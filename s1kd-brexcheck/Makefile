@@ -14,3 +14,5 @@ clean:
 
 install: $(OUTPUT)
 	cp $(OUTPUT) $(INSTALL_PREFIX)/
+	$(MAKE) -C doc install
+
