@@ -7,6 +7,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0`
 INSTALL_PREFIX=/usr/bin
 
 all: $(OUTPUT)
+	$(MAKE) -C doc
 
 strings.h: help.msg
 	xxd -i help.msg > strings.h
@@ -16,6 +17,7 @@ $(OUTPUT): $(SOURCE) strings.h
 
 clean:
 	rm -f $(OUTPUT)
+	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
 	cp $(OUTPUT) $(INSTALL_PREFIX)/
