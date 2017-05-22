@@ -190,7 +190,7 @@ void sync_refs(xmlNode *dmodule)
 	struct ref refs[256];
 	int n = 0, i;
 
-	xmlNode *content, *old_refs, *new_refs, *searchable;
+	xmlNodePtr content, old_refs, new_refs, searchable, new_node;
 
 	content = find_child(dmodule, "content");
 
@@ -218,7 +218,8 @@ void sync_refs(xmlNode *dmodule)
 	qsort(refs, n, sizeof(struct ref), compare_refs);
 
 	for (i = 0; i < n; ++i) {
-		xmlAddChild(new_refs, xmlCopyNode(refs[i].ref, 1));
+		new_node = xmlAddChild(new_refs, xmlCopyNode(refs[i].ref, 1));
+		xmlUnsetProp(new_node, (xmlChar *) "id");
 	}
 }
 
