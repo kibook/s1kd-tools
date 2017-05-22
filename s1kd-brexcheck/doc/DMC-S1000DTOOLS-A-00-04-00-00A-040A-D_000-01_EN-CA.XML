@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule [
+<!ENTITY % ISOEntities PUBLIC "ISO 8879-1986//ENTITIES ISO Character Entities 20030531//EN//XML" "http://www.s1000d.org/S1000D_4-0-1/ent/ISOEntities">
+]>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="05" day="22"/>
+        <dmTitle>
+          <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzai.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzai.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-brexcheck - Validate S1000D data modules against BREX data modules</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path> [-vh?] <datamodules>]]></para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates an S1000D data module using the context rules of one or multiple Business Rule EXchange (BREX) data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-b &lt;brex&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Check the data modules against this BREX. Multiple BREX data modules can be specified by adding this option multiple times. When no BREX data modules are specified, the BREX data module referenced in &lt;brexDmRef&gt; in the data module is attempted to be used instead.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add a search path for BREX data modules. By default, only the current directory is searched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Use verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show the help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
