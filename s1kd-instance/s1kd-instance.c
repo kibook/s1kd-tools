@@ -1093,6 +1093,112 @@ void undepend_warncaut_cir(xmlDocPtr dm, xmlDocPtr cir)
 	xmlXPathFreeContext(ctxt1);
 }
 
+/* Applicability repository (0A2) */
+
+void replace_applic_ref(xmlNodePtr ref, xmlNodePtr applic)
+{
+	xmlChar *id;
+	xmlNodePtr a;
+
+	a = xmlAddNextSibling(ref, xmlCopyNode(applic, 1));
+	id = xmlGetProp(ref, (xmlChar *) "id");
+	xmlSetProp(a, (xmlChar *) "id", id);
+	xmlFree(id);
+}
+
+void replace_applic_refs(xmlDocPtr dm, xmlNodePtr applicSpecIdent, xmlNodePtr applic)
+{
+	char xpath[256], *applicIdentValue;
+	xmlXPathContextPtr ctxt;
+	xmlXPathObjectPtr results;
+	int i;
+
+	ctxt = xmlXPathNewContext(dm);
+
+	applicIdentValue = (char *) xmlGetProp(applicSpecIdent, (xmlChar *) "applicIdentValue");
+	snprintf(xpath, 256, "//applicRef[@applicIdentValue='%s']", applicIdentValue);
+	xmlFree(applicIdentValue);
+
+	results = xmlXPathEvalExpression((xmlChar *) xpath, ctxt);
+
+	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
+		for (i = 0; i < results->nodesetval->nodeNr; ++i) {
+			replace_applic_ref(results->nodesetval->nodeTab[i], applic);
+		}
+	}
+
+	xmlXPathFreeObject(results);
+	xmlXPathFreeContext(ctxt);
+}
+
+void replace_referenced_applic_group_ref(xmlDocPtr dm)
+{
+	xmlXPathContextPtr ctxt;
+	xmlXPathObjectPtr result;
+	xmlNodePtr referencedApplicGroupRef, referencedApplicGroup, cur;
+
+	ctxt = xmlXPathNewContext(dm);
+	result = xmlXPathEvalExpression((xmlChar *) "//referencedApplicGroupRef", ctxt);
+
+	referencedApplicGroupRef = result->nodesetval->nodeTab[0];
+
+	referencedApplicGroup = xmlNewNode(NULL, (xmlChar *) "referencedApplicGroup");
+	referencedApplicGroup = xmlAddNextSibling(referencedApplicGroupRef, referencedApplicGroup);
+
+	for (cur = referencedApplicGroupRef->children; cur; cur = cur->next)
+		if (strcmp((char *) cur->name, "applic") == 0)
+			xmlAddChild(referencedApplicGroup, xmlCopyNode(cur, 1));
+
+	xmlXPathFreeObject(result);
+	xmlXPathFreeContext(ctxt);
+
+	xmlUnlinkNode(referencedApplicGroupRef);
+	xmlFreeNode(referencedApplicGroupRef);
+}
+
+void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
+{
+	xmlXPathContextPtr ctxt;
+	xmlXPathObjectPtr results1;
+	int i;
+
+	ctxt = xmlXPathNewContext(cir);
+
+	results1 = xmlXPathEvalExpression((xmlChar *) "//applicSpec", ctxt);
+
+	if (!xmlXPathNodeSetIsEmpty(results1->nodesetval)) {
+		for (i = 0; i < results1->nodesetval->nodeNr; ++i) {
+			char *applicMapRefId, xpath[256];
+			xmlNodePtr applicSpec, applicSpecIdent, applic;
+			xmlXPathObjectPtr results2;
+			
+			applicSpec = results1->nodesetval->nodeTab[i];
+
+			ctxt->node = applicSpec;
+			results2 = xmlXPathEvalExpression((xmlChar *) "applicSpecIdent", ctxt);
+			applicSpecIdent = results2->nodesetval->nodeTab[0];
+			xmlXPathFreeObject(results2);
+
+			applicMapRefId = (char *) xmlGetProp(applicSpec, (xmlChar *) "applicMapRefId");
+			snprintf(xpath, 256, "//referencedApplicGroup/applic[@id='%s']", applicMapRefId);
+			xmlFree(applicMapRefId);
+			results2 = xmlXPathEvalExpression((xmlChar *) xpath, ctxt);
+
+			if (!xmlXPathNodeSetIsEmpty(results2->nodesetval)) {
+				applic = results2->nodesetval->nodeTab[0];
+				replace_applic_refs(dm, applicSpecIdent, applic);
+			}
+
+			xmlXPathFreeObject(results2);
+		}
+
+		replace_referenced_applic_group_ref(dm);
+	}
+
+	xmlXPathFreeObject(results1);
+	xmlXPathFreeContext(ctxt);
+}
+
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
 void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
@@ -1131,6 +1237,11 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 		undepend_funcitem_cir(dm, cir);
 	} else if (strcmp(cirtype, "warningRepository") == 0 || strcmp(cirtype, "cautionRepository") == 0) {
 		undepend_warncaut_cir(dm, cir);
+	} else if (strcmp(cirtype, "applicRepository") == 0) {
+		undepend_applic_cir(dm, cir);
+	} else {
+		fprintf(stderr, ERR_PREFIX "Unsupported CIR type: %s\n", cirtype);
+		add_src = false;
 	}
 
 	xmlXPathFreeContext(ctxt);
@@ -1139,23 +1250,23 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 		xmlNodePtr security, dmIdent, repositorySourceDmIdent, cur;
 
 		ctxt = xmlXPathNewContext(dm);
-
 		results = xmlXPathEvalExpression((xmlChar *) "//dmStatus/security", ctxt);
 		security = results->nodesetval->nodeTab[0];
 		xmlXPathFreeObject(results);
+		xmlXPathFreeContext(ctxt);
 
 		repositorySourceDmIdent = xmlNewNode(NULL, (xmlChar *) "repositorySourceDmIdent");
 		repositorySourceDmIdent = xmlAddPrevSibling(security, repositorySourceDmIdent);
 
+		ctxt = xmlXPathNewContext(cir);
 		results = xmlXPathEvalExpression((xmlChar *) "//dmIdent", ctxt);
 		dmIdent = results->nodesetval->nodeTab[0];
 		xmlXPathFreeObject(results);
+		xmlXPathFreeContext(ctxt);
 
 		for (cur = dmIdent->children; cur; cur = cur->next) {
 			xmlAddChild(repositorySourceDmIdent, xmlCopyNode(cur, 1));
 		}
-
-		xmlXPathFreeContext(ctxt);
 	}
 }
 
@@ -1269,8 +1380,6 @@ int main(int argc, char **argv)
 
 	content = find_req_child(dmodule, "content");
 
-	referencedApplicGroup = find_child(content, "referencedApplicGroup");
-
 	applicability = xmlNewNode(NULL, (xmlChar *) "applic");
 
 	/* All remaining arguments are treated as applic defs and copied to the
@@ -1290,18 +1399,6 @@ int main(int argc, char **argv)
 		define_applic(ident, type, value);
 
 		++napplics;
-	}
-
-	if (referencedApplicGroup) {
-		strip_applic(referencedApplicGroup, content);
-
-		if (clean || simpl) {
-			clean_applic(referencedApplicGroup, content);
-		}
-
-		if (simpl) {
-			simpl_applic_clean(referencedApplicGroup);
-		}
 	}
 
 	if (add_source_ident) {
@@ -1327,6 +1424,20 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(cirdoc);
 		xmlFree(cirdocfname);
+	}
+
+	referencedApplicGroup = find_child(content, "referencedApplicGroup");
+
+	if (referencedApplicGroup) {
+		strip_applic(referencedApplicGroup, content);
+
+		if (clean || simpl) {
+			clean_applic(referencedApplicGroup, content);
+		}
+
+		if (simpl) {
+			simpl_applic_clean(referencedApplicGroup);
+		}
 	}
 
 	xmlFreeNode(cirs);
