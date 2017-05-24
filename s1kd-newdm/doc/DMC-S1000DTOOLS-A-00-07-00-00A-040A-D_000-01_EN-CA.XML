@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule [
+<!ENTITY % ISOEntities PUBLIC "ISO 8879-1986//ENTITIES ISO Character Entities 20030531//EN//XML" "http://www.s1000d.org/S1000D_4-0-1/ent/ISOEntities">
+]>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="05" day="22"/>
+        <dmTitle>
+          <techName>s1kd-newdm(1) | General Commands Manual</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzai.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzai.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-newdm - Create a new S1000D data module</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>s1kd-newdm [options]</para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-newdm</emphasis> tool creates a new S1000D data module with the data module code and other metadata specified.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the 'defaults' file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-D &lt;dmtypes&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the 'dmtypes' file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Prompts the user for any values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-# &lt;DMC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The data module code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L &lt;language&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The language ISO code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C &lt;country&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The country ISO code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The inwork number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r &lt;RPC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The responsible partner company enterprise name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The originator enterprise name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;tech&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The tech name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i &lt;info&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The info name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T &lt;schema&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The type (schema) of the new data module. Supported schemas:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>appliccrossreftable - Applicability cross-reference table</para>
+                    </listItem>
+                    <listItem>
+                      <para>brdoc - Business rule document</para>
+                    </listItem>
+                    <listItem>
+                      <para>brex - Business rule exchange</para>
+                    </listItem>
+                    <listItem>
+                      <para>comrep - Common information repository</para>
+                    </listItem>
+                    <listItem>
+                      <para>descript - Descriptive</para>
+                    </listItem>
+                    <listItem>
+                      <para>frontmatter - Front matter</para>
+                    </listItem>
+                    <listItem>
+                      <para>proced - Procedural</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title>Prompt (-p) option</title>
+          <para>If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the 'defaults' and 'dmtypes' files), it will be displayed in square brackets [] in the prompt, and pressing Enter without typing any value will select this default value.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>'defaults' file</title>
+          <para>This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named 'defaults', but any file can be specified by using the -d option.</para>
+          <para>Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Example:</para>
+          <para>
+            <verbatimText><![CDATA[modelIdentCode               S1000DTOOLS
+systemDiffCode               A
+systemCode                   00
+subSystemCode                0
+subSubSystemCode             0
+assyCode                     00
+disassyCode                  00
+disassycodeVariant           A
+infoCode                     040
+infoCodeVariant              A
+itemLocationCode             D
+languageIsoCode              en
+countryIsoCode               CA
+issueNumber                  000
+inWork                       01
+securityClassification       01
+responsiblePartnerCompany    khzai.net
+originator                   khzai.net]]></verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>'dmtypes' file</title>
+          <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named 'dmtypes', but any file can be specified by using the -D option.</para>
+          <para>Each line consists of an info code and a schema identifier. Example:</para>
+          <para>
+            <verbatimText><![CDATA[00E    comrep
+00W    appliccrossreftable
+009    frontmatter
+022    brex
+024    brdoc
+040    descript
+520    proced]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>s1kd-new -# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript</para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
