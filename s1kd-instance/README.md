@@ -6,7 +6,7 @@ s1kd-instance - Create S1000D data module instances
 SYNOPSIS
 ========
 
-s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-I &lt;iss&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[&lt;applic&gt;...\]
+s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-I &lt;iss&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[&lt;applic&gt;...\]
 
 DESCRIPTION
 ===========
@@ -30,6 +30,9 @@ Set the language and country of the data module instance. For example, to create
 
 -I &lt;iss&gt;  
 Set the issue and inwork numbers of the data module instance. By default, the issue and inwork number are taken from the source data module.
+
+-u &lt;sec&gt;  
+Set the security classification of the data module instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.
 
 -o &lt;file&gt;  
 Output data module instance to file instead of stdout.
