@@ -6,7 +6,7 @@ s1kd-instance - Create S1000D data module instances
 SYNOPSIS
 ========
 
-s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[&lt;applic&gt;...\]
+s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-I &lt;iss&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[&lt;applic&gt;...\]
 
 DESCRIPTION
 ===========
@@ -28,6 +28,9 @@ Specify a new data module code (DMC) for the instance.
 -l &lt;lang&gt;  
 Set the language and country of the data module instance. For example, to create an instance for US English, lang would be "en-US".
 
+-I &lt;iss&gt;  
+Set the issue and inwork numbers of the data module instance. By default, the issue and inwork number are taken from the source data module.
+
 -o &lt;file&gt;  
 Output data module instance to file instead of stdout.
 
@@ -40,7 +43,7 @@ Output data module instance in dir, automatically naming it based on:
 
 -   the language and country specified with -L
 
-The issue information is copied from the source data module.
+The issue information is copied from the source data module or taken as specified in the -I option.
 
 -f  
 Overwrite existing file with same name as the filename generated automatically with -O, if it exists.

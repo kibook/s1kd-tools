@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [&lt;applic&gt;...]</para>
+        <para>s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-I &lt;iss&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [&lt;applic&gt;...]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -85,6 +85,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-I &lt;iss&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue and inwork numbers of the data module instance. By default, the issue and inwork number are taken from the source data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-o &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Output data module instance to file instead of stdout.</para>
@@ -107,7 +113,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>The issue information is copied from the source data module.</para>
+                <para>The issue information is copied from the source data module or taken as specified in the -I option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -7,9 +7,10 @@
 s1kd\-instance \- Create S1000D data module instances
 .SH SYNOPSIS
 .PP
-s1kd\-instance [\-s <src>] [\-e <ext>] [\-c <dmc>] [\-l <lang>] [\-o
-<file>|\-O <dir>] [\-f] [\-t <techName>] [\-i <infoName>] [\-a|\-A] [\-Y
-<text>] [\-C <comment>] [\-R <CIR> ...] [\-S] [<applic>...]
+s1kd\-instance [\-s <src>] [\-e <ext>] [\-c <dmc>] [\-l <lang>] [\-I
+<iss>] [\-o <file>|\-O <dir>] [\-f] [\-t <techName>] [\-i <infoName>]
+[\-a|\-A] [\-Y <text>] [\-C <comment>] [\-R <CIR> ...] [\-S]
+[<applic>...]
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-instance\f[] tool filters a master S1000D data module on
@@ -40,6 +41,13 @@ For example, to create an instance for US English, lang would be
 .RS
 .RE
 .TP
+.B \-I <iss>
+Set the issue and inwork numbers of the data module instance.
+By default, the issue and inwork number are taken from the source data
+module.
+.RS
+.RE
+.TP
 .B \-o <file>
 Output data module instance to file instead of stdout.
 .RS
@@ -55,7 +63,8 @@ the data module code specified with \-c, and/or
 .IP \[bu] 2
 the language and country specified with \-L
 .PP
-The issue information is copied from the source data module.
+The issue information is copied from the source data module or taken as
+specified in the \-I option.
 .RE
 .TP
 .B \-f
