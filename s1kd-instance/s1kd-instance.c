@@ -1305,6 +1305,12 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
 }
 
+void set_security(xmlDocPtr dm, char *sec)
+{
+	xmlNodePtr security = first_xpath_node(dm, "//dmStatus/security");
+	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1340,6 +1346,7 @@ int main(int argc, char **argv)
 	bool force_overwrite = false;
 	bool use_stdin = false;
 	char issinfo[8] = "";
+	char secu[4] = "";
 
 	int parseopts = 0;
 
@@ -1350,7 +1357,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, (xmlChar *) "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, 255); break;
 			case 'S': add_source_ident = false; break;
@@ -1367,7 +1374,8 @@ int main(int argc, char **argv)
 			case 'C': strncpy(comment_text, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
 			case 'R': xmlNewChild(cirs, NULL, (xmlChar *) "cir", (xmlChar *) optarg); break;
-			case 'I': strncpy(issinfo, optarg, 8); break;
+			case 'I': strncpy(issinfo, optarg, 6); break;
+			case 'u': strncpy(secu, optarg, 2); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1499,6 +1507,10 @@ int main(int argc, char **argv)
 
 	if (strcmp(issinfo, "") != 0) {
 		set_issue(dm, issinfo);
+	}
+
+	if (strcmp(secu, "") != 0) {
+		set_security(dm, secu);
 	}
 
 	if (strcmp(comment_text, "") != 0) {

@@ -8,8 +8,8 @@ s1kd\-instance \- Create S1000D data module instances
 .SH SYNOPSIS
 .PP
 s1kd\-instance [\-s <src>] [\-e <ext>] [\-c <dmc>] [\-l <lang>] [\-I
-<iss>] [\-o <file>|\-O <dir>] [\-f] [\-t <techName>] [\-i <infoName>]
-[\-a|\-A] [\-Y <text>] [\-C <comment>] [\-R <CIR> ...] [\-S]
+<iss>] [\-u <sec>] [\-o <file>|\-O <dir>] [\-f] [\-t <techName>] [\-i
+<infoName>] [\-a|\-A] [\-Y <text>] [\-C <comment>] [\-R <CIR> ...] [\-S]
 [<applic>...]
 .SH DESCRIPTION
 .PP
@@ -45,6 +45,13 @@ For example, to create an instance for US English, lang would be
 Set the issue and inwork numbers of the data module instance.
 By default, the issue and inwork number are taken from the source data
 module.
+.RS
+.RE
+.TP
+.B \-u <sec>
+Set the security classification of the data module instance.
+An instance may have a lower security classification than the source if
+classified information is removed for a particular customer.
 .RS
 .RE
 .TP

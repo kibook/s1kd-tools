@@ -9,6 +9,7 @@ Options:
   -c <DMC>	The new data module code of the data module instance.
   -l <lang>	Specify the language of the data module instance.
   -I <iss>      Set the issue and inwork numbers of the instance.
+  -u <sec>      Set the security classification of the instance.
   -o <file>	Output data module instance to file instead of stdout.
   -O <dir>	Output data module instance in dir, automatically named.
   -f		Overwrite file with same name as automatic output, if it exists.
