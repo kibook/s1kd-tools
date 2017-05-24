@@ -1201,6 +1201,7 @@ void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
 
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
+
 void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 {
 	xmlXPathContextPtr ctxt;
@@ -1270,6 +1271,40 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 	}
 }
 
+xmlNodePtr first_xpath_node(xmlDocPtr doc, char *path)
+{
+	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
+	xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar *) path, ctxt);
+	xmlNodePtr ret;
+	
+	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+		ret = NULL;
+	} else {
+		ret = result->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(result);
+	xmlXPathFreeContext(ctxt);
+
+	return ret;
+}
+
+void set_issue(xmlDocPtr dm, char *issinfo)
+{
+	char issue[4], inwork[3];
+	xmlNodePtr issueInfo;
+
+	if (sscanf(issinfo, "%3s-%2s", issue, inwork) != 2) {
+		fprintf(stderr, ERR_PREFIX "Invalid format for issue/in-work number.\n");
+		exit(EXIT_MISSING_ARGS);
+	}
+
+	issueInfo = first_xpath_node(dm, "//dmIdent/issueInfo");
+
+	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
+	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1304,6 +1339,7 @@ int main(int argc, char **argv)
 	bool add_source_ident = true;
 	bool force_overwrite = false;
 	bool use_stdin = false;
+	char issinfo[8] = "";
 
 	int parseopts = 0;
 
@@ -1314,7 +1350,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, (xmlChar *) "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, 255); break;
 			case 'S': add_source_ident = false; break;
@@ -1331,6 +1367,7 @@ int main(int argc, char **argv)
 			case 'C': strncpy(comment_text, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
 			case 'R': xmlNewChild(cirs, NULL, (xmlChar *) "cir", (xmlChar *) optarg); break;
+			case 'I': strncpy(issinfo, optarg, 8); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1460,6 +1497,10 @@ int main(int argc, char **argv)
 		set_applic(dmodule, new_display_text);
 	}
 
+	if (strcmp(issinfo, "") != 0) {
+		set_issue(dm, issinfo);
+	}
+
 	if (strcmp(comment_text, "") != 0) {
 		comment = xmlNewComment((xmlChar *) comment_text);
 		identAndStatusSection = find_child(dmodule, "identAndStatusSection");
@@ -1484,9 +1525,7 @@ int main(int argc, char **argv)
 	xmlSaveFile(out, dm);
 
 	xmlFreeNode(applicability);
-
 	xmlFreeDoc(dm);
-
 	xmlCleanupParser();
 
 	return 0;
