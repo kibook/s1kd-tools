@@ -49,9 +49,9 @@ enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
 enum verbosity verbose = NORMAL;
 bool shortmsg = false;
 
-xmlNode *find_child(xmlNode *parent, const char *name)
+xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, name) == 0) {
@@ -62,27 +62,22 @@ xmlNode *find_child(xmlNode *parent, const char *name)
 	return NULL;
 }
 
-void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNode *brexError)
+void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError)
 {
 	int i;
 
-	xmlNode *object;
-	xmlNode *copy;
-
-	char line_s[256];
-
 	for (i = 0; i < nodes->nodeNr; ++i) {
-		snprintf(line_s, 256, "%d", nodes->nodeTab[i]->line);
+		xmlNodePtr node = nodes->nodeTab[i];
+		xmlNodePtr object;
+		char line_s[256];
+
+		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
+
+		snprintf(line_s, 256, "%d", node->line);
 		object = xmlNewChild(brexError, NULL, (xmlChar *) "object", NULL);
 		xmlSetProp(object, (xmlChar *) "line", (xmlChar *) line_s);
 
-		copy = nodes->nodeTab[i];
-
-		if (copy->type == XML_ATTRIBUTE_NODE) {
-			copy = copy->parent;
-		}
-		
-		xmlAddChild(object, xmlCopyNode(copy, 2));
+		xmlAddChild(object, xmlCopyNode(node, 2));
 	}
 }
 
@@ -126,7 +121,7 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
 
-	xmlNode *dmCode;
+	xmlNodePtr dmCode;
 
 	char *modelIdentCode;
 	char *systemDiffCode;
@@ -215,13 +210,13 @@ bool is_invalid(char *allowedObjectFlag, xmlNodeSetPtr nodesetval)
 }
 
 int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
-	xmlNode *brexCheck)
+	xmlNodePtr brexCheck)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
 
-	xmlNode *objectPath;
-	xmlNode *objectUse;
+	xmlNodePtr objectPath;
+	xmlNodePtr objectUse;
 
 	char *allowedObjectFlag;
 	char *path;
@@ -231,7 +226,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 	int nerr = 0;
 	
-	xmlNode *brexError;
+	xmlNodePtr brexError;
 
 	context = xmlXPathNewContext(doc);
 	xmlXPathRegisterNs(context, (xmlChar *) "xsi", XSI_URI);
@@ -293,7 +288,7 @@ void show_help(void)
 }
 
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
-	char brex_fnames[BREX_MAX][256], int num_brex_fnames, xmlNode *brexCheck)
+	char brex_fnames[BREX_MAX][256], int num_brex_fnames, xmlNodePtr brexCheck)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr result;
@@ -333,13 +328,13 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	return status;
 }
 
-void print_node(xmlNode *node)
+void print_node(xmlNodePtr node)
 {
 	char *use;
 	char *doc;
 	char *line;
 
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	if (strcmp((char *) node->name, "brexError") == 0) {
 		printf("BREX ERROR: ");
@@ -393,7 +388,7 @@ int main(int argc, char *argv[])
 	bool xmlout = false;
 
 	xmlDocPtr outdoc;
-	xmlNode *brexCheck;
+	xmlNodePtr brexCheck;
 
 	while ((c = getopt(argc, argv, "b:I:xvVDqsh?")) != -1) {
 		switch (c) {
