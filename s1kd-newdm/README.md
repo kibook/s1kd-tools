@@ -121,4 +121,4 @@ Each line consists of an info code and a schema identifier. Example:
 EXAMPLE
 =======
 
-s1kd-new -\# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript
+s1kd-newdm -\# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript

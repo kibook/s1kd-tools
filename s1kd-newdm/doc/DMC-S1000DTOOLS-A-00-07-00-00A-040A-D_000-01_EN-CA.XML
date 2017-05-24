@@ -217,7 +217,7 @@ originator                   khzai.net]]></verbatimText>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLE</title>
-        <para>s1kd-new -# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript</para>
+        <para>s1kd-newdm -# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript</para>
       </levelledPara>
     </description>
   </content>
