@@ -138,7 +138,6 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	char dmcode[256];
 
 	bool found;
-	int i;
 
 	context = xmlXPathNewContext(doc);
 
@@ -189,6 +188,8 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	found = search_brex_fname(fname, ".", dmcode);
 
 	if (!found) {
+		int i;
+
 		for (i = 0; i < nspaths; ++i) {
 			found = search_brex_fname(fname, spaths[i], dmcode);
 		}
@@ -210,17 +211,13 @@ bool is_invalid(char *allowedObjectFlag, xmlNodeSetPtr nodesetval)
 }
 
 int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
-	xmlNodePtr brexCheck)
+	const char *brexfname, xmlNodePtr brexCheck)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
 
 	xmlNodePtr objectPath;
 	xmlNodePtr objectUse;
-
-	char *allowedObjectFlag;
-	char *path;
-	char *use;
 
 	int i;
 
@@ -232,6 +229,10 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	xmlXPathRegisterNs(context, (xmlChar *) "xsi", XSI_URI);
 
 	for (i = 0; i < rules->nodeNr; ++i) {
+		char *allowedObjectFlag;
+		char *path;
+		char *use;
+
 		objectPath = find_child(rules->nodeTab[i], "objectPath");
 		objectUse = find_child(rules->nodeTab[i], "objectUse");
 
@@ -249,9 +250,12 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 		}
 
 		if (is_invalid(allowedObjectFlag, object->nodesetval)) {
+			char rpath[PATH_MAX];
+
 			brexError = xmlNewChild(brexCheck, NULL, (xmlChar *) "brexError",
 				NULL);
-			xmlNewChild(brexError, NULL, (xmlChar *) "document", (xmlChar *) fname);
+			xmlNewChild(brexError, NULL, (xmlChar *) "document", (xmlChar *) realpath(fname, rpath));
+			xmlNewChild(brexError, NULL, (xmlChar *) "brex", (xmlChar *) realpath(brexfname, rpath));
 			xmlNewChild(brexError, NULL, (xmlChar *) "objectPath", (xmlChar *) path);
 			xmlNewChild(brexError, NULL, (xmlChar *) "objectUse", (xmlChar *) use);
 
@@ -313,7 +317,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		result = xmlXPathEvalExpression(STRUCT_OBJ_RULE_PATH, context);
 
 		status = check_brex_rules(result->nodesetval, dmod_doc, docname,
-			brexCheck);
+			brex_fnames[i], brexCheck);
 
 		if (verbose >= MESSAGE) {
 			printf(status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
@@ -330,16 +334,13 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 void print_node(xmlNodePtr node)
 {
-	char *use;
-	char *doc;
-	char *line;
 
 	xmlNodePtr cur;
 
 	if (strcmp((char *) node->name, "brexError") == 0) {
 		printf("BREX ERROR: ");
 	} else if (strcmp((char *) node->name, "document") == 0) {
-		doc = (char *) xmlNodeGetContent(node);
+		char *doc = (char *) xmlNodeGetContent(node);
 		if (shortmsg) {
 			printf("%s: ", doc);
 		} else {
@@ -347,14 +348,14 @@ void print_node(xmlNodePtr node)
 		}
 		xmlFree(doc);
 	} else if (strcmp((char *) node->name, "objectUse") == 0) {
-		use = (char *) xmlNodeGetContent(node);
+		char *use = (char *) xmlNodeGetContent(node);
 		if (!shortmsg) {
 			printf("  ");
 		}
 		printf("%s\n", use);
 		xmlFree(use);
 	} else if (strcmp((char *) node->name, "object") == 0 && !shortmsg) {
-		line = (char *) xmlGetProp(node, (xmlChar *) "line");
+		char *line = (char *) xmlGetProp(node, (xmlChar *) "line");
 		printf("  line %s:\n", line);
 		xmlFree(line);
 
