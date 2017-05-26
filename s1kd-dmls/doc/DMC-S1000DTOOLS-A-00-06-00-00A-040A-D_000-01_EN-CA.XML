@@ -97,6 +97,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-w</listItemTerm>
+              <listItemDefinition>
+                <para>Show only writable data module files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-h</listItemTerm>
               <listItemDefinition>
                 <para>Show the usage message.</para>
