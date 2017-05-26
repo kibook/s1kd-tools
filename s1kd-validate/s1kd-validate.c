@@ -91,7 +91,7 @@ void show_help(void)
 	puts("  <dms>    Any number of data modules to validate.");
 }
 
-void validate_file(const char *fname, const char *schema_dir)
+int validate_file(const char *fname, const char *schema_dir)
 {
 	xmlDocPtr doc;
 	xmlNodePtr dmodule;
@@ -109,7 +109,7 @@ void validate_file(const char *fname, const char *schema_dir)
 		if (verbosity > SILENT) {
 			fprintf(stderr, ERR_PREFIX "%s has no schema.\n", fname);
 		}
-		return;
+		return 1;
 	}
 
 	if (strcmp(schema_dir, "") != 0) {
@@ -152,12 +152,15 @@ void validate_file(const char *fname, const char *schema_dir)
 	}
 
 	xmlFreeDoc(doc);
+
+	return err;
 }
 
 int main(int argc, char *argv[])
 {
 	int c, i;
 	char schema_dir[256] = "";
+	int err = 0;
 
 	while ((c = getopt(argc, argv, "vqDd:h?")) != -1) {
 		switch (c) {
@@ -171,10 +174,10 @@ int main(int argc, char *argv[])
 	}
 
 	if (optind >= argc) {
-		validate_file("-", schema_dir);
+		err = validate_file("-", schema_dir);
 	} else {
 		for (i = optind; i < argc; ++i) {
-			validate_file(argv[i], schema_dir);
+			err += validate_file(argv[i], schema_dir);
 		}
 	}
 
@@ -187,5 +190,5 @@ int main(int argc, char *argv[])
 
 	xmlCleanupParser();
 
-	return 0;
+	return err;
 }
