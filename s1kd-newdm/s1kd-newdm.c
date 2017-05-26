@@ -32,7 +32,7 @@
 #define MAX_TECH_NAME 256
 #define MAX_INFO_NAME 256
 
-#define ERR_PREFIX "createdm: ERROR: "
+#define ERR_PREFIX "s1kd-newdm: ERROR: "
 
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
@@ -70,7 +70,7 @@ xmlNode *find_child(xmlNode *parent, const char *name)
 
 void show_help(void)
 {
-	puts("Usage: createdm [options]");
+	puts("Usage: s1kd-newdm [options]");
 	puts("");
 	puts("Options:");
 	puts("  -p	Prompt the user for each value");
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
 	char dmcode[256] = "";
 	bool skipdmc = false;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:o:t:i:T:#:s:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:o:t:i:T:#:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;

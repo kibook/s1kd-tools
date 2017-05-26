@@ -218,7 +218,7 @@ int ispm(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: dmls [-aHhilor]");
+	puts("Usage: s1kd-dmls [-aHhilor]");
 	puts("");
 	puts("Options:");
 	puts("  -l	Show only latest issue/inwork version");
@@ -227,6 +227,7 @@ void show_help(void)
 	puts("  -o	Include originator column");
 	puts("  -a	Include applicability column");
 	puts("  -H	Show headers on columns");
+	puts("  -w	Show only writable data module files.");
 	puts("  -h	Show this help message");
 }
 
@@ -243,13 +244,14 @@ int main(int argc, char **argv)
 
 	int c;
 	int only_latest = 0;
+	int only_writable = 0;
 	char latest_dms[1024][256];
 	int nlatest_dms;
 
 	int columns = 0;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "ltiroaAHh?")) != -1) {
+	while ((c = getopt(argc, argv, "ltiroaAHwh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 't': columns |= COL_TITLE; break;
@@ -259,6 +261,7 @@ int main(int argc, char **argv)
 			case 'a': columns |= COL_APPLIC; break;
 			case 'A': columns |= COL_ALL; break;
 			case 'H': header = 1; break;
+			case 'w': only_writable = 1; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -273,6 +276,8 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		/* Read dms to list from arguments */
 		for (i = optind; i < argc; ++i) {
+			if (only_writable && access(argv[i], W_OK) != 0)
+				continue;
 			if (isdm(argv[i])) {
 				strcpy(dms[ndms++], argv[i]);
 			} else if (ispm(argv[i])) {
@@ -284,6 +289,8 @@ int main(int argc, char **argv)
 		dir = opendir(".");
 
 		while ((cur = readdir(dir))) {
+			if (only_writable && access(cur->d_name, W_OK) != 0)
+				continue;
 			if (isdm(cur->d_name)) {
 				strcpy(dms[ndms++], cur->d_name);
 			} else if (ispm(cur->d_name)) {
