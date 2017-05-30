@@ -102,7 +102,7 @@ bool search_brex_fname(char *fname, const char *dpath, const char *dmcode)
 
 			sprintf(tmp_fname, "%s/%s", dpath, cur->d_name);
 
-			if (is_xml_file(tmp_fname) && (!found || strcmp(tmp_fname, fname)) > 0) {
+			if (is_xml_file(tmp_fname) && (!found || strcmp(tmp_fname, fname) > 0)) {
 				strcpy(fname, tmp_fname);
 			}
 			
