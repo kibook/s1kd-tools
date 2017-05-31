@@ -14,12 +14,13 @@
 #define COL_TITLE	(COL_TECH | COL_INFO)
 #define COL_ALL		(COL_ISSDATE | COL_RPC | COL_ORIG | COL_TECH | COL_INFO | COL_APPLIC)
 
-xmlNode *getElementByName(xmlNode *root, const char *name)
+xmlNodePtr getElementByName(xmlNodePtr root, const char *name)
 {
-	xmlNode *cur;
-	xmlNode *elem;
+	xmlNodePtr cur;
 
 	for (cur = root->children; cur; cur = cur->next) {
+		xmlNodePtr elem;
+
 		if (strcmp((char *) cur->name, name) == 0) {
 			return cur;
 		} else if ((elem = getElementByName(cur, name))) {
@@ -30,9 +31,9 @@ xmlNode *getElementByName(xmlNode *root, const char *name)
 	return NULL;
 }
 
-xmlNode *findChild(xmlNode *parent, const char *childname)
+xmlNodePtr findChild(xmlNodePtr parent, const char *childname)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, childname) == 0) {
@@ -48,24 +49,22 @@ void printdms(char dms[1024][256], int n, int columns, int header)
 	int i;
 
 	xmlDocPtr dm;
-	xmlNode *dmodule;
-	xmlNode *identAndStatusSection;
-	xmlNode *dmAddress;
-	xmlNode *dmAddressItems;
-	xmlNode *dmTitle;
-	xmlNode *techName;
-	xmlNode *infoName;
-	xmlNode *issueDate;
-	xmlNode *dmStatus;
-	xmlNode *responsiblePartnerCompany;
-	xmlNode *originator;
-	xmlNode *enterpriseName;
-	xmlNode *applic;
-	xmlNode *displayText;
-	xmlNode *simplePara;
+	xmlNodePtr dmodule;
+	xmlNodePtr identAndStatusSection;
+	xmlNodePtr dmAddress;
+	xmlNodePtr dmAddressItems;
+	xmlNodePtr dmTitle;
+	xmlNodePtr techName;
+	xmlNodePtr infoName;
+	xmlNodePtr issueDate;
+	xmlNodePtr dmStatus;
+	xmlNodePtr responsiblePartnerCompany;
+	xmlNodePtr originator;
+	xmlNodePtr enterpriseName;
+	xmlNodePtr applic;
+	xmlNodePtr displayText;
+	xmlNodePtr simplePara;
 
-	char *tech;
-	char *info;
 
 	char *year;
 	char *month;
@@ -87,6 +86,8 @@ void printdms(char dms[1024][256], int n, int columns, int header)
 	}
 
 	for (i = 0; i < n; ++i) {
+		char *tech, *info;
+
 		dm = xmlReadFile(dms[i], NULL, 0);
 
 		dmodule = xmlDocGetRootElement(dm);
@@ -173,14 +174,15 @@ void printpms(char pms[1024][256], int n, int columns)
 {
 	int i;
 	xmlDocPtr pm_doc;
-	xmlNode *pm;
-	xmlNode *identAndStatusSection;
-	xmlNode *pmAddress;
-	xmlNode *pmAddressItems;
-	xmlNode *pmTitle;
-	char *title;
+	xmlNodePtr pm;
+	xmlNodePtr identAndStatusSection;
+	xmlNodePtr pmAddress;
+	xmlNodePtr pmAddressItems;
+	xmlNodePtr pmTitle;
 
 	for (i = 0; i < n; ++i) {
+		char *title;
+
 		pm_doc = xmlReadFile(pms[i], NULL, 0);
 
 		pm = xmlDocGetRootElement(pm_doc);
@@ -234,7 +236,6 @@ void show_help(void)
 int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
-	struct dirent *cur;
 
 	char dms[1024][256];
 	char pms[1024][256];
@@ -285,6 +286,8 @@ int main(int argc, char **argv)
 			}
 		}
 	} else {
+		struct dirent *cur;
+
 		/* Read dms to list from current directory */
 		dir = opendir(".");
 
