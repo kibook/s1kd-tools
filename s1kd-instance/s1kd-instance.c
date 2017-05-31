@@ -1111,7 +1111,6 @@ void replace_applic_refs(xmlDocPtr dm, xmlNodePtr applicSpecIdent, xmlNodePtr ap
 	char xpath[256], *applicIdentValue;
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
-	int i;
 
 	ctxt = xmlXPathNewContext(dm);
 
@@ -1122,6 +1121,8 @@ void replace_applic_refs(xmlDocPtr dm, xmlNodePtr applicSpecIdent, xmlNodePtr ap
 	results = xmlXPathEvalExpression((xmlChar *) xpath, ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
+		int i;
+
 		for (i = 0; i < results->nodesetval->nodeNr; ++i) {
 			replace_applic_ref(results->nodesetval->nodeTab[i], applic);
 		}
@@ -1160,13 +1161,14 @@ void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
 {
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results1;
-	int i;
 
 	ctxt = xmlXPathNewContext(cir);
 
 	results1 = xmlXPathEvalExpression((xmlChar *) "//applicSpec", ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results1->nodesetval)) {
+		int i;
+
 		for (i = 0; i < results1->nodesetval->nodeNr; ++i) {
 			char *applicMapRefId, xpath[256];
 			xmlNodePtr applicSpec, applicSpecIdent, applic;
