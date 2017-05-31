@@ -16,7 +16,7 @@
 
 struct ref {
 	char code[256];
-	xmlNode *ref;
+	xmlNodePtr ref;
 };
 
 bool contains_code(struct ref refs[256], int n, const char *code)
@@ -32,9 +32,9 @@ bool contains_code(struct ref refs[256], int n, const char *code)
 	return false;
 }
 
-xmlNode *find_child(xmlNode *parent, const char *child_name)
+xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, child_name) == 0) {
@@ -45,7 +45,7 @@ xmlNode *find_child(xmlNode *parent, const char *child_name)
 	return NULL;
 }
 
-bool is_ref(xmlNode *node)
+bool is_ref(xmlNodePtr node)
 {
 	return node->type == XML_ELEMENT_NODE && (
 		strcmp((char *) node->name, "dmRef") == 0 ||
@@ -53,32 +53,24 @@ bool is_ref(xmlNode *node)
 		strcmp((char *) node->name, "externalPubRef") == 0);
 }
 
-void copy_code(char *dst, xmlNode *ref)
+void copy_code(char *dst, xmlNodePtr ref)
 {
-	xmlNode *ref_ident;
-	xmlNode *code;
-	xmlNode *title;
+	xmlNodePtr ref_ident, code;
 
 	char *model_ident_code;
-	char *system_diff_code;
-	char *system_code;
-	char *sub_system_code;
-	char *sub_sub_system_code;
-	char *assy_code;
-	char *disassy_code;
-	char *disassy_code_variant;
-	char *info_code;
-	char *info_code_variant;
-	char *item_location_code;
-
-	char *pm_issuer;
-	char *pm_number;
-	char *pm_volume;
-
-	char *code_content;
-	char *title_content;
 
 	if (strcmp((char *) ref->name, "dmRef") == 0) {
+		char *system_diff_code;
+		char *system_code;
+		char *sub_system_code;
+		char *sub_sub_system_code;
+		char *assy_code;
+		char *disassy_code;
+		char *disassy_code_variant;
+		char *info_code;
+		char *info_code_variant;
+		char *item_location_code;
+
 		ref_ident = find_child(ref, "dmRefIdent");
 		code = find_child(ref_ident, "dmCode");
 
@@ -119,6 +111,10 @@ void copy_code(char *dst, xmlNode *ref)
 		xmlFree(info_code_variant);
 		xmlFree(item_location_code);
 	} else if (strcmp((char *) ref->name, "pmRef") == 0) {
+		char *pm_issuer;
+		char *pm_number;
+		char *pm_volume;
+
 		ref_ident = find_child(ref, "pmRefIdent");
 		code = find_child(ref_ident, "pmCode");
 
@@ -138,15 +134,21 @@ void copy_code(char *dst, xmlNode *ref)
 		xmlFree(pm_number);
 		xmlFree(pm_volume);
 	} else if (strcmp((char *) ref->name, "externalPubRef") == 0) {
+		xmlNodePtr title;
+
 		ref_ident = find_child(ref, "externalPubRefIdent");
 		code = find_child(ref_ident, "externalPubCode");
 		title = find_child(ref_ident, "externalPubTitle");
 
 		if (code) {
+			char *code_content;
+
 			code_content = (char *) xmlNodeGetContent(code);
 			sprintf(dst, EP"%s", code_content);
 			xmlFree(code_content);
 		} else if (title) {
+			char *title_content;
+
 			title_content = (char *) xmlNodeGetContent(title);
 			sprintf(dst, EP"%s", title_content);
 			xmlFree(title_content);
@@ -156,13 +158,13 @@ void copy_code(char *dst, xmlNode *ref)
 	}
 }
 
-void find_refs(struct ref refs[256], int *n, xmlNode *node)
+void find_refs(struct ref refs[256], int *n, xmlNodePtr node)
 {
-	xmlNode *cur;
-
-	char code[256];
+	xmlNodePtr cur;
 
 	if (is_ref(node)) {
+		char code[256];
+
 		copy_code(code, node);
 
 		if (!contains_code(refs, *n, code)) {
@@ -185,7 +187,7 @@ int compare_refs(const void *a, const void *b)
 	return strcmp(ref1->code, ref2->code);
 }
 
-void sync_refs(xmlNode *dmodule)
+void sync_refs(xmlNodePtr dmodule)
 {
 	struct ref refs[256];
 	int n = 0, i;
@@ -239,7 +241,7 @@ int main(int argc, char *argv[])
 
 	xmlDocPtr dm;
 
-	xmlNode *dmodule;
+	xmlNodePtr dmodule;
 	
 	char out[256] = "";
 

@@ -80,9 +80,9 @@ void define_applic(char *ident, char *type, char *value)
 }
 
 /* Find the first child element with a given name */
-xmlNode *find_child(xmlNode *parent, const char *name)
+xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, name) == 0) {
@@ -94,9 +94,9 @@ xmlNode *find_child(xmlNode *parent, const char *name)
 }
 
 /* Same as above but throws a fatal error if the child is not found instead of returning NULL. */
-xmlNode *find_req_child(xmlNode *parent, const char *name)
+xmlNodePtr find_req_child(xmlNodePtr parent, const char *name)
 {
-	xmlNode *child;
+	xmlNodePtr child;
 
 	if (!(child = find_child(parent, name))) {
 		fprintf(stderr, ERR_PREFIX "Element %s missing child element %s.\n", (char *) parent->name, name);
@@ -110,14 +110,14 @@ xmlNode *find_req_child(xmlNode *parent, const char *name)
  * dynamically allocated so they must be freed using free_ident. */
 void init_ident(struct dmident *ident, xmlDocPtr dm)
 {
-	xmlNode *dmodule;
-	xmlNode *identAndStatusSection;
-	xmlNode *dmAddress;
-	xmlNode *dmIdent;
-	xmlNode *identExtension;
-	xmlNode *dmCode;
-	xmlNode *language;
-	xmlNode *issueInfo;
+	xmlNodePtr dmodule;
+	xmlNodePtr identAndStatusSection;
+	xmlNodePtr dmAddress;
+	xmlNodePtr dmIdent;
+	xmlNodePtr identExtension;
+	xmlNodePtr dmCode;
+	xmlNodePtr language;
+	xmlNodePtr issueInfo;
 
 	dmodule = xmlDocGetRootElement(dm);
 	identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
@@ -194,7 +194,7 @@ void free_ident(struct dmident *ident)
  * condition (CCT) for which a value is asserted in the applic statement but
  * for which no value was supplied by the user.
  */
-bool eval_applic(xmlNode *node, bool assume);
+bool eval_applic(xmlNodePtr node, bool assume);
 
 /* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
 bool is_in_range(const char *value, const char *range)
@@ -281,7 +281,7 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 }
 
 /* Tests whether an <assert> element is applicable */
-bool eval_assert(xmlNode *assert, bool assume)
+bool eval_assert(xmlNodePtr assert, bool assume)
 {
 	char *ident, *type, *values;
 
@@ -301,13 +301,13 @@ bool eval_assert(xmlNode *assert, bool assume)
 }
 
 /* Test whether an <evaluate> element is applicable. */
-bool eval_evaluate(xmlNode *evaluate, bool assume)
+bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 {
 	char *op;
 
 	bool ret;
 
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	op = (char *) xmlGetProp(evaluate, (xmlChar *) "andOr");
 
@@ -334,7 +334,7 @@ bool eval_evaluate(xmlNode *evaluate, bool assume)
 }
 
 /* Generic test for either <assert> or <evaluate> */
-bool eval_applic(xmlNode *node, bool assume)
+bool eval_applic(xmlNodePtr node, bool assume)
 {
 	if (strcmp((char *) node->name, "assert") == 0) {
 		return eval_assert(node, assume);
@@ -346,9 +346,9 @@ bool eval_applic(xmlNode *node, bool assume)
 }
 
 /* Tests whether an <applic> element is true. */
-bool eval_applic_stmt(xmlNode *applic, bool assume)
+bool eval_applic_stmt(xmlNodePtr applic, bool assume)
 {
-	xmlNode *stmt;
+	xmlNodePtr stmt;
 
 	stmt = find_child(applic, "assert");
 
@@ -360,13 +360,13 @@ bool eval_applic_stmt(xmlNode *applic, bool assume)
 }
 
 /* Search recursively for a descendant element with the given id */
-xmlNode *get_element_by_id(xmlNode *root, const char *id)
+xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 	char *cid;
 
 	for (cur = root->children; cur; cur = cur->next) {
-		xmlNode *ch;
+		xmlNodePtr ch;
 		bool match;
 
 		cid = (char *) xmlGetProp(cur, (xmlChar *) "id");
@@ -386,7 +386,7 @@ xmlNode *get_element_by_id(xmlNode *root, const char *id)
 }
 
 /* Remove non-applicable elements from content */
-void strip_applic(xmlNode *referencedApplicGroup, xmlNodePtr node)
+void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
@@ -414,7 +414,7 @@ void strip_applic(xmlNode *referencedApplicGroup, xmlNodePtr node)
 }
 
 /* Remove applic references on content where all assertions are unambigously true */
-void clean_applic(xmlNode *referencedApplicGroup, xmlNode *node)
+void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
@@ -438,9 +438,9 @@ void clean_applic(xmlNode *referencedApplicGroup, xmlNode *node)
 
 /* Remove applic statements or parts of applic statements where all assertions
  * are unambigously true */
-void simpl_applic(xmlNode *node)
+void simpl_applic(xmlNodePtr node)
 {
-	xmlNode *cur, *next;
+	xmlNodePtr cur, next;
 
 	if (strcmp((char *) node->name, "applic") == 0) {
 		if (eval_applic_stmt(node, false) || !eval_applic_stmt(node, true)) {
@@ -475,7 +475,7 @@ void simpl_applic(xmlNode *node)
 }
 
 /* If an <evaluate> contains only one (or no) child elements, remove it. */
-void simpl_evaluate(xmlNode *evaluate)
+void simpl_evaluate(xmlNodePtr evaluate)
 {
 	int nchild = 0;
 	xmlNodePtr cur;
@@ -498,9 +498,9 @@ void simpl_evaluate(xmlNode *evaluate)
 }
 
 /* Simplify <evaluate> elements recursively. */
-void simpl_applic_evals(xmlNode *node)
+void simpl_applic_evals(xmlNodePtr node)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = node->children; cur; cur = cur->next) {
 		if (cur->type == XML_ELEMENT_NODE) {
@@ -517,7 +517,7 @@ void simpl_applic_evals(xmlNode *node)
 void simpl_applic_clean(xmlNode* referencedApplicGroup)
 {
 	bool has_applic = false;
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	if (!referencedApplicGroup) {
 		return;
@@ -539,7 +539,7 @@ void simpl_applic_clean(xmlNode* referencedApplicGroup)
 }
 
 /* Add metadata linking the data module instance with the master data module */
-void add_source(xmlNode *dmodule)
+void add_source(xmlNodePtr dmodule)
 {
 	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
 	xmlNodePtr dmStatus = find_req_child(identAndStatusSection, "dmStatus");
@@ -595,13 +595,13 @@ void add_source(xmlNode *dmodule)
 }
 
 /* Add an extension to the data module code */
-void set_dme(xmlNode *dmodule, char *extension)
+void set_dme(xmlNodePtr dmodule, char *extension)
 {
-	xmlNode *identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNode *dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	xmlNode *dmIdent = find_req_child(dmAddress, "dmIdent");
-	xmlNode *dmCode = find_req_child(dmIdent, "dmCode");
-	xmlNode *identExtension = find_child(dmIdent, "identExtension");
+	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
+	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
+	xmlNodePtr dmIdent = find_req_child(dmAddress, "dmIdent");
+	xmlNodePtr dmCode = find_req_child(dmIdent, "dmCode");
+	xmlNodePtr identExtension = find_child(dmIdent, "identExtension");
 
 	char *extensionProducer;
 	char *extensionCode;
@@ -619,12 +619,12 @@ void set_dme(xmlNode *dmodule, char *extension)
 }
 
 /* Set the DMC of the produced data module of the instance */
-void set_dmc(xmlNode *dmodule, char *dmc)
+void set_dmc(xmlNodePtr dmodule, char *dmc)
 {
-	xmlNode *identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNode *dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	xmlNode *dmIdent = find_req_child(dmAddress, "dmIdent");
-	xmlNode *dmCode = find_req_child(dmIdent, "dmCode");
+	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
+	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
+	xmlNodePtr dmIdent = find_req_child(dmAddress, "dmIdent");
+	xmlNodePtr dmCode = find_req_child(dmIdent, "dmCode");
 
 	char *modelIdentCode;
 	char *systemDiffCode;      
@@ -672,14 +672,14 @@ void set_dmc(xmlNode *dmodule, char *dmc)
 }
 
 /* Set the techName and/or infoName of the data module instance */
-void set_title(xmlNode *dmodule, char *tech, char *info)
+void set_title(xmlNodePtr dmodule, char *tech, char *info)
 {
-	xmlNode *identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNode *dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	xmlNode *dmAddressItems = find_req_child(dmAddress, "dmAddressItems");
-	xmlNode *dmTitle = find_req_child(dmAddressItems, "dmTitle");
-	xmlNode *techName = find_req_child(dmTitle, "techName");
-	xmlNode *infoName = find_child(dmTitle, "infoName");
+	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
+	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
+	xmlNodePtr dmAddressItems = find_req_child(dmAddress, "dmAddressItems");
+	xmlNodePtr dmTitle = find_req_child(dmAddressItems, "dmTitle");
+	xmlNodePtr techName = find_req_child(dmTitle, "techName");
+	xmlNodePtr infoName = find_child(dmTitle, "infoName");
 
 	if (strcmp(tech, "") != 0) {
 		xmlNodeSetContent(techName, (xmlChar *) tech);
@@ -694,7 +694,7 @@ void set_title(xmlNode *dmodule, char *tech, char *info)
 }
 
 /* Set the applicability for the whole datamodule instance */
-void set_applic(xmlNode *dmodule, char *new_text)
+void set_applic(xmlNodePtr dmodule, char *new_text)
 {
 	xmlNodePtr identAndStatusSection = find_child(dmodule, "identAndStatusSection");
 	xmlNodePtr dmStatus = find_child(identAndStatusSection, "dmStatus");
@@ -741,12 +741,12 @@ void set_applic(xmlNode *dmodule, char *new_text)
 }
 
 /* Set the language/country for the data module instance */
-void set_lang(xmlNode *dmodule, char *lang)
+void set_lang(xmlNodePtr dmodule, char *lang)
 {
-	xmlNode *identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-	xmlNode *dmAddress = find_child(identAndStatusSection, "dmAddress");
-	xmlNode *dmIdent = find_child(dmAddress, "dmIdent");
-	xmlNode *language = find_child(dmIdent, "language");
+	xmlNodePtr identAndStatusSection = find_child(dmodule, "identAndStatusSection");
+	xmlNodePtr dmAddress = find_child(identAndStatusSection, "dmAddress");
+	xmlNodePtr dmIdent = find_child(dmAddress, "dmIdent");
+	xmlNodePtr language = find_child(dmIdent, "language");
 
 	char *language_iso_code;
 	char *country_iso_code;
