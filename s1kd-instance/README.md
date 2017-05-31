@@ -96,7 +96,7 @@ The resulting data module instance will contain the element &lt;sourceDmIdent&gt
 
 Additionally, the instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.
 
-If the -S option is used, neither the &lt;sourceDmIdent&gt; element or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per say, but more generally to make a data module based on an existing data module.
+If the -S option is used, neither the &lt;sourceDmIdent&gt; element or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a data module based on an existing data module.
 
 Instance data module code (-c) vs extension (-e)
 ------------------------------------------------
