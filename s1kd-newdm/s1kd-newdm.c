@@ -36,6 +36,7 @@
 
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
+#define EXIT_BAD_DMC 3
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -55,9 +56,9 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-xmlNode *find_child(xmlNode *parent, const char *name)
+xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, name) == 0) {
@@ -234,25 +235,25 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(dmcode, "") != 0) {
-		char *subAndSubSub;
-		char *disassyCodeAndVariant;
-		char *infoCodeAndVariant;
+		int n;
 
-		strcpy(modelIdentCode, strtok(dmcode, "-"));
-		strcpy(systemDiffCode, strtok(NULL, "-"));
-		strcpy(systemCode, strtok(NULL, "-"));
-		subAndSubSub = strtok(NULL, "-");
-		strcpy(assyCode, strtok(NULL, "-"));
-		disassyCodeAndVariant = strtok(NULL, "-");
-		infoCodeAndVariant = strtok(NULL, "-");
-		strcpy(itemLocationCode, strtok(NULL, ""));
+		n = sscanf(dmcode, "%[^-]-%[^-]-%[^-]-%c%c-%[^-]-%2s%[^-]-%3s%c-%c",
+			modelIdentCode,
+			systemDiffCode,
+			systemCode,
+			subSystemCode,
+			subSubSystemCode,
+			assyCode,
+			disassyCode,
+			disassyCodeVariant,
+			infoCode,
+			infoCodeVariant,
+			itemLocationCode);
 
-		strncpy(subSystemCode, subAndSubSub, 1);
-		strncpy(subSubSystemCode, subAndSubSub + 1, 1);
-		strncpy(disassyCode, disassyCodeAndVariant, 2);
-		strcpy(disassyCodeVariant, disassyCodeAndVariant + 2);
-		strncpy(infoCode, infoCodeAndVariant, 3);
-		strcpy(infoCodeVariant, infoCodeAndVariant + 3);
+		if (n != 11) {
+			fprintf(stderr, ERR_PREFIX "Bad data module code.\n");
+			exit(EXIT_BAD_DMC);
+		}
 	}
 
 	defaults = fopen(dmtypes_fname, "r");
