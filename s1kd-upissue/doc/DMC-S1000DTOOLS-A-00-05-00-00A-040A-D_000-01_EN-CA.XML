@@ -72,6 +72,12 @@
                 <para>Increase the issue number of the data module. By default, the in-work issue is increased.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s &lt;status&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the status of the new issue. Default is 'changed'.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
       </levelledPara>

@@ -21,3 +21,6 @@ Print the file name of the upissued data module.
 
 -I  
 Increase the issue number of the data module. By default, the in-work issue is increased.
+
+-s &lt;status&gt;  
+Set the status of the new issue. Default is 'changed'.
