@@ -79,6 +79,18 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-s</listItemTerm>
+              <listItemDefinition>
+                <para>Use shortened, single-line messages to report BREX errors instead of multiline indented messages.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x</listItemTerm>
+              <listItemDefinition>
+                <para>Output an XML report instead of a plain-text one.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show the help/usage message.</para>
