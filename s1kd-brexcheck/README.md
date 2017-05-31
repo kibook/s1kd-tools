@@ -25,5 +25,11 @@ Add a search path for BREX data modules. By default, only the current directory 
 -v  
 Use verbose output.
 
+-s  
+Use shortened, single-line messages to report BREX errors instead of multiline indented messages.
+
+-x  
+Output an XML report instead of a plain-text one.
+
 -h -?  
 Show the help/usage message.
