@@ -34,5 +34,8 @@ Include the applicability column.
 -H  
 Show headers on columns.
 
+-w  
+Show only writable data module files.
+
 -h  
 Show the usage message.
