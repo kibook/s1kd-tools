@@ -57,9 +57,9 @@ void define_applic(char *ident, char *type, char *value)
 	xmlNodePtr cur;
 
 	for (cur = applicability->children; cur; cur = cur->next) {
-		char *cur_ident = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyIdent");
-		char *cur_type  = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyType");
-		char *cur_value = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyValues");
+		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
 
 		if (strcmp(cur_ident, ident) == 0 && strcmp(cur_type, type) == 0) {
 			assert = cur;
@@ -71,12 +71,12 @@ void define_applic(char *ident, char *type, char *value)
 	}
 
 	if (!assert) {
-		assert = xmlNewChild(applicability, NULL, (xmlChar *) "assert", NULL);
-		xmlSetProp(assert, (xmlChar *) "applicPropertyIdent", (xmlChar *) ident);
-		xmlSetProp(assert, (xmlChar *) "applicPropertyType",  (xmlChar *) type);
+		assert = xmlNewChild(applicability, NULL, BAD_CAST "assert", NULL);
+		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", BAD_CAST ident);
+		xmlSetProp(assert, BAD_CAST "applicPropertyType",  BAD_CAST type);
 	}
 
-	xmlSetProp(assert, (xmlChar *) "applicPropertyValues", (xmlChar *) value);
+	xmlSetProp(assert, BAD_CAST "applicPropertyValues", BAD_CAST value);
 }
 
 /* Find the first child element with a given name */
@@ -128,28 +128,28 @@ void init_ident(struct dmident *ident, xmlDocPtr dm)
 	language = find_req_child(dmIdent, "language");
 	issueInfo = find_req_child(dmIdent, "issueInfo");
 
-	ident->modelIdentCode     = (char *) xmlGetProp(dmCode, (xmlChar *) "modelIdentCode");
-	ident->systemDiffCode     = (char *) xmlGetProp(dmCode, (xmlChar *) "systemDiffCode");
-	ident->systemCode         = (char *) xmlGetProp(dmCode, (xmlChar *) "systemCode");
-	ident->subSystemCode      = (char *) xmlGetProp(dmCode, (xmlChar *) "subSystemCode");
-	ident->subSubSystemCode   = (char *) xmlGetProp(dmCode, (xmlChar *) "subSubSystemCode");
-	ident->assyCode           = (char *) xmlGetProp(dmCode, (xmlChar *) "assyCode");
-	ident->disassyCode        = (char *) xmlGetProp(dmCode, (xmlChar *) "disassyCode");
-	ident->disassyCodeVariant = (char *) xmlGetProp(dmCode, (xmlChar *) "disassyCodeVariant");
-	ident->infoCode           = (char *) xmlGetProp(dmCode, (xmlChar *) "infoCode");
-	ident->infoCodeVariant    = (char *) xmlGetProp(dmCode, (xmlChar *) "infoCodeVariant");
-	ident->itemLocationCode   = (char *) xmlGetProp(dmCode, (xmlChar *) "itemLocationCode");
+	ident->modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
+	ident->systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
+	ident->systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
+	ident->subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
+	ident->subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
+	ident->assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
+	ident->disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
+	ident->disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
+	ident->infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
+	ident->infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
+	ident->itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
 
-	ident->issueNumber = (char *) xmlGetProp(issueInfo, (xmlChar *) "issueNumber");
-	ident->inWork      = (char *) xmlGetProp(issueInfo, (xmlChar *) "inWork");
+	ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
+	ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
 
-	ident->languageIsoCode = (char *) xmlGetProp(language, (xmlChar *) "languageIsoCode");
-	ident->countryIsoCode  = (char *) xmlGetProp(language, (xmlChar *) "countryIsoCode");
+	ident->languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+	ident->countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
 
 	if (identExtension) {
 		ident->extended = true;
-		ident->extensionProducer = (char *) xmlGetProp(identExtension, (xmlChar *) "extensionProducer");
-		ident->extensionCode     = (char *) xmlGetProp(identExtension, (xmlChar *) "extensionCode");
+		ident->extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
+		ident->extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
 	} else {
 		ident->extended = false;
 	}
@@ -257,9 +257,9 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 	bool result = assume;
 
 	for (cur = applicability->children; cur; cur = cur->next) {
-		char *cur_ident = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyIdent");
-		char *cur_type  = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyType");
-		char *cur_value = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyValues");
+		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
 
 		bool match = strcmp(cur_ident, ident) == 0 && strcmp(cur_type, type) == 0;
 
@@ -287,9 +287,9 @@ bool eval_assert(xmlNodePtr assert, bool assume)
 
 	bool ret;
 
-	ident  = (char *) xmlGetProp(assert, (xmlChar *) "applicPropertyIdent");
-	type   = (char *) xmlGetProp(assert, (xmlChar *) "applicPropertyType");
-	values = (char *) xmlGetProp(assert, (xmlChar *) "applicPropertyValues");
+	ident  = (char *) xmlGetProp(assert, BAD_CAST "applicPropertyIdent");
+	type   = (char *) xmlGetProp(assert, BAD_CAST "applicPropertyType");
+	values = (char *) xmlGetProp(assert, BAD_CAST "applicPropertyValues");
 
 	ret = is_applic(ident, type, values, assume);
 
@@ -309,7 +309,7 @@ bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 
 	xmlNodePtr cur;
 
-	op = (char *) xmlGetProp(evaluate, (xmlChar *) "andOr");
+	op = (char *) xmlGetProp(evaluate, BAD_CAST "andOr");
 
 	if (!op) {
 		fprintf(stderr, ERR_PREFIX "Element evaluate missing required attribute andOr.");
@@ -369,7 +369,7 @@ xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 		xmlNodePtr ch;
 		bool match;
 
-		cid = (char *) xmlGetProp(cur, (xmlChar *) "id");
+		cid = (char *) xmlGetProp(cur, BAD_CAST "id");
 
 		match = cid && strcmp(cid, id) == 0;
 
@@ -390,11 +390,11 @@ void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
-	if (xmlHasProp(node, (xmlChar *) "applicRefId")) {
+	if (xmlHasProp(node, BAD_CAST "applicRefId")) {
 		char *applicRefId;
 		xmlNodePtr applic;
 
-		applicRefId = (char *) xmlGetProp(node, (xmlChar *) "applicRefId");
+		applicRefId = (char *) xmlGetProp(node, BAD_CAST "applicRefId");
 		applic = get_element_by_id(referencedApplicGroup, applicRefId);
 		xmlFree(applicRefId);
 
@@ -418,16 +418,16 @@ void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
-	if (xmlHasProp(node, (xmlChar *) "applicRefId")) {
+	if (xmlHasProp(node, BAD_CAST "applicRefId")) {
 		char *applicRefId;
 		xmlNodePtr applic;
 
-		applicRefId = (char *) xmlGetProp(node, (xmlChar *) "applicRefId");
+		applicRefId = (char *) xmlGetProp(node, BAD_CAST "applicRefId");
 		applic = get_element_by_id(referencedApplicGroup, applicRefId);
 		xmlFree(applicRefId);
 
 		if (applic && eval_applic_stmt(applic, false)) {
-			xmlUnsetProp(node, (xmlChar *) "applicRefId");
+			xmlUnsetProp(node, BAD_CAST "applicRefId");
 		}
 	}
 
@@ -455,9 +455,9 @@ void simpl_applic(xmlNodePtr node)
 			return;
 		}
 	} else if (strcmp((char *) node->name, "assert") == 0) {
-		char *ident  = (char *) xmlGetProp(node, (xmlChar *) "applicPropertyIdent");
-		char *type   = (char *) xmlGetProp(node, (xmlChar *) "applicPropertyType");
-		char *values = (char *) xmlGetProp(node, (xmlChar *) "applicPropertyValues");
+		char *ident  = (char *) xmlGetProp(node, BAD_CAST "applicPropertyIdent");
+		char *type   = (char *) xmlGetProp(node, BAD_CAST "applicPropertyType");
+		char *values = (char *) xmlGetProp(node, BAD_CAST "applicPropertyValues");
 
 		if (is_applic(ident, type, values, false) || !is_applic(ident, type, values, true)) {
 			xmlUnlinkNode(node);
@@ -558,38 +558,38 @@ void add_source(xmlNodePtr dmodule)
 		xmlFreeNode(sourceDmIdent);
 	}
 
-	sourceDmIdent = xmlNewNode(NULL, (xmlChar *) "sourceDmIdent");
+	sourceDmIdent = xmlNewNode(NULL, BAD_CAST "sourceDmIdent");
 	sourceDmIdent = xmlAddPrevSibling(security, sourceDmIdent);
 
 	init_ident(&ident, dmodule->doc);
 
 	if (ident.extended) {
-		src_identExtension = xmlNewChild(sourceDmIdent, NULL, (xmlChar *) "identExtension", NULL);
-		xmlSetProp(src_identExtension, (xmlChar *) "extensionProducer", (xmlChar *) ident.extensionProducer);
-		xmlSetProp(src_identExtension, (xmlChar *) "extensionCode", (xmlChar *) ident.extensionCode);
+		src_identExtension = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "identExtension", NULL);
+		xmlSetProp(src_identExtension, BAD_CAST "extensionProducer", BAD_CAST ident.extensionProducer);
+		xmlSetProp(src_identExtension, BAD_CAST "extensionCode", BAD_CAST ident.extensionCode);
 	}
 
-	src_dmCode = xmlNewChild(sourceDmIdent, NULL, (xmlChar *) "dmCode", NULL);
-	src_language = xmlNewChild(sourceDmIdent, NULL, (xmlChar *) "language", NULL);
-	src_issueInfo = xmlNewChild(sourceDmIdent, NULL, (xmlChar *) "issueInfo", NULL);
+	src_dmCode = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "dmCode", NULL);
+	src_language = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "language", NULL);
+	src_issueInfo = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "issueInfo", NULL);
 
-	xmlSetProp(src_dmCode, (xmlChar *) "modelIdentCode",     (xmlChar *) ident.modelIdentCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "systemDiffCode",     (xmlChar *) ident.systemDiffCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "systemCode",         (xmlChar *) ident.systemCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "subSystemCode",      (xmlChar *) ident.subSystemCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "subSubSystemCode",   (xmlChar *) ident.subSubSystemCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "assyCode",           (xmlChar *) ident.assyCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "disassyCode",        (xmlChar *) ident.disassyCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "disassyCodeVariant", (xmlChar *) ident.disassyCodeVariant);
-	xmlSetProp(src_dmCode, (xmlChar *) "infoCode",           (xmlChar *) ident.infoCode);
-	xmlSetProp(src_dmCode, (xmlChar *) "infoCodeVariant",    (xmlChar *) ident.infoCodeVariant);
-	xmlSetProp(src_dmCode, (xmlChar *) "itemLocationCode",   (xmlChar *) ident.itemLocationCode);
+	xmlSetProp(src_dmCode, BAD_CAST "modelIdentCode",     BAD_CAST ident.modelIdentCode);
+	xmlSetProp(src_dmCode, BAD_CAST "systemDiffCode",     BAD_CAST ident.systemDiffCode);
+	xmlSetProp(src_dmCode, BAD_CAST "systemCode",         BAD_CAST ident.systemCode);
+	xmlSetProp(src_dmCode, BAD_CAST "subSystemCode",      BAD_CAST ident.subSystemCode);
+	xmlSetProp(src_dmCode, BAD_CAST "subSubSystemCode",   BAD_CAST ident.subSubSystemCode);
+	xmlSetProp(src_dmCode, BAD_CAST "assyCode",           BAD_CAST ident.assyCode);
+	xmlSetProp(src_dmCode, BAD_CAST "disassyCode",        BAD_CAST ident.disassyCode);
+	xmlSetProp(src_dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST ident.disassyCodeVariant);
+	xmlSetProp(src_dmCode, BAD_CAST "infoCode",           BAD_CAST ident.infoCode);
+	xmlSetProp(src_dmCode, BAD_CAST "infoCodeVariant",    BAD_CAST ident.infoCodeVariant);
+	xmlSetProp(src_dmCode, BAD_CAST "itemLocationCode",   BAD_CAST ident.itemLocationCode);
 
-	xmlSetProp(src_issueInfo, (xmlChar *) "issueNumber", (xmlChar *) ident.issueNumber);
-	xmlSetProp(src_issueInfo, (xmlChar *) "inWork",      (xmlChar *) ident.inWork);
+	xmlSetProp(src_issueInfo, BAD_CAST "issueNumber", BAD_CAST ident.issueNumber);
+	xmlSetProp(src_issueInfo, BAD_CAST "inWork",      BAD_CAST ident.inWork);
 
-	xmlSetProp(src_language, (xmlChar *) "languageIsoCode", (xmlChar *) ident.languageIsoCode);
-	xmlSetProp(src_language, (xmlChar *) "countryIsoCode",  (xmlChar *) ident.countryIsoCode);
+	xmlSetProp(src_language, BAD_CAST "languageIsoCode", BAD_CAST ident.languageIsoCode);
+	xmlSetProp(src_language, BAD_CAST "countryIsoCode",  BAD_CAST ident.countryIsoCode);
 
 	free_ident(&ident);
 }
@@ -607,15 +607,15 @@ void set_dme(xmlNodePtr dmodule, char *extension)
 	char *extensionCode;
 
 	if (!identExtension) {
-		identExtension = xmlNewNode(NULL, (xmlChar *) "identExtension");
+		identExtension = xmlNewNode(NULL, BAD_CAST "identExtension");
 		identExtension = xmlAddPrevSibling(dmCode, identExtension);
 	}
 
 	extensionProducer = strtok(extension, "-");
 	extensionCode     = strtok(NULL, "-");
 
-	xmlSetProp(identExtension, (xmlChar *) "extensionProducer", (xmlChar *) extensionProducer);
-	xmlSetProp(identExtension, (xmlChar *) "extensionCode",     (xmlChar *) extensionCode);
+	xmlSetProp(identExtension, BAD_CAST "extensionProducer", BAD_CAST extensionProducer);
+	xmlSetProp(identExtension, BAD_CAST "extensionCode",     BAD_CAST extensionCode);
 }
 
 /* Set the DMC of the produced data module of the instance */
@@ -658,17 +658,17 @@ void set_dmc(xmlNodePtr dmodule, char *dmc)
 	strncpy(infoCode, infoCodeAndVariant, 3);
 	strncpy(infoCodeVariant, infoCodeAndVariant + 3, 1);
 
-	xmlSetProp(dmCode, (xmlChar *) "modelIdentCode",     (xmlChar *) modelIdentCode);
-	xmlSetProp(dmCode, (xmlChar *) "systemDiffCode",     (xmlChar *) systemDiffCode);
-	xmlSetProp(dmCode, (xmlChar *) "systemCode",         (xmlChar *) systemCode);
-	xmlSetProp(dmCode, (xmlChar *) "subSystemCode",      (xmlChar *) subSystemCode);
-	xmlSetProp(dmCode, (xmlChar *) "subSubSystemCode",   (xmlChar *) subSubSystemCode);
-	xmlSetProp(dmCode, (xmlChar *) "assyCode",           (xmlChar *) assyCode);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCode",        (xmlChar *) disassyCode);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCodeVariant", (xmlChar *) disassyCodeVariant);
-	xmlSetProp(dmCode, (xmlChar *) "infoCode",           (xmlChar *) infoCode);
-	xmlSetProp(dmCode, (xmlChar *) "infoCodeVariant",    (xmlChar *) infoCodeVariant);
-	xmlSetProp(dmCode, (xmlChar *) "itemLocationCode",   (xmlChar *) itemLocationCode);
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode",     BAD_CAST modelIdentCode);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode",     BAD_CAST systemDiffCode);
+	xmlSetProp(dmCode, BAD_CAST "systemCode",         BAD_CAST systemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode",      BAD_CAST subSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode",   BAD_CAST subSubSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "assyCode",           BAD_CAST assyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode",        BAD_CAST disassyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode",           BAD_CAST infoCode);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant",    BAD_CAST infoCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode",   BAD_CAST itemLocationCode);
 }
 
 /* Set the techName and/or infoName of the data module instance */
@@ -682,14 +682,14 @@ void set_title(xmlNodePtr dmodule, char *tech, char *info)
 	xmlNodePtr infoName = find_child(dmTitle, "infoName");
 
 	if (strcmp(tech, "") != 0) {
-		xmlNodeSetContent(techName, (xmlChar *) tech);
+		xmlNodeSetContent(techName, BAD_CAST tech);
 	}
 
 	if (strcmp(info, "") != 0) {
 		if (!infoName) {
-			infoName = xmlNewChild(dmTitle, NULL, (xmlChar *) "infoName", NULL);
+			infoName = xmlNewChild(dmTitle, NULL, BAD_CAST "infoName", NULL);
 		}
-		xmlNodeSetContent(infoName, (xmlChar *) info);
+		xmlNodeSetContent(infoName, BAD_CAST info);
 	}	
 }
 
@@ -707,29 +707,29 @@ void set_applic(xmlNodePtr dmodule, char *new_text)
 
 	xmlNodePtr cur;
 
-	new_applic = xmlNewNode(NULL, (xmlChar *) "applic");
+	new_applic = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlAddNextSibling(applic, new_applic);
 
-	new_displayText = xmlNewChild(new_applic, NULL, (xmlChar *) "displayText", NULL);
-	new_simplePara = xmlNewChild(new_displayText, NULL, (xmlChar *) "simplePara", NULL);
-	xmlNodeSetContent(new_simplePara, (xmlChar *) new_text);
+	new_displayText = xmlNewChild(new_applic, NULL, BAD_CAST "displayText", NULL);
+	new_simplePara = xmlNewChild(new_displayText, NULL, BAD_CAST "simplePara", NULL);
+	xmlNodeSetContent(new_simplePara, BAD_CAST new_text);
 
 	if (napplics > 1) {
-		new_evaluate = xmlNewChild(new_applic, NULL, (xmlChar *) "evaluate", NULL);
-		xmlSetProp(new_evaluate, (xmlChar *) "andOr", (xmlChar *) "and");
+		new_evaluate = xmlNewChild(new_applic, NULL, BAD_CAST "evaluate", NULL);
+		xmlSetProp(new_evaluate, BAD_CAST "andOr", BAD_CAST "and");
 	} else {
 		new_evaluate = new_applic;
 	}
 
 	for (cur = applicability->children; cur; cur = cur->next) {
-		char *cur_ident = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyIdent");
-		char *cur_type  = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyType");
-		char *cur_value = (char *) xmlGetProp(cur, (xmlChar *) "applicPropertyValues");
+		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
 
-		xmlNodePtr new_assert = xmlNewChild(new_evaluate, NULL, (xmlChar *) "assert", NULL);
-		xmlSetProp(new_assert, (xmlChar *) "applicPropertyIdent",  (xmlChar *) cur_ident);
-		xmlSetProp(new_assert, (xmlChar *) "applicPropertyType",   (xmlChar *) cur_type);
-		xmlSetProp(new_assert, (xmlChar *) "applicPropertyValues", (xmlChar *) cur_value);
+		xmlNodePtr new_assert = xmlNewChild(new_evaluate, NULL, BAD_CAST "assert", NULL);
+		xmlSetProp(new_assert, BAD_CAST "applicPropertyIdent",  BAD_CAST cur_ident);
+		xmlSetProp(new_assert, BAD_CAST "applicPropertyType",   BAD_CAST cur_type);
+		xmlSetProp(new_assert, BAD_CAST "applicPropertyValues", BAD_CAST cur_value);
 
 		xmlFree(cur_ident);
 		xmlFree(cur_type);
@@ -763,8 +763,8 @@ void set_lang(xmlNodePtr dmodule, char *lang)
 		country_iso_code[i] = toupper(country_iso_code[i]);
 	}
 
-	xmlSetProp(language, (xmlChar *) "languageIsoCode", (xmlChar *) language_iso_code);
-	xmlSetProp(language, (xmlChar *) "countryIsoCode", (xmlChar *) country_iso_code);
+	xmlSetProp(language, BAD_CAST "languageIsoCode", BAD_CAST language_iso_code);
+	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST country_iso_code);
 }
 
 void auto_name(char *out, xmlDocPtr dm, const char *dir)
@@ -840,7 +840,7 @@ void replace_funcitem_ref(xmlNodePtr ref, xmlNodePtr spec)
 	ctxt = xmlXPathNewContext(spec->doc);
 	ctxt->node = spec;
 
-	results = xmlXPathEvalExpression((xmlChar *) "functionalItemAlts/functionalItem", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST "functionalItemAlts/functionalItem", ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results->nodesetval) && results->nodesetval->nodeNr == 1) {
 		spec = results->nodesetval->nodeTab[0];
@@ -872,8 +872,8 @@ bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
 
 	bool match;
 
-	refnum = xmlGetProp(ref, (xmlChar *) "functionalItemNumber");
-	spcnum = xmlGetProp(spc, (xmlChar *) "functionalItemNumber");
+	refnum = xmlGetProp(ref, BAD_CAST "functionalItemNumber");
+	spcnum = xmlGetProp(spc, BAD_CAST "functionalItemNumber");
 
 	match = refnum == NULL;
 	if (refnum && spcnum) match = xmlStrcmp(refnum, spcnum) == 0;
@@ -883,8 +883,8 @@ bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
 
 	if (!match) return false;
 
-	reffit = xmlGetProp(ref, (xmlChar *) "functionalItemType");
-	spcfit = xmlGetProp(spc, (xmlChar *) "functionalItemType");
+	reffit = xmlGetProp(ref, BAD_CAST "functionalItemType");
+	spcfit = xmlGetProp(spc, BAD_CAST "functionalItemType");
 
 	match = reffit == NULL;
 	if (reffit && spcfit) match = xmlStrcmp(reffit, spcfit) == 0;
@@ -894,8 +894,8 @@ bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
 
 	if (!match) return false;
 
-	refins = xmlGetProp(ref, (xmlChar *) "installationIdent");
-	spcins = xmlGetProp(spc, (xmlChar *) "installationIdent");
+	refins = xmlGetProp(ref, BAD_CAST "installationIdent");
+	spcins = xmlGetProp(spc, BAD_CAST "installationIdent");
 
 	match = refins == NULL;
 	if (refins && spcins) match = xmlStrcmp(refins, spcins) == 0;
@@ -905,8 +905,8 @@ bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
 
 	if (!match) return false;
 
-	refctx = xmlGetProp(ref, (xmlChar *) "contextIdent");
-	spcctx = xmlGetProp(spc, (xmlChar *) "contextIdent");
+	refctx = xmlGetProp(ref, BAD_CAST "contextIdent");
+	spcctx = xmlGetProp(spc, BAD_CAST "contextIdent");
 
 	match = refctx == NULL;
 	if (refctx && spcctx) match = xmlStrcmp(refctx, spcctx) == 0;
@@ -916,8 +916,8 @@ bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
 
 	if (!match) return false;
 
-	refman = xmlGetProp(ref, (xmlChar *) "manufacturerCodeValue");
-	spcman = xmlGetProp(spc, (xmlChar *) "manufacturerCodeValue");
+	refman = xmlGetProp(ref, BAD_CAST "manufacturerCodeValue");
+	spcman = xmlGetProp(spc, BAD_CAST "manufacturerCodeValue");
 
 	match = refman == NULL;
 	if (refman && spcman) match = xmlStrcmp(refman, spcman) == 0;
@@ -927,8 +927,8 @@ bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
 
 	if (!match) return false;
 
-	reforg = xmlGetProp(ref, (xmlChar *) "itemOriginator");
-	spcorg = xmlGetProp(spc, (xmlChar *) "itemOriginator");
+	reforg = xmlGetProp(ref, BAD_CAST "itemOriginator");
+	spcorg = xmlGetProp(spc, BAD_CAST "itemOriginator");
 
 	match = reforg == NULL;
 	if (reforg && spcorg) match = xmlStrcmp(reforg, spcorg) == 0;
@@ -957,8 +957,8 @@ void undepend_funcitem_cir(xmlDocPtr dm, xmlDocPtr cir)
 	ctxt1 = xmlXPathNewContext(cir);
 	ctxt2 = xmlXPathNewContext(dm);
 
-	results1 = xmlXPathEvalExpression((xmlChar *) "//functionalItemSpec", ctxt1);
-	results2 = xmlXPathEvalExpression((xmlChar *) "//functionalItemRef", ctxt2);
+	results1 = xmlXPathEvalExpression(BAD_CAST "//functionalItemSpec", ctxt1);
+	results2 = xmlXPathEvalExpression(BAD_CAST "//functionalItemRef", ctxt2);
 
 	for (i = 0; i < results2->nodesetval->nodeNr; ++i) {
 		functionalItemRef = results2->nodesetval->nodeTab[i];
@@ -998,17 +998,17 @@ bool warncautref_match(xmlNodePtr ref, xmlNodePtr spec)
 	if (strcmp(refname, "cautionRef") == 0 && strcmp(specname, "cautionSpec") != 0) return false;
 
 	if (strcmp(refname, "warningRef") == 0) {
-		refident = (char *) xmlGetProp(ref, (xmlChar *) "warningIdentNumber");
+		refident = (char *) xmlGetProp(ref, BAD_CAST "warningIdentNumber");
 	} else {
-		refident = (char *) xmlGetProp(ref, (xmlChar *) "cautionIdentNumber");
+		refident = (char *) xmlGetProp(ref, BAD_CAST "cautionIdentNumber");
 	}
 
 	if (strcmp(specname, "warningSpec") == 0) {
 		ident = find_req_child(spec, "warningIdent");
-		specident = (char *) xmlGetProp(ident, (xmlChar *) "warningIdentNumber");
+		specident = (char *) xmlGetProp(ident, BAD_CAST "warningIdentNumber");
 	} else {
 		ident = find_req_child(spec, "cautionIdent");
-		specident = (char *) xmlGetProp(ident, (xmlChar *) "cautionIdentNumber");
+		specident = (char *) xmlGetProp(ident, BAD_CAST "cautionIdentNumber");
 	}
 
 	match = strcmp(refident, specident) == 0;
@@ -1030,13 +1030,13 @@ void replace_warncaut_ref(xmlNodePtr ref, xmlNodePtr spec)
 	xmlChar *id;
 
 	if (strcmp((char *) ref->name, "warningRef") == 0) {
-		new = xmlNewNode(NULL, (xmlChar *) "warning");
+		new = xmlNewNode(NULL, BAD_CAST "warning");
 	} else {
-		new = xmlNewNode(NULL, (xmlChar *) "caution");
+		new = xmlNewNode(NULL, BAD_CAST "caution");
 	}
 
-	id = xmlGetProp(ref, (xmlChar *) "id");
-	xmlSetProp(new, (xmlChar *) "id", id);
+	id = xmlGetProp(ref, BAD_CAST "id");
+	xmlSetProp(new, BAD_CAST "id", id);
 	xmlFree(id);
 
 	for (cur = spec->children; cur; cur = cur->next) {
@@ -1064,10 +1064,10 @@ void undepend_warncaut_cir(xmlDocPtr dm, xmlDocPtr cir)
 
 	ctxt1 = xmlXPathNewContext(cir);
 
-	results1 = xmlXPathEvalExpression((xmlChar *) "//warningSpec|//cautionSpec", ctxt1);
+	results1 = xmlXPathEvalExpression(BAD_CAST "//warningSpec|//cautionSpec", ctxt1);
 
 	ctxt2 = xmlXPathNewContext(dm);
-	results2 = xmlXPathEvalExpression((xmlChar *) "//warningsAndCautionsRef", ctxt2);
+	results2 = xmlXPathEvalExpression(BAD_CAST "//warningsAndCautionsRef", ctxt2);
 	warningsAndCautionsRef = results2->nodesetval->nodeTab[0];
 	xmlXPathFreeObject(results2);
 	xmlXPathFreeContext(ctxt2);
@@ -1101,8 +1101,8 @@ void replace_applic_ref(xmlNodePtr ref, xmlNodePtr applic)
 	xmlNodePtr a;
 
 	a = xmlAddNextSibling(ref, xmlCopyNode(applic, 1));
-	id = xmlGetProp(ref, (xmlChar *) "id");
-	xmlSetProp(a, (xmlChar *) "id", id);
+	id = xmlGetProp(ref, BAD_CAST "id");
+	xmlSetProp(a, BAD_CAST "id", id);
 	xmlFree(id);
 }
 
@@ -1114,11 +1114,11 @@ void replace_applic_refs(xmlDocPtr dm, xmlNodePtr applicSpecIdent, xmlNodePtr ap
 
 	ctxt = xmlXPathNewContext(dm);
 
-	applicIdentValue = (char *) xmlGetProp(applicSpecIdent, (xmlChar *) "applicIdentValue");
+	applicIdentValue = (char *) xmlGetProp(applicSpecIdent, BAD_CAST "applicIdentValue");
 	snprintf(xpath, 256, "//applicRef[@applicIdentValue='%s']", applicIdentValue);
 	xmlFree(applicIdentValue);
 
-	results = xmlXPathEvalExpression((xmlChar *) xpath, ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST xpath, ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
 		int i;
@@ -1139,11 +1139,11 @@ void replace_referenced_applic_group_ref(xmlDocPtr dm)
 	xmlNodePtr referencedApplicGroupRef, referencedApplicGroup, cur;
 
 	ctxt = xmlXPathNewContext(dm);
-	result = xmlXPathEvalExpression((xmlChar *) "//referencedApplicGroupRef", ctxt);
+	result = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroupRef", ctxt);
 
 	referencedApplicGroupRef = result->nodesetval->nodeTab[0];
 
-	referencedApplicGroup = xmlNewNode(NULL, (xmlChar *) "referencedApplicGroup");
+	referencedApplicGroup = xmlNewNode(NULL, BAD_CAST "referencedApplicGroup");
 	referencedApplicGroup = xmlAddNextSibling(referencedApplicGroupRef, referencedApplicGroup);
 
 	for (cur = referencedApplicGroupRef->children; cur; cur = cur->next)
@@ -1164,7 +1164,7 @@ void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
 
 	ctxt = xmlXPathNewContext(cir);
 
-	results1 = xmlXPathEvalExpression((xmlChar *) "//applicSpec", ctxt);
+	results1 = xmlXPathEvalExpression(BAD_CAST "//applicSpec", ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results1->nodesetval)) {
 		int i;
@@ -1177,14 +1177,14 @@ void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
 			applicSpec = results1->nodesetval->nodeTab[i];
 
 			ctxt->node = applicSpec;
-			results2 = xmlXPathEvalExpression((xmlChar *) "applicSpecIdent", ctxt);
+			results2 = xmlXPathEvalExpression(BAD_CAST "applicSpecIdent", ctxt);
 			applicSpecIdent = results2->nodesetval->nodeTab[0];
 			xmlXPathFreeObject(results2);
 
-			applicMapRefId = (char *) xmlGetProp(applicSpec, (xmlChar *) "applicMapRefId");
+			applicMapRefId = (char *) xmlGetProp(applicSpec, BAD_CAST "applicMapRefId");
 			snprintf(xpath, 256, "//referencedApplicGroup/applic[@id='%s']", applicMapRefId);
 			xmlFree(applicMapRefId);
-			results2 = xmlXPathEvalExpression((xmlChar *) xpath, ctxt);
+			results2 = xmlXPathEvalExpression(BAD_CAST xpath, ctxt);
 
 			if (!xmlXPathNodeSetIsEmpty(results2->nodesetval)) {
 				applic = results2->nodesetval->nodeTab[0];
@@ -1217,11 +1217,11 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 
 	ctxt = xmlXPathNewContext(cir);
 
-	results = xmlXPathEvalExpression((xmlChar *) "//content", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST "//content", ctxt);
 	content = results->nodesetval->nodeTab[0];
 	xmlXPathFreeObject(results);
 
-	results = xmlXPathEvalExpression((xmlChar *) "//referencedApplicGroup", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroup", ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
 		referencedApplicGroup = results->nodesetval->nodeTab[0];
@@ -1230,7 +1230,7 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 
 	xmlXPathFreeObject(results);
 
-	results = xmlXPathEvalExpression((xmlChar *) "//content/commonRepository/*", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST "//content/commonRepository/*", ctxt);
 	cirnode = results->nodesetval->nodeTab[0];
 	xmlXPathFreeObject(results);
 
@@ -1253,16 +1253,16 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 		xmlNodePtr security, dmIdent, repositorySourceDmIdent, cur;
 
 		ctxt = xmlXPathNewContext(dm);
-		results = xmlXPathEvalExpression((xmlChar *) "//dmStatus/security", ctxt);
+		results = xmlXPathEvalExpression(BAD_CAST "//dmStatus/security", ctxt);
 		security = results->nodesetval->nodeTab[0];
 		xmlXPathFreeObject(results);
 		xmlXPathFreeContext(ctxt);
 
-		repositorySourceDmIdent = xmlNewNode(NULL, (xmlChar *) "repositorySourceDmIdent");
+		repositorySourceDmIdent = xmlNewNode(NULL, BAD_CAST "repositorySourceDmIdent");
 		repositorySourceDmIdent = xmlAddPrevSibling(security, repositorySourceDmIdent);
 
 		ctxt = xmlXPathNewContext(cir);
-		results = xmlXPathEvalExpression((xmlChar *) "//dmIdent", ctxt);
+		results = xmlXPathEvalExpression(BAD_CAST "//dmIdent", ctxt);
 		dmIdent = results->nodesetval->nodeTab[0];
 		xmlXPathFreeObject(results);
 		xmlXPathFreeContext(ctxt);
@@ -1276,7 +1276,7 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 xmlNodePtr first_xpath_node(xmlDocPtr doc, char *path)
 {
 	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
-	xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar *) path, ctxt);
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST path, ctxt);
 	xmlNodePtr ret;
 	
 	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
@@ -1357,7 +1357,7 @@ int main(int argc, char **argv)
 
 	opterr = 1;
 
-	cirs = xmlNewNode(NULL, (xmlChar *) "cirs");
+	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
 	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:h?")) != -1) {
 		switch (c) {
@@ -1375,7 +1375,7 @@ int main(int argc, char **argv)
 			case 'Y': strncpy(new_display_text, optarg, 255); break;
 			case 'C': strncpy(comment_text, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
-			case 'R': xmlNewChild(cirs, NULL, (xmlChar *) "cir", (xmlChar *) optarg); break;
+			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
 			case 'I': strncpy(issinfo, optarg, 6); break;
 			case 'u': strncpy(secu, optarg, 2); break;
 			case 'h':
@@ -1427,7 +1427,7 @@ int main(int argc, char **argv)
 
 	content = find_req_child(dmodule, "content");
 
-	applicability = xmlNewNode(NULL, (xmlChar *) "applic");
+	applicability = xmlNewNode(NULL, BAD_CAST "applic");
 
 	/* All remaining arguments are treated as applic defs and copied to the
 	 * global applicability list. */
@@ -1516,7 +1516,7 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(comment_text, "") != 0) {
-		comment = xmlNewComment((xmlChar *) comment_text);
+		comment = xmlNewComment(BAD_CAST comment_text);
 		identAndStatusSection = find_child(dmodule, "identAndStatusSection");
 
 		if (!identAndStatusSection) {
