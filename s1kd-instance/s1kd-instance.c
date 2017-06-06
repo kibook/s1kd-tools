@@ -1089,6 +1089,8 @@ void undepend_warncaut_cir(xmlDocPtr dm, xmlDocPtr cir)
 		cur = next;
 	}
 
+	xmlNodeSetName(warningsAndCautionsRef, BAD_CAST "warningsAndCautions");
+
 	xmlXPathFreeObject(results1);
 	xmlXPathFreeContext(ctxt1);
 }
