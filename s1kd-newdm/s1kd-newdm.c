@@ -44,14 +44,27 @@ void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
 		printf("%s: ", prompt);
-		fgets(str, n, stdin);
-		strtok(str, "\n");
+
+		while (!strchr(fgets(str, n, stdin), '\n')) {
+			fprintf(stderr, ERR_PREFIX "Bad input for \"%s\".\n", prompt);
+			while (getchar() != '\n');
+			printf("%s: ", prompt);
+		}
+
+		*(strchr(str, '\n')) = '\0';
 	} else {
 		char temp[512] = "";
 
 		printf("%s [%s]: ", prompt, str);
-		fgets(temp, n, stdin);
+
+		while (!strchr(fgets(temp, n, stdin), '\n')) {
+			fprintf(stderr, ERR_PREFIX "Bad input for \"%s\".\n", prompt);
+			while (getchar() != '\n');
+			printf("%s [%s]:  ", prompt, str);
+		}
+
 		*(strchr(temp, '\n')) = '\0';
+
 		if (strcmp(temp, "") != 0) {
 			strncpy(str, temp, n);
 		}
@@ -216,6 +229,10 @@ int main(int argc, char **argv)
 				strcpy(infoCodeVariant, def_val);
 			else if (strcmp(def_key, "itemLocationCode") == 0 && strcmp(itemLocationCode, "") == 0)
 				strcpy(itemLocationCode, def_val);
+			else if (strcmp(def_key, "learnCode") == 0 && strcmp(learnCode, "") == 0)
+				strcpy(learnCode, def_val);
+			else if (strcmp(def_key, "learnEventCode") == 0 && strcmp(learnEventCode, "") == 0)
+				strcpy(learnEventCode, def_val);
 			else if (strcmp(def_key, "languageIsoCode") == 0 && strcmp(languageIsoCode, "") == 0)
 				strcpy(languageIsoCode, def_val);
 			else if (strcmp(def_key, "countryIsoCode") == 0 && strcmp(countryIsoCode, "") == 0)
@@ -290,6 +307,8 @@ int main(int argc, char **argv)
 			prompt("Information code", infoCode, MAX_INFO_CODE);
 			prompt("Information code variant", infoCodeVariant, MAX_INFO_CODE_VARIANT);
 			prompt("Item location code", itemLocationCode, MAX_ITEM_LOCATION_CODE);
+			prompt("Learn code", learnCode, MAX_LEARN_CODE);
+			prompt("Learn event code", learnEventCode, MAX_LEARN_EVENT_CODE);
 		}
 		prompt("Language ISO code", languageIsoCode, MAX_LANGUAGE_ISO_CODE);
 		prompt("Country ISO code", countryIsoCode, MAX_COUNTRY_ISO_CODE);
@@ -377,7 +396,7 @@ int main(int argc, char **argv)
 
 	xmlNodeAddContent(techName, BAD_CAST techName_content);
 
-	if (strcmp(infoName_content, "\n") == 0) {
+	if (strcmp(infoName_content, "") == 0) {
 		xmlUnlinkNode(infoName);
 		xmlFreeNode(infoName);
 	} else {
