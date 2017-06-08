@@ -20,6 +20,8 @@
 #define MAX_INFO_CODE			 3	+ 2
 #define MAX_INFO_CODE_VARIANT		 1	+ 2
 #define MAX_ITEM_LOCATION_CODE		 1	+ 2
+#define MAX_LEARN_CODE                   3      + 2
+#define MAX_LEARN_EVENT_CODE		 1	+ 2
 #define MAX_LANGUAGE_ISO_CODE		 3	+ 2
 #define MAX_COUNTRY_ISO_CODE		 2	+ 2
 #define MAX_ISSUE_NUMBER		 3	+ 2
@@ -103,6 +105,8 @@ int main(int argc, char **argv)
 	char infoCode[MAX_INFO_CODE] = "";
 	char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
 	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+	char learnCode[MAX_LEARN_CODE] = "";
+	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
 
 	char languageIsoCode[MAX_LANGUAGE_ISO_CODE] = "";
 	char countryIsoCode[MAX_COUNTRY_ISO_CODE] = "";
@@ -126,6 +130,7 @@ int main(int argc, char **argv)
 	char dmtype[32] = "";
 
 	char dmc[MAX_DATAMODULE_CODE];
+	char learn[6] = "";
 
 	xmlDocPtr dm;
 	xmlNode *dmodule;
@@ -237,7 +242,7 @@ int main(int argc, char **argv)
 	if (strcmp(dmcode, "") != 0) {
 		int n;
 
-		n = sscanf(dmcode, "%[^-]-%[^-]-%[^-]-%c%c-%[^-]-%2s%[^-]-%3s%c-%c",
+		n = sscanf(dmcode, "%[^-]-%[^-]-%[^-]-%c%c-%[^-]-%2s%[^-]-%3s%c-%c-%3s%1s",
 			modelIdentCode,
 			systemDiffCode,
 			systemCode,
@@ -248,9 +253,11 @@ int main(int argc, char **argv)
 			disassyCodeVariant,
 			infoCode,
 			infoCodeVariant,
-			itemLocationCode);
+			itemLocationCode,
+			learnCode,
+			learnEventCode);
 
-		if (n != 11) {
+		if (n != 11 && n != 13) {
 			fprintf(stderr, ERR_PREFIX "Bad data module code.\n");
 			exit(EXIT_BAD_DMC);
 		}
@@ -331,23 +338,26 @@ int main(int argc, char **argv)
 	techName = find_child(dmTitle, "techName");
 	infoName = find_child(dmTitle, "infoName");
 
-	xmlSetProp(dmCode, (xmlChar *) "modelIdentCode", (xmlChar *) modelIdentCode);
-	xmlSetProp(dmCode, (xmlChar *) "systemDiffCode", (xmlChar *) systemDiffCode);
-	xmlSetProp(dmCode, (xmlChar *) "systemCode", (xmlChar *) systemCode);
-	xmlSetProp(dmCode, (xmlChar *) "subSystemCode", (xmlChar *) subSystemCode);
-	xmlSetProp(dmCode, (xmlChar *) "subSubSystemCode", (xmlChar *) subSubSystemCode);
-	xmlSetProp(dmCode, (xmlChar *) "assyCode", (xmlChar *) assyCode);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCode", (xmlChar *) disassyCode);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCodeVariant", (xmlChar *) disassyCodeVariant);
-	xmlSetProp(dmCode, (xmlChar *) "infoCode", (xmlChar *) infoCode);
-	xmlSetProp(dmCode, (xmlChar *) "infoCodeVariant", (xmlChar *) infoCodeVariant);
-	xmlSetProp(dmCode, (xmlChar *) "itemLocationCode", (xmlChar *) itemLocationCode);
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST systemDiffCode);
+	xmlSetProp(dmCode, BAD_CAST "systemCode", BAD_CAST systemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode", BAD_CAST subSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", BAD_CAST subSubSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "assyCode", BAD_CAST assyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode", BAD_CAST disassyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST infoCode);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST infoCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode", BAD_CAST itemLocationCode);
 
-	xmlSetProp(language, (xmlChar *) "languageIsoCode", (xmlChar *) languageIsoCode);
-	xmlSetProp(language, (xmlChar *) "countryIsoCode", (xmlChar *) countryIsoCode);
+	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
+	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 
-	xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) issueNumber);
-	xmlSetProp(issueInfo, (xmlChar *) "inWork", (xmlChar *) inWork);
+	xmlSetProp(language, BAD_CAST "languageIsoCode", BAD_CAST languageIsoCode);
+	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST countryIsoCode);
+
+	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issueNumber);
+	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inWork);
 
 	time(&now);
 	local = localtime(&now);
@@ -359,33 +369,37 @@ int main(int argc, char **argv)
 	sprintf(month_s, "%.2d", month);
 	sprintf(year_s, "%d", year);
 
-	xmlSetProp(issueDate, (xmlChar *) "year", (xmlChar *) year_s);
-	xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
-	xmlSetProp(issueDate, (xmlChar *) "day", (xmlChar *) day_s);
+	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 
-	xmlSetProp(security, (xmlChar *) "securityClassification", (xmlChar *) securityClassification);
+	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST securityClassification);
 
-	xmlNodeAddContent(techName, (xmlChar *) techName_content);
+	xmlNodeAddContent(techName, BAD_CAST techName_content);
 
 	if (strcmp(infoName_content, "\n") == 0) {
 		xmlUnlinkNode(infoName);
 		xmlFreeNode(infoName);
 	} else {
-		xmlNodeAddContent(infoName, (xmlChar *) infoName_content);
+		xmlNodeAddContent(infoName, BAD_CAST infoName_content);
 	}
 
 	responsiblePartnerCompany = find_child(dmStatus, "responsiblePartnerCompany");
 	enterpriseName = find_child(responsiblePartnerCompany, "enterpriseName");
-	xmlNodeAddContent(enterpriseName, (xmlChar *) responsiblePartnerCompany_enterpriseName);
+	xmlNodeAddContent(enterpriseName, BAD_CAST responsiblePartnerCompany_enterpriseName);
 
 	originator = find_child(dmStatus, "originator");
 	enterpriseName = find_child(originator, "enterpriseName");
-	xmlNodeAddContent(enterpriseName, (xmlChar *) originator_enterpriseName);
+	xmlNodeAddContent(enterpriseName, BAD_CAST originator_enterpriseName);
 
 	for (i = 0; languageIsoCode[i]; ++i) languageIsoCode[i] = toupper(languageIsoCode[i]);
 
+	if (strcmp(learnCode, "") != 0 && strcmp(learnEventCode, "") != 0) {
+		sprintf(learn, "-%s%s", learnCode, learnEventCode);
+	}
+
 	snprintf(dmc, MAX_DATAMODULE_CODE,
-		"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s_%s-%s_%s-%s.XML",
+		"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s_%s-%s_%s-%s.XML",
 		modelIdentCode,
 		systemDiffCode,
 		systemCode,
@@ -397,6 +411,7 @@ int main(int argc, char **argv)
 		infoCode,
 		infoCodeVariant,
 		itemLocationCode,
+		learn,
 		issueNumber,
 		inWork,
 		languageIsoCode,

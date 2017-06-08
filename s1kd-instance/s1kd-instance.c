@@ -41,6 +41,8 @@ struct dmident {
 	char *infoCode;
 	char *infoCodeVariant;
 	char *itemLocationCode;
+	char *learnCode;
+	char *learnEventCode;
 	char *issueNumber;
 	char *inWork;
 	char *languageIsoCode;
@@ -139,6 +141,8 @@ void init_ident(struct dmident *ident, xmlDocPtr dm)
 	ident->infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
 	ident->infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
 	ident->itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
+	ident->learnCode          = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
+	ident->learnEventCode     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
 
 	ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
 	ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
@@ -172,6 +176,8 @@ void free_ident(struct dmident *ident)
 	xmlFree(ident->infoCode);
 	xmlFree(ident->infoCodeVariant);
 	xmlFree(ident->itemLocationCode);
+	xmlFree(ident->learnCode);
+	xmlFree(ident->learnEventCode);
 	xmlFree(ident->issueNumber);
 	xmlFree(ident->inWork);
 	xmlFree(ident->languageIsoCode);
@@ -771,6 +777,7 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 {
 	struct dmident ident;
 	int i;
+	char learn[6] = "";
 
 	init_ident(&ident, dm);
 
@@ -778,8 +785,12 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 		ident.languageIsoCode[i] = toupper(ident.languageIsoCode[i]);
 	}
 
+	if (ident.learnCode && ident.learnEventCode) {
+		sprintf(learn, "-%s%s", ident.learnCode, ident.learnEventCode);
+	}
+
 	if (ident.extended) {
-		sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s_%s-%s_%s-%s.XML",
+		sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s_%s-%s_%s-%s.XML",
 			dir,
 			ident.extensionProducer,
 			ident.extensionCode,
@@ -794,12 +805,13 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 			ident.infoCode,
 			ident.infoCodeVariant,
 			ident.itemLocationCode,
+			learn,
 			ident.issueNumber,
 			ident.inWork,
 			ident.languageIsoCode,
 			ident.countryIsoCode);
 	} else {
-		sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s_%s-%s_%s-%s.XML",
+		sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s_%s-%s_%s-%s.XML",
 			dir,
 			ident.modelIdentCode,
 			ident.systemDiffCode,
@@ -812,6 +824,7 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 			ident.infoCode,
 			ident.infoCodeVariant,
 			ident.itemLocationCode,
+			learn,
 			ident.issueNumber,
 			ident.inWork,
 			ident.languageIsoCode,

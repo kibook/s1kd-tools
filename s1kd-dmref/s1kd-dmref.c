@@ -39,17 +39,19 @@ void printref(const char *ref, int opts)
 	char extension_producer[256] = "";
 	char extension_code[256] = "";
 
-	char model_ident_code[15] = "";
-	char system_diff_code[2] = "";
-	char system_code[4] = "";
-	char assy_code[5] = "";
-	char item_location_code[2] = "";
-	char sub_system_code[2] = "";
-	char sub_sub_system_code[2] = "";
-	char disassy_code[3] = "";
+	char model_ident_code[15]    = "";
+	char system_diff_code[2]     = "";
+	char system_code[4]          = "";
+	char assy_code[5]            = "";
+	char item_location_code[2]   = "";
+	char learn_code[4]           = "";
+	char learn_event_code[2]     = "";
+	char sub_system_code[2]      = "";
+	char sub_sub_system_code[2]  = "";
+	char disassy_code[3]         = "";
 	char disassy_code_variant[4] = "";
-	char info_code[4] = "";
-	char info_code_variant[2] = "";
+	char info_code[4]            = "";
+	char info_code_variant[2]    = "";
 
 	xmlNode *dmRef;
 	xmlNode *dmRefIdent;
@@ -94,7 +96,7 @@ void printref(const char *ref, int opts)
 		code = strtok(NULL, "");
 	}
 
-	n = sscanf(code, "%[^-]-%[^-]-%[^-]-%1s%1s-%[^-]-%2s%[^-]-%3s%1s-%1s",
+	n = sscanf(code, "%[^-]-%[^-]-%[^-]-%1s%1s-%[^-]-%2s%[^-]-%3s%1s-%1s-%3s%1s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
@@ -105,35 +107,40 @@ void printref(const char *ref, int opts)
 		disassy_code_variant,
 		info_code,
 		info_code_variant,
-		item_location_code);
+		item_location_code,
+		learn_code,
+		learn_event_code);
 
-	if (n != 11) {
+	if (n != 11 && n != 13) {
 		fprintf(stderr, ERR_PREFIX "Data module code invalid: %s\n", code);
 		exit(EXIT_BAD_INPUT);
 	}
 
-	dmRef = xmlNewNode(NULL, (xmlChar *) "dmRef");
-	dmRefIdent = xmlNewChild(dmRef, NULL, (xmlChar *) "dmRefIdent", NULL);
+	dmRef = xmlNewNode(NULL, BAD_CAST "dmRef");
+	dmRefIdent = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefIdent", NULL);
 
 	if (is_dme) {
-		identExtension = xmlNewChild(dmRefIdent, NULL, (xmlChar *) "identExtension", NULL);
-		xmlSetProp(identExtension, (xmlChar *) "extensionProducer", (xmlChar *) extension_producer);
-		xmlSetProp(identExtension, (xmlChar *) "extensionCode", (xmlChar *) extension_code);
+		identExtension = xmlNewChild(dmRefIdent, NULL, BAD_CAST "identExtension", NULL);
+		xmlSetProp(identExtension, BAD_CAST "extensionProducer", BAD_CAST extension_producer);
+		xmlSetProp(identExtension, BAD_CAST "extensionCode", BAD_CAST extension_code);
 	}
 
-	dmCode = xmlNewChild(dmRefIdent, NULL, (xmlChar *) "dmCode", NULL);
+	dmCode = xmlNewChild(dmRefIdent, NULL, BAD_CAST "dmCode", NULL);
 
-	xmlSetProp(dmCode, (xmlChar *) "modelIdentCode", (xmlChar *) model_ident_code);
-	xmlSetProp(dmCode, (xmlChar *) "systemDiffCode", (xmlChar *) system_diff_code);
-	xmlSetProp(dmCode, (xmlChar *) "systemCode", (xmlChar *) system_code);
-	xmlSetProp(dmCode, (xmlChar *) "subSystemCode", (xmlChar *) sub_system_code);
-	xmlSetProp(dmCode, (xmlChar *) "subSubSystemCode", (xmlChar *) sub_sub_system_code);
-	xmlSetProp(dmCode, (xmlChar *) "assyCode", (xmlChar *) assy_code);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCode", (xmlChar *) disassy_code);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCodeVariant", (xmlChar *) disassy_code_variant);
-	xmlSetProp(dmCode, (xmlChar *) "infoCode", (xmlChar *) info_code);
-	xmlSetProp(dmCode, (xmlChar *) "infoCodeVariant", (xmlChar *) info_code_variant);
-	xmlSetProp(dmCode, (xmlChar *) "itemLocationCode", (xmlChar *) item_location_code);
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST system_diff_code);
+	xmlSetProp(dmCode, BAD_CAST "systemCode", BAD_CAST system_code);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode", BAD_CAST sub_system_code);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", BAD_CAST sub_sub_system_code);
+	xmlSetProp(dmCode, BAD_CAST "assyCode", BAD_CAST assy_code);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode", BAD_CAST disassy_code);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassy_code_variant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST info_code);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST info_code_variant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode", BAD_CAST item_location_code);
+
+	if (strcmp(learn_code, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learn_code);
+	if (strcmp(learn_event_code, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learn_event_code);
 
 	if (opts) {
 		doc = xmlReadFile(ref, NULL, 0);
@@ -161,7 +168,7 @@ void printref(const char *ref, int opts)
 		}
 
 		if (hasopt(opts, OPT_TITLE)) {
-			dmRefAddressItems = xmlNewChild(dmRef, NULL, (xmlChar *) "dmRefAddressItems", NULL);
+			dmRefAddressItems = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefAddressItems", NULL);
 			xmlAddChild(dmRefAddressItems, xmlCopyNode(ref_dmTitle, 1));
 		}
 

@@ -70,23 +70,32 @@ void copy_code(char *dst, xmlNodePtr ref)
 		char *info_code;
 		char *info_code_variant;
 		char *item_location_code;
+		char *learn_code;
+		char *learn_event_code;
+
+		char learn[6] = "";
 
 		ref_ident = find_child(ref, "dmRefIdent");
 		code = find_child(ref_ident, "dmCode");
 
-		model_ident_code = (char *) xmlGetProp(code, (xmlChar *) "modelIdentCode");
-		system_diff_code = (char *) xmlGetProp(code, (xmlChar *) "systemDiffCode");
-		system_code = (char *) xmlGetProp(code, (xmlChar *) "systemCode");
-		sub_system_code = (char *) xmlGetProp(code, (xmlChar *) "subSystemCode");
-		sub_sub_system_code = (char *) xmlGetProp(code, (xmlChar *) "subSubSystemCode");
-		assy_code = (char *) xmlGetProp(code, (xmlChar *) "assyCode");
-		disassy_code = (char *) xmlGetProp(code, (xmlChar *) "disassyCode");
-		disassy_code_variant = (char *) xmlGetProp(code, (xmlChar *) "disassyCodeVariant");
-		info_code = (char *) xmlGetProp(code, (xmlChar *) "infoCode");
-		info_code_variant = (char *) xmlGetProp(code, (xmlChar *) "infoCodeVariant");
-		item_location_code = (char *) xmlGetProp(code, (xmlChar *) "itemLocationCode");
+		model_ident_code     = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+		system_diff_code     = (char *) xmlGetProp(code, BAD_CAST "systemDiffCode");
+		system_code          = (char *) xmlGetProp(code, BAD_CAST "systemCode");
+		sub_system_code      = (char *) xmlGetProp(code, BAD_CAST "subSystemCode");
+		sub_sub_system_code  = (char *) xmlGetProp(code, BAD_CAST "subSubSystemCode");
+		assy_code            = (char *) xmlGetProp(code, BAD_CAST "assyCode");
+		disassy_code         = (char *) xmlGetProp(code, BAD_CAST "disassyCode");
+		disassy_code_variant = (char *) xmlGetProp(code, BAD_CAST "disassyCodeVariant");
+		info_code            = (char *) xmlGetProp(code, BAD_CAST "infoCode");
+		info_code_variant    = (char *) xmlGetProp(code, BAD_CAST "infoCodeVariant");
+		item_location_code   = (char *) xmlGetProp(code, BAD_CAST "itemLocationCode");
+		learn_code           = (char *) xmlGetProp(code, BAD_CAST "learnCode");
+		learn_event_code     = (char *) xmlGetProp(code, BAD_CAST "learnEventCode");
 
-		sprintf(dst, DM"%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
+		if (learn_code && learn_event_code)
+			sprintf(learn, "-%s%s", learn_code, learn_event_code);
+
+		sprintf(dst, DM"%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
 			model_ident_code,
 			system_diff_code,
 			system_code,
@@ -97,7 +106,8 @@ void copy_code(char *dst, xmlNodePtr ref)
 			disassy_code_variant,
 			info_code,
 			info_code_variant,
-			item_location_code);
+			item_location_code,
+			learn);
 
 		xmlFree(model_ident_code);
 		xmlFree(system_diff_code);
@@ -110,6 +120,8 @@ void copy_code(char *dst, xmlNodePtr ref)
 		xmlFree(info_code);
 		xmlFree(info_code_variant);
 		xmlFree(item_location_code);
+		xmlFree(learn_code);
+		xmlFree(learn_event_code);
 	} else if (strcmp((char *) ref->name, "pmRef") == 0) {
 		char *pm_issuer;
 		char *pm_number;
@@ -118,10 +130,10 @@ void copy_code(char *dst, xmlNodePtr ref)
 		ref_ident = find_child(ref, "pmRefIdent");
 		code = find_child(ref_ident, "pmCode");
 
-		model_ident_code = (char *) xmlGetProp(code, (xmlChar *) "modelIdentCode");
-		pm_issuer = (char *) xmlGetProp(code, (xmlChar *) "pmIssuer");
-		pm_number = (char *) xmlGetProp(code, (xmlChar *) "pmNumber");
-		pm_volume = (char *) xmlGetProp(code, (xmlChar *) "pmVolume");
+		model_ident_code = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+		pm_issuer = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
+		pm_number = (char *) xmlGetProp(code, BAD_CAST "pmNumber");
+		pm_volume = (char *) xmlGetProp(code, BAD_CAST "pmVolume");
 
 		sprintf(dst, PM"%s-%s-%s-%s",
 			model_ident_code,
@@ -202,7 +214,7 @@ void sync_refs(xmlNodePtr dmodule)
 		xmlFreeNode(old_refs);
 	}
 
-	new_refs = xmlNewNode(NULL, (xmlChar *) "refs");
+	new_refs = xmlNewNode(NULL, BAD_CAST "refs");
 
 	xmlAddPrevSibling(content->children, new_refs);
 
@@ -221,7 +233,7 @@ void sync_refs(xmlNodePtr dmodule)
 
 	for (i = 0; i < n; ++i) {
 		new_node = xmlAddChild(new_refs, xmlCopyNode(refs[i].ref, 1));
-		xmlUnsetProp(new_node, (xmlChar *) "id");
+		xmlUnsetProp(new_node, BAD_CAST "id");
 	}
 }
 
