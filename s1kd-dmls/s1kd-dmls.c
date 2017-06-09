@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <unistd.h>
+#include <libgen.h>
 #include <libxml/tree.h>
 
 #define COL_ISSDATE	0x01
@@ -277,11 +278,18 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		/* Read dms to list from arguments */
 		for (i = optind; i < argc; ++i) {
+			char path[PATH_MAX];
+			char *base;
+
+			strcpy(path, argv[i]);
+
+			base = basename(path);
+
 			if (only_writable && access(argv[i], W_OK) != 0)
 				continue;
-			if (isdm(argv[i])) {
+			if (isdm(base)) {
 				strcpy(dms[ndms++], argv[i]);
-			} else if (ispm(argv[i])) {
+			} else if (ispm(base)) {
 				strcpy(pms[npms++], argv[i]);
 			}
 		}
