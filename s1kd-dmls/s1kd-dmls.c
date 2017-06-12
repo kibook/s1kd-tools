@@ -278,11 +278,9 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		/* Read dms to list from arguments */
 		for (i = optind; i < argc; ++i) {
-			char path[PATH_MAX];
-			char *base;
+			char path[PATH_MAX], *base;
 
 			strcpy(path, argv[i]);
-
 			base = basename(path);
 
 			if (only_writable && access(argv[i], W_OK) != 0)
