@@ -88,8 +88,13 @@ void printdms(char dms[1024][256], int n, int columns, int header)
 
 	for (i = 0; i < n; ++i) {
 		char *tech, *info;
+		char real[PATH_MAX];
 
-		dm = xmlReadFile(dms[i], NULL, 0);
+		if (readlink(dms[i], real, PATH_MAX) != -1) {
+			dm = xmlReadFile(real, NULL, 0);
+		} else {
+			dm = xmlReadFile(dms[i], NULL, 0);
+		}
 
 		dmodule = xmlDocGetRootElement(dm);
 		identAndStatusSection = findChild(dmodule, "identAndStatusSection");
