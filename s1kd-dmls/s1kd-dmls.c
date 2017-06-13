@@ -244,8 +244,14 @@ int is_directory(const char *path)
 {
 	struct stat st;
 
+	char scratch[PATH_MAX];
+	char *base;
+
+	strcpy(scratch, path);
+	base = basename(scratch);
+
 	/* Do not recurse in to current or parent directory */
-	if (strcmp(path, ".") == 0 || strcmp(path, "..") == 0)
+	if (strcmp(base, ".") == 0 || strcmp(base, "..") == 0)
 		return 0;
 
 	stat(path, &st);
@@ -258,19 +264,18 @@ void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][2
 	struct dirent *cur;
 
 	int len = strlen(path);
-	char *fpath;
+	char fpath[PATH_MAX];
+	char cpath[PATH_MAX];
 
 	if (strcmp(path, ".") == 0) {
-		fpath = strdup("");
+		strcpy(fpath, "");
 	} else if (path[len - 1] != '/') {
-		fpath = malloc(len + 2);
 		strcpy(fpath, path);
 		strcat(fpath, "/");
 	} else {
-		fpath = strdup(path);
+		strcpy(fpath, path);
 	}
 
-	/* Read dms to list from current directory */
 	dir = opendir(path);
 
 	while ((cur = readdir(dir))) {
@@ -284,16 +289,15 @@ void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][2
 			strcpy(pms[*npms], fpath);
 			strcat(pms[*npms], cur->d_name);
 			(*npms)++;
-		} else if (recursive && is_directory(cur->d_name)) {
-			char *cpath = malloc(len + strlen(cur->d_name) + 1);
+		} else if (recursive) {
 			strcpy(cpath, fpath);
 			strcat(cpath, cur->d_name);
-			list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
-			free(cpath);
+
+			if (is_directory(cpath)) {
+				list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
+			}
 		}
 	}
-	
-	free(fpath);
 }
 
 int main(int argc, char **argv)
@@ -329,9 +333,8 @@ int main(int argc, char **argv)
 			case 'w': only_writable = 1; break;
 			case 'R': recursive = 1; break;
 			case 'h':
-			case '?':
-				show_help();
-				exit(0);
+			case '?': show_help();
+				  exit(0);
 		}
 	}
 
