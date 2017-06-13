@@ -1,7 +1,7 @@
 SOURCE=s1kd-dmls.c
 OUTPUT=s1kd-dmls
 
-CFLAGS=-Wall -Werror -O3 `pkg-config --cflags libxml-2.0`
+CFLAGS=-Wall -Werror -g `pkg-config --cflags libxml-2.0`
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
 INSTALL_PREFIX=/usr/bin

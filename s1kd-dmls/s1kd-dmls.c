@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <sys/stat.h>
 #include <libxml/tree.h>
 
 #define COL_ISSDATE	0x01
@@ -239,6 +240,62 @@ void show_help(void)
 	puts("  -h	Show this help message");
 }
 
+int is_directory(const char *path)
+{
+	struct stat st;
+
+	/* Do not recurse in to current or parent directory */
+	if (strcmp(path, ".") == 0 || strcmp(path, "..") == 0)
+		return 0;
+
+	stat(path, &st);
+	return S_ISDIR(st.st_mode);
+}
+
+void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][256], int *npms, int only_writable, int recursive)
+{
+	DIR *dir;
+	struct dirent *cur;
+
+	int len = strlen(path);
+	char *fpath;
+
+	if (strcmp(path, ".") == 0) {
+		fpath = strdup("");
+	} else if (path[len - 1] != '/') {
+		fpath = malloc(len + 2);
+		strcpy(fpath, path);
+		strcat(fpath, "/");
+	} else {
+		fpath = strdup(path);
+	}
+
+	/* Read dms to list from current directory */
+	dir = opendir(path);
+
+	while ((cur = readdir(dir))) {
+		if (only_writable && access(cur->d_name, W_OK) != 0)
+			continue;
+		if (isdm(cur->d_name)) {
+			strcpy(dms[*ndms], fpath);
+			strcat(dms[*ndms], cur->d_name);
+			(*ndms)++;
+		} else if (ispm(cur->d_name)) {
+			strcpy(pms[*npms], fpath);
+			strcat(pms[*npms], cur->d_name);
+			(*npms)++;
+		} else if (recursive && is_directory(cur->d_name)) {
+			char *cpath = malloc(len + strlen(cur->d_name) + 1);
+			strcpy(cpath, fpath);
+			strcat(cpath, cur->d_name);
+			list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
+			free(cpath);
+		}
+	}
+	
+	free(fpath);
+}
+
 int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
@@ -254,11 +311,12 @@ int main(int argc, char **argv)
 	int only_writable = 0;
 	char latest_dms[1024][256];
 	int nlatest_dms;
+	int recursive = 0;
 
 	int columns = 0;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "ltiroaAHwh?")) != -1) {
+	while ((c = getopt(argc, argv, "ltiroaAHwRh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 't': columns |= COL_TITLE; break;
@@ -269,6 +327,7 @@ int main(int argc, char **argv)
 			case 'A': columns |= COL_ALL; break;
 			case 'H': header = 1; break;
 			case 'w': only_writable = 1; break;
+			case 'R': recursive = 1; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -294,23 +353,13 @@ int main(int argc, char **argv)
 				strcpy(dms[ndms++], argv[i]);
 			} else if (ispm(base)) {
 				strcpy(pms[npms++], argv[i]);
+			} else if (recursive && is_directory(argv[i])) {
+				list_dir(argv[i], dms, &ndms, pms, &npms, only_writable, recursive);
 			}
 		}
 	} else {
-		struct dirent *cur;
-
 		/* Read dms to list from current directory */
-		dir = opendir(".");
-
-		while ((cur = readdir(dir))) {
-			if (only_writable && access(cur->d_name, W_OK) != 0)
-				continue;
-			if (isdm(cur->d_name)) {
-				strcpy(dms[ndms++], cur->d_name);
-			} else if (ispm(cur->d_name)) {
-				strcpy(pms[npms++], cur->d_name);
-			}
-		}
+		list_dir(".", dms, &ndms, pms, &npms, only_writable, recursive);
 	}
 
 	qsort(dms, ndms, 256, compare);
