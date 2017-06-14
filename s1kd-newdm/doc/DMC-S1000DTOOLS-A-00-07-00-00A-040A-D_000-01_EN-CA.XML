@@ -121,9 +121,21 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the responsible partner company.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-o &lt;orig&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The originator enterprise name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-O &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the originator.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -180,7 +192,7 @@
           <para>This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named 'defaults', but any file can be specified by using the -d option.</para>
           <para>Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Example:</para>
           <para>
-            <verbatimText><![CDATA[modelIdentCode               S1000DTOOLS
+            <verbatimText verbatimStyle="vs23"><![CDATA[modelIdentCode               S1000DTOOLS
 systemDiffCode               A
 systemCode                   00
 subSystemCode                0
@@ -205,7 +217,7 @@ originator                   khzai.net]]></verbatimText>
           <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named 'dmtypes', but any file can be specified by using the -D option.</para>
           <para>Each line consists of an info code and a schema identifier. Example:</para>
           <para>
-            <verbatimText><![CDATA[00E    comrep
+            <verbatimText verbatimStyle="vs23"><![CDATA[00E    comrep
 00W    appliccrossreftable
 009    frontmatter
 022    brex

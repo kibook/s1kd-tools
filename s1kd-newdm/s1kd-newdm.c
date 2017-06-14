@@ -101,7 +101,9 @@ void show_help(void)
 	puts("  -w	Inwork issue");
 	puts("  -c	Security classification");
 	puts("  -r	Responsible partner company enterprise name");
+	puts("  -R	Responsible partner company CAGE code.");
 	puts("  -o	Originator enterprise name");
+	puts("  -O	Originator CAGE code.");
 	puts("  -t	Tech name");
 	puts("  -i	Info name");
 	puts("  -T	DM type (descript, proced, frontmatter, brex, brdoc)");

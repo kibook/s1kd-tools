@@ -46,8 +46,14 @@ The security classification of the new data module.
 -r &lt;RPC&gt;  
 The responsible partner company enterprise name of the new data module.
 
+-R &lt;CAGE&gt;  
+The CAGE code of the responsible partner company.
+
 -o &lt;orig&gt;  
 The originator enterprise name of the new data module.
+
+-O &lt;CAGE&gt;  
+The CAGE code of the originator.
 
 -t &lt;tech&gt;  
 The tech name of the new data module.
