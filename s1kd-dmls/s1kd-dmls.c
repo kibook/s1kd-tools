@@ -67,7 +67,6 @@ void printdms(char dms[1024][256], int n, int columns, int header)
 	xmlNodePtr displayText;
 	xmlNodePtr simplePara;
 
-
 	char *year;
 	char *month;
 	char *day;
