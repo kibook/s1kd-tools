@@ -184,7 +184,7 @@ int main(int argc, char **argv)
 	char dmcode[256] = "";
 	bool skipdmc = false;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:o:t:i:T:#:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
