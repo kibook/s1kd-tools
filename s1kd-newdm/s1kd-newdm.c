@@ -31,6 +31,8 @@
 #define MAX_DATAMODULE_CODE 256
 
 #define MAX_ENTERPRISE_NAME 256
+#define MAX_ENTERPRISE_CODE 7
+
 #define MAX_TECH_NAME 256
 #define MAX_INFO_NAME 256
 
@@ -132,6 +134,9 @@ int main(int argc, char **argv)
 	char responsiblePartnerCompany_enterpriseName[MAX_ENTERPRISE_NAME] = "";
 	char originator_enterpriseName[MAX_ENTERPRISE_NAME] = "";
 
+	char responsiblePartnerCompany_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
+	char originator_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
+
 	char techName_content[MAX_TECH_NAME] = "";
 	char infoName_content[MAX_INFO_NAME] = "";
 
@@ -190,7 +195,9 @@ int main(int argc, char **argv)
 			case 'w': strcpy(inWork, optarg); break;
 			case 'c': strcpy(securityClassification, optarg); break;
 			case 'r': strcpy(responsiblePartnerCompany_enterpriseName, optarg); break;
+			case 'R': strcpy(responsiblePartnerCompany_enterpriseCode, optarg); break;
 			case 'o': strcpy(originator_enterpriseName, optarg); break;
+			case 'O': strcpy(originator_enterpriseCode, optarg); break;
 			case 't': strcpy(techName_content, optarg); break;
 			case 'i': strcpy(infoName_content, optarg); break;
 			case 'T': strcpy(dmtype, optarg); break;
@@ -245,8 +252,12 @@ int main(int argc, char **argv)
 				strcpy(securityClassification, def_val);
 			else if (strcmp(def_key, "responsiblePartnerCompany") == 0 && strcmp(responsiblePartnerCompany_enterpriseName, "") == 0)
 				strcpy(responsiblePartnerCompany_enterpriseName, def_val);
+			else if (strcmp(def_key, "responsiblePartnerCompanyCode") == 0 && strcmp(responsiblePartnerCompany_enterpriseCode, "") == 0)
+				strcpy(responsiblePartnerCompany_enterpriseCode, def_val);
 			else if (strcmp(def_key, "originator") == 0 && strcmp(originator_enterpriseName, "") == 0)
 				strcpy(originator_enterpriseName, def_val);
+			else if (strcmp(def_key, "originatorCode") == 0 && strcmp(originator_enterpriseCode, "") == 0)
+				strcpy(originator_enterpriseCode, def_val);
 			else if (strcmp(def_key, "techName") == 0 && strcmp(techName_content, "") == 0)
 				strcpy(techName_content, def_val);
 			else if (strcmp(def_key, "infoName") == 0 && strcmp(infoName_content, "") == 0)
@@ -404,10 +415,16 @@ int main(int argc, char **argv)
 	}
 
 	responsiblePartnerCompany = find_child(dmStatus, "responsiblePartnerCompany");
+	if (strcmp(responsiblePartnerCompany_enterpriseCode, "") != 0) {
+		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST responsiblePartnerCompany_enterpriseCode);
+	}
 	enterpriseName = find_child(responsiblePartnerCompany, "enterpriseName");
 	xmlNodeAddContent(enterpriseName, BAD_CAST responsiblePartnerCompany_enterpriseName);
 
 	originator = find_child(dmStatus, "originator");
+	if (strcmp(originator_enterpriseCode, "") != 0) {
+		xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST originator_enterpriseCode);
+	}
 	enterpriseName = find_child(originator, "enterpriseName");
 	xmlNodeAddContent(enterpriseName, BAD_CAST originator_enterpriseName);
 
