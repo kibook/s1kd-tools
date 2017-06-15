@@ -126,8 +126,10 @@ option.
 Each line consists of the identifier of a piece of metadata and its
 default value, separated by whitespace.
 Example:
-.PP
-\f[C]modelIdentCode\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ S1000DTOOLS
+.IP
+.nf
+\f[C]
+modelIdentCode\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ S1000DTOOLS
 systemDiffCode\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ A
 systemCode\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 00
 subSystemCode\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0
@@ -144,7 +146,9 @@ issueNumber\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 000
 inWork\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 01
 securityClassification\ \ \ \ \ \ \ 01
 responsiblePartnerCompany\ \ \ \ khzai.net
-originator\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ khzai.net\f[]
+originator\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ khzai.net
+\f[]
+.fi
 .SS \[aq]dmtypes\[aq] file
 .PP
 This file sets the default type (schema) for data modules based on their
@@ -155,14 +159,18 @@ option.
 .PP
 Each line consists of an info code and a schema identifier.
 Example:
-.PP
-\f[C]00E\ \ \ \ comrep
+.IP
+.nf
+\f[C]
+00E\ \ \ \ comrep
 00W\ \ \ \ appliccrossreftable
 009\ \ \ \ frontmatter
 022\ \ \ \ brex
 024\ \ \ \ brdoc
 040\ \ \ \ descript
-520\ \ \ \ proced\f[]
+520\ \ \ \ proced
+\f[]
+.fi
 .SH EXAMPLE
 .PP
 s1kd\-newdm \-# S1000DTOOLS\-A\-00\-07\-00\-00A\-040A\-D \-T descript
