@@ -230,7 +230,7 @@ void show_dmcode(xmlNodePtr node)
 int edit_dmcode(xmlNodePtr node, const char *val)
 {
 	char model_ident_code[15];
-	char system_diff_code[2];
+	char system_diff_code[5];
 	char system_code[4];
 	char sub_system_code[2];
 	char sub_sub_system_code[2];

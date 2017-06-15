@@ -40,7 +40,7 @@ void printref(const char *ref, int opts)
 	char extension_code[256] = "";
 
 	char model_ident_code[15]    = "";
-	char system_diff_code[2]     = "";
+	char system_diff_code[5]     = "";
 	char system_code[4]          = "";
 	char assy_code[5]            = "";
 	char item_location_code[2]   = "";
