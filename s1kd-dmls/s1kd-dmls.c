@@ -5,6 +5,7 @@
 #include <libgen.h>
 #include <sys/stat.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #define COL_ISSDATE	0x01
 #define COL_RPC		0x02
@@ -230,6 +231,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -l	Show only latest issue/inwork version");
+	puts("  -I      Show only official issues");
 	puts("  -i	Include issue date column");
 	puts("  -r	Include responsible partner company column");
 	puts("  -o	Include originator column");
@@ -299,6 +301,20 @@ void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][2
 	}
 }
 
+int is_official_issue(const char *fname)
+{
+	xmlDocPtr doc = xmlReadFile(fname, NULL, 0);
+	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "string(//dmIdent/issueInfo/@inWork)", ctxt);
+	int ret = strcmp((char *) result->stringval, "00") == 0;
+
+	xmlXPathFreeObject(result);
+	xmlXPathFreeContext(ctxt);
+	xmlFreeDoc(doc);
+
+	return ret;
+}
+
 int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
@@ -311,17 +327,21 @@ int main(int argc, char **argv)
 
 	int c;
 	int only_latest = 0;
+	int only_official_issue = 0;
 	int only_writable = 0;
 	char latest_dms[1024][256];
 	int nlatest_dms;
+	char issue_dms[1024][256];
+	int nissue_dms;
 	int recursive = 0;
 
 	int columns = 0;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "ltiroaAHwRh?")) != -1) {
+	while ((c = getopt(argc, argv, "lItiroaAHwRh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
+			case 'I': only_official_issue = 1; break;
 			case 't': columns |= COL_TITLE; break;
 			case 'i': columns |= COL_ISSDATE; break;
 			case 'r': columns |= COL_RPC; break;
@@ -340,6 +360,7 @@ int main(int argc, char **argv)
 	ndms = 0;
 	npms = 0;
 	nlatest_dms = 0;
+	nissue_dms = 0;
 
 	if (optind < argc) {
 		/* Read dms to list from arguments */
@@ -367,7 +388,23 @@ int main(int argc, char **argv)
 	qsort(dms, ndms, 256, compare);
 	qsort(pms, npms, 256, compare);
 
-	if (only_latest) {
+	if (only_official_issue) {
+		for (i = 0; i < ndms; ++i) {
+			if (is_official_issue(dms[i])) {
+				strcpy(issue_dms[nissue_dms++], dms[i]);
+			}
+		}
+
+		if (only_latest) {
+			for (i = 0; i < nissue_dms; ++i) {
+				if (i == 0 || strncmp(issue_dms[i], issue_dms[i - 1], strchr(issue_dms[i], '_') - issue_dms[i]) != 0) {
+					strcpy(latest_dms[nlatest_dms++], issue_dms[i]);
+				} else {
+					strcpy(latest_dms[nlatest_dms - 1], issue_dms[i]);
+				}
+			}
+		}
+	} else if (only_latest) {
 		for (i = 0; i < ndms; ++i) {
 			if (i == 0 || strncmp(dms[i], dms[i - 1], strchr(dms[i], '_') - dms[i]) != 0) {
 				strcpy(latest_dms[nlatest_dms++], dms[i]);
@@ -379,6 +416,8 @@ int main(int argc, char **argv)
 
 	if (only_latest) {
 		printdms(latest_dms, nlatest_dms, columns, header);
+	} else if (only_official_issue) {
+		printdms(issue_dms, nissue_dms, columns, header);
 	} else {
 		printdms(dms, ndms, columns, header);
 	}

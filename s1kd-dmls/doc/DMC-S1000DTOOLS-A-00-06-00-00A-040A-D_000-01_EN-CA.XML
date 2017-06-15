@@ -67,6 +67,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-I</listItemTerm>
+              <listItemDefinition>
+                <para>Show only official issues of data modules (inwork = 00).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
                 <para>Include the issue date column.</para>

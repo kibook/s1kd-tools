@@ -19,6 +19,9 @@ OPTIONS
 -l  
 Show only the latest issue/inwork version of data modules.
 
+-I  
+Show only official issues of data modules (inwork = 00).
+
 -i  
 Include the issue date column.
 
