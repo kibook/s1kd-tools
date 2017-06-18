@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 
 	while ((c = getopt(argc, argv, "vqDd:h?")) != -1) {
 		switch (c) {
-			case 's': verbosity = SILENT; break;
+			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 'D': verbosity = DEBUG; break;
 			case 'd': strcpy(schema_dir, optarg); break;
