@@ -85,13 +85,48 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -d <dir> Search for schemas in <dir> instead of using the URL.");
+	puts("  -X <URI> Exclude namespace from validation by URI.");
 	puts("  -v       Verbose output.");
 	puts("  -q       Silent (not output).");
 	puts("  -D       Debug output.");
 	puts("  <dms>    Any number of data modules to validate.");
 }
 
-int validate_file(const char *fname, const char *schema_dir)
+void add_ignore_ns(xmlNodePtr ignore_ns, const char *arg)
+{
+	xmlNewChild(ignore_ns, NULL, BAD_CAST "ignore", BAD_CAST arg);
+}
+
+void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
+{
+	xmlXPathContextPtr ctxt;
+	xmlXPathObjectPtr results;
+
+	char xpath[256];
+
+	char *uri;
+	int i;
+
+	uri = (char *) xmlNodeGetContent(ignore);
+
+	snprintf(xpath, 256, "//*[namespace-uri() = '%s']", uri);
+
+	xmlFree(uri);
+
+	ctxt = xmlXPathNewContext(doc);
+	
+	results = xmlXPathEvalExpression(BAD_CAST xpath, ctxt);
+
+	for (i = results->nodesetval->nodeNr - 1; i >= 0; --i) {
+		xmlUnlinkNode(results->nodesetval->nodeTab[i]);
+		xmlFreeNode(results->nodesetval->nodeTab[i]);
+	}
+
+	xmlXPathFreeObject(results);
+	xmlXPathFreeContext(ctxt);
+}
+
+int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns)
 {
 	xmlDocPtr doc;
 	xmlNodePtr dmodule;
@@ -100,6 +135,14 @@ int validate_file(const char *fname, const char *schema_dir)
 	int err;
 
 	doc = xmlReadFile(fname, NULL, 0);
+
+	if (ignore_ns->children) {
+		xmlNodePtr cur;
+
+		for (cur = ignore_ns->children; cur; cur = cur->next) {
+			strip_ns(doc, cur);
+		}
+	}
 
 	dmodule = xmlDocGetRootElement(doc);
 
@@ -162,22 +205,27 @@ int main(int argc, char *argv[])
 	char schema_dir[256] = "";
 	int err = 0;
 
-	while ((c = getopt(argc, argv, "vqDd:h?")) != -1) {
+	xmlNodePtr ignore_ns;
+
+	ignore_ns = xmlNewNode(NULL, BAD_CAST "ignorens");
+
+	while ((c = getopt(argc, argv, "vqDd:X:h?")) != -1) {
 		switch (c) {
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 'D': verbosity = DEBUG; break;
 			case 'd': strcpy(schema_dir, optarg); break;
-			case 'h':
+			case 'X': add_ignore_ns(ignore_ns, optarg); break;
+			case 'h': 
 			case '?': show_help(); exit(0);
 		}
 	}
 
 	if (optind >= argc) {
-		err = validate_file("-", schema_dir);
+		err = validate_file("-", schema_dir, ignore_ns);
 	} else {
 		for (i = optind; i < argc; ++i) {
-			err += validate_file(argv[i], schema_dir);
+			err += validate_file(argv[i], schema_dir, ignore_ns);
 		}
 	}
 
@@ -187,6 +235,8 @@ int main(int argc, char *argv[])
 		xmlSchemaFree(schema_parsers[i].schema);
 		xmlSchemaFreeParserCtxt(schema_parsers[i].ctxt);
 	}
+
+	xmlFree(ignore_ns);
 
 	xmlCleanupParser();
 
