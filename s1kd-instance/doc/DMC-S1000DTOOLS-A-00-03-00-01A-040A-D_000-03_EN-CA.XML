@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- This document was created with Syntext Serna Free. -->
 <!DOCTYPE dmodule [
 <!ENTITY % ISOEntities PUBLIC "ISO 8879-1986//ENTITIES ISO Character Entities 20030531//EN//XML" "http://www.s1000d.org/S1000D_4-2/ent/ISOEntities">
 ]>
@@ -155,7 +156,7 @@
             <definitionListItem>
               <listItemTerm>-Y &lt;text&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set the applicability for the whole data module using the user-definied applicability values, using text as the new display text.</para>
+                <para>Set the applicability for the whole data module using the user-defined applicability values, using text as the new display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -186,8 +187,8 @@
         </para>
         <levelledPara>
           <title>-a vs -A</title>
-          <para>The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambigously valid (their validity does not rely on applicability values left undefined by the user). The applicability statements themselves however will be untouched.</para>
-          <para>The -A option will do the above, but will also attempt to simplify unused parts of applicability statements or remove unused applicability statements entirely. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambigously valid or invalid given the user-definied values, and removing uneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.</para>
+          <para>The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). The applicability statements themselves however will be untouched.</para>
+          <para>The -A option will do the above, but will also attempt to simplify unused parts of applicability statements or remove unused applicability statements entirely. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.</para>
           <note>
             <notePara>The -A option may change the <emphasis>meaning</emphasis> of certain applicability statements without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect.</notePara>
           </note>
