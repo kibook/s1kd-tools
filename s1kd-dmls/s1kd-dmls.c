@@ -280,6 +280,8 @@ void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][2
 	dir = opendir(path);
 
 	while ((cur = readdir(dir))) {
+		if (access(cur->d_name, R_OK) != 0)
+			continue;
 		if (only_writable && access(cur->d_name, W_OK) != 0)
 			continue;
 		if (isdm(cur->d_name)) {
@@ -370,8 +372,12 @@ int main(int argc, char **argv)
 			strcpy(path, argv[i]);
 			base = basename(path);
 
+			if (access(argv[i], R_OK) != 0)
+				continue;
+
 			if (only_writable && access(argv[i], W_OK) != 0)
 				continue;
+
 			if (isdm(base)) {
 				strcpy(dms[ndms++], argv[i]);
 			} else if (ispm(base)) {
