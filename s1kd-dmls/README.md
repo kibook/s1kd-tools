@@ -6,7 +6,7 @@ s1kd-dmls - List data modules
 SYNOPSIS
 ========
 
-s1kd-dmls \[aHhilor\]
+s1kd-dmls \[-aHhilortT\]
 
 DESCRIPTION
 ===========
@@ -21,6 +21,12 @@ Show only the latest issue/inwork version of data modules.
 
 -I  
 Show only official issues of data modules (inwork = 00).
+
+-t  
+Show tech and info name columns.
+
+-T  
+Show title in single column (techName - infoName).
 
 -i  
 Include the issue date column.

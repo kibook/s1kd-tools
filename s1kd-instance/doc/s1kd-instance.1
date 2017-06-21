@@ -102,7 +102,7 @@ applicability statements.
 .RE
 .TP
 .B \-Y <text>
-Set the applicability for the whole data module using the user\-definied
+Set the applicability for the whole data module using the user\-defined
 applicability values, using text as the new display text.
 .RS
 .RE
@@ -137,7 +137,7 @@ Any number of applicability definitions in the form of:
 .SS \-a vs \-A
 .PP
 The \-a option will remove applicability annotations (applicRefId) from
-elements which are deemed to be unambigously valid (their validity does
+elements which are deemed to be unambiguously valid (their validity does
 not rely on applicability values left undefined by the user).
 The applicability statements themselves however will be untouched.
 .PP
@@ -145,8 +145,8 @@ The \-A option will do the above, but will also attempt to simplify
 unused parts of applicability statements or remove unused applicability
 statements entirely.
 It simplifies a statement by removing <assert> elements determined to be
-either unambigously valid or invalid given the user\-definied values,
-and removing uneeded <evaluate> elements when they contain only one
+either unambiguously valid or invalid given the user\-defined values,
+and removing unneeded <evaluate> elements when they contain only one
 remaining <assert>.
 .RS
 .PP

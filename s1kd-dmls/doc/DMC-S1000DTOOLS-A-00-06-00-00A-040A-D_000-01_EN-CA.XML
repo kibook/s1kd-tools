@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-dmls [aHhilor]</para>
+        <para>s1kd-dmls [-aHhilortT]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -70,6 +70,18 @@
               <listItemTerm>-I</listItemTerm>
               <listItemDefinition>
                 <para>Show only official issues of data modules (inwork = 00).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Show tech and info name columns.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T</listItemTerm>
+              <listItemDefinition>
+                <para>Show title in single column (techName - infoName).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

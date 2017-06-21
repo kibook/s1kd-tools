@@ -13,9 +13,16 @@
 #define COL_TECH	0x08
 #define COL_INFO	0x10
 #define COL_APPLIC	0x20
+#define COL_STITLE      0x40
 
 #define COL_TITLE	(COL_TECH | COL_INFO)
 #define COL_ALL		(COL_ISSDATE | COL_RPC | COL_ORIG | COL_TECH | COL_INFO | COL_APPLIC)
+
+#define DM_MAX 5120
+
+#define ERR_PREFIX "s1kd-dmls: ERROR: "
+
+#define EXIT_DM_MAX 1
 
 xmlNodePtr getElementByName(xmlNodePtr root, const char *name)
 {
@@ -47,7 +54,7 @@ xmlNodePtr findChild(xmlNodePtr parent, const char *childname)
 	return NULL;
 }
 
-void printdms(char dms[1024][256], int n, int columns, int header)
+void printdms(char dms[DM_MAX][256], int n, int columns, int header)
 {
 	int i;
 
@@ -127,11 +134,20 @@ void printdms(char dms[1024][256], int n, int columns, int header)
 
 		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
 		}
-		if ((columns & COL_TECH) == COL_TECH) {
+
+		if ((columns & COL_STITLE) == COL_STITLE) {
 			printf("	%s", tech);
-		}
-		if ((columns & COL_INFO) == COL_INFO) {
-			printf("	%s", infoName ? info : "");
+
+			if (infoName) {
+				printf(" - %s", info);
+			}
+		} else {
+			if ((columns & COL_TECH) == COL_TECH) {
+				printf("	%s", tech);
+			}
+			if ((columns & COL_INFO) == COL_INFO) {
+				printf("	%s", infoName ? info : "");
+			}
 		}
 
 		if ((columns & COL_RPC) == COL_RPC) {
@@ -177,7 +193,7 @@ void printdms(char dms[1024][256], int n, int columns, int header)
 	}
 }
 
-void printpms(char pms[1024][256], int n, int columns)
+void printpms(char pms[DM_MAX][256], int n, int columns)
 {
 	int i;
 	xmlDocPtr pm_doc;
@@ -227,11 +243,13 @@ int ispm(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-dmls [-aHhilor]");
+	puts("Usage: s1kd-dmls [-aHhilort]");
 	puts("");
 	puts("Options:");
 	puts("  -l	Show only latest issue/inwork version");
 	puts("  -I      Show only official issues");
+	puts("  -t	Show tech and info name columns");
+	puts("  -T	Show single title column");
 	puts("  -i	Include issue date column");
 	puts("  -r	Include responsible partner company column");
 	puts("  -o	Include originator column");
@@ -259,7 +277,7 @@ int is_directory(const char *path)
 	return S_ISDIR(st.st_mode);
 }
 
-void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][256], int *npms, int only_writable, int recursive)
+void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MAX][256], int *npms, int only_writable, int recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -285,10 +303,18 @@ void list_dir(const char *path, char dms[1024][256], int *ndms, char pms[1024][2
 		if (only_writable && access(cur->d_name, W_OK) != 0)
 			continue;
 		if (isdm(cur->d_name)) {
+			if (*ndms == DM_MAX) {
+				fprintf(stderr, ERR_PREFIX "Maximum data modules reached (%d).\n", DM_MAX);
+				exit(EXIT_DM_MAX);
+			}
 			strcpy(dms[*ndms], fpath);
 			strcat(dms[*ndms], cur->d_name);
 			(*ndms)++;
 		} else if (ispm(cur->d_name)) {
+			if (*npms == DM_MAX) {
+				fprintf(stderr, ERR_PREFIX "Maximum pub modules reached (%d).\n", DM_MAX);
+				exit(EXIT_DM_MAX);
+			}
 			strcpy(pms[*npms], fpath);
 			strcat(pms[*npms], cur->d_name);
 			(*npms)++;
@@ -321,8 +347,8 @@ int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
 
-	char dms[1024][256];
-	char pms[1024][256];
+	char dms[DM_MAX][256];
+	char pms[DM_MAX][256];
 	int ndms;
 	int npms;
 	int i;
@@ -331,20 +357,21 @@ int main(int argc, char **argv)
 	int only_latest = 0;
 	int only_official_issue = 0;
 	int only_writable = 0;
-	char latest_dms[1024][256];
+	char latest_dms[DM_MAX][256];
 	int nlatest_dms;
-	char issue_dms[1024][256];
+	char issue_dms[DM_MAX][256];
 	int nissue_dms;
 	int recursive = 0;
 
 	int columns = 0;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "lItiroaAHwRh?")) != -1) {
+	while ((c = getopt(argc, argv, "lItTiroaAHwRh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 'I': only_official_issue = 1; break;
 			case 't': columns |= COL_TITLE; break;
+			case 'T': columns |= COL_STITLE; break;
 			case 'i': columns |= COL_ISSDATE; break;
 			case 'r': columns |= COL_RPC; break;
 			case 'o': columns |= COL_ORIG; break;
