@@ -298,7 +298,10 @@ void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MA
 	dir = opendir(path);
 
 	while ((cur = readdir(dir))) {
-		if (access(cur->d_name, R_OK) != 0)
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
+
+		if (access(cpath, R_OK) != 0)
 			continue;
 		if (only_writable && access(cur->d_name, W_OK) != 0)
 			continue;
@@ -307,24 +310,15 @@ void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MA
 				fprintf(stderr, ERR_PREFIX "Maximum data modules reached (%d).\n", DM_MAX);
 				exit(EXIT_DM_MAX);
 			}
-			strcpy(dms[*ndms], fpath);
-			strcat(dms[*ndms], cur->d_name);
-			(*ndms)++;
+			strcpy(dms[(*ndms)++], cpath);
 		} else if (ispm(cur->d_name)) {
 			if (*npms == DM_MAX) {
 				fprintf(stderr, ERR_PREFIX "Maximum pub modules reached (%d).\n", DM_MAX);
 				exit(EXIT_DM_MAX);
 			}
-			strcpy(pms[*npms], fpath);
-			strcat(pms[*npms], cur->d_name);
-			(*npms)++;
-		} else if (recursive) {
-			strcpy(cpath, fpath);
-			strcat(cpath, cur->d_name);
-
-			if (is_directory(cpath)) {
-				list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
-			}
+			strcpy(pms[(*npms)++], cpath);
+		} else if (recursive && is_directory(cpath)) {
+			list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
 		}
 	}
 }
