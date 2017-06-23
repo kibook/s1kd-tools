@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <libgen.h>
 
 #define ERR_PREFIX "s1kd-dmref: ERROR: "
 
@@ -32,7 +33,7 @@ xmlNode *find_child(xmlNode *parent, char *name)
 	return NULL;
 }
 
-void printref(const char *ref, int opts)
+void printref(const char *ref, const char *fname, int opts)
 {
 	char dmc[256];
 
@@ -143,7 +144,7 @@ void printref(const char *ref, int opts)
 	if (strcmp(learn_event_code, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learn_event_code);
 
 	if (opts) {
-		doc = xmlReadFile(ref, NULL, 0);
+		doc = xmlReadFile(fname, NULL, 0);
 
 		if (!doc) {
 			fprintf(stderr, ERR_PREFIX "Could not read file: %s\n", ref);
@@ -217,7 +218,9 @@ void show_help(void)
 
 int main(int argc, char **argv)
 {
-	char dmc[256];
+	char fname[PATH_MAX];
+	char scratch[PATH_MAX];
+	char *base;
 	int i;
 	int c;
 
@@ -235,12 +238,14 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			strcpy(dmc, argv[i]);
-			printref(dmc, opts);
+			strcpy(fname, argv[i]);
+			strcpy(scratch, fname);
+			base = basename(scratch);
+			printref(base, fname, opts);
 		}
 	} else {
-		while (fgets(dmc, 256, stdin)) {
-			printref(trim(dmc), opts);
+		while (fgets(scratch, PATH_MAX, stdin)) {
+			printref(trim(scratch), NULL, opts);
 		}
 	}
 
