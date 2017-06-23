@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-dmls [-aHhilortT]</para>
+        <para>s1kd-dmls [-acfHhilorTt]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -70,6 +70,18 @@
               <listItemTerm>-I</listItemTerm>
               <listItemDefinition>
                 <para>Show only official issues of data modules (inwork = 00).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Show filename column.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>Show data module code column.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
