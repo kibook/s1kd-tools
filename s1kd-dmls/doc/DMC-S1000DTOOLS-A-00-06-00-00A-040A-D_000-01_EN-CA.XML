@@ -85,6 +85,18 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-n</listItemTerm>
+              <listItemDefinition>
+                <para>Show issue info (issueNumber-inWork).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L</listItemTerm>
+              <listItemDefinition>
+                <para>Show language info (languageIsoCode-countryIsoCode).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
                 <para>Show tech and info name columns.</para>

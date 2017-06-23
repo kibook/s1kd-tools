@@ -14,12 +14,14 @@
 #define COL_TECH	0x008
 #define COL_INFO	0x010
 #define COL_APPLIC	0x020
-#define COL_STITLE      0x040
-#define COL_FNAME       0x080
-#define COL_CODE        0x100
+#define COL_STITLE	0x040
+#define COL_FNAME	0x080
+#define COL_CODE	0x100
+#define COL_ISSUE	0x200
+#define COL_LANG	0x400
 
 #define COL_TITLE	(COL_TECH | COL_INFO)
-#define COL_ALL		(COL_ISSDATE | COL_RPC | COL_ORIG | COL_TECH | COL_INFO | COL_APPLIC | COL_FNAME)
+#define COL_ALL		(COL_ISSDATE | COL_RPC | COL_ORIG | COL_TECH | COL_INFO | COL_APPLIC | COL_FNAME | COL_CODE | COL_ISSUE | COL_LANG)
 
 #define DM_MAX 5120
 
@@ -201,6 +203,8 @@ void printdms(char dms[DM_MAX][256], int n, int columns, int header)
 	if (header) {
 		if ((columns & COL_FNAME) == COL_FNAME) printf("FILENAME	");
 		if ((columns & COL_CODE) == COL_CODE) printf("DMC	");
+		if ((columns & COL_LANG) == COL_LANG) printf("LANG	");
+		if ((columns & COL_ISSUE) == COL_ISSUE) printf("ISSUE	");
 		if ((columns & COL_ISSDATE) == COL_ISSDATE) printf("DATE	");
 		if ((columns & COL_TECH) == COL_TECH) printf("TECH NAME	");
 		if ((columns & COL_INFO) == COL_INFO) printf("INFO NAME	");
@@ -257,6 +261,16 @@ void printdms(char dms[DM_MAX][256], int n, int columns, int header)
 			if (ident.learnCode && ident.learnEventCode) {
 				printf("-%s%s", ident.learnCode, ident.learnEventCode);
 			}
+
+			printf("	");
+		}
+
+		if ((columns & COL_LANG) == COL_LANG) {
+			printf("%s-%s	", ident.languageIsoCode, ident.countryIsoCode);
+		}
+
+		if ((columns & COL_ISSUE) == COL_ISSUE) {
+			printf("%s-%s	", ident.issueNumber, ident.inWork);
 		}
 
 		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
@@ -391,6 +405,8 @@ void show_help(void)
 	puts("  -I	Show only official issues");
 	puts("  -f	Show filename");
 	puts("  -c	Show data module code");
+	puts("  -n	Show issue info");
+	puts("  -L	Show language info");
 	puts("  -t	Show tech and info name columns");
 	puts("  -T	Show single title column");
 	puts("  -i	Include issue date column");
@@ -503,12 +519,14 @@ int main(int argc, char **argv)
 	int columns = 0;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "fclItTiroaAHwRh?")) != -1) {
+	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 'I': only_official_issue = 1; break;
 			case 'f': columns |= COL_FNAME; break;
 			case 'c': columns |= COL_CODE; break;
+			case 'n': columns |= COL_ISSUE; break;
+			case 'L': columns |= COL_LANG; break;
 			case 't': columns |= COL_TITLE; break;
 			case 'T': columns |= COL_STITLE; break;
 			case 'i': columns |= COL_ISSDATE; break;

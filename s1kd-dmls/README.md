@@ -28,6 +28,12 @@ Show filename column.
 -c  
 Show data module code column.
 
+-n  
+Show issue info (issueNumber-inWork).
+
+-L  
+Show language info (languageIsoCode-countryIsoCode).
+
 -t  
 Show tech and info name columns.
 
