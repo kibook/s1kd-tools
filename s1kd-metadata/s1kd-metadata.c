@@ -415,6 +415,11 @@ struct metadata metadata[] = {
 		show_simple_node,
 		edit_simple_node,
 		NULL},
+	{"dmc",
+		"//dmIdent/dmCode",
+		show_dmcode,
+		NULL,
+		NULL},
 	{NULL}
 };
 

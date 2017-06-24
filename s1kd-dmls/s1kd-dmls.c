@@ -169,7 +169,7 @@ xmlNodePtr getElementByName(xmlNodePtr root, const char *name)
 	return NULL;
 }
 
-void printdms(char dms[DM_MAX][256], int n, int columns, int header)
+void printdms(char dms[DM_MAX][256], int n, int columns)
 {
 	int i;
 
@@ -199,20 +199,6 @@ void printdms(char dms[DM_MAX][256], int n, int columns, int header)
 	char *display;
 
 	struct dmident ident;
-
-	if (header) {
-		if ((columns & COL_FNAME) == COL_FNAME) printf("FILENAME	");
-		if ((columns & COL_CODE) == COL_CODE) printf("DMC	");
-		if ((columns & COL_LANG) == COL_LANG) printf("LANG	");
-		if ((columns & COL_ISSUE) == COL_ISSUE) printf("ISSUE	");
-		if ((columns & COL_ISSDATE) == COL_ISSDATE) printf("DATE	");
-		if ((columns & COL_TECH) == COL_TECH) printf("TECH NAME	");
-		if ((columns & COL_INFO) == COL_INFO) printf("INFO NAME	");
-		if ((columns & COL_RPC) == COL_RPC) printf("RPC	");
-		if ((columns & COL_ORIG) == COL_ORIG) printf("ORIG	");
-		if ((columns & COL_APPLIC) == COL_APPLIC) printf("APPLIC	");
-		printf("\n");
-	}
 
 	for (i = 0; i < n; ++i) {
 		char *tech, *info;
@@ -355,6 +341,7 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 	xmlNodePtr pm;
 	xmlNodePtr identAndStatusSection;
 	xmlNodePtr pmAddress;
+	xmlNodePtr pmIdent;
 	xmlNodePtr pmAddressItems;
 	xmlNodePtr pmTitle;
 
@@ -366,15 +353,74 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		pm = xmlDocGetRootElement(pm_doc);
 		identAndStatusSection = find_child(pm, "identAndStatusSection");
 		pmAddress = find_child(identAndStatusSection, "pmAddress");
+		pmIdent = find_child(pmAddress, "pmIdent");
 		pmAddressItems = find_child(pmAddress, "pmAddressItems");
 		pmTitle = find_child(pmAddressItems, "pmTitle");
 
 		title = (char *) xmlNodeGetContent(pmTitle);
 
-		printf("%s", pms[i]);
-		if (columns & COL_TITLE) {
-			printf("	%s", title);
+		if ((columns & COL_FNAME) == COL_FNAME) {
+			printf("%s	", pms[i]);
 		}
+
+		if ((columns & COL_CODE) == COL_CODE) {
+			xmlNodePtr pmCode;
+			char *modelIdentCode;
+			char *pmIssuer;
+			char *pmNumber;
+			char *pmVolume;
+
+			pmCode = find_req_child(pmIdent, "pmCode");
+
+			modelIdentCode = (char *) xmlGetProp(pmCode, BAD_CAST "modelIdentCode");
+			pmIssuer       = (char *) xmlGetProp(pmCode, BAD_CAST "pmIssuer");
+			pmNumber       = (char *) xmlGetProp(pmCode, BAD_CAST "pmNumber");
+			pmVolume       = (char *) xmlGetProp(pmCode, BAD_CAST "pmVolume");
+
+			printf("%s-%s-%s-%s	", modelIdentCode, pmIssuer, pmNumber, pmVolume);
+
+			xmlFree(modelIdentCode);
+			xmlFree(pmIssuer);
+			xmlFree(pmNumber);
+			xmlFree(pmVolume);
+		}
+
+		if ((columns & COL_LANG) == COL_LANG) {
+			xmlNodePtr language;
+			char *languageIsoCode;
+			char *countryIsoCode;
+
+			language = find_req_child(pmIdent, "language");
+
+			languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+			countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+
+			printf("%s-%s	", languageIsoCode, countryIsoCode);
+
+			xmlFree(languageIsoCode);
+			xmlFree(countryIsoCode);
+		}
+
+		if ((columns & COL_ISSUE) == COL_ISSUE) {
+			xmlNodePtr issueInfo;
+			char *issueNumber;
+			char *inWork;
+
+			issueInfo = find_req_child(pmIdent, "issueInfo");
+
+			issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
+			inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+
+			printf("%s-%s	", issueNumber, inWork);
+
+			xmlFree(issueNumber);
+			xmlFree(inWork);
+		}	
+
+		if (((columns & COL_TITLE) == COL_TITLE) || ((columns & COL_STITLE) == COL_STITLE)) {
+			printf("%s	", title);
+		}
+
 		printf("\n");
 
 		xmlFree(title);
@@ -403,7 +449,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -l	Show only latest issue/inwork version");
 	puts("  -I	Show only official issues");
-	puts("  -f	Show filename");
+	puts("  -f	Do not show filename");
 	puts("  -c	Show data module code");
 	puts("  -n	Show issue info");
 	puts("  -L	Show language info");
@@ -516,14 +562,14 @@ int main(int argc, char **argv)
 	int nissue_dms;
 	int recursive = 0;
 
-	int columns = 0;
+	int columns = COL_FNAME;
 	int header = 0;
 
 	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 'I': only_official_issue = 1; break;
-			case 'f': columns |= COL_FNAME; break;
+			case 'f': columns &= ~COL_FNAME; break;
 			case 'c': columns |= COL_CODE; break;
 			case 'n': columns |= COL_ISSUE; break;
 			case 'L': columns |= COL_LANG; break;
@@ -543,7 +589,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (!columns) columns = COL_FNAME;
+	if (!columns) exit(0);
 
 	ndms = 0;
 	npms = 0;
@@ -606,12 +652,27 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (header) {
+		if ((columns & COL_FNAME) == COL_FNAME) printf("FILENAME	");
+		if ((columns & COL_CODE) == COL_CODE) printf("CODE	");
+		if ((columns & COL_LANG) == COL_LANG) printf("LANG	");
+		if ((columns & COL_ISSUE) == COL_ISSUE) printf("ISSUE	");
+		if ((columns & COL_ISSDATE) == COL_ISSDATE) printf("DATE	");
+		if ((columns & COL_STITLE) == COL_STITLE) printf("TITLE	");
+		if ((columns & COL_TECH) == COL_TECH) printf("TECH NAME/TITLE	");
+		if ((columns & COL_INFO) == COL_INFO) printf("INFO NAME	");
+		if ((columns & COL_RPC) == COL_RPC) printf("RPC	");
+		if ((columns & COL_ORIG) == COL_ORIG) printf("ORIG	");
+		if ((columns & COL_APPLIC) == COL_APPLIC) printf("APPLIC	");
+		printf("\n");
+	}
+
 	if (only_latest) {
-		printdms(latest_dms, nlatest_dms, columns, header);
+		printdms(latest_dms, nlatest_dms, columns);
 	} else if (only_official_issue) {
-		printdms(issue_dms, nissue_dms, columns, header);
+		printdms(issue_dms, nissue_dms, columns);
 	} else {
-		printdms(dms, ndms, columns, header);
+		printdms(dms, ndms, columns);
 	}
 
 	printpms(pms, npms, columns);

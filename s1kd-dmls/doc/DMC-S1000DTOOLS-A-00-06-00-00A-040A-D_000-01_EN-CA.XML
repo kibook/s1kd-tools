@@ -75,7 +75,7 @@
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>Show filename column.</para>
+                <para>Do not show filename column.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

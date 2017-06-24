@@ -23,7 +23,7 @@ Show only the latest issue/inwork version of data modules.
 Show only official issues of data modules (inwork = 00).
 
 -f  
-Show filename column.
+Do not show filename column.
 
 -c  
 Show data module code column.
