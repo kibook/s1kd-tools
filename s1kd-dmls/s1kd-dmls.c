@@ -30,6 +30,8 @@
 #define EXIT_DM_MAX 1
 #define EXIT_BAD_XML 2
 
+int clean_unprintable = 1;
+
 struct dmident {
 	bool extended;
 	char *extensionProducer;
@@ -169,6 +171,19 @@ xmlNodePtr getElementByName(xmlNodePtr root, const char *name)
 	return NULL;
 }
 
+void clean(char *s)
+{
+	int i;
+
+	for (i = 0; s[i]; ++i) {
+		switch (s[i]) {
+			case '\n':
+			case '\t':
+				s[i] = ' ';
+		}
+	}
+}
+
 void printdms(char dms[DM_MAX][256], int n, int columns)
 {
 	int i;
@@ -224,6 +239,9 @@ void printdms(char dms[DM_MAX][256], int n, int columns)
 
 		tech = (char *) xmlNodeGetContent(techName);
 		info = (char *) xmlNodeGetContent(infoName);
+
+		if (clean_unprintable) clean(tech);
+		if (clean_unprintable && info) clean(info);
 
 		if ((columns & COL_FNAME) == COL_FNAME) {
 			printf("%s	", dms[i]);
@@ -359,6 +377,8 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 
 		title = (char *) xmlNodeGetContent(pmTitle);
 
+		if (clean_unprintable) clean(title);
+
 		if ((columns & COL_FNAME) == COL_FNAME) {
 			printf("%s	", pms[i]);
 		}
@@ -461,6 +481,7 @@ void show_help(void)
 	puts("  -a	Include applicability column");
 	puts("  -H	Show headers on columns");
 	puts("  -w	Show only writable data module files.");
+	puts("  -p	Print control characters");
 	puts("  -h	Show this help message");
 }
 
@@ -565,7 +586,7 @@ int main(int argc, char **argv)
 	int columns = COL_FNAME;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLh?")) != -1) {
+	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLph?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 'I': only_official_issue = 1; break;
@@ -575,6 +596,7 @@ int main(int argc, char **argv)
 			case 'L': columns |= COL_LANG; break;
 			case 't': columns |= COL_TITLE; break;
 			case 'T': columns |= COL_STITLE; break;
+			case 'p': clean_unprintable = 0; break;
 			case 'i': columns |= COL_ISSDATE; break;
 			case 'r': columns |= COL_RPC; break;
 			case 'o': columns |= COL_ORIG; break;
