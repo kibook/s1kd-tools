@@ -64,7 +64,7 @@ Remove unused applicability annotations but not statements.
 Remove unused applicability annotations and simplify/remove unused applicability statements.
 
 -Y &lt;text&gt;  
-Set the applicability for the whole data module using the user-definied applicability values, using text as the new display text.
+Set the applicability for the whole data module using the user-defined applicability values, using text as the new display text.
 
 -C &lt;comment&gt;  
 Add an XML comment to the top of the data module instance. Useful as another way of identifying a data module as an instance aside from the source data module address or extended data module code, or giving additional information about a particular instance.
@@ -75,15 +75,18 @@ Use a CIR to resolve external dependencies in the master data module, making the
 -S  
 Do not include &lt;sourceDmIdent&gt; in the data module instance.
 
+-w  
+Check the applicability of the whole data module against the user-defined applicability. If the whole data module is not applicable, then no instance is created.
+
 &lt;applic&gt;...  
 Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;
 
 -a vs -A
 --------
 
-The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambigously valid (their validity does not rely on applicability values left undefined by the user). The applicability statements themselves however will be untouched.
+The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). The applicability statements themselves however will be untouched.
 
-The -A option will do the above, but will also attempt to simplify unused parts of applicability statements or remove unused applicability statements entirely. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambigously valid or invalid given the user-definied values, and removing uneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
+The -A option will do the above, but will also attempt to simplify unused parts of applicability statements or remove unused applicability statements entirely. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
 
 > **Note**
 >

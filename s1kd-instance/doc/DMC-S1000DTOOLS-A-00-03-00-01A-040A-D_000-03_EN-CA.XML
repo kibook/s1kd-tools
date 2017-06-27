@@ -178,6 +178,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-w</listItemTerm>
+              <listItemDefinition>
+                <para>Check the applicability of the whole data module against the user-defined applicability. If the whole data module is not applicable, then no instance is created.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;applic&gt;...</listItemTerm>
               <listItemDefinition>
                 <para>Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</para>

@@ -362,6 +362,10 @@ bool eval_applic_stmt(xmlNodePtr applic, bool assume)
 		stmt = find_child(applic, "evaluate");
 	}
 
+	if (!stmt) {
+		return assume;
+	}
+
 	return eval_applic(stmt, assume);
 }
 
@@ -1328,6 +1332,15 @@ void set_security(xmlDocPtr dm, char *sec)
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
 }
 
+bool check_wholedm_applic(xmlDocPtr dm)
+{
+	xmlNodePtr applic;
+
+	applic = first_xpath_node(dm, "//dmStatus/applic");
+
+	return eval_applic_stmt(applic, true);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1346,15 +1359,15 @@ int main(int argc, char **argv)
 	int i;
 	int c;
 
-	char src[256] = "";
+	char src[PATH_MAX] = "";
 	char dmc[256] = "";
-	char out[256] = "-";
+	char out[PATH_MAX] = "-";
 	bool clean = false;
 	bool simpl = false;
 	char tech[256] = "";
 	char info[256] = "";
 	bool autoname = false;
-	char dir[256] = "";
+	char dir[PATH_MAX] = "";
 	char new_display_text[256] = "";
 	char comment_text[256] = "";
 	char extension[256] = "";
@@ -1364,6 +1377,7 @@ int main(int argc, char **argv)
 	bool use_stdin = false;
 	char issinfo[8] = "";
 	char secu[4] = "";
+	bool wholedm = false;
 
 	int parseopts = 0;
 
@@ -1374,14 +1388,14 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wh?")) != -1) {
 		switch (c) {
-			case 's': strncpy(src, optarg, 255); break;
+			case 's': strncpy(src, optarg, PATH_MAX); break;
 			case 'S': add_source_ident = false; break;
 			case 'e': strncpy(extension, optarg, 255); break;
 			case 'c': strncpy(dmc, optarg, 255); break;
-			case 'o': strncpy(out, optarg, 255); break;
-			case 'O': autoname = true; strncpy(dir, optarg, 255); break;
+			case 'o': strncpy(out, optarg, PATH_MAX); break;
+			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
 			case 'f': force_overwrite = true; break;
 			case 'a': clean = true; break;
 			case 'A': simpl = true; break;
@@ -1393,6 +1407,7 @@ int main(int argc, char **argv)
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
 			case 'I': strncpy(issinfo, optarg, 6); break;
 			case 'u': strncpy(secu, optarg, 2); break;
+			case 'w': wholedm = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1461,6 +1476,10 @@ int main(int argc, char **argv)
 		define_applic(ident, type, value);
 
 		++napplics;
+	}
+
+	if (wholedm && !check_wholedm_applic(dm)) {
+		exit(0);
 	}
 
 	if (add_source_ident) {

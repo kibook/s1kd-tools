@@ -21,4 +21,5 @@ Options:
   -S		Do not include <sourceDmIdent> or <repositorySourceDmIdent> in instance.
   -C <comment>	Add an XML comment to the top of the data module instance.
   -R <CIR>      Resolve externalized items using the given CIR.
+  -w            Check the applic of the whole DM.
   <applic>...	Any number of applic defs in the form of <ident>:<type>=<value>
