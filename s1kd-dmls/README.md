@@ -6,7 +6,7 @@ s1kd-dmls - List data modules
 SYNOPSIS
 ========
 
-s1kd-dmls \[-acfHhilorTt\]
+s1kd-dmls \[-acfHhilorTtpDP\]
 
 DESCRIPTION
 ===========
@@ -57,6 +57,12 @@ Show headers on columns.
 
 -w  
 Show only writable data module files.
+
+-p  
+Do not include control characters (\\n, \\t) in the output.
+
+-D, -P  
+List data modules/publication modules. If neither is specified, -DP is assumed.
 
 -h  
 Show the usage message.

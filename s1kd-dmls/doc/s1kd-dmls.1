@@ -7,7 +7,7 @@
 s1kd\-dmls \- List data modules
 .SH SYNOPSIS
 .PP
-s1kd\-dmls [\-acfHhilorTt]
+s1kd\-dmls [\-acfHhilorTtpDP]
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-dmls\f[] tool lists data modules in a directory, with
@@ -82,6 +82,17 @@ Show headers on columns.
 .TP
 .B \-w
 Show only writable data module files.
+.RS
+.RE
+.TP
+.B \-p
+Do not include control characters (\\n, \\t) in the output.
+.RS
+.RE
+.TP
+.B \-D, \-P
+List data modules/publication modules.
+If neither is specified, \-DP is assumed.
 .RS
 .RE
 .TP

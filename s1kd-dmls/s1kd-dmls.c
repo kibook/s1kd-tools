@@ -485,6 +485,8 @@ void show_help(void)
 	puts("  -H	Show headers on columns");
 	puts("  -w	Show only writable data module files.");
 	puts("  -p	Print control characters");
+	puts("  -D	List data modules only");
+	puts("  -P	List pub modules only");
 	puts("  -h	Show this help message");
 }
 
