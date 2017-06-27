@@ -30,6 +30,9 @@
 #define EXIT_DM_MAX 1
 #define EXIT_BAD_XML 2
 
+#define SHOW_DM 0x1
+#define SHOW_PM 0x2
+
 int clean_unprintable = 1;
 
 struct dmident {
@@ -582,11 +585,12 @@ int main(int argc, char **argv)
 	char issue_dms[DM_MAX][256];
 	int nissue_dms;
 	int recursive = 0;
+	int show = 0;
 
 	int columns = COL_FNAME;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLph?")) != -1) {
+	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLpDPh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 'I': only_official_issue = 1; break;
@@ -605,6 +609,8 @@ int main(int argc, char **argv)
 			case 'H': header = 1; break;
 			case 'w': only_writable = 1; break;
 			case 'R': recursive = 1; break;
+			case 'D': show = SHOW_DM; break;
+			case 'P': show = SHOW_PM; break;
 			case 'h':
 			case '?': show_help();
 				  exit(0);
@@ -612,6 +618,8 @@ int main(int argc, char **argv)
 	}
 
 	if (!columns) exit(0);
+
+	if (!show) show = SHOW_DM | SHOW_PM;
 
 	ndms = 0;
 	npms = 0;
@@ -689,15 +697,19 @@ int main(int argc, char **argv)
 		printf("\n");
 	}
 
-	if (only_latest) {
-		printdms(latest_dms, nlatest_dms, columns);
-	} else if (only_official_issue) {
-		printdms(issue_dms, nissue_dms, columns);
-	} else {
-		printdms(dms, ndms, columns);
+	if ((show & SHOW_DM) == SHOW_DM) {
+		if (only_latest) {
+			printdms(latest_dms, nlatest_dms, columns);
+		} else if (only_official_issue) {
+			printdms(issue_dms, nissue_dms, columns);
+		} else {
+			printdms(dms, ndms, columns);
+		}
 	}
 
-	printpms(pms, npms, columns);
+	if ((show & SHOW_PM) == SHOW_PM) {
+		printpms(pms, npms, columns);
+	}
 
 	if (dir) {
 		closedir(dir);
