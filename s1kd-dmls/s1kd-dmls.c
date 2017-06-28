@@ -490,7 +490,7 @@ void show_help(void)
 	puts("  -h	Show this help message");
 }
 
-int is_directory(const char *path)
+int is_directory(const char *path, int recursive)
 {
 	struct stat st;
 
@@ -501,7 +501,7 @@ int is_directory(const char *path)
 	base = basename(scratch);
 
 	/* Do not recurse in to current or parent directory */
-	if (strcmp(base, ".") == 0 || strcmp(base, "..") == 0)
+	if (recursive && (strcmp(base, ".") == 0 || strcmp(base, "..") == 0))
 		return 0;
 
 	stat(path, &st);
@@ -548,7 +548,7 @@ void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MA
 				exit(EXIT_DM_MAX);
 			}
 			strcpy(pms[(*npms)++], cpath);
-		} else if (recursive && is_directory(cpath)) {
+		} else if (recursive && is_directory(cpath, recursive)) {
 			list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
 		}
 	}
@@ -646,7 +646,7 @@ int main(int argc, char **argv)
 				strcpy(dms[ndms++], argv[i]);
 			} else if (ispm(base)) {
 				strcpy(pms[npms++], argv[i]);
-			} else if (recursive && is_directory(argv[i])) {
+			} else if (is_directory(argv[i], recursive)) {
 				list_dir(argv[i], dms, &ndms, pms, &npms, only_writable, recursive);
 			}
 		}
