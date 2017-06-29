@@ -220,13 +220,20 @@ void printdms(char dms[DM_MAX][256], int n, int columns)
 
 	for (i = 0; i < n; ++i) {
 		char *tech, *info;
-		char real[PATH_MAX];
 
+		#ifndef _WIN32
+		char real[PATH_MAX];
+		#endif
+
+		#ifdef _WIN32
+		dm = xmlReadFile(dms[i], NULL, 0);
+		#else
 		if (readlink(dms[i], real, PATH_MAX) != -1) {
 			dm = xmlReadFile(real, NULL, 0);
 		} else {
 			dm = xmlReadFile(dms[i], NULL, 0);
 		}
+		#endif
 
 		init_ident(&ident, dm);
 
