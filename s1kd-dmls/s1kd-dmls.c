@@ -447,6 +447,8 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		printf("\n");
 
 		xmlFree(title);
+
+		xmlFreeDoc(pm_doc);
 	}
 }
 
@@ -552,6 +554,8 @@ void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MA
 			list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
 		}
 	}
+
+	closedir(dir);
 }
 
 int is_official_issue(const char *fname)
@@ -572,25 +576,32 @@ int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
 
-	char dms[DM_MAX][256];
-	char pms[DM_MAX][256];
+	char (*dms)[256] = malloc(DM_MAX);
+	char (*pms)[256] = malloc(DM_MAX);
 	int ndms;
 	int npms;
+
 	int i;
 
 	int c;
 	int only_latest = 0;
 	int only_official_issue = 0;
 	int only_writable = 0;
-	char latest_dms[DM_MAX][256];
+
+	char (*latest_dms)[256] = malloc(DM_MAX);
 	int nlatest_dms;
-	char issue_dms[DM_MAX][256];
+
+	char (*issue_dms)[256] = malloc(DM_MAX);
 	int nissue_dms;
+
 	int recursive = 0;
 	int show = 0;
 
 	int columns = COL_FNAME;
 	int header = 0;
+
+	dms = malloc(DM_MAX * 256);
+	pms = malloc(DM_MAX * 256);
 
 	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLpDPh?")) != -1) {
 		switch (c) {
@@ -717,6 +728,11 @@ int main(int argc, char **argv)
 		closedir(dir);
 
 	}
+
+	free(dms);
+	free(pms);
+	free(latest_dms);
+	free(issue_dms);
 
 	xmlCleanupParser();
 
