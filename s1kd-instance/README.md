@@ -78,6 +78,9 @@ Do not include &lt;sourceDmIdent&gt; in the data module instance.
 -w  
 Check the applicability of the whole data module against the user-defined applicability. If the whole data module is not applicable, then no instance is created.
 
+-N  
+Omit issue/inwork numbers from automatically generated filenames.
+
 &lt;applic&gt;...  
 Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;
 

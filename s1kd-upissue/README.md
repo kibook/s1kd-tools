@@ -24,3 +24,6 @@ Increase the issue number of the data module. By default, the in-work issue is i
 
 -s &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.
+
+-N  
+Omit issue/inwork numbers from filename.

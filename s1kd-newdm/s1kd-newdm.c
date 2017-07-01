@@ -107,6 +107,7 @@ void show_help(void)
 	puts("  -t	Tech name");
 	puts("  -i	Info name");
 	puts("  -T	DM type (descript, proced, frontmatter, brex, brdoc)");
+	puts("  -N	Omit issue/inwork from filename.");
 }
 
 int main(int argc, char **argv)

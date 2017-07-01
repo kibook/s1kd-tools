@@ -20,6 +20,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -v	Print filename of upissued data module");
 	puts("  -I	Create a new issue of the data module");
+	puts("  -N	Omit issue/inwork numbers from filename");
 }
 
 xmlNode *find_child(xmlNode *parent, const char *name)

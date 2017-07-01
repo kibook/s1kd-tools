@@ -78,6 +78,9 @@ The type (schema) of the new data module. Supported schemas:
 
 -   proced - Procedural
 
+-N  
+Omit issue/inwork numbers from filename.
+
 Prompt (-p) option
 ------------------
 

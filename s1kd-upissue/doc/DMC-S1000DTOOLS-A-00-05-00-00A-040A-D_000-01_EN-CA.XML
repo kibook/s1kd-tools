@@ -78,6 +78,12 @@
                 <para>Set the status of the new issue. Default is 'changed'.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N</listItemTerm>
+              <listItemDefinition>
+                <para>Omit issue/inwork numbers from filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
       </levelledPara>

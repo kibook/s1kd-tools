@@ -22,4 +22,5 @@ Options:
   -C <comment>	Add an XML comment to the top of the data module instance.
   -R <CIR>      Resolve externalized items using the given CIR.
   -w            Check the applic of the whole DM.
+  -N            Omit issue/inwork numbers from automatic filename.
   <applic>...	Any number of applic defs in the form of <ident>:<type>=<value>

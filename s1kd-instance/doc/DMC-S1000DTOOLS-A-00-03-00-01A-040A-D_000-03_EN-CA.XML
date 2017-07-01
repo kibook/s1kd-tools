@@ -184,6 +184,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-N</listItemTerm>
+              <listItemDefinition>
+                <para>Omit issue/inwork numbers from automatically generated filenames.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;applic&gt;...</listItemTerm>
               <listItemDefinition>
                 <para>Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</para>
