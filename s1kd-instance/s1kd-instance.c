@@ -777,11 +777,12 @@ void set_lang(xmlNodePtr dmodule, char *lang)
 	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST country_iso_code);
 }
 
-void auto_name(char *out, xmlDocPtr dm, const char *dir)
+void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 {
 	struct dmident ident;
 	int i;
 	char learn[6] = "";
+	char iss[8] = "";
 
 	init_ident(&ident, dm);
 
@@ -793,8 +794,12 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 		sprintf(learn, "-%s%s", ident.learnCode, ident.learnEventCode);
 	}
 
+	if (!noiss) {
+		sprintf(iss, "_%s-%s", ident.issueNumber, ident.inWork);
+	}
+
 	if (ident.extended) {
-		sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s_%s-%s_%s-%s.XML",
+		sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
 			dir,
 			ident.extensionProducer,
 			ident.extensionCode,
@@ -810,12 +815,11 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 			ident.infoCodeVariant,
 			ident.itemLocationCode,
 			learn,
-			ident.issueNumber,
-			ident.inWork,
+			iss,
 			ident.languageIsoCode,
 			ident.countryIsoCode);
 	} else {
-		sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s_%s-%s_%s-%s.XML",
+		sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
 			dir,
 			ident.modelIdentCode,
 			ident.systemDiffCode,
@@ -829,8 +833,7 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir)
 			ident.infoCodeVariant,
 			ident.itemLocationCode,
 			learn,
-			ident.issueNumber,
-			ident.inWork,
+			iss,
 			ident.languageIsoCode,
 			ident.countryIsoCode);
 	}
@@ -1378,6 +1381,7 @@ int main(int argc, char **argv)
 	char issinfo[8] = "";
 	char secu[4] = "";
 	bool wholedm = false;
+	bool no_issue = false;
 
 	int parseopts = 0;
 
@@ -1388,7 +1392,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wh?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wNh?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX); break;
 			case 'S': add_source_ident = false; break;
@@ -1408,6 +1412,7 @@ int main(int argc, char **argv)
 			case 'I': strncpy(issinfo, optarg, 6); break;
 			case 'u': strncpy(secu, optarg, 2); break;
 			case 'w': wholedm = true; break;
+			case 'N': no_issue = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1441,11 +1446,9 @@ int main(int argc, char **argv)
 		exit(EXIT_BAD_XML);
 	}
 
-	if (autoname) {
-		if (strcmp(dir, "") == 0) {
-			fprintf(stderr, ERR_PREFIX "No directory specified with -O.\n");
-			exit(EXIT_MISSING_ARGS);
-		}
+	if (autoname && strcmp(dir, "") == 0) {
+		fprintf(stderr, ERR_PREFIX "No directory specified with -O.\n");
+		exit(EXIT_MISSING_ARGS);
 	}
 
 	dmodule = xmlDocGetRootElement(dm);
@@ -1562,7 +1565,7 @@ int main(int argc, char **argv)
 	}
 
 	if (autoname) {
-		auto_name(out, dm, dir);
+		auto_name(out, dm, dir, no_issue);
 
 		if (access(out, F_OK) == 0 && !force_overwrite) {
 			fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);

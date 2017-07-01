@@ -151,6 +151,7 @@ int main(int argc, char **argv)
 
 	char dmc[MAX_DATAMODULE_CODE];
 	char learn[6] = "";
+	char iss[8] = "";
 
 	xmlDocPtr dm;
 	xmlNode *dmodule;
@@ -185,8 +186,9 @@ int main(int argc, char **argv)
 	bool showprompts = false;
 	char dmcode[256] = "";
 	bool skipdmc = false;
+	bool no_issue = false;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Nh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -204,6 +206,7 @@ int main(int argc, char **argv)
 			case 'i': strcpy(infoName_content, optarg); break;
 			case 'T': strcpy(dmtype, optarg); break;
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
+			case 'N': no_issue = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -436,8 +439,12 @@ int main(int argc, char **argv)
 		sprintf(learn, "-%s%s", learnCode, learnEventCode);
 	}
 
+	if (!no_issue) {
+		sprintf(iss, "_%s-%s", issueNumber, inWork);
+	}
+
 	snprintf(dmc, MAX_DATAMODULE_CODE,
-		"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s_%s-%s_%s-%s.XML",
+		"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
 		modelIdentCode,
 		systemDiffCode,
 		systemCode,
@@ -450,8 +457,7 @@ int main(int argc, char **argv)
 		infoCodeVariant,
 		itemLocationCode,
 		learn,
-		issueNumber,
-		inWork,
+		iss,
 		languageIsoCode,
 		countryIsoCode);
 

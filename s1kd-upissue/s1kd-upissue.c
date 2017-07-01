@@ -77,7 +77,9 @@ int main(int argc, char **argv)
 
 	char status[32] = "changed";
 
-	while ((c = getopt(argc, argv, "Ivs:h?")) != -1) {
+	bool no_issue = false;
+
+	while ((c = getopt(argc, argv, "Ivs:Nh?")) != -1) {
 		switch (c) {
 			case 'I':
 				newissue = true;
@@ -87,6 +89,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				strcpy(status, optarg);
+				break;
+			case 'N':
+				no_issue = true;
 				break;
 			case 'h':
 			case '?':
@@ -153,8 +158,10 @@ int main(int argc, char **argv)
 			xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
 		}
 
-		strncpy(dmfile + (dmfilelen - 16), upissued_issueNumber, 3);
-		strncpy(dmfile + (dmfilelen - 12), upissued_inWork, 2);
+		if (!no_issue) {
+			strncpy(dmfile + (dmfilelen - 16), upissued_issueNumber, 3);
+			strncpy(dmfile + (dmfilelen - 12), upissued_inWork, 2);
+		}
 
 		xmlSaveFormatFile(dmfile, dmdoc, 1);
 
