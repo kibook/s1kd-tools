@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #include "template.h"
 
@@ -16,9 +17,9 @@
 #define EXIT_BAD_PMC 1
 #define EXIT_PM_EXISTS 2
 
-xmlNode *find_child(xmlNode *parent, char *name)
+xmlNodePtr find_child(xmlNodePtr parent, char *name)
 {
-	xmlNode *cur;
+	xmlNodePtr cur;
 
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, name) == 0) {
@@ -60,96 +61,62 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-void add_dm_ref(xmlNode *pmEntry, char *path)
+xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 {
-	char *dm_filename;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
 
-	char *model_ident_code;
-	char *system_diff_code;
-	char *system_code;
-	char *sub_and_sub_sub;
-	char *assy_code;
-	char *disassy_code_and_variant;
-	char *info_code_and_variant;
-	char *item_location_code;
-	char *issue_number;
-	char *in_work;
-	char *language_iso_code;
-	char *country_iso_code;
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
-	char sub_system_code[2];
-	char sub_sub_system_code[2];
-	char disassy_code[3];
-	char disassy_code_variant[2];
-	char info_code[4];
-	char info_code_variant[2];
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
 
-	xmlNode *dmRef;
-	xmlNode *dmRefIdent;
-	xmlNode *dmCode;
-	xmlNode *issueInfo;
-	xmlNode *language;
+	xmlXPathFreeObject(obj);
 
-	int i;
+	return node;
+}
 
-	dm_filename = basename(path);
-	
-	strtok(dm_filename, "-");
-	model_ident_code = strtok(NULL, "-");
-	system_diff_code = strtok(NULL, "-");
-	system_code = strtok(NULL, "-");
-	sub_and_sub_sub = strtok(NULL, "-");
-	assy_code = strtok(NULL, "-");
-	disassy_code_and_variant = strtok(NULL, "-");
-	info_code_and_variant = strtok(NULL, "-");
-	item_location_code = strtok(NULL, "_");
-	issue_number = strtok(NULL, "-");
-	in_work = strtok(NULL, "_");
-	language_iso_code = strtok(NULL, "-");
-	country_iso_code = strtok(NULL, ".");
+void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool include_language)
+{
+	xmlNodePtr ident_extension, dm_code, issue_info, language;
+	xmlNodePtr dm_ref, dm_ref_ident;
 
-	sub_system_code[0] = sub_and_sub_sub[0];
-	sub_system_code[1] = 0;
-	sub_sub_system_code[0] = sub_and_sub_sub[1];
-	sub_sub_system_code[1] = 0;
-	strncpy(disassy_code, disassy_code_and_variant, 2);
-	disassy_code[2] = 0;
-	strncpy(disassy_code_variant, disassy_code_and_variant + 2, 1);
-	disassy_code_variant[1] = 0;
-	strncpy(info_code, info_code_and_variant, 3);
-	info_code[3] = 0;
-	strncpy(info_code_variant, info_code_and_variant + 3, 1);
-	info_code_variant[1] = 0;
+	xmlDocPtr dmodule;
+	xmlXPathContextPtr ctx;
 
-	for (i = 0; language_iso_code[i]; ++i) {
-		language_iso_code[i] = tolower(language_iso_code[i]);
+	if (access(path, F_OK) == -1) {
+		fprintf(stderr, ERR_PREFIX "Could not find referenced data module '%s'.\n", path);
+		return;
 	}
 
-	dmRef = xmlNewChild(pmEntry, NULL, (xmlChar *) "dmRef", NULL);
-	dmRefIdent = xmlNewChild(dmRef, NULL, (xmlChar *) "dmRefIdent", NULL);
-	dmCode = xmlNewChild(dmRefIdent, NULL, (xmlChar *) "dmCode", NULL);
+	dmodule = xmlReadFile(path, NULL, 0);
+	ctx = xmlXPathNewContext(dmodule);
 
-	xmlSetProp(dmCode, (xmlChar *) "modelIdentCode",     (xmlChar *) model_ident_code);
-	xmlSetProp(dmCode, (xmlChar *) "systemDiffCode",     (xmlChar *) system_diff_code);
-	xmlSetProp(dmCode, (xmlChar *) "systemCode",         (xmlChar *) system_code);
-	xmlSetProp(dmCode, (xmlChar *) "subSystemCode",      (xmlChar *) sub_system_code);
-	xmlSetProp(dmCode, (xmlChar *) "subSubSystemCode",   (xmlChar *) sub_sub_system_code);
-	xmlSetProp(dmCode, (xmlChar *) "assyCode",           (xmlChar *) assy_code);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCode",        (xmlChar *) disassy_code);
-	xmlSetProp(dmCode, (xmlChar *) "disassyCodeVariant", (xmlChar *) disassy_code_variant);
-	xmlSetProp(dmCode, (xmlChar *) "infoCode",           (xmlChar *) info_code);
-	xmlSetProp(dmCode, (xmlChar *) "infoCodeVariant",    (xmlChar *) info_code_variant);
-	xmlSetProp(dmCode, (xmlChar *) "itemLocationCode",   (xmlChar *) item_location_code);
+	ident_extension = first_xpath_node("//dmIdent/identExtension", ctx);
+	dm_code = first_xpath_node("//dmIdent/dmCode", ctx);
+	issue_info = first_xpath_node("//dmIdent/issueInfo", ctx);
+	language = first_xpath_node("//dmIdent/language", ctx);
 
-	issueInfo = xmlNewChild(dmRefIdent, NULL, (xmlChar *) "issueInfo", NULL);
+	dm_ref = xmlNewNode(NULL, BAD_CAST "dmRef");
+	dm_ref_ident = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefIdent", NULL);
+	
+	if (ident_extension) {
+		xmlAddChild(dm_ref_ident, xmlCopyNode(ident_extension, 1));
+	}
 
-	xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) issue_number);
-	xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) in_work);
+	xmlAddChild(dm_ref_ident, xmlCopyNode(dm_code, 1));
 
-	language = xmlNewChild(dmRefIdent, NULL, (xmlChar *) "language", NULL);
+	if (include_issue_info) {
+		xmlAddChild(dm_ref_ident, xmlCopyNode(issue_info, 1));
+	}
 
-	xmlSetProp(language, (xmlChar *) "languageIsoCode", (xmlChar *) language_iso_code);
-	xmlSetProp(language, (xmlChar *) "countryIsoCode",  (xmlChar *) country_iso_code);
+	if (include_language) {
+		xmlAddChild(dm_ref_ident, xmlCopyNode(language, 1));
+	}
+
+	xmlAddChild(pmEntry, dm_ref);
 }
 
 void show_help(void)
@@ -175,21 +142,21 @@ int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;
 
-	xmlNode *pm;
-	xmlNode *identAndStatusSection;
-	xmlNode *pmAddress;
-	xmlNode *pmIdent;
-	xmlNode *pmCode;
-	xmlNode *language;
-	xmlNode *issueInfo;
-	xmlNode *pmAddressItems;
-	xmlNode *issueDate;
-	xmlNode *pmTitle;
-	xmlNode *pmStatus;
-	xmlNode *security;
-	xmlNode *responsiblePartnerCompany;
-	xmlNode *enterpriseName;
-	xmlNode *pmEntry;
+	xmlNodePtr pm;
+	xmlNodePtr identAndStatusSection;
+	xmlNodePtr pmAddress;
+	xmlNodePtr pmIdent;
+	xmlNodePtr pmCode;
+	xmlNodePtr language;
+	xmlNodePtr issueInfo;
+	xmlNodePtr pmAddressItems;
+	xmlNodePtr issueDate;
+	xmlNodePtr pmTitle;
+	xmlNodePtr pmStatus;
+	xmlNodePtr security;
+	xmlNodePtr responsiblePartnerCompany;
+	xmlNodePtr enterpriseName;
+	xmlNodePtr pmEntry;
 
 	char pm_filename[256];
 
@@ -223,8 +190,10 @@ int main(int argc, char **argv)
 	char defaults_fname[256] = "defaults";
 	bool no_issue = false;
 	char iss[8] = "";
+	bool include_issue_info = false;
+	bool include_language = false;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -237,6 +206,8 @@ int main(int argc, char **argv)
 			case 'r': strcpy(enterprise_name, optarg); break;
 			case 't': strcpy(pm_title, optarg); break;
 			case 'N': no_issue = true; break;
+			case 'i': include_issue_info = true; break;
+			case 'l': include_language = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -358,7 +329,7 @@ int main(int argc, char **argv)
 	xmlNodeSetContent(enterpriseName, (xmlChar *) enterprise_name);
 
 	for (i = optind; i < argc; ++i) {
-		add_dm_ref(pmEntry, argv[i]);
+		add_dm_ref(pmEntry, argv[i], include_issue_info, include_language);
 	}
 
 	for (i = 0; language_iso_code[i]; ++i) {

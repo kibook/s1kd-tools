@@ -313,7 +313,7 @@ void printdms(char dms[DM_MAX][256], int n, int columns)
 				printf("%s	", tech);
 			}
 			if ((columns & COL_INFO) == COL_INFO) {
-				printf("%s	", infoName ? info : "");
+				printf("%s	", infoName ? info : " ");
 			}
 		}
 
@@ -445,7 +445,24 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 
 			xmlFree(issueNumber);
 			xmlFree(inWork);
-		}	
+		}
+
+		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
+			xmlNodePtr issueDate;
+			char *year, *month, *day;
+
+			issueDate = find_req_child(pmAddressItems, "issueDate");
+
+			year  = (char *) xmlGetProp(issueDate, BAD_CAST "year");
+			month = (char *) xmlGetProp(issueDate, BAD_CAST "month");
+			day   = (char *) xmlGetProp(issueDate, BAD_CAST "day");
+
+			printf("%s-%s-%s	", year, month, day);
+
+			xmlFree(year);
+			xmlFree(month);
+			xmlFree(day);
+		}
 
 		if (((columns & COL_TITLE) == COL_TITLE) || ((columns & COL_STITLE) == COL_STITLE)) {
 			printf("%s	", title);
@@ -708,9 +725,12 @@ int main(int argc, char **argv)
 		if ((columns & COL_LANG) == COL_LANG) printf("LANG	");
 		if ((columns & COL_ISSUE) == COL_ISSUE) printf("ISSUE	");
 		if ((columns & COL_ISSDATE) == COL_ISSDATE) printf("DATE	");
-		if ((columns & COL_STITLE) == COL_STITLE) printf("TITLE	");
-		if ((columns & COL_TECH) == COL_TECH) printf("TECH NAME/TITLE	");
-		if ((columns & COL_INFO) == COL_INFO) printf("INFO NAME	");
+		if ((columns & COL_STITLE) == COL_STITLE) {
+			printf("TITLE	");
+		} else {
+			if ((columns & COL_TECH) == COL_TECH) printf("TECH NAME/TITLE	");
+			if ((columns & COL_INFO) == COL_INFO) printf("INFO NAME	");
+		}
 		if ((columns & COL_RPC) == COL_RPC) printf("RPC	");
 		if ((columns & COL_ORIG) == COL_ORIG) printf("ORIG	");
 		if ((columns & COL_APPLIC) == COL_APPLIC) printf("APPLIC	");
