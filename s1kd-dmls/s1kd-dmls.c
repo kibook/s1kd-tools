@@ -235,6 +235,8 @@ void printdms(char dms[DM_MAX][256], int n, int columns)
 		}
 		#endif
 
+		if (!dm) continue;
+
 		init_ident(&ident, dm);
 
 		dmodule = xmlDocGetRootElement(dm);
