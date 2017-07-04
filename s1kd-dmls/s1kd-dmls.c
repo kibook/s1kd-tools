@@ -562,9 +562,9 @@ void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MA
 
 		if (access(cpath, R_OK) != 0)
 			continue;
-		if (only_writable && access(cur->d_name, W_OK) != 0)
+		else if (only_writable && access(cur->d_name, W_OK) != 0)
 			continue;
-		if (isdm(cur->d_name)) {
+		else if (isdm(cur->d_name)) {
 			if (*ndms == DM_MAX) {
 				fprintf(stderr, ERR_PREFIX "Maximum data modules reached (%d).\n", DM_MAX);
 				exit(EXIT_DM_MAX);
@@ -602,8 +602,8 @@ int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
 
-	char (*dms)[256] = malloc(DM_MAX);
-	char (*pms)[256] = malloc(DM_MAX);
+	char (*dms)[256] = malloc(DM_MAX * 256);
+	char (*pms)[256] = malloc(DM_MAX * 256);
 	int ndms;
 	int npms;
 
@@ -614,10 +614,10 @@ int main(int argc, char **argv)
 	int only_official_issue = 0;
 	int only_writable = 0;
 
-	char (*latest_dms)[256] = malloc(DM_MAX);
+	char (*latest_dms)[256] = malloc(DM_MAX * 256);
 	int nlatest_dms;
 
-	char (*issue_dms)[256] = malloc(DM_MAX);
+	char (*issue_dms)[256] = malloc(DM_MAX * 256);
 	int nissue_dms;
 
 	int recursive = 0;
@@ -625,9 +625,6 @@ int main(int argc, char **argv)
 
 	int columns = COL_FNAME;
 	int header = 0;
-
-	dms = malloc(DM_MAX * 256);
-	pms = malloc(DM_MAX * 256);
 
 	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLpDPh?")) != -1) {
 		switch (c) {
@@ -680,8 +677,16 @@ int main(int argc, char **argv)
 				continue;
 
 			if (isdm(base)) {
+				if (ndms == DM_MAX) {
+					fprintf(stderr, ERR_PREFIX "Maximum data modules reached (%d).\n", DM_MAX);
+					exit(EXIT_DM_MAX);
+				}
 				strcpy(dms[ndms++], argv[i]);
 			} else if (ispm(base)) {
+				if (npms == DM_MAX) {
+					fprintf(stderr, ERR_PREFIX "Maximum pub modules reached (%d).\n", DM_MAX);
+					exit(EXIT_DM_MAX);
+				}
 				strcpy(pms[npms++], argv[i]);
 			} else if (is_directory(argv[i], recursive)) {
 				list_dir(argv[i], dms, &ndms, pms, &npms, only_writable, recursive);
