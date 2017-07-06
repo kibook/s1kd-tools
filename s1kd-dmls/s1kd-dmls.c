@@ -71,19 +71,18 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *childname)
 	return NULL;
 }
 
-xmlNodePtr find_req_child(xmlNodePtr parent, const char *name)
+xmlNodePtr find_req_child(xmlNodePtr parent, const char *name, const char *fname)
 {
 	xmlNodePtr child;
 
 	if (!(child = find_child(parent, name))) {
-		fprintf(stderr, ERR_PREFIX "Element %s missing child element %s.\n", (char *) parent->name, name);
-		exit(EXIT_BAD_XML);
+		fprintf(stderr, ERR_PREFIX "Element %s missing child element %s (%s).\n", (char *) parent->name, name, fname);
 	}
 
 	return child;
 }
 
-void init_ident(struct dmident *ident, xmlDocPtr dm)
+bool init_ident(struct dmident *ident, xmlDocPtr dm, const char *fname)
 {
 	xmlNodePtr dmodule;
 	xmlNodePtr identAndStatusSection;
@@ -95,13 +94,13 @@ void init_ident(struct dmident *ident, xmlDocPtr dm)
 	xmlNodePtr issueInfo;
 
 	dmodule = xmlDocGetRootElement(dm);
-	identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	dmIdent = find_req_child(dmAddress, "dmIdent");
+	if (!(identAndStatusSection = find_req_child(dmodule, "identAndStatusSection", fname))) return false;
+	if (!(dmAddress = find_req_child(identAndStatusSection, "dmAddress", fname))) return false;
+	if (!(dmIdent = find_req_child(dmAddress, "dmIdent", fname))) return false;
 	identExtension = find_child(dmIdent, "identExtension");
-	dmCode = find_req_child(dmIdent, "dmCode");
-	language = find_req_child(dmIdent, "language");
-	issueInfo = find_req_child(dmIdent, "issueInfo");
+	if (!(dmCode = find_req_child(dmIdent, "dmCode", fname))) return false;
+	if (!(language = find_req_child(dmIdent, "language", fname))) return false;
+	if (!(issueInfo = find_req_child(dmIdent, "issueInfo", fname))) return false;
 
 	ident->modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
 	ident->systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
@@ -130,6 +129,8 @@ void init_ident(struct dmident *ident, xmlDocPtr dm)
 	} else {
 		ident->extended = false;
 	}
+
+	return true;
 }
 
 void free_ident(struct dmident *ident)
@@ -237,17 +238,17 @@ void printdms(char dms[DM_MAX][256], int n, int columns)
 
 		if (!dm) continue;
 
-		init_ident(&ident, dm);
+		if (!init_ident(&ident, dm, dms[i])) continue;
 
 		dmodule = xmlDocGetRootElement(dm);
-		identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-		dmAddress = find_child(identAndStatusSection, "dmAddress");
-		dmAddressItems = find_child(dmAddress, "dmAddressItems");
-		dmTitle = find_child(dmAddressItems, "dmTitle");
-		techName = find_child(dmTitle, "techName");
+		if (!(identAndStatusSection = find_req_child(dmodule, "identAndStatusSection", dms[i]))) continue;
+		if (!(dmAddress = find_req_child(identAndStatusSection, "dmAddress", dms[i]))) continue;
+		if (!(dmAddressItems = find_req_child(dmAddress, "dmAddressItems", dms[i]))) continue;
+		if (!(dmTitle = find_req_child(dmAddressItems, "dmTitle", dms[i]))) continue;
+		if (!(techName = find_req_child(dmTitle, "techName", dms[i]))) continue;
 		infoName = find_child(dmTitle, "infoName");
 
-		dmStatus = find_child(identAndStatusSection, "dmStatus");
+		if (!(dmStatus = find_req_child(identAndStatusSection, "dmStatus", dms[i]))) continue;
 
 		tech = (char *) xmlNodeGetContent(techName);
 		info = (char *) xmlNodeGetContent(infoName);
@@ -374,6 +375,10 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 	xmlNodePtr pmIdent;
 	xmlNodePtr pmAddressItems;
 	xmlNodePtr pmTitle;
+	xmlNodePtr pmCode;
+	xmlNodePtr language;
+	xmlNodePtr issueInfo;
+	xmlNodePtr issueDate;
 
 	for (i = 0; i < n; ++i) {
 		char *title;
@@ -381,11 +386,15 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		pm_doc = xmlReadFile(pms[i], NULL, 0);
 
 		pm = xmlDocGetRootElement(pm_doc);
-		identAndStatusSection = find_child(pm, "identAndStatusSection");
-		pmAddress = find_child(identAndStatusSection, "pmAddress");
-		pmIdent = find_child(pmAddress, "pmIdent");
-		pmAddressItems = find_child(pmAddress, "pmAddressItems");
-		pmTitle = find_child(pmAddressItems, "pmTitle");
+		if (!(identAndStatusSection = find_req_child(pm, "identAndStatusSection", pms[i]))) continue;
+		if (!(pmAddress = find_req_child(identAndStatusSection, "pmAddress", pms[i]))) continue;
+		if (!(pmIdent = find_req_child(pmAddress, "pmIdent", pms[i]))) continue;
+		if (!(pmAddressItems = find_req_child(pmAddress, "pmAddressItems", pms[i]))) continue;
+		if (!(pmTitle = find_req_child(pmAddressItems, "pmTitle", pms[i]))) continue;
+		if (!(pmCode = find_req_child(pmIdent, "pmCode", pms[i]))) continue;
+		if (!(language = find_req_child(pmIdent, "language", pms[i]))) continue;
+		if (!(issueInfo = find_req_child(pmIdent, "issueInfo", pms[i]))) continue;
+		if (!(issueDate = find_req_child(pmAddressItems, "issueDate", pms[i]))) continue;
 
 		title = (char *) xmlNodeGetContent(pmTitle);
 
@@ -396,13 +405,10 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		}
 
 		if ((columns & COL_CODE) == COL_CODE) {
-			xmlNodePtr pmCode;
 			char *modelIdentCode;
 			char *pmIssuer;
 			char *pmNumber;
 			char *pmVolume;
-
-			pmCode = find_req_child(pmIdent, "pmCode");
 
 			modelIdentCode = (char *) xmlGetProp(pmCode, BAD_CAST "modelIdentCode");
 			pmIssuer       = (char *) xmlGetProp(pmCode, BAD_CAST "pmIssuer");
@@ -418,11 +424,8 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		}
 
 		if ((columns & COL_LANG) == COL_LANG) {
-			xmlNodePtr language;
 			char *languageIsoCode;
 			char *countryIsoCode;
-
-			language = find_req_child(pmIdent, "language");
 
 			languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
 			countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
@@ -434,11 +437,8 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		}
 
 		if ((columns & COL_ISSUE) == COL_ISSUE) {
-			xmlNodePtr issueInfo;
 			char *issueNumber;
 			char *inWork;
-
-			issueInfo = find_req_child(pmIdent, "issueInfo");
 
 			issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
 			inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
@@ -450,10 +450,7 @@ void printpms(char pms[DM_MAX][256], int n, int columns)
 		}
 
 		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
-			xmlNodePtr issueDate;
 			char *year, *month, *day;
-
-			issueDate = find_req_child(pmAddressItems, "issueDate");
 
 			year  = (char *) xmlGetProp(issueDate, BAD_CAST "year");
 			month = (char *) xmlGetProp(issueDate, BAD_CAST "month");
