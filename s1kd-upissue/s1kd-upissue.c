@@ -1,11 +1,3 @@
-/* Usage:
- * 	upissue [-vI] [-f] DATAMODULE
- *
- * 	-v	Print filename of upissued datamodule
- * 	-I	Create a new issue of the datamodule
- * 	-f	specify the datamodule file to upissue
- */
-
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -13,9 +5,16 @@
 #include <time.h>
 #include <libxml/tree.h>
 
+#define PROG_NAME "s1kd-upissue"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define EXIT_NO_FILE 1
+#define EXIT_NO_OVERWRITE 2
+
 void show_help(void)
 {
-	puts("Usage: upissue [-vI] DATAMODULE");
+	puts("Usage: " PROG_NAME " [-vIN] DATAMODULE");
 	putchar('\n');
 	puts("Options:");
 	puts("  -v	Print filename of upissued data module");
@@ -39,7 +38,6 @@ xmlNode *find_child(xmlNode *parent, const char *name)
 int main(int argc, char **argv)
 {
 	char dmfile[256];
-	int dmfilelen;
 	xmlDocPtr dmdoc;
 
 	xmlNode *dmodule;
@@ -62,8 +60,9 @@ int main(int argc, char **argv)
 
 	int c;
 
-	bool verbose;
-	bool newissue;
+	bool verbose = false;
+	bool newissue = false;
+	bool overwrite = false;
 
 	int i;
 
@@ -72,15 +71,11 @@ int main(int argc, char **argv)
 	int year, month, day;
 	char year_s[5], month_s[3], day_s[3];
 
-	dmfilelen = 0;
-	verbose = false;
-	newissue = false;
-
 	char status[32] = "changed";
 
 	bool no_issue = false;
 
-	while ((c = getopt(argc, argv, "Ivs:Nh?")) != -1) {
+	while ((c = getopt(argc, argv, "Ivs:Nfh?")) != -1) {
 		switch (c) {
 			case 'I':
 				newissue = true;
@@ -94,6 +89,9 @@ int main(int argc, char **argv)
 			case 'N':
 				no_issue = true;
 				break;
+			case 'f':
+				overwrite = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -103,14 +101,13 @@ int main(int argc, char **argv)
 
 	for (i = optind; i < argc; i++) {
 		strcpy(dmfile, argv[i]);
-		dmfilelen = strlen(dmfile);
-
-		if (!dmfilelen) {
-			fputs("ERROR: No file specified\n", stderr);
-			exit(1);
-		}
 
 		dmdoc = xmlReadFile(dmfile, NULL, XML_PARSE_NONET);
+
+		if (!dmdoc) {
+			fprintf(stderr, ERR_PREFIX "Could not read file %s.\n", dmfile);
+			exit(EXIT_NO_FILE);
+		}
 
 		dmodule = xmlDocGetRootElement(dmdoc);
 		identAndStatusSection = find_child(dmodule, "identAndStatusSection");
@@ -155,13 +152,22 @@ int main(int argc, char **argv)
 			xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
 			xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
 
-			dmStatus = find_child(identAndStatusSection, "dmStatus");
-			xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
+			/* Do not change issueType when upissuing from 000 -> 001 */
+			if (issueNumber_int > 0) {
+				dmStatus = find_child(identAndStatusSection, "dmStatus");
+				xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
+			}
 		}
 
 		if (!no_issue) {
+			int dmfilelen = strlen(dmfile);
 			strncpy(dmfile + (dmfilelen - 16), upissued_issueNumber, 3);
 			strncpy(dmfile + (dmfilelen - 12), upissued_inWork, 2);
+		}
+
+		if (!overwrite && access(dmfile, F_OK) != -1) {
+			fprintf(stderr, ERR_PREFIX "%s already exists.\n", dmfile);
+			exit(EXIT_NO_OVERWRITE);
 		}
 
 		xmlSaveFormatFile(dmfile, dmdoc, 1);
