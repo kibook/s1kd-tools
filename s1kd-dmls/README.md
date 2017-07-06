@@ -58,8 +58,11 @@ Show headers on columns.
 -w  
 Show only writable data module files.
 
+-R  
+Recursively descend in to directories.
+
 -p  
-Do not include control characters (\\n, \\t) in the output.
+Do not replace control characters (\\n, \\t) when printing.
 
 -D, -P  
 List data modules/publication modules. If neither is specified, -DP is assumed.

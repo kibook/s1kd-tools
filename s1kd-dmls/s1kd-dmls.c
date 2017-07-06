@@ -492,7 +492,7 @@ int ispm(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-dmls [-acfHhilorTt]");
+	puts("Usage: s1kd-dmls [-acfHhilorRTt]");
 	puts("");
 	puts("Options:");
 	puts("  -l	Show only latest issue/inwork version");
@@ -508,7 +508,8 @@ void show_help(void)
 	puts("  -o	Include originator column");
 	puts("  -a	Include applicability column");
 	puts("  -H	Show headers on columns");
-	puts("  -w	Show only writable data module files.");
+	puts("  -w	Show only writable data module files");
+	puts("  -R	Recursively search directories");
 	puts("  -p	Print control characters");
 	puts("  -D	List data modules only");
 	puts("  -P	List pub modules only");

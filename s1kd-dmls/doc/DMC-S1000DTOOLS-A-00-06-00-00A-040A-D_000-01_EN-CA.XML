@@ -145,9 +145,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-R</listItemTerm>
+              <listItemDefinition>
+                <para>Recursively descend in to directories.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-p</listItemTerm>
               <listItemDefinition>
-                <para>Do not include control characters (\n, \t) in the output.</para>
+                <para>Do not replace control characters (\n, \t) when printing.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
