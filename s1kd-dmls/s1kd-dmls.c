@@ -686,7 +686,7 @@ int main(int argc, char **argv)
 					exit(EXIT_DM_MAX);
 				}
 				strcpy(pms[npms++], argv[i]);
-			} else if (is_directory(argv[i], recursive)) {
+			} else if (is_directory(argv[i], 0)) {
 				list_dir(argv[i], dms, &ndms, pms, &npms, only_writable, recursive);
 			}
 		}
