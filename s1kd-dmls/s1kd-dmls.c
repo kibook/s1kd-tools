@@ -5,6 +5,7 @@
 #include <libgen.h>
 #include <sys/stat.h>
 #include <stdbool.h>
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
@@ -23,7 +24,7 @@
 #define COL_TITLE	(COL_TECH | COL_INFO)
 #define COL_ALL		(COL_ISSDATE | COL_RPC | COL_ORIG | COL_TECH | COL_INFO | COL_APPLIC | COL_FNAME | COL_CODE | COL_ISSUE | COL_LANG)
 
-#define DM_MAX 5120
+#define DM_MAX 10240
 
 #define ERR_PREFIX "s1kd-dmls: ERROR: "
 
@@ -188,7 +189,7 @@ void clean(char *s)
 	}
 }
 
-void printdms(char dms[DM_MAX][256], int n, int columns)
+void printdms(char dms[DM_MAX][PATH_MAX], int n, int columns)
 {
 	int i;
 
@@ -365,7 +366,7 @@ void printdms(char dms[DM_MAX][256], int n, int columns)
 	}
 }
 
-void printpms(char pms[DM_MAX][256], int n, int columns)
+void printpms(char pms[DM_MAX][PATH_MAX], int n, int columns)
 {
 	int i;
 	xmlDocPtr pm_doc;
@@ -534,7 +535,7 @@ int is_directory(const char *path, int recursive)
 	return S_ISDIR(st.st_mode);
 }
 
-void list_dir(const char *path, char dms[DM_MAX][256], int *ndms, char pms[DM_MAX][256], int *npms, int only_writable, int recursive)
+void list_dir(const char *path, char dms[DM_MAX][PATH_MAX], int *ndms, char pms[DM_MAX][PATH_MAX], int *npms, int only_writable, int recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -600,8 +601,8 @@ int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
 
-	char (*dms)[256] = malloc(DM_MAX * 256);
-	char (*pms)[256] = malloc(DM_MAX * 256);
+	char (*dms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
+	char (*pms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	int ndms;
 	int npms;
 
@@ -612,10 +613,10 @@ int main(int argc, char **argv)
 	int only_official_issue = 0;
 	int only_writable = 0;
 
-	char (*latest_dms)[256] = malloc(DM_MAX * 256);
+	char (*latest_dms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	int nlatest_dms;
 
-	char (*issue_dms)[256] = malloc(DM_MAX * 256);
+	char (*issue_dms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	int nissue_dms;
 
 	int recursive = 0;
@@ -695,8 +696,8 @@ int main(int argc, char **argv)
 		list_dir(".", dms, &ndms, pms, &npms, only_writable, recursive);
 	}
 
-	qsort(dms, ndms, 256, compare);
-	qsort(pms, npms, 256, compare);
+	qsort(dms, ndms, PATH_MAX, compare);
+	qsort(pms, npms, PATH_MAX, compare);
 
 	if (only_official_issue) {
 		for (i = 0; i < ndms; ++i) {
