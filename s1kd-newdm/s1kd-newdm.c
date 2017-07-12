@@ -188,8 +188,9 @@ int main(int argc, char **argv)
 	char dmcode[256] = "";
 	bool skipdmc = false;
 	bool no_issue = false;
+	char schema[1024] = "";
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Nh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -208,6 +209,7 @@ int main(int argc, char **argv)
 			case 'T': strcpy(dmtype, optarg); break;
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
 			case 'N': no_issue = true; break;
+			case 'S': strcpy(schema, optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -268,6 +270,8 @@ int main(int argc, char **argv)
 				strcpy(techName_content, def_val);
 			else if (strcmp(def_key, "infoName") == 0 && strcmp(infoName_content, "") == 0)
 				strcpy(infoName_content, def_val);
+			else if (strcmp(def_key, "schema") == 0 && strcmp(schema, "") == 0)
+				strcpy(schema, def_val);
 		}
 
 		fclose(defaults);
@@ -336,8 +340,8 @@ int main(int argc, char **argv)
 		prompt("Originator", originator_enterpriseName, MAX_ENTERPRISE_NAME);
 		prompt("Tech name", techName_content, MAX_TECH_NAME);
 		prompt("Info name", infoName_content, MAX_INFO_NAME);
-
 		prompt("DM type", dmtype, 32);
+		prompt("Schema", schema, 1024);
 	}
 
 	if (strcmp(issueNumber, "") == 0) strcpy(issueNumber, "000");
@@ -379,6 +383,10 @@ int main(int argc, char **argv)
 	dmTitle = find_child(dmAddressItems, "dmTitle");
 	techName = find_child(dmTitle, "techName");
 	infoName = find_child(dmTitle, "infoName");
+
+	if (strcmp(schema, "") != 0) {
+		xmlSetProp(dmodule, BAD_CAST "xsi:noNamespaceSchemaLocation", BAD_CAST schema);
+	}
 
 	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
 	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST systemDiffCode);
