@@ -340,6 +340,12 @@ int main(int argc, char **argv)
 		prompt("DM type", dmtype, 32);
 	}
 
+	if (strcmp(issueNumber, "") == 0) strcpy(issueNumber, "000");
+	if (strcmp(inWork, "") == 0) strcpy(inWork, "01");
+	if (strcmp(languageIsoCode, "") == 0) strcpy(languageIsoCode, "und");
+	if (strcmp(countryIsoCode, "") == 0) strcpy(countryIsoCode, "ZZ");
+	if (strcmp(securityClassification, "") == 0) strcpy(securityClassification, "01");
+
 	if (strcmp(dmtype, "descript") == 0)
 		dm = xmlReadMemory((const char *)templates_descript_xml, templates_descript_xml_len, NULL, NULL, 0);
 	else if (strcmp(dmtype, "proced") == 0)
