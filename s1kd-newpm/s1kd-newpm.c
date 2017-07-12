@@ -280,6 +280,12 @@ int main(int argc, char **argv)
 		prompt("Responsible partner company", enterprise_name, 256);
 	}
 
+	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
+	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
+	if (strcmp(language_iso_code, "") == 0) strcpy(language_iso_code, "und");
+	if (strcmp(country_iso_code, "") == 0) strcpy(country_iso_code, "ZZ");
+	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
+
 	for (i = 0; language_iso_code[i]; ++i) {
 		language_iso_code[i] = tolower(language_iso_code[i]);
 	}
