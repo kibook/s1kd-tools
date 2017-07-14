@@ -173,9 +173,6 @@ int main(int argc, char **argv)
 	char enterprise_name[256] = "";
 
 	FILE *defaults;
-	char default_line[1024];
-	char *def_key;
-	char *def_val;
 
 	int c;
 	int i;
@@ -218,7 +215,10 @@ int main(int argc, char **argv)
 	defaults = fopen(defaults_fname, "r");
 
 	if (defaults) {
+		char default_line[1024];
 		while (fgets(default_line, 1024, defaults)) {
+			char *def_key;
+			char *def_val;
 			def_key = strtok(default_line, "\t ");
 			def_val = strtok(NULL, "\t\n");
 
@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 	if (strcmp(pmcode, "") != 0) {
 		int n;
 
-		n = sscanf(pmcode, "%[^-]-%5s-%5s-%2s",
+		n = sscanf(pmcode, "%14[^-]-%5s-%5s-%2s",
 			model_ident_code,
 			pm_issuer,
 			pm_number,
