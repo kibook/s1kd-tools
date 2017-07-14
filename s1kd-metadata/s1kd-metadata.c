@@ -244,7 +244,7 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 	char learn_event_code[2];
 	int n;
 
-	n = sscanf(val, "%[^-]-%[^-]-%[^-]-%1s%1s-%[^-]-%2s%[^-]-%3s%1s-%1s-%3s%1s",
+	n = sscanf(val, "%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
@@ -498,7 +498,7 @@ int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 {
 	char key[256], val[256];
 
-	while (fscanf(input, "%s %[^\n]", key, val) == 2) {
+	while (fscanf(input, "%255s %255[^\n]", key, val) == 2) {
 		edit_metadata(ctxt, key, val);
 	}
 
