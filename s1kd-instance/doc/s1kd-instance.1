@@ -10,7 +10,7 @@ s1kd\-instance \- Create S1000D data module instances
 s1kd\-instance [\-s <src>] [\-e <ext>] [\-c <dmc>] [\-l <lang>] [\-I
 <iss>] [\-u <sec>] [\-o <file>|\-O <dir>] [\-f] [\-t <techName>] [\-i
 <infoName>] [\-a|\-A] [\-Y <text>] [\-C <comment>] [\-R <CIR> ...] [\-S]
-[<applic>...]
+[\-N] [\-P <PCT> \-p <id>] [<applic>...]
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-instance\f[] tool filters a master S1000D data module on
@@ -138,6 +138,18 @@ If the whole data module is not applicable, then no instance is created.
 .TP
 .B \-N
 Omit issue/inwork numbers from automatically generated filenames.
+.RS
+.RE
+.TP
+.B \-P <PCT>
+Product cross\-reference table file to read product definitions from
+(\-p).
+.RS
+.RE
+.TP
+.B \-p <id>
+Product ID of the product to read applicability definitions from, using
+the specified PCT data module (\-P).
 .RS
 .RE
 .TP

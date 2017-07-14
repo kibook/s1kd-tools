@@ -51,7 +51,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-I &lt;iss&gt;] [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [&lt;applic&gt;...]</para>
+        <para>s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-I &lt;iss&gt;] [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [&lt;applic&gt;...]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -187,6 +187,18 @@
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
                 <para>Omit issue/inwork numbers from automatically generated filenames.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P &lt;PCT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Product cross-reference table file to read product definitions from (-p).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p &lt;id&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

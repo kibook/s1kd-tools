@@ -1344,6 +1344,50 @@ bool check_wholedm_applic(xmlDocPtr dm)
 	return eval_applic_stmt(applic, true);
 }
 
+void load_applic_from_pct(const char *pctfname, const char *product)
+{
+	xmlDocPtr pct;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	char xpath[256];
+
+	pct = xmlReadFile(pctfname, NULL, 0);
+
+	ctx = xmlXPathNewContext(pct);
+
+	snprintf(xpath, 256, "//product[@id='%s']/assign", product);
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		fprintf(stderr, ERR_PREFIX "No product '%s' in PCT '%s'.\n", product, pctfname);
+		exit(EXIT_BAD_APPLIC);
+	} else {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char *ident, *type, *value;
+
+			ident = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+				BAD_CAST "applicPropertyIdent");
+			type  = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+				BAD_CAST "applicPropertyType");
+			value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+				BAD_CAST "applicPropertyValue");
+
+			define_applic(ident, type, value);
+
+			xmlFree(ident);
+			xmlFree(type);
+			xmlFree(value);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+	xmlFreeDoc(pct);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1382,6 +1426,8 @@ int main(int argc, char **argv)
 	char secu[4] = "";
 	bool wholedm = false;
 	bool no_issue = false;
+	char pctfname[PATH_MAX] = "";
+	char product[64] = "";
 
 	int parseopts = 0;
 
@@ -1392,13 +1438,13 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wNh?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wNP:p:h?")) != -1) {
 		switch (c) {
-			case 's': strncpy(src, optarg, PATH_MAX); break;
+			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
 			case 'e': strncpy(extension, optarg, 255); break;
 			case 'c': strncpy(dmc, optarg, 255); break;
-			case 'o': strncpy(out, optarg, PATH_MAX); break;
+			case 'o': strncpy(out, optarg, PATH_MAX - 1); break;
 			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
 			case 'f': force_overwrite = true; break;
 			case 'a': clean = true; break;
@@ -1413,6 +1459,8 @@ int main(int argc, char **argv)
 			case 'u': strncpy(secu, optarg, 2); break;
 			case 'w': wholedm = true; break;
 			case 'N': no_issue = true; break;
+			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
+			case 'p': strncpy(product, optarg, 63); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1461,6 +1509,20 @@ int main(int argc, char **argv)
 	content = find_req_child(dmodule, "content");
 
 	applicability = xmlNewNode(NULL, BAD_CAST "applic");
+
+	if (strcmp(product, "") != 0) {
+		if (strcmp(pctfname, "") == 0) {
+			fprintf(stderr, ERR_PREFIX "No PCT specified (-P).\n");
+			exit(EXIT_MISSING_ARGS);
+		} else {
+			if (access(pctfname, F_OK) == -1) {
+				fprintf(stderr, ERR_PREFIX "PCT '%s' not found.\n", pctfname);
+				exit(EXIT_MISSING_FILE);
+			} else {
+				load_applic_from_pct(pctfname, product);
+			}
+		}
+	}
 
 	/* All remaining arguments are treated as applic defs and copied to the
 	 * global applicability list. */
