@@ -169,10 +169,16 @@
                       <para>comrep - Common information repository</para>
                     </listItem>
                     <listItem>
+                      <para>condcrossreftable - Conditions cross-reference table</para>
+                    </listItem>
+                    <listItem>
                       <para>descript - Descriptive</para>
                     </listItem>
                     <listItem>
                       <para>frontmatter - Front matter</para>
+                    </listItem>
+                    <listItem>
+                      <para>prdcrossreftable - Product cross-reference table</para>
                     </listItem>
                     <listItem>
                       <para>proced - Procedural</para>

@@ -362,6 +362,10 @@ int main(int argc, char **argv)
 		dm = xmlReadMemory((const char *) templates_brdoc_xml, templates_brdoc_xml_len, NULL, NULL, 0);
 	else if (strcmp(dmtype, "appliccrossreftable") == 0)
 		dm = xmlReadMemory((const char *) templates_appliccrossreftable_xml, templates_appliccrossreftable_xml_len, NULL, NULL, 0);
+	else if (strcmp(dmtype, "prdcrossreftable") == 0)
+		dm = xmlReadMemory((const char *) templates_prdcrossreftable_xml, templates_prdcrossreftable_xml_len, NULL, NULL, 0);
+	else if (strcmp(dmtype, "condcrossreftable") == 0)
+		dm = xmlReadMemory((const char *) templates_condcrossreftable_xml, templates_condcrossreftable_xml_len, NULL, NULL, 0);
 	else if (strcmp(dmtype, "comrep") == 0)
 		dm = xmlReadMemory((const char *) templates_comrep_xml, templates_comrep_xml_len, NULL, NULL, 0);
 	else {

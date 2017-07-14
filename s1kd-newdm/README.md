@@ -72,9 +72,13 @@ The type (schema) of the new data module. Supported schemas:
 
 -   comrep - Common information repository
 
+-   condcrossreftable - Conditions cross-reference table
+
 -   descript - Descriptive
 
 -   frontmatter - Front matter
+
+-   prdcrossreftable - Product cross-reference table
 
 -   proced - Procedural
 
