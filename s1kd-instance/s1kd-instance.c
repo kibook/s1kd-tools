@@ -1486,11 +1486,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+
 	if (strcmp(src, "") == 0) {
 		strcpy(src, "-");
 		use_stdin = true;
+	} else if (dmlist) {
+		list = fopen(src, "r");
 	}
-
 
 	if (!use_stdin && access(src, F_OK) == -1) {
 		fprintf(stderr, ERR_PREFIX "Could not find source data module/list \"%s\".\n", src);
@@ -1545,14 +1547,10 @@ int main(int argc, char **argv)
 		parseopts |= XML_PARSE_NONET;
 	}
 
-	if (dmlist && strcmp(src, "") != 0) {
-		list = fopen(src, "r");
-	}
-
 	while (1) {
 		if (dmlist) {
 			if (!fgets(src, PATH_MAX - 1, list)) break;
-			strtok(src, "\n");
+			strtok(src, "\t\n");
 		}
 
 		dm = xmlReadFile(src, NULL, parseopts);
@@ -1572,97 +1570,95 @@ int main(int argc, char **argv)
 
 		content = find_req_child(dmodule, "content");
 
-		if (wholedm && !check_wholedm_applic(dm)) {
-			exit(0);
-		}
-
-		if (add_source_ident) {
-			add_source(dmodule);
-		}
-
-		for (cir = cirs->children; cir; cir = cir->next) {
-			char *cirdocfname = (char *) xmlNodeGetContent(cir);
-
-			if (access(cirdocfname, F_OK) == -1) {
-				fprintf(stderr, ERR_PREFIX "Could not find CIR %s.", cirdocfname);
-				continue;
+		if (!wholedm || check_wholedm_applic(dm)) {
+			if (add_source_ident) {
+				add_source(dmodule);
 			}
 
-			cirdoc = xmlReadFile(cirdocfname, NULL, 0);
+			for (cir = cirs->children; cir; cir = cir->next) {
+				char *cirdocfname = (char *) xmlNodeGetContent(cir);
 
-			if (!cirdoc) {
-				fprintf(stderr, ERR_PREFIX "CIR %s is invalid.", cirdocfname);
-				continue;
+				if (access(cirdocfname, F_OK) == -1) {
+					fprintf(stderr, ERR_PREFIX "Could not find CIR %s.", cirdocfname);
+					continue;
+				}
+
+				cirdoc = xmlReadFile(cirdocfname, NULL, 0);
+
+				if (!cirdoc) {
+					fprintf(stderr, ERR_PREFIX "CIR %s is invalid.", cirdocfname);
+					continue;
+				}
+
+				undepend_cir(dm, cirdoc, add_source_ident);
+
+				xmlFreeDoc(cirdoc);
+				xmlFree(cirdocfname);
 			}
 
-			undepend_cir(dm, cirdoc, add_source_ident);
+			referencedApplicGroup = find_child(content, "referencedApplicGroup");
 
-			xmlFreeDoc(cirdoc);
-			xmlFree(cirdocfname);
-		}
+			if (referencedApplicGroup) {
+				strip_applic(referencedApplicGroup, content);
 
-		referencedApplicGroup = find_child(content, "referencedApplicGroup");
+				if (clean || simpl) {
+					clean_applic(referencedApplicGroup, content);
+				}
 
-		if (referencedApplicGroup) {
-			strip_applic(referencedApplicGroup, content);
-
-			if (clean || simpl) {
-				clean_applic(referencedApplicGroup, content);
+				if (simpl) {
+					simpl_applic_clean(referencedApplicGroup);
+				}
 			}
 
-			if (simpl) {
-				simpl_applic_clean(referencedApplicGroup);
-			}
-		}
-
-		if (strcmp(extension, "") != 0) {
-			set_dme(dmodule, extension);
-		}
-
-		if (strcmp(dmc, "") != 0) {
-			set_dmc(dmodule, dmc);
-		}
-
-		set_title(dmodule, tech, info);
-
-		if (strcmp(language, "") != 0) {
-			set_lang(dmodule, language);
-		}
-
-		if (strcmp(new_display_text, "") != 0) {
-			set_applic(dmodule, new_display_text);
-		}
-
-		if (strcmp(issinfo, "") != 0) {
-			set_issue(dm, issinfo);
-		}
-
-		if (strcmp(secu, "") != 0) {
-			set_security(dm, secu);
-		}
-
-		if (strcmp(comment_text, "") != 0) {
-			comment = xmlNewComment(BAD_CAST comment_text);
-			identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-
-			if (!identAndStatusSection) {
-				fprintf(stderr, ERR_PREFIX "Data module missing child identAndStatusSection.");
-				exit(EXIT_BAD_XML);
+			if (strcmp(extension, "") != 0) {
+				set_dme(dmodule, extension);
 			}
 
-			xmlAddPrevSibling(identAndStatusSection, comment);
-		}
-
-		if (autoname) {
-			auto_name(out, dm, dir, no_issue);
-
-			if (access(out, F_OK) == 0 && !force_overwrite) {
-				fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
-				exit(EXIT_NO_OVERWRITE);
+			if (strcmp(dmc, "") != 0) {
+				set_dmc(dmodule, dmc);
 			}
-		}
 
-		xmlSaveFile(out, dm);
+			set_title(dmodule, tech, info);
+
+			if (strcmp(language, "") != 0) {
+				set_lang(dmodule, language);
+			}
+
+			if (strcmp(new_display_text, "") != 0) {
+				set_applic(dmodule, new_display_text);
+			}
+
+			if (strcmp(issinfo, "") != 0) {
+				set_issue(dm, issinfo);
+			}
+
+			if (strcmp(secu, "") != 0) {
+				set_security(dm, secu);
+			}
+
+			if (strcmp(comment_text, "") != 0) {
+				comment = xmlNewComment(BAD_CAST comment_text);
+				identAndStatusSection = find_child(dmodule, "identAndStatusSection");
+
+				if (!identAndStatusSection) {
+					fprintf(stderr, ERR_PREFIX "Data module missing child identAndStatusSection.");
+					exit(EXIT_BAD_XML);
+				}
+
+				xmlAddPrevSibling(identAndStatusSection, comment);
+			}
+
+			if (autoname) {
+				auto_name(out, dm, dir, no_issue);
+
+				if (access(out, F_OK) == 0 && !force_overwrite) {
+					fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
+					exit(EXIT_NO_OVERWRITE);
+				}
+			}
+
+			xmlSaveFile(out, dm);
+		}
 
 		xmlFreeDoc(dm);
 
