@@ -280,7 +280,7 @@ int main(int argc, char **argv)
 	if (strcmp(dmcode, "") != 0) {
 		int n;
 
-		n = sscanf(dmcode, "%[^-]-%[^-]-%[^-]-%c%c-%[^-]-%2s%[^-]-%3s%c-%c-%3s%1s",
+		n = sscanf(dmcode, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
 			modelIdentCode,
 			systemDiffCode,
 			systemCode,
