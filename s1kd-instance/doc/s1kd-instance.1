@@ -10,7 +10,7 @@ s1kd\-instance \- Create S1000D data module instances
 s1kd\-instance [\-s <src>] [\-e <ext>] [\-c <dmc>] [\-l <lang>] [\-I
 <iss>] [\-u <sec>] [\-o <file>|\-O <dir>] [\-f] [\-t <techName>] [\-i
 <infoName>] [\-a|\-A] [\-Y <text>] [\-C <comment>] [\-R <CIR> ...] [\-S]
-[\-N] [\-P <PCT> \-p <id>] [<applic>...]
+[\-N] [\-P <PCT> \-p <id>] [\-L] [<applic>...]
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-instance\f[] tool filters a master S1000D data module on
@@ -150,6 +150,12 @@ Product cross\-reference table file to read product definitions from
 .B \-p <id>
 Product ID of the product to read applicability definitions from, using
 the specified PCT data module (\-P).
+.RS
+.RE
+.TP
+.B \-L
+Source (\-s or stdin) is a list of data module filenames to create
+instances of, rather than a single data module.
 .RS
 .RE
 .TP

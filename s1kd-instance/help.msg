@@ -23,4 +23,7 @@ Options:
   -R <CIR>      Resolve externalized items using the given CIR.
   -w            Check the applic of the whole DM.
   -N            Omit issue/inwork numbers from automatic filename.
+  -P <PCT>      PCT file to read products from
+  -p <id>       ID of product in specified PCT to read applic defs from.
+  -L		Source (-s/stdin) is a list of files instead of a DM.
   <applic>...	Any number of applic defs in the form of <ident>:<type>=<value>

@@ -22,6 +22,7 @@
 #define EXIT_BAD_APPLIC 4 /* Malformed applic definitions */
 #define EXIT_NO_OVERWRITE 5 /* Did not overwrite existing out file */
 #define EXIT_BAD_XML 6 /* Invalid XML/S1000D */
+#define EXIT_BAD_ARG 7 /* Malformed argument */
 
 /* Convenient structure for all strings related to uniquely identifying a
  * data module.
@@ -605,13 +606,15 @@ void add_source(xmlNodePtr dmodule)
 }
 
 /* Add an extension to the data module code */
-void set_dme(xmlNodePtr dmodule, char *extension)
+void set_dme(xmlNodePtr dmodule, const char *extension)
 {
 	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
 	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
 	xmlNodePtr dmIdent = find_req_child(dmAddress, "dmIdent");
 	xmlNodePtr dmCode = find_req_child(dmIdent, "dmCode");
 	xmlNodePtr identExtension = find_child(dmIdent, "identExtension");
+
+	char *ext = strdup(extension);
 
 	char *extensionProducer;
 	char *extensionCode;
@@ -621,52 +624,59 @@ void set_dme(xmlNodePtr dmodule, char *extension)
 		identExtension = xmlAddPrevSibling(dmCode, identExtension);
 	}
 
-	extensionProducer = strtok(extension, "-");
+	extensionProducer = strtok(ext, "-");
 	extensionCode     = strtok(NULL, "-");
 
 	xmlSetProp(identExtension, BAD_CAST "extensionProducer", BAD_CAST extensionProducer);
 	xmlSetProp(identExtension, BAD_CAST "extensionCode",     BAD_CAST extensionCode);
+
+	free(ext);
 }
 
 /* Set the DMC of the produced data module of the instance */
-void set_dmc(xmlNodePtr dmodule, char *dmc)
+void set_dmc(xmlNodePtr dmodule, const char *dmc)
 {
 	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
 	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
 	xmlNodePtr dmIdent = find_req_child(dmAddress, "dmIdent");
 	xmlNodePtr dmCode = find_req_child(dmIdent, "dmCode");
 
-	char *modelIdentCode;
-	char *systemDiffCode;      
-	char *systemCode;      
-	char *subAndSubSub;
-	char *assyCode;
-	char *disassyCodeAndVariant;
-	char *infoCodeAndVariant;
-	char *itemLocationCode;
+	char modelIdentCode[15];
+	char systemDiffCode[5];
+	char systemCode[4];
+	char subSystemCode[2];
+	char subSubSystemCode[2];
+	char assyCode[5];
+	char disassyCode[3];
+	char disassyCodeVariant[4];
+	char infoCode[4];
+	char infoCodeVariant[2];
+	char itemLocationCode[2];
+	char learnCode[4];
+	char learnEventCode[2];
 
-	char subSystemCode[2] = "";
-	char subSubSystemCode[2] = "";
-	char disassyCode[3] = "";
-	char disassyCodeVariant[2] = "";
-	char infoCode[4] = "";
-	char infoCodeVariant[2] = "";
+	int n;
 
-	modelIdentCode        = strtok(dmc, "-");
-	systemDiffCode        = strtok(NULL, "-");
-	systemCode            = strtok(NULL, "-");
-	subAndSubSub          = strtok(NULL, "-");
-	assyCode              = strtok(NULL, "-");
-	disassyCodeAndVariant = strtok(NULL, "-");
-	infoCodeAndVariant    = strtok(NULL, "-");
-	itemLocationCode      = strtok(NULL, "_");
+	n = sscanf(dmc,
+		"%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
+		modelIdentCode,
+		systemDiffCode,
+		systemCode,
+		subSystemCode,
+		subSubSystemCode,
+		assyCode,
+		disassyCode,
+		disassyCodeVariant,
+		infoCode,
+		infoCodeVariant,
+		itemLocationCode,
+		learnCode,
+		learnEventCode);
 
-	strncpy(subSystemCode, subAndSubSub, 1);
-	strncpy(subSubSystemCode, subAndSubSub + 1, 1);
-	strncpy(disassyCode, disassyCodeAndVariant, 2);
-	strncpy(disassyCodeVariant, disassyCodeAndVariant + 2, 1);
-	strncpy(infoCode, infoCodeAndVariant, 3);
-	strncpy(infoCodeVariant, infoCodeAndVariant + 3, 1);
+	if (n != 11 && n != 13) {
+		fprintf(stderr, ERR_PREFIX "Bad data module code: %s.\n", dmc);
+		exit(EXIT_BAD_ARG);
+	}
 
 	xmlSetProp(dmCode, BAD_CAST "modelIdentCode",     BAD_CAST modelIdentCode);
 	xmlSetProp(dmCode, BAD_CAST "systemDiffCode",     BAD_CAST systemDiffCode);
@@ -679,6 +689,11 @@ void set_dmc(xmlNodePtr dmodule, char *dmc)
 	xmlSetProp(dmCode, BAD_CAST "infoCode",           BAD_CAST infoCode);
 	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant",    BAD_CAST infoCodeVariant);
 	xmlSetProp(dmCode, BAD_CAST "itemLocationCode",   BAD_CAST itemLocationCode);
+
+	if (n == 13) {
+		xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
+		xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+	}
 }
 
 /* Set the techName and/or infoName of the data module instance */
@@ -1428,6 +1443,8 @@ int main(int argc, char **argv)
 	bool no_issue = false;
 	char pctfname[PATH_MAX] = "";
 	char product[64] = "";
+	bool dmlist = false;
+	FILE *list = stdin;
 
 	int parseopts = 0;
 
@@ -1438,7 +1455,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wNP:p:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wNP:p:Lh?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1461,6 +1478,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
 			case 'p': strncpy(product, optarg, 63); break;
+			case 'L': dmlist = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1473,40 +1491,16 @@ int main(int argc, char **argv)
 		use_stdin = true;
 	}
 
-	/* Bug in libxml < 20902 where entities in DTD are substituted even
-	 * when XML_PARSE_NOENT is specified (default). Denying network access
-	 * prevents it from substituting the %ISOEntities; parameter in the DTD
-	 */
-	if (LIBXML_VERSION < 20902) {
-		parseopts |= XML_PARSE_NONET;
-	}
 
 	if (!use_stdin && access(src, F_OK) == -1) {
-		fprintf(stderr, ERR_PREFIX "Could not find source data module \"%s\".\n", src);
+		fprintf(stderr, ERR_PREFIX "Could not find source data module/list \"%s\".\n", src);
 		exit(EXIT_MISSING_FILE);
-	}
-
-	dm = xmlReadFile(src, NULL, parseopts);
-
-	if (!dm) {
-		fprintf(stderr, ERR_PREFIX "%s does not contain valid XML.\n",
-			use_stdin ? "stdin" : src);
-		exit(EXIT_BAD_XML);
 	}
 
 	if (autoname && strcmp(dir, "") == 0) {
 		fprintf(stderr, ERR_PREFIX "No directory specified with -O.\n");
 		exit(EXIT_MISSING_ARGS);
 	}
-
-	dmodule = xmlDocGetRootElement(dm);
-
-	if (!dmodule) {
-		fprintf(stderr, ERR_PREFIX "Source XML is not a data module.\n");
-		exit(EXIT_BAD_XML);
-	}
-
-	content = find_req_child(dmodule, "content");
 
 	applicability = xmlNewNode(NULL, BAD_CAST "applic");
 
@@ -1543,102 +1537,142 @@ int main(int argc, char **argv)
 		++napplics;
 	}
 
-	if (wholedm && !check_wholedm_applic(dm)) {
-		exit(0);
+	/* Bug in libxml < 20902 where entities in DTD are substituted even
+	 * when XML_PARSE_NOENT is specified (default). Denying network access
+	 * prevents it from substituting the %ISOEntities; parameter in the DTD
+	 */
+	if (LIBXML_VERSION < 20902) {
+		parseopts |= XML_PARSE_NONET;
 	}
 
-	if (add_source_ident) {
-		add_source(dmodule);
+	if (dmlist && strcmp(src, "") != 0) {
+		list = fopen(src, "r");
 	}
 
-	for (cir = cirs->children; cir; cir = cir->next) {
-		char *cirdocfname = (char *) xmlNodeGetContent(cir);
-
-		if (access(cirdocfname, F_OK) == -1) {
-			fprintf(stderr, ERR_PREFIX "Could not find CIR %s.", cirdocfname);
-			continue;
+	while (1) {
+		if (dmlist) {
+			if (!fgets(src, PATH_MAX - 1, list)) break;
+			strtok(src, "\n");
 		}
 
-		cirdoc = xmlReadFile(cirdocfname, NULL, 0);
+		dm = xmlReadFile(src, NULL, parseopts);
 
-		if (!cirdoc) {
-			fprintf(stderr, ERR_PREFIX "CIR %s is invalid.", cirdocfname);
-			continue;
-		}
-
-		undepend_cir(dm, cirdoc, add_source_ident);
-
-		xmlFreeDoc(cirdoc);
-		xmlFree(cirdocfname);
-	}
-
-	referencedApplicGroup = find_child(content, "referencedApplicGroup");
-
-	if (referencedApplicGroup) {
-		strip_applic(referencedApplicGroup, content);
-
-		if (clean || simpl) {
-			clean_applic(referencedApplicGroup, content);
-		}
-
-		if (simpl) {
-			simpl_applic_clean(referencedApplicGroup);
-		}
-	}
-
-	xmlFreeNode(cirs);
-
-	if (strcmp(extension, "") != 0) {
-		set_dme(dmodule, extension);
-	}
-
-	if (strcmp(dmc, "") != 0) {
-		set_dmc(dmodule, dmc);
-	}
-
-	set_title(dmodule, tech, info);
-
-	if (strcmp(language, "") != 0) {
-		set_lang(dmodule, language);
-	}
-
-	if (strcmp(new_display_text, "") != 0) {
-		set_applic(dmodule, new_display_text);
-	}
-
-	if (strcmp(issinfo, "") != 0) {
-		set_issue(dm, issinfo);
-	}
-
-	if (strcmp(secu, "") != 0) {
-		set_security(dm, secu);
-	}
-
-	if (strcmp(comment_text, "") != 0) {
-		comment = xmlNewComment(BAD_CAST comment_text);
-		identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-
-		if (!identAndStatusSection) {
-			fprintf(stderr, ERR_PREFIX "Data module missing child identAndStatusSection.");
+		if (!dm) {
+			fprintf(stderr, ERR_PREFIX "%s does not contain valid XML.\n",
+				use_stdin ? "stdin" : src);
 			exit(EXIT_BAD_XML);
 		}
 
-		xmlAddPrevSibling(identAndStatusSection, comment);
-	}
+		dmodule = xmlDocGetRootElement(dm);
 
-	if (autoname) {
-		auto_name(out, dm, dir, no_issue);
-
-		if (access(out, F_OK) == 0 && !force_overwrite) {
-			fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
-			exit(EXIT_NO_OVERWRITE);
+		if (!dmodule) {
+			fprintf(stderr, ERR_PREFIX "Source XML is not a data module.\n");
+			exit(EXIT_BAD_XML);
 		}
+
+		content = find_req_child(dmodule, "content");
+
+		if (wholedm && !check_wholedm_applic(dm)) {
+			exit(0);
+		}
+
+		if (add_source_ident) {
+			add_source(dmodule);
+		}
+
+		for (cir = cirs->children; cir; cir = cir->next) {
+			char *cirdocfname = (char *) xmlNodeGetContent(cir);
+
+			if (access(cirdocfname, F_OK) == -1) {
+				fprintf(stderr, ERR_PREFIX "Could not find CIR %s.", cirdocfname);
+				continue;
+			}
+
+			cirdoc = xmlReadFile(cirdocfname, NULL, 0);
+
+			if (!cirdoc) {
+				fprintf(stderr, ERR_PREFIX "CIR %s is invalid.", cirdocfname);
+				continue;
+			}
+
+			undepend_cir(dm, cirdoc, add_source_ident);
+
+			xmlFreeDoc(cirdoc);
+			xmlFree(cirdocfname);
+		}
+
+		referencedApplicGroup = find_child(content, "referencedApplicGroup");
+
+		if (referencedApplicGroup) {
+			strip_applic(referencedApplicGroup, content);
+
+			if (clean || simpl) {
+				clean_applic(referencedApplicGroup, content);
+			}
+
+			if (simpl) {
+				simpl_applic_clean(referencedApplicGroup);
+			}
+		}
+
+		if (strcmp(extension, "") != 0) {
+			set_dme(dmodule, extension);
+		}
+
+		if (strcmp(dmc, "") != 0) {
+			set_dmc(dmodule, dmc);
+		}
+
+		set_title(dmodule, tech, info);
+
+		if (strcmp(language, "") != 0) {
+			set_lang(dmodule, language);
+		}
+
+		if (strcmp(new_display_text, "") != 0) {
+			set_applic(dmodule, new_display_text);
+		}
+
+		if (strcmp(issinfo, "") != 0) {
+			set_issue(dm, issinfo);
+		}
+
+		if (strcmp(secu, "") != 0) {
+			set_security(dm, secu);
+		}
+
+		if (strcmp(comment_text, "") != 0) {
+			comment = xmlNewComment(BAD_CAST comment_text);
+			identAndStatusSection = find_child(dmodule, "identAndStatusSection");
+
+			if (!identAndStatusSection) {
+				fprintf(stderr, ERR_PREFIX "Data module missing child identAndStatusSection.");
+				exit(EXIT_BAD_XML);
+			}
+
+			xmlAddPrevSibling(identAndStatusSection, comment);
+		}
+
+		if (autoname) {
+			auto_name(out, dm, dir, no_issue);
+
+			if (access(out, F_OK) == 0 && !force_overwrite) {
+				fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
+				exit(EXIT_NO_OVERWRITE);
+			}
+		}
+
+		xmlSaveFile(out, dm);
+
+		xmlFreeDoc(dm);
+
+		if (!dmlist) break;
 	}
 
-	xmlSaveFile(out, dm);
+	if (list != stdin) fclose(list);
 
+	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
-	xmlFreeDoc(dm);
 	xmlCleanupParser();
 
 	return 0;

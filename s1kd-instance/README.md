@@ -6,7 +6,7 @@ s1kd-instance - Create S1000D data module instances
 SYNOPSIS
 ========
 
-s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-I &lt;iss&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[&lt;applic&gt;...\]
+s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-I &lt;iss&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[-L\] \[&lt;applic&gt;...\]
 
 DESCRIPTION
 ===========
@@ -86,6 +86,9 @@ Product cross-reference table file to read product definitions from (-p).
 
 -p &lt;id&gt;  
 Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).
+
+-L  
+Source (-s or stdin) is a list of data module filenames to create instances of, rather than a single data module.
 
 &lt;applic&gt;...  
 Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;
