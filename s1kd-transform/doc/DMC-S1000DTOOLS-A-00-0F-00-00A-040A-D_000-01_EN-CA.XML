@@ -48,7 +48,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-transform [-h?] [-s &lt;stylesheet&gt; ...] [-i] &lt;datamodules&gt;</para>
+        <para>s1kd-transform [-h?] [-s &lt;stylesheet&gt; ...] [-i] [-o &lt;file&gt;] &lt;datamodules&gt;</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -74,6 +74,12 @@
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
                 <para>Includes an "identity" template in to each specified stylesheet.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Output to &lt;file&gt; instead of overwriting the original data module file. This option only makes sense when the input is a single data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -6,7 +6,7 @@ s1kd-transform - Apply XSL transformations to data modules
 SYNOPSIS
 ========
 
-s1kd-transform \[-h?\] \[-s &lt;stylesheet&gt; ...\] \[-i\] &lt;datamodules&gt;
+s1kd-transform \[-h?\] \[-s &lt;stylesheet&gt; ...\] \[-i\] \[-o &lt;file&gt;\] &lt;datamodules&gt;
 
 DESCRIPTION
 ===========
@@ -24,6 +24,9 @@ An XSLT stylesheet file to apply to each data module. Multiple stylesheets can b
 
 -i  
 Includes an "identity" template in to each specified stylesheet.
+
+-o &lt;file&gt;  
+Output to &lt;file&gt; instead of overwriting the original data module file. This option only makes sense when the input is a single data module.
 
 &lt;datamodules&gt;  
 Any number of data modules to apply all specified stylesheets to. The original files are overwritten with the results of the transformations.

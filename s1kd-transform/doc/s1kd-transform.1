@@ -7,7 +7,8 @@
 s1kd\-transform \- Apply XSL transformations to data modules
 .SH SYNOPSIS
 .PP
-s1kd\-transform [\-h?] [\-s <stylesheet> ...] [\-i] <datamodules>
+s1kd\-transform [\-h?] [\-s <stylesheet> ...] [\-i] [\-o <file>]
+<datamodules>
 .SH DESCRIPTION
 .PP
 Applies an XSLT stylesheet to S1000D data modules.
@@ -30,6 +31,12 @@ The stylesheets will be applied in the order they are listed.
 .TP
 .B \-i
 Includes an "identity" template in to each specified stylesheet.
+.RS
+.RE
+.TP
+.B \-o <file>
+Output to <file> instead of overwriting the original data module file.
+This option only makes sense when the input is a single data module.
 .RS
 .RE
 .TP
