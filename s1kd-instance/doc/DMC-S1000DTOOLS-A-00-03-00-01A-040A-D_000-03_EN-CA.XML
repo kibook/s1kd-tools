@@ -47,7 +47,7 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-instance - Create S1000D data module instances</para>
+        <para>s1kd-instance - Create S1000D data/pub module instances</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
@@ -64,63 +64,63 @@
             <definitionListItem>
               <listItemTerm>-s &lt;src&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The source data module (default is to read from stdin).</para>
+                <para>The source data module or publication module (default is to read from stdin).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-e &lt;ext&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify an extension on the data module code (DME) for the instance.</para>
+                <para>Specify an extension on the data module code (DME) or publication module code (PME) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-c &lt;dmc&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify a new data module code (DMC) for the instance.</para>
+                <para>Specify a new data module code (DMC) or publication module code (PMC) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-l &lt;lang&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set the language and country of the data module instance. For example, to create an instance for US English, lang would be "en-US".</para>
+                <para>Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-I &lt;iss&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set the issue and inwork numbers of the data module instance. By default, the issue and inwork number are taken from the source data module.</para>
+                <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-u &lt;sec&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set the security classification of the data module instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.</para>
+                <para>Set the security classification of the instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-o &lt;file&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Output data module instance to file instead of stdout.</para>
+                <para>Output instance to file instead of stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-O &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Output data module instance in dir, automatically naming it based on:</para>
+                <para>Output instance(s) in dir, automatically naming them based on:</para>
                 <para>
                   <randomList>
                     <listItem>
                       <para>the extension specified with -e, and/or</para>
                     </listItem>
                     <listItem>
-                      <para>the data module code specified with -c, and/or</para>
+                      <para>the code specified with -c, and/or</para>
                     </listItem>
                     <listItem>
                       <para>the language and country specified with -L</para>
                     </listItem>
                   </randomList>
                 </para>
-                <para>The issue information is copied from the source data module or taken as specified in the -I option.</para>
+                <para>The issue information is copied from the source or taken as specified in the -I option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -132,7 +132,7 @@
             <definitionListItem>
               <listItemTerm>-t &lt;techName&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Give the data module instance a different techName.</para>
+                <para>Give the instance a different techName/pmTitle.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -156,13 +156,13 @@
             <definitionListItem>
               <listItemTerm>-Y &lt;text&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set the applicability for the whole data module using the user-defined applicability values, using text as the new display text.</para>
+                <para>Set the applicability for the whole data module/publication module using the user-defined applicability values, using text as the new display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-C &lt;comment&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Add an XML comment to the top of the data module instance. Useful as another way of identifying a data module as an instance aside from the source data module address or extended data module code, or giving additional information about a particular instance.</para>
+                <para>Add an XML comment to the top of the instance. Useful as another way of identifying a data module/publication module as an instance aside from the source address or extended code, or giving additional information about a particular instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -174,13 +174,13 @@
             <definitionListItem>
               <listItemTerm>-S</listItemTerm>
               <listItemDefinition>
-                <para>Do not include &lt;sourceDmIdent&gt; in the data module instance.</para>
+                <para>Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
-                <para>Check the applicability of the whole data module against the user-defined applicability. If the whole data module is not applicable, then no instance is created.</para>
+                <para>Check the applicability of the whole data module/publication module against the user-defined applicability. If the whole data module/publication module is not applicable, then no instance is created.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -204,7 +204,7 @@
             <definitionListItem>
               <listItemTerm>-L</listItemTerm>
               <listItemDefinition>
-                <para>Source (-s or stdin) is a list of data module filenames to create instances of, rather than a single data module.</para>
+                <para>Source (-s or stdin) is a list of data module/publication module filenames to create instances of, rather than a single data module/publication module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -225,9 +225,9 @@
         </levelledPara>
         <levelledPara>
           <title>Identifying source data module of an instance</title>
-          <para>The resulting data module instance will contain the element &lt;sourceDmIdent&gt;, which will contain a &lt;dmRef&gt; to the data module specified with the -s option.</para>
+          <para>The resulting data module instance will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the data module specified with the -s option. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.</para>
           <para>Additionally, the instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.</para>
-          <para>If the -S option is used, neither the &lt;sourceDmIdent&gt; element or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a data module based on an existing data module.</para>
+          <para>If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a data module based on an existing data module.</para>
         </levelledPara>
         <levelledPara>
           <title>Instance data module code (-c) vs extension (-e)</title>

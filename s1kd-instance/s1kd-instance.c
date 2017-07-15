@@ -25,10 +25,11 @@
 #define EXIT_BAD_ARG 7 /* Malformed argument */
 
 /* Convenient structure for all strings related to uniquely identifying a
- * data module.
+ * data module or pub module.
  */
-struct dmident {
+struct ident {
 	bool extended;
+	bool ispm;
 	char *extensionProducer;
 	char *extensionCode;
 	char *modelIdentCode;
@@ -44,6 +45,9 @@ struct dmident {
 	char *itemLocationCode;
 	char *learnCode;
 	char *learnEventCode;
+	char *pmIssuer;
+	char *pmNumber;
+	char *pmVolume;
 	char *issueNumber;
 	char *inWork;
 	char *languageIsoCode;
@@ -109,41 +113,59 @@ xmlNodePtr find_req_child(xmlNodePtr parent, const char *name)
 	return child;
 }
 
+xmlNodePtr first_xpath_node(xmlDocPtr doc, char *path)
+{
+	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST path, ctxt);
+	xmlNodePtr ret;
+	
+	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+		ret = NULL;
+	} else {
+		ret = result->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(result);
+	xmlXPathFreeContext(ctxt);
+
+	return ret;
+}
+
 /* Copy strings related to uniquely identifying a data module. The strings are
  * dynamically allocated so they must be freed using free_ident. */
-void init_ident(struct dmident *ident, xmlDocPtr dm)
+void init_ident(struct ident *ident, xmlDocPtr doc)
 {
-	xmlNodePtr dmodule;
-	xmlNodePtr identAndStatusSection;
-	xmlNodePtr dmAddress;
-	xmlNodePtr dmIdent;
-	xmlNodePtr identExtension;
-	xmlNodePtr dmCode;
-	xmlNodePtr language;
-	xmlNodePtr issueInfo;
+	xmlNodePtr moduleIdent, identExtension, code, language, issueInfo;
 
-	dmodule = xmlDocGetRootElement(dm);
-	identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	dmIdent = find_req_child(dmAddress, "dmIdent");
-	identExtension = find_child(dmIdent, "identExtension");
-	dmCode = find_req_child(dmIdent, "dmCode");
-	language = find_req_child(dmIdent, "language");
-	issueInfo = find_req_child(dmIdent, "issueInfo");
+	moduleIdent = first_xpath_node(doc, "//dmIdent|//pmIdent");
 
-	ident->modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-	ident->systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-	ident->systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
-	ident->subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-	ident->subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-	ident->assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
-	ident->disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
-	ident->disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
-	ident->infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
-	ident->infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
-	ident->itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
-	ident->learnCode          = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
-	ident->learnEventCode     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
+	ident->ispm = strcmp((char *) moduleIdent->name, "pmIdent") == 0;
+
+	identExtension = first_xpath_node(doc, "//dmIdent/identExtension|//pmIdent/identExtension");
+	code = first_xpath_node(doc, "//dmIdent/dmCode|//pmIdent/pmCode");
+	language = first_xpath_node(doc, "//dmIdent/language|//pmIdent/language");
+	issueInfo = first_xpath_node(doc, "//dmIdent/issueInfo|//pmIdent/issueInfo");
+
+	ident->modelIdentCode     = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+
+	if (!ident->ispm) {
+		ident->systemDiffCode     = (char *) xmlGetProp(code, BAD_CAST "systemDiffCode");
+		ident->systemCode         = (char *) xmlGetProp(code, BAD_CAST "systemCode");
+		ident->subSystemCode      = (char *) xmlGetProp(code, BAD_CAST "subSystemCode");
+		ident->subSubSystemCode   = (char *) xmlGetProp(code, BAD_CAST "subSubSystemCode");
+		ident->assyCode           = (char *) xmlGetProp(code, BAD_CAST "assyCode");
+		ident->disassyCode        = (char *) xmlGetProp(code, BAD_CAST "disassyCode");
+		ident->disassyCodeVariant = (char *) xmlGetProp(code, BAD_CAST "disassyCodeVariant");
+		ident->infoCode           = (char *) xmlGetProp(code, BAD_CAST "infoCode");
+		ident->infoCodeVariant    = (char *) xmlGetProp(code, BAD_CAST "infoCodeVariant");
+		ident->itemLocationCode   = (char *) xmlGetProp(code, BAD_CAST "itemLocationCode");
+		ident->learnCode          = (char *) xmlGetProp(code, BAD_CAST "learnCode");
+		ident->learnEventCode     = (char *) xmlGetProp(code, BAD_CAST "learnEventCode");
+	} else {
+		ident->pmIssuer           = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
+		ident->pmNumber           = (char *) xmlGetProp(code, BAD_CAST "pmNumber");
+		ident->pmVolume           = (char *) xmlGetProp(code, BAD_CAST "pmVolume");
+	}
 
 	ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
 	ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
@@ -160,25 +182,34 @@ void init_ident(struct dmident *ident, xmlDocPtr dm)
 	}
 }
 
-void free_ident(struct dmident *ident)
+void free_ident(struct ident *ident)
 {
 	if (ident->extended) {
 		xmlFree(ident->extensionProducer);
 		xmlFree(ident->extensionCode);
 	}
+
 	xmlFree(ident->modelIdentCode);
-	xmlFree(ident->systemDiffCode);
-	xmlFree(ident->systemCode);
-	xmlFree(ident->subSystemCode);
-	xmlFree(ident->subSubSystemCode);
-	xmlFree(ident->assyCode);
-	xmlFree(ident->disassyCode);
-	xmlFree(ident->disassyCodeVariant);
-	xmlFree(ident->infoCode);
-	xmlFree(ident->infoCodeVariant);
-	xmlFree(ident->itemLocationCode);
-	xmlFree(ident->learnCode);
-	xmlFree(ident->learnEventCode);
+
+	if (!ident->ispm) {
+		xmlFree(ident->systemDiffCode);
+		xmlFree(ident->systemCode);
+		xmlFree(ident->subSystemCode);
+		xmlFree(ident->subSubSystemCode);
+		xmlFree(ident->assyCode);
+		xmlFree(ident->disassyCode);
+		xmlFree(ident->disassyCodeVariant);
+		xmlFree(ident->infoCode);
+		xmlFree(ident->infoCodeVariant);
+		xmlFree(ident->itemLocationCode);
+		xmlFree(ident->learnCode);
+		xmlFree(ident->learnEventCode);
+	} else {
+		xmlFree(ident->pmIssuer);
+		xmlFree(ident->pmNumber);
+		xmlFree(ident->pmVolume);
+	}
+
 	xmlFree(ident->issueNumber);
 	xmlFree(ident->inWork);
 	xmlFree(ident->languageIsoCode);
@@ -549,79 +580,49 @@ void simpl_applic_clean(xmlNode* referencedApplicGroup)
 	}
 }
 
+
 /* Add metadata linking the data module instance with the master data module */
-void add_source(xmlNodePtr dmodule)
+void add_source(xmlDocPtr doc)
 {
-	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNodePtr dmStatus = find_req_child(identAndStatusSection, "dmStatus");
-	xmlNodePtr sourceDmIdent = find_child(dmStatus, "sourceDmIdent");
-	xmlNodePtr security = find_req_child(dmStatus, "security");
+	xmlNodePtr ident, status, sourceIdent, security, cur;
 
-	xmlNodePtr src_identExtension;
-	xmlNodePtr src_dmCode;
-	xmlNodePtr src_issueInfo;
-	xmlNodePtr src_language;
+	ident       = first_xpath_node(doc, "//dmIdent|//pmIdent");
+	status      = first_xpath_node(doc, "//dmStatus|//pmStatus");
+	sourceIdent = first_xpath_node(doc, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent");
+	security    = first_xpath_node(doc, "//dmStatus/security|//pmStatus/security");
 
-	struct dmident ident;
-
-	if (sourceDmIdent) {
-		xmlUnlinkNode(sourceDmIdent);
-		xmlFreeNode(sourceDmIdent);
+	if (sourceIdent) {
+		xmlUnlinkNode(sourceIdent);
+		xmlFreeNode(sourceIdent);
 	}
 
-	sourceDmIdent = xmlNewNode(NULL, BAD_CAST "sourceDmIdent");
-	sourceDmIdent = xmlAddPrevSibling(security, sourceDmIdent);
-
-	init_ident(&ident, dmodule->doc);
-
-	if (ident.extended) {
-		src_identExtension = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "identExtension", NULL);
-		xmlSetProp(src_identExtension, BAD_CAST "extensionProducer", BAD_CAST ident.extensionProducer);
-		xmlSetProp(src_identExtension, BAD_CAST "extensionCode", BAD_CAST ident.extensionCode);
+	if (strcmp((char *) status->name, "dmStatus") == 0) {
+		sourceIdent = xmlNewNode(NULL, BAD_CAST "sourceDmIdent");
+	} else {
+		sourceIdent = xmlNewNode(NULL, BAD_CAST "sourcePmIdent");
 	}
 
-	src_dmCode = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "dmCode", NULL);
-	src_language = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "language", NULL);
-	src_issueInfo = xmlNewChild(sourceDmIdent, NULL, BAD_CAST "issueInfo", NULL);
+	sourceIdent = xmlAddPrevSibling(security, sourceIdent);
 
-	xmlSetProp(src_dmCode, BAD_CAST "modelIdentCode",     BAD_CAST ident.modelIdentCode);
-	xmlSetProp(src_dmCode, BAD_CAST "systemDiffCode",     BAD_CAST ident.systemDiffCode);
-	xmlSetProp(src_dmCode, BAD_CAST "systemCode",         BAD_CAST ident.systemCode);
-	xmlSetProp(src_dmCode, BAD_CAST "subSystemCode",      BAD_CAST ident.subSystemCode);
-	xmlSetProp(src_dmCode, BAD_CAST "subSubSystemCode",   BAD_CAST ident.subSubSystemCode);
-	xmlSetProp(src_dmCode, BAD_CAST "assyCode",           BAD_CAST ident.assyCode);
-	xmlSetProp(src_dmCode, BAD_CAST "disassyCode",        BAD_CAST ident.disassyCode);
-	xmlSetProp(src_dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST ident.disassyCodeVariant);
-	xmlSetProp(src_dmCode, BAD_CAST "infoCode",           BAD_CAST ident.infoCode);
-	xmlSetProp(src_dmCode, BAD_CAST "infoCodeVariant",    BAD_CAST ident.infoCodeVariant);
-	xmlSetProp(src_dmCode, BAD_CAST "itemLocationCode",   BAD_CAST ident.itemLocationCode);
-
-	xmlSetProp(src_issueInfo, BAD_CAST "issueNumber", BAD_CAST ident.issueNumber);
-	xmlSetProp(src_issueInfo, BAD_CAST "inWork",      BAD_CAST ident.inWork);
-
-	xmlSetProp(src_language, BAD_CAST "languageIsoCode", BAD_CAST ident.languageIsoCode);
-	xmlSetProp(src_language, BAD_CAST "countryIsoCode",  BAD_CAST ident.countryIsoCode);
-
-	free_ident(&ident);
+	for (cur = ident->children; cur; cur = cur->next) {
+		xmlAddChild(sourceIdent, xmlCopyNode(cur, 1));
+	}
 }
 
 /* Add an extension to the data module code */
-void set_dme(xmlNodePtr dmodule, const char *extension)
+void set_extd(xmlDocPtr doc, const char *extension)
 {
-	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	xmlNodePtr dmIdent = find_req_child(dmAddress, "dmIdent");
-	xmlNodePtr dmCode = find_req_child(dmIdent, "dmCode");
-	xmlNodePtr identExtension = find_child(dmIdent, "identExtension");
+	xmlNodePtr identExtension, code;
+	char *ext, *extensionProducer, *extensionCode;
 
-	char *ext = strdup(extension);
+	identExtension = first_xpath_node(doc, "//dmIdent/identExtension|//pmIdent/identExtension");
+	code = first_xpath_node(doc, "//dmIdent/dmCode|//pmIdent/pmCode");
 
-	char *extensionProducer;
-	char *extensionCode;
+	ext = strdup(extension);
 
 	if (!identExtension) {
 		identExtension = xmlNewNode(NULL, BAD_CAST "identExtension");
-		identExtension = xmlAddPrevSibling(dmCode, identExtension);
+		identExtension = xmlAddPrevSibling(code, identExtension);
 	}
 
 	extensionProducer = strtok(ext, "-");
@@ -634,12 +635,9 @@ void set_dme(xmlNodePtr dmodule, const char *extension)
 }
 
 /* Set the DMC of the produced data module of the instance */
-void set_dmc(xmlNodePtr dmodule, const char *dmc)
+void set_code(xmlDocPtr doc, const char *new_code)
 {
-	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	xmlNodePtr dmIdent = find_req_child(dmAddress, "dmIdent");
-	xmlNodePtr dmCode = find_req_child(dmIdent, "dmCode");
+	xmlNodePtr code;
 
 	char modelIdentCode[15];
 	char systemDiffCode[5];
@@ -657,7 +655,9 @@ void set_dmc(xmlNodePtr dmodule, const char *dmc)
 
 	int n;
 
-	n = sscanf(dmc,
+	code = first_xpath_node(doc, "//dmIdent/dmCode|//pmIdent/pmCode");
+
+	n = sscanf(new_code,
 		"%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
 		modelIdentCode,
 		systemDiffCode,
@@ -674,37 +674,54 @@ void set_dmc(xmlNodePtr dmodule, const char *dmc)
 		learnEventCode);
 
 	if (n != 11 && n != 13) {
-		fprintf(stderr, ERR_PREFIX "Bad data module code: %s.\n", dmc);
-		exit(EXIT_BAD_ARG);
-	}
+		char pmIssuer[6];
+		char pmNumber[6];
+		char pmVolume[3];
 
-	xmlSetProp(dmCode, BAD_CAST "modelIdentCode",     BAD_CAST modelIdentCode);
-	xmlSetProp(dmCode, BAD_CAST "systemDiffCode",     BAD_CAST systemDiffCode);
-	xmlSetProp(dmCode, BAD_CAST "systemCode",         BAD_CAST systemCode);
-	xmlSetProp(dmCode, BAD_CAST "subSystemCode",      BAD_CAST subSystemCode);
-	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode",   BAD_CAST subSubSystemCode);
-	xmlSetProp(dmCode, BAD_CAST "assyCode",           BAD_CAST assyCode);
-	xmlSetProp(dmCode, BAD_CAST "disassyCode",        BAD_CAST disassyCode);
-	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
-	xmlSetProp(dmCode, BAD_CAST "infoCode",           BAD_CAST infoCode);
-	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant",    BAD_CAST infoCodeVariant);
-	xmlSetProp(dmCode, BAD_CAST "itemLocationCode",   BAD_CAST itemLocationCode);
+		n = sscanf(new_code,
+			"%14[^-]-%5[^-]-%5[^-]-%2s",
+			modelIdentCode,
+			pmIssuer,
+			pmNumber,
+			pmVolume);
+		
+		if (n != 4) {
+			fprintf(stderr, ERR_PREFIX "Bad data module/pub module code: %s.\n", new_code);
+			exit(EXIT_BAD_ARG);
+		} else {
+			xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
+			xmlSetProp(code, BAD_CAST "pmIssuer", BAD_CAST pmIssuer);
+			xmlSetProp(code, BAD_CAST "pmNumber", BAD_CAST pmNumber);
+			xmlSetProp(code, BAD_CAST "pmVolume", BAD_CAST pmVolume);
+		}
+	} else {
+		xmlSetProp(code, BAD_CAST "modelIdentCode",     BAD_CAST modelIdentCode);
+		xmlSetProp(code, BAD_CAST "systemDiffCode",     BAD_CAST systemDiffCode);
+		xmlSetProp(code, BAD_CAST "systemCode",         BAD_CAST systemCode);
+		xmlSetProp(code, BAD_CAST "subSystemCode",      BAD_CAST subSystemCode);
+		xmlSetProp(code, BAD_CAST "subSubSystemCode",   BAD_CAST subSubSystemCode);
+		xmlSetProp(code, BAD_CAST "assyCode",           BAD_CAST assyCode);
+		xmlSetProp(code, BAD_CAST "disassyCode",        BAD_CAST disassyCode);
+		xmlSetProp(code, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+		xmlSetProp(code, BAD_CAST "infoCode",           BAD_CAST infoCode);
+		xmlSetProp(code, BAD_CAST "infoCodeVariant",    BAD_CAST infoCodeVariant);
+		xmlSetProp(code, BAD_CAST "itemLocationCode",   BAD_CAST itemLocationCode);
 
-	if (n == 13) {
-		xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
-		xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+		if (n == 13) {
+			xmlSetProp(code, BAD_CAST "learnCode", BAD_CAST learnCode);
+			xmlSetProp(code, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+		}
 	}
 }
 
 /* Set the techName and/or infoName of the data module instance */
-void set_title(xmlNodePtr dmodule, char *tech, char *info)
+void set_title(xmlDocPtr doc, char *tech, char *info)
 {
-	xmlNodePtr identAndStatusSection = find_req_child(dmodule, "identAndStatusSection");
-	xmlNodePtr dmAddress = find_req_child(identAndStatusSection, "dmAddress");
-	xmlNodePtr dmAddressItems = find_req_child(dmAddress, "dmAddressItems");
-	xmlNodePtr dmTitle = find_req_child(dmAddressItems, "dmTitle");
-	xmlNodePtr techName = find_req_child(dmTitle, "techName");
-	xmlNodePtr infoName = find_child(dmTitle, "infoName");
+	xmlNodePtr dmTitle, techName, infoName;
+	
+	dmTitle  = first_xpath_node(doc, "//dmAddressItems/dmTitle");
+	techName = first_xpath_node(doc, "//dmAddressItems/dmTitle/techName|//pmAddressItems/pmTitle");
+	infoName = first_xpath_node(doc, "//dmAddressItems/dmTitle/infoName");
 
 	if (strcmp(tech, "") != 0) {
 		xmlNodeSetContent(techName, BAD_CAST tech);
@@ -719,18 +736,18 @@ void set_title(xmlNodePtr dmodule, char *tech, char *info)
 }
 
 /* Set the applicability for the whole datamodule instance */
-void set_applic(xmlNodePtr dmodule, char *new_text)
+void set_applic(xmlDocPtr doc, char *new_text)
 {
-	xmlNodePtr identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-	xmlNodePtr dmStatus = find_child(identAndStatusSection, "dmStatus");
-	xmlNodePtr applic = find_child(dmStatus, "applic");
-
 	xmlNodePtr new_applic;
 	xmlNodePtr new_displayText;
 	xmlNodePtr new_simplePara;
 	xmlNodePtr new_evaluate;
 
 	xmlNodePtr cur;
+
+	xmlNodePtr applic;
+
+	applic = first_xpath_node(doc, "//dmStatus/applic|//pmStatus/applic");
 
 	new_applic = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlAddNextSibling(applic, new_applic);
@@ -766,17 +783,16 @@ void set_applic(xmlNodePtr dmodule, char *new_text)
 }
 
 /* Set the language/country for the data module instance */
-void set_lang(xmlNodePtr dmodule, char *lang)
+void set_lang(xmlDocPtr doc, char *lang)
 {
-	xmlNodePtr identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-	xmlNodePtr dmAddress = find_child(identAndStatusSection, "dmAddress");
-	xmlNodePtr dmIdent = find_child(dmAddress, "dmIdent");
-	xmlNodePtr language = find_child(dmIdent, "language");
+	xmlNodePtr language;
 
 	char *language_iso_code;
 	char *country_iso_code;
 
 	int i;
+
+	language = first_xpath_node(doc, "//dmIdent/language|//pmIdent/language");
 
 	language_iso_code = strtok(lang, "-");
 	country_iso_code = strtok(NULL, "");
@@ -794,9 +810,8 @@ void set_lang(xmlNodePtr dmodule, char *lang)
 
 void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 {
-	struct dmident ident;
+	struct ident ident;
 	int i;
-	char learn[6] = "";
 	char iss[8] = "";
 
 	init_ident(&ident, dm);
@@ -805,52 +820,80 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 		ident.languageIsoCode[i] = toupper(ident.languageIsoCode[i]);
 	}
 
-	if (ident.learnCode && ident.learnEventCode) {
-		sprintf(learn, "-%s%s", ident.learnCode, ident.learnEventCode);
-	}
-
 	if (!noiss) {
 		sprintf(iss, "_%s-%s", ident.issueNumber, ident.inWork);
 	}
 
-	if (ident.extended) {
-		sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
-			dir,
-			ident.extensionProducer,
-			ident.extensionCode,
-			ident.modelIdentCode,
-			ident.systemDiffCode,
-			ident.systemCode,
-			ident.subSystemCode,
-			ident.subSubSystemCode,
-			ident.assyCode,
-			ident.disassyCode,
-			ident.disassyCodeVariant,
-			ident.infoCode,
-			ident.infoCodeVariant,
-			ident.itemLocationCode,
-			learn,
-			iss,
-			ident.languageIsoCode,
-			ident.countryIsoCode);
+	if (ident.ispm) {
+		if (ident.extended) {
+			sprintf(out, "%s/PME-%s-%s-%s-%s-%s-%s%s_%s-%s.XML",
+				dir,
+				ident.extensionProducer,
+				ident.extensionCode,
+				ident.modelIdentCode,
+				ident.pmIssuer,
+				ident.pmNumber,
+				ident.pmVolume,
+				iss,
+				ident.languageIsoCode,
+				ident.countryIsoCode);
+		} else {
+			sprintf(out, "%s/PMC-%s-%s-%s-%s%s_%s-%s.XML",
+				dir,
+				ident.modelIdentCode,
+				ident.pmIssuer,
+				ident.pmNumber,
+				ident.pmVolume,
+				iss,
+				ident.languageIsoCode,
+				ident.countryIsoCode);
+		}
 	} else {
-		sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
-			dir,
-			ident.modelIdentCode,
-			ident.systemDiffCode,
-			ident.systemCode,
-			ident.subSystemCode,
-			ident.subSubSystemCode,
-			ident.assyCode,
-			ident.disassyCode,
-			ident.disassyCodeVariant,
-			ident.infoCode,
-			ident.infoCodeVariant,
-			ident.itemLocationCode,
-			learn,
-			iss,
-			ident.languageIsoCode,
-			ident.countryIsoCode);
+		char learn[6] = "";
+
+		if (ident.learnCode && ident.learnEventCode) {
+			sprintf(learn, "-%s%s", ident.learnCode, ident.learnEventCode);
+		}
+
+		if (ident.extended) {
+			sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+				dir,
+				ident.extensionProducer,
+				ident.extensionCode,
+				ident.modelIdentCode,
+				ident.systemDiffCode,
+				ident.systemCode,
+				ident.subSystemCode,
+				ident.subSubSystemCode,
+				ident.assyCode,
+				ident.disassyCode,
+				ident.disassyCodeVariant,
+				ident.infoCode,
+				ident.infoCodeVariant,
+				ident.itemLocationCode,
+				learn,
+				iss,
+				ident.languageIsoCode,
+				ident.countryIsoCode);
+		} else {
+			sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+				dir,
+				ident.modelIdentCode,
+				ident.systemDiffCode,
+				ident.systemCode,
+				ident.subSystemCode,
+				ident.subSubSystemCode,
+				ident.assyCode,
+				ident.disassyCode,
+				ident.disassyCodeVariant,
+				ident.infoCode,
+				ident.infoCodeVariant,
+				ident.itemLocationCode,
+				learn,
+				iss,
+				ident.languageIsoCode,
+				ident.countryIsoCode);
+		}
 	}
 
 	free_ident(&ident);
@@ -1178,14 +1221,17 @@ void replace_referenced_applic_group_ref(xmlDocPtr dm)
 	ctxt = xmlXPathNewContext(dm);
 	result = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroupRef", ctxt);
 
-	referencedApplicGroupRef = result->nodesetval->nodeTab[0];
+	if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
 
-	referencedApplicGroup = xmlNewNode(NULL, BAD_CAST "referencedApplicGroup");
-	referencedApplicGroup = xmlAddNextSibling(referencedApplicGroupRef, referencedApplicGroup);
+		referencedApplicGroupRef = result->nodesetval->nodeTab[0];
 
-	for (cur = referencedApplicGroupRef->children; cur; cur = cur->next)
-		if (strcmp((char *) cur->name, "applic") == 0)
-			xmlAddChild(referencedApplicGroup, xmlCopyNode(cur, 1));
+		referencedApplicGroup = xmlNewNode(NULL, BAD_CAST "referencedApplicGroup");
+		referencedApplicGroup = xmlAddNextSibling(referencedApplicGroupRef, referencedApplicGroup);
+
+		for (cur = referencedApplicGroupRef->children; cur; cur = cur->next)
+			if (strcmp((char *) cur->name, "applic") == 0)
+				xmlAddChild(referencedApplicGroup, xmlCopyNode(cur, 1));
+	}
 
 	xmlXPathFreeObject(result);
 	xmlXPathFreeContext(ctxt);
@@ -1310,23 +1356,6 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 	}
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, char *path)
-{
-	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
-	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST path, ctxt);
-	xmlNodePtr ret;
-	
-	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-		ret = NULL;
-	} else {
-		ret = result->nodesetval->nodeTab[0];
-	}
-
-	xmlXPathFreeObject(result);
-	xmlXPathFreeContext(ctxt);
-
-	return ret;
-}
 
 void set_issue(xmlDocPtr dm, char *issinfo)
 {
@@ -1338,7 +1367,7 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 		exit(EXIT_MISSING_ARGS);
 	}
 
-	issueInfo = first_xpath_node(dm, "//dmIdent/issueInfo");
+	issueInfo = first_xpath_node(dm, "//dmIdent/issueInfo|//pmIdent/issueInfo");
 
 	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
@@ -1346,7 +1375,7 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 
 void set_security(xmlDocPtr dm, char *sec)
 {
-	xmlNodePtr security = first_xpath_node(dm, "//dmStatus/security");
+	xmlNodePtr security = first_xpath_node(dm, "//dmStatus/security|//pmStatus/security");
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
 }
 
@@ -1354,7 +1383,7 @@ bool check_wholedm_applic(xmlDocPtr dm)
 {
 	xmlNodePtr applic;
 
-	applic = first_xpath_node(dm, "//dmStatus/applic");
+	applic = first_xpath_node(dm, "//dmStatus/applic|//pmStatus/applic");
 
 	return eval_applic_stmt(applic, true);
 }
@@ -1411,8 +1440,8 @@ void show_help(void)
 
 int main(int argc, char **argv)
 {
-	xmlDocPtr dm;
-	xmlNodePtr dmodule;
+	xmlDocPtr doc;
+	xmlNodePtr root;
 	xmlNodePtr content;
 	xmlNodePtr identAndStatusSection;
 	xmlNodePtr referencedApplicGroup;
@@ -1422,7 +1451,7 @@ int main(int argc, char **argv)
 	int c;
 
 	char src[PATH_MAX] = "";
-	char dmc[256] = "";
+	char code[256] = "";
 	char out[PATH_MAX] = "-";
 	bool clean = false;
 	bool simpl = false;
@@ -1460,7 +1489,7 @@ int main(int argc, char **argv)
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
 			case 'e': strncpy(extension, optarg, 255); break;
-			case 'c': strncpy(dmc, optarg, 255); break;
+			case 'c': strncpy(code, optarg, 255); break;
 			case 'o': strncpy(out, optarg, PATH_MAX - 1); break;
 			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
 			case 'f': force_overwrite = true; break;
@@ -1553,26 +1582,21 @@ int main(int argc, char **argv)
 			strtok(src, "\t\n");
 		}
 
-		dm = xmlReadFile(src, NULL, parseopts);
+		doc = xmlReadFile(src, NULL, parseopts);
 
-		if (!dm) {
+		if (!doc) {
 			fprintf(stderr, ERR_PREFIX "%s does not contain valid XML.\n",
 				use_stdin ? "stdin" : src);
 			exit(EXIT_BAD_XML);
 		}
 
-		dmodule = xmlDocGetRootElement(dm);
+		root = xmlDocGetRootElement(doc);
 
-		if (!dmodule) {
-			fprintf(stderr, ERR_PREFIX "Source XML is not a data module.\n");
-			exit(EXIT_BAD_XML);
-		}
+		content = find_req_child(root, "content");
 
-		content = find_req_child(dmodule, "content");
-
-		if (!wholedm || check_wholedm_applic(dm)) {
+		if (!wholedm || check_wholedm_applic(doc)) {
 			if (add_source_ident) {
-				add_source(dmodule);
+				add_source(doc);
 			}
 
 			for (cir = cirs->children; cir; cir = cir->next) {
@@ -1590,7 +1614,11 @@ int main(int argc, char **argv)
 					continue;
 				}
 
-				undepend_cir(dm, cirdoc, add_source_ident);
+				if (strcmp((char *) root->name, "pm") == 0) {
+					undepend_cir(doc, cirdoc, false);
+				} else {
+					undepend_cir(doc, cirdoc, add_source_ident);
+				}
 
 				xmlFreeDoc(cirdoc);
 				xmlFree(cirdocfname);
@@ -1611,34 +1639,34 @@ int main(int argc, char **argv)
 			}
 
 			if (strcmp(extension, "") != 0) {
-				set_dme(dmodule, extension);
+				set_extd(doc, extension);
 			}
 
-			if (strcmp(dmc, "") != 0) {
-				set_dmc(dmodule, dmc);
+			if (strcmp(code, "") != 0) {
+				set_code(doc, code);
 			}
 
-			set_title(dmodule, tech, info);
+			set_title(doc, tech, info);
 
 			if (strcmp(language, "") != 0) {
-				set_lang(dmodule, language);
+				set_lang(doc, language);
 			}
 
 			if (strcmp(new_display_text, "") != 0) {
-				set_applic(dmodule, new_display_text);
+				set_applic(doc, new_display_text);
 			}
 
 			if (strcmp(issinfo, "") != 0) {
-				set_issue(dm, issinfo);
+				set_issue(doc, issinfo);
 			}
 
 			if (strcmp(secu, "") != 0) {
-				set_security(dm, secu);
+				set_security(doc, secu);
 			}
 
 			if (strcmp(comment_text, "") != 0) {
 				comment = xmlNewComment(BAD_CAST comment_text);
-				identAndStatusSection = find_child(dmodule, "identAndStatusSection");
+				identAndStatusSection = find_child(root, "identAndStatusSection");
 
 				if (!identAndStatusSection) {
 					fprintf(stderr, ERR_PREFIX "Data module missing child identAndStatusSection.");
@@ -1649,7 +1677,7 @@ int main(int argc, char **argv)
 			}
 
 			if (autoname) {
-				auto_name(out, dm, dir, no_issue);
+				auto_name(out, doc, dir, no_issue);
 
 				if (access(out, F_OK) == 0 && !force_overwrite) {
 					fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
@@ -1657,10 +1685,10 @@ int main(int argc, char **argv)
 				}
 			}
 
-			xmlSaveFile(out, dm);
+			xmlSaveFile(out, doc);
 		}
 
-		xmlFreeDoc(dm);
+		xmlFreeDoc(doc);
 
 		if (!dmlist) break;
 	}

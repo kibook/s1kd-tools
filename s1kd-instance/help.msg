@@ -13,7 +13,7 @@ Options:
   -o <file>	Output data module instance to file instead of stdout.
   -O <dir>	Output data module instance in dir, automatically named.
   -f		Overwrite file with same name as automatic output, if it exists.
-  -t <techName>	Give the data module instance a different techName.
+  -t <techName>	Give the data module instance a different techName (title for PM).
   -i <infoName>	Give the data module instance a different infoName.
   -a		Remove unused applicability annotations but not statements.
   -A		Remove unused applicability annotations and simplify statements.
