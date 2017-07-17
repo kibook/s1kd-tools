@@ -216,11 +216,7 @@ void sync_refs(xmlNodePtr dmodule)
 
 	new_refs = xmlNewNode(NULL, BAD_CAST "refs");
 
-	xmlAddPrevSibling(content->children, new_refs);
-
-	searchable = find_child(content, "description");
-	if (!searchable) searchable = find_child(content, "procedure");
-	if (!searchable) searchable = find_child(content, "brDoc");
+	searchable = xmlLastElementChild(content);
 
 	if (!searchable) {
 		fprintf(stderr, ERR_PREFIX "Invalid data module.\n");
@@ -234,6 +230,10 @@ void sync_refs(xmlNodePtr dmodule)
 	for (i = 0; i < n; ++i) {
 		new_node = xmlAddChild(new_refs, xmlCopyNode(refs[i].ref, 1));
 		xmlUnsetProp(new_node, BAD_CAST "id");
+	}
+
+	if (n > 0) {
+		xmlAddPrevSibling(content->children, new_refs);
 	}
 }
 
