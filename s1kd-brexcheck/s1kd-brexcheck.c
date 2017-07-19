@@ -40,9 +40,9 @@
 #define ERR_MAX_BREX_PATH -6
 #define ERR_MAX_DMOD -7
 
-#define BREX_MAX 256
-#define BREX_PATH_MAX 256
-#define DMOD_MAX 1024
+#define BREX_MAX 1024
+#define BREX_PATH_MAX 1024
+#define DMOD_MAX 10240
 
 enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
 
@@ -115,7 +115,7 @@ bool search_brex_fname(char *fname, const char *dpath, const char *dmcode)
 	return found;
 }
 
-bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_MAX][256],
+bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_MAX][PATH_MAX],
 	int nspaths)
 {
 	xmlXPathContextPtr context;
@@ -292,7 +292,7 @@ void show_help(void)
 }
 
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
-	char brex_fnames[BREX_MAX][256], int num_brex_fnames, xmlNodePtr brexCheck)
+	char brex_fnames[BREX_MAX][PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr result;
@@ -374,13 +374,13 @@ int main(int argc, char *argv[])
 
 	xmlDocPtr dmod_doc;
 
-	char brex_fnames[BREX_MAX][256];
+	char (*brex_fnames)[PATH_MAX] = malloc(BREX_MAX * PATH_MAX);
 	int num_brex_fnames = 0;
 
-	char brex_search_paths[BREX_PATH_MAX][256];
+	char (*brex_search_paths)[PATH_MAX] = malloc(BREX_PATH_MAX * PATH_MAX);
 	int num_brex_search_paths = 0;
 
-	char dmod_fnames[DMOD_MAX][256];
+	char (*dmod_fnames)[PATH_MAX] = malloc(DMOD_MAX * PATH_MAX);
 	int num_dmod_fnames = 0;
 
 	int status = 0;
@@ -494,6 +494,10 @@ int main(int argc, char *argv[])
 	xmlFreeDoc(outdoc);
 
 	xmlCleanupParser();
+
+	free(brex_fnames);
+	free(brex_search_paths);
+	free(dmod_fnames);
 
 	return status;
 }
