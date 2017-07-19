@@ -61,7 +61,7 @@ void show_help(void)
 	puts("  -d <defaults>    Specify the 'defaults' file name.");
 	puts("  -p               Prompt user for values.");
 	puts("In addition, the following metadata can be set:");
-	puts("  -# <code>        The DDN code (MIC-CAGE-YEAR-SEQ)");
+	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
 	puts("  -o <sender>      Sender enterprise name");
 	puts("  -r <receiver>    Receiver enterprise name");
 	puts("  -t <city>        Sender city");
