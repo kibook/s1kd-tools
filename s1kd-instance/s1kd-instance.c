@@ -1216,12 +1216,12 @@ void replace_referenced_applic_group_ref(xmlDocPtr dm)
 {
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr result;
-	xmlNodePtr referencedApplicGroupRef, referencedApplicGroup, cur;
 
 	ctxt = xmlXPathNewContext(dm);
 	result = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroupRef", ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+		xmlNodePtr referencedApplicGroupRef, referencedApplicGroup, cur;
 
 		referencedApplicGroupRef = result->nodesetval->nodeTab[0];
 
@@ -1231,13 +1231,13 @@ void replace_referenced_applic_group_ref(xmlDocPtr dm)
 		for (cur = referencedApplicGroupRef->children; cur; cur = cur->next)
 			if (strcmp((char *) cur->name, "applic") == 0)
 				xmlAddChild(referencedApplicGroup, xmlCopyNode(cur, 1));
+
+		xmlUnlinkNode(referencedApplicGroupRef);
+		xmlFreeNode(referencedApplicGroupRef);
 	}
 
 	xmlXPathFreeObject(result);
 	xmlXPathFreeContext(ctxt);
-
-	xmlUnlinkNode(referencedApplicGroupRef);
-	xmlFreeNode(referencedApplicGroupRef);
 }
 
 void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
