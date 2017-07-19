@@ -14,6 +14,7 @@
 #define EXIT_NO_WRITE 3
 #define EXIT_MISSING_METADATA 4
 #define EXIT_NO_EDIT 5
+#define EXIT_INVALID_CREATE 6
 
 #define KEY_COLUMN_WIDTH 31
 
@@ -22,7 +23,7 @@ struct metadata {
 	char *path;
 	void (*show)(xmlNodePtr);
 	int (*edit)(xmlNodePtr, const char *);
-	void (*create)(xmlXPathContextPtr, const char *val);
+	int (*create)(xmlXPathContextPtr, const char *val);
 };
 
 xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
@@ -86,12 +87,14 @@ int edit_simple_node(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-void create_info_name(xmlXPathContextPtr ctxt, const char *val)
+int create_info_name(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr tech_name = first_xpath_node("//dmAddressItems/dmTitle/techName", ctxt);
 	xmlNodePtr info_name = xmlNewNode(NULL, BAD_CAST "infoName");
 	info_name = xmlAddNextSibling(tech_name, info_name);
 	xmlNodeSetContent(info_name, BAD_CAST val);
+
+	return 0;
 }
 
 void show_simple_attr(xmlNodePtr node, const char *attr)
@@ -107,7 +110,7 @@ int edit_simple_attr(xmlNodePtr node, const char *attr, const char *val)
 	return 0;
 }
 
-void create_simple_attr(xmlXPathContextPtr ctxt, const char *nodepath, const char *attr, const char *val)
+int create_simple_attr(xmlXPathContextPtr ctxt, const char *nodepath, const char *attr, const char *val)
 {
 	xmlXPathObjectPtr results;
 	xmlNodePtr node;
@@ -120,6 +123,8 @@ void create_simple_attr(xmlXPathContextPtr ctxt, const char *nodepath, const cha
 	}
 
 	xmlXPathFreeObject(results);
+
+	return 0;
 }
 
 void show_ent_code(xmlNodePtr node)
@@ -132,14 +137,16 @@ int edit_ent_code(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "enterpriseCode", val);
 }
 
-void create_rpc_ent_code(xmlXPathContextPtr ctxt, const char *val)
+int create_rpc_ent_code(xmlXPathContextPtr ctxt, const char *val)
 {
 	create_simple_attr(ctxt, "//dmStatus/responsiblePartnerCompany", "enterpriseCode", val);
+	return 0;
 }
 
-void  create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
+int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
 {
 	create_simple_attr(ctxt, "//dmStatus/originator", "enterpriseCode", val);
+	return 0;
 }
 
 void show_sec_class(xmlNodePtr node)
@@ -315,7 +322,7 @@ void show_issue_info(xmlNodePtr node)
 	xmlFree(in_work);
 }
 
-void create_act_ref(xmlXPathContextPtr ctxt, const char *val)
+int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 
@@ -326,7 +333,68 @@ void create_act_ref(xmlXPathContextPtr ctxt, const char *val)
 	node = xmlNewChild(node, NULL, BAD_CAST "dmRefIdent", NULL);
 	node = xmlNewChild(node, NULL, BAD_CAST "dmCode", NULL);
 
-	edit_dmcode(node, val);
+	return edit_dmcode(node, val);
+}
+
+int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
+{
+	xmlNodePtr node;
+
+	node = first_xpath_node("//commentAddressItems/issueDate", ctxt);
+	
+	if (!node) return EXIT_INVALID_CREATE;
+
+	node = xmlAddNextSibling(node, xmlNewNode(NULL, BAD_CAST "commentTitle"));
+
+	return edit_simple_node(node, val);
+}
+
+void show_comment_code(xmlNodePtr node)
+{
+	char *model_ident_code;
+	char *sender_ident;
+	char *year_of_data_issue;
+	char *seq_number;
+	char *comment_type;
+
+	model_ident_code   = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
+	sender_ident       = (char *) xmlGetProp(node, BAD_CAST "senderIdent");
+	year_of_data_issue = (char *) xmlGetProp(node, BAD_CAST "yearOfDataIssue");
+	seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
+	comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
+
+	printf("%s-%s-%s-%s-%s\n",
+		model_ident_code,
+		sender_ident,
+		year_of_data_issue,
+		seq_number,
+		comment_type);
+	
+	xmlFree(model_ident_code);
+	xmlFree(sender_ident);
+	xmlFree(year_of_data_issue);
+	xmlFree(seq_number);
+	xmlFree(comment_type);
+}
+
+void show_comment_priority(xmlNodePtr node)
+{
+	show_simple_attr(node, "commentPriorityCode");
+}
+
+int edit_comment_priority(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "commentPriorityCode", val);
+}
+
+void show_comment_response(xmlNodePtr node)
+{
+	show_simple_attr(node, "responseType");
+}
+
+int edit_comment_response(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "responseType", val);
 }
 
 struct metadata metadata[] = {
@@ -420,9 +488,33 @@ struct metadata metadata[] = {
 		show_dmcode,
 		NULL,
 		NULL},
+	{"commentTitle",
+		"//commentAddressItems/commentTitle",
+		show_simple_node,
+		edit_simple_node,
+		create_comment_title},
+	{"commentCode",
+		"//commentIdent/commentCode",
+		show_comment_code,
+		NULL,
+		NULL},
+	{"commentIssueDate",
+		"//commentAddressItems/issueDate",
+		show_issue_date,
+		edit_issue_date,
+		NULL},
+	{"commentPriority",
+		"//commentStatus/commentPriority/@commentPriorityCode",
+		show_comment_priority,
+		edit_comment_priority,
+		NULL},
+	{"commentResponse",
+		"//commentStatus/commentResponse/@responseType",
+		show_comment_response,
+		edit_comment_response,
+		NULL},
 	{NULL}
 };
-
 
 int show_metadata(xmlXPathContextPtr ctxt, const char *key)
 {
@@ -452,8 +544,7 @@ int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *val)
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctxt))) {
 				if (metadata[i].create) {
-					metadata[i].create(ctxt, val);
-					return EXIT_SUCCESS;
+					return metadata[i].create(ctxt, val);
 				} else {
 					return EXIT_NO_EDIT;
 				}
@@ -604,6 +695,9 @@ int main(int argc, char **argv)
 			break;
 		case EXIT_NO_EDIT:
 			fprintf(stderr, ERR_PREFIX "Cannot edit metadata: %s\n", key);
+			break;
+		case EXIT_INVALID_CREATE:
+			fprintf(stderr, ERR_PREFIX "%s is not valid metadata for %s\n", key, fname);
 			break;
 	}
 
