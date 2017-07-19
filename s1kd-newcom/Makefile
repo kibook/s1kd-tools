@@ -9,11 +9,15 @@ INSTALL_PREFIX=/usr/bin
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-$(OUTPUT): $(SOURCE)
+template.h: comment.xml
+	xxd -i comment.xml > template.h
+
+$(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 clean:
 	rm -f $(OUTPUT)
+	rm -f template.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
