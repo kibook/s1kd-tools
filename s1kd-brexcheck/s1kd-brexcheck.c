@@ -143,6 +143,9 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 
 	object = xmlXPathEvalExpression(BREX_REF_DMCODE_PATH, context);
 
+	if (xmlXPathNodeSetIsEmpty(object->nodesetval))
+		return false;
+
 	dmCode = object->nodesetval->nodeTab[0];
 
 	xmlXPathFreeObject(object);
