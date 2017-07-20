@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="D" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="07" day="06"/>
+        <dmTitle>
+          <techName>s1kd-newimf(1) | General Commands Manual</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-newimf - Create a new S1000D ICN metadata file</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>s1kd-newifm [options] &lt;ICNs&gt;...</para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-newimf</emphasis> tool creates a new S1000D ICN metadata file for specified ICN files.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the 'defaults' file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Prompts the user for any values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue number of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The inwork issue of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r &lt;RPC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The responsible partner company enterprise name of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the responsible partner company.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The originator enterprise name of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-O &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the originator.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;title&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The ICN title (if creating multiple ICNs, they will all use this title).</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
