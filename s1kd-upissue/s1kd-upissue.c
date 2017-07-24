@@ -88,6 +88,7 @@ int main(int argc, char **argv)
 				break;
 			case 'N':
 				no_issue = true;
+				overwrite = true;
 				break;
 			case 'f':
 				overwrite = true;
