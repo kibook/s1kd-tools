@@ -158,14 +158,14 @@ void printref(const char *ref, const char *fname, int opts)
 		ref_dmAddressItems = find_child(ref_dmAddress, "dmAddressItems");
 		ref_dmTitle = find_child(ref_dmAddressItems, "dmTitle");
 
-		if (hasopt(opts, OPT_LANG)) {
-			ref_language = find_child(ref_dmIdent, "language");
-			xmlAddChild(dmRefIdent, xmlCopyNode(ref_language, 1));
-		}
-
 		if (hasopt(opts, OPT_ISSUE)) {
 			ref_issueInfo = find_child(ref_dmIdent, "issueInfo");
 			xmlAddChild(dmRefIdent, xmlCopyNode(ref_issueInfo, 1));
+		}
+
+		if (hasopt(opts, OPT_LANG)) {
+			ref_language = find_child(ref_dmIdent, "language");
+			xmlAddChild(dmRefIdent, xmlCopyNode(ref_language, 1));
 		}
 
 		if (hasopt(opts, OPT_TITLE)) {
