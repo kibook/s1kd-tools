@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-upissue"
 
@@ -22,17 +23,24 @@ void show_help(void)
 	puts("  -N	Omit issue/inwork numbers from filename");
 }
 
-xmlNode *find_child(xmlNode *parent, const char *name)
+xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 {
-	xmlNode *cur;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
 
-	for (cur = parent->children; cur; cur = cur->next) {
-		if (strcmp((char *) cur->name, name) == 0) {
-			return cur;
-		}
-	}
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
-	return NULL;
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+	
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
 }
 
 int main(int argc, char **argv)
@@ -40,14 +48,9 @@ int main(int argc, char **argv)
 	char dmfile[256];
 	xmlDocPtr dmdoc;
 
-	xmlNode *dmodule;
-	xmlNode *identAndStatusSection;
-	xmlNode *dmAddress;
-	xmlNode *dmIdent;
-	xmlNode *issueInfo;
-	xmlNode *dmAddressItems;
-	xmlNode *issueDate;
-	xmlNode *dmStatus;
+	xmlNodePtr issueInfo;
+	xmlNodePtr issueDate;
+	xmlNodePtr dmStatus;
 
 	char *issueNumber;
 	char *inWork;
@@ -110,11 +113,7 @@ int main(int argc, char **argv)
 			exit(EXIT_NO_FILE);
 		}
 
-		dmodule = xmlDocGetRootElement(dmdoc);
-		identAndStatusSection = find_child(dmodule, "identAndStatusSection");
-		dmAddress = find_child(identAndStatusSection, "dmAddress");
-		dmIdent = find_child(dmAddress, "dmIdent");
-		issueInfo = find_child(dmIdent, "issueInfo");
+		issueInfo = firstXPathNode("//issueInfo", dmdoc);
 
 		issueNumber = (char *) xmlGetProp(issueInfo, (xmlChar *) "issueNumber");
 		inWork = (char *) xmlGetProp(issueInfo, (xmlChar *) "inWork");
@@ -137,8 +136,7 @@ int main(int argc, char **argv)
 		xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) upissued_inWork);
 
 		if (newissue) {
-			dmAddressItems = find_child(dmAddress, "dmAddressItems");
-			issueDate = find_child(dmAddressItems, "issueDate");
+			issueDate = firstXPathNode("//issueDate", dmdoc);
 
 			time(&now);
 			local = localtime(&now);
@@ -155,15 +153,18 @@ int main(int argc, char **argv)
 
 			/* Do not change issueType when upissuing from 000 -> 001 */
 			if (issueNumber_int > 0) {
-				dmStatus = find_child(identAndStatusSection, "dmStatus");
-				xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
+				if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc)))
+					xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
 			}
 		}
 
 		if (!no_issue) {
-			int dmfilelen = strlen(dmfile);
-			strncpy(dmfile + (dmfilelen - 16), upissued_issueNumber, 3);
-			strncpy(dmfile + (dmfilelen - 12), upissued_inWork, 2);
+			char *i;
+
+			i = strchr(dmfile, '_') + 1;
+
+			strncpy(i, upissued_issueNumber, 3);
+			strncpy(i + 4, upissued_inWork, 2);
 		}
 
 		if (!overwrite && access(dmfile, F_OK) != -1) {
