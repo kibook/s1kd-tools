@@ -56,74 +56,76 @@
       </levelledPara>
       <levelledPara id="options">
         <title>OPTIONS</title>
-        <definitionList>
-          <definitionListItem>
-            <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>Specify the 'defaults' file name.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-p &lt;showprompts&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>Prompt the user for values left unspecified.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-# &lt;code&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The code of the new data dispatch note, in the form of MODELIDENTCODE-SENDER-RECEIVER-YEAR-SEQUENCE.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-o &lt;sender&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The enterprise name of the sender.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-r &lt;receiver&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The enterprise name of the receiver.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-t &lt;city&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The sender's city.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-T &lt;city&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The receiver's city.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-n &lt;country&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The sender's country.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-N &lt;country&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>The receiver's country.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-a &lt;auth&gt;</listItemTerm>
-            <listItemDefinition>
-              <para>Specify the authorization.</para>
-            </listItemDefinition>
-          </definitionListItem>
-          <definitionListItem>
-            <listItemTerm>-h -?</listItemTerm>
-            <listItemDefinition>
-              <para>Show help/usage message.</para>
-            </listItemDefinition>
-          </definitionListItem>
-        </definitionList>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the 'defaults' file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p &lt;showprompts&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Prompt the user for values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-# &lt;code&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The code of the new data dispatch note, in the form of MODELIDENTCODE-SENDER-RECEIVER-YEAR-SEQUENCE.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;sender&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The enterprise name of the sender.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r &lt;receiver&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The enterprise name of the receiver.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;city&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The sender's city.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T &lt;city&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The receiver's city.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;country&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The sender's country.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N &lt;country&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The receiver's country.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a &lt;auth&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the authorization.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
       </levelledPara>
     </description>
   </content>
