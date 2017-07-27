@@ -46,6 +46,11 @@
   <content>
     <description>
       <para>A set of small tools for manipulating S1000D data.</para>
+      <para>A more complete example of an S1000D data set produced with these tools is available at <externalPubRef xlink:href="https://github.com/kibook/s1kd-tools-doc">
+        <externalPubRefIdent>
+          <externalPubCode>https://github.com/kibook/s1kd-tools-doc</externalPubCode>
+        </externalPubRefIdent>
+      </externalPubRef></para>
     </description>
   </content>
 </dmodule>
