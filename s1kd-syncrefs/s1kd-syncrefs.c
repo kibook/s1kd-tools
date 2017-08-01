@@ -19,6 +19,8 @@ struct ref {
 	xmlNodePtr ref;
 };
 
+bool only_delete = false;
+
 bool contains_code(struct ref refs[256], int n, const char *code)
 {
 	int i;
@@ -214,6 +216,8 @@ void sync_refs(xmlNodePtr dmodule)
 		xmlFreeNode(old_refs);
 	}
 
+	if (only_delete) return;
+
 	new_refs = xmlNewNode(NULL, BAD_CAST "refs");
 
 	searchable = xmlLastElementChild(content);
@@ -257,10 +261,13 @@ int main(int argc, char *argv[])
 	
 	char out[256] = "";
 
-	while ((c = getopt(argc, argv, "o:h?")) != -1) {
+	while ((c = getopt(argc, argv, "o:dh?")) != -1) {
 		switch (c) {
 			case 'o':
 				strcpy(out, optarg);
+				break;
+			case 'd':
+				only_delete = true;
 				break;
 			case 'h':
 			case '?':
