@@ -319,7 +319,7 @@ bool samePm(xmlNodePtr ref, xmlNodePtr address)
 
 void validityError(xmlNodePtr ref, const char *fname)
 {
-	char *prefix;
+	char *prefix = "";
 	char code[256];
 
 	if (isDmRef(ref)) {
