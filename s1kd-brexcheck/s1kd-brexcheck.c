@@ -10,7 +10,7 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/debugXML.h>
 
-#define STRUCT_OBJ_RULE_PATH (xmlChar *) "/dmodule/content/brex/contextRules/structureObjectRuleGroup/structureObjectRule"
+#define STRUCT_OBJ_RULE_PATH "/dmodule/content/brex/contextRules[not(@rulesContext) or @rulesContext='%s']/structureObjectRuleGroup/structureObjectRule"
 #define BREX_REF_DMCODE_PATH (xmlChar *) "//brexDmRef/dmRef/dmRefIdent/dmCode"
 
 #define XSI_URI (xmlChar *) "http://www.w3.org/2001/XMLSchema-instance"
@@ -305,6 +305,13 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	int i;
 	int status = 0;
 
+	char *schema;
+	char xpath[512];
+
+	schema = (char *) xmlGetProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation");
+	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema);
+	xmlFree(schema);
+
 	for (i = 0; i < num_brex_fnames; ++i) {
 		brex_doc = xmlReadFile(brex_fnames[i], NULL, 0);
 
@@ -317,13 +324,15 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 		context = xmlXPathNewContext(brex_doc);
 
-		result = xmlXPathEvalExpression(STRUCT_OBJ_RULE_PATH, context);
+		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
 
-		status = check_brex_rules(result->nodesetval, dmod_doc, docname,
-			brex_fnames[i], brexCheck);
+		if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+			status = check_brex_rules(result->nodesetval, dmod_doc, docname,
+				brex_fnames[i], brexCheck);
 
-		if (verbose >= MESSAGE) {
-			printf(status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
+			if (verbose >= MESSAGE) {
+				printf(status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
+			}
 		}
 
 		xmlXPathFreeObject(result);
