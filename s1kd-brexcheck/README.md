@@ -33,3 +33,30 @@ Output an XML report instead of a plain-text one.
 
 -h -?  
 Show the help/usage message.
+
+Example
+=======
+
+    $ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+    $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+    $ cat $DMOD
+    [...]
+    <listItem id="stp-0001">
+      <para>List items shouldn't be used as steps...</para>
+    </listItem>
+    [...]
+    <para>Refer to <internalRef internalRefId="stp-0001" internalRefTargetType="irtt08"/>.</para>
+    [...]
+
+    $ s1kd-brexcheck -b $BREX $DMOD
+    BREX ERROR: DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+      Only when the reference target is a step can the value of attribute
+    internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
+      line 53:
+        ELEMENT internalRef
+          ATTRIBUTE internalRefId
+            TEXT
+              content=stp-0001
+          ATTRIBUTE internalRefTargetType
+            TEXT
+              content=irtt08
