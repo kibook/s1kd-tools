@@ -6,7 +6,7 @@ s1kd-newimf - Create a new S1000D ICN metadata file
 SYNOPSIS
 ========
 
-s1kd-newifm \[options\] &lt;ICNs&gt;...
+s1kd-newimf \[options\] &lt;ICNs&gt;...
 
 DESCRIPTION
 ===========
