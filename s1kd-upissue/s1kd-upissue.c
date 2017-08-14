@@ -43,9 +43,27 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 	return node;
 }
 
+void copy(const char *from, const char *to)
+{
+
+	FILE *f1, *f2;
+	char buf[4096];
+	size_t n;
+
+	f1 = fopen(from, "rb");
+	f2 = fopen(to, "wb");
+
+	while ((n = fread(buf, 1, 4096, f1)) > 0) {
+		fwrite(buf, 1, n, f2);
+	}
+
+	fclose(f1);
+	fclose(f2);
+}
+
 int main(int argc, char **argv)
 {
-	char dmfile[256];
+	char dmfile[256], cpfile[256];
 	xmlDocPtr dmdoc;
 
 	xmlNodePtr issueInfo;
@@ -106,17 +124,33 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; i++) {
 		strcpy(dmfile, argv[i]);
 
-		dmdoc = xmlReadFile(dmfile, NULL, XML_PARSE_NONET);
-
-		if (!dmdoc) {
+		if (access(dmfile, F_OK) == -1) {
 			fprintf(stderr, ERR_PREFIX "Could not read file %s.\n", dmfile);
 			exit(EXIT_NO_FILE);
 		}
 
-		issueInfo = firstXPathNode("//issueInfo", dmdoc);
+		dmdoc = xmlReadFile(dmfile, NULL, XML_PARSE_NONET | XML_PARSE_NOERROR);
 
-		issueNumber = (char *) xmlGetProp(issueInfo, (xmlChar *) "issueNumber");
-		inWork = (char *) xmlGetProp(issueInfo, (xmlChar *) "inWork");
+		if (dmdoc) {
+			issueInfo = firstXPathNode("//issueInfo", dmdoc);
+		} else {
+			issueInfo = NULL;
+		}
+
+		if (issueInfo) {
+			issueNumber = (char *) xmlGetProp(issueInfo, (xmlChar *) "issueNumber");
+			inWork = (char *) xmlGetProp(issueInfo, (xmlChar *) "inWork");
+		} else { /* Get issue/inwork from filename only */
+			char *i;
+
+			i = strchr(dmfile, '_') + 1;
+
+			issueNumber = calloc(4, 1);
+			inWork = calloc(3, 1);
+
+			strncpy(issueNumber, i, 3);
+			strncpy(inWork, i + 4, 2);
+		}
 
 		issueNumber_int = atoi(issueNumber);
 		inWork_int = atoi(inWork);
@@ -132,30 +166,36 @@ int main(int argc, char **argv)
 			snprintf(upissued_inWork, 32, "%.2d", inWork_int + 1);
 		}
 
-		xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) upissued_issueNumber);
-		xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) upissued_inWork);
+		if (issueInfo) {
+			xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) upissued_issueNumber);
+			xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) upissued_inWork);
 
-		if (newissue) {
-			issueDate = firstXPathNode("//issueDate", dmdoc);
+			if (newissue) {
+				issueDate = firstXPathNode("//issueDate", dmdoc);
 
-			time(&now);
-			local = localtime(&now);
-			year = local->tm_year + 1900;
-			month = local->tm_mon + 1;
-			day = local->tm_mday;
-			sprintf(year_s, "%d", year);
-			sprintf(month_s, "%.2d", month);
-			sprintf(day_s, "%.2d", day);
+				time(&now);
+				local = localtime(&now);
+				year = local->tm_year + 1900;
+				month = local->tm_mon + 1;
+				day = local->tm_mday;
+				sprintf(year_s, "%d", year);
+				sprintf(month_s, "%.2d", month);
+				sprintf(day_s, "%.2d", day);
 
-			xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
-			xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
-			xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
+				xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
+				xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
+				xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
 
-			/* Do not change issueType when upissuing from 000 -> 001 */
-			if (issueNumber_int > 0) {
-				if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc)))
-					xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
+				/* Do not change issueType when upissuing from 000 -> 001 */
+				if (issueNumber_int > 0) {
+					if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc)))
+						xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
+				}
 			}
+		}
+
+		if (!dmdoc) { /* Preserve non-XML filename for copying */
+			strcpy(cpfile, dmfile);
 		}
 
 		if (!no_issue) {
@@ -172,13 +212,19 @@ int main(int argc, char **argv)
 			exit(EXIT_NO_OVERWRITE);
 		}
 
-		xmlSaveFormatFile(dmfile, dmdoc, 1);
+		if (dmdoc) {
+			xmlSaveFormatFile(dmfile, dmdoc, 1);
+		} else { /* Copy non-XML file */
+			copy(cpfile, dmfile);
+		}
 
 		if (verbose) {
 			puts(dmfile);
 		}
 
-		xmlFreeDoc(dmdoc);
+		if (dmdoc) {
+			xmlFreeDoc(dmdoc);
+		}
 	}
 
 	xmlCleanupParser();
