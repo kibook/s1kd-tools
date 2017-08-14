@@ -48,7 +48,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-newifm [options] &lt;ICNs&gt;...</para>
+        <para>s1kd-newimf [options] &lt;ICNs&gt;...</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
