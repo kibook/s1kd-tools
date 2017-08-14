@@ -4,14 +4,20 @@
 .hy
 .SH NAME
 .PP
-s1kd\-upissue \- Upissue an S1000D data module
+s1kd\-upissue \- Upissue S1000D data
 .SH SYNOPSIS
 .PP
-s1kd\-upissue [\-vI] <datamodules>
+s1kd\-upissue [\-vI] <files>
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-upissue\f[] tool increases the in\-work or issue number
-of an S1000D data module.
+of an S1000D data module, publication module, etc.
+.PP
+Any files using an S1000D\-esque naming convention, placing the issue
+and in\-work numbers after the first underscore (_) character, can also
+be "upissued".
+Files which do not contain the appropriate S1000D metadata are simply
+copied.
 .SH OPTIONS
 .TP
 .B \-v
@@ -35,5 +41,52 @@ Default is \[aq]changed\[aq].
 Omit issue/inwork numbers from filename.
 .RS
 .RE
+.SH EXAMPLES
+.SS Data module with issue/inwork in filename
+.IP
+.nf
+\f[C]
+$\ ls
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-01_EN\-CA.XML
+
+$\ s1kd\-upissue\ DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-01_EN\-CA.XML
+$\ ls
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-01_EN\-CA.XML
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-02_EN\-CA.XML
+
+$\ s1kd\-upissue\ \-I\ DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-02_EN\-CA.XML
+$\ ls
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-01_EN\-CA.XML
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_000\-02_EN\-CA.XML
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_001\-00_EN\-CA.XML
+\f[]
+.fi
+.SS Data module without issue/inwork in filename
+.IP
+.nf
+\f[C]
+$\ ls
+DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_EN\-US.XML
+
+$\ s1kd\-metadata\ DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_EN\-CA.XML\ issueInfo
+000\-01
+$\ s1kd\-upissue\ \-N\ DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_EN\-CA.XML
+$\ s1kd\-metadata\ DMC\-S1000DTOOLS\-A\-00\-00\-00\-00A\-040A\-D_EN\-CA.XML\ issueInfo
+000\-02
+\f[]
+.fi
+.SS Non\-XML file with issue/inwork in filename
+.IP
+.nf
+\f[C]
+$\ ls
+TXT\-S1000DTOOLS\-KHZAE\-FOOBAR_000\-01_EN\-CA.TXT
+
+$\ s1kd\-upissue\ TXT\-S1000DTOOLS\-KHZAE\-00001_000\-01_EN\-CA.TXT
+$\ ls
+TXT\-S1000DTOOLS\-KHZAE\-FOOBAR_000\-01_EN\-CA.TXT
+TXT\-S1000DTOOLS\-KHZAE\-FOOBAR_000\-02_EN\-CA.TXT
+\f[]
+.fi
 .SH AUTHORS
 khzae.net.
