@@ -96,9 +96,9 @@ int main(int argc, char **argv)
 
 	bool no_issue = false;
 
-	while ((c = getopt(argc, argv, "Ivs:Nfh?")) != -1) {
+	while ((c = getopt(argc, argv, "ivs:nfh?")) != -1) {
 		switch (c) {
-			case 'I':
+			case 'i':
 				newissue = true;
 				break;
 			case 'v':
@@ -107,12 +107,15 @@ int main(int argc, char **argv)
 			case 's':
 				strcpy(status, optarg);
 				break;
-			case 'N':
+			case 'n':
 				no_issue = true;
 				overwrite = true;
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'I':
+				icn_issue = true;
 				break;
 			case 'h':
 			case '?':
