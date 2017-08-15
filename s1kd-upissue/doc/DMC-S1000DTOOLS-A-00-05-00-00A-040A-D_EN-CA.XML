@@ -8,7 +8,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="5" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2017" month="08" day="14"/>
@@ -17,7 +17,7 @@
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-upissue [-vI] &lt;files&gt;</para>
+        <para>s1kd-upissue [-vin] [-s &lt;status&gt;] &lt;files&gt;</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -68,7 +68,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-I</listItemTerm>
+              <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
                 <para>Increase the issue number of the data module. By default, the in-work issue is increased.</para>
               </listItemDefinition>
@@ -80,7 +80,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-N</listItemTerm>
+              <listItemTerm>-n</listItemTerm>
               <listItemDefinition>
                 <para>Omit issue/inwork numbers from filename.</para>
               </listItemDefinition>

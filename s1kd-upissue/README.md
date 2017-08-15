@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-s1kd-upissue \[-vI\] &lt;files&gt;
+s1kd-upissue \[-vin\] \[-s &lt;status&gt;\] &lt;files&gt;
 
 DESCRIPTION
 ===========
@@ -21,13 +21,13 @@ OPTIONS
 -v  
 Print the file name of the upissued data module.
 
--I  
+-i  
 Increase the issue number of the data module. By default, the in-work issue is increased.
 
 -s &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.
 
--N  
+-n  
 Omit issue/inwork numbers from filename.
 
 EXAMPLES

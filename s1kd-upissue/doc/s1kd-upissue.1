@@ -7,7 +7,7 @@
 s1kd\-upissue \- Upissue S1000D data
 .SH SYNOPSIS
 .PP
-s1kd\-upissue [\-vI] <files>
+s1kd\-upissue [\-vin] [\-s <status>] <files>
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-upissue\f[] tool increases the in\-work or issue number
@@ -25,7 +25,7 @@ Print the file name of the upissued data module.
 .RS
 .RE
 .TP
-.B \-I
+.B \-i
 Increase the issue number of the data module.
 By default, the in\-work issue is increased.
 .RS
@@ -37,7 +37,7 @@ Default is \[aq]changed\[aq].
 .RS
 .RE
 .TP
-.B \-N
+.B \-n
 Omit issue/inwork numbers from filename.
 .RS
 .RE

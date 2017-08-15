@@ -15,12 +15,12 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-vIN] DATAMODULE");
+	puts("Usage: " PROG_NAME " [-vin] DATAMODULE");
 	putchar('\n');
 	puts("Options:");
 	puts("  -v	Print filename of upissued data module");
-	puts("  -I	Create a new issue of the data module");
-	puts("  -N	Omit issue/inwork numbers from filename");
+	puts("  -i	Create a new issue of the data module");
+	puts("  -n	Omit issue/inwork numbers from filename");
 }
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
