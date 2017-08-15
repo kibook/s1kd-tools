@@ -114,9 +114,6 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
-			case 'I':
-				icn_issue = true;
-				break;
 			case 'h':
 			case '?':
 				show_help();
