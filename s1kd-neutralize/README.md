@@ -25,3 +25,31 @@ Output neutralized data module XML to &lt;file&gt; instead of overwriting the so
 
 -h -?  
 Show usage message.
+
+EXAMPLE
+=======
+
+    $ DMOD=DMC-XLINKTEST-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+    $ xmllint --xpath "//description/dmRef" $DMOD
+    <dmRef>
+      <dmRefIdent>
+        <dmCode modelIdentCode="XLINKTEST" systemDiffCode="A"
+    systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="01"
+    disassyCode="00" disassyCodeVariant="A" infoCode="040"
+    infoCodeVariant="A" itemLocationCode="D"/>
+      </dmRefIdent>
+      <dmRefAddressItems>
+        <dmTitle>
+          <techName>XLink test</techName>
+          <infoName>Referenced data module</infoName>
+        </dmTitle>
+      </dmRefAddressItems>
+    </dmRef>
+
+    $ s1kd-neutralize $DMOD
+    $ xmllint --xpath "//description/dmRef" $DMOD
+    <dmRef xlink:type="simple"
+    xlink:href="URN:S1000D:DMC-XLINKTEST-A-00-00-01-00A-040A-D"
+    xlink:title="XLink test - Referenced data module">
+    [...]
+    </dmRef>

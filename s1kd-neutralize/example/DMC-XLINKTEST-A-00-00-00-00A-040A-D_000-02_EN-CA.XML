@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <rdf:Description>
+    <dc:title>XLink test - Example</dc:title>
+    <dc:creator>khzae.net</dc:creator>
+    <dc:subject>XLink test - Example</dc:subject>
+    <dc:publisher>khzae.net</dc:publisher>
+    <dc:contributor>khzae.net</dc:contributor>
+    <dc:date>2017-08-16</dc:date>
+    <dc:type>text</dc:type>
+    <dc:format>text/xml</dc:format>
+    <dc:identifier>XLINKTEST-A-00-00-00-00A-040A-D_000-02</dc:identifier>
+    <dc:language>en-CA</dc:language>
+    <dc:source/>
+    <dc:rights>01</dc:rights>
+  </rdf:Description>
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="XLINKTEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="02"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="08" day="16"/>
+        <dmTitle>
+          <techName>XLink test</techName>
+          <infoName>Example</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef xlink:type="simple" xlink:href="URN:S1000D:DMC-S1000D-F-04-10-0301-00A-022A-D" xlink:title="">
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>General</title>
+        <para>Refer to <dmRef xlink:type="simple" xlink:href="URN:S1000D:DMC-XLINKTEST-A-00-00-01-00A-040A-D" xlink:title="XLink test - Referenced data module"><dmRefIdent><dmCode modelIdentCode="XLINKTEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="01" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/></dmRefIdent><dmRefAddressItems><dmTitle><techName>XLink test</techName><infoName>Referenced data module</infoName></dmTitle></dmRefAddressItems></dmRef>.</para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
