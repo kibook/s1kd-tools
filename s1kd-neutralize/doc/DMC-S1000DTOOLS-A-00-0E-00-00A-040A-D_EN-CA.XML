@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="E" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2017" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-neutralize(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -61,9 +61,6 @@
             <listItem>
               <para>RDF and Dublin Core metadata.</para>
             </listItem>
-            <listItem>
-              <para>(optionally) Autopopulated references table.</para>
-            </listItem>
           </randomList>
         </para>
       </levelledPara>
@@ -75,12 +72,6 @@
               <listItemTerm>-o &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Output neutralized data module XML to &lt;file&gt; instead of overwriting the source data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-r</listItemTerm>
-              <listItemDefinition>
-                <para>Autopopulate the references table.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

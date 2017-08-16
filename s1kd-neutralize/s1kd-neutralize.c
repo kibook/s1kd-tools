@@ -12,8 +12,6 @@
 
 #define PROG_NAME "s1kd-neutralize"
 
-bool syncrefs = false;
-
 void neutralizeFile(const char *fname, const char *outfile)
 {
 	xmlDocPtr doc, res, styledoc, orig;
@@ -37,17 +35,6 @@ void neutralizeFile(const char *fname, const char *outfile)
 	xmlFreeDoc(doc);
 	xsltFreeStylesheet(style);
 
-	if (syncrefs) {
-		doc = res;
-
-		styledoc = xmlReadMemory((const char *) stylesheets_syncrefs_xsl,
-			stylesheets_syncrefs_xsl_len, NULL, NULL, 0);
-		style = xsltParseStylesheetDoc(styledoc);
-		res = xsltApplyStylesheet(style, doc, NULL);
-		xmlFreeDoc(doc);
-		xsltFreeStylesheet(style);
-	}
-
 	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
 
 	if (outfile)
@@ -65,7 +52,6 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -o <file>  Output to <file> instead of overwriting.");
-	puts("  -r         Synchronize references.");
 	puts("  -h -?      Show usage message.");
 }
 
@@ -76,9 +62,6 @@ int main(int argc, char **argv)
 
 	while ((i = getopt(argc, argv, "ro:h?")) != -1) {
 		switch (i) {
-			case 'r':
-				syncrefs = true;
-				break;
 			case 'o':
 				outfile = strdup(optarg);
 				break;

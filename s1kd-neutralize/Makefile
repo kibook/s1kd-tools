@@ -11,7 +11,6 @@ all: $(OUTPUT)
 
 stylesheets.h: stylesheets/*.xsl
 	xxd -i stylesheets/rdf.xsl > stylesheets.h
-	xxd -i stylesheets/syncrefs.xsl >> stylesheets.h
 	xxd -i stylesheets/xlink.xsl >> stylesheets.h
 
 $(OUTPUT): $(SOURCE) stylesheets.h
