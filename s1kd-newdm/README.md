@@ -95,26 +95,50 @@ If this option is specified, the program will prompt the user to enter values fo
 
 This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named 'defaults', but any file can be specified by using the -d option.
 
-Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Example:
+All of the s1kd-new\* commands use the same 'defaults' file format, so this file can contain default values for multiple types of metadata.
 
-    modelIdentCode               S1000DTOOLS
-    systemDiffCode               A
-    systemCode                   00
-    subSystemCode                0
-    subSubSystemCode             0
-    assyCode                     00
-    disassyCode                  00
-    disassycodeVariant           A
-    infoCode                     040
-    infoCodeVariant              A
-    itemLocationCode             D
-    languageIsoCode              en
-    countryIsoCode               CA
-    issueNumber                  000
-    inWork                       01
-    securityClassification       01
-    responsiblePartnerCompany    khzai.net
-    originator                   khzai.net
+Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:
+
+    # General
+    modelIdentCode            S1000DTOOLS
+    securityClassification    01
+    responsiblePartnerCompany khzae.net
+    originator                khzae.net
+    languageIsoCode           en
+    countryIsoCode            CA
+    issueNumber               000
+    inWork                    01
+
+    # Data modules
+    systemDiffCode            A
+    systemCode                00
+    subSystemCode             0
+    subSubSystemCode          0
+    assyCode                  00
+    disassyCode               00
+    disassyCodeVariant        A
+    infoCode                  040
+    infoCodeVariant           A
+    itemLocationCode          D
+
+    # Comments/DDN
+    senderIdent               KHZAE
+    yearOfDataIssue           2017
+    seqNumber                 00001
+    city                      Toronto
+    country                   Canada
+
+    # Comments
+    commentType               q
+    commentPriorityCode       cp01
+
+    # DDN
+    authorization             khzae.net
+
+    # Publication modules
+    pmIssuer                  KHZAE
+    pmNumber                  00001
+    pmVolume                  00
 
 'dmtypes' file
 --------------

@@ -48,3 +48,8 @@ Specify the authorization.
 
 -h -?  
 Show help/usage message.
+
+'defaults' file
+---------------
+
+Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.

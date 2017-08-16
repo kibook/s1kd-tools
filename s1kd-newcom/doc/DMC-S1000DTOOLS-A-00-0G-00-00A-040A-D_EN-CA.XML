@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="G" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2017" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-newcom(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -114,6 +114,10 @@
             </definitionListItem>
           </definitionList>
         </para>
+        <levelledPara>
+          <title>'defaults' file</title>
+          <para>Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new* commands.</para>
+        </levelledPara>
       </levelledPara>
     </description>
   </content>

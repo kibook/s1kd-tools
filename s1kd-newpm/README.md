@@ -45,3 +45,8 @@ The responsible partner company enterprise name of the new publication module.
 
 -t &lt;title&gt;  
 The title of the new publication module.
+
+'defaults' file
+---------------
+
+Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
