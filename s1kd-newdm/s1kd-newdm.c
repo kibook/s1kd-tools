@@ -42,6 +42,39 @@
 #define EXIT_UNKNOWN_DMTYPE 2
 #define EXIT_BAD_DMC 3
 
+char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
+char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
+char systemCode[MAX_SYSTEM_CODE] = "";
+char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
+char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
+char assyCode[MAX_ASSY_CODE] = "";
+char disassyCode[MAX_DISASSY_CODE] = "";
+char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
+char infoCode[MAX_INFO_CODE] = "";
+char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
+char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+char learnCode[MAX_LEARN_CODE] = "";
+char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+
+char languageIsoCode[MAX_LANGUAGE_ISO_CODE] = "";
+char countryIsoCode[MAX_COUNTRY_ISO_CODE] = "";
+
+char securityClassification[MAX_SECURITY_CLASSIFICATION] = "";
+
+char issueNumber[MAX_ISSUE_NUMBER] = "";
+char inWork[MAX_IN_WORK] = "";
+
+char responsiblePartnerCompany_enterpriseName[MAX_ENTERPRISE_NAME] = "";
+char originator_enterpriseName[MAX_ENTERPRISE_NAME] = "";
+
+char responsiblePartnerCompany_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
+char originator_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
+
+char techName_content[MAX_TECH_NAME] = "";
+char infoName_content[MAX_INFO_NAME] = "";
+
+char schema[1024] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -110,39 +143,62 @@ void show_help(void)
 	puts("  -N	Omit issue/inwork from filename.");
 }
 
+void copy_default_value(const char *key, const char *val)
+{
+	if (strcmp(key, "modelIdentCode") == 0 && strcmp(modelIdentCode, "") == 0)
+		strcpy(modelIdentCode, val);
+	else if (strcmp(key, "systemDiffCode") == 0 && strcmp(systemDiffCode, "") == 0)
+		strcpy(systemDiffCode, val);
+	else if (strcmp(key, "systemCode") == 0 && strcmp(systemCode, "") == 0)
+		strcpy(systemCode, val);
+	else if (strcmp(key, "subSystemCode") == 0 && strcmp(subSystemCode, "") == 0)
+		strcpy(subSystemCode, val);
+	else if (strcmp(key, "subSubSystemCode") == 0 && strcmp(subSubSystemCode, "") == 0)
+		strcpy(subSubSystemCode, val);
+	else if (strcmp(key, "assyCode") == 0 && strcmp(assyCode, "") == 0)
+		strcpy(assyCode, val);
+	else if (strcmp(key, "disassyCode") == 0 && strcmp(disassyCode, "") == 0)
+		strcpy(disassyCode, val);
+	else if (strcmp(key, "disassyCodeVariant") == 0 && strcmp(disassyCodeVariant, "") == 0)
+		strcpy(disassyCodeVariant, val);
+	else if (strcmp(key, "infoCode") == 0 && strcmp(infoCode, "") == 0)
+		strcpy(infoCode, val);
+	else if (strcmp(key, "infoCodeVariant") == 0 && strcmp(infoCodeVariant, "") == 0)
+		strcpy(infoCodeVariant, val);
+	else if (strcmp(key, "itemLocationCode") == 0 && strcmp(itemLocationCode, "") == 0)
+		strcpy(itemLocationCode, val);
+	else if (strcmp(key, "learnCode") == 0 && strcmp(learnCode, "") == 0)
+		strcpy(learnCode, val);
+	else if (strcmp(key, "learnEventCode") == 0 && strcmp(learnEventCode, "") == 0)
+		strcpy(learnEventCode, val);
+	else if (strcmp(key, "languageIsoCode") == 0 && strcmp(languageIsoCode, "") == 0)
+		strcpy(languageIsoCode, val);
+	else if (strcmp(key, "countryIsoCode") == 0 && strcmp(countryIsoCode, "") == 0)
+		strcpy(countryIsoCode, val);
+	else if (strcmp(key, "issueNumber") == 0 && strcmp(issueNumber, "") == 0)
+		strcpy(issueNumber, val);
+	else if (strcmp(key, "inWork") == 0 && strcmp(inWork, "") == 0)
+		strcpy(inWork, val);
+	else if (strcmp(key, "securityClassification") == 0 && strcmp(securityClassification, "") == 0)
+		strcpy(securityClassification, val);
+	else if (strcmp(key, "responsiblePartnerCompany") == 0 && strcmp(responsiblePartnerCompany_enterpriseName, "") == 0)
+		strcpy(responsiblePartnerCompany_enterpriseName, val);
+	else if (strcmp(key, "responsiblePartnerCompanyCode") == 0 && strcmp(responsiblePartnerCompany_enterpriseCode, "") == 0)
+		strcpy(responsiblePartnerCompany_enterpriseCode, val);
+	else if (strcmp(key, "originator") == 0 && strcmp(originator_enterpriseName, "") == 0)
+		strcpy(originator_enterpriseName, val);
+	else if (strcmp(key, "originatorCode") == 0 && strcmp(originator_enterpriseCode, "") == 0)
+		strcpy(originator_enterpriseCode, val);
+	else if (strcmp(key, "techName") == 0 && strcmp(techName_content, "") == 0)
+		strcpy(techName_content, val);
+	else if (strcmp(key, "infoName") == 0 && strcmp(infoName_content, "") == 0)
+		strcpy(infoName_content, val);
+	else if (strcmp(key, "schema") == 0 && strcmp(schema, "") == 0)
+		strcpy(schema, val);
+}
+
 int main(int argc, char **argv)
 {
-	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
-	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
-	char systemCode[MAX_SYSTEM_CODE] = "";
-	char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
-	char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
-	char assyCode[MAX_ASSY_CODE] = "";
-	char disassyCode[MAX_DISASSY_CODE] = "";
-	char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
-	char infoCode[MAX_INFO_CODE] = "";
-	char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
-	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
-	char learnCode[MAX_LEARN_CODE] = "";
-	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
-
-	char languageIsoCode[MAX_LANGUAGE_ISO_CODE] = "";
-	char countryIsoCode[MAX_COUNTRY_ISO_CODE] = "";
-
-	char securityClassification[MAX_SECURITY_CLASSIFICATION] = "";
-
-	char issueNumber[MAX_ISSUE_NUMBER] = "";
-	char inWork[MAX_IN_WORK] = "";
-
-	char responsiblePartnerCompany_enterpriseName[MAX_ENTERPRISE_NAME] = "";
-	char originator_enterpriseName[MAX_ENTERPRISE_NAME] = "";
-
-	char responsiblePartnerCompany_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
-	char originator_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
-
-	char techName_content[MAX_TECH_NAME] = "";
-	char infoName_content[MAX_INFO_NAME] = "";
-
 	time_t now;
 	struct tm *local;
 	int year, month, day;
@@ -174,9 +230,6 @@ int main(int argc, char **argv)
 	xmlNode *enterpriseName;
 
 	FILE *defaults;
-	char default_line[1024];
-	char *def_key;
-	char *def_val;
 
 	char defaults_fname[256] = "defaults";
 	char dmtypes_fname[256] = "dmtypes";
@@ -188,7 +241,8 @@ int main(int argc, char **argv)
 	char dmcode[256] = "";
 	bool skipdmc = false;
 	bool no_issue = false;
-	char schema[1024] = "";
+
+	xmlDocPtr defaults_xml;
 
 	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:h?")) != -1) {
 		switch (c) {
@@ -215,66 +269,35 @@ int main(int argc, char **argv)
 		}
 	}
 
-	defaults = fopen(defaults_fname, "r");
 
-	if (defaults) {
-		while (fgets(default_line, 1024, defaults)) {
-			def_key = strtok(default_line, "\t ");
-			def_val = strtok(NULL, "\t\n");
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR))) {
+		xmlNodePtr cur;
 
-			if (strcmp(def_key, "modelIdentCode") == 0 && strcmp(modelIdentCode, "") == 0)
-				strcpy(modelIdentCode, def_val);
-			else if (strcmp(def_key, "systemDiffCode") == 0 && strcmp(systemDiffCode, "") == 0)
-				strcpy(systemDiffCode, def_val);
-			else if (strcmp(def_key, "systemCode") == 0 && strcmp(systemCode, "") == 0)
-				strcpy(systemCode, def_val);
-			else if (strcmp(def_key, "subSystemCode") == 0 && strcmp(subSystemCode, "") == 0)
-				strcpy(subSystemCode, def_val);
-			else if (strcmp(def_key, "subSubSystemCode") == 0 && strcmp(subSubSystemCode, "") == 0)
-				strcpy(subSubSystemCode, def_val);
-			else if (strcmp(def_key, "assyCode") == 0 && strcmp(assyCode, "") == 0)
-				strcpy(assyCode, def_val);
-			else if (strcmp(def_key, "disassyCode") == 0 && strcmp(disassyCode, "") == 0)
-				strcpy(disassyCode, def_val);
-			else if (strcmp(def_key, "disassyCodeVariant") == 0 && strcmp(disassyCodeVariant, "") == 0)
-				strcpy(disassyCodeVariant, def_val);
-			else if (strcmp(def_key, "infoCode") == 0 && strcmp(infoCode, "") == 0)
-				strcpy(infoCode, def_val);
-			else if (strcmp(def_key, "infoCodeVariant") == 0 && strcmp(infoCodeVariant, "") == 0)
-				strcpy(infoCodeVariant, def_val);
-			else if (strcmp(def_key, "itemLocationCode") == 0 && strcmp(itemLocationCode, "") == 0)
-				strcpy(itemLocationCode, def_val);
-			else if (strcmp(def_key, "learnCode") == 0 && strcmp(learnCode, "") == 0)
-				strcpy(learnCode, def_val);
-			else if (strcmp(def_key, "learnEventCode") == 0 && strcmp(learnEventCode, "") == 0)
-				strcpy(learnEventCode, def_val);
-			else if (strcmp(def_key, "languageIsoCode") == 0 && strcmp(languageIsoCode, "") == 0)
-				strcpy(languageIsoCode, def_val);
-			else if (strcmp(def_key, "countryIsoCode") == 0 && strcmp(countryIsoCode, "") == 0)
-				strcpy(countryIsoCode, def_val);
-			else if (strcmp(def_key, "issueNumber") == 0 && strcmp(issueNumber, "") == 0)
-				strcpy(issueNumber, def_val);
-			else if (strcmp(def_key, "inWork") == 0 && strcmp(inWork, "") == 0)
-				strcpy(inWork, def_val);
-			else if (strcmp(def_key, "securityClassification") == 0 && strcmp(securityClassification, "") == 0)
-				strcpy(securityClassification, def_val);
-			else if (strcmp(def_key, "responsiblePartnerCompany") == 0 && strcmp(responsiblePartnerCompany_enterpriseName, "") == 0)
-				strcpy(responsiblePartnerCompany_enterpriseName, def_val);
-			else if (strcmp(def_key, "responsiblePartnerCompanyCode") == 0 && strcmp(responsiblePartnerCompany_enterpriseCode, "") == 0)
-				strcpy(responsiblePartnerCompany_enterpriseCode, def_val);
-			else if (strcmp(def_key, "originator") == 0 && strcmp(originator_enterpriseName, "") == 0)
-				strcpy(originator_enterpriseName, def_val);
-			else if (strcmp(def_key, "originatorCode") == 0 && strcmp(originator_enterpriseCode, "") == 0)
-				strcpy(originator_enterpriseCode, def_val);
-			else if (strcmp(def_key, "techName") == 0 && strcmp(techName_content, "") == 0)
-				strcpy(techName_content, def_val);
-			else if (strcmp(def_key, "infoName") == 0 && strcmp(infoName_content, "") == 0)
-				strcpy(infoName_content, def_val);
-			else if (strcmp(def_key, "schema") == 0 && strcmp(schema, "") == 0)
-				strcpy(schema, def_val);
+		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+			char *def_key = (char *) cur->name;
+			char *def_val = (char *) xmlNodeGetContent(cur);
+
+			copy_default_value(def_key, def_val);
+
+			xmlFree(def_val);
 		}
 
-		fclose(defaults);
+		xmlFreeDoc(defaults_xml);
+	} else {
+		defaults = fopen(defaults_fname, "r");
+
+		if (defaults) {
+			char default_line[1024];
+
+			while (fgets(default_line, 1024, defaults)) {
+				char *def_key = strtok(default_line, "\t ");
+				char *def_val = strtok(NULL, "\t\n");
+
+				copy_default_value(def_key, def_val);
+			}
+
+			fclose(defaults);
+		}
 	}
 
 	if (strcmp(dmcode, "") != 0) {
@@ -301,18 +324,43 @@ int main(int argc, char **argv)
 		}
 	}
 
-	defaults = fopen(dmtypes_fname, "r");
+	if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, XML_PARSE_NOERROR))) {
+		xmlNodePtr cur;
 
-	if (defaults) {
-		while (fgets(default_line, 1024, defaults)) {
-			def_key = strtok(default_line, "\t ");
-			def_val = strtok(NULL, "\t\n");
+		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+			char *def_key, *def_val;
+
+			if (cur->type != XML_ELEMENT_NODE) continue;
+			if (!xmlHasProp(cur, BAD_CAST "infoCode")) continue;
+			if (!xmlHasProp(cur, BAD_CAST "schema")) continue;
+
+			def_key = (char *) xmlGetProp(cur, BAD_CAST "infoCode");
+			def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
 
 			if (strcmp(def_key, infoCode) == 0)
 				strcpy(dmtype, def_val);
+
+			xmlFree(def_key);
+			xmlFree(def_val);
 		}
 
-		fclose(defaults);
+		xmlFreeDoc(defaults_xml);
+	} else {
+		defaults = fopen(dmtypes_fname, "r");
+
+		if (defaults) {
+			char default_line[1024];
+
+			while (fgets(default_line, 1024, defaults)) {
+				char *def_key = strtok(default_line, "\t ");
+				char *def_val = strtok(NULL, "\t\n");
+
+				if (strcmp(def_key, infoCode) == 0)
+					strcpy(dmtype, def_val);
+			}
+
+			fclose(defaults);
+		}
 	}
 
 	if (showprompts) {

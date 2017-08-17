@@ -186,6 +186,22 @@ pmNumber\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 00001
 pmVolume\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 00
 \f[]
 .fi
+.PP
+Alternatively, the \[aq]defaults\[aq] file can be written using an XML
+format where each child element represents the identifier and its
+content is the default value:
+.IP
+.nf
+\f[C]
+<?xml\ version="1.0"?>
+<defaults>
+\ \ <!\-\-\ General\ \-\->
+\ \ <modelIdentCode>S1000DTOOLS</modelIdentCode>
+\ \ <securityClassification>01</securityClassification>
+\ \ [...]
+</defaults>
+\f[]
+.fi
 .SS \[aq]dmtypes\[aq] file
 .PP
 This file sets the default type (schema) for data modules based on their
@@ -206,6 +222,20 @@ Example:
 024\ \ \ \ brdoc
 040\ \ \ \ descript
 520\ \ \ \ proced
+\f[]
+.fi
+.PP
+Like the \[aq]defaults\[aq] file, the \[aq]dmtypes\[aq] file may also be
+written in an XML format, where each child has an attribute
+\f[C]infoCode\f[] and an attribute \f[C]schema\f[].
+.IP
+.nf
+\f[C]
+<?xml\ version="1.0">
+<dmtypes>
+\ \ <type\ infoCode="040"\ schema="descript"/>
+\ \ <type\ infoCode="520"\ schema="proced"/>
+</dmtypes>
 \f[]
 .fi
 .SH EXAMPLE

@@ -140,6 +140,16 @@ Each line consists of the identifier of a piece of metadata and its default valu
     pmNumber                  00001
     pmVolume                  00
 
+Alternatively, the 'defaults' file can be written using an XML format where each child element represents the identifier and its content is the default value:
+
+    <?xml version="1.0"?>
+    <defaults>
+      <!-- General -->
+      <modelIdentCode>S1000DTOOLS</modelIdentCode>
+      <securityClassification>01</securityClassification>
+      [...]
+    </defaults>
+
 'dmtypes' file
 --------------
 
@@ -154,6 +164,14 @@ Each line consists of an info code and a schema identifier. Example:
     024    brdoc
     040    descript
     520    proced
+
+Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute `infoCode` and an attribute `schema`.
+
+    <?xml version="1.0">
+    <dmtypes>
+      <type infoCode="040" schema="descript"/>
+      <type infoCode="520" schema="proced"/>
+    </dmtypes>
 
 EXAMPLE
 =======

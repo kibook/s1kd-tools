@@ -14,6 +14,20 @@
 #define EXIT_BAD_CODE 1
 #define EXIT_COMMENT_EXISTS 2
 
+char modelIdentCode[16] = "";
+char senderIdent[7] = "";
+char yearOfDataIssue[6] = "";
+char seqNumber[7] = "";
+char commentType[3] = "";
+char languageIsoCode[5] = "";
+char countryIsoCode[4] = "";
+char enterprise_name[256] = "";
+char address_city[256] = "";
+char address_country[256] = "";
+char securityClassification[4] = "";
+char commentPriorityCode[6] = "";
+char responseType[6] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -75,23 +89,37 @@ void show_help(void)
 	puts("  -r    Response type");
 }
 
+void copy_default_value(const char *def_key, const char *def_val)
+{
+	if (strcmp(def_key, "modelIdentCode") == 0)
+		strcpy(modelIdentCode, def_val);
+	else if (strcmp(def_key, "senderIdent") == 0)
+		strcpy(senderIdent, def_val);
+	else if (strcmp(def_key, "yearOfDataIssue") == 0)
+		strcpy(yearOfDataIssue, def_val);
+	else if (strcmp(def_key, "seqNumber") == 0)
+		strcpy(seqNumber, def_val);
+	else if (strcmp(def_key, "commentType") == 0)
+		strcpy(commentType, def_val);
+	else if (strcmp(def_key, "languageIsoCode") == 0)
+		strcpy(languageIsoCode, def_val);
+	else if (strcmp(def_key, "countryIsoCode") == 0)
+		strcpy(countryIsoCode, def_val);
+	else if (strcmp(def_key, "originator") == 0)
+		strcpy(enterprise_name, def_val);
+	else if (strcmp(def_key, "city") == 0)
+		strcpy(address_city, def_val);
+	else if (strcmp(def_key, "country") == 0)
+		strcpy(address_country, def_val);
+	else if (strcmp(def_key, "securityClassification") == 0)
+		strcpy(securityClassification, def_val);
+	else if (strcmp(def_key, "commentPriorityCode") == 0)
+		strcpy(commentPriorityCode, def_val);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr comment_doc;
-
-	char modelIdentCode[16] = "";
-	char senderIdent[7] = "";
-	char yearOfDataIssue[6] = "";
-	char seqNumber[7] = "";
-	char commentType[3] = "";
-	char languageIsoCode[5] = "";
-	char countryIsoCode[4] = "";
-	char enterprise_name[256] = "";
-	char address_city[256] = "";
-	char address_country[256] = "";
-	char securityClassification[4] = "";
-	char commentPriorityCode[6] = "";
-	char responseType[6] = "";
 
 	xmlNodePtr comment;
 	xmlNodePtr identAndStatusSection;
@@ -129,6 +157,8 @@ int main(int argc, char **argv)
 	bool show_prompts = false;
 	bool skip_code = false;
 	char commentTitle[256] = "";
+
+	xmlDocPtr defaults_xml;
 
 	int i;
 
@@ -172,6 +202,41 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR))) {
+		xmlNodePtr cur;
+
+		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+			char *def_key = (char *) cur->name;
+			char *def_val = (char *) xmlNodeGetContent(cur);
+
+			copy_default_value(def_key, def_val);
+
+			xmlFree(def_val);
+		}
+
+		xmlFreeDoc(defaults_xml);
+	} else {
+		defaults = fopen(defaults_fname, "r");
+
+		if (defaults) {
+			char default_line[1024];
+
+			while (fgets(default_line, 1024, defaults)) {
+				char *def_key;
+				char *def_val;
+
+				def_key = strtok(default_line, "\t ");
+				def_val = strtok(NULL, "\t\n");
+
+				copy_default_value(def_key, def_val);
+			}
+
+			fclose(defaults);
+		}
+	}
+
+	comment_doc = xmlReadMemory((const char *) comment_xml, comment_xml_len, NULL, NULL, 0);
+
 	if (strcmp(code, "") != 0) {
 		int n;
 
@@ -187,49 +252,6 @@ int main(int argc, char **argv)
 			exit(EXIT_BAD_CODE);
 		}
 	}
-
-	defaults = fopen(defaults_fname, "r");
-
-	if (defaults) {
-		char default_line[1024];
-
-		while (fgets(default_line, 1024, defaults)) {
-			char *def_key;
-			char *def_val;
-
-			def_key = strtok(default_line, "\t ");
-			def_val = strtok(NULL, "\t\n");
-
-			if (strcmp(def_key, "modelIdentCode") == 0)
-				strcpy(modelIdentCode, def_val);
-			else if (strcmp(def_key, "senderIdent") == 0)
-				strcpy(senderIdent, def_val);
-			else if (strcmp(def_key, "yearOfDataIssue") == 0)
-				strcpy(yearOfDataIssue, def_val);
-			else if (strcmp(def_key, "seqNumber") == 0)
-				strcpy(seqNumber, def_val);
-			else if (strcmp(def_key, "commentType") == 0)
-				strcpy(commentType, def_val);
-			else if (strcmp(def_key, "languageIsoCode") == 0)
-				strcpy(languageIsoCode, def_val);
-			else if (strcmp(def_key, "countryIsoCode") == 0)
-				strcpy(countryIsoCode, def_val);
-			else if (strcmp(def_key, "originator") == 0)
-				strcpy(enterprise_name, def_val);
-			else if (strcmp(def_key, "city") == 0)
-				strcpy(address_city, def_val);
-			else if (strcmp(def_key, "country") == 0)
-				strcpy(address_country, def_val);
-			else if (strcmp(def_key, "securityClassification") == 0)
-				strcpy(securityClassification, def_val);
-			else if (strcmp(def_key, "commentPriorityCode") == 0)
-				strcpy(commentPriorityCode, def_val);
-		}
-
-		fclose(defaults);
-	}
-
-	comment_doc = xmlReadMemory((const char *) comment_xml, comment_xml_len, NULL, NULL, 0);
 
 	if (show_prompts) {
 		if (!skip_code) {

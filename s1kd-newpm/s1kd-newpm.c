@@ -17,6 +17,18 @@
 #define EXIT_BAD_PMC 1
 #define EXIT_PM_EXISTS 2
 
+char model_ident_code[16] = "";
+char pm_issuer[7] = "";
+char pm_number[7] = "";
+char pm_volume[4] = "";
+char language_iso_code[5] = "";
+char country_iso_code[4] = "";
+char issue_number[5] = "";
+char in_work[4] = "";
+char pm_title[256] = "";
+char security_classification[4] = "";
+char enterprise_name[256] = "";
+
 xmlNodePtr find_child(xmlNodePtr parent, char *name)
 {
 	xmlNodePtr cur;
@@ -138,6 +150,30 @@ void show_help(void)
 	puts("  -t    Publication module title");
 }
 
+void copy_default_value(const char *key, const char *val)
+{
+	if (strcmp(key, "modelIdentCode") == 0)
+		strcpy(model_ident_code, val);
+	else if (strcmp(key, "pmIssuer") == 0)
+		strcpy(pm_issuer, val);
+	else if (strcmp(key, "pmNumber") == 0)
+		strcpy(pm_number, val);
+	else if (strcmp(key, "pmVolume") == 0)
+		strcpy(pm_volume, val);
+	else if (strcmp(key, "languageIsoCode") == 0)
+		strcpy(language_iso_code, val);
+	else if (strcmp(key, "countryIsoCode") == 0)
+		strcpy(country_iso_code, val);
+	else if (strcmp(key, "securityClassification") == 0)
+		strcpy(security_classification, val);
+	else if (strcmp(key, "responsiblePartnerCompany") == 0)
+		strcpy(enterprise_name, val);
+	else if (strcmp(key, "issueNumber") == 0)
+		strcpy(issue_number, val);
+	else if (strcmp(key, "inWork") == 0)
+		strcpy(in_work, val);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;
@@ -160,20 +196,6 @@ int main(int argc, char **argv)
 
 	char pm_filename[256];
 
-	char model_ident_code[16] = "";
-	char pm_issuer[7] = "";
-	char pm_number[7] = "";
-	char pm_volume[4] = "";
-	char language_iso_code[5] = "";
-	char country_iso_code[4] = "";
-	char issue_number[5] = "";
-	char in_work[4] = "";
-	char pm_title[256] = "";
-	char security_classification[4] = "";
-	char enterprise_name[256] = "";
-
-	FILE *defaults;
-
 	int c;
 	int i;
 
@@ -189,6 +211,7 @@ int main(int argc, char **argv)
 	char iss[8] = "";
 	bool include_issue_info = false;
 	bool include_language = false;
+	xmlDocPtr defaults_xml;
 
 	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilh?")) != -1) {
 		switch (c) {
@@ -212,39 +235,40 @@ int main(int argc, char **argv)
 		}
 	}
 
-	defaults = fopen(defaults_fname, "r");
+	defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR);
 
-	if (defaults) {
-		char default_line[1024];
-		while (fgets(default_line, 1024, defaults)) {
-			char *def_key;
-			char *def_val;
-			def_key = strtok(default_line, "\t ");
-			def_val = strtok(NULL, "\t\n");
+	if (defaults_xml) {
+		xmlNodePtr cur;
 
-			if (strcmp(def_key, "modelIdentCode") == 0)
-				strcpy(model_ident_code, def_val);
-			else if (strcmp(def_key, "pmIssuer") == 0)
-				strcpy(pm_issuer, def_val);
-			else if (strcmp(def_key, "pmNumber") == 0)
-				strcpy(pm_number, def_val);
-			else if (strcmp(def_key, "pmVolume") == 0)
-				strcpy(pm_volume, def_val);
-			else if (strcmp(def_key, "languageIsoCode") == 0)
-				strcpy(language_iso_code, def_val);
-			else if (strcmp(def_key, "countryIsoCode") == 0)
-				strcpy(country_iso_code, def_val);
-			else if (strcmp(def_key, "securityClassification") == 0)
-				strcpy(security_classification, def_val);
-			else if (strcmp(def_key, "responsiblePartnerCompany") == 0)
-				strcpy(enterprise_name, def_val);
-			else if (strcmp(def_key, "issueNumber") == 0)
-				strcpy(issue_number, def_val);
-			else if (strcmp(def_key, "inWork") == 0)
-				strcpy(in_work, def_val);
+		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+			char *def_key = (char *) cur->name;
+			char *def_val = (char *) xmlNodeGetContent(cur);
+
+			copy_default_value(def_key, def_val);
+
+			xmlFree(def_val);
 		}
 
-		fclose(defaults);
+		xmlFreeDoc(defaults_xml);
+	} else {
+		FILE *defaults;
+
+		defaults = fopen(defaults_fname, "r");
+
+		if (defaults) {
+			char default_line[1024];
+			while (fgets(default_line, 1024, defaults)) {
+				char *def_key;
+				char *def_val;
+
+				def_key = strtok(default_line, "\t ");
+				def_val = strtok(NULL, "\t\n");
+
+				copy_default_value(def_key, def_val);
+			}
+
+			fclose(defaults);
+		}
 	}
 
 	pm_doc = xmlReadMemory((const char *) pm_xml, pm_xml_len, NULL, NULL, 0);

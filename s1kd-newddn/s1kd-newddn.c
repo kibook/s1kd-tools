@@ -22,6 +22,20 @@
 #define EXIT_DDN_EXISTS 1
 #define EXIT_MALFORMED_CODE 2
 
+char model_ident_code[MODEL_IDENT_CODE_MAX] = "";
+char sender_ident[CAGE_MAX] = "";
+char receiver_ident[CAGE_MAX] = "";
+char year_of_data_issue[YEAR_MAX] = "";
+char seq_number[SEQ_NO_MAX] = "";
+char sender[256] = "";
+char receiver[256] = "";
+char sender_city[256] = "";
+char receiver_city[256] = "";
+char sender_country[256] = "";
+char receiver_country[256] = "";
+char security_classification[4] = "";
+char authorization[256] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -102,33 +116,47 @@ void populate_list(xmlNodePtr deliv, int argc, char **argv, int i)
 	}
 }
 
+void copy_default_value(const char *def_key, const char *def_val)
+{
+	if (matches_key_and_not_set(def_key, "modelIdentCode", model_ident_code))
+		strcpy(model_ident_code, def_val);
+	if (matches_key_and_not_set(def_key, "senderIdent", sender_ident))
+		strcpy(sender_ident, def_val);
+	if (matches_key_and_not_set(def_key, "receiverIdent", receiver_ident))
+		strcpy(receiver_ident, def_val);
+	if (matches_key_and_not_set(def_key, "yearOfDataIssue", year_of_data_issue))
+		strcpy(year_of_data_issue, def_val);
+	if (matches_key_and_not_set(def_key, "seqNumber", seq_number))
+		strcpy(seq_number, def_val);
+	if (matches_key_and_not_set(def_key, "originator", sender))
+		strcpy(sender, def_val);
+	if (matches_key_and_not_set(def_key, "receiver", receiver))
+		strcpy(receiver, def_val);
+	if (matches_key_and_not_set(def_key, "city", sender_city))
+		strcpy(sender_city, def_val);
+	if (matches_key_and_not_set(def_key, "receiverCity", receiver_city))
+		strcpy(receiver_city, def_val);
+	if (matches_key_and_not_set(def_key, "country", sender_country))
+		strcpy(sender_country, def_val);
+	if (matches_key_and_not_set(def_key, "receiverCountry", receiver_country))
+		strcpy(receiver_country, def_val);
+	if (matches_key_and_not_set(def_key, "securityClassification", security_classification))
+		strcpy(security_classification, def_val);
+	if (matches_key_and_not_set(def_key, "authorization", authorization))
+		strcpy(authorization, def_val);
+}
+
 int main(int argc, char **argv)
 {
 	int c;
 
 	FILE *defaults;
 	char defaults_fname[PATH_MAX] = "defaults";
-	char default_line[1024];
-	char *def_key, *def_val;
 
 	char ddncode[256] = "";
 
 	int showprompts = 0;
 	int skipcode = 0;
-
-	char model_ident_code[MODEL_IDENT_CODE_MAX] = "";
-	char sender_ident[CAGE_MAX] = "";
-	char receiver_ident[CAGE_MAX] = "";
-	char year_of_data_issue[YEAR_MAX] = "";
-	char seq_number[SEQ_NO_MAX] = "";
-	char sender[256] = "";
-	char receiver[256] = "";
-	char sender_city[256] = "";
-	char receiver_city[256] = "";
-	char sender_country[256] = "";
-	char receiver_country[256] = "";
-	char security_classification[4] = "";
-	char authorization[256] = "";
 
 	xmlDocPtr ddn;
 	xmlNodePtr ddn_code;
@@ -150,6 +178,8 @@ int main(int argc, char **argv)
 
 	char outfile[PATH_MAX];
 
+	xmlDocPtr defaults_xml;
+
 	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
@@ -167,6 +197,37 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR))) {
+		xmlNodePtr cur;
+
+		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+			char *def_key = (char *) cur->name;
+			char *def_val = (char *) xmlNodeGetContent(cur);
+
+			copy_default_value(def_key, def_val);
+
+			xmlFree(def_val);
+		}
+
+		xmlFreeDoc(defaults_xml);
+	} else {
+		defaults = fopen(defaults_fname, "r");
+		if (defaults) {
+			char default_line[1024];
+
+			while (fgets(default_line, 1024, defaults)) {
+				char *def_key, *def_val;
+
+				def_key = strtok(default_line, "\t ");
+				def_val = strtok(NULL, "\t\n");
+
+				copy_default_value(def_key, def_val);
+			}
+
+			fclose(defaults);
+		}
+	}
+
 	if (strcmp(ddncode, "") != 0) {
 		int n;
 
@@ -181,43 +242,6 @@ int main(int argc, char **argv)
 			fprintf(stderr, ERR_PREFIX "Bad DDN code.\n");
 			exit(EXIT_MALFORMED_CODE);
 		}
-	}
-
-	defaults = fopen(defaults_fname, "r");
-	if (defaults) {
-		while (fgets(default_line, 1024, defaults)) {
-			def_key = strtok(default_line, "\t ");
-			def_val = strtok(NULL, "\t\n");
-
-			if (matches_key_and_not_set(def_key, "modelIdentCode", model_ident_code))
-				strcpy(model_ident_code, def_val);
-			if (matches_key_and_not_set(def_key, "senderIdent", sender_ident))
-				strcpy(sender_ident, def_val);
-			if (matches_key_and_not_set(def_key, "receiverIdent", receiver_ident))
-				strcpy(receiver_ident, def_val);
-			if (matches_key_and_not_set(def_key, "yearOfDataIssue", year_of_data_issue))
-				strcpy(year_of_data_issue, def_val);
-			if (matches_key_and_not_set(def_key, "seqNumber", seq_number))
-				strcpy(seq_number, def_val);
-			if (matches_key_and_not_set(def_key, "originator", sender))
-				strcpy(sender, def_val);
-			if (matches_key_and_not_set(def_key, "receiver", receiver))
-				strcpy(receiver, def_val);
-			if (matches_key_and_not_set(def_key, "city", sender_city))
-				strcpy(sender_city, def_val);
-			if (matches_key_and_not_set(def_key, "receiverCity", receiver_city))
-				strcpy(receiver_city, def_val);
-			if (matches_key_and_not_set(def_key, "country", sender_country))
-				strcpy(sender_country, def_val);
-			if (matches_key_and_not_set(def_key, "receiverCountry", receiver_country))
-				strcpy(receiver_country, def_val);
-			if (matches_key_and_not_set(def_key, "securityClassification", security_classification))
-				strcpy(security_classification, def_val);
-			if (matches_key_and_not_set(def_key, "authorization", authorization))
-				strcpy(authorization, def_val);
-		}
-
-		fclose(defaults);
 	}
 
 	if (showprompts) {

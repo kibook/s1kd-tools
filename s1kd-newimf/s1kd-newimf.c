@@ -14,6 +14,15 @@
 
 #define EXIT_IMF_EXISTS 1
 
+char issue_number[5] = "";
+char in_work[4] = "";
+char security_classification[4] = "";
+char responsible_partner_company[256] = "";
+char responsible_partner_company_code[7] = "";
+char originator[256] = "";
+char originator_code[7] = "";
+char icn_title[256] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -91,6 +100,17 @@ void show_help(void)
 	puts("  -t          ICN title");
 }
 
+void copy_default_value(const char *def_key, const char *def_val)
+{
+	copy_def_val(issue_number, "issueNumber", def_key, def_val);
+	copy_def_val(in_work, "inWork", def_key, def_val);
+	copy_def_val(security_classification, "securityClassification", def_key, def_val);
+	copy_def_val(responsible_partner_company, "responsiblePartnerCompany", def_key, def_val);
+	copy_def_val(responsible_partner_company_code, "responsiblePartnerCompanyCode", def_key, def_val);
+	copy_def_val(originator, "originator", def_key, def_val);
+	copy_def_val(originator_code, "originatorCode", def_key, def_val);
+}
+
 int main(int argc, char **argv)
 {
 	int i;
@@ -101,14 +121,7 @@ int main(int argc, char **argv)
 	FILE *defaults;
 	char defaults_fname[PATH_MAX] = "defaults";
 
-	char issue_number[5] = "";
-	char in_work[4] = "";
-	char security_classification[4] = "";
-	char responsible_partner_company[256] = "";
-	char responsible_partner_company_code[7] = "";
-	char originator[256] = "";
-	char originator_code[7] = "";
-	char icn_title[256] = "";
+	xmlDocPtr defaults_xml;
 
 	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:h?")) != -1) {
 		switch (i) {
@@ -128,20 +141,27 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((defaults = fopen(defaults_fname, "r"))) {
-		char defaults_line[1024], *def_key, *def_val;
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR))) {
+		xmlNodePtr cur;
+
+		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+			char *def_key = (char *) cur->name;
+			char *def_val = (char *) xmlNodeGetContent(cur);
+
+			copy_default_value(def_key, def_val);
+			
+			xmlFree(def_val);
+		}
+
+		xmlFreeDoc(defaults_xml);
+	} else if ((defaults = fopen(defaults_fname, "r"))) {
+		char defaults_line[1024];
 
 		while (fgets(defaults_line, 1024, defaults)) {
-			def_key = strtok(defaults_line, "\t ");
-			def_val = strtok(NULL, "\t\n");
+			char *def_key = strtok(defaults_line, "\t ");
+			char *def_val = strtok(NULL, "\t\n");
 
-			copy_def_val(issue_number, "issueNumber", def_key, def_val);
-			copy_def_val(in_work, "inWork", def_key, def_val);
-			copy_def_val(security_classification, "securityClassification", def_key, def_val);
-			copy_def_val(responsible_partner_company, "responsiblePartnerCompany", def_key, def_val);
-			copy_def_val(responsible_partner_company_code, "responsiblePartnerCompanyCode", def_key, def_val);
-			copy_def_val(originator, "originator", def_key, def_val);
-			copy_def_val(originator_code, "originatorCode", def_key, def_val);
+			copy_default_value(def_key, def_val);
 		}
 
 		fclose(defaults);

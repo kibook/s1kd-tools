@@ -246,6 +246,16 @@ pmIssuer                  KHZAE
 pmNumber                  00001
 pmVolume                  00]]></verbatimText>
           </para>
+          <para>Alternatively, the 'defaults' file can be written using an XML format where each child element represents the identifier and its content is the default value:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
+<defaults>
+  <!-- General -->
+  <modelIdentCode>S1000DTOOLS</modelIdentCode>
+  <securityClassification>01</securityClassification>
+  [...]
+</defaults>]]></verbatimText>
+          </para>
         </levelledPara>
         <levelledPara>
           <title>'dmtypes' file</title>
@@ -259,6 +269,14 @@ pmVolume                  00]]></verbatimText>
 024    brdoc
 040    descript
 520    proced]]></verbatimText>
+          </para>
+          <para>Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>.</para>
+          <para>
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
+<dmtypes>
+  <type infoCode="040" schema="descript"/>
+  <type infoCode="520" schema="proced"/>
+</dmtypes>]]></verbatimText>
           </para>
         </levelledPara>
       </levelledPara>
