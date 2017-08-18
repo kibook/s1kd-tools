@@ -140,13 +140,13 @@ Each line consists of the identifier of a piece of metadata and its default valu
     pmNumber                  00001
     pmVolume                  00
 
-Alternatively, the 'defaults' file can be written using an XML format where each child element represents the identifier and its content is the default value:
+Alternatively, the 'defaults' file can be written using an XML format, containing a root element `defaults` with child elements `default` which each have an attribute `ident` and an attribute `value`.
 
     <?xml version="1.0"?>
     <defaults>
       <!-- General -->
-      <modelIdentCode>S1000DTOOLS</modelIdentCode>
-      <securityClassification>01</securityClassification>
+      <default ident="modelIdentCode" value="S1000DTOOLS"/>
+      <default ident="securityClassification" value="01"/>
       [...]
     </defaults>
 

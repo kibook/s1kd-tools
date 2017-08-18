@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="16"/>
+        <issueDate year="2017" month="08" day="18"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -246,13 +246,13 @@ pmIssuer                  KHZAE
 pmNumber                  00001
 pmVolume                  00]]></verbatimText>
           </para>
-          <para>Alternatively, the 'defaults' file can be written using an XML format where each child element represents the identifier and its content is the default value:</para>
+          <para>Alternatively, the 'defaults' file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
           <para>
             <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
 <defaults>
   <!-- General -->
-  <modelIdentCode>S1000DTOOLS</modelIdentCode>
-  <securityClassification>01</securityClassification>
+  <default ident="modelIdentCode" value="S1000DTOOLS"/>
+  <default ident="securityClassification" value="01"/>
   [...]
 </defaults>]]></verbatimText>
           </para>

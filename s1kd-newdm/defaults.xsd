@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="defaultElemType">
+    <xs:attribute name="ident" type="xs:string"/>
+    <xs:attribute name="value" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="defaultsElemType">
+    <xs:sequence>
+      <xs:element name="default" type="defaultElemType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="defaults" type="defaultsElemType"/>
+</xs:schema>

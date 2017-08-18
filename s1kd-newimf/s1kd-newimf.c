@@ -145,11 +145,18 @@ int main(int argc, char **argv)
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
-			char *def_key = (char *) cur->name;
-			char *def_val = (char *) xmlNodeGetContent(cur);
+			char *def_key, *def_val;
+
+			if (cur->type != XML_ELEMENT_NODE) continue;
+			if (!xmlHasProp(cur, BAD_CAST "ident")) continue;
+			if (!xmlHasProp(cur, BAD_CAST "value")) continue;
+
+			def_key = (char *) xmlGetProp(cur, BAD_CAST "ident");
+			def_val = (char *) xmlGetProp(cur, BAD_CAST "value");
 
 			copy_default_value(def_key, def_val);
-			
+
+			xmlFree(def_key);
 			xmlFree(def_val);
 		}
 
