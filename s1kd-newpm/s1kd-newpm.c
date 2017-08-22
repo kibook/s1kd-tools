@@ -235,7 +235,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR);
+	defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
 
 	if (defaults_xml) {
 		xmlNodePtr cur;

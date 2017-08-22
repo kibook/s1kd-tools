@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR))) {
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
