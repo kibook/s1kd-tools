@@ -17,6 +17,7 @@ templates.h: templates/*
 	xxd -i templates/comrep.xml >> templates.h
 	xxd -i templates/prdcrossreftable.xml >> templates.h
 	xxd -i templates/condcrossreftable.xml >> templates.h
+	xxd -i templates/process.xml >> templates.h
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)

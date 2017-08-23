@@ -423,6 +423,8 @@ int main(int argc, char **argv)
 		dm = xmlReadMemory((const char *) templates_condcrossreftable_xml, templates_condcrossreftable_xml_len, NULL, NULL, 0);
 	else if (strcmp(dmtype, "comrep") == 0)
 		dm = xmlReadMemory((const char *) templates_comrep_xml, templates_comrep_xml_len, NULL, NULL, 0);
+	else if (strcmp(dmtype, "process") == 0)
+		dm = xmlReadMemory((const char *) templates_process_xml, templates_process_xml_len, NULL, NULL, 0);
 	else {
 		fprintf(stderr, "ERROR: Unknown dmtype %s\n", dmtype);
 		exit(EXIT_UNKNOWN_DMTYPE);

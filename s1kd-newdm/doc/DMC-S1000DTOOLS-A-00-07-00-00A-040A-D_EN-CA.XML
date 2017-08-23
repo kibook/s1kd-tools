@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="18"/>
+        <issueDate year="2017" month="08" day="23"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -182,6 +182,9 @@
                     </listItem>
                     <listItem>
                       <para>proced - Procedural</para>
+                    </listItem>
+                    <listItem>
+                      <para>process - Process</para>
                     </listItem>
                   </randomList>
                 </para>
