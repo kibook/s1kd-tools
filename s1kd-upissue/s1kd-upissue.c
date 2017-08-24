@@ -15,12 +15,12 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-vin] DATAMODULE");
+	puts("Usage: " PROG_NAME " [-viN] DATAMODULE");
 	putchar('\n');
 	puts("Options:");
 	puts("  -v	Print filename of upissued data module");
 	puts("  -i	Create a new issue of the data module");
-	puts("  -n	Omit issue/inwork numbers from filename");
+	puts("  -N	Omit issue/inwork numbers from filename");
 }
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 
 	bool no_issue = false;
 
-	while ((c = getopt(argc, argv, "ivs:nfh?")) != -1) {
+	while ((c = getopt(argc, argv, "ivs:Nfh?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 			case 's':
 				strcpy(status, optarg);
 				break;
-			case 'n':
+			case 'N':
 				no_issue = true;
 				overwrite = true;
 				break;

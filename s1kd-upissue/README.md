@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-s1kd-upissue \[-vin\] \[-s &lt;status&gt;\] &lt;files&gt;
+s1kd-upissue \[-viN\] \[-s &lt;status&gt;\] &lt;files&gt;
 
 DESCRIPTION
 ===========
@@ -27,7 +27,7 @@ Increase the issue number of the data module. By default, the in-work issue is i
 -s &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.
 
--n  
+-N  
 Omit issue/inwork numbers from filename.
 
 EXAMPLES
@@ -58,7 +58,7 @@ Data module without issue/inwork in filename
 
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML issueInfo
     000-01
-    $ s1kd-upissue -n DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
+    $ s1kd-upissue -N DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML issueInfo
     000-02
 
