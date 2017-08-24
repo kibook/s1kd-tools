@@ -12,6 +12,7 @@
 
 #define EXIT_NO_FILE 1
 #define EXIT_NO_OVERWRITE 2
+#define EXIT_BAD_FILENAME 3
 
 void show_help(void)
 {
@@ -137,6 +138,11 @@ int main(int argc, char **argv)
 			issueInfo = NULL;
 		}
 
+		if (!issueInfo && no_issue) {
+			fprintf(stderr, ERR_PREFIX "Cannot use -N when file does not contain issue info metadata.\n");
+			exit(EXIT_NO_OVERWRITE);
+		}
+
 		if (issueInfo) {
 			issueNumber = (char *) xmlGetProp(issueInfo, (xmlChar *) "issueNumber");
 			inWork = (char *) xmlGetProp(issueInfo, (xmlChar *) "inWork");
@@ -144,6 +150,11 @@ int main(int argc, char **argv)
 			char *i;
 
 			i = strchr(dmfile, '_') + 1;
+
+			if (i < dmfile || i > dmfile + strlen(dmfile) - 6) {
+				fprintf(stderr, ERR_PREFIX "Filename does not contain issue info and -N not specified.\n");
+				exit(EXIT_BAD_FILENAME);
+			}
 
 			issueNumber = calloc(4, 1);
 			inWork = calloc(3, 1);
