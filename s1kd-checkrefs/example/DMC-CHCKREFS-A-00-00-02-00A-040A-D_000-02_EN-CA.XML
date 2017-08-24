@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="CHCKREFS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="02" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="02"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="08" day="24"/>
+        <dmTitle>
+          <techName>s1kd-checkrefs example</techName>
+          <infoName>Data module with reference including title</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <sourceDmIdent>
+        <dmCode modelIdentCode="CHCKREFS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="02" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </sourceDmIdent><security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName/>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName/>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <remarks>
+        <simplePara>This data module demonstrates the use of the -u option. This data module references CHCKREFS-A-00-00-00-00A-040A-D, but the title in the reference does not match the title of the referenced data module, perhaps because the referenced data module's title was at some point changed. The -u option will update the address items in any valid references it finds.</simplePara>
+      </remarks>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <para>Refer to <dmRef><dmRefIdent><dmCode modelIdentCode="CHCKREFS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/></dmRefIdent><dmRefAddressItems><dmTitle>
+          <techName>s1kd-checkrefs example</techName>
+          <infoName>Main data module</infoName>
+        </dmTitle></dmRefAddressItems></dmRef>.</para>
+    </description>
+  </content>
+</dmodule>
