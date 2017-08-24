@@ -61,3 +61,28 @@ Available metadata names
 -   techName
 
 -   type
+
+EXAMPLE
+=======
+
+    $ ls
+    DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+
+    $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+    issueDate                      2017-08-14
+    techName                       s1kd-metadata(1) | General Commands Manual
+    responsiblePartnerCompany      khzae.net
+    originator                     khzae.net
+    securityClassification         01
+    schema                         http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd
+    type                           dmodule
+    applic                         All
+    brex                           S1000D-F-04-10-0301-00A-022A-D
+    issueType                      new
+    language                       en-CA
+    issueInfo                      001-00
+    dmCode                         S1000DTOOLS-A-00-09-00-00A-040A-D
+
+    $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML techName 'New title'
+    $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML techName
+    techName                       New title
