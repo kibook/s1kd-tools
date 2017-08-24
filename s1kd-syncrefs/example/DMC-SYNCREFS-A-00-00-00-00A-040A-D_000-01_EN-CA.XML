@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="SYNCREFS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="08" day="24"/>
+        <dmTitle>
+          <techName>s1kd-syncrefs example</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName/>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName/>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <para>
+        <randomList>
+          <title>Various references</title>
+          <listItem>
+            <para>
+              <dmRef>
+                <dmRefIdent>
+                  <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+                </dmRefIdent>
+                <dmRefAddressItems>
+                  <dmTitle>
+                    <techName>s1kd-instance</techName>
+                    <infoName>Description</infoName>
+                  </dmTitle>
+                </dmRefAddressItems>
+              </dmRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <dmRef>
+                <dmRefIdent>
+                  <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+                </dmRefIdent>
+                <dmRefAddressItems>
+                  <dmTitle>
+                    <techName>s1kd-newdm</techName>
+                    <infoName>Description</infoName>
+                  </dmTitle>
+                </dmRefAddressItems>
+              </dmRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <dmRef>
+                <dmRefIdent>
+                  <dmCode modelIdentCode="S1000D" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="9" assyCode="0502" disassyCode="01" disassyCodeVariant="C" infoCode="040" infoCodeVariant="A" itemLocationCode="A"/>
+                </dmRefIdent>
+                <dmRefAddressItems>
+                  <dmTitle>
+                    <techName>Chapter 3.9.5.2.1.2</techName>
+                    <infoName>Common constructs - Referencing</infoName>
+                  </dmTitle>
+                </dmRefAddressItems>
+              </dmRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <pmRef>
+                <pmRefIdent>
+                  <pmCode modelIdentCode="S1000D" pmIssuer="B6865" pmNumber="01000" pmVolume="00"/>
+                </pmRefIdent>
+                <pmRefAddressItems>
+                  <pmTitle>International specification for technical publications</pmTitle>
+                </pmRefAddressItems>
+              </pmRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="http://s1000d.org">
+                <externalPubRefIdent>
+                  <externalPubCode>s1000d.org</externalPubCode>
+                  <externalPubTitle>S1000D website</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+        </randomList>
+      </para>
+    </description>
+  </content>
+</dmodule>
