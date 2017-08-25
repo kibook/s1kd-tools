@@ -16,6 +16,7 @@ void neutralizeFile(const char *fname, const char *outfile)
 {
 	xmlDocPtr doc, res, styledoc, orig;
 	xsltStylesheetPtr style;
+	xmlNodePtr oldroot;
 
 	orig = xmlReadFile(fname, NULL, 0);
 
@@ -34,6 +35,10 @@ void neutralizeFile(const char *fname, const char *outfile)
 	res = xsltApplyStylesheet(style, doc, NULL);
 	xmlFreeDoc(doc);
 	xsltFreeStylesheet(style);
+
+	oldroot = xmlDocGetRootElement(orig);
+	xmlUnlinkNode(oldroot);
+	xmlFreeNode(oldroot);
 
 	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
 
@@ -77,6 +82,9 @@ int main(int argc, char **argv)
 	}
 
 	free(outfile);
+
+	xsltCleanupGlobals();
+	xmlCleanupParser();
 
 	return 0;
 }
