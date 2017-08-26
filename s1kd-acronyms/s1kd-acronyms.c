@@ -151,6 +151,7 @@ void printAcronyms(xmlNodePtr acronyms, const char *path)
 
 			xmlFree(term);
 			xmlFree(defn);
+			xmlFree(type);
 		}
 	}
 
