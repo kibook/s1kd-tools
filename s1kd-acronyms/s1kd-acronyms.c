@@ -182,16 +182,12 @@ xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 	const char *params[3];
 	char *typesParam;
 
-	if (types) {
-		typesParam = malloc(strlen(types) + 3);
-		sprintf(typesParam, "'%s'", types);
+	typesParam = malloc(strlen(types) + 3);
+	sprintf(typesParam, "'%s'", types);
 
-		params[0] = "types";
-		params[1] = typesParam;
-		params[2] = NULL;
-	} else {
-		params[0] = NULL;
-	}
+	params[0] = "types";
+	params[1] = typesParam;
+	params[2] = NULL;
 
 	styleDoc = xmlReadMemory((const char *) stylesheets_types_xsl, stylesheets_types_xsl_len, NULL, NULL, 0);
 
@@ -199,8 +195,7 @@ xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 
 	result = xsltApplyStylesheet(style, doc, params);
 
-	if (types)
-		free(typesParam);
+	free(typesParam);
 
 	xmlFreeDoc(doc);
 	xsltFreeStylesheet(style);
@@ -279,7 +274,8 @@ int main(int argc, char **argv)
 
 	doc = removeNonUniqueAcronyms(doc);
 
-	doc = limitToTypes(doc, types);
+	if (types)
+		doc = limitToTypes(doc, types);
 
 	if (xmlOut) {
 		switch (xmlFormat) {
