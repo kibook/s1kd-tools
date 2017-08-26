@@ -1,0 +1,8 @@
+AIA                at01  Aerospace Industries Association
+ASD                at01  AeroSpace Defence Industries Association of Europe
+ATA                at01  Air Transport Association
+HTML               at01  Hyper Text Markup Language
+XML                at01  Extensible Markup Language
+XSL                at01  Extensible Stylesheet Language
+markup language    at02  A system for annotating a document in a way that is syntactically distinguishable from the text
+military aircraft  at02  Any fixed-wing or rotary-wing aircraft that is operated by a legal or insurrectionary armed service of any type

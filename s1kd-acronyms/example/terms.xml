@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<acronyms>
+  <acronym acronymType="at02">
+    <acronymTerm>markup language</acronymTerm>
+    <acronymDefinition>A system for annotating a document in a way that is syntactically distinguishable from the text</acronymDefinition>
+  </acronym>
+  <acronym acronymType="at02">
+    <acronymTerm>military aircraft</acronymTerm>
+    <acronymDefinition>Any fixed-wing or rotary-wing aircraft that is operated by a legal or insurrectionary armed service of any type</acronymDefinition>
+  </acronym>
+</acronyms>

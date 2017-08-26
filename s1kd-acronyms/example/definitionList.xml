@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<definitionList>
+  <definitionListItem>
+    <listItemTerm>AIA</listItemTerm>
+    <listItemDefinition>
+      <para>Aerospace Industries Association</para>
+    </listItemDefinition>
+  </definitionListItem>
+  <definitionListItem>
+    <listItemTerm>ASD</listItemTerm>
+    <listItemDefinition>
+      <para>AeroSpace Defence Industries Association of Europe</para>
+    </listItemDefinition>
+  </definitionListItem>
+  <definitionListItem>
+    <listItemTerm>ATA</listItemTerm>
+    <listItemDefinition>
+      <para>Air Transport Association</para>
+    </listItemDefinition>
+  </definitionListItem>
+  <definitionListItem>
+    <listItemTerm>HTML</listItemTerm>
+    <listItemDefinition>
+      <para>Hyper Text Markup Language</para>
+    </listItemDefinition>
+  </definitionListItem>
+  <definitionListItem>
+    <listItemTerm>XML</listItemTerm>
+    <listItemDefinition>
+      <para>Extensible Markup Language</para>
+    </listItemDefinition>
+  </definitionListItem>
+  <definitionListItem>
+    <listItemTerm>XSL</listItemTerm>
+    <listItemDefinition>
+      <para>Extensible Stylesheet Language</para>
+    </listItemDefinition>
+  </definitionListItem>
+</definitionList>

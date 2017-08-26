@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<acronyms>
+  <acronym acronymType="at01">
+    <acronymTerm>AIA</acronymTerm>
+    <acronymDefinition>Aerospace Industries Association</acronymDefinition>
+  </acronym>
+  <acronym acronymType="at01">
+    <acronymTerm>ASD</acronymTerm>
+    <acronymDefinition>AeroSpace Defence Industries Association of Europe</acronymDefinition>
+  </acronym>
+  <acronym acronymType="at01">
+    <acronymTerm>ATA</acronymTerm>
+    <acronymDefinition>Air Transport Association</acronymDefinition>
+  </acronym>
+  <acronym acronymType="at01">
+    <acronymTerm>HTML</acronymTerm>
+    <acronymDefinition>Hyper Text Markup Language</acronymDefinition>
+  </acronym>
+  <acronym acronymType="at01">
+    <acronymTerm>XML</acronymTerm>
+    <acronymDefinition>Extensible Markup Language</acronymDefinition>
+  </acronym>
+  <acronym acronymType="at01">
+    <acronymTerm>XSL</acronymTerm>
+    <acronymDefinition>Extensible Stylesheet Language</acronymDefinition>
+  </acronym>
+</acronyms>

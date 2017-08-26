@@ -1,4 +1,5 @@
 all:
+	$(MAKE) -C s1kd-acronyms
 	$(MAKE) -C s1kd-brexcheck
 	$(MAKE) -C s1kd-checkrefs
 	$(MAKE) -C s1kd-dmls
@@ -17,6 +18,7 @@ all:
 	$(MAKE) -C s1kd-validate
 
 clean:
+	$(MAKE) -C s1kd-acronyms clean
 	$(MAKE) -C s1kd-brexcheck clean
 	$(MAKE) -C s1kd-checkrefs clean
 	$(MAKE) -C s1kd-dmls clean
@@ -35,6 +37,7 @@ clean:
 	$(MAKE) -C s1kd-validate clean
 
 install:
+	$(MAKE) -C s1kd-acronyms install
 	$(MAKE) -C s1kd-brexcheck install
 	$(MAKE) -C s1kd-checkrefs install
 	$(MAKE) -C s1kd-dmls install
