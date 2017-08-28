@@ -16,7 +16,7 @@ $(OUTPUT): $(SOURCE) strings.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(OUTPUT) strings.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

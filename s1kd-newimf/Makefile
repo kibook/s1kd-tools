@@ -14,7 +14,7 @@ $(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT) $(OUTPUT).exe
+	rm -f $(OUTPUT) template.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
