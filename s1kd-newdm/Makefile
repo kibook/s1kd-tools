@@ -18,12 +18,13 @@ templates.h: templates/*
 	xxd -i templates/prdcrossreftable.xml >> templates.h
 	xxd -i templates/condcrossreftable.xml >> templates.h
 	xxd -i templates/process.xml >> templates.h
+	xxd -i templates/ipd.xml >> templates.h
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT) $(OUTPUT).exe
+	rm -f $(OUTPUT) templates.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

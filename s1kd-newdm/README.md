@@ -78,6 +78,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   frontmatter - Front matter
 
+-   ipd - Illustrated parts data
+
 -   prdcrossreftable - Product cross-reference table
 
 -   proced - Procedural
