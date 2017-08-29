@@ -1184,6 +1184,8 @@ void replace_applic_ref(xmlNodePtr ref, xmlNodePtr applic)
 	id = xmlGetProp(ref, BAD_CAST "id");
 	xmlSetProp(a, BAD_CAST "id", id);
 	xmlFree(id);
+	xmlUnlinkNode(ref);
+	xmlFreeNode(ref);
 }
 
 void replace_applic_refs(xmlDocPtr dm, xmlNodePtr applicSpecIdent, xmlNodePtr applic)
