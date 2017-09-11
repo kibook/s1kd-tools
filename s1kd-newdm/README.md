@@ -76,6 +76,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   descript - Descriptive
 
+-   fault - Fault information
+
 -   frontmatter - Front matter
 
 -   ipd - Illustrated parts data
