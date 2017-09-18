@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="CHCKREFS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="01" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="000" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2017" month="08" day="23"/>
@@ -51,7 +51,7 @@
         <externalPubRef>
           <externalPubRefIdent>
             <externalPubCode pubCodingScheme="ISBN">1501089390</externalPubCode>
-            <externalPubTitle>Incorrect title</externalPubTitle>
+            <externalPubTitle>Managing Your First S1000D Project: A Guide for Technical Publications Project Managers</externalPubTitle>
           </externalPubRefIdent>
           <externalPubRefAddressItems>
             <externalPubIssueDate year="2014" month="11"/>

@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="J" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2017" month="09" day="17"/>
         <dmTitle>
           <techName>s1kd-checkrefs(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -89,6 +89,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-e</listItemTerm>
+              <listItemDefinition>
+                <para>Check/update external publication references against a pre-defined list of publications.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
@@ -102,6 +108,26 @@
             </definitionListItem>
           </definitionList>
         </para>
+        <levelledPara>
+          <title>External publication list (-e)</title>
+          <para>Since external publications can be of any format, in order to check references to them, their metadata must be specified in an XML format for the s1kd-checkrefs tool to read.</para>
+          <para>The root element of the XML file is the <verbatimText verbatimStyle="vs12">externalPubs</verbatimText> element. Each external publication is represented by an element <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText>. The identifying elements of the publication are stored in the <verbatimText verbatimStyle="vs12">externalPubIdent</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefIdent</verbatimText> element). The address items are stored in the <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefAddressItems</verbatimText> element).</para>
+          <para>Example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+<externalPubs>
+  <externalPubAddress>
+    <externalPubIdent>
+      <externalPubCode>s1kd-checkrefs</externalPubCode>
+      <externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
+    </externalPubIdent>
+    <externalPubAddressItems>
+      <externalPubIssueDate year="2017" month="08" day="14"/>
+    </externalPubAddressItems>
+  </externalPubAddress>
+</externalPubs>]]></verbatimText>
+          </para>
+        </levelledPara>
       </levelledPara>
     </description>
   </content>

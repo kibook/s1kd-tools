@@ -11,9 +11,18 @@
 
 #define EXIT_VALIDITY_ERR 1
 
+#define ADDR_PATH     "//dmAddress|//pmAddress"
+#define ADDR_PATH_EXT "//dmAddress|//pmAddress|//externalPubAddress"
+
+#define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//pmRef"
+#define REFS_PATH_CONTENT_EXT BAD_CAST "//content//dmRef|//content//pmRef|//content//externalPubRef"
+#define REFS_PATH BAD_CAST "//dmRef|//pmRef"
+#define REFS_PATH_EXT BAD_CAST "//dmRef|//pmRef|//externalPubRef"
+
 bool verbose = false;
 bool validateOnly = true;
 bool failOnInvalid = false;
+bool checkExtPubRefs = false;
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -253,6 +262,33 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	}
 }
 
+void getExtPubCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
+{
+	xmlNodePtr externalPubCode;
+	char *scheme;
+	char *code;
+
+	externalPubCode = findChild(ident, "externalPubCode");
+
+	if (!externalPubCode) {
+		externalPubCode = findChild(ident, "externalPubTitle");
+	}
+
+	scheme = (char *) xmlGetProp(externalPubCode, BAD_CAST "pubCodingScheme");
+	code = (char *) xmlNodeGetContent(externalPubCode);
+
+	if (scheme) {
+		strcpy(dst, scheme);
+		strcat(dst, " ");
+		strcat(dst, code);
+	} else {
+		strcpy(dst, code);
+	}
+
+	xmlFree(scheme);
+	xmlFree(code);
+}
+
 bool isDmRef(xmlNodePtr ref)
 {
 	return strcmp((char *) ref->name, "dmRef") == 0;
@@ -317,6 +353,37 @@ bool samePm(xmlNodePtr ref, xmlNodePtr address)
 	return strcmp(refcode, addcode) == 0;
 }
 
+bool isExtPubRef(xmlNodePtr ref)
+{
+	return strcmp((char *) ref->name, "externalPubRef") == 0;
+}
+
+bool sameExtPubRef(xmlNodePtr ref, xmlNodePtr address)
+{
+	char refcode[256], addcode[256];
+	bool withIssue;
+
+	xmlNodePtr ref_extPubIdent;
+	xmlNodePtr add_extPubIdent;
+
+	if (!isExtPubRef(ref) || strcmp((char *) address->name, "externalPubAddress") != 0)
+		return false;
+
+	ref_extPubIdent = findChild(ref, "externalPubRefIdent");
+	add_extPubIdent = findChild(address, "externalPubIdent");
+
+	withIssue = findChild(ref_extPubIdent, "externalPubIssueInfo");
+
+	getExtPubCode(refcode, ref_extPubIdent, withIssue, false);
+	getExtPubCode(addcode, add_extPubIdent, withIssue, false);
+
+	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
+		printf("    Updating reference to external pub %s...\n", addcode);
+	}
+
+	return strcmp(refcode, addcode) == 0;
+}
+
 void validityError(xmlNodePtr ref, const char *fname)
 {
 	char *prefix = "";
@@ -328,6 +395,9 @@ void validityError(xmlNodePtr ref, const char *fname)
 	} else if (isPmRef(ref)) {
 		prefix = "pub module";
 		getPmCode(code, firstXPathNode("pmRefIdent", ref->doc, ref), false, false);
+	} else if (isExtPubRef(ref)) {
+		prefix = "external pub";
+		getExtPubCode(code, firstXPathNode("externalPubRefIdent", ref->doc, ref), false, false);
 	}
 
 	fprintf(stderr, ERR_PREFIX "%s (Line %d): invalid reference to %s %s.\n", fname, ref->line, prefix, code);
@@ -370,6 +440,32 @@ void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname)
 				if (pmRefIssueDate) replaceNode(pmRefIssueDate, issueDate);
 				if (pmRefTitle)     replaceNode(pmRefTitle, pmTitle);
 			}
+		} else if (checkExtPubRefs && sameExtPubRef(ref, cur)) {
+			isValid = true;
+
+			if (!validateOnly) {
+				xmlNodePtr extPubIdent = findChild(cur, "externalPubIdent");
+				xmlNodePtr extPubTitle = findChild(extPubIdent, "externalPubTitle");
+				xmlNodePtr extPubAddressItems = findChild(cur, "externalPubAddressItems");
+				xmlNodePtr extPubIssueDate = findChild(extPubAddressItems, "externalPubIssueDate");
+				xmlNodePtr extPubSecurity = findChild(extPubAddressItems, "security");
+				xmlNodePtr extPubRPC = findChild(extPubAddressItems, "responsiblePartnerCompany");
+				xmlNodePtr extPubShortTitle = findChild(extPubAddressItems, "shortExternalPubTitle");
+				xmlNodePtr extPubRefIdent = findChild(ref, "externalPubRefIdent");
+				xmlNodePtr extPubRefTitle = findChild(extPubRefIdent, "externalPubTitle");
+				xmlNodePtr extPubRefAddressItems = findChild(ref, "externalPubRefAddressItems");
+				xmlNodePtr extPubRefIssueDate = findChild(extPubRefAddressItems, "externalPubIssueDate");
+				xmlNodePtr extPubRefSecurity = findChild(extPubRefAddressItems, "security");
+				xmlNodePtr extPubRefRPC = findChild(extPubRefAddressItems, "responsiblePartnerCompany");
+				xmlNodePtr extPubRefShortTitle = findChild(extPubRefAddressItems, "shortExternalPubTitle");
+
+				if (extPubRefIssueDate)  replaceNode(extPubRefIssueDate, extPubIssueDate);
+				if (extPubRefTitle)      replaceNode(extPubRefTitle, extPubTitle);
+				if (extPubRefSecurity)   replaceNode(extPubRefSecurity, extPubSecurity);
+				if (extPubRefRPC)        replaceNode(extPubRefRPC, extPubRPC);
+				if (extPubRefShortTitle) replaceNode(extPubRefShortTitle, extPubShortTitle);
+			}
+
 		}
 	}
 
@@ -387,7 +483,7 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-h?]");
+	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-cuFevh?]");
 	puts("");
 	puts("Options:");
 	puts("  -s <source>    Use only <source> as source.");
@@ -395,6 +491,7 @@ void showHelp(void)
 	puts("  -c             Only check references in content section of targets.");
 	puts("  -u             Update address items of references.");
 	puts("  -F             Fail on first invalid reference, returning error code.");
+	puts("  -e             Check externalPubRefs");
 	puts("  -v             Verbose output.");
 	puts("  -h -?          Show help/usage message.");
 }
@@ -402,20 +499,38 @@ void showHelp(void)
 void addAddress(const char *fname, xmlNodePtr addresses)
 {
 	xmlDocPtr doc;
-	xmlNodePtr address;
+	xmlNodePtr root;
 
 	doc = xmlReadFile(fname, NULL, 0);
 
 	if (!doc)
 		return;
-	
+
 	if (verbose)
 		printf("Registering %s...\n", fname);
-	
-	address = firstXPathNode("//dmAddress|//pmAddress", doc, NULL);
 
-	if (address) {
-		xmlAddChild(addresses, xmlCopyNode(address, 1));
+	root = xmlDocGetRootElement(doc);
+
+	if (checkExtPubRefs && strcmp((char *) root->name, "externalPubs") == 0) {
+		xmlXPathContextPtr ctx;
+		xmlXPathObjectPtr obj;
+
+		ctx = xmlXPathNewContext(doc);
+		obj = xmlXPathEvalExpression(BAD_CAST "//externalPubAddress", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			int i;
+
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlAddChild(addresses, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
+			}
+		}
+	} else {
+		xmlNodePtr address = firstXPathNode(ADDR_PATH, doc, NULL);
+
+		if (address) {
+			xmlAddChild(addresses, xmlCopyNode(address, 1));
+		}
 	}
 
 	xmlFreeDoc(doc);
@@ -438,9 +553,17 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly)
 	ctx = xmlXPathNewContext(doc);
 
 	if (contentOnly) {
-		obj = xmlXPathEvalExpression(BAD_CAST "//content//dmRef|//content//pmRef", ctx);
+		if (checkExtPubRefs) {
+			obj = xmlXPathEvalExpression(REFS_PATH_CONTENT_EXT, ctx);
+		} else {
+			obj = xmlXPathEvalExpression(REFS_PATH_CONTENT, ctx);
+		}
 	} else {
-		obj = xmlXPathEvalExpression(BAD_CAST "//dmRef|//pmRef", ctx);
+		if (checkExtPubRefs) {
+			obj = xmlXPathEvalExpression(REFS_PATH_EXT, ctx);
+		} else {
+			obj = xmlXPathEvalExpression(REFS_PATH, ctx);
+		}
 	}
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval))
@@ -466,7 +589,7 @@ int main(int argc, char **argv)
 	char *source = NULL;
 	char *target = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFvh?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFveh?")) != -1) {
 		switch (i) {
 			case 's':
 				source = strdup(optarg);
@@ -485,6 +608,9 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				verbose = true;
+				break;
+			case 'e':
+				checkExtPubRefs = true;
 				break;
 			case 'h':
 			case '?':
