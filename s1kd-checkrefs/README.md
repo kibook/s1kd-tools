@@ -31,8 +31,33 @@ Update the address items of all valid references found within the specified modu
 -F  
 Fail on first invalid reference and return an error code.
 
+-e  
+Check/update external publication references against a pre-defined list of publications.
+
 -v  
 Verbose output.
 
 -h -?  
 Show help/usage message
+
+External publication list (-e)
+------------------------------
+
+Since external publications can be of any format, in order to check references to them, their metadata must be specified in an XML format for the s1kd-checkrefs tool to read.
+
+The root element of the XML file is the `externalPubs` element. Each external publication is represented by an element `externalPubAddress`. The identifying elements of the publication are stored in the `externalPubIdent` element (corresponding with the `externalPubRefIdent` element). The address items are stored in the `externalPubAddress` element (corresponding with the `externalPubRefAddressItems` element).
+
+Example:
+
+    <?xml version="1.0"?>
+    <externalPubs>
+      <externalPubAddress>
+        <externalPubIdent>
+          <externalPubCode>s1kd-checkrefs</externalPubCode>
+          <externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
+        </externalPubIdent>
+        <externalPubAddressItems>
+          <externalPubIssueDate year="2017" month="08" day="14"/>
+        </externalPubAddressItems>
+      </externalPubAddress>
+    </externalPubs>
