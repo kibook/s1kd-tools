@@ -339,12 +339,12 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 				brex_fnames[i], brexCheck);
 
 			if (verbose >= MESSAGE) {
-				printf(status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
+				fprintf(stderr, status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
 			}
 
 			total += status;
 		} else if (verbose >= MESSAGE) {
-			printf(E_VALIDDOC, docname, brex_fnames[i]);
+			fprintf(stderr, E_VALIDDOC, docname, brex_fnames[i]);
 		}
 
 		xmlXPathFreeObject(result);
