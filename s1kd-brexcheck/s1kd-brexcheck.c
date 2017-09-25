@@ -310,7 +310,8 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	xmlDocPtr brex_doc;
 
 	int i;
-	int status = 0;
+	int status;
+	int total = 0;
 
 	char *schema;
 	char xpath[512];
@@ -334,12 +335,14 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
 
 		if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-			status += check_brex_rules(result->nodesetval, dmod_doc, docname,
+			status = check_brex_rules(result->nodesetval, dmod_doc, docname,
 				brex_fnames[i], brexCheck);
 
 			if (verbose >= MESSAGE) {
 				printf(status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
 			}
+
+			total += status;
 		} else if (verbose >= MESSAGE) {
 			printf(E_VALIDDOC, docname, brex_fnames[i]);
 		}
@@ -350,7 +353,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlFreeDoc(brex_doc);
 	}
 
-	return status;
+	return total;
 }
 
 void print_node(xmlNodePtr node)
