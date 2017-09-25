@@ -15,9 +15,12 @@
 
 #define XSI_URI (xmlChar *) "http://www.w3.org/2001/XMLSchema-instance"
 
-#define E_PREFIX "s1kd-brexcheck: ERROR: "
-#define F_PREFIX "s1kd-brexcheck: FAILED: "
-#define S_PREFIX "s1kd-brexcheck: SUCCESS: "
+#define PROG_NAME "s1kd-brexcheck"
+
+#define E_PREFIX PROG_NAME ": ERROR: "
+#define F_PREFIX PROG_NAME ": FAILED: "
+#define S_PREFIX PROG_NAME ": SUCCESS: "
+#define I_PREFIX PROG_NAME ": INFO: "
 
 #define E_NODMOD E_PREFIX "Data module %s not found.\n"
 #define E_NODMOD_STDIN E_PREFIX "stdin does not contain valid XML.\n"
@@ -28,9 +31,12 @@
 #define E_MAXDMOD E_PREFIX "Too many data modules specified.\n"
 #define E_INVOBJPATH E_PREFIX "Invalid object path.\n"
 #define E_MISSBREX E_PREFIX "Could not find BREX file \"%s\".\n"
+#define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
 
 #define E_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
 #define E_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
+
+#define I_FILE_FOUND I_PREFIX "Found file for BREX %s: %s\n"
 
 #define ERR_MISSING_BREX_FILE -1
 #define ERR_UNFINDABLE_BREX_FILE -2
@@ -199,7 +205,7 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	}
 
 	if (verbose >= INFO && found) {
-		fprintf(stderr, "brexcheck: INFO: Found file for BREX %s: %s\n", dmcode, fname);
+		fprintf(stderr, I_FILE_FOUND, dmcode, fname);
 	}
 
 	return found;
@@ -283,15 +289,16 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vh?] <datamodules>");
+	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlh?] <datamodules>");
 	puts("");
 	puts("Options:");
-	puts("	-b <brex>	Use <brex> as the BREX data module");
-	puts("	-I <path>	Add <path> to search path for BREX data module.");
-	puts("	-v		Verbose messages.");
-	puts("	-s		Short messages.");
-	puts("	-x		XML output.");
-	puts("	-h -?		Show this help message.");
+	puts("	-b <brex>    Use <brex> as the BREX data module");
+	puts("	-I <path>    Add <path> to search path for BREX data module.");
+	puts("	-v -V -q -D  Message verbosity.");
+	puts("	-s           Short messages.");
+	puts("	-x           XML output.");
+	puts("  -l           Check BREX referenced by other BREX.");
+	puts("	-h -?        Show this help message.");
 }
 
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
@@ -327,12 +334,14 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
 
 		if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-			status = check_brex_rules(result->nodesetval, dmod_doc, docname,
+			status += check_brex_rules(result->nodesetval, dmod_doc, docname,
 				brex_fnames[i], brexCheck);
 
 			if (verbose >= MESSAGE) {
 				printf(status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
 			}
+		} else if (verbose >= MESSAGE) {
+			printf(E_VALIDDOC, docname, brex_fnames[i]);
 		}
 
 		xmlXPathFreeObject(result);
@@ -379,6 +388,47 @@ void print_node(xmlNodePtr node)
 	}
 }
 
+bool brex_exists(char fname[PATH_MAX], char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[BREX_PATH_MAX][PATH_MAX], int nspaths)
+{
+	int i;
+
+	for (i = 0; i < nfnames; ++i) {
+		if (strcmp(fname, fnames[i]) == 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[BREX_PATH_MAX][PATH_MAX], int nspaths)
+{
+	int i;
+	int total = nfnames;
+
+	for (i = 0; i < nfnames; ++i) {
+		xmlDocPtr doc;
+		char fname[PATH_MAX];
+		bool found;
+
+		doc = xmlReadFile(fnames[i], NULL, 0);
+
+		found = find_brex_fname_from_doc(fname, doc, spaths, nspaths);
+
+		if (!found) {
+			fprintf(stderr, E_NOBREX_LAYER, fnames[i]);
+		} else if (!brex_exists(fname, fnames, nfnames, spaths, nspaths)) {
+			strcpy(fnames[total++], fname);
+
+			total = add_layered_brex(fnames, total, spaths, nspaths);
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	return total;
+}
+
 int main(int argc, char *argv[])
 {
 	int c;
@@ -399,11 +449,12 @@ int main(int argc, char *argv[])
 
 	bool use_stdin = false;
 	bool xmlout = false;
+	bool layered = false;
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqsh?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslh?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -433,6 +484,7 @@ int main(int argc, char *argv[])
 			case 'V': verbose = INFO; break;
 			case 'D': verbose = DEBUG; break;
 			case 's': shortmsg = true; break;
+			case 'l': layered = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -481,12 +533,18 @@ int main(int argc, char *argv[])
 				}
 				continue;
 			}
-			status += check_brex(dmod_doc, dmod_fnames[i],
-				brex_fnames, 1, brexCheck);
-		} else {
-			status += check_brex(dmod_doc, dmod_fnames[i],
-				brex_fnames, num_brex_fnames, brexCheck);
+
+			num_brex_fnames = 1;
 		}
+
+		if (layered) {
+			num_brex_fnames = add_layered_brex(brex_fnames,
+				num_brex_fnames, brex_search_paths,
+				num_brex_search_paths);
+		}
+
+		status += check_brex(dmod_doc, dmod_fnames[i],
+			brex_fnames, num_brex_fnames, brexCheck);
 
 		xmlFreeDoc(dmod_doc);
 	}

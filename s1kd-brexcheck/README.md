@@ -6,7 +6,7 @@ s1kd-brexcheck - Validate S1000D data modules against BREX data modules
 SYNOPSIS
 ========
 
-s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt; \[-vh?\] &lt;datamodules&gt;
+s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-vVqDsxlh?\] &lt;datamodules&gt;
 
 DESCRIPTION
 ===========
@@ -22,8 +22,8 @@ Check the data modules against this BREX. Multiple BREX data modules can be spec
 -I &lt;path&gt;  
 Add a search path for BREX data modules. By default, only the current directory is searched.
 
--v  
-Use verbose output.
+-v -V -q -D  
+Verbosity of the output.
 
 -s  
 Use shortened, single-line messages to report BREX errors instead of multiline indented messages.
@@ -31,8 +31,16 @@ Use shortened, single-line messages to report BREX errors instead of multiline i
 -x  
 Output an XML report instead of a plain-text one.
 
+-l  
+Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified data modules) will also be checked against.
+
 -h -?  
 Show the help/usage message.
+
+RETURN VALUE
+============
+
+The number of BREX errors encountered is returned in the exit status code.
 
 Example
 =======

@@ -8,16 +8,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2017" month="09" day="25"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path> [-vh?] <datamodules>]]></para>
+        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqDsxlh?] <datamodules>]]></para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -73,9 +73,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
+              <listItemTerm>-v -V -q -D</listItemTerm>
               <listItemDefinition>
-                <para>Use verbose output.</para>
+                <para>Verbosity of the output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -91,6 +91,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified data modules) will also be checked against.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show the help/usage message.</para>
@@ -98,6 +104,10 @@
             </definitionListItem>
           </definitionList>
         </para>
+      </levelledPara>
+      <levelledPara>
+        <title>RETURN VALUE</title>
+        <para>The number of BREX errors encountered is returned in the exit status code.</para>
       </levelledPara>
       <levelledPara>
         <title>Example</title>
