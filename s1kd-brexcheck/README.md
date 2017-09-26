@@ -6,7 +6,7 @@ s1kd-brexcheck - Validate S1000D data modules against BREX data modules
 SYNOPSIS
 ========
 
-s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-vVqDsxlh?\] &lt;datamodules&gt;
+s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\] \[-vVqDsxlh?\] &lt;datamodules&gt;
 
 DESCRIPTION
 ===========
@@ -34,8 +34,26 @@ Output an XML report instead of a plain-text one.
 -l  
 Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified data modules) will also be checked against.
 
+-w &lt;severities&gt;  
+Specify a list of severity levels for business rules.
+
 -h -?  
 Show the help/usage message.
+
+Business rule severity levels (-w)
+----------------------------------
+
+The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The -w option takes an XML file containing a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.
+
+An example of the format of this file is given below:
+
+    <?xml version="1.0"?>
+    <brSeverityLevels>
+      <brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
+      <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
+    </brSeverityLevels>
+
+When the attribute `fail` has a value of "yes" (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is no, the errors are still displayed but are not counted as errors in the exit status code of the tool.
 
 RETURN VALUE
 ============

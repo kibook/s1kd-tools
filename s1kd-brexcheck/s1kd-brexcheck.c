@@ -11,9 +11,9 @@
 #include <libxml/debugXML.h>
 
 #define STRUCT_OBJ_RULE_PATH "/dmodule/content/brex/contextRules[not(@rulesContext) or @rulesContext='%s']/structureObjectRuleGroup/structureObjectRule"
-#define BREX_REF_DMCODE_PATH (xmlChar *) "//brexDmRef/dmRef/dmRefIdent/dmCode"
+#define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef/dmRef/dmRefIdent/dmCode"
 
-#define XSI_URI (xmlChar *) "http://www.w3.org/2001/XMLSchema-instance"
+#define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
 
@@ -55,6 +55,9 @@ enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
 enum verbosity verbose = NORMAL;
 bool shortmsg = false;
 
+char *brsl_fname = NULL;
+xmlDocPtr brsl;
+
 xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
@@ -80,8 +83,8 @@ void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError
 		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
 		snprintf(line_s, 256, "%d", node->line);
-		object = xmlNewChild(brexError, NULL, (xmlChar *) "object", NULL);
-		xmlSetProp(object, (xmlChar *) "line", (xmlChar *) line_s);
+		object = xmlNewChild(brexError, NULL, BAD_CAST "object", NULL);
+		xmlSetProp(object, BAD_CAST "line", BAD_CAST line_s);
 
 		xmlAddChild(object, xmlCopyNode(node, 2));
 	}
@@ -157,17 +160,17 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	xmlXPathFreeObject(object);
 	xmlXPathFreeContext(context);
 
-	modelIdentCode     = (char *) xmlGetProp(dmCode, (xmlChar *) "modelIdentCode");
-	systemDiffCode     = (char *) xmlGetProp(dmCode, (xmlChar *) "systemDiffCode");
-	systemCode         = (char *) xmlGetProp(dmCode, (xmlChar *) "systemCode");
-	subSystemCode      = (char *) xmlGetProp(dmCode, (xmlChar *) "subSystemCode");
-	subSubSystemCode   = (char *) xmlGetProp(dmCode, (xmlChar *) "subSubSystemCode");
-	assyCode           = (char *) xmlGetProp(dmCode, (xmlChar *) "assyCode");
-	disassyCode        = (char *) xmlGetProp(dmCode, (xmlChar *) "disassyCode");
-	disassyCodeVariant = (char *) xmlGetProp(dmCode, (xmlChar *) "disassyCodeVariant");
-	infoCode           = (char *) xmlGetProp(dmCode, (xmlChar *) "infoCode");
-	infoCodeVariant    = (char *) xmlGetProp(dmCode, (xmlChar *) "infoCodeVariant");
-	itemLocationCode   = (char *) xmlGetProp(dmCode, (xmlChar *) "itemLocationCode");
+	modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
+	systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
+	systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
+	subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
+	subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
+	assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
+	disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
+	disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
+	infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
+	infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
+	itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
 
 	snprintf(dmcode, 256, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		modelIdentCode,
@@ -219,6 +222,68 @@ bool is_invalid(char *allowedObjectFlag, xmlNodeSetPtr nodesetval)
 	        xmlXPathNodeSetIsEmpty(nodesetval));
 }
 
+bool is_failure(xmlChar *severity)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	bool ret = true;
+
+	ctx = xmlXPathNewContext(brsl);
+	obj = xmlXPathEvalExpression(BAD_CAST "//brSeverityLevel", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *value;
+			bool match;
+
+			value = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "value");
+			match = xmlStrcmp(value, severity) == 0;
+			xmlFree(value);
+
+			if (match) {
+				xmlChar *fail;
+
+				fail = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "fail");
+				ret = xmlStrcmp(fail, BAD_CAST "no") != 0;
+				xmlFree(fail);
+				break;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return ret;
+}
+
+xmlChar *brsl_type(xmlChar *severity)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	char xpath[256];
+	xmlChar *type;
+
+	sprintf(xpath, "//brSeverityLevel[@value = '%s']", (char *) severity);
+
+	ctx = xmlXPathNewContext(brsl);
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		type = NULL;
+	} else {
+		type = xmlNodeGetContent(obj->nodesetval->nodeTab[0]);
+	}
+	
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return type;
+}
+
 int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr brexCheck)
 {
@@ -235,7 +300,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	xmlNodePtr brexError;
 
 	context = xmlXPathNewContext(doc);
-	xmlXPathRegisterNs(context, (xmlChar *) "xsi", XSI_URI);
+	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
 
 	for (i = 0; i < rules->nodeNr; ++i) {
 		char *allowedObjectFlag;
@@ -245,11 +310,11 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 		objectPath = find_child(rules->nodeTab[i], "objectPath");
 		objectUse = find_child(rules->nodeTab[i], "objectUse");
 
-		allowedObjectFlag = (char *) xmlGetProp(objectPath, (xmlChar *) "allowedObjectFlag");
+		allowedObjectFlag = (char *) xmlGetProp(objectPath, BAD_CAST "allowedObjectFlag");
 		path = (char *) xmlNodeGetContent(objectPath);
 		use  = (char *) xmlNodeGetContent(objectUse);
 
-		object = xmlXPathEvalExpression((xmlChar *) path, context);
+		object = xmlXPathEvalExpression(BAD_CAST path, context);
 
 		if (!object) {
 			if (verbose > SILENT) {
@@ -260,20 +325,42 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 		if (is_invalid(allowedObjectFlag, object->nodesetval)) {
 			char rpath[PATH_MAX];
+			xmlChar *severity;
 
-			brexError = xmlNewChild(brexCheck, NULL, (xmlChar *) "brexError",
+			severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel");
+
+			brexError = xmlNewChild(brexCheck, NULL, BAD_CAST "brexError",
 				NULL);
-			xmlNewChild(brexError, NULL, (xmlChar *) "document", (xmlChar *) realpath(fname, rpath));
-			xmlNewChild(brexError, NULL, (xmlChar *) "brex", (xmlChar *) realpath(brexfname, rpath));
-			xmlNewChild(brexError, NULL, (xmlChar *) "objectPath", (xmlChar *) path);
-			xmlNewChild(brexError, NULL, (xmlChar *) "objectUse", (xmlChar *) use);
+			xmlNewChild(brexError, NULL, BAD_CAST "document", BAD_CAST realpath(fname, rpath));
+			xmlNewChild(brexError, NULL, BAD_CAST "brex", BAD_CAST realpath(brexfname, rpath));
+
+			if (severity) {
+				xmlNewChild(brexError, NULL, BAD_CAST "severity", severity);
+
+				if (brsl_fname) {
+					xmlChar *type = brsl_type(severity);
+					xmlNewChild(brexError, NULL, BAD_CAST "type", type);
+					xmlFree(type);
+				}
+			}
+
+			xmlNewChild(brexError, NULL, BAD_CAST "objectPath", BAD_CAST path);
+			xmlNewChild(brexError, NULL, BAD_CAST "objectUse", BAD_CAST use);
 
 			if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 				dump_nodes_xml(object->nodesetval, fname,
 					brexError);
 			}
+			
+			if (severity) {
+				if (is_failure(severity)) {
+					++nerr;
+				}
+			} else {
+				++nerr;
+			}
 
-			++nerr;
+			xmlFree(severity);
 		}
 
 		xmlXPathFreeObject(object);
@@ -363,6 +450,14 @@ void print_node(xmlNodePtr node)
 
 	if (strcmp((char *) node->name, "brexError") == 0) {
 		printf("BREX ERROR: ");
+	} else if (strcmp((char *) node->name, "type") == 0 && !shortmsg) {
+		char *type = (char *) xmlNodeGetContent(node);
+		printf("  TYPE: %s\n", type);
+		xmlFree(type);
+	} else if (strcmp((char *) node->name, "brex") == 0 && !shortmsg) {
+		char *brex = (char *) xmlNodeGetContent(node);
+		printf("  BREX: %s\n", brex);
+		xmlFree(brex);
 	} else if (strcmp((char *) node->name, "document") == 0) {
 		char *doc = (char *) xmlNodeGetContent(node);
 		if (shortmsg) {
@@ -379,7 +474,7 @@ void print_node(xmlNodePtr node)
 		printf("%s\n", use);
 		xmlFree(use);
 	} else if (strcmp((char *) node->name, "object") == 0 && !shortmsg) {
-		char *line = (char *) xmlGetProp(node, (xmlChar *) "line");
+		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
 		printf("  line %s:\n", line);
 		xmlFree(line);
 
@@ -457,7 +552,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslh?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:h?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -488,6 +583,7 @@ int main(int argc, char *argv[])
 			case 'D': verbose = DEBUG; break;
 			case 's': shortmsg = true; break;
 			case 'l': layered = true; break;
+			case 'w': brsl_fname = strdup(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -509,8 +605,12 @@ int main(int argc, char *argv[])
 		use_stdin = true;
 	}
 
-	outdoc = xmlNewDoc((xmlChar *) "1.0");
-	brexCheck = xmlNewNode(NULL, (xmlChar *) "brexCheck");
+	if (brsl_fname) {
+		brsl = xmlReadFile(brsl_fname, NULL, 0);
+	}
+
+	outdoc = xmlNewDoc(BAD_CAST "1.0");
+	brexCheck = xmlNewNode(NULL, BAD_CAST "brexCheck");
 	xmlDocSetRootElement(outdoc, brexCheck);
 
 	for (i = 0; i < num_dmod_fnames; ++i) {
@@ -552,8 +652,8 @@ int main(int argc, char *argv[])
 		xmlFreeDoc(dmod_doc);
 	}
 
-	if (status == 0) {
-		xmlNewChild(brexCheck, NULL, (xmlChar *) "noErrors", NULL);
+	if (!brexCheck->children) {
+		xmlNewChild(brexCheck, NULL, BAD_CAST "noErrors", NULL);
 	}
 
 	if (!xmlout) {
@@ -565,6 +665,10 @@ int main(int argc, char *argv[])
 	}
 
 	xmlFreeDoc(outdoc);
+
+	if (brsl_fname) {
+		xmlFreeDoc(brsl);
+	}
 
 	xmlCleanupParser();
 

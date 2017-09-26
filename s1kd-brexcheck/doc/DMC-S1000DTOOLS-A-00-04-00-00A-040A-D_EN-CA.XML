@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="09" day="25"/>
+        <issueDate year="2017" month="09" day="26"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
         </dmTitle>
@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqDsxlh?] <datamodules>]]></para>
+        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlh?] <datamodules>]]></para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -97,6 +97,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-w &lt;severities&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a list of severity levels for business rules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show the help/usage message.</para>
@@ -104,6 +110,19 @@
             </definitionListItem>
           </definitionList>
         </para>
+        <levelledPara>
+          <title>Business rule severity levels (-w)</title>
+          <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The -w option takes an XML file containing a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
+          <para>An example of the format of this file is given below:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+<brSeverityLevels>
+  <brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
+  <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
+</brSeverityLevels>]]></verbatimText>
+          </para>
+          <para>When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of "yes" (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is no, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>RETURN VALUE</title>

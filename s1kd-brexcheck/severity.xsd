@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="yesNoType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="brSeverityLevelElemType" mixed="true">
+    <xs:attribute name="value" type="xs:string"/>
+    <xs:attribute name="fail" type="yesNoType"/>
+  </xs:complexType>
+  <xs:complexType name="brSeverityLevelsElemType">
+    <xs:sequence>
+      <xs:element name="brSeverityLevel" type="brSeverityLevelElemType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="brSeverityLevels" type="brSeverityLevelsElemType"/>
+</xs:schema>
