@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <dirent.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
@@ -284,6 +288,16 @@ xmlChar *brsl_type(xmlChar *severity)
 	return type;
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	GetFullPathName(path, PATH_MAX, real, NULL);
+	return real;
+	#else
+	return realpath(path, real);
+	#endif
+}
+
 int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr brexCheck)
 {
@@ -331,8 +345,9 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 			brexError = xmlNewChild(brexCheck, NULL, BAD_CAST "brexError",
 				NULL);
-			xmlNewChild(brexError, NULL, BAD_CAST "document", BAD_CAST realpath(fname, rpath));
-			xmlNewChild(brexError, NULL, BAD_CAST "brex", BAD_CAST realpath(brexfname, rpath));
+
+			xmlNewChild(brexError, NULL, BAD_CAST "document", BAD_CAST real_path(fname, rpath));
+			xmlNewChild(brexError, NULL, BAD_CAST "brex", BAD_CAST real_path(brexfname, rpath));
 
 			if (severity) {
 				xmlNewChild(brexError, NULL, BAD_CAST "severity", severity);
