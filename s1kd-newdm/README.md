@@ -70,6 +70,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   brex - Business rule exchange
 
+-   checklist - Maintenance checklist
+
 -   comrep - Common information repository
 
 -   condcrossreftable - Conditions cross-reference table

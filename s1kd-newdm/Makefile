@@ -20,6 +20,7 @@ templates.h: templates/*
 	xxd -i templates/process.xml >> templates.h
 	xxd -i templates/ipd.xml >> templates.h
 	xxd -i templates/fault.xml >> templates.h
+	xxd -i templates/checklist.xml >> templates.h
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
