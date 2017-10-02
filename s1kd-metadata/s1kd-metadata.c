@@ -513,6 +513,11 @@ struct metadata metadata[] = {
 		show_simple_node,
 		edit_simple_node,
 		NULL},
+	{"pmTitle",
+		"//pmAddressItems/pmTitle",
+		show_simple_node,
+		edit_simple_node,
+		NULL},
 	{NULL}
 };
 
