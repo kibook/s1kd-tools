@@ -464,7 +464,7 @@ struct metadata metadata[] = {
 		edit_dmcode,
 		create_act_ref},
 	{"issueType",
-		"//dmStatus|//pmStatus",
+		"//dmStatus/@issueType|//pmStatus/@issueType",
 		show_issue_type,
 		edit_issue_type,
 		NULL},
