@@ -9,11 +9,14 @@ INSTALL_PREFIX=/usr/bin
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-$(OUTPUT): $(SOURCE)
+$(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
+templates.h: dml.xml
+	xxd -i dml.xml > templates.h
+
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(OUTPUT) templates.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
