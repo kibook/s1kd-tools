@@ -62,6 +62,8 @@ bool shortmsg = false;
 char *brsl_fname = NULL;
 xmlDocPtr brsl;
 
+bool check_sns = false;
+
 xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
@@ -400,15 +402,121 @@ void show_help(void)
 	puts("	-s           Short messages.");
 	puts("	-x           XML output.");
 	puts("  -l           Check BREX referenced by other BREX.");
+	puts("  -w <sev>     List of severity levels.");
+	puts("  -S           Check SNS rules.");
 	puts("	-h -?        Show this help message.");
+}
+
+xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	ctx = xmlXPathNewContext(doc);
+	ctx->node = context;
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+	
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
+}
+
+bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
+	const char *dmod_fname, xmlNodePtr brexCheck)
+{
+	xmlNodePtr dmcode;
+	xmlChar *systemCode, *subSystemCode, *subSubSystemCode, *assyCode;
+	char xpath[256];
+	xmlNodePtr ctx = NULL;
+	xmlNodePtr snsError;
+	char rpath[PATH_MAX];
+	char value[256];
+	int i;
+	xmlDocPtr snsRulesDoc;
+	xmlNodePtr snsRulesGroup;
+
+	/* The valid SNS is taken as a combination of the snsRules from all specified BREX data modules. */
+	snsRulesDoc = xmlNewDoc(BAD_CAST "1.0");
+	xmlDocSetRootElement(snsRulesDoc, xmlNewNode(NULL, BAD_CAST "snsRulesGroup"));
+	snsRulesGroup = xmlDocGetRootElement(snsRulesDoc);
+
+	for (i = 0; i < nbrex_fnames; ++i) {
+		xmlDocPtr brex;
+
+		brex = xmlReadFile(brex_fnames[i], NULL, 0);
+
+		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
+
+		xmlFreeDoc(brex);
+	}
+
+	dmcode = firstXPathNode(dmod_doc, NULL, "//dmIdent/dmCode");
+
+	systemCode       = xmlGetProp(dmcode, BAD_CAST "systemCode");
+	subSystemCode    = xmlGetProp(dmcode, BAD_CAST "subSystemCode");
+	subSubSystemCode = xmlGetProp(dmcode, BAD_CAST "subSubSystemCode");
+	assyCode         = xmlGetProp(dmcode, BAD_CAST "assyCode");
+
+	snsError = xmlNewNode(NULL, BAD_CAST "snsError");
+	xmlNewChild(snsError, NULL, BAD_CAST "document", BAD_CAST real_path(dmod_fname, rpath));
+
+	sprintf(xpath, "//snsSystem[snsCode = '%s']", (char *) systemCode);
+	if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
+		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
+		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", systemCode);
+		xmlAddChild(brexCheck, snsError);
+		return false;
+	}
+
+	sprintf(xpath, ".//snsSubSystem[snsCode = '%s']", (char *) subSystemCode);
+	if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
+		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSystemCode");
+
+		sprintf(value, "%s-%s", systemCode, subSystemCode);
+		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
+
+		xmlAddChild(brexCheck, snsError);
+		return false;
+	}
+
+	sprintf(xpath, ".//snsSubSubSystem[snsCode = '%s']", (char *) subSubSystemCode);
+	if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
+		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSubSystemCode");
+
+		sprintf(value, "%s-%s%s", systemCode, subSystemCode, subSubSystemCode);
+		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
+
+		xmlAddChild(brexCheck, snsError);
+		return false;
+	}
+
+	sprintf(xpath, ".//snsAssy[snsCode = '%s']", (char *) assyCode);
+	if (!firstXPathNode(snsRulesDoc, ctx, xpath)) {
+		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "assyCode");
+
+		sprintf(value, "%s-%s%s-%s", systemCode, subSystemCode, subSubSystemCode, assyCode);
+		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
+
+		xmlAddChild(brexCheck, snsError);
+		return false;
+	}
+
+	xmlFreeNode(snsError);
+
+	return true;
 }
 
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char brex_fnames[BREX_MAX][PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
 {
-	xmlXPathContextPtr context;
-	xmlXPathObjectPtr result;
-
 	xmlDocPtr brex_doc;
 
 	int i;
@@ -422,7 +530,13 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema);
 	xmlFree(schema);
 
+	if (check_sns && !check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck))
+		++total;
+
 	for (i = 0; i < num_brex_fnames; ++i) {
+		xmlXPathContextPtr context;
+		xmlXPathObjectPtr result;
+
 		brex_doc = xmlReadFile(brex_fnames[i], NULL, 0);
 
 		if (!brex_doc) {
@@ -450,6 +564,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		}
 
 		xmlXPathFreeObject(result);
+
 		xmlXPathFreeContext(context);
 
 		xmlFreeDoc(brex_doc);
@@ -494,6 +609,16 @@ void print_node(xmlNodePtr node)
 		xmlFree(line);
 
 		xmlDebugDumpOneNode(stdout, node->children, 2);
+	} else if (strcmp((char *) node->name, "snsError") == 0) {
+		printf("SNS ERROR: ");
+	} else if (strcmp((char *) node->name, "code") == 0) {
+		char *code = (char *) xmlNodeGetContent(node);
+		printf("  Value of %s does not conform to SNS: ", code);
+		xmlFree(code);
+	} else if (strcmp((char *) node->name, "invalidValue") == 0) {
+		char *value = (char *) xmlNodeGetContent(node);
+		printf("%s\n", value);
+		xmlFree(value);
 	}
 
 	for (cur = node->children; cur; cur = cur->next) {
@@ -567,7 +692,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:h?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Sh?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -599,6 +724,7 @@ int main(int argc, char *argv[])
 			case 's': shortmsg = true; break;
 			case 'l': layered = true; break;
 			case 'w': brsl_fname = strdup(optarg); break;
+			case 'S': check_sns = true; break;
 			case 'h':
 			case '?':
 				show_help();

@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="09" day="26"/>
+        <issueDate year="2017" month="10" day="04"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
         </dmTitle>
@@ -100,6 +100,12 @@
               <listItemTerm>-w &lt;severities&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a list of severity levels for business rules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-S</listItemTerm>
+              <listItemDefinition>
+                <para>Check SNS rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -37,6 +37,9 @@ Use the layered BREX concept. BREX data modules referenced by other BREX data mo
 -w &lt;severities&gt;  
 Specify a list of severity levels for business rules.
 
+-S  
+Check SNS rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
+
 -h -?  
 Show the help/usage message.
 
