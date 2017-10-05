@@ -99,6 +99,9 @@ BREX data module code.
 -v  
 Print the file name of the newly created data module.
 
+-f  
+Overwrite existing file.
+
 Prompt (-p) option
 ------------------
 

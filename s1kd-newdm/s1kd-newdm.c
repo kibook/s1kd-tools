@@ -131,6 +131,7 @@ void show_help(void)
 	puts("  -p      Prompt the user for each value");
 	puts("  -N      Omit issue/inwork from filename.");
 	puts("  -v      Print file name of new data module.");
+	puts("  -f      Overwrite existing file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#      Data module code");
@@ -327,10 +328,11 @@ int main(int argc, char **argv)
 	bool skipdmc = false;
 	bool no_issue = false;
 	bool verbose = false;
+	bool overwrite = false;
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:b:vh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:b:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -352,6 +354,7 @@ int main(int argc, char **argv)
 			case 'S': strcpy(schema, optarg); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'v': verbose = true; break;
+			case 'f': overwrite = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -634,7 +637,7 @@ int main(int argc, char **argv)
 		languageIsoCode,
 		countryIsoCode);
 
-	if (access(dmc, F_OK) != -1) {
+	if (!overwrite && access(dmc, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "Data module already exists.\n");
 		exit(EXIT_DM_EXISTS);
 	}
