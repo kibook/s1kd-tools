@@ -38,6 +38,8 @@ char originator[256] = "";
 char originator_code[7] = "";
 char icn_title[256] = "";
 
+char brex_dmcode[256] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -125,6 +127,7 @@ void copy_default_value(const char *def_key, const char *def_val)
 	copy_def_val(responsible_partner_company_code, "responsiblePartnerCompanyCode", def_key, def_val);
 	copy_def_val(originator, "originator", def_key, def_val);
 	copy_def_val(originator_code, "originatorCode", def_key, def_val);
+	copy_def_val(brex_dmcode, "brex", def_key, def_val);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -200,8 +203,6 @@ int main(int argc, char **argv)
 	char defaults_fname[PATH_MAX] = "defaults";
 
 	xmlDocPtr defaults_xml;
-
-	char brex_dmcode[256] = "";
 
 	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:h?")) != -1) {
 		switch (i) {
