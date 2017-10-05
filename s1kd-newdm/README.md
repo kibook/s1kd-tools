@@ -96,6 +96,9 @@ Omit issue/inwork numbers from filename.
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-v  
+Print the file name of the newly created data module.
+
 Prompt (-p) option
 ------------------
 

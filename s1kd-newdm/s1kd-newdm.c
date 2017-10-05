@@ -128,23 +128,24 @@ void show_help(void)
 	puts("Usage: s1kd-newdm [options]");
 	puts("");
 	puts("Options:");
-	puts("  -p	Prompt the user for each value");
-	puts("  -N	Omit issue/inwork from filename.");
+	puts("  -p      Prompt the user for each value");
+	puts("  -N      Omit issue/inwork from filename.");
+	puts("  -v      Print file name of new data module.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -#	Data module code");
-	puts("  -L	Language ISO code");
-	puts("  -C	Country ISO code");
-	puts("  -n	Issue number");
-	puts("  -w	Inwork issue");
-	puts("  -c	Security classification");
-	puts("  -r	Responsible partner company enterprise name");
-	puts("  -R	Responsible partner company CAGE code.");
-	puts("  -o	Originator enterprise name");
-	puts("  -O	Originator CAGE code.");
-	puts("  -t	Tech name");
-	puts("  -i	Info name");
-	puts("  -T	DM type (descript, proced, frontmatter, brex, brdoc)");
+	puts("  -#      Data module code");
+	puts("  -L      Language ISO code");
+	puts("  -C      Country ISO code");
+	puts("  -n      Issue number");
+	puts("  -w      Inwork issue");
+	puts("  -c      Security classification");
+	puts("  -r      Responsible partner company enterprise name");
+	puts("  -R      Responsible partner company CAGE code.");
+	puts("  -o      Originator enterprise name");
+	puts("  -O      Originator CAGE code.");
+	puts("  -t      Tech name");
+	puts("  -i      Info name");
+	puts("  -T      DM type (descript, proced, frontmatter, brex, brdoc)");
 	puts("  -b      BREX data module code.");
 }
 
@@ -325,10 +326,11 @@ int main(int argc, char **argv)
 	char dmcode[256] = "";
 	bool skipdmc = false;
 	bool no_issue = false;
+	bool verbose = false;
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:b:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:b:vh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -349,6 +351,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 'S': strcpy(schema, optarg); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
+			case 'v': verbose = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -637,6 +640,9 @@ int main(int argc, char **argv)
 	}
 
 	xmlSaveFormatFile(dmc, dm, 1);
+
+	if (verbose)
+		puts(dmc);
 
 	xmlFreeDoc(dm);
 
