@@ -52,6 +52,9 @@ Show help/usage message.
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-v  
+Print the file name of the newly created DDN.
+
 'defaults' file
 ---------------
 

@@ -91,6 +91,8 @@ void show_help(void)
 	puts("Options:");
 	puts("  -d <defaults>    Specify the 'defaults' file name.");
 	puts("  -p               Prompt user for values.");
+	puts("  -v               Print file name of DDN.");
+	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
 	puts("  -o <sender>      Sender enterprise name");
@@ -239,6 +241,7 @@ int main(int argc, char **argv)
 
 	int showprompts = 0;
 	int skipcode = 0;
+	int verbose = 0;
 
 	xmlDocPtr ddn;
 	xmlNodePtr ddn_code;
@@ -262,7 +265,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:vh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -275,6 +278,7 @@ int main(int argc, char **argv)
 			case 'N': strncpy(receiver_country, optarg, 255); break;
 			case 'a': strncpy(authorization, optarg, 255); break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
+			case 'v': verbose = 1; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -424,6 +428,9 @@ int main(int argc, char **argv)
 	}
 
 	xmlSaveFile(outfile, ddn);
+
+	if (verbose)
+		puts(outfile);
 
 	xmlFreeDoc(ddn);
 
