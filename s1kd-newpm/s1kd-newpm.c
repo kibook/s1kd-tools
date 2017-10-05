@@ -157,6 +157,7 @@ void show_help(void)
 	puts("  -p    Prompt the user for each value.");
 	puts("  -N    Omit issue/inwork from file name.");
 	puts("  -v    Print file name of pub module.");
+	puts("  -f    Overwrite existing file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Publication module code");
@@ -311,9 +312,10 @@ int main(int argc, char **argv)
 	bool include_issue_info = false;
 	bool include_language = false;
 	bool verbose = false;
+	bool overwrite = false;
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:vh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -330,6 +332,7 @@ int main(int argc, char **argv)
 			case 'l': include_language = true; break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'v': verbose = true; break;
+			case 'f': overwrite = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -491,7 +494,7 @@ int main(int argc, char **argv)
 		language_iso_code,
 		country_iso_code);
 
-	if (access(pm_filename, F_OK) != -1) {
+	if (!overwrite && access(pm_filename, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "Pub module %s already exists.\n", pm_filename);
 		exit(EXIT_PM_EXISTS);
 	}
