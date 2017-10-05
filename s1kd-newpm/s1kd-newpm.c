@@ -44,6 +44,8 @@ char pm_title[256] = "";
 char security_classification[4] = "";
 char enterprise_name[256] = "";
 
+char brex_dmcode[256] = "";
+
 xmlNodePtr find_child(xmlNodePtr parent, char *name)
 {
 	xmlNodePtr cur;
@@ -189,6 +191,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(issue_number, val);
 	else if (strcmp(key, "inWork") == 0)
 		strcpy(in_work, val);
+	else if (strcmp(key, "brex") == 0)
+		strcpy(brex_dmcode, val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -306,7 +310,6 @@ int main(int argc, char **argv)
 	bool include_issue_info = false;
 	bool include_language = false;
 	xmlDocPtr defaults_xml;
-	char brex_dmcode[256] = "";
 
 	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:h?")) != -1) {
 		switch (c) {
