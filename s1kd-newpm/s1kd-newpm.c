@@ -171,27 +171,27 @@ void show_help(void)
 
 void copy_default_value(const char *key, const char *val)
 {
-	if (strcmp(key, "modelIdentCode") == 0)
+	if (strcmp(key, "modelIdentCode") == 0 && strcmp(model_ident_code, "") == 0)
 		strcpy(model_ident_code, val);
-	else if (strcmp(key, "pmIssuer") == 0)
+	else if (strcmp(key, "pmIssuer") == 0 && strcmp(pm_issuer, "") == 0)
 		strcpy(pm_issuer, val);
-	else if (strcmp(key, "pmNumber") == 0)
+	else if (strcmp(key, "pmNumber") == 0 && strcmp(pm_number, "") == 0)
 		strcpy(pm_number, val);
-	else if (strcmp(key, "pmVolume") == 0)
+	else if (strcmp(key, "pmVolume") == 0 && strcmp(pm_volume, "") == 0)
 		strcpy(pm_volume, val);
-	else if (strcmp(key, "languageIsoCode") == 0)
+	else if (strcmp(key, "languageIsoCode") == 0 && strcmp(language_iso_code, "") == 0)
 		strcpy(language_iso_code, val);
-	else if (strcmp(key, "countryIsoCode") == 0)
+	else if (strcmp(key, "countryIsoCode") == 0 && strcmp(country_iso_code, "") == 0)
 		strcpy(country_iso_code, val);
-	else if (strcmp(key, "securityClassification") == 0)
+	else if (strcmp(key, "securityClassification") == 0 && strcmp(security_classification, "") == 0)
 		strcpy(security_classification, val);
-	else if (strcmp(key, "responsiblePartnerCompany") == 0)
+	else if (strcmp(key, "responsiblePartnerCompany") == 0 && strcmp(enterprise_name, "") == 0)
 		strcpy(enterprise_name, val);
-	else if (strcmp(key, "issueNumber") == 0)
+	else if (strcmp(key, "issueNumber") == 0 && strcmp(issue_number, "") == 0)
 		strcpy(issue_number, val);
-	else if (strcmp(key, "inWork") == 0)
+	else if (strcmp(key, "inWork") == 0 && strcmp(in_work, "") == 0)
 		strcpy(in_work, val);
-	else if (strcmp(key, "brex") == 0)
+	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strcpy(brex_dmcode, val);
 }
 
