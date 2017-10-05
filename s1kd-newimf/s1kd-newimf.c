@@ -101,11 +101,12 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
-	puts("  -p          Show prompts");
-	puts("  -d <path>   Defaults file path");
-	puts("  -N          Omit issue/inwork numbers from filename");
-	puts("  -v          Print file name of IMF");
-	puts("  <icns>      1 or more ICNs to generate a metadata file for");
+	puts("  -p          Show prompts.");
+	puts("  -d <path>   Defaults file path.");
+	puts("  -N          Omit issue/inwork numbers from filename.");
+	puts("  -v          Print file name of IMF.");
+	puts("  -f          Overwrite existing file.");
+	puts("  <icns>      1 or more ICNs to generate a metadata file for.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -n          Issue number");
@@ -200,13 +201,14 @@ int main(int argc, char **argv)
 	bool show_prompts = false;
 	bool no_issue = false;
 	bool verbose = false;
+	bool overwrite = false;
 
 	FILE *defaults;
 	char defaults_fname[PATH_MAX] = "defaults";
 
 	xmlDocPtr defaults_xml;
 
-	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:vh?")) != -1) {
+	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:vfh?")) != -1) {
 		switch (i) {
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -221,6 +223,7 @@ int main(int argc, char **argv)
 			case 't': strncpy(icn_title, optarg, 255); break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
 			case 'v': verbose = true; break;
+			case 'f': overwrite = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -343,7 +346,7 @@ int main(int argc, char **argv)
 			snprintf(fname, 256, "IMF-%s_%s-%s.XML", icn, issue_number, in_work);
 		}
 
-		if (access(fname, F_OK) != -1) {
+		if (!overwrite && access(fname, F_OK) != -1) {
 			fprintf(stderr, ERR_PREFIX "%s already exists.\n", fname);
 			exit(EXIT_IMF_EXISTS);
 		}

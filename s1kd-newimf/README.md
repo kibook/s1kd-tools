@@ -51,3 +51,6 @@ BREX data module code.
 
 -v  
 Print the file name of the newly created IMF.
+
+-f  
+Overwrite existing file.
