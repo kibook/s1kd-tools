@@ -107,6 +107,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created DML.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;datamodules&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Any number of data module file names to automatically add to the list.</para>

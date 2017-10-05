@@ -150,6 +150,7 @@ void show_help(void)
 	puts("  -h -?    Show usage message.");
 	puts("  -p       Prompt the user for each value.");
 	puts("  -N       Omit issue/inwork from filename.");
+	puts("  -v       Print file name of DML.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#       DML code");
@@ -232,6 +233,7 @@ int main(int argc, char **argv)
 	char code[256];
 	bool skipcode = false;
 	bool noissue = false;
+	bool verbose = false;
 
 	time_t now;
 	struct tm *local;
@@ -244,7 +246,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:vh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -254,6 +256,7 @@ int main(int argc, char **argv)
 			case 'c': strcpy(security_classification, optarg); break;
 			case 'N': noissue = true; break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
+			case 'v': verbose = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -409,6 +412,9 @@ int main(int argc, char **argv)
 	}
 
 	xmlSaveFile(dml_fname, dml_doc);
+
+	if (verbose)
+		puts(dml_fname);
 
 	xmlFreeDoc(dml_doc);
 
