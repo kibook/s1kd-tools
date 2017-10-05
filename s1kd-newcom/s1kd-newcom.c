@@ -110,31 +110,31 @@ void show_help(void)
 
 void copy_default_value(const char *def_key, const char *def_val)
 {
-	if (strcmp(def_key, "modelIdentCode") == 0)
+	if (strcmp(def_key, "modelIdentCode") == 0 && strcmp(modelIdentCode, "") == 0)
 		strcpy(modelIdentCode, def_val);
-	else if (strcmp(def_key, "senderIdent") == 0)
+	else if (strcmp(def_key, "senderIdent") == 0 && strcmp(senderIdent, "") == 0)
 		strcpy(senderIdent, def_val);
-	else if (strcmp(def_key, "yearOfDataIssue") == 0)
+	else if (strcmp(def_key, "yearOfDataIssue") == 0 && strcmp(yearOfDataIssue, "") == 0)
 		strcpy(yearOfDataIssue, def_val);
-	else if (strcmp(def_key, "seqNumber") == 0)
+	else if (strcmp(def_key, "seqNumber") == 0 && strcmp(seqNumber, "") == 0)
 		strcpy(seqNumber, def_val);
-	else if (strcmp(def_key, "commentType") == 0)
+	else if (strcmp(def_key, "commentType") == 0 && strcmp(commentType, "") == 0)
 		strcpy(commentType, def_val);
-	else if (strcmp(def_key, "languageIsoCode") == 0)
+	else if (strcmp(def_key, "languageIsoCode") == 0 && strcmp(languageIsoCode, "") == 0)
 		strcpy(languageIsoCode, def_val);
-	else if (strcmp(def_key, "countryIsoCode") == 0)
+	else if (strcmp(def_key, "countryIsoCode") == 0 && strcmp(countryIsoCode, "") == 0)
 		strcpy(countryIsoCode, def_val);
-	else if (strcmp(def_key, "originator") == 0)
+	else if (strcmp(def_key, "originator") == 0 && strcmp(enterprise_name, "") == 0)
 		strcpy(enterprise_name, def_val);
-	else if (strcmp(def_key, "city") == 0)
+	else if (strcmp(def_key, "city") == 0 && strcmp(address_city, "") == 0)
 		strcpy(address_city, def_val);
-	else if (strcmp(def_key, "country") == 0)
+	else if (strcmp(def_key, "country") == 0 && strcmp(address_country, "") == 0)
 		strcpy(address_country, def_val);
-	else if (strcmp(def_key, "securityClassification") == 0)
+	else if (strcmp(def_key, "securityClassification") == 0 && strcmp(securityClassification, "") == 0)
 		strcpy(securityClassification, def_val);
-	else if (strcmp(def_key, "commentPriorityCode") == 0)
+	else if (strcmp(def_key, "commentPriorityCode") == 0 && strcmp(commentPriorityCode, "") == 0)
 		strcpy(commentPriorityCode, def_val);
-	else if (strcmp(def_key, "brex") == 0)
+	else if (strcmp(def_key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strcpy(brex_dmcode, def_val);
 }
 
