@@ -43,6 +43,9 @@ The security classification of the new publication module.
 -r &lt;RPC&gt;  
 The responsible partner company enterprise name of the new publication module.
 
+-R &lt;CAGE&gt;  
+The CAGE code of the responsible partner company.
+
 -t &lt;title&gt;  
 The title of the new publication module.
 

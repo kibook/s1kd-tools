@@ -115,6 +115,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the responsible partner company.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-t &lt;title&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The title of the new publication module.</para>

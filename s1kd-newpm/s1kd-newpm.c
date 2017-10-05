@@ -317,7 +317,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -328,6 +328,7 @@ int main(int argc, char **argv)
 			case 'w': strcpy(in_work, optarg); break;
 			case 'c': strcpy(security_classification, optarg); break;
 			case 'r': strcpy(enterprise_name, optarg); break;
+			case 'R': strcpy(enterprise_code, optarg); break;
 			case 't': strcpy(pm_title, optarg); break;
 			case 'N': no_issue = true; break;
 			case 'i': include_issue_info = true; break;
