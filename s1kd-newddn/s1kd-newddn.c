@@ -92,6 +92,7 @@ void show_help(void)
 	puts("  -d <defaults>    Specify the 'defaults' file name.");
 	puts("  -p               Prompt user for values.");
 	puts("  -v               Print file name of DDN.");
+	puts("  -f               Overwrite existing file.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
@@ -242,6 +243,7 @@ int main(int argc, char **argv)
 	int showprompts = 0;
 	int skipcode = 0;
 	int verbose = 0;
+	int overwrite = 0;
 
 	xmlDocPtr ddn;
 	xmlNodePtr ddn_code;
@@ -265,7 +267,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:vh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -279,6 +281,7 @@ int main(int argc, char **argv)
 			case 'a': strncpy(authorization, optarg, 255); break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
 			case 'v': verbose = 1; break;
+			case 'f': overwrite = 1; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -422,7 +425,7 @@ int main(int argc, char **argv)
 		year_of_data_issue,
 		seq_number);
 
-	if (access(outfile, F_OK) != -1) {
+	if (!overwrite && access(outfile, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "%s already exists.\n", outfile);
 		exit(EXIT_DDN_EXISTS);
 	}
