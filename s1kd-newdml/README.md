@@ -43,6 +43,9 @@ BREX data module code.
 -v  
 Print the file name of the newly created DML.
 
+-f  
+Overwrite existing file.
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 

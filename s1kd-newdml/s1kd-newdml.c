@@ -151,6 +151,7 @@ void show_help(void)
 	puts("  -p       Prompt the user for each value.");
 	puts("  -N       Omit issue/inwork from filename.");
 	puts("  -v       Print file name of DML.");
+	puts("  -f       Overwrite existing file.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#       DML code");
@@ -234,6 +235,7 @@ int main(int argc, char **argv)
 	bool skipcode = false;
 	bool noissue = false;
 	bool verbose = false;
+	bool overwrite = false;
 
 	time_t now;
 	struct tm *local;
@@ -246,7 +248,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:vh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -257,6 +259,7 @@ int main(int argc, char **argv)
 			case 'N': noissue = true; break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
 			case 'v': verbose = true; break;
+			case 'f': overwrite = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -402,7 +405,7 @@ int main(int argc, char **argv)
 			in_work);
 	}
 
-	if (access(dml_fname, F_OK) != -1) {
+	if (!overwrite && access(dml_fname, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "Data module list already exists.\n");
 		exit(EXIT_DML_EXISTS);
 	}

@@ -113,6 +113,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;datamodules&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Any number of data module file names to automatically add to the list.</para>
