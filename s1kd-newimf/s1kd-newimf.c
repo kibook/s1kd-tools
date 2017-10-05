@@ -325,17 +325,21 @@ int main(int argc, char **argv)
 			node = first_xpath_node("//imfStatus/responsiblePartnerCompany", ctx);
 			xmlSetProp(node, BAD_CAST "enterpriseCode", BAD_CAST responsible_partner_company_code);
 		}
+
+		if (strcmp(responsible_partner_company, "") != 0) {
+			node = first_xpath_node("//imfStatus/responsiblePartnerCompany", ctx);
+			xmlNewChild(node, NULL, BAD_CAST "enterpriseName", BAD_CAST responsible_partner_company);
+		}
 		
 		if (strcmp(originator_code, "") != 0) {
 			node = first_xpath_node("//imfStatus/originator", ctx);
 			xmlSetProp(node, BAD_CAST "enterpriseCode", BAD_CAST originator_code);
 		}
 
-		node = first_xpath_node("//imfStatus/responsiblePartnerCompany/enterpriseName", ctx);
-		xmlNodeSetContent(node, BAD_CAST responsible_partner_company);
-
-		node = first_xpath_node("//imfStatus/originator/enterpriseName", ctx);
-		xmlNodeSetContent(node, BAD_CAST originator);
+		if (strcmp(originator, "") != 0) {
+			node = first_xpath_node("//imfStatus/originator", ctx);
+			xmlNewChild(node, NULL, BAD_CAST "enterpriseName", BAD_CAST originator);
+		}
 
 		if (strcmp(brex_dmcode, "") != 0)
 			set_brex(template, brex_dmcode);

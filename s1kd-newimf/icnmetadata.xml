@@ -13,12 +13,8 @@
     </imfAddress>
     <imfStatus>
       <security/>
-      <responsiblePartnerCompany>
-        <enterpriseName/>
-      </responsiblePartnerCompany>
-      <originator>
-        <enterpriseName/>
-      </originator>
+      <responsiblePartnerCompany/>
+      <originator/>
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
