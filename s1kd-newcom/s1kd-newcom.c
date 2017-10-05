@@ -98,6 +98,7 @@ void show_help(void)
 	puts("  -d    Specify the 'defaults' file name.");
 	puts("  -p    Prompt the user for each value.");
 	puts("  -v    Print file name of comment.");
+	puts("  -f    Overwrite existing file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Comment code");
@@ -259,12 +260,13 @@ int main(int argc, char **argv)
 	char commentTitle[256] = "";
 
 	bool verbose = false;
+	bool overwrite = false;
 
 	xmlDocPtr defaults_xml;
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:vh?")) != -1) {
+	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:vfh?")) != -1) {
 		switch (i) {
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
@@ -302,6 +304,9 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				verbose = true;
+				break;
+			case 'f':
+				overwrite = true;
 				break;
 			case 'h':
 			case '?':
@@ -468,7 +473,7 @@ int main(int argc, char **argv)
 		language_fname,
 		countryIsoCode);
 
-	if (access(comment_fname, F_OK) != -1) {
+	if (!overwrite && access(comment_fname, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "%s already exists.\n", comment_fname);
 		exit(EXIT_COMMENT_EXISTS);
 	}

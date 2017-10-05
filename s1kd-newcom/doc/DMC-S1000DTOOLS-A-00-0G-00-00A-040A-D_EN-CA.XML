@@ -124,6 +124,12 @@
                 <para>Print the file name of the newly created comment.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
         <levelledPara>

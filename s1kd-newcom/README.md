@@ -49,6 +49,9 @@ BREX data module code.
 -v  
 Print the file name of the newly created comment.
 
+-f  
+Overwrite existing file.
+
 'defaults' file
 ---------------
 
