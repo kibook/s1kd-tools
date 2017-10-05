@@ -7,7 +7,7 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="brSeverityLevelElemType" mixed="true">
-    <xs:attribute name="value" type="xs:string"/>
+    <xs:attribute name="value" type="xs:string" use="required"/>
     <xs:attribute name="fail" type="yesNoType"/>
   </xs:complexType>
   <xs:complexType name="brSeverityLevelsElemType">
