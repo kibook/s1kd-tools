@@ -522,6 +522,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	int i;
 	int status;
 	int total = 0;
+	bool valid_sns = true;
 
 	char *schema;
 	char xpath[512];
@@ -530,7 +531,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema);
 	xmlFree(schema);
 
-	if (check_sns && !check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck))
+	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck)))
 		++total;
 
 	for (i = 0; i < num_brex_fnames; ++i) {
@@ -555,12 +556,12 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 				brex_fnames[i], brexCheck);
 
 			if (verbose >= MESSAGE) {
-				fprintf(stderr, status ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
+				fprintf(stderr, status || !valid_sns ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
 			}
 
 			total += status;
 		} else if (verbose >= MESSAGE) {
-			fprintf(stderr, E_VALIDDOC, docname, brex_fnames[i]);
+			fprintf(stderr, valid_sns ? E_VALIDDOC : E_INVALIDDOC, docname, brex_fnames[i]);
 		}
 
 		xmlXPathFreeObject(result);
