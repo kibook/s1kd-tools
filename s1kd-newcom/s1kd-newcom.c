@@ -44,6 +44,8 @@ char securityClassification[4] = "";
 char commentPriorityCode[6] = "";
 char responseType[6] = "";
 
+char brex_dmcode[256] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -132,6 +134,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(securityClassification, def_val);
 	else if (strcmp(def_key, "commentPriorityCode") == 0)
 		strcpy(commentPriorityCode, def_val);
+	else if (strcmp(def_key, "brex") == 0)
+		strcpy(brex_dmcode, def_val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -253,8 +257,6 @@ int main(int argc, char **argv)
 	char commentTitle[256] = "";
 
 	xmlDocPtr defaults_xml;
-
-	char brex_dmcode[256] = "";
 
 	int i;
 
