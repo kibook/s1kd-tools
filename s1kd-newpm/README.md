@@ -49,6 +49,9 @@ The title of the new publication module.
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-v  
+Print the file name of the newly created publication module.
+
 'defaults' file
 ---------------
 

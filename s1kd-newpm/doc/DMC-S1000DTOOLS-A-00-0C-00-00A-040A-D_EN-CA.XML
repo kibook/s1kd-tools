@@ -126,6 +126,12 @@
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created publication module.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
         <levelledPara>

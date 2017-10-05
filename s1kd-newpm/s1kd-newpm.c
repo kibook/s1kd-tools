@@ -156,6 +156,7 @@ void show_help(void)
 	puts("  -d    Specify the 'defaults' file name.");
 	puts("  -p    Prompt the user for each value.");
 	puts("  -N    Omit issue/inwork from file name.");
+	puts("  -v    Print file name of pub module.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Publication module code");
@@ -309,9 +310,10 @@ int main(int argc, char **argv)
 	char iss[8] = "";
 	bool include_issue_info = false;
 	bool include_language = false;
+	bool verbose = false;
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:vh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -327,6 +329,7 @@ int main(int argc, char **argv)
 			case 'i': include_issue_info = true; break;
 			case 'l': include_language = true; break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
+			case 'v': verbose = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -494,6 +497,9 @@ int main(int argc, char **argv)
 	}
 
 	xmlSaveFormatFile(pm_filename, pm_doc, 1);
+
+	if (verbose)
+		puts(pm_filename);
 
 	xmlFreeDoc(pm_doc);
 
