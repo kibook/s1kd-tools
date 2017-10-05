@@ -42,6 +42,8 @@ char security_classification[4] = "";
 char issue_number[5] = "";
 char in_work[4] = "";
 
+char brex_dmcode[256] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -136,6 +138,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(in_work, def_val);
 	else if (strcmp(def_key, "securityClassification") == 0 && strcmp(security_classification, "") == 0)
 		strcpy(security_classification, def_val);
+	else if (strcmp(def_key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
+		strcpy(brex_dmcode, def_val);
 }
 
 void show_help(void)
@@ -235,8 +239,6 @@ int main(int argc, char **argv)
 	char year_s[5], month_s[3], day_s[3];
 
 	char dml_fname[PATH_MAX];
-
-	char brex_dmcode[256] = "";
 
 	int c;
 
