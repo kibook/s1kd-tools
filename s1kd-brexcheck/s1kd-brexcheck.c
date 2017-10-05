@@ -393,7 +393,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlh?] <datamodules>");
+	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlSh?] <datamodules>");
 	puts("");
 	puts("Options:");
 	puts("	-b <brex>    Use <brex> as the BREX data module");

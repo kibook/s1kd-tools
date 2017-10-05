@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlh?] <datamodules>]]></para>
+        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlSh?] <datamodules>]]></para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
