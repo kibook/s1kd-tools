@@ -43,6 +43,7 @@ char in_work[4] = "";
 char pm_title[256] = "";
 char security_classification[4] = "";
 char enterprise_name[256] = "";
+char enterprise_code[7] = "";
 
 char brex_dmcode[256] = "";
 
@@ -189,6 +190,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(security_classification, val);
 	else if (strcmp(key, "responsiblePartnerCompany") == 0 && strcmp(enterprise_name, "") == 0)
 		strcpy(enterprise_name, val);
+	else if (strcmp(key, "responsiblePartnerCompanyCode") == 0 && strcmp(enterprise_code, "") == 0)
+		strcpy(enterprise_code, val);
 	else if (strcmp(key, "issueNumber") == 0 && strcmp(issue_number, "") == 0)
 		strcpy(issue_number, val);
 	else if (strcmp(key, "inWork") == 0 && strcmp(in_work, "") == 0)
@@ -291,7 +294,6 @@ int main(int argc, char **argv)
 	xmlNodePtr pmStatus;
 	xmlNodePtr security;
 	xmlNodePtr responsiblePartnerCompany;
-	xmlNodePtr enterpriseName;
 	xmlNodePtr pmEntry;
 
 	char pm_filename[256];
@@ -439,7 +441,6 @@ int main(int argc, char **argv)
 	pmStatus = find_child(identAndStatusSection, "pmStatus");
 	security = find_child(pmStatus, "security");
 	responsiblePartnerCompany = find_child(pmStatus, "responsiblePartnerCompany");
-	enterpriseName = find_child(responsiblePartnerCompany, "enterpriseName");
 	pmEntry = find_child(find_child(pm, "content"), "pmEntry");
 
 	xmlSetProp(pmCode, (xmlChar *) "modelIdentCode", (xmlChar *) model_ident_code);
@@ -468,7 +469,12 @@ int main(int argc, char **argv)
 	xmlNodeSetContent(pmTitle, (xmlChar *) pm_title);
 
 	xmlSetProp(security, (xmlChar *) "securityClassification", (xmlChar *) security_classification);
-	xmlNodeSetContent(enterpriseName, (xmlChar *) enterprise_name);
+
+	if (strcmp(enterprise_name, "") != 0)
+		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST enterprise_name);
+
+	if (strcmp(enterprise_code, "") != 0)
+		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST enterprise_code);
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(pm_doc, brex_dmcode);

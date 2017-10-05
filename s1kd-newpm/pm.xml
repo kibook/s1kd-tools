@@ -16,9 +16,7 @@
     </pmAddress>
     <pmStatus>
       <security securityClassification=""/>
-      <responsiblePartnerCompany>
-        <enterpriseName></enterpriseName>
-      </responsiblePartnerCompany>
+      <responsiblePartnerCompany/>
       <applic>
         <displayText>
           <simplePara>All</simplePara>
