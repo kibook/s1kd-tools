@@ -104,6 +104,7 @@ void show_help(void)
 	puts("  -p          Show prompts");
 	puts("  -d <path>   Defaults file path");
 	puts("  -N          Omit issue/inwork numbers from filename");
+	puts("  -v          Print file name of IMF");
 	puts("  <icns>      1 or more ICNs to generate a metadata file for");
 	puts("");
 	puts("In addition, the following metadata can be set:");
@@ -198,13 +199,14 @@ int main(int argc, char **argv)
 
 	bool show_prompts = false;
 	bool no_issue = false;
+	bool verbose = false;
 
 	FILE *defaults;
 	char defaults_fname[PATH_MAX] = "defaults";
 
 	xmlDocPtr defaults_xml;
 
-	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:h?")) != -1) {
+	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:vh?")) != -1) {
 		switch (i) {
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -218,6 +220,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 't': strncpy(icn_title, optarg, 255); break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
+			case 'v': verbose = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -346,6 +349,9 @@ int main(int argc, char **argv)
 		}
 
 		xmlSaveFile(fname, template);
+
+		if (verbose)
+			puts(fname);
 
 		xmlFreeDoc(template);
 	}

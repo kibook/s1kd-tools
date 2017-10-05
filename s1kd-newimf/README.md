@@ -48,3 +48,6 @@ The ICN title (if creating multiple ICNs, they will all use this title).
 
 -b &lt;BREX&gt;  
 BREX data module code.
+
+-v  
+Print the file name of the newly created IMF.
