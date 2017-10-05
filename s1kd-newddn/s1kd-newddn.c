@@ -51,6 +51,8 @@ char receiver_country[256] = "";
 char security_classification[4] = "";
 char authorization[256] = "";
 
+char brex_dmcode[256] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -160,6 +162,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(security_classification, def_val);
 	if (matches_key_and_not_set(def_key, "authorization", authorization))
 		strcpy(authorization, def_val);
+	if (matches_key_and_not_set(def_key, "brex", brex_dmcode))
+		strcpy(brex_dmcode, def_val);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -257,8 +261,6 @@ int main(int argc, char **argv)
 	char outfile[PATH_MAX];
 
 	xmlDocPtr defaults_xml;
-
-	char brex_dmcode[256] = "";
 
 	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:h?")) != -1) {
 		switch (c) {
