@@ -313,7 +313,6 @@ int main(int argc, char **argv)
 	xmlNode *infoName;
 	xmlNode *responsiblePartnerCompany;
 	xmlNode *originator;
-	xmlNode *enterpriseName;
 
 	FILE *defaults;
 
@@ -596,15 +595,17 @@ int main(int argc, char **argv)
 	if (strcmp(responsiblePartnerCompany_enterpriseCode, "") != 0) {
 		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST responsiblePartnerCompany_enterpriseCode);
 	}
-	enterpriseName = find_child(responsiblePartnerCompany, "enterpriseName");
-	xmlNodeAddContent(enterpriseName, BAD_CAST responsiblePartnerCompany_enterpriseName);
+	if (strcmp(responsiblePartnerCompany_enterpriseName, "") != 0) {
+		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST responsiblePartnerCompany_enterpriseName);
+	}
 
 	originator = find_child(dmStatus, "originator");
 	if (strcmp(originator_enterpriseCode, "") != 0) {
 		xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST originator_enterpriseCode);
 	}
-	enterpriseName = find_child(originator, "enterpriseName");
-	xmlNodeAddContent(enterpriseName, BAD_CAST originator_enterpriseName);
+	if (strcmp(originator_enterpriseName, "") != 0) {
+		xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST originator_enterpriseName);
+	}
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(dm, brex_dmcode);

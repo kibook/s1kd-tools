@@ -19,12 +19,8 @@
     </dmAddress>
     <dmStatus issueType="new">
       <security/>
-      <responsiblePartnerCompany>
-        <enterpriseName></enterpriseName>
-      </responsiblePartnerCompany>
-      <originator>
-        <enterpriseName></enterpriseName>
-      </originator>
+      <responsiblePartnerCompany/>
+      <originator/>
       <applic>
         <displayText>
           <simplePara>All</simplePara>
