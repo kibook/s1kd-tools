@@ -43,6 +43,9 @@ The title of the new comment.
 -r &lt;type&gt;  
 The response type of the new comment.
 
+-b &lt;BREX&gt;  
+BREX data module code.
+
 'defaults' file
 ---------------
 

@@ -6,6 +6,7 @@
 #include <ctype.h>
 
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #include "templates.h"
 
@@ -41,6 +42,7 @@
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
 #define EXIT_BAD_DMC 3
+#define EXIT_BAD_BREX_DMC 4
 
 char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -125,6 +127,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -p	Prompt the user for each value");
+	puts("  -N	Omit issue/inwork from filename.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#	Data module code");
@@ -140,7 +143,7 @@ void show_help(void)
 	puts("  -t	Tech name");
 	puts("  -i	Info name");
 	puts("  -T	DM type (descript, proced, frontmatter, brex, brdoc)");
-	puts("  -N	Omit issue/inwork from filename.");
+	puts("  -b      BREX data module code.");
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -197,6 +200,83 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(schema, val);
 }
 
+xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
+}
+
+void set_brex(xmlDocPtr doc, const char *code)
+{
+	xmlNodePtr dmCode;
+	int n;
+
+	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
+	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
+	char systemCode[MAX_SYSTEM_CODE] = "";
+	char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
+	char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
+	char assyCode[MAX_ASSY_CODE] = "";
+	char disassyCode[MAX_DISASSY_CODE] = "";
+	char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
+	char infoCode[MAX_INFO_CODE] = "";
+	char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
+	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+	char learnCode[MAX_LEARN_CODE] = "";
+	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+
+	dmCode = firstXPathNode(doc, "//brexDmRef/dmRef/dmRefIdent/dmCode");
+
+	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+		modelIdentCode,
+		systemDiffCode,
+		systemCode,
+		subSystemCode,
+		subSubSystemCode,
+		assyCode,
+		disassyCode,
+		disassyCodeVariant,
+		infoCode,
+		infoCodeVariant,
+		itemLocationCode,
+		learnCode,
+		learnEventCode);
+
+	if (n != 11 && n != 13) {
+		fprintf(stderr, ERR_PREFIX "Bad BREX data module code.\n");
+		exit(EXIT_BAD_BREX_DMC);
+	}
+
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST systemDiffCode);
+	xmlSetProp(dmCode, BAD_CAST "systemCode", BAD_CAST systemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode", BAD_CAST subSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", BAD_CAST subSubSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "assyCode", BAD_CAST assyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode", BAD_CAST disassyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST infoCode);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST infoCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode", BAD_CAST itemLocationCode);
+
+	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
+	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+}
+
 int main(int argc, char **argv)
 {
 	time_t now;
@@ -241,10 +321,11 @@ int main(int argc, char **argv)
 	char dmcode[256] = "";
 	bool skipdmc = false;
 	bool no_issue = false;
+	char brex_dmcode[256] = "";
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:b:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -264,6 +345,7 @@ int main(int argc, char **argv)
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
 			case 'N': no_issue = true; break;
 			case 'S': strcpy(schema, optarg); break;
+			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -514,6 +596,9 @@ int main(int argc, char **argv)
 	}
 	enterpriseName = find_child(originator, "enterpriseName");
 	xmlNodeAddContent(enterpriseName, BAD_CAST originator_enterpriseName);
+
+	if (strcmp(brex_dmcode, "") != 0)
+		set_brex(dm, brex_dmcode);
 
 	for (i = 0; languageIsoCode[i]; ++i) languageIsoCode[i] = toupper(languageIsoCode[i]);
 

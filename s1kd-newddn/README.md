@@ -49,6 +49,9 @@ Specify the authorization.
 -h -?  
 Show help/usage message.
 
+-b &lt;BREX&gt;  
+BREX data module code.
+
 'defaults' file
 ---------------
 

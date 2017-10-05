@@ -93,6 +93,9 @@ The type (schema) of the new data module. Supported schemas:
 -N  
 Omit issue/inwork numbers from filename.
 
+-b &lt;BREX&gt;  
+BREX data module code.
+
 Prompt (-p) option
 ------------------
 

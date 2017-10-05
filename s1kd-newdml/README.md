@@ -37,6 +37,9 @@ The security classification of the new data module.
 -N  
 Omit the issue/inwork numbers from filename.
 
+-b &lt;BREX&gt;  
+BREX data module code.
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 

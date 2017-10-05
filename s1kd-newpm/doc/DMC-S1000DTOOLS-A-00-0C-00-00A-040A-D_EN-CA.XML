@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="C" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="16"/>
+        <issueDate year="2017" month="10" day="05"/>
         <dmTitle>
           <techName>s1kd-newpm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -118,6 +118,12 @@
               <listItemTerm>-t &lt;title&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The title of the new publication module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

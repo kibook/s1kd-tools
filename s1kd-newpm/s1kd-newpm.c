@@ -16,6 +16,21 @@
 
 #define EXIT_BAD_PMC 1
 #define EXIT_PM_EXISTS 2
+#define EXIT_BAD_BREX_DMC 3
+
+#define MAX_MODEL_IDENT_CODE		14	+ 2
+#define MAX_SYSTEM_DIFF_CODE		 4	+ 2
+#define MAX_SYSTEM_CODE			 3	+ 2
+#define MAX_SUB_SYSTEM_CODE		 1	+ 2
+#define MAX_SUB_SUB_SYSTEM_CODE		 1	+ 2
+#define MAX_ASSY_CODE			 4	+ 2
+#define MAX_DISASSY_CODE		 2	+ 2
+#define MAX_DISASSY_CODE_VARIANT	 1	+ 2
+#define MAX_INFO_CODE			 3	+ 2
+#define MAX_INFO_CODE_VARIANT		 1	+ 2
+#define MAX_ITEM_LOCATION_CODE		 1	+ 2
+#define MAX_LEARN_CODE                   3      + 2
+#define MAX_LEARN_EVENT_CODE		 1	+ 2
 
 char model_ident_code[16] = "";
 char pm_issuer[7] = "";
@@ -137,7 +152,8 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -d    Specify the 'defaults' file name.");
-	puts("  -p    Prompt the user for each value");
+	puts("  -p    Prompt the user for each value.");
+	puts("  -N    Omit issue/inwork from file name.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Publication module code");
@@ -148,6 +164,7 @@ void show_help(void)
 	puts("  -c    Security classification");
 	puts("  -r    Responsible partner company enterprise name");
 	puts("  -t    Publication module title");
+	puts("  -b    BREX data module code");
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -172,6 +189,83 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(issue_number, val);
 	else if (strcmp(key, "inWork") == 0)
 		strcpy(in_work, val);
+}
+
+xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
+}
+
+void set_brex(xmlDocPtr doc, const char *code)
+{
+	xmlNodePtr dmCode;
+	int n;
+
+	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
+	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
+	char systemCode[MAX_SYSTEM_CODE] = "";
+	char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
+	char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
+	char assyCode[MAX_ASSY_CODE] = "";
+	char disassyCode[MAX_DISASSY_CODE] = "";
+	char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
+	char infoCode[MAX_INFO_CODE] = "";
+	char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
+	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+	char learnCode[MAX_LEARN_CODE] = "";
+	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+
+	dmCode = firstXPathNode(doc, "//brexDmRef/dmRef/dmRefIdent/dmCode");
+
+	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+		modelIdentCode,
+		systemDiffCode,
+		systemCode,
+		subSystemCode,
+		subSubSystemCode,
+		assyCode,
+		disassyCode,
+		disassyCodeVariant,
+		infoCode,
+		infoCodeVariant,
+		itemLocationCode,
+		learnCode,
+		learnEventCode);
+
+	if (n != 11 && n != 13) {
+		fprintf(stderr, ERR_PREFIX "Bad BREX data module code.\n");
+		exit(EXIT_BAD_BREX_DMC);
+	}
+
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST systemDiffCode);
+	xmlSetProp(dmCode, BAD_CAST "systemCode", BAD_CAST systemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode", BAD_CAST subSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", BAD_CAST subSubSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "assyCode", BAD_CAST assyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode", BAD_CAST disassyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST infoCode);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST infoCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode", BAD_CAST itemLocationCode);
+
+	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
+	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
 int main(int argc, char **argv)
@@ -212,8 +306,9 @@ int main(int argc, char **argv)
 	bool include_issue_info = false;
 	bool include_language = false;
 	xmlDocPtr defaults_xml;
+	char brex_dmcode[256] = "";
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:t:Nilb:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -228,6 +323,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 'i': include_issue_info = true; break;
 			case 'l': include_language = true; break;
+			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -364,6 +460,9 @@ int main(int argc, char **argv)
 
 	xmlSetProp(security, (xmlChar *) "securityClassification", (xmlChar *) security_classification);
 	xmlNodeSetContent(enterpriseName, (xmlChar *) enterprise_name);
+
+	if (strcmp(brex_dmcode, "") != 0)
+		set_brex(pm_doc, brex_dmcode);
 
 	for (i = optind; i < argc; ++i) {
 		add_dm_ref(pmEntry, argv[i], include_issue_info, include_language);

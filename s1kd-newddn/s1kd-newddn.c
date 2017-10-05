@@ -21,6 +21,21 @@
 
 #define EXIT_DDN_EXISTS 1
 #define EXIT_MALFORMED_CODE 2
+#define EXIT_BAD_BREX_DMC 3
+
+#define MAX_MODEL_IDENT_CODE		14	+ 2
+#define MAX_SYSTEM_DIFF_CODE		 4	+ 2
+#define MAX_SYSTEM_CODE			 3	+ 2
+#define MAX_SUB_SYSTEM_CODE		 1	+ 2
+#define MAX_SUB_SUB_SYSTEM_CODE		 1	+ 2
+#define MAX_ASSY_CODE			 4	+ 2
+#define MAX_DISASSY_CODE		 2	+ 2
+#define MAX_DISASSY_CODE_VARIANT	 1	+ 2
+#define MAX_INFO_CODE			 3	+ 2
+#define MAX_INFO_CODE_VARIANT		 1	+ 2
+#define MAX_ITEM_LOCATION_CODE		 1	+ 2
+#define MAX_LEARN_CODE                   3      + 2
+#define MAX_LEARN_EVENT_CODE		 1	+ 2
 
 char model_ident_code[MODEL_IDENT_CODE_MAX] = "";
 char sender_ident[CAGE_MAX] = "";
@@ -83,6 +98,7 @@ void show_help(void)
 	puts("  -n <country>     Sender country");
 	puts("  -N <country>     Receiver country");
 	puts("  -a <auth>        Authorization");
+	puts("  -b <BREX>        BREX data module code");
 }
 
 int matches_key_and_not_set(const char *key, const char *match, const char *var)
@@ -146,6 +162,68 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(authorization, def_val);
 }
 
+void set_brex(xmlDocPtr doc, const char *code)
+{
+	xmlNodePtr dmCode;
+	xmlXPathContextPtr ctx;
+	int n;
+
+	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
+	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
+	char systemCode[MAX_SYSTEM_CODE] = "";
+	char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
+	char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
+	char assyCode[MAX_ASSY_CODE] = "";
+	char disassyCode[MAX_DISASSY_CODE] = "";
+	char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
+	char infoCode[MAX_INFO_CODE] = "";
+	char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
+	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+	char learnCode[MAX_LEARN_CODE] = "";
+	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+
+	ctx = xmlXPathNewContext(doc);
+
+	dmCode = first_xpath_node("//brexDmRef/dmRef/dmRefIdent/dmCode", ctx);
+
+	xmlXPathFreeContext(ctx);
+
+	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+		modelIdentCode,
+		systemDiffCode,
+		systemCode,
+		subSystemCode,
+		subSubSystemCode,
+		assyCode,
+		disassyCode,
+		disassyCodeVariant,
+		infoCode,
+		infoCodeVariant,
+		itemLocationCode,
+		learnCode,
+		learnEventCode);
+
+	if (n != 11 && n != 13) {
+		fprintf(stderr, ERR_PREFIX "Bad BREX data module code.\n");
+		exit(EXIT_BAD_BREX_DMC);
+	}
+
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST systemDiffCode);
+	xmlSetProp(dmCode, BAD_CAST "systemCode", BAD_CAST systemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode", BAD_CAST subSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", BAD_CAST subSubSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "assyCode", BAD_CAST assyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode", BAD_CAST disassyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST infoCode);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST infoCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode", BAD_CAST itemLocationCode);
+
+	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
+	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+}
+
 int main(int argc, char **argv)
 {
 	int c;
@@ -180,7 +258,9 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:h?")) != -1) {
+	char brex_dmcode[256] = "";
+
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -192,6 +272,7 @@ int main(int argc, char **argv)
 			case 'T': strncpy(receiver_city, optarg, 255); break;
 			case 'N': strncpy(receiver_country, optarg, 255); break;
 			case 'a': strncpy(authorization, optarg, 255); break;
+			case 'b': strncpy(brex_dmcode, optarg, 255); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -318,6 +399,9 @@ int main(int argc, char **argv)
 
 	auth = first_xpath_node("//ddnStatus/authorization", ctxt);
 	xmlNodeSetContent(auth, BAD_CAST authorization);
+
+	if (strcmp(brex_dmcode, "") != 0)
+		set_brex(ddn, brex_dmcode);
 
 	delivery_list = first_xpath_node("//ddnContent/deliveryList", ctxt);
 

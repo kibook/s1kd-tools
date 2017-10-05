@@ -46,6 +46,9 @@ The responsible partner company enterprise name of the new publication module.
 -t &lt;title&gt;  
 The title of the new publication module.
 
+-b &lt;BREX&gt;  
+BREX data module code.
+
 'defaults' file
 ---------------
 

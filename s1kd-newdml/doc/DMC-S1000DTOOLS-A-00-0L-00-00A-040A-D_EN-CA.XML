@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="001" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="09" day="18"/>
+        <issueDate year="2017" month="10" day="05"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | General Commands Manual</techName>
         </dmTitle>
@@ -98,6 +98,12 @@
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
                 <para>Omit the issue/inwork numbers from filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

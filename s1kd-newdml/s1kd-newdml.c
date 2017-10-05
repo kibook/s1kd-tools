@@ -17,6 +17,21 @@
 #define EXIT_DML_EXISTS 1
 #define EXIT_BAD_INPUT 2
 #define EXIT_BAD_CODE 3
+#define EXIT_BAD_BREX_DMC 4
+
+#define MAX_MODEL_IDENT_CODE		14	+ 2
+#define MAX_SYSTEM_DIFF_CODE		 4	+ 2
+#define MAX_SYSTEM_CODE			 3	+ 2
+#define MAX_SUB_SYSTEM_CODE		 1	+ 2
+#define MAX_SUB_SUB_SYSTEM_CODE		 1	+ 2
+#define MAX_ASSY_CODE			 4	+ 2
+#define MAX_DISASSY_CODE		 2	+ 2
+#define MAX_DISASSY_CODE_VARIANT	 1	+ 2
+#define MAX_INFO_CODE			 3	+ 2
+#define MAX_INFO_CODE_VARIANT		 1	+ 2
+#define MAX_ITEM_LOCATION_CODE		 1	+ 2
+#define MAX_LEARN_CODE                   3      + 2
+#define MAX_LEARN_EVENT_CODE		 1	+ 2
 
 char model_ident_code[16] = "";
 char sender_ident[7] = "";
@@ -137,6 +152,64 @@ void show_help(void)
 	puts("  -n       Issue number");
 	puts("  -w       Inwork issue");
 	puts("  -c       Security classification");
+	puts("  -b       BREX data module code");
+}
+
+void set_brex(xmlDocPtr doc, const char *code)
+{
+	xmlNodePtr dmCode;
+	int n;
+
+	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
+	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
+	char systemCode[MAX_SYSTEM_CODE] = "";
+	char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
+	char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
+	char assyCode[MAX_ASSY_CODE] = "";
+	char disassyCode[MAX_DISASSY_CODE] = "";
+	char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
+	char infoCode[MAX_INFO_CODE] = "";
+	char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
+	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+	char learnCode[MAX_LEARN_CODE] = "";
+	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+
+	dmCode = firstXPathNode("//brexDmRef/dmRef/dmRefIdent/dmCode", doc);
+
+	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+		modelIdentCode,
+		systemDiffCode,
+		systemCode,
+		subSystemCode,
+		subSubSystemCode,
+		assyCode,
+		disassyCode,
+		disassyCodeVariant,
+		infoCode,
+		infoCodeVariant,
+		itemLocationCode,
+		learnCode,
+		learnEventCode);
+
+	if (n != 11 && n != 13) {
+		fprintf(stderr, ERR_PREFIX "Bad BREX data module code.\n");
+		exit(EXIT_BAD_BREX_DMC);
+	}
+
+	xmlSetProp(dmCode, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
+	xmlSetProp(dmCode, BAD_CAST "systemDiffCode", BAD_CAST systemDiffCode);
+	xmlSetProp(dmCode, BAD_CAST "systemCode", BAD_CAST systemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSystemCode", BAD_CAST subSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", BAD_CAST subSubSystemCode);
+	xmlSetProp(dmCode, BAD_CAST "assyCode", BAD_CAST assyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCode", BAD_CAST disassyCode);
+	xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST infoCode);
+	xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST infoCodeVariant);
+	xmlSetProp(dmCode, BAD_CAST "itemLocationCode", BAD_CAST itemLocationCode);
+
+	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
+	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
 int main(int argc, char **argv)
@@ -163,11 +236,13 @@ int main(int argc, char **argv)
 
 	char dml_fname[PATH_MAX];
 
+	char brex_dmcode[256] = "";
+
 	int c;
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -176,6 +251,7 @@ int main(int argc, char **argv)
 			case 'w': strcpy(in_work, optarg); break;
 			case 'c': strcpy(security_classification, optarg); break;
 			case 'N': noissue = true; break;
+			case 'b': strncpy(brex_dmcode, optarg, 255); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -295,6 +371,9 @@ int main(int argc, char **argv)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 
 	xmlXPathFreeContext(ctxt);
+
+	if (strcmp(brex_dmcode, "") != 0)
+		set_brex(dml_doc, brex_dmcode);
 
 	dml_type[0] = toupper(dml_type[0]);
 
