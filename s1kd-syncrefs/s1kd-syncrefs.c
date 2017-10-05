@@ -10,7 +10,9 @@
 #define PM "1" /* pmRef */
 #define EP "2" /* externalPubRef */
 
-#define ERR_PREFIX "syncrefs: ERROR: "
+#define PROG_NAME "s1kd-syncrefs"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_INVALID_DM 1
 
@@ -243,7 +245,7 @@ void sync_refs(xmlNodePtr dmodule)
 
 void show_help(void)
 {
-	puts("Usage: syncrefs [-o <out>] <dms>");
+	puts("Usage: " PROG_NAME " [-o <out>] <dms>");
 	puts("");
 	puts("Options:");
 	puts("  -o <out>	Output to <out> instead of overwriting (- for stdout)");
