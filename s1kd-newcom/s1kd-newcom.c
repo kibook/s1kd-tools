@@ -96,7 +96,9 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -d    Specify the 'defaults' file name.");
-	puts("  -p    Prompt the user for each value");
+	puts("  -p    Prompt the user for each value.");
+	puts("  -v    Print file name of comment.");
+	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Comment code");
 	puts("  -L    Language ISO code");
@@ -256,11 +258,13 @@ int main(int argc, char **argv)
 	bool skip_code = false;
 	char commentTitle[256] = "";
 
+	bool verbose = false;
+
 	xmlDocPtr defaults_xml;
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:h?")) != -1) {
+	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:vh?")) != -1) {
 		switch (i) {
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
@@ -295,6 +299,9 @@ int main(int argc, char **argv)
 				break;
 			case 'b':
 				strncpy(brex_dmcode, optarg, 255);
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':
@@ -467,6 +474,9 @@ int main(int argc, char **argv)
 	}
 
 	xmlSaveFormatFile(comment_fname, comment_doc, 1);
+
+	if (verbose)
+		puts(comment_fname);
 
 	xmlFreeDoc(comment_doc);
 

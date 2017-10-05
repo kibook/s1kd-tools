@@ -46,6 +46,9 @@ The response type of the new comment.
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-v  
+Print the file name of the newly created comment.
+
 'defaults' file
 ---------------
 

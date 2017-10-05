@@ -118,6 +118,12 @@
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
         <levelledPara>
