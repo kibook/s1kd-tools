@@ -300,6 +300,27 @@ char *real_path(const char *path, char *real)
 	#endif
 }
 
+void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(rule->doc);
+	ctx->node = rule;
+
+	obj = xmlXPathEvalExpression(BAD_CAST "objectValue", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlAddChild(brexError, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr brexCheck)
 {
@@ -363,6 +384,8 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 			xmlNewChild(brexError, NULL, BAD_CAST "objectPath", BAD_CAST path);
 			xmlNewChild(brexError, NULL, BAD_CAST "objectUse", BAD_CAST use);
+
+			add_object_values(brexError, rules->nodeTab[i]);
 
 			if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 				dump_nodes_xml(object->nodesetval, fname,
@@ -604,17 +627,26 @@ void print_node(xmlNodePtr node)
 		}
 		printf("%s\n", use);
 		xmlFree(use);
+	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
+		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
+		char *content = (char *) xmlNodeGetContent(node);
+		printf("  VALUE ALLOWED: %s", content);
+		if (allowed)
+			printf(" (%s)", allowed);
+		putchar('\n');
+		xmlFree(content);
+		xmlFree(allowed);
 	} else if (strcmp((char *) node->name, "object") == 0 && !shortmsg) {
 		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
 		printf("  line %s:\n", line);
 		xmlFree(line);
-
 		xmlDebugDumpOneNode(stdout, node->children, 2);
 	} else if (strcmp((char *) node->name, "snsError") == 0) {
 		printf("SNS ERROR: ");
 	} else if (strcmp((char *) node->name, "code") == 0) {
 		char *code = (char *) xmlNodeGetContent(node);
-		printf("  Value of %s does not conform to SNS: ", code);
+		if (!shortmsg) printf("  ");
+		printf("Value of %s does not conform to SNS: ", code);
 		xmlFree(code);
 	} else if (strcmp((char *) node->name, "invalidValue") == 0) {
 		char *value = (char *) xmlNodeGetContent(node);
