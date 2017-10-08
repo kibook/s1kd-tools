@@ -63,7 +63,7 @@ RETURN VALUE
 
 The number of BREX errors encountered is returned in the exit status code.
 
-Example
+EXAMPLE
 =======
 
     $ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
