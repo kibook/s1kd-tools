@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="H" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="05"/>
+        <issueDate year="2017" month="10" day="10"/>
         <dmTitle>
           <techName>s1kd-newddn(1) | General Commands Manual</techName>
         </dmTitle>
@@ -44,7 +44,10 @@
     <description>
       <levelledPara id="name">
         <title>NAME</title>
-        <para>s1kd-newddn - Create an S1000D data dispatch note.</para>
+        <para>s1kd-newddn - Create an S1000D <acronym acronymType="at01">
+          <acronymTerm>DDN</acronymTerm>
+          <acronymDefinition>Data Dispatch Note</acronymDefinition>
+        </acronym>.</para>
       </levelledPara>
       <levelledPara id="synopsis">
         <title>SYNOPSIS</title>

@@ -70,7 +70,7 @@ Set the applicability for the whole data module/publication module using the use
 Add an XML comment to the top of the instance. Useful as another way of identifying a data module/publication module as an instance aside from the source address or extended code, or giving additional information about a particular instance.
 
 -R &lt;CIR&gt; ...  
-Use a CIR to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times. Currently the functional item, warnings/cautions and applicability CIRs are supported.
+Use a CIR (Common Information Repository) to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times. Currently the functional item, warnings/cautions and applicability CIRs are supported.
 
 -S  
 Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.
@@ -82,7 +82,7 @@ Check the applicability of the whole data module/publication module against the 
 Omit issue/inwork numbers from automatically generated filenames.
 
 -P &lt;PCT&gt;  
-Product cross-reference table file to read product definitions from (-p).
+PCT (Product Cross-reference Table) file to read product definitions from (-p).
 
 -p &lt;id&gt;  
 Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).

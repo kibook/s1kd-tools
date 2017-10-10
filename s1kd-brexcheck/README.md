@@ -11,7 +11,7 @@ s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\]
 DESCRIPTION
 ===========
 
-The *s1kd-brexcheck* tool validates an S1000D data module using the context rules of one or multiple Business Rule EXchange (BREX) data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.
+The *s1kd-brexcheck* tool validates an S1000D data module using the context rules of one or multiple BREX (Business Rules EXchange) data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.
 
 OPTIONS
 =======
