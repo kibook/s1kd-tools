@@ -156,11 +156,24 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	}
 
 	if (strcmp(schema_dir, "") != 0) {
-		char *last_slash, *schema_name, schema_file[256];
+		char *last_slash, *slash1, *slash2, *schema_name, schema_file[256];
 
+		/* Check if directory is in multi-spec format */
+		slash1 = strrchr(url, '/');
+		slash1[0] = 0;
+		slash2 = strrchr(url, '/');
+		slash2[0] = 0;
 		last_slash = strrchr(url, '/');
+		slash1[0] = slash2[0] = '/';
 		schema_name = url + (last_slash - url) + 1;
 		snprintf(schema_file, 256, "%s/%s", schema_dir, schema_name);
+
+		/* Otherwise, try single-spec format */
+		if (access(schema_file, F_OK) == -1) {
+			last_slash = strrchr(url, '/');
+			schema_name = url + (last_slash - url) + 1;
+			snprintf(schema_file, 256, "%s/%s", schema_dir, schema_name);
+		}
 
 		if (access(schema_file, F_OK) == -1) {
 			if (verbosity > SILENT) {

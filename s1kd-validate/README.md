@@ -24,3 +24,16 @@ Set the verbosity of the output, verbose, quiet, and debug. Verbose will explict
 
 &lt;datamodules&gt;  
 Any number of data modules to validate.
+
+Multi-spec directory with -d option
+-----------------------------------
+
+The -d option can point either to a directory containing the XSD schema files for a single S1000D spec (i.e. the last part of the schema URI), or to a directory containing schemas for multiple specs. The latter must follow a particular format for the tool to locate the appropriate schemas for a given spec:
+
+    schemas/    <-- The directory passed to -d
+        S1000D_4-1/
+            xml_schema_flat/
+                [4.1 XSD files...]
+        S1000D_4-2/
+            xml_schema_flat/
+                [4.2 XSD files...]
