@@ -70,6 +70,51 @@ of all SNS rules of all specified BREX data modules.
 .RS
 .RE
 .TP
+.B \-t
+Strict SNS checking.
+By default, the SNS check (\-S) will assume optional elements
+snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0"
+("00" or "0000" for snsAssy) when their parent element does not contain
+any of each.
+This provides a shorthand, such that
+.RS
+.IP
+.nf
+\f[C]
+<snsSystem>
+\ \ <snsCode>00</snsCode>
+\ \ <snsTitle>General</snsTitle>
+</snsSystem>
+\f[]
+.fi
+.PP
+is equivalent to
+.IP
+.nf
+\f[C]
+<snsSystem>
+\ \ <snsCode>00</snsCode>
+\ \ <snsTitle>General</snsTitle>
+\ \ <snsSubSystem>
+\ \ \ \ <snsCode>0</snsCode>
+\ \ \ \ <snsTitle>General</snsTitle>
+\ \ \ \ <snsSubSubSystem>
+\ \ \ \ \ \ <snsCode>0</snsCode>
+\ \ \ \ \ \ <snsTitle>General</snsTitle>
+\ \ \ \ \ \ <snsAssy>
+\ \ \ \ \ \ \ \ <snsCode>00</snsCode>
+\ \ \ \ \ \ \ \ <snsTitle>General</snsTitle>
+\ \ \ \ \ \ </snsAssy>
+\ \ \ \ </snsSubSubSystem>
+\ \ </snsSubSystem>
+</snsSystem>
+\f[]
+.fi
+.PP
+Specifying the \-t option will disable this shorthand, and missing
+optional elements will result in an error.
+.RE
+.TP
 .B \-h \-?
 Show the help/usage message.
 .RS

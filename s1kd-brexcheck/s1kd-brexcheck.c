@@ -63,6 +63,7 @@ char *brsl_fname = NULL;
 xmlDocPtr brsl;
 
 bool check_sns = false;
+bool strict_sns = false;
 
 xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
@@ -452,6 +453,21 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 	return node;
 }
 
+bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
+{
+	bool ret;
+
+	if (strict_sns) return true;
+
+	if (strcmp(path, ".//snsSubSystem") == 0 || strcmp(path, ".//snsSubSubSystem") == 0) {
+		ret = xmlStrcmp(code, BAD_CAST "0") != 0;
+	} else {
+		ret = !(xmlStrcmp(code, BAD_CAST "00") == 0 || xmlStrcmp(code, BAD_CAST "0000") == 0);
+	}
+
+	return ret || firstXPathNode(snsRulesDoc, ctx, path);
+}
+
 bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
 	const char *dmod_fname, xmlNodePtr brexCheck)
 {
@@ -499,37 +515,43 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 		return false;
 	}
 
-	sprintf(xpath, ".//snsSubSystem[snsCode = '%s']", (char *) subSystemCode);
-	if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
-		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSystemCode");
+	if (should_check(subSystemCode, ".//snsSubSystem", snsRulesDoc, ctx)) {
+		sprintf(xpath, ".//snsSubSystem[snsCode = '%s']", (char *) subSystemCode);
+		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
+			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSystemCode");
 
-		sprintf(value, "%s-%s", systemCode, subSystemCode);
-		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
+			sprintf(value, "%s-%s", systemCode, subSystemCode);
+			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
 
-		xmlAddChild(brexCheck, snsError);
-		return false;
+			xmlAddChild(brexCheck, snsError);
+			return false;
+		}
 	}
 
-	sprintf(xpath, ".//snsSubSubSystem[snsCode = '%s']", (char *) subSubSystemCode);
-	if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
-		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSubSystemCode");
+	if (should_check(subSubSystemCode, ".//snsSubSubSystem", snsRulesDoc, ctx)) {
+		sprintf(xpath, ".//snsSubSubSystem[snsCode = '%s']", (char *) subSubSystemCode);
+		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
+			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSubSystemCode");
 
-		sprintf(value, "%s-%s%s", systemCode, subSystemCode, subSubSystemCode);
-		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
+			sprintf(value, "%s-%s%s", systemCode, subSystemCode, subSubSystemCode);
+			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
 
-		xmlAddChild(brexCheck, snsError);
-		return false;
+			xmlAddChild(brexCheck, snsError);
+			return false;
+		}
 	}
 
-	sprintf(xpath, ".//snsAssy[snsCode = '%s']", (char *) assyCode);
-	if (!firstXPathNode(snsRulesDoc, ctx, xpath)) {
-		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "assyCode");
+	if (should_check(assyCode, ".//snsAssy", snsRulesDoc, ctx)) {
+		sprintf(xpath, ".//snsAssy[snsCode = '%s']", (char *) assyCode);
+		if (!firstXPathNode(snsRulesDoc, ctx, xpath)) {
+			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "assyCode");
 
-		sprintf(value, "%s-%s%s-%s", systemCode, subSystemCode, subSubSystemCode, assyCode);
-		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
+			sprintf(value, "%s-%s%s-%s", systemCode, subSystemCode, subSubSystemCode, assyCode);
+			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
 
-		xmlAddChild(brexCheck, snsError);
-		return false;
+			xmlAddChild(brexCheck, snsError);
+			return false;
+		}
 	}
 
 	xmlFreeNode(snsError);
@@ -725,7 +747,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Sh?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Sth?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -758,6 +780,7 @@ int main(int argc, char *argv[])
 			case 'l': layered = true; break;
 			case 'w': brsl_fname = strdup(optarg); break;
 			case 'S': check_sns = true; break;
+			case 't': strict_sns = true; break;
 			case 'h':
 			case '?':
 				show_help();

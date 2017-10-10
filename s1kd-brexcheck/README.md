@@ -40,6 +40,35 @@ Specify a list of severity levels for business rules.
 -S  
 Check SNS rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
 
+-t  
+Strict SNS checking. By default, the SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that
+
+    <snsSystem>
+      <snsCode>00</snsCode>
+      <snsTitle>General</snsTitle>
+    </snsSystem>
+
+is equivalent to
+
+    <snsSystem>
+      <snsCode>00</snsCode>
+      <snsTitle>General</snsTitle>
+      <snsSubSystem>
+        <snsCode>0</snsCode>
+        <snsTitle>General</snsTitle>
+        <snsSubSubSystem>
+          <snsCode>0</snsCode>
+          <snsTitle>General</snsTitle>
+          <snsAssy>
+            <snsCode>00</snsCode>
+            <snsTitle>General</snsTitle>
+          </snsAssy>
+        </snsSubSubSystem>
+      </snsSubSystem>
+    </snsSystem>
+
+Specifying the -t option will disable this shorthand, and missing optional elements will result in an error.
+
 -h -?  
 Show the help/usage message.
 
