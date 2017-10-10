@@ -85,4 +85,4 @@ EXAMPLE
 
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML techName 'New title'
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML techName
-    techName                       New title
+    New title
