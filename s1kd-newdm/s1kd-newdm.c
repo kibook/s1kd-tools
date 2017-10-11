@@ -521,6 +521,8 @@ int main(int argc, char **argv)
 		dm = xmlReadMemory((const char *) templates_fault_xml, templates_fault_xml_len, NULL, NULL, 0);
 	else if (strcmp(dmtype, "checklist") == 0)
 		dm = xmlReadMemory((const char *) templates_checklist_xml, templates_checklist_xml_len, NULL, NULL, 0);
+	else if (strcmp(dmtype, "learning") == 0)
+		dm = xmlReadMemory((const char *) templates_learning_xml, templates_learning_xml_len, NULL, NULL, 0);
 	else {
 		fprintf(stderr, "ERROR: Unknown dmtype %s\n", dmtype);
 		exit(EXIT_UNKNOWN_DMTYPE);

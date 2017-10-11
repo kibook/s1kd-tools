@@ -84,6 +84,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   ipd - Illustrated parts data
 
+-   learning - Technical training information
+
 -   prdcrossreftable - Product cross-reference table
 
 -   proced - Procedural
