@@ -421,42 +421,44 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
-		xmlNodePtr cur;
+	if (strcmp(dmtype, "") == 0) {
+		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+			xmlNodePtr cur;
 
-		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
-			char *def_key, *def_val;
+			for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
+				char *def_key, *def_val;
 
-			if (cur->type != XML_ELEMENT_NODE) continue;
-			if (!xmlHasProp(cur, BAD_CAST "infoCode")) continue;
-			if (!xmlHasProp(cur, BAD_CAST "schema")) continue;
+				if (cur->type != XML_ELEMENT_NODE) continue;
+				if (!xmlHasProp(cur, BAD_CAST "infoCode")) continue;
+				if (!xmlHasProp(cur, BAD_CAST "schema")) continue;
 
-			def_key = (char *) xmlGetProp(cur, BAD_CAST "infoCode");
-			def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
-
-			if (strcmp(def_key, infoCode) == 0)
-				strcpy(dmtype, def_val);
-
-			xmlFree(def_key);
-			xmlFree(def_val);
-		}
-
-		xmlFreeDoc(defaults_xml);
-	} else {
-		defaults = fopen(dmtypes_fname, "r");
-
-		if (defaults) {
-			char default_line[1024];
-
-			while (fgets(default_line, 1024, defaults)) {
-				char *def_key = strtok(default_line, "\t ");
-				char *def_val = strtok(NULL, "\t\n");
+				def_key = (char *) xmlGetProp(cur, BAD_CAST "infoCode");
+				def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
 
 				if (strcmp(def_key, infoCode) == 0)
 					strcpy(dmtype, def_val);
+
+				xmlFree(def_key);
+				xmlFree(def_val);
 			}
 
-			fclose(defaults);
+			xmlFreeDoc(defaults_xml);
+		} else {
+			defaults = fopen(dmtypes_fname, "r");
+
+			if (defaults) {
+				char default_line[1024];
+
+				while (fgets(default_line, 1024, defaults)) {
+					char *def_key = strtok(default_line, "\t ");
+					char *def_val = strtok(NULL, "\t\n");
+
+					if (strcmp(def_key, infoCode) == 0)
+						strcpy(dmtype, def_val);
+				}
+
+				fclose(defaults);
+			}
 		}
 	}
 
