@@ -54,6 +54,8 @@
 #define BREX_PATH_MAX 1024
 #define DMOD_MAX 10240
 
+#define PROGRESS_BAR_WIDTH 60
+
 enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
 
 enum verbosity verbose = NORMAL;
@@ -418,20 +420,19 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStuh?] <datamodules>");
+	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStuph?] <datamodules>");
 	puts("");
 	puts("Options:");
-	puts("	-b <brex>    Use <brex> as the BREX data module");
-	puts("	-I <path>    Add <path> to search path for BREX data module.");
-	puts("	-v -V -q -D  Message verbosity.");
-	puts("	-s           Short messages.");
-	puts("	-x           XML output.");
+	puts("  -b <brex>    Use <brex> as the BREX data module");
+	puts("  -I <path>    Add <path> to search path for BREX data module.");
+	puts("  -v -V -q -D  Message verbosity.");
+	puts("  -s           Short messages.");
+	puts("  -x           XML output.");
 	puts("  -l           Check BREX referenced by other BREX.");
 	puts("  -w <sev>     List of severity levels.");
-	puts("  -S           Check SNS rules.");
-	puts("  -t           Strict SNS checking.");
-	puts("  -u           Unstrict SNS checking.");
-	puts("	-h -?        Show this help message.");
+	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict)");
+	puts("  -p           Display progress bar.");
+	puts("  -h -?        Show this help message.");
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -732,6 +733,27 @@ int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[B
 	return total;
 }
 
+void show_progress(float cur, float total)
+{
+	float p;
+	int i, b;
+
+	p = cur / total;
+	b = PROGRESS_BAR_WIDTH * p;
+
+	fprintf(stderr, "\r[");
+	for (i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
+		if (i < b)
+			fputc('=', stderr);
+		else
+			fputc(' ', stderr);
+	}
+	fprintf(stderr, "] %d%% (%d/%d) ", (int)(p * 100.0), (int) cur, (int) total);
+	if (cur == total)
+		fputc('\n', stderr);
+	fflush(stderr);
+}
+
 int main(int argc, char *argv[])
 {
 	int c;
@@ -753,11 +775,12 @@ int main(int argc, char *argv[])
 	bool use_stdin = false;
 	bool xmlout = false;
 	bool layered = false;
+	bool progress = false;
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stuh?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stuph?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -792,6 +815,7 @@ int main(int argc, char *argv[])
 			case 'S': check_sns = true; break;
 			case 't': strict_sns = true; break;
 			case 'u': unstrict_sns = true; break;
+			case 'p': progress = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -858,7 +882,13 @@ int main(int argc, char *argv[])
 			brex_fnames, num_brex_fnames, brexCheck);
 
 		xmlFreeDoc(dmod_doc);
+
+		if (progress) 
+			show_progress(i, num_dmod_fnames);
 	}
+
+	if (progress)
+		show_progress(i, num_dmod_fnames);
 
 	if (!brexCheck->children) {
 		xmlNewChild(brexCheck, NULL, BAD_CAST "noErrors", NULL);

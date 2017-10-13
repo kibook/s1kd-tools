@@ -77,6 +77,9 @@ Using strict checking will disable this shorthand, and missing optional elements
 
 ...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
 
+-p  
+Display a progress bar.
+
 -h -?  
 Show the help/usage message.
 

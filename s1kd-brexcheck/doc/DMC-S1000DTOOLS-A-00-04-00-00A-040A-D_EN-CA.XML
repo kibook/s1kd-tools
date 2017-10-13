@@ -8,7 +8,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2017" month="10" day="13"/>
@@ -147,6 +147,12 @@
 </snsSystem>]]></verbatimText>
                 </para>
                 <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Display a progress bar.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
