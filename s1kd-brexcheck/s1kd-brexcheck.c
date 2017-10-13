@@ -488,6 +488,10 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 	xmlDocPtr snsRulesDoc;
 	xmlNodePtr snsRulesGroup;
 
+	/* Only check SNS in data modules. */
+	if (xmlStrcmp(xmlDocGetRootElement(dmod_doc)->name, BAD_CAST "dmodule") != 0)
+		return true;
+
 	/* The valid SNS is taken as a combination of the snsRules from all specified BREX data modules. */
 	snsRulesDoc = xmlNewDoc(BAD_CAST "1.0");
 	xmlDocSetRootElement(snsRulesDoc, xmlNewNode(NULL, BAD_CAST "snsRulesGroup"));
