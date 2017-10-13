@@ -64,6 +64,7 @@ xmlDocPtr brsl;
 
 bool check_sns = false;
 bool strict_sns = false;
+bool unstrict_sns = false;
 
 xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
@@ -417,7 +418,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlSh?] <datamodules>");
+	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStuh?] <datamodules>");
 	puts("");
 	puts("Options:");
 	puts("	-b <brex>    Use <brex> as the BREX data module");
@@ -428,6 +429,8 @@ void show_help(void)
 	puts("  -l           Check BREX referenced by other BREX.");
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -S           Check SNS rules.");
+	puts("  -t           Strict SNS checking.");
+	puts("  -u           Unstrict SNS checking.");
 	puts("	-h -?        Show this help message.");
 }
 
@@ -458,6 +461,9 @@ bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr c
 	bool ret;
 
 	if (strict_sns) return true;
+
+	if (unstrict_sns)
+		return firstXPathNode(snsRulesDoc, ctx, path);
 
 	if (strcmp(path, ".//snsSubSystem") == 0 || strcmp(path, ".//snsSubSubSystem") == 0) {
 		ret = xmlStrcmp(code, BAD_CAST "0") != 0;
@@ -747,7 +753,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Sth?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stuh?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -781,6 +787,7 @@ int main(int argc, char *argv[])
 			case 'w': brsl_fname = strdup(optarg); break;
 			case 'S': check_sns = true; break;
 			case 't': strict_sns = true; break;
+			case 'u': unstrict_sns = true; break;
 			case 'h':
 			case '?':
 				show_help();

@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="10"/>
+        <issueDate year="2017" month="10" day="13"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
         </dmTitle>
@@ -50,7 +50,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlSh?] <datamodules>]]></para>
+        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlStuh?] <datamodules>]]></para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -106,15 +106,13 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-S</listItemTerm>
+              <listItemTerm>-S[tu]</listItemTerm>
               <listItemDefinition>
-                <para>Check SNS rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-t</listItemTerm>
-              <listItemDefinition>
-                <para>Strict SNS checking. By default, the SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that</para>
+                <para>Check <acronym acronymType="at01">
+                  <acronymTerm>SNS</acronymTerm>
+                  <acronymDefinition>Standard Numbering System</acronymDefinition>
+                </acronym> rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
+                <para>-St enables <emphasis>strict</emphasis> SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that</para>
                 <para>
                   <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
   <snsCode>00</snsCode>
@@ -140,7 +138,15 @@
   </snsSubSystem>
 </snsSystem>]]></verbatimText>
                 </para>
-                <para>Specifying the -t option will disable this shorthand, and missing optional elements will result in an error.</para>
+                <para>Using strict checking will disable this shorthand, and missing optional elements will result in an error.</para>
+                <para>-Su enables <emphasis>unstrict</emphasis> SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, <emphasis>any</emphasis> code used will not produce an error when the relevant optional elements are omitted. This means that given the following...</para>
+                <para>
+                  <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
+  <snsCode>00</snsCode>
+  <snsTitle>General</snsTitle>
+</snsSystem>]]></verbatimText>
+                </para>
+                <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

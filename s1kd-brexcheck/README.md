@@ -6,7 +6,7 @@ s1kd-brexcheck - Validate S1000D data modules against BREX data modules
 SYNOPSIS
 ========
 
-s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\] \[-vVqDsxlSh?\] &lt;datamodules&gt;
+s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\] \[-vVqDsxlStuh?\] &lt;datamodules&gt;
 
 DESCRIPTION
 ===========
@@ -37,11 +37,10 @@ Use the layered BREX concept. BREX data modules referenced by other BREX data mo
 -w &lt;severities&gt;  
 Specify a list of severity levels for business rules.
 
--S  
-Check SNS rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
+-S\[tu\]  
+Check SNS (Standard Numbering System) rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
 
--t  
-Strict SNS checking. By default, the SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that
+-St enables *strict* SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that
 
     <snsSystem>
       <snsCode>00</snsCode>
@@ -67,7 +66,16 @@ is equivalent to
       </snsSubSystem>
     </snsSystem>
 
-Specifying the -t option will disable this shorthand, and missing optional elements will result in an error.
+Using strict checking will disable this shorthand, and missing optional elements will result in an error.
+
+-Su enables *unstrict* SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, *any* code used will not produce an error when the relevant optional elements are omitted. This means that given the following...
+
+    <snsSystem>
+      <snsCode>00</snsCode>
+      <snsTitle>General</snsTitle>
+    </snsSystem>
+
+...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
 
 -h -?  
 Show the help/usage message.
