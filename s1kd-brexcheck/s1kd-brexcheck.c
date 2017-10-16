@@ -432,6 +432,7 @@ void show_help(void)
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict)");
 	puts("  -p           Display progress bar.");
+	puts("  -f           Output only filenames of invalid modules.");
 	puts("  -h -?        Show this help message.");
 }
 
@@ -692,6 +693,22 @@ void print_node(xmlNodePtr node)
 	}
 }
 
+void print_fnames(xmlNodePtr node)
+{
+	xmlNodePtr cur;
+
+	if (xmlStrcmp(node->name, BAD_CAST "document") == 0) {
+		xmlChar *fname;
+		fname = xmlNodeGetContent(node);
+		puts((char *) fname);
+		xmlFree(fname);
+	}
+
+	for (cur = node->children; cur; cur = cur->next) {
+		print_fnames(cur);
+	}
+}
+
 bool brex_exists(char fname[PATH_MAX], char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[BREX_PATH_MAX][PATH_MAX], int nspaths)
 {
 	int i;
@@ -776,11 +793,12 @@ int main(int argc, char *argv[])
 	bool xmlout = false;
 	bool layered = false;
 	bool progress = false;
+	bool only_fnames = false;
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stuph?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stupfh?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -816,6 +834,7 @@ int main(int argc, char *argv[])
 			case 't': strict_sns = true; break;
 			case 'u': unstrict_sns = true; break;
 			case 'p': progress = true; break;
+			case 'f': only_fnames = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -896,7 +915,11 @@ int main(int argc, char *argv[])
 
 	if (!xmlout) {
 		if (verbose > SILENT) {
-			print_node(brexCheck);
+			if (only_fnames) {
+				print_fnames(brexCheck);
+			} else {
+				print_node(brexCheck);
+			}
 		}
 	} else {
 		xmlSaveFormatFile("-", outdoc, 1);

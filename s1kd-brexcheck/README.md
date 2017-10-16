@@ -80,6 +80,9 @@ Using strict checking will disable this shorthand, and missing optional elements
 -p  
 Display a progress bar.
 
+-f  
+Output only the filenames if modules with BREX/SNS errors.
+
 -h -?  
 Show the help/usage message.
 
