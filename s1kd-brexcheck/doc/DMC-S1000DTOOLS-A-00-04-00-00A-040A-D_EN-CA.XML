@@ -158,7 +158,7 @@
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>Output only the filenames if modules with BREX/SNS errors.</para>
+                <para>Output only the filenames of modules with BREX/SNS errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
