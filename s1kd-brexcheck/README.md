@@ -117,7 +117,8 @@ EXAMPLE
       <para>List items shouldn't be used as steps...</para>
     </listItem>
     [...]
-    <para>Refer to <internalRef internalRefId="stp-0001" internalRefTargetType="irtt08"/>.</para>
+    <para>Refer to <internalRef internalRefId="stp-0001"
+    internalRefTargetType="irtt08"/>.</para>
     [...]
 
     $ s1kd-brexcheck -b $BREX $DMOD
