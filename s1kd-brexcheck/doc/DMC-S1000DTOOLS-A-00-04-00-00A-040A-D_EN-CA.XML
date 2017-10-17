@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="16"/>
+        <issueDate year="2017" month="10" day="17"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
         </dmTitle>
@@ -147,6 +147,13 @@
 </snsSystem>]]></verbatimText>
                 </para>
                 <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n</listItemTerm>
+              <listItemDefinition>
+                <para>Check notation rules. Any notation names listed in any of the BREX data modules with attribute <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "1" or omitted are considered valid notations. If a notation in a data module is not present or has <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "0", an error will be returned.</para>
+                <para>For notations not included but not explicitly excluded, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the first inclusion rule will be returned with the error. For explicitly excluded notations, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the explicit exclusion rule is returned.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -68,6 +68,8 @@ bool check_sns = false;
 bool strict_sns = false;
 bool unstrict_sns = false;
 
+bool check_notation = false;
+
 xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
@@ -431,6 +433,7 @@ void show_help(void)
 	puts("  -l           Check BREX referenced by other BREX.");
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict)");
+	puts("  -n           Check notation rules.");
 	puts("  -p           Display progress bar.");
 	puts("  -f           Output only filenames of invalid modules.");
 	puts("  -h -?        Show this help message.");
@@ -524,6 +527,8 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
 		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", systemCode);
 		xmlAddChild(brexCheck, snsError);
+
+		xmlFreeDoc(snsRulesDoc);
 		return false;
 	}
 
@@ -536,6 +541,8 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
 
 			xmlAddChild(brexCheck, snsError);
+
+			xmlFreeDoc(snsRulesDoc);
 			return false;
 		}
 	}
@@ -549,6 +556,8 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
 
 			xmlAddChild(brexCheck, snsError);
+
+			xmlFree(snsRulesDoc);
 			return false;
 		}
 	}
@@ -562,13 +571,78 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
 
 			xmlAddChild(brexCheck, snsError);
+
+			xmlFreeDoc(snsRulesDoc);
 			return false;
 		}
 	}
 
 	xmlFreeNode(snsError);
 
+	xmlFreeDoc(snsRulesDoc);
 	return true;
+}
+
+int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
+	xmlNodePtr brexCheck, const char *docname)
+{	
+	char xpath[256];
+	xmlNodePtr rule;
+	xmlNodePtr notationError;
+
+	sprintf(xpath, "//notationRule[notationName='%s' and notationName/@allowedNotationFlag!='0']",
+		(char *) entity->content);
+
+	if ((rule = firstXPathNode(notationRuleDoc, NULL, xpath)))
+		return 0;
+
+	sprintf(xpath, "(//notationRule[notationName='%s']|//notationRule)[1]", (char *) entity->content);
+	rule = firstXPathNode(notationRuleDoc, NULL, xpath);
+
+	notationError = xmlNewChild(brexCheck, NULL, BAD_CAST "notationError", NULL);
+	xmlNewChild(notationError, NULL, BAD_CAST "document", BAD_CAST docname);
+	xmlNewChild(notationError, NULL, BAD_CAST "invalidNotation", entity->content);
+	xmlAddChild(notationError, xmlCopyNode(firstXPathNode(notationRuleDoc, rule, "objectUse"), 1));
+
+	return 1;
+}
+
+int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
+	const char *dmod_fname, xmlNodePtr brexCheck)
+{
+	xmlDocPtr notationRuleDoc;
+	xmlNodePtr notationRuleGroup;
+	int i;
+	xmlDtdPtr dtd;
+	xmlNodePtr cur;
+	int invalid = 0;
+
+	notationRuleDoc = xmlNewDoc(BAD_CAST "1.0");
+	xmlDocSetRootElement(notationRuleDoc, xmlNewNode(NULL, BAD_CAST "notationRuleGroup"));
+	notationRuleGroup = xmlDocGetRootElement(notationRuleDoc);
+
+	for (i = 0; i < nbrex_fnames; ++i) {
+		xmlDocPtr brex;
+
+		brex = xmlReadFile(brex_fnames[i], NULL, 0);
+
+		xmlAddChild(notationRuleGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//notationRuleList"), 1));
+
+		xmlFreeDoc(brex);
+	}
+
+	dtd = dmod_doc->intSubset;
+
+	for (cur = dtd->children; cur; cur = cur->next) {
+		if (cur->type == XML_ENTITY_DECL && ((xmlEntityPtr) cur)->etype == 3) {
+			invalid += check_entity((xmlEntityPtr) cur, notationRuleDoc,
+				brexCheck, dmod_fname);
+		}
+	}
+
+	xmlFreeDoc(notationRuleDoc);
+
+	return invalid;
 }
 
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
@@ -580,6 +654,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	int status;
 	int total = 0;
 	bool valid_sns = true;
+	int invalid_notations = 0;
 
 	char *schema;
 	char xpath[512];
@@ -590,6 +665,11 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck)))
 		++total;
+
+	if (check_notation) {
+		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck);
+		total += invalid_notations;
+	}
 
 	for (i = 0; i < num_brex_fnames; ++i) {
 		xmlXPathContextPtr context;
@@ -613,12 +693,12 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 				brex_fnames[i], brexCheck);
 
 			if (verbose >= MESSAGE) {
-				fprintf(stderr, status || !valid_sns ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
+				fprintf(stderr, status || !valid_sns || invalid_notations ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
 			}
 
 			total += status;
 		} else if (verbose >= MESSAGE) {
-			fprintf(stderr, valid_sns ? E_VALIDDOC : E_INVALIDDOC, docname, brex_fnames[i]);
+			fprintf(stderr, valid_sns && !invalid_notations ? E_VALIDDOC : E_INVALIDDOC, docname, brex_fnames[i]);
 		}
 
 		xmlXPathFreeObject(result);
@@ -685,6 +765,13 @@ void print_node(xmlNodePtr node)
 	} else if (strcmp((char *) node->name, "invalidValue") == 0) {
 		char *value = (char *) xmlNodeGetContent(node);
 		printf("%s\n", value);
+		xmlFree(value);
+	} else if (strcmp((char *) node->name, "notationError") == 0) {
+		printf("NOTATION ERROR: ");
+	} else if (strcmp((char *) node->name, "invalidNotation") == 0) {
+		char *value = (char *) xmlNodeGetContent(node);
+		if (!shortmsg) printf("  ");
+		printf("Notation %s is not allowed.\n", value);
 		xmlFree(value);
 	}
 
@@ -798,7 +885,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stupfh?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stupfnh?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -835,6 +922,7 @@ int main(int argc, char *argv[])
 			case 'u': unstrict_sns = true; break;
 			case 'p': progress = true; break;
 			case 'f': only_fnames = true; break;
+			case 'n': check_notation = true; break;
 			case 'h':
 			case '?':
 				show_help();

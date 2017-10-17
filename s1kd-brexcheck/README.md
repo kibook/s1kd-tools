@@ -77,6 +77,11 @@ Using strict checking will disable this shorthand, and missing optional elements
 
 ...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
 
+-n  
+Check notation rules. Any notation names listed in any of the BREX data modules with attribute `allowedNotationFlag` set to "1" or omitted are considered valid notations. If a notation in a data module is not present or has `allowedNotationFlag` set to "0", an error will be returned.
+
+For notations not included but not explicitly excluded, the `objectUse` of the first inclusion rule will be returned with the error. For explicitly excluded notations, the `objectUse` of the explicit exclusion rule is returned.
+
 -p  
 Display a progress bar.
 
