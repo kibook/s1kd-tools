@@ -617,6 +617,9 @@ int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames,
 	xmlNodePtr cur;
 	int invalid = 0;
 
+	if (!(dtd = dmod_doc->intSubset))
+		return 0;
+
 	notationRuleDoc = xmlNewDoc(BAD_CAST "1.0");
 	xmlDocSetRootElement(notationRuleDoc, xmlNewNode(NULL, BAD_CAST "notationRuleGroup"));
 	notationRuleGroup = xmlDocGetRootElement(notationRuleDoc);
@@ -630,8 +633,6 @@ int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames,
 
 		xmlFreeDoc(brex);
 	}
-
-	dtd = dmod_doc->intSubset;
 
 	for (cur = dtd->children; cur; cur = cur->next) {
 		if (cur->type == XML_ENTITY_DECL && ((xmlEntityPtr) cur)->etype == 3) {
