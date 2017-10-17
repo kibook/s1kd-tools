@@ -14,6 +14,7 @@
 
 #define EXIT_MAX_SCHEMAS 1
 #define EXIT_MISSING_SCHEMA 2
+#define EXIT_BAD_IDREF 3
 
 enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
 
@@ -126,6 +127,43 @@ void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
 	xmlXPathFreeContext(ctxt);
 }
 
+xmlNodePtr first_xpath_node(char *xpath, xmlXPathContextPtr ctx)
+{
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+	
+	xmlXPathFreeObject(obj);
+
+	return node;
+}
+
+void check_idrefs(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlNodePtr invalid;
+
+	ctx = xmlXPathNewContext(doc);
+
+	invalid = first_xpath_node("//@internalRefId[not(//@id = .)]", ctx);
+
+	xmlXPathFreeContext(ctx);
+
+	if (invalid) {
+		if (verbosity > SILENT) {
+			xmlChar *id = xmlNodeGetContent(invalid);
+			fprintf(stderr, ERR_PREFIX "No matching ID for '%s' (line %u).\n", (char *) id, invalid->parent->line);
+		}
+		exit(EXIT_BAD_IDREF);
+	}
+}
+
 int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns)
 {
 	xmlDocPtr doc;
@@ -143,6 +181,8 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 			strip_ns(doc, cur);
 		}
 	}
+
+	check_idrefs(doc);
 
 	dmodule = xmlDocGetRootElement(doc);
 
