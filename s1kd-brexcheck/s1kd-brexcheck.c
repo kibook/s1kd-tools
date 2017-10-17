@@ -772,7 +772,11 @@ void print_node(xmlNodePtr node)
 	} else if (strcmp((char *) node->name, "invalidNotation") == 0) {
 		char *value = (char *) xmlNodeGetContent(node);
 		if (!shortmsg) printf("  ");
-		printf("Notation %s is not allowed.\n", value);
+		printf("Notation %s is not allowed", value);
+		if (shortmsg)
+			printf(": ");
+		else
+			printf(".\n");
 		xmlFree(value);
 	}
 
