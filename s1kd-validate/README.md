@@ -6,7 +6,7 @@ s1kd-validate - Validate an S1000D data module against its schema
 SYNOPSIS
 ========
 
-s1kd-validate \[-d &lt;dir&gt;\] \[-vqD\] \[&lt;datamodules&gt;\]
+s1kd-validate \[-d &lt;dir&gt;\] \[-X &lt;URI&gt;\] \[-vqD\] \[&lt;datamodules&gt;\]
 
 DESCRIPTION
 ===========
@@ -18,6 +18,9 @@ OPTIONS
 
 -d &lt;dir&gt;  
 Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.
+
+-X &lt;URI&gt;  
+Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.
 
 -v -q -D  
 Set the verbosity of the output, verbose, quiet, and debug. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.

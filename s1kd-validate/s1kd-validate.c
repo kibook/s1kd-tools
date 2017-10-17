@@ -82,7 +82,7 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROGNAME " [-d <dir>] [-vqD] <dms>");
+	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-vqD] <dms>");
 	puts("");
 	puts("Options:");
 	puts("  -d <dir> Search for schemas in <dir> instead of using the URL.");
