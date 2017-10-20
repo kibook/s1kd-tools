@@ -342,11 +342,10 @@ int main(int argc, char **argv)
 			char default_line[1024];
 
 			while (fgets(default_line, 1024, defaults)) {
-				char *def_key;
-				char *def_val;
+				char def_key[32], def_val[256];
 
-				def_key = strtok(default_line, "\t ");
-				def_val = strtok(NULL, "\t\n");
+				if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+					continue;
 
 				copy_default_value(def_key, def_val);
 			}

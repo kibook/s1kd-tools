@@ -253,8 +253,10 @@ int main(int argc, char **argv)
 		char defaults_line[1024];
 
 		while (fgets(defaults_line, 1024, defaults)) {
-			char *def_key = strtok(defaults_line, "\t ");
-			char *def_val = strtok(NULL, "\t\n");
+			char def_key[32], def_val[256];
+
+			if (sscanf(defaults_line, "%s %[^\n]", def_key, def_val) != 2)
+				continue;
 
 			copy_default_value(def_key, def_val);
 		}
