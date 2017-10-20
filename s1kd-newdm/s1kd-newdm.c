@@ -130,6 +130,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -p      Prompt the user for each value");
 	puts("  -N      Omit issue/inwork from filename.");
+	puts("  -S      Get tech name from BREX SNS.");
 	puts("  -v      Print file name of new data module.");
 	puts("  -f      Overwrite existing file.");
 	puts("");
@@ -147,7 +148,8 @@ void show_help(void)
 	puts("  -t      Tech name");
 	puts("  -i      Info name");
 	puts("  -T      DM type (descript, proced, frontmatter, brex, brdoc)");
-	puts("  -b      BREX data module code.");
+	puts("  -b      BREX data module code");
+	puts("  -s      Schema");
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -283,6 +285,53 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
+#define SNS_XPATH_1 "//snsSystem[snsCode='%s']/snsSubSystem[snsCode='%s']/snsSubSubSystem[snsCode='%s']/snsAssy[snsCode='%s']/snsTitle"
+#define SNS_XPATH_2 "//snsSystem[snsCode='%s']/snsSubSystem[snsCode='%s']/snsSubSubSystem[snsCode='%s']/snsTitle"
+#define SNS_XPATH_3 "//snsSystem[snsCode='%s']/snsSubSystem[snsCode='%s']/snsTitle"
+#define SNS_XPATH_4 "//snsSystem[snsCode='%s']/snsTitle"
+
+void set_sns_title(xmlNodePtr snsTitle)
+{
+	char *title;
+
+	title = (char *) xmlNodeGetContent(snsTitle);
+	strcpy(techName_content, title);
+	xmlFree(title);
+}
+
+void set_tech_from_sns(const char *fname)
+{
+	xmlDocPtr brex;
+	char xpath[256];
+	xmlNodePtr snsTitle;
+
+	brex = xmlReadFile(fname, NULL, 0);
+
+	sprintf(xpath, SNS_XPATH_1, systemCode, subSystemCode, subSubSystemCode, assyCode);
+	if ((snsTitle = firstXPathNode(brex, xpath))) {
+		set_sns_title(snsTitle);
+		return;
+	}
+
+	sprintf(xpath, SNS_XPATH_2, systemCode, subSystemCode, subSubSystemCode);
+	if ((snsTitle = firstXPathNode(brex, xpath))) {
+		set_sns_title(snsTitle);
+		return;
+	}
+
+	sprintf(xpath, SNS_XPATH_3, systemCode, subSystemCode);
+	if ((snsTitle = firstXPathNode(brex, xpath))) {
+		set_sns_title(snsTitle);
+		return;
+	}
+
+	sprintf(xpath, SNS_XPATH_4, systemCode);
+	if ((snsTitle = firstXPathNode(brex, xpath))) {
+		set_sns_title(snsTitle);
+		return;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	time_t now;
@@ -329,9 +378,11 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	bool overwrite = false;
 
+	char sns_fname[PATH_MAX] = "";
+
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:NS:b:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -350,8 +401,9 @@ int main(int argc, char **argv)
 			case 'T': strcpy(dmtype, optarg); break;
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
 			case 'N': no_issue = true; break;
-			case 'S': strcpy(schema, optarg); break;
+			case 's': strcpy(schema, optarg); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
+			case 'S': strcpy(sns_fname, optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case 'h':
@@ -504,6 +556,9 @@ int main(int argc, char **argv)
 		prompt("DM type", dmtype, 32);
 		prompt("Schema", schema, 1024);
 	}
+
+	if (strcmp(sns_fname, "") != 0 && strcmp(techName_content, "") == 0)
+		set_tech_from_sns(sns_fname);
 
 	if (strcmp(issueNumber, "") == 0) strcpy(issueNumber, "000");
 	if (strcmp(inWork, "") == 0) strcpy(inWork, "01");

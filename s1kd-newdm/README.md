@@ -104,6 +104,12 @@ Print the file name of the newly created data module.
 -f  
 Overwrite existing file.
 
+-s &lt;schema&gt;  
+The schema URL.
+
+-S &lt;BREX&gt;  
+Determine the tech name from the SNS rules of a specified BREX data module.
+
 Prompt (-p) option
 ------------------
 

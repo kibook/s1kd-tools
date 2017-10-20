@@ -8,7 +8,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2017" month="10" day="20"/>
@@ -224,6 +224,18 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s &lt;schema&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The schema URL.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Determine the tech name from the SNS rules of a specified BREX data module.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
