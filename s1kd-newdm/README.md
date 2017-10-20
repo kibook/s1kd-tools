@@ -174,22 +174,23 @@ Alternatively, the 'defaults' file can be written using an XML format, containin
 
 This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named 'dmtypes', but any file can be specified by using the -D option.
 
-Each line consists of an info code and a schema identifier. Example:
+Each line consists of an info code, a schema identifier, and optionally a default info name. Example:
 
     00E    comrep
     00W    appliccrossreftable
     009    frontmatter
     022    brex
     024    brdoc
-    040    descript
-    520    proced
+    040    descript    Description
+    520    proced      Remove procedure
 
 Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute `infoCode` and an attribute `schema`.
 
     <?xml version="1.0">
     <dmtypes>
-      <type infoCode="040" schema="descript"/>
-      <type infoCode="520" schema="proced"/>
+      <type infoCode="022" schema="brex"/>
+      <type infoCode="040" schema="descript" infoName="Description"/>
+      <type infoCode="520" schema="proced" infoName="Remove procedure"/>
     </dmtypes>
 
 EXAMPLE

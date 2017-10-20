@@ -387,8 +387,10 @@ int main(int argc, char **argv)
 			char default_line[1024];
 
 			while (fgets(default_line, 1024, defaults)) {
-				char *def_key = strtok(default_line, "\t ");
-				char *def_val = strtok(NULL, "\t\n");
+				char def_key[32], def_val[256];
+				
+				if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+					continue;
 
 				copy_default_value(def_key, def_val);
 			}
@@ -421,12 +423,12 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (strcmp(dmtype, "") == 0) {
+	if (strcmp(dmtype, "") == 0 || strcmp(infoName_content, "") == 0) {
 		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			xmlNodePtr cur;
 
 			for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
-				char *def_key, *def_val;
+				char *def_key, *def_val, *infname;
 
 				if (cur->type != XML_ELEMENT_NODE) continue;
 				if (!xmlHasProp(cur, BAD_CAST "infoCode")) continue;
@@ -434,9 +436,13 @@ int main(int argc, char **argv)
 
 				def_key = (char *) xmlGetProp(cur, BAD_CAST "infoCode");
 				def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
+				infname = (char *) xmlGetProp(cur, BAD_CAST "infoName");
 
-				if (strcmp(def_key, infoCode) == 0)
+				if (strcmp(def_key, infoCode) == 0 && strcmp(dmtype, "") == 0)
 					strcpy(dmtype, def_val);
+
+				if (infname && strcmp(def_key, infoCode) == 0 && strcmp(infoName_content, "") == 0)
+					strcpy(infoName_content, infname);
 
 				xmlFree(def_key);
 				xmlFree(def_val);
@@ -450,11 +456,19 @@ int main(int argc, char **argv)
 				char default_line[1024];
 
 				while (fgets(default_line, 1024, defaults)) {
-					char *def_key = strtok(default_line, "\t ");
-					char *def_val = strtok(NULL, "\t\n");
+					char def_key[32], def_val[256], infname[256];
+					int n;
 
-					if (strcmp(def_key, infoCode) == 0)
+					n = sscanf(default_line, "%s %s %[^\n]", def_key, def_val, infname);
+
+					if (n < 2)
+						continue;
+
+					if (strcmp(def_key, infoCode) == 0 && strcmp(dmtype, "") == 0)
 						strcpy(dmtype, def_val);
+
+					if (n == 3 && strcmp(def_key, infoCode) == 0 && strcmp(infoName_content, "") == 0)
+						strcpy(infoName_content, infname);
 				}
 
 				fclose(defaults);
