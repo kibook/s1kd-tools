@@ -108,7 +108,7 @@ Overwrite existing file.
 The schema URL.
 
 -S &lt;BREX&gt;  
-Determine the tech name from the SNS rules of a specified BREX data module.
+Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.
 
 Prompt (-p) option
 ------------------

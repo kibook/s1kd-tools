@@ -79,6 +79,8 @@ char schema[1024] = "";
 
 char brex_dmcode[256] = "";
 
+char sns_fname[PATH_MAX] = "";
+
 void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
@@ -206,6 +208,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(schema, val);
 	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strcpy(brex_dmcode, val);
+	else if (strcmp(key, "sns") == 0 && strcmp(sns_fname, "") == 0)
+		strcpy(sns_fname, val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -377,8 +381,6 @@ int main(int argc, char **argv)
 	bool no_issue = false;
 	bool verbose = false;
 	bool overwrite = false;
-
-	char sns_fname[PATH_MAX] = "";
 
 	xmlDocPtr defaults_xml;
 
