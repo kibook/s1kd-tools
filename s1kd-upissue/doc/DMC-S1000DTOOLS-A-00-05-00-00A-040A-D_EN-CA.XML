@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="5" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="23"/>
+        <issueDate year="2017" month="10" day="21"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | General Commands Manual</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Add -r option to keep RFUs from previous issue.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -83,6 +86,12 @@
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
                 <para>Omit issue/inwork numbers from filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r</listItemTerm>
+              <listItemDefinition>
+                <para>Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with the change markup attributes on elements referencing them. This option prevents their deletion.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

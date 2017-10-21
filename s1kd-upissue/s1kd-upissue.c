@@ -22,6 +22,7 @@ void show_help(void)
 	puts("  -v	Print filename of upissued data module");
 	puts("  -i	Create a new issue of the data module");
 	puts("  -N	Omit issue/inwork numbers from filename");
+	puts("  -r      Keep RFUs from old issue");
 }
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
@@ -62,6 +63,57 @@ void copy(const char *from, const char *to)
 	fclose(f2);
 }
 
+/* Remove change markup attributes from elements referencing old RFUs */
+void del_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
+{
+	char xpath[256];
+	xmlXPathObjectPtr obj;
+	char *id;
+
+	id = (char *) xmlGetProp(rfu, BAD_CAST "id");
+
+	sprintf(xpath, "//*[contains(@reasonForUpdateRefIds, '%s')]", id);
+
+	xmlFree(id);
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeType");
+			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeMark");
+			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "reasonForUpdateRefIds");
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+}
+
+/* Delete old RFUs */
+void del_rfus(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//reasonForUpdate", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			del_rfu_attrs(obj->nodesetval->nodeTab[i], ctx);
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 int main(int argc, char **argv)
 {
 	char dmfile[256], cpfile[256];
@@ -97,7 +149,9 @@ int main(int argc, char **argv)
 
 	bool no_issue = false;
 
-	while ((c = getopt(argc, argv, "ivs:Nfh?")) != -1) {
+	bool keep_rfus = false;
+
+	while ((c = getopt(argc, argv, "ivs:Nfrh?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -114,6 +168,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'r':
+				keep_rfus = true;
 				break;
 			case 'h':
 			case '?':
@@ -180,6 +237,10 @@ int main(int argc, char **argv)
 		if (issueInfo) {
 			xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) upissued_issueNumber);
 			xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) upissued_inWork);
+
+			if (!keep_rfus && strcmp(upissued_inWork, "01") == 0) {
+				del_rfus(dmdoc);
+			}
 
 			if (newissue) {
 				issueDate = firstXPathNode("//issueDate", dmdoc);

@@ -30,6 +30,9 @@ Set the status of the new issue. Default is 'changed'.
 -N  
 Omit issue/inwork numbers from filename.
 
+-r  
+Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with the change markup attributes on elements referencing them. This option prevents their deletion.
+
 EXAMPLES
 ========
 
