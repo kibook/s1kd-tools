@@ -992,6 +992,11 @@ int main(int argc, char *argv[])
 
 			num_brex_fnames = 1;
 			ref_brex = true;
+
+			/* When using brexDmRef, if the data module is itself a
+			 * BREX data module, include it as a BREX. */
+			if (strcmp(brex_fnames[0], dmod_fnames[i]) != 0 && firstXPathNode(dmod_doc, NULL, "//brex"))
+				strcpy(brex_fnames[num_brex_fnames++], dmod_fnames[i]);
 		}
 
 		if (layered) {
