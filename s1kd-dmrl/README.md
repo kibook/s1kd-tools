@@ -16,6 +16,9 @@ The *s1kd-dmrl* tool reads S1000D data management lists and creates CSBD objects
 OPTIONS
 =======
 
+-s  
+Do not create CSDB objects, only output the s1kd-new\* commands to create them.
+
 -N  
 Omit issue/in-work numbers from the filenames of created CSDB objects.
 

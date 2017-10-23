@@ -13,6 +13,7 @@ void showHelp(void)
 	puts("Usage: s1kd-dmrl [-Nh?] <DML>...");
 	puts("");
 	puts("Options:");
+	puts("  -s       Output s1kd-new* commands only.");
 	puts("  -N       Omit issue/inwork numbers.");
 	puts("  -h -?    Show usage message.");
 }

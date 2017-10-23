@@ -59,6 +59,12 @@
         <para>
           <definitionList>
             <definitionListItem>
+              <listItemTerm>-s</listItemTerm>
+              <listItemDefinition>
+                <para>Do not create CSDB objects, only output the s1kd-new* commands to create them.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
                 <para>Omit issue/in-work numbers from the filenames of created CSDB objects.</para>
