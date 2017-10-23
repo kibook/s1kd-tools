@@ -85,6 +85,15 @@
     <xsl:value-of select="@countryIsoCode"/>
   </xsl:template>
 
+  <xsl:template match="issueDate">
+    <xsl:text> -I </xsl:text>
+    <xsl:value-of select="@year"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@month"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@day"/>
+  </xsl:template>
+
   <xsl:template match="techName">
     <xsl:text> -t "</xsl:text>
     <xsl:value-of select="."/>
