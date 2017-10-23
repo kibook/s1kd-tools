@@ -43,6 +43,7 @@
 #define EXIT_UNKNOWN_DMTYPE 2
 #define EXIT_BAD_DMC 3
 #define EXIT_BAD_BREX_DMC 4
+#define EXIT_BAD_DATE 5
 
 char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -80,6 +81,8 @@ char schema[1024] = "";
 char brex_dmcode[256] = "";
 
 char sns_fname[PATH_MAX] = "";
+
+char issue_date[16] = "";
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -152,6 +155,7 @@ void show_help(void)
 	puts("  -T      DM type (descript, proced, frontmatter, brex, brdoc)");
 	puts("  -b      BREX data module code");
 	puts("  -s      Schema");
+	puts("  -I      Issue date");
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -336,13 +340,38 @@ void set_tech_from_sns(const char *fname)
 	}
 }
 
-int main(int argc, char **argv)
+void set_issue_date(xmlNodePtr issueDate)
 {
-	time_t now;
-	struct tm *local;
-	int year, month, day;
 	char year_s[5], month_s[3], day_s[3];
 
+	if (strcmp(issue_date, "") == 0) {
+		time_t now;
+		struct tm *local;
+		int year, month, day;
+
+		time(&now);
+		local = localtime(&now);
+		year = local->tm_year + 1900;
+		month = local->tm_mon + 1;
+		day = local->tm_mday;
+
+		sprintf(day_s, "%.2d", day);
+		sprintf(month_s, "%.2d", month);
+		sprintf(year_s, "%d", year);
+	} else {
+		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
+			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
+			exit(EXIT_BAD_DATE);
+		}
+	}
+
+	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
+}
+
+int main(int argc, char **argv)
+{
 	char dmtype[32] = "";
 
 	char dmc[MAX_DATAMODULE_CODE];
@@ -384,7 +413,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -406,6 +435,7 @@ int main(int argc, char **argv)
 			case 's': strcpy(schema, optarg); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'S': strcpy(sns_fname, optarg); break;
+			case 'I': strcpy(issue_date, optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case 'h':
@@ -641,19 +671,7 @@ int main(int argc, char **argv)
 	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issueNumber);
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inWork);
 
-	time(&now);
-	local = localtime(&now);
-	year = local->tm_year + 1900;
-	month = local->tm_mon + 1;
-	day = local->tm_mday;
-
-	sprintf(day_s, "%.2d", day);
-	sprintf(month_s, "%.2d", month);
-	sprintf(year_s, "%d", year);
-
-	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
-	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
-	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
+	set_issue_date(issueDate);
 
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST securityClassification);
 
