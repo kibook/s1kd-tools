@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Add -I option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -133,7 +136,7 @@
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-I &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new DDN in the form of YYYY-MM-DD.</para>
