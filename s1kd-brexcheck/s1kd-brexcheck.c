@@ -958,6 +958,15 @@ int main(int argc, char *argv[])
 	xmlDocSetRootElement(outdoc, brexCheck);
 
 	for (i = 0; i < num_dmod_fnames; ++i) {
+		/* Indicates if a referenced BREX data module is used as
+		 * opposed to one specified on the command line.
+		 *
+		 * The practical difference is that those specified on the
+		 * command line are meant to apply to ALL data modules
+		 * specified, while a referenced BREX only applies to the data
+		 * module which referenced it. */
+		bool ref_brex = false;
+
 		dmod_doc = xmlReadFile(dmod_fnames[i], NULL, 0);
 
 		if (!dmod_doc) {
@@ -982,6 +991,7 @@ int main(int argc, char *argv[])
 			}
 
 			num_brex_fnames = 1;
+			ref_brex = true;
 		}
 
 		if (layered) {
@@ -997,6 +1007,12 @@ int main(int argc, char *argv[])
 
 		if (progress) 
 			show_progress(i, num_dmod_fnames);
+
+		/* If the referenced BREX was used, reset the BREX data module
+		 * list, as each data module may reference a different BREX or
+		 * set of BREX. */
+		if (ref_brex)
+			num_brex_fnames = 0;
 	}
 
 	if (progress)
