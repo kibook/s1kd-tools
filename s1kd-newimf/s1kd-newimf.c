@@ -14,6 +14,7 @@
 
 #define EXIT_IMF_EXISTS 1
 #define EXIT_BAD_BREX_DMC 2
+#define EXIT_BAD_DATE 3
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -39,6 +40,8 @@ char originator_code[7] = "";
 char icn_title[256] = "";
 
 char brex_dmcode[256] = "";
+
+char issue_date[16] = "";
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -118,6 +121,7 @@ void show_help(void)
 	puts("  -O          Originator CAGE code");
 	puts("  -t          ICN title");
 	puts("  -b          BREX data module code");
+	puts("  -I          Issue date");
 }
 
 void copy_default_value(const char *def_key, const char *def_val)
@@ -194,6 +198,35 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
+void set_issue_date(xmlNodePtr issueDate)
+{
+	char year_s[5], month_s[3], day_s[3];
+
+	if (strcmp(issue_date, "") == 0) {
+		time_t now;
+		struct tm *local;
+		int year, month, day;
+
+		time(&now);
+		local = localtime(&now);
+		year = local->tm_year + 1900;
+		month = local->tm_mon + 1;
+		day = local->tm_mday;
+		sprintf(year_s, "%d", year);
+		sprintf(month_s, "%.2d", month);
+		sprintf(day_s, "%.2d", day);
+	} else {
+		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
+			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
+			exit(EXIT_BAD_DATE);
+		}
+	}
+
+	xmlSetProp(issueDate, BAD_CAST "year",  BAD_CAST year_s);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
+}
+
 int main(int argc, char **argv)
 {
 	int i;
@@ -208,7 +241,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:vfh?")) != -1) {
+	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:I:vfh?")) != -1) {
 		switch (i) {
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -222,6 +255,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 't': strncpy(icn_title, optarg, 255); break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
+			case 'I': strncpy(issue_date, optarg, 15); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case 'h':
@@ -284,10 +318,6 @@ int main(int argc, char **argv)
 		xmlDocPtr template;
 		xmlNodePtr node;
 		xmlXPathContextPtr ctx;
-		time_t now;
-		struct tm *local;
-		int year, month, day;
-		char year_s[5], month_s[3], day_s[3];
 
 		n = sscanf(argv[i], "ICN-%[^.].%*s", icn);
 
@@ -308,17 +338,7 @@ int main(int argc, char **argv)
 		xmlNodeSetContent(node, BAD_CAST icn_title);
 
 		node = first_xpath_node("//imfAddressItems/issueDate", ctx);
-		time(&now);
-		local = localtime(&now);
-		year = local->tm_year + 1900;
-		month = local->tm_mon + 1;
-		day = local->tm_mday;
-		sprintf(year_s, "%d", year);
-		sprintf(month_s, "%.2d", month);
-		sprintf(day_s, "%.2d", day);
-		xmlSetProp(node, BAD_CAST "year", BAD_CAST year_s);
-		xmlSetProp(node, BAD_CAST "month", BAD_CAST month_s);
-		xmlSetProp(node, BAD_CAST "day", BAD_CAST day_s);
+		set_issue_date(node);
 
 		node = first_xpath_node("//imfStatus/security", ctx);
 		xmlSetProp(node, BAD_CAST "securityClassification", BAD_CAST security_classification);

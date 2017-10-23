@@ -49,6 +49,9 @@ The ICN title (if creating multiple ICNs, they will all use this title).
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-I &lt;date&gt;  
+The issue date of the new ICN metadata file in the form of YYYY-MM-DD.
+
 -v  
 Print the file name of the newly created IMF.
 
