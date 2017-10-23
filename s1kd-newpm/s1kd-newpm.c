@@ -17,6 +17,7 @@
 #define EXIT_BAD_PMC 1
 #define EXIT_PM_EXISTS 2
 #define EXIT_BAD_BREX_DMC 3
+#define EXIT_BAD_DATE 4
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -46,6 +47,8 @@ char enterprise_name[256] = "";
 char enterprise_code[7] = "";
 
 char brex_dmcode[256] = "";
+
+char issue_date[16] = "";
 
 xmlNodePtr find_child(xmlNodePtr parent, char *name)
 {
@@ -149,6 +152,35 @@ void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool in
 	xmlAddChild(pmEntry, dm_ref);
 }
 
+void set_issue_date(xmlNodePtr issueDate)
+{
+	char year_s[5], month_s[3], day_s[3];
+
+	if (strcmp(issue_date, "") == 0) {
+		time_t now;
+		struct tm *local;
+		int year, month, day;
+
+		time(&now);
+		local = localtime(&now);
+		year = local->tm_year + 1900;
+		month = local->tm_mon + 1;
+		day = local->tm_mday;
+		sprintf(year_s, "%d", year);
+		sprintf(month_s, "%.2d", month);
+		sprintf(day_s, "%.2d", day);
+	} else {
+		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
+			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
+			exit(EXIT_BAD_DATE);
+		}
+	}
+
+	xmlSetProp(issueDate, (xmlChar *) "year", (xmlChar *) year_s);
+	xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
+	xmlSetProp(issueDate, (xmlChar *) "day", (xmlChar *) day_s);
+}
+
 void show_help(void)
 {
 	puts("Usage: s1kd-newpm [options]");
@@ -170,6 +202,7 @@ void show_help(void)
 	puts("  -r    Responsible partner company enterprise name");
 	puts("  -t    Publication module title");
 	puts("  -b    BREX data module code");
+	puts("  -I    Issue date");
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -301,10 +334,6 @@ int main(int argc, char **argv)
 	int c;
 	int i;
 
-	time_t now;
-	struct tm *local;
-	int year, month, day;
-	char year_s[5], month_s[3], day_s[3];
 	char pmcode[256] = "";
 	bool showprompts = false;
 	bool skippmc = false;
@@ -317,7 +346,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -334,6 +363,7 @@ int main(int argc, char **argv)
 			case 'i': include_issue_info = true; break;
 			case 'l': include_language = true; break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
+			case 'I': strcpy(issue_date, optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case 'h':
@@ -455,17 +485,7 @@ int main(int argc, char **argv)
 	xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) issue_number);
 	xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) in_work);
 
-	time(&now);
-	local = localtime(&now);
-	year = local->tm_year + 1900;
-	month = local->tm_mon + 1;
-	day = local->tm_mday;
-	sprintf(year_s, "%d", year);
-	sprintf(month_s, "%.2d", month);
-	sprintf(day_s, "%.2d", day);
-	xmlSetProp(issueDate, (xmlChar *) "year", (xmlChar *) year_s);
-	xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
-	xmlSetProp(issueDate, (xmlChar *) "day", (xmlChar *) day_s);
+	set_issue_date(issueDate);
 
 	xmlNodeSetContent(pmTitle, (xmlChar *) pm_title);
 
