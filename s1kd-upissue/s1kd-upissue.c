@@ -223,9 +223,6 @@ int main(int argc, char **argv)
 		issueNumber_int = atoi(issueNumber);
 		inWork_int = atoi(inWork);
 
-		xmlFree(issueNumber);
-		xmlFree(inWork);
-		
 		if (newissue) {
 			snprintf(upissued_issueNumber, 32, "%.3d", issueNumber_int + 1);
 			snprintf(upissued_inWork, 32, "%.2d", 0);
@@ -238,7 +235,8 @@ int main(int argc, char **argv)
 			xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) upissued_issueNumber);
 			xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) upissued_inWork);
 
-			if (!keep_rfus && strcmp(upissued_inWork, "01") == 0) {
+			/* Delete RFUs when upissuing an official module */
+			if (!keep_rfus && strcmp(inWork, "00") == 0) {
 				del_rfus(dmdoc);
 			}
 
@@ -265,6 +263,9 @@ int main(int argc, char **argv)
 				}
 			}
 		}
+
+		xmlFree(issueNumber);
+		xmlFree(inWork);
 
 		if (!dmdoc) { /* Preserve non-XML filename for copying */
 			strcpy(cpfile, dmfile);
