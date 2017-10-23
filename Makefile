@@ -4,6 +4,7 @@ all:
 	$(MAKE) -C s1kd-checkrefs
 	$(MAKE) -C s1kd-dmls
 	$(MAKE) -C s1kd-dmref
+	$(MAKE) -C s1kd-dmrl
 	$(MAKE) -C s1kd-instance
 	$(MAKE) -C s1kd-metadata
 	$(MAKE) -C s1kd-neutralize
@@ -24,6 +25,7 @@ clean:
 	$(MAKE) -C s1kd-checkrefs clean
 	$(MAKE) -C s1kd-dmls clean
 	$(MAKE) -C s1kd-dmref clean
+	$(MAKE) -C s1kd-dmrl clean
 	$(MAKE) -C s1kd-instance clean
 	$(MAKE) -C s1kd-metadata clean
 	$(MAKE) -C s1kd-neutralize clean
@@ -44,6 +46,7 @@ install:
 	$(MAKE) -C s1kd-checkrefs install
 	$(MAKE) -C s1kd-dmls install
 	$(MAKE) -C s1kd-dmref install
+	$(MAKE) -C s1kd-dmrl install
 	$(MAKE) -C s1kd-instance install
 	$(MAKE) -C s1kd-metadata install
 	$(MAKE) -C s1kd-neutralize install
