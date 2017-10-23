@@ -15,6 +15,7 @@
 #define EXIT_BAD_CODE 1
 #define EXIT_COMMENT_EXISTS 2
 #define EXIT_BAD_BREX_DMC 3
+#define EXIT_BAD_DATE 4
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -45,6 +46,8 @@ char commentPriorityCode[6] = "";
 char responseType[6] = "";
 
 char brex_dmcode[256] = "";
+
+char issue_date[16] = "";
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -90,6 +93,36 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
+void set_issue_date(xmlNodePtr issueDate)
+{
+	char year_s[5], month_s[3], day_s[3];
+
+	if (strcmp(issue_date, "") == 0) {
+		time_t now;
+		struct tm *local;
+		int year, month, day;
+
+		time(&now);
+		local = localtime(&now);
+		year = local->tm_year + 1900;
+		month = local->tm_mon + 1;
+		day = local->tm_mday;
+		sprintf(year_s, "%d", year);
+		sprintf(month_s, "%.2d", month);
+		sprintf(day_s, "%.2d", day);
+	} else {
+		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
+			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
+			exit(EXIT_BAD_DATE);
+		}
+	}
+
+	xmlSetProp(issueDate, BAD_CAST "year",  BAD_CAST year_s);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
+
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options]");
@@ -109,6 +142,7 @@ void show_help(void)
 	puts("  -t    Title");
 	puts("  -r    Response type");
 	puts("  -b    BREX data module code");
+	puts("  -I    Issue date");
 }
 
 void copy_default_value(const char *def_key, const char *def_val)
@@ -242,10 +276,6 @@ int main(int argc, char **argv)
 	xmlNodePtr commentPriority;
 	xmlNodePtr commentResponse;
 
-	time_t now;
-	struct tm *local;
-	int year, month, day;
-	char year_s[5], month_s[3], day_s[3];
 
 	FILE *defaults;
 
@@ -266,7 +296,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:vfh?")) != -1) {
+	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vfh?")) != -1) {
 		switch (i) {
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
@@ -301,6 +331,9 @@ int main(int argc, char **argv)
 				break;
 			case 'b':
 				strncpy(brex_dmcode, optarg, 255);
+				break;
+			case 'I':
+				strncpy(issue_date, optarg, 15);
 				break;
 			case 'v':
 				verbose = true;
@@ -433,17 +466,7 @@ int main(int argc, char **argv)
 		xmlNodeSetContent(commentTitleNode, BAD_CAST commentTitle);
 	}
 
-	time(&now);
-	local = localtime(&now);
-	year = local->tm_year + 1900;
-	month = local->tm_mon + 1;
-	day = local->tm_mday;
-	sprintf(year_s, "%d", year);
-	sprintf(month_s, "%.2d", month);
-	sprintf(day_s, "%.2d", day);
-	xmlSetProp(issueDate, BAD_CAST "year",  BAD_CAST year_s);
-	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
-	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
+	set_issue_date(issueDate);
 
 	xmlNodeSetContent(enterpriseName, BAD_CAST enterprise_name);
 	xmlNodeSetContent(city, BAD_CAST address_city);

@@ -46,6 +46,9 @@ The response type of the new comment.
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-I &lt;date&gt;  
+The issue date of the new comment in the form of YYYY-MM-DD.
+
 -v  
 Print the file name of the newly created comment.
 
