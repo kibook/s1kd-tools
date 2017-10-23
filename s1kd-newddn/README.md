@@ -52,6 +52,9 @@ Show help/usage message.
 -b &lt;BREX&gt;  
 BREX data module code.
 
+-I &lt;date&gt;  
+The issue date of the new DDN in the form of YYYY-MM-DD.
+
 -v  
 Print the file name of the newly created DDN.
 

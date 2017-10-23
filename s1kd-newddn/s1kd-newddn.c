@@ -22,6 +22,7 @@
 #define EXIT_DDN_EXISTS 1
 #define EXIT_MALFORMED_CODE 2
 #define EXIT_BAD_BREX_DMC 3
+#define EXIT_BAD_DATE 4
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -52,6 +53,8 @@ char security_classification[4] = "";
 char authorization[256] = "";
 
 char brex_dmcode[256] = "";
+
+char ddn_issue_date[16] = "";
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -104,6 +107,7 @@ void show_help(void)
 	puts("  -N <country>     Receiver country");
 	puts("  -a <auth>        Authorization");
 	puts("  -b <BREX>        BREX data module code");
+	puts("  -I <date>        Issue date");
 }
 
 int matches_key_and_not_set(const char *key, const char *match, const char *var)
@@ -231,6 +235,35 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
+void set_issue_date(xmlNodePtr issue_date)
+{
+	char year_s[5], month_s[3], day_s[3];
+
+	if (strcmp(ddn_issue_date, "") == 0) {
+		time_t now;
+		struct tm *local;
+		int year, month, day;
+
+		time(&now);
+		local = localtime(&now);
+		year = local->tm_year + 1900;
+		month = local->tm_mon + 1;
+		day = local->tm_mday;
+		sprintf(year_s, "%d", year);
+		sprintf(month_s, "%.2d", month);
+		sprintf(day_s, "%.2d", day);
+	} else {
+		if (sscanf(ddn_issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
+			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", ddn_issue_date);
+			exit(EXIT_BAD_DATE);
+		}
+	}
+
+	xmlSetProp(issue_date, BAD_CAST "year", BAD_CAST year_s);
+	xmlSetProp(issue_date, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issue_date, BAD_CAST "day", BAD_CAST day_s);
+}
+
 int main(int argc, char **argv)
 {
 	int c;
@@ -258,16 +291,11 @@ int main(int argc, char **argv)
 
 	xmlXPathContextPtr ctxt;
 
-	time_t now;
-	struct tm *local;
-	int year, month, day;
-	char year_s[5], month_s[3], day_s[3];
-
 	char outfile[PATH_MAX];
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vfh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -280,6 +308,7 @@ int main(int argc, char **argv)
 			case 'N': strncpy(receiver_country, optarg, 255); break;
 			case 'a': strncpy(authorization, optarg, 255); break;
 			case 'b': strncpy(brex_dmcode, optarg, 255); break;
+			case 'I': strncpy(ddn_issue_date, optarg, 15); break;
 			case 'v': verbose = 1; break;
 			case 'f': overwrite = 1; break;
 			case 'h':
@@ -373,17 +402,7 @@ int main(int argc, char **argv)
 	xmlSetProp(ddn_code, BAD_CAST "seqNumber", BAD_CAST seq_number);
 
 	issue_date = first_xpath_node("//ddnAddressItems/issueDate", ctxt);
-	time(&now);
-	local = localtime(&now);
-	year = local->tm_year + 1900;
-	month = local->tm_mon + 1;
-	day = local->tm_mday;
-	sprintf(year_s, "%d", year);
-	sprintf(month_s, "%.2d", month);
-	sprintf(day_s, "%.2d", day);
-	xmlSetProp(issue_date, BAD_CAST "year", BAD_CAST year_s);
-	xmlSetProp(issue_date, BAD_CAST "month", BAD_CAST month_s);
-	xmlSetProp(issue_date, BAD_CAST "day", BAD_CAST day_s);
+	set_issue_date(issue_date);
 
 	sender_ent_name = first_xpath_node("//ddnAddressItems/dispatchFrom/dispatchAddress/enterprise/enterpriseName", ctxt);
 	xmlNodeSetContent(sender_ent_name, BAD_CAST sender);
