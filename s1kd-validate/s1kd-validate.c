@@ -16,6 +16,10 @@
 #define EXIT_MISSING_SCHEMA 2
 #define EXIT_BAD_IDREF 3
 
+#define INVALID_ID_XPATH "//@internalRefId[not(//@id = .)]|" \
+                         "//@applicRefId[not(//@id = .)]" \
+			 "//@nextActionRefId[not(//@id = .)]"
+
 enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
 
 /* Cache schemas to prevent parsing them twice (mainly needed when accessing
@@ -151,7 +155,7 @@ void check_idrefs(xmlDocPtr doc)
 
 	ctx = xmlXPathNewContext(doc);
 
-	invalid = first_xpath_node("//@internalRefId[not(//@id = .)]", ctx);
+	invalid = first_xpath_node(INVALID_ID_XPATH, ctx);
 
 	xmlXPathFreeContext(ctx);
 
