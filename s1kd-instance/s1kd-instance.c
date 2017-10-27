@@ -23,6 +23,7 @@
 #define EXIT_NO_OVERWRITE 5 /* Did not overwrite existing out file */
 #define EXIT_BAD_XML 6 /* Invalid XML/S1000D */
 #define EXIT_BAD_ARG 7 /* Malformed argument */
+#define EXIT_BAD_DATE 8 /* Malformed issue date */
 
 /* Convenient structure for all strings related to uniquely identifying a
  * data module or pub module.
@@ -1358,7 +1359,6 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 	}
 }
 
-
 void set_issue(xmlDocPtr dm, char *issinfo)
 {
 	char issue[4], inwork[3];
@@ -1374,6 +1374,24 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
 }
+
+void set_issue_date(xmlDocPtr doc, const char *issdate)
+{
+	char year_s[5], month_s[3], day_s[3];
+	xmlNodePtr issueDate;
+
+	issueDate = first_xpath_node(doc, "//issueDate");
+
+	if (sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
+		fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issdate);
+		exit(EXIT_BAD_DATE);
+	}
+
+	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
+}
+
 
 void set_security(xmlDocPtr dm, char *sec)
 {
@@ -1476,6 +1494,7 @@ int main(int argc, char **argv)
 	char product[64] = "";
 	bool dmlist = false;
 	FILE *list = stdin;
+	char issdate[16] = "";
 
 	int parseopts = 0;
 
@@ -1486,7 +1505,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:I:u:wNP:p:Lh?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:n:u:wNP:p:LI:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1503,13 +1522,14 @@ int main(int argc, char **argv)
 			case 'C': strncpy(comment_text, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
-			case 'I': strncpy(issinfo, optarg, 6); break;
+			case 'n': strncpy(issinfo, optarg, 6); break;
 			case 'u': strncpy(secu, optarg, 2); break;
 			case 'w': wholedm = true; break;
 			case 'N': no_issue = true; break;
 			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
 			case 'p': strncpy(product, optarg, 63); break;
 			case 'L': dmlist = true; break;
+			case 'I': strncpy(issdate, optarg, 15); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1660,6 +1680,10 @@ int main(int argc, char **argv)
 
 			if (strcmp(issinfo, "") != 0) {
 				set_issue(doc, issinfo);
+			}
+
+			if (strcmp(issdate, "") != 0) {
+				set_issue_date(doc, issdate);
 			}
 
 			if (strcmp(secu, "") != 0) {

@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="10"/>
+        <issueDate year="2017" month="10" day="27"/>
         <dmTitle>
           <techName>s1kd-instance(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,6 +41,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Changed -I to -n, and added new -I option to set issue date of instance.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -51,7 +54,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-I &lt;iss&gt;] [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-n &lt;iss&gt;] [-I &lt;date&gt;] [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -86,9 +89,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-I &lt;iss&gt;</listItemTerm>
+              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0001">-n &lt;iss&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-I &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue date of the instance. By default, the issue date is taken from the source.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

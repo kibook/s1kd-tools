@@ -1,4 +1,4 @@
-Usage: s1kd-instance [-s <source>] [-c <dmc>] [-l <lang>] [-I <iss>]
+Usage: s1kd-instance [-s <source>] [-c <dmc>] [-l <lang>] [-n <iss>] [-I <date>]
                      [-o <file>|-O <dir>] [-t <techName>] [-i <infoName>]
 		     [-a|-A] [-Y <text>] [-C <comment>] [-R <CIR> ...] [-S]
 		     [<applic>...]
@@ -8,7 +8,8 @@ Options:
   -e <ext>	Specify an extension on the data module code (DME).
   -c <DMC>	The new data module code of the data module instance.
   -l <lang>	Specify the language of the data module instance.
-  -I <iss>      Set the issue and inwork numbers of the instance.
+  -n <iss>      Set the issue and inwork numbers of the instance.
+  -I <date>     Set the issue date of the instance.
   -u <sec>      Set the security classification of the instance.
   -o <file>	Output data module instance to file instead of stdout.
   -O <dir>	Output data module instance in dir, automatically named.

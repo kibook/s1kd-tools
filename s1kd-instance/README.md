@@ -6,7 +6,7 @@ s1kd-instance - Create S1000D data/pub module instances
 SYNOPSIS
 ========
 
-s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-I &lt;iss&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[-L\] \[&lt;applic&gt;...\]
+s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-n &lt;iss&gt;\] \[-I &lt;date&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[-L\] \[&lt;applic&gt;...\]
 
 DESCRIPTION
 ===========
@@ -28,8 +28,11 @@ Specify a new data module code (DMC) or publication module code (PMC) for the in
 -l &lt;lang&gt;  
 Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".
 
--I &lt;iss&gt;  
+-n &lt;iss&gt;  
 Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.
+
+-I &lt;date&gt;  
+Set the issue date of the instance. By default, the issue date is taken from the source.
 
 -u &lt;sec&gt;  
 Set the security classification of the instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.
