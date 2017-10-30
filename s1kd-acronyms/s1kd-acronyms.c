@@ -19,6 +19,8 @@ bool prettyPrint = false;
 int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
 
+xsltStylesheetPtr termStylesheet, idStylesheet;
+
 void combineAcronymLists(xmlNodePtr dst, xmlNodePtr src)
 {
 	xmlNodePtr cur;
@@ -285,6 +287,19 @@ void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 	}
 }
 
+xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
+{
+	xmlDocPtr res;
+
+	res = xsltApplyStylesheet(termStylesheet, doc, NULL);
+	xmlFreeDoc(doc);
+	doc = res;
+	res = xsltApplyStylesheet(idStylesheet, doc, NULL);
+	xmlFreeDoc(doc);
+
+	return res;
+}
+
 void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out)
 {
 	xmlDocPtr doc;
@@ -292,6 +307,8 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 	doc = xmlReadFile(path, NULL, 0);
 
 	markupAcronyms(doc, acronyms);
+
+	doc = matchAcronymTerms(doc);
 
 	xmlSaveFile(out, doc);
 
@@ -378,9 +395,17 @@ int main(int argc, char **argv)
 
 
 	if (markup) {
+		xmlDocPtr termStylesheetDoc, idStylesheetDoc;
+
 		doc = xmlReadFile(markup, NULL, 0);
 		doc = sortAcronyms(doc);
 		acronyms = xmlDocGetRootElement(doc);
+
+		termStylesheetDoc = xmlReadMemory((const char *) stylesheets_term_xsl, stylesheets_term_xsl_len, NULL, NULL, 0);
+		idStylesheetDoc = xmlReadMemory((const char *) stylesheets_id_xsl, stylesheets_id_xsl_len, NULL, NULL, 0);
+
+		termStylesheet = xsltParseStylesheetDoc(termStylesheetDoc);
+		idStylesheet = xsltParseStylesheetDoc(idStylesheetDoc);
 
 		if (optind >= argc) {
 			markupAcronymsInFile("-", acronyms, out);
@@ -393,6 +418,9 @@ int main(int argc, char **argv)
 				markupAcronymsInFile(argv[i], acronyms, argv[i]);
 			}
 		}
+
+		xsltFreeStylesheet(termStylesheet);
+		xsltFreeStylesheet(idStylesheet);
 	} else {
 		doc = xmlNewDoc(BAD_CAST "1.0");
 		acronyms = xmlNewNode(NULL, BAD_CAST "acronyms");
