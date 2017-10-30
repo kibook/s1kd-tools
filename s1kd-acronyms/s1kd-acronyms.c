@@ -12,6 +12,9 @@
 
 #define PROG_NAME "s1kd-acronyms"
 
+/* Paths to text nodes where acronyms may occur */
+#define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
+
 bool prettyPrint = false;
 int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
@@ -204,6 +207,87 @@ xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 	return result;
 }
 
+void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
+{
+	xmlChar *content;
+	xmlChar *term = NULL;
+	int termLen, contentLen;
+	xmlNodePtr cur;
+	int i;
+
+	for (cur = acronym->children; cur; cur = cur->next)
+		if (xmlStrcmp(cur->name, BAD_CAST "acronymTerm") == 0)
+			term = xmlNodeGetContent(cur);
+
+	termLen = xmlStrlen(term);
+
+	content = xmlNodeGetContent(node);
+	contentLen = xmlStrlen(content);
+
+	i = 0;
+	while (i < contentLen) {
+		if (xmlStrcmp(xmlStrsub(content, i, termLen), term) == 0) {
+			xmlChar *s1 = xmlStrndup(content, i);
+			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
+			xmlNodePtr acr;
+
+			xmlFree(content);
+
+			xmlNodeSetContent(node, s1);
+			acr = xmlAddNextSibling(node, xmlCopyNode(acronym, 1));
+			xmlAddNextSibling(acr, xmlNewText(s2));
+
+			xmlFree(s1);
+			
+			content = s2;
+			contentLen = xmlStrlen(s2);
+			i = 0;
+		} else {
+			++i;
+		}
+	}
+
+	xmlFree(term);
+	xmlFree(content);
+}
+
+void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
+{
+	xmlNodePtr cur;
+
+	for (cur = acronyms->children; cur; cur = cur->next) {
+		if (xmlStrcmp(cur->name, BAD_CAST "acronym") == 0) {
+			xmlXPathContextPtr ctx;
+			xmlXPathObjectPtr obj;
+
+			ctx = xmlXPathNewContext(doc);
+
+			obj = xmlXPathEvalExpression(ACRO_MARKUP_XPATH, ctx);
+
+			if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				int i;
+
+				for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+					markupAcronymInNode(obj->nodesetval->nodeTab[i], cur);
+				}
+			}
+		}
+	}
+}
+
+void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out)
+{
+	xmlDocPtr doc;
+
+	doc = xmlReadFile(path, NULL, 0);
+
+	markupAcronyms(doc, acronyms);
+
+	xmlSaveFile(out, doc);
+
+	xmlFreeDoc(doc);
+}
+
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [-pxdth?] [-n <#>] [-T <types>] [-o <file>] [<datamodules>]");
@@ -216,6 +300,7 @@ void showHelp(void)
 	puts("  -t          Format XML output as table");
 	puts("  -T <types>  Only search for acronyms of these types");
 	puts("  -o <file>   Output to <file> instead of stdout");
+	puts("  -m <list>   Add markup for acronyms");
 	puts("  -h -?  Show usage message");
 }
 
@@ -229,8 +314,10 @@ int main(int argc, char **argv)
 	bool xmlOut = false;
 	char *types = NULL;
 	char *out = strdup("-");
+	bool outarg = false;
+	char *markup = NULL;
 
-	while ((i = getopt(argc, argv, "pn:xdtT:o:h?")) != -1) {
+	while ((i = getopt(argc, argv, "pn:xdtT:o:m:h?")) != -1) {
 		switch (i) {
 			case 'p':
 				prettyPrint = true;
@@ -251,8 +338,12 @@ int main(int argc, char **argv)
 				types = strdup(optarg);
 				break;
 			case 'o':
+				outarg = true;
 				free(out);
 				out = strdup(optarg);
+				break;
+			case 'm':
+				markup = strdup(optarg);
 				break;
 			case 'h':
 			case '?':
@@ -261,46 +352,65 @@ int main(int argc, char **argv)
 		}
 	}
 
-	doc = xmlNewDoc(BAD_CAST "1.0");
-	acronyms = xmlNewNode(NULL, BAD_CAST "acronyms");
-	xmlDocSetRootElement(doc, acronyms);
 
-	if (optind >= argc) {
-		findAcronymsInFile(acronyms, "-");
-	}
+	if (markup) {
+		doc = xmlReadFile(markup, NULL, 0);
+		acronyms = xmlDocGetRootElement(doc);
 
-	for (i = optind; i < argc; ++i) {
-		findAcronymsInFile(acronyms, argv[i]);
-	}
-
-	doc = removeNonUniqueAcronyms(doc);
-
-	if (types)
-		doc = limitToTypes(doc, types);
-
-	if (xmlOut) {
-		switch (xmlFormat) {
-			case DEFLIST:
-				doc = formatXmlAs(doc, stylesheets_list_xsl, stylesheets_list_xsl_len);
-				break;
-			case TABLE:
-				doc = formatXmlAs(doc, stylesheets_table_xsl, stylesheets_table_xsl_len);
-				break;
-			default:
-				break;
+		if (optind >= argc) {
+			markupAcronymsInFile("-", acronyms, out);
 		}
 
-		if (prettyPrint) {
-			xmlSaveFormatFile(out, doc, 1);
-		} else {
-			xmlSaveFile(out, doc);
+		for (i = optind; i < argc; ++i) {
+			if (outarg) {
+				markupAcronymsInFile(argv[i], acronyms, out);
+			} else {
+				markupAcronymsInFile(argv[i], acronyms, argv[i]);
+			}
 		}
 	} else {
-		printAcronyms(xmlDocGetRootElement(doc), out);
+		doc = xmlNewDoc(BAD_CAST "1.0");
+		acronyms = xmlNewNode(NULL, BAD_CAST "acronyms");
+		xmlDocSetRootElement(doc, acronyms);
+
+		if (optind >= argc) {
+			findAcronymsInFile(acronyms, "-");
+		}
+
+		for (i = optind; i < argc; ++i) {
+			findAcronymsInFile(acronyms, argv[i]);
+		}
+
+		doc = removeNonUniqueAcronyms(doc);
+
+		if (types)
+			doc = limitToTypes(doc, types);
+
+		if (xmlOut) {
+			switch (xmlFormat) {
+				case DEFLIST:
+					doc = formatXmlAs(doc, stylesheets_list_xsl, stylesheets_list_xsl_len);
+					break;
+				case TABLE:
+					doc = formatXmlAs(doc, stylesheets_table_xsl, stylesheets_table_xsl_len);
+					break;
+				default:
+					break;
+			}
+
+			if (prettyPrint) {
+				xmlSaveFormatFile(out, doc, 1);
+			} else {
+				xmlSaveFile(out, doc);
+			}
+		} else {
+			printAcronyms(xmlDocGetRootElement(doc), out);
+		}
 	}
 
 	free(types);
 	free(out);
+	free(markup);
 
 	xmlFreeDoc(doc);
 

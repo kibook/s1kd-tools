@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="K" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="26"/>
+        <issueDate year="2017" month="10" day="30"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Add -m option for automatically marking up acronyms.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -94,10 +97,16 @@
                 <para>Only search for acronyms with an attribute <verbatimText verbatimStyle="vs13">acronymType</verbatimText> whose value is contained within the string &lt;types&gt;.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-m &lt;acronyms&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the <verbatimText verbatimStyle="vs12">acronym</verbatimText> element in the list.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-o &lt;file&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Output to &lt;file&gt; instead of stdout.</para>
+              <listItemDefinition changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                <para>Output to &lt;file&gt; instead of stdout. When used with the -m option, output to &lt;file&gt; instead of overwriting the existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
