@@ -7,12 +7,12 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="acronym" mode="id">
+  <xsl:template match="acronymDefinition" mode="id">
     <xsl:text>acr-</xsl:text>
     <xsl:number count="acronym" from="dmodule" level="any" format="0001"/>
   </xsl:template>
 
-  <xsl:template match="acronym/@id">
+  <xsl:template match="acronymDefinition/@id">
     <xsl:attribute name="id">
       <xsl:apply-templates select=".." mode="id"/>
     </xsl:attribute>
@@ -20,8 +20,8 @@
 
   <xsl:template match="acronymTerm/@internalRefId">
     <xsl:variable name="ref" select="."/>
-    <xsl:attribute name="id">
-      <xsl:apply-templates select="//acronym[@id = $ref]" mode="id"/>
+    <xsl:attribute name="internalRefId">
+      <xsl:apply-templates select="//acronymDefinition[@id = $ref]" mode="id"/>
     </xsl:attribute>
   </xsl:template>
 

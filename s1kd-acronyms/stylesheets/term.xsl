@@ -25,12 +25,16 @@
         </acronymTerm>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:copy>
-          <xsl:attribute name="id">
-            <xsl:value-of select="generate-id()"/>
-          </xsl:attribute>
-          <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
+        <acronym>
+          <xsl:apply-templates select="@*"/>
+          <xsl:apply-templates select="acronymTerm"/>
+          <acronymDefinition>
+            <xsl:attribute name="id">
+              <xsl:value-of select="generate-id()"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="acronymDefinition/@*|acronymDefinition/node()"/>
+          </acronymDefinition>
+        </acronym>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
