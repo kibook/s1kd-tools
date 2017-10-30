@@ -298,6 +298,8 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
 			xmlNodePtr acr;
 
+			printf("[%s] [%s]\n", (char *) s1, (char *) s2);
+
 			if (interactive) {
 				acronym = chooseAcronym(acronym, term, content);
 			}
@@ -308,7 +310,7 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 			xmlFree(s1);
 
 			acr = xmlAddNextSibling(node, xmlCopyNode(acronym, 1));
-			xmlAddNextSibling(acr, xmlNewText(s2));
+			node = xmlAddNextSibling(acr, xmlNewText(s2));
 
 			content = s2;
 			contentLen = xmlStrlen(s2);
