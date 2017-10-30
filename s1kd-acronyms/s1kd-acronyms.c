@@ -15,6 +15,11 @@
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
 
+/* Characters that must occur before/after a set of characters in order for the
+ * set to be considered a valid acronym. */
+#define PRE_ACRONYM_DELIM " "
+#define POST_ACRONYM_DELIM " .,"
+
 bool prettyPrint = false;
 int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
@@ -284,6 +289,24 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 	return acronym;
 }
 
+bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term, int termLen)
+{
+	xmlChar *sub;
+	bool isTerm;
+	char s, e;
+
+	sub = xmlStrsub(content, i, termLen);
+
+	s = i == 0 ? ' ' : (char) content[i - 1];
+	e = i + termLen == contentLen - 1 ? ' ' : (char) content[i + termLen];
+
+	isTerm = strchr(" ", s) && xmlStrcmp(sub, term) == 0 && strchr(" .", e);
+
+	xmlFree(sub);
+
+	return isTerm;
+}
+
 void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 {
 	xmlChar *content;
@@ -298,13 +321,8 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 	termLen = xmlStrlen(term);
 
 	i = 0;
-	while (i < contentLen) {
-		xmlChar *sub;
-
-		if (i + termLen >= contentLen)
-			break;
-
-		if (xmlStrcmp(sub = xmlStrsub(content, i, termLen), term) == 0) {
+	while (i + termLen < contentLen) {
+		if (isAcronymTerm(content, contentLen, i, term, termLen)) {
 			xmlChar *s1 = xmlStrndup(content, i);
 			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
 			xmlNodePtr acr = acronym;
@@ -333,8 +351,6 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 		} else {
 			++i;
 		}
-
-		xmlFree(sub);
 	}
 
 	xmlFree(term);
