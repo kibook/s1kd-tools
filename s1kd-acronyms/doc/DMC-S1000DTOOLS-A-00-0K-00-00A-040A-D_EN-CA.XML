@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001">
         <simplePara>Add -m option for automatically marking up acronyms.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002">
+        <simplePara>Add -i option for choosing acronyms when multiple definitions are available.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -101,6 +104,13 @@
               <listItemTerm>-m &lt;acronyms&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the <verbatimText verbatimStyle="vs12">acronym</verbatimText> element in the list.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-i</listItemTerm>
+              <listItemDefinition>
+                <para>Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.</para>
+                <para>When not in interactive mode, the first definition found will be used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

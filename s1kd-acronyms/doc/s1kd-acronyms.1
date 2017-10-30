@@ -54,6 +54,17 @@ Occurrences of the acronym term will be replaced in text with the
 .RS
 .RE
 .TP
+.B \-i
+Markup acronyms in interactive mode.
+If the specified acronyms list contains multiple definitions for a given
+acronym term, the tool will prompt the user with the context in which
+the acronym is used and present a list of the definitions for them to
+choose from.
+.RS
+.PP
+When not in interactive mode, the first definition found will be used.
+.RE
+.TP
 .B \-o <file>
 Output to <file> instead of stdout.
 When used with the \-m option, output to <file> instead of overwriting

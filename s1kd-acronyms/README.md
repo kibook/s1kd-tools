@@ -37,6 +37,11 @@ Only search for acronyms with an attribute `acronymType` whose value is containe
 -m &lt;acronyms&gt;  
 Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the `acronym` element in the list.
 
+-i  
+Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.
+
+When not in interactive mode, the first definition found will be used.
+
 -o &lt;file&gt;  
 Output to &lt;file&gt; instead of stdout. When used with the -m option, output to &lt;file&gt; instead of overwriting the existing file.
 

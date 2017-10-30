@@ -18,6 +18,7 @@
 bool prettyPrint = false;
 int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
+bool interactive = false;
 
 xsltStylesheetPtr termStylesheet, idStylesheet;
 
@@ -209,21 +210,80 @@ xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 	return result;
 }
 
+xmlNodePtr firstXPathNode(char *xpath, xmlNodePtr from)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	ctx = xmlXPathNewContext(from->doc);
+	ctx->node = from;
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	 else
+	 	node = obj->nodesetval->nodeTab[0];
+	
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
+}
+
+xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	xmlChar xpath[256];
+
+	ctx = xmlXPathNewContext(acronym->doc);
+
+	xmlStrPrintf(xpath, 256, BAD_CAST "//acronym[acronymTerm = '%s']", term);
+
+	obj = xmlXPathEvalExpression(xpath, ctx);
+
+	if (obj->nodesetval->nodeNr > 1) {
+		int i;
+
+		printf("Multiple definitions for acronym term %s in the following context:\n\n", (char *) term);
+
+		printf("%s\n\n", (char *) content);
+
+		puts("Choose:");
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlNodePtr acronymDefinition = firstXPathNode("acronymDefinition", obj->nodesetval->nodeTab[i]);
+			xmlChar *definition = xmlNodeGetContent(acronymDefinition);
+
+			printf("%d) %s\n", i + 1, (char *) definition);
+
+			xmlFree(definition);
+		}
+
+		i = getchar() - 49;
+		acronym = obj->nodesetval->nodeTab[i];
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return acronym;
+}
+
 void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 {
 	xmlChar *content;
-	xmlChar *term = NULL;
+	xmlChar *term;
 	int termLen, contentLen;
-	xmlNodePtr cur;
 	int i;
 
 	content = xmlNodeGetContent(node);
 	contentLen = xmlStrlen(content);
 
-	for (cur = acronym->children; cur; cur = cur->next)
-		if (xmlStrcmp(cur->name, BAD_CAST "acronymTerm") == 0)
-			term = xmlNodeGetContent(cur);
-
+	term = xmlNodeGetContent(firstXPathNode("acronymTerm", acronym));
 	termLen = xmlStrlen(term);
 
 	i = 0;
@@ -237,6 +297,10 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 			xmlChar *s1 = xmlStrndup(content, i);
 			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
 			xmlNodePtr acr;
+
+			if (interactive) {
+				acronym = chooseAcronym(acronym, term, content);
+			}
 
 			xmlFree(content);
 
@@ -358,7 +422,7 @@ int main(int argc, char **argv)
 	bool outarg = false;
 	char *markup = NULL;
 
-	while ((i = getopt(argc, argv, "pn:xdtT:o:m:h?")) != -1) {
+	while ((i = getopt(argc, argv, "pn:xdtT:o:m:ih?")) != -1) {
 		switch (i) {
 			case 'p':
 				prettyPrint = true;
@@ -386,6 +450,9 @@ int main(int argc, char **argv)
 			case 'm':
 				markup = strdup(optarg);
 				break;
+			case 'i':
+				interactive = true;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -401,8 +468,10 @@ int main(int argc, char **argv)
 		doc = sortAcronyms(doc);
 		acronyms = xmlDocGetRootElement(doc);
 
-		termStylesheetDoc = xmlReadMemory((const char *) stylesheets_term_xsl, stylesheets_term_xsl_len, NULL, NULL, 0);
-		idStylesheetDoc = xmlReadMemory((const char *) stylesheets_id_xsl, stylesheets_id_xsl_len, NULL, NULL, 0);
+		termStylesheetDoc = xmlReadMemory((const char *) stylesheets_term_xsl,
+			stylesheets_term_xsl_len, NULL, NULL, 0);
+		idStylesheetDoc = xmlReadMemory((const char *) stylesheets_id_xsl,
+			stylesheets_id_xsl_len, NULL, NULL, 0);
 
 		termStylesheet = xsltParseStylesheetDoc(termStylesheetDoc);
 		idStylesheet = xsltParseStylesheetDoc(idStylesheetDoc);
