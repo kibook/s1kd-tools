@@ -298,6 +298,20 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 	xmlFreeDoc(doc);
 }
 
+xmlDocPtr sortAcronyms(xmlDocPtr doc)
+{
+	xmlDocPtr sortdoc;
+	xsltStylesheetPtr sort;
+	xmlDocPtr sorted;
+
+	sortdoc = xmlReadMemory((const char *) stylesheets_sort_xsl, stylesheets_sort_xsl_len, NULL, NULL, 0);
+	sort = xsltParseStylesheetDoc(sortdoc);
+	sorted = xsltApplyStylesheet(sort, doc, NULL);
+	xmlFreeDoc(doc);
+	xsltFreeStylesheet(sort);
+	return sorted;
+}
+
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [-pxdth?] [-n <#>] [-T <types>] [-o <file>] [<datamodules>]");
@@ -365,6 +379,7 @@ int main(int argc, char **argv)
 
 	if (markup) {
 		doc = xmlReadFile(markup, NULL, 0);
+		doc = sortAcronyms(doc);
 		acronyms = xmlDocGetRootElement(doc);
 
 		if (optind >= argc) {
