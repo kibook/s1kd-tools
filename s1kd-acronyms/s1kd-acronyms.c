@@ -215,18 +215,23 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 	xmlNodePtr cur;
 	int i;
 
+	content = xmlNodeGetContent(node);
+	contentLen = xmlStrlen(content);
+
 	for (cur = acronym->children; cur; cur = cur->next)
 		if (xmlStrcmp(cur->name, BAD_CAST "acronymTerm") == 0)
 			term = xmlNodeGetContent(cur);
 
 	termLen = xmlStrlen(term);
 
-	content = xmlNodeGetContent(node);
-	contentLen = xmlStrlen(content);
-
 	i = 0;
 	while (i < contentLen) {
-		if (xmlStrcmp(xmlStrsub(content, i, termLen), term) == 0) {
+		xmlChar *sub;
+
+		if (i + termLen >= contentLen)
+			break;
+
+		if (xmlStrcmp(sub = xmlStrsub(content, i, termLen), term) == 0) {
 			xmlChar *s1 = xmlStrndup(content, i);
 			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
 			xmlNodePtr acr;
@@ -234,17 +239,19 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 			xmlFree(content);
 
 			xmlNodeSetContent(node, s1);
+			xmlFree(s1);
+
 			acr = xmlAddNextSibling(node, xmlCopyNode(acronym, 1));
 			xmlAddNextSibling(acr, xmlNewText(s2));
 
-			xmlFree(s1);
-			
 			content = s2;
 			contentLen = xmlStrlen(s2);
 			i = 0;
 		} else {
 			++i;
 		}
+
+		xmlFree(sub);
 	}
 
 	xmlFree(term);
@@ -271,6 +278,9 @@ void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 					markupAcronymInNode(obj->nodesetval->nodeTab[i], cur);
 				}
 			}
+
+			xmlXPathFreeObject(obj);
+			xmlXPathFreeContext(ctx);
 		}
 	}
 }

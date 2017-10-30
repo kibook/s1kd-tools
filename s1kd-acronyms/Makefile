@@ -1,7 +1,7 @@
 SOURCE=s1kd-acronyms.c
 OUTPUT=s1kd-acronyms
 
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=-Wall -Werror -pedantic-errors -g `pkg-config --cflags libxml-2.0 libxslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 INSTALL_PREFIX=/usr/bin
