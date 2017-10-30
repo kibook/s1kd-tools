@@ -3,7 +3,7 @@
   
   <xsl:template match="@*|node()">
     <xsl:copy>
-      <xsl:apply-templates/>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
@@ -33,6 +33,10 @@
         </xsl:copy>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="ignoredAcronym">
+    <xsl:apply-templates/>
   </xsl:template>
 
 </xsl:stylesheet>

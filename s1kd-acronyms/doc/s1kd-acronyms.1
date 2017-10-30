@@ -7,8 +7,8 @@
 s1kd\-acronyms \- Generate a list of acronyms from S1000D data modules
 .SH SYNOPSIS
 .PP
-s1kd\-acronyms [\-pxdth?] [\-n <#>] [\-T <types>] [\-o <file>]
-[<datamodules>]
+s1kd\-acronyms [\-pxdtiIh?] [\-n <#>] [\-T <types>] [\-m <acronyms>]
+[\-o <file>] [<datamodules>]
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-acronyms\f[] tool generates a list of unique acronyms
@@ -54,7 +54,7 @@ Occurrences of the acronym term will be replaced in text with the
 .RS
 .RE
 .TP
-.B \-i
+.B \-i \-I
 Markup acronyms in interactive mode.
 If the specified acronyms list contains multiple definitions for a given
 acronym term, the tool will prompt the user with the context in which
@@ -63,6 +63,11 @@ choose from.
 .RS
 .PP
 When not in interactive mode, the first definition found will be used.
+.PP
+The \-I option prompts for all acronyms, not just those with multiple
+definitions.
+This can be useful if some occurrences of the acronym term should be
+ignored.
 .RE
 .TP
 .B \-o <file>

@@ -19,6 +19,7 @@ bool prettyPrint = false;
 int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
 bool interactive = false;
+bool alwaysAsk = false;
 
 xsltStylesheetPtr termStylesheet, idStylesheet;
 
@@ -245,14 +246,14 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 
 	obj = xmlXPathEvalExpression(xpath, ctx);
 
-	if (obj->nodesetval->nodeNr > 1) {
+	if (alwaysAsk || obj->nodesetval->nodeNr > 1) {
 		int i;
 
-		printf("Multiple definitions for acronym term %s in the following context:\n\n", (char *) term);
+		printf("Found acronym term %s in the following context:\n\n", (char *) term);
 
 		printf("%s\n\n", (char *) content);
 
-		puts("Choose:");
+		puts("Choose definition:");
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			xmlNodePtr acronymDefinition = firstXPathNode("acronymDefinition", obj->nodesetval->nodeTab[i]);
@@ -263,8 +264,18 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 			xmlFree(definition);
 		}
 
-		i = getchar() - 49;
-		acronym = obj->nodesetval->nodeTab[i];
+		puts("s) Ignore this one");
+
+		i = getchar();
+
+		if (i == 's') {
+			acronym = NULL;
+		} else {
+			acronym = obj->nodesetval->nodeTab[i - 49];
+		}
+
+		while (getchar() != '\n');
+		putchar('\n');
 	}
 
 	xmlXPathFreeObject(obj);
@@ -296,12 +307,10 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 		if (xmlStrcmp(sub = xmlStrsub(content, i, termLen), term) == 0) {
 			xmlChar *s1 = xmlStrndup(content, i);
 			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
-			xmlNodePtr acr;
-
-			printf("[%s] [%s]\n", (char *) s1, (char *) s2);
+			xmlNodePtr acr = acronym;
 
 			if (interactive) {
-				acronym = chooseAcronym(acronym, term, content);
+				acr = chooseAcronym(acronym, term, content);
 			}
 
 			xmlFree(content);
@@ -309,7 +318,13 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 			xmlNodeSetContent(node, s1);
 			xmlFree(s1);
 
-			acr = xmlAddNextSibling(node, xmlCopyNode(acronym, 1));
+			if (acr) {
+				acr = xmlAddNextSibling(node, xmlCopyNode(acr, 1));
+			} else {
+				acr = xmlAddNextSibling(node, xmlNewNode(NULL, BAD_CAST "ignoredAcronym"));
+				xmlNodeSetContent(acr, term);
+			}
+
 			node = xmlAddNextSibling(acr, xmlNewText(s2));
 
 			content = s2;
@@ -424,7 +439,7 @@ int main(int argc, char **argv)
 	bool outarg = false;
 	char *markup = NULL;
 
-	while ((i = getopt(argc, argv, "pn:xdtT:o:m:ih?")) != -1) {
+	while ((i = getopt(argc, argv, "pn:xdtT:o:m:iIh?")) != -1) {
 		switch (i) {
 			case 'p':
 				prettyPrint = true;
@@ -454,6 +469,10 @@ int main(int argc, char **argv)
 				break;
 			case 'i':
 				interactive = true;
+				break;
+			case 'I':
+				interactive = true;
+				alwaysAsk = true;
 				break;
 			case 'h':
 			case '?':
