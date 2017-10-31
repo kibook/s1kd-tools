@@ -392,6 +392,9 @@ void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 {
 	xmlDocPtr res;
+	xmlDocPtr orig;
+
+	orig = xmlCopyDoc(doc, 1);
 
 	res = xsltApplyStylesheet(termStylesheet, doc, NULL);
 	xmlFreeDoc(doc);
@@ -399,7 +402,10 @@ xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 	res = xsltApplyStylesheet(idStylesheet, doc, NULL);
 	xmlFreeDoc(doc);
 
-	return res;
+	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeDoc(res);
+
+	return orig;
 }
 
 void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out)
