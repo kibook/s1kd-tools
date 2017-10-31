@@ -300,7 +300,9 @@ bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term, int t
 	s = i == 0 ? ' ' : (char) content[i - 1];
 	e = i + termLen == contentLen - 1 ? ' ' : (char) content[i + termLen];
 
-	isTerm = strchr(" ", s) && xmlStrcmp(sub, term) == 0 && strchr(" .", e);
+	isTerm = strchr(PRE_ACRONYM_DELIM, s) &&
+	         xmlStrcmp(sub, term) == 0 &&
+		 strchr(POST_ACRONYM_DELIM, e);
 
 	xmlFree(sub);
 
