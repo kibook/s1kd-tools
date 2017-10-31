@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="ACRONYMS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="01" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="08" day="25"/>
+        <dmTitle>
+          <techName>s1kd-acronyms example data module 2</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName/>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName/>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <remarks>
+        <simplePara>Source: https://en.wikipedia.org/wiki/XML</simplePara>
+      </remarks>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>General</title>
+        <para>In computing, <acronym acronymType="at01"><acronymTerm>XML</acronymTerm><acronymDefinition id="acrXML">Extensible Markup Language</acronymDefinition></acronym> is a <acronym acronymType="at02"><acronymTerm>markup language</acronymTerm><acronymDefinition id="acrMarkupLanguage">A system for annotating a document in a way that is syntactically distinguishable from the text</acronymDefinition></acronym> that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable through use of tags that can be created and defined by users. Much like natural language is extensible (that is, can grow) when speakers create new words and agree on what they mean, <acronymTerm internalRefId="acrXML">XML</acronymTerm> is a markup language that can grow when users create new elements and agree on what they mean. This makes <acronymTerm internalRefId="acrXML">XML</acronymTerm> able to capture intent in a way much broader than a nonextensible markup language such as <acronym acronymType="at01"><acronymTerm>HTML</acronymTerm><acronymDefinition id="acrHTML">Hyper Text Markup Language</acronymDefinition></acronym>. For example, <acronymTerm internalRefId="acrXML">XML</acronymTerm> can mark up machine-readably that apples and bananas are types of fruit, which is semantically deeper than the purpose of <acronymTerm internalRefId="acrHTML">HTML</acronymTerm>. However, <acronymTerm internalRefId="acrHTML">HTML</acronymTerm> is useful for display of content; often <acronymTerm internalRefId="acrHTML">HTML</acronymTerm> is used to display <acronymTerm internalRefId="acrXML">XML</acronymTerm> content after transformation with <acronym acronymType="at01"><acronymTerm>XSL</acronymTerm><acronymDefinition id="acrXSL">Extensible Stylesheet Language</acronymDefinition></acronym>.</para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
