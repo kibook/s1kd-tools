@@ -148,7 +148,7 @@ xmlNodePtr first_xpath_node(char *xpath, xmlXPathContextPtr ctx)
 	return node;
 }
 
-void check_idrefs(xmlDocPtr doc)
+int check_idrefs(xmlDocPtr doc, const char *fname)
 {
 	xmlXPathContextPtr ctx;
 	xmlNodePtr invalid;
@@ -162,10 +162,12 @@ void check_idrefs(xmlDocPtr doc)
 	if (invalid) {
 		if (verbosity > SILENT) {
 			xmlChar *id = xmlNodeGetContent(invalid);
-			fprintf(stderr, ERR_PREFIX "No matching ID for '%s' (line %u).\n", (char *) id, invalid->parent->line);
+			fprintf(stderr, ERR_PREFIX "No matching ID for '%s' (%s line %u).\n", (char *) id, fname, invalid->parent->line);
 		}
-		exit(EXIT_BAD_IDREF);
+		return EXIT_BAD_IDREF;
 	}
+
+	return 0;
 }
 
 int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns)
@@ -174,7 +176,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	xmlNodePtr dmodule;
 	char *url;
 	struct s1kd_schema_parser *parser;
-	int err;
+	int err = 0;
 
 	doc = xmlReadFile(fname, NULL, 0);
 
@@ -186,7 +188,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		}
 	}
 
-	check_idrefs(doc);
+	err += check_idrefs(doc, fname);
 
 	dmodule = xmlDocGetRootElement(doc);
 
@@ -241,7 +243,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		parser = add_schema_parser(url);
 	}
 
-	err = xmlSchemaValidateDoc(parser->valid_ctxt, doc);
+	err += xmlSchemaValidateDoc(parser->valid_ctxt, doc);
 
 	if (verbosity >= VERBOSE) {
 		if (err) {
