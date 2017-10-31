@@ -20,8 +20,16 @@
 
   <xsl:template match="acronymTerm/@internalRefId">
     <xsl:variable name="ref" select="."/>
+    <xsl:variable name="def" select="//acronymDefinition[@id = $ref]"/>
     <xsl:attribute name="internalRefId">
-      <xsl:apply-templates select="//acronymDefinition[@id = $ref]" mode="id"/>
+      <xsl:choose>
+        <xsl:when test="$def">
+          <xsl:apply-templates select="$def" mode="id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$ref"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
   </xsl:template>
 
