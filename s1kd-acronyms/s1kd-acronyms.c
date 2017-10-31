@@ -271,6 +271,8 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 
 		puts("s) Ignore this one");
 
+		fflush(stdout);
+
 		i = getchar();
 
 		if (i < '1' || i > '9') {
