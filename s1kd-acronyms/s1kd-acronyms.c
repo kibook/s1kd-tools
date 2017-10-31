@@ -260,7 +260,7 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 
 		puts("Choose definition:");
 
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+		for (i = 0; i < obj->nodesetval->nodeNr && i < 9; ++i) {
 			xmlNodePtr acronymDefinition = firstXPathNode("acronymDefinition", obj->nodesetval->nodeTab[i]);
 			xmlChar *definition = xmlNodeGetContent(acronymDefinition);
 
@@ -273,13 +273,13 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 
 		i = getchar();
 
-		if (i == 's') {
+		if (i < '1' || i > '9') {
 			acronym = NULL;
 		} else {
 			acronym = obj->nodesetval->nodeTab[i - 49];
 		}
 
-		while (getchar() != '\n');
+		while ((i = getchar()) != EOF && i != '\n');
 		putchar('\n');
 	}
 
@@ -326,7 +326,7 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 	while (i + termLen < contentLen) {
 		if (isAcronymTerm(content, contentLen, i, term, termLen)) {
 			xmlChar *s1 = xmlStrndup(content, i);
-			xmlChar *s2 = xmlStrdup(xmlStrsub(content, i + termLen, xmlStrlen(content)));
+			xmlChar *s2 = xmlStrsub(content, i + termLen, xmlStrlen(content));
 			xmlNodePtr acr = acronym;
 
 			if (interactive) {
