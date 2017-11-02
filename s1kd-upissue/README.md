@@ -33,6 +33,9 @@ Omit issue/inwork numbers from filename.
 -r  
 Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with the change markup attributes on elements referencing them. This option prevents their deletion.
 
+-I  
+Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.
+
 EXAMPLES
 ========
 

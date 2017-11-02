@@ -23,6 +23,7 @@ void show_help(void)
 	puts("  -i	Create a new issue of the data module");
 	puts("  -N	Omit issue/inwork numbers from filename");
 	puts("  -r      Keep RFUs from old issue");
+	puts("  -I      Do not change issue date");
 }
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
@@ -144,14 +145,12 @@ int main(int argc, char **argv)
 	struct tm *local;
 	int year, month, day;
 	char year_s[5], month_s[3], day_s[3];
-
 	char status[32] = "changed";
-
 	bool no_issue = false;
-
 	bool keep_rfus = false;
+	bool set_date = true;
 
-	while ((c = getopt(argc, argv, "ivs:Nfrh?")) != -1) {
+	while ((c = getopt(argc, argv, "ivs:NfrIh?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -171,6 +170,9 @@ int main(int argc, char **argv)
 				break;
 			case 'r':
 				keep_rfus = true;
+				break;
+			case 'I':
+				set_date = false;
 				break;
 			case 'h':
 			case '?':
@@ -240,7 +242,7 @@ int main(int argc, char **argv)
 				del_rfus(dmdoc);
 			}
 
-			if (newissue) {
+			if (set_date) {
 				issueDate = firstXPathNode("//issueDate", dmdoc);
 
 				time(&now);
@@ -255,7 +257,9 @@ int main(int argc, char **argv)
 				xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
 				xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
 				xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
+			}
 
+			if (newissue) {
 				/* Do not change issueType when upissuing from 000 -> 001 */
 				if (issueNumber_int > 0) {
 					if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc)))
