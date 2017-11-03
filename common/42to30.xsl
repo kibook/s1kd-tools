@@ -663,4 +663,53 @@
     </ccontent>
   </xsl:template>
 
+  <xsl:template match="ddnCode">
+    <ddnc>
+      <xsl:apply-templates select="@*"/>
+    </ddnc>
+  </xsl:template>
+
+  <xsl:template match="@receiverIdent">
+    <recvid>
+      <xsl:apply-templates/>
+    </recvid>
+  </xsl:template>
+
+  <xsl:template match="ddn/identAndStatusSection">
+    <xsl:apply-templates select="ddnAddress/ddnIdent/ddnCode"/>
+    <xsl:apply-templates select="ddnAddress/ddnAddressItems/issueDate"/>
+    <xsl:apply-templates select="ddnStatus/security"/>
+    <xsl:apply-templates select="ddnAddress/ddnAddressItems/dispatchTo"/>
+    <xsl:apply-templates select="ddnAddress/ddnAddressItems/dispatchFrom"/>
+    <xsl:apply-templates select="ddnStatus/authorization"/>
+  </xsl:template>
+
+  <xsl:template match="dispatchTo">
+    <dispto>
+      <xsl:apply-templates/>
+    </dispto>
+  </xsl:template>
+
+  <xsl:template match="dispatchFrom">
+    <dispfrom>
+      <xsl:apply-templates/>
+    </dispfrom>
+  </xsl:template>
+
+  <xsl:template match="authorization">
+    <authrtn>
+      <xsl:apply-templates/>
+    </authrtn>
+  </xsl:template>
+
+  <xsl:template match="ddnContent">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="deliveryList">
+    <delivlst>
+      <xsl:apply-templates/>
+    </delivlst>
+  </xsl:template>
+
 </xsl:stylesheet>

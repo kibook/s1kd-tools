@@ -7,6 +7,8 @@
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
 
 #include "templates.h"
 
@@ -23,6 +25,7 @@
 #define EXIT_MALFORMED_CODE 2
 #define EXIT_BAD_BREX_DMC 3
 #define EXIT_BAD_DATE 4
+#define EXIT_BAD_ISSUE 5
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -55,6 +58,82 @@ char authorization[256] = "";
 char brex_dmcode[256] = "";
 
 char ddn_issue_date[16] = "";
+
+#define DEFAULT_S1000D_ISSUE ISS_42
+#define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
+#define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
+#define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
+
+enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+
+enum issue get_issue(const char *iss)
+{
+	if (strcmp(iss, "4.2") == 0)
+		return ISS_42;
+	else if (strcmp(iss, "4.1") == 0)
+		return ISS_41;
+	else if (strcmp(iss, "4.0") == 0)
+		return ISS_40;
+	else if (strcmp(iss, "3.0") == 0)
+		return ISS_30;
+	
+	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
+	exit(EXIT_BAD_ISSUE);
+
+	return NO_ISS;
+}
+
+const char *issue_name(enum issue iss)
+{
+	switch (iss) {
+		case ISS_42: return "4.2";
+		case ISS_41: return "4.1";
+		case ISS_40: return "4.0";
+		case ISS_30: return "3.0";
+		default: return "";
+	}
+}
+
+xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+{
+	xsltStylesheetPtr style;
+	xmlDocPtr styledoc, res, orig;
+	unsigned char *xml = NULL;
+	unsigned int len;
+
+	switch (iss) {
+		case ISS_41:
+			xml = ___common_42to41_xsl;
+			len = ___common_42to41_xsl_len;
+			break;
+		case ISS_40:
+			xml = ___common_42to40_xsl;
+			len = ___common_42to40_xsl_len;
+			break;
+		case ISS_30:
+			xml = ___common_42to30_xsl;
+			len = ___common_42to30_xsl_len;
+			break;
+		default:
+			return NULL;
+	}
+
+	orig = xmlCopyDoc(doc, 1);
+			
+	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	xmlFreeDoc(doc);
+	xsltFreeStylesheet(style);
+
+	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+
+	xmlFreeDoc(res);
+
+	return orig;
+}
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -171,6 +250,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(authorization, def_val);
 	if (matches_key_and_not_set(def_key, "brex", brex_dmcode))
 		strcpy(brex_dmcode, def_val);
+	if (strcmp(def_key, "issue") == 0 && issue == NO_ISS)
+		issue = get_issue(def_val);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -295,7 +376,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -311,6 +392,7 @@ int main(int argc, char **argv)
 			case 'I': strncpy(ddn_issue_date, optarg, 15); break;
 			case 'v': verbose = 1; break;
 			case 'f': overwrite = 1; break;
+			case '$': issue = get_issue(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -388,6 +470,7 @@ int main(int argc, char **argv)
 		prompt("Authorization", authorization, 256);
 	}
 
+	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
 
 	ddn = xmlReadMemory((const char *) templates_ddn_xml, templates_ddn_xml_len, NULL, NULL, 0);
@@ -436,6 +519,26 @@ int main(int argc, char **argv)
 	xmlXPathFreeContext(ctxt);
 
 	populate_list(delivery_list, argc, argv, optind);
+
+	if (issue < ISS_42) {
+		if (strcmp(brex_dmcode, "") == 0) {
+			switch (issue) {
+				case ISS_30:
+					set_brex(ddn, ISS_30_DEFAULT_BREX);
+					break;
+				case ISS_40:
+					set_brex(ddn, ISS_40_DEFAULT_BREX);
+					break;
+				case ISS_41:
+					set_brex(ddn, ISS_41_DEFAULT_BREX);
+					break;
+				default:
+					break;
+			}
+		}
+
+		ddn = toissue(ddn, issue);
+	}
 
 	snprintf(outfile, PATH_MAX, "DDN-%s-%s-%s-%s-%s.XML",
 		model_ident_code,

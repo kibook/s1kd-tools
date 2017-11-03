@@ -1,16 +1,19 @@
 SOURCE=s1kd-newddn.c
 OUTPUT=s1kd-newddn
 
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
-LDFLAGS=`pkg-config --libs libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 INSTALL_PREFIX=/usr/bin
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-templates.h:
+templates.h: templates/ddn.xml ../common/42to*.xsl
 	xxd -i templates/ddn.xml > templates.h
+	xxd -i ../common/42to30.xsl >> templates.h
+	xxd -i ../common/42to40.xsl >> templates.h
+	xxd -i ../common/42to41.xsl >> templates.h
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)

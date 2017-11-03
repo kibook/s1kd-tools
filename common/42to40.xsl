@@ -29,4 +29,11 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="ddnStatus">
+    <xsl:copy>
+      <xsl:apply-templates select="security"/>
+      <xsl:apply-templates select="authorization"/>
+    </xsl:copy>
+  </xsl:template>
+
 </xsl:stylesheet>
