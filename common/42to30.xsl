@@ -712,4 +712,43 @@
     </delivlst>
   </xsl:template>
 
+  <xsl:template match="dml/identAndStatusSection">
+    <xsl:apply-templates select="dmlAddress/dmlIdent/dmlCode"/>
+    <xsl:apply-templates select="dmlAddress/dmlIdent/issueInfo"/>
+    <xsl:apply-templates select="dmlAddress/dmlAddressItems/issueDate"/>
+    <xsl:apply-templates select="dmlStatus/security"/>
+  </xsl:template>
+
+  <xsl:template match="dmlCode">
+    <dmlc>
+      <xsl:apply-templates select="@*"/>
+    </dmlc>
+  </xsl:template>
+
+  <xsl:template match="@dmlType">
+    <dmltype type="{.}"/>
+  </xsl:template>
+
+  <xsl:template match="dmlContent">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="dmlEntry">
+    <dmentry>
+      <xsl:apply-templates/>
+    </dmentry>
+  </xsl:template>
+
+  <xsl:template match="dmlEntry/dmRef">
+    <addresdm>
+      <dmc>
+        <xsl:apply-templates select="dmRefIdent/dmCode"/>
+      </dmc>
+      <xsl:apply-templates select="../dmAddressItems/dmTitle"/>
+      <xsl:apply-templates select="issueInfo"/>
+      <xsl:apply-templates select="../dmAddressItems/issueDate"/>
+      <xsl:apply-templates select="language"/>
+    </addresdm>
+  </xsl:template>
+
 </xsl:stylesheet>

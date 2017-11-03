@@ -36,4 +36,10 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="dmlStatus">
+    <xsl:copy>
+      <xsl:apply-templates select="security"/>
+    </xsl:copy>
+  </xsl:template>
+
 </xsl:stylesheet>

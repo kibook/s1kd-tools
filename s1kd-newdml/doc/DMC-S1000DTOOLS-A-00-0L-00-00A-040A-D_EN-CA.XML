@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="23"/>
+        <issueDate year="2017" month="11" day="03"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,8 +39,8 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -I option.</simplePara>
-      </reasonForUpdate>
+        <simplePara>Added -$ option to choose different S1000D issues.</simplePara>
+      </reasonForUpdate>      
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -109,7 +109,7 @@
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-I &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new DML in the form of YYYY-MM-DD.</para>
@@ -125,6 +125,28 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>4.2 (default)</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>3.0</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

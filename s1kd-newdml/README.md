@@ -49,6 +49,17 @@ Print the file name of the newly created DML.
 -f  
 Overwrite existing file.
 
+-$ &lt;issue&gt;  
+Specify which issue of S1000D to use. Currently supported issues are:
+
+-   4.2 (default)
+
+-   4.1
+
+-   4.0
+
+-   3.0
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 

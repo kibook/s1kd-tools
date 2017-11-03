@@ -7,6 +7,8 @@
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
 
 #include "templates.h"
 
@@ -19,6 +21,7 @@
 #define EXIT_BAD_CODE 3
 #define EXIT_BAD_BREX_DMC 4
 #define EXIT_BAD_DATE 5
+#define EXIT_BAD_ISSUE 6
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -46,6 +49,82 @@ char in_work[4] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+
+#define DEFAULT_S1000D_ISSUE ISS_42
+#define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
+#define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
+#define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
+
+enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+
+enum issue get_issue(const char *iss)
+{
+	if (strcmp(iss, "4.2") == 0)
+		return ISS_42;
+	else if (strcmp(iss, "4.1") == 0)
+		return ISS_41;
+	else if (strcmp(iss, "4.0") == 0)
+		return ISS_40;
+	else if (strcmp(iss, "3.0") == 0)
+		return ISS_30;
+	
+	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
+	exit(EXIT_BAD_ISSUE);
+
+	return NO_ISS;
+}
+
+const char *issue_name(enum issue iss)
+{
+	switch (iss) {
+		case ISS_42: return "4.2";
+		case ISS_41: return "4.1";
+		case ISS_40: return "4.0";
+		case ISS_30: return "3.0";
+		default: return "";
+	}
+}
+
+xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+{
+	xsltStylesheetPtr style;
+	xmlDocPtr styledoc, res, orig;
+	unsigned char *xml = NULL;
+	unsigned int len;
+
+	switch (iss) {
+		case ISS_41:
+			xml = ___common_42to41_xsl;
+			len = ___common_42to41_xsl_len;
+			break;
+		case ISS_40:
+			xml = ___common_42to40_xsl;
+			len = ___common_42to40_xsl_len;
+			break;
+		case ISS_30:
+			xml = ___common_42to30_xsl;
+			len = ___common_42to30_xsl_len;
+			break;
+		default:
+			return NULL;
+	}
+
+	orig = xmlCopyDoc(doc, 1);
+			
+	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	xmlFreeDoc(doc);
+	xsltFreeStylesheet(style);
+
+	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+
+	xmlFreeDoc(res);
+
+	return orig;
+}
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -277,7 +356,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -290,6 +369,7 @@ int main(int argc, char **argv)
 			case 'I': strncpy(issue_date, optarg, 15); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
+			case '$': issue = get_issue(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -363,6 +443,7 @@ int main(int argc, char **argv)
 		prompt("Security classification", security_classification, 4);
 	}
 
+	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
@@ -405,6 +486,30 @@ int main(int argc, char **argv)
 
 	dml_type[0] = toupper(dml_type[0]);
 
+	for (c = optind; c < argc; ++c) {
+		addDmRef(argv[c], dml_doc);
+	}
+
+	if (issue < ISS_42) {
+		if (strcmp(brex_dmcode, "") == 0) {
+			switch (issue) {
+				case ISS_30:
+					set_brex(dml_doc, ISS_30_DEFAULT_BREX);
+					break;
+				case ISS_40:
+					set_brex(dml_doc, ISS_40_DEFAULT_BREX);
+					break;
+				case ISS_41:
+					set_brex(dml_doc, ISS_41_DEFAULT_BREX);
+					break;
+				default:
+					break;
+			}
+		}
+
+		dml_doc = toissue(dml_doc, issue);
+	}
+
 	if (noissue) {
 		snprintf(dml_fname, PATH_MAX,
 			"DML-%s-%s-%s-%s-%s.XML",
@@ -428,10 +533,6 @@ int main(int argc, char **argv)
 	if (!overwrite && access(dml_fname, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "Data module list already exists.\n");
 		exit(EXIT_DML_EXISTS);
-	}
-
-	for (c = optind; c < argc; ++c) {
-		addDmRef(argv[c], dml_doc);
 	}
 
 	xmlSaveFile(dml_fname, dml_doc);
