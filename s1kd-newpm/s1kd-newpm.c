@@ -10,6 +10,9 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
+
 #include "template.h"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
@@ -18,6 +21,7 @@
 #define EXIT_PM_EXISTS 2
 #define EXIT_BAD_BREX_DMC 3
 #define EXIT_BAD_DATE 4
+#define EXIT_BAD_ISSUE 5
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -49,6 +53,82 @@ char enterprise_code[7] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+
+#define DEFAULT_S1000D_ISSUE ISS_42
+#define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
+#define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
+#define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
+
+enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+
+enum issue get_issue(const char *iss)
+{
+	if (strcmp(iss, "4.2") == 0)
+		return ISS_42;
+	else if (strcmp(iss, "4.1") == 0)
+		return ISS_41;
+	else if (strcmp(iss, "4.0") == 0)
+		return ISS_40;
+	else if (strcmp(iss, "3.0") == 0)
+		return ISS_30;
+	
+	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
+	exit(EXIT_BAD_ISSUE);
+
+	return NO_ISS;
+}
+
+const char *issue_name(enum issue iss)
+{
+	switch (iss) {
+		case ISS_42: return "4.2";
+		case ISS_41: return "4.1";
+		case ISS_40: return "4.0";
+		case ISS_30: return "3.0";
+		default: return "";
+	}
+}
+
+xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+{
+	xsltStylesheetPtr style;
+	xmlDocPtr styledoc, res, orig;
+	unsigned char *xml = NULL;
+	unsigned int len;
+
+	switch (iss) {
+		case ISS_41:
+			xml = ___common_42to41_xsl;
+			len = ___common_42to41_xsl_len;
+			break;
+		case ISS_40:
+			xml = ___common_42to40_xsl;
+			len = ___common_42to40_xsl_len;
+			break;
+		case ISS_30:
+			xml = ___common_42to30_xsl;
+			len = ___common_42to30_xsl_len;
+			break;
+		default:
+			return NULL;
+	}
+
+	orig = xmlCopyDoc(doc, 1);
+			
+	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	xmlFreeDoc(doc);
+	xsltFreeStylesheet(style);
+
+	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+
+	xmlFreeDoc(res);
+
+	return orig;
+}
 
 xmlNodePtr find_child(xmlNodePtr parent, char *name)
 {
@@ -231,6 +311,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(in_work, val);
 	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strcpy(brex_dmcode, val);
+	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
+		issue = get_issue(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -346,7 +428,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -366,6 +448,7 @@ int main(int argc, char **argv)
 			case 'I': strcpy(issue_date, optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
+			case '$': issue = get_issue(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -449,6 +532,7 @@ int main(int argc, char **argv)
 		prompt("Responsible partner company", enterprise_name, 256);
 	}
 
+	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
 	if (strcmp(language_iso_code, "") == 0) strcpy(language_iso_code, "und");
@@ -510,6 +594,24 @@ int main(int argc, char **argv)
 
 	if (!no_issue) {
 		sprintf(iss, "_%s-%s", issue_number, in_work);
+	}
+
+	if (issue < ISS_42) {
+		switch (issue) {
+			case ISS_30:
+				set_brex(pm_doc, ISS_30_DEFAULT_BREX);
+				break;
+			case ISS_40:
+				set_brex(pm_doc, ISS_40_DEFAULT_BREX);
+				break;
+			case ISS_41:
+				set_brex(pm_doc, ISS_41_DEFAULT_BREX);
+				break;
+			default:
+				break;
+		}
+
+		pm_doc = toissue(pm_doc, issue);
 	}
 
 	snprintf(pm_filename, 256, "PMC-%s-%s-%s-%s%s_%s-%s.XML",
