@@ -85,9 +85,13 @@ char brex_dmcode[256] = "";
 char sns_fname[PATH_MAX] = "";
 char issue_date[16] = "";
 
-enum issue { NO_ISS, ISS_42, ISS_41, ISS_40, ISS_30 } issue = NO_ISS;
+enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
+
+#define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
+#define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
+#define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
 enum issue get_issue(const char *iss)
 {
@@ -416,71 +420,47 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		exit(EXIT_UNKNOWN_DMTYPE);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_descript_xml;
 				len = templates_42_descript_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_descript_xml;
-				len = templates_41_descript_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_descript_xml;
-				len = templates_40_descript_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "proced") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_proced_xml;
 				len = templates_42_proced_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_proced_xml;
-				len = templates_41_proced_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_proced_xml;
-				len = templates_40_proced_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "frontmatter") == 0) {
 		switch (iss) {
+			case ISS_40:
+			case ISS_41:
 			case ISS_42:
 				xml = templates_42_frontmatter_xml;
 				len = templates_42_frontmatter_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_frontmatter_xml;
-				len = templates_41_frontmatter_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_frontmatter_xml;
-				len = templates_40_frontmatter_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "brex") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_brex_xml;
 				len = templates_42_brex_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_brex_xml;
-				len = templates_41_brex_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_brex_xml;
-				len = templates_40_brex_xml_len;
 				break;
 			default:
 				break;
@@ -496,159 +476,105 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "appliccrossreftable") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_appliccrossreftable_xml;
 				len = templates_42_appliccrossreftable_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_appliccrossreftable_xml;
-				len = templates_41_appliccrossreftable_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_appliccrossreftable_xml;
-				len = templates_40_appliccrossreftable_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "prdcrossreftable") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_prdcrossreftable_xml;
 				len = templates_42_prdcrossreftable_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_prdcrossreftable_xml;
-				len = templates_41_prdcrossreftable_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_prdcrossreftable_xml;
-				len = templates_40_prdcrossreftable_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "condcrossreftable") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_condcrossreftable_xml;
 				len = templates_42_condcrossreftable_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_condcrossreftable_xml;
-				len = templates_41_condcrossreftable_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_condcrossreftable_xml;
-				len = templates_40_condcrossreftable_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "comrep") == 0) {
 		switch (iss) {
+			case ISS_40:
+			case ISS_41:
 			case ISS_42:
 				xml = templates_42_comrep_xml;
 				len = templates_42_comrep_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_comrep_xml;
-				len = templates_41_comrep_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_comrep_xml;
-				len = templates_40_comrep_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "process") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_process_xml;
 				len = templates_42_process_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_process_xml;
-				len = templates_41_process_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_process_xml;
-				len = templates_40_process_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "ipd") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_ipd_xml;
 				len = templates_42_ipd_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_ipd_xml;
-				len = templates_41_ipd_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_ipd_xml;
-				len = templates_40_ipd_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "fault") == 0) {
 		switch (iss) {
-			case ISS_42:
 			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
 				xml = templates_42_fault_xml;
 				len = templates_42_fault_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_fault_xml;
-				len = templates_41_fault_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_fault_xml;
-				len = templates_40_fault_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "checklist") == 0) {
 		switch (iss) {
+			case ISS_40:
+			case ISS_41:
 			case ISS_42:
 				xml = templates_42_checklist_xml;
 				len = templates_42_checklist_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_checklist_xml;
-				len = templates_41_checklist_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_checklist_xml;
-				len = templates_40_checklist_xml_len;
 				break;
 			default:
 				break;
 		}
 	} else if (strcmp(dmtype, "learning") == 0) {
 		switch (iss) {
+			case ISS_40:
+			case ISS_41:
 			case ISS_42:
 				xml = templates_42_learning_xml;
 				len = templates_42_learning_xml_len;
-				break;
-			case ISS_41:
-				xml = templates_41_learning_xml;
-				len = templates_41_learning_xml_len;
-				break;
-			case ISS_40:
-				xml = templates_40_learning_xml;
-				len = templates_40_learning_xml_len;
 				break;
 			default:
 				break;
@@ -666,15 +592,33 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
 }
 
-xmlDocPtr iss42to30(xmlDocPtr doc)
+xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr styledoc, res, orig;
+	unsigned char *xml = NULL;
+	unsigned int len;
+
+	switch (iss) {
+		case ISS_41:
+			xml = templates_41_42to41_xsl;
+			len = templates_41_42to41_xsl_len;
+			break;
+		case ISS_40:
+			xml = templates_40_42to40_xsl;
+			len = templates_40_42to40_xsl_len;
+			break;
+		case ISS_30:
+			xml = templates_30_42to30_xsl;
+			len = templates_30_42to30_xsl_len;
+			break;
+		default:
+			return NULL;
+	}
 
 	orig = xmlCopyDoc(doc, 1);
-
-	styledoc = xmlReadMemory((const char *) templates_30_42to30_xsl,
-		templates_30_42to30_xsl_len, NULL, NULL, 0);
+			
+	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, doc, NULL);
@@ -1003,9 +947,22 @@ int main(int argc, char **argv)
 		sprintf(iss, "_%s-%s", issueNumber, inWork);
 	}
 
-	if (issue == ISS_30) {
-		set_brex(dm, "AE-A-04-10-0301-00A-022A-D");
-		dm = iss42to30(dm);
+	if (issue < ISS_42) {
+		switch (issue) {
+			case ISS_30:
+				set_brex(dm, ISS_30_DEFAULT_BREX);
+				break;
+			case ISS_40:
+				set_brex(dm, ISS_40_DEFAULT_BREX);
+				break;
+			case ISS_41:
+				set_brex(dm, ISS_41_DEFAULT_BREX);
+				break;
+			default:
+				break;
+		}
+
+		dm = toissue(dm, issue);
 	}
 
 	snprintf(dmc, MAX_DATAMODULE_CODE,
