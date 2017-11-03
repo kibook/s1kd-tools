@@ -948,18 +948,20 @@ int main(int argc, char **argv)
 	}
 
 	if (issue < ISS_42) {
-		switch (issue) {
-			case ISS_30:
-				set_brex(dm, ISS_30_DEFAULT_BREX);
-				break;
-			case ISS_40:
-				set_brex(dm, ISS_40_DEFAULT_BREX);
-				break;
-			case ISS_41:
-				set_brex(dm, ISS_41_DEFAULT_BREX);
-				break;
-			default:
-				break;
+		if (strcmp(brex_dmcode, "") == 0) {
+			switch (issue) {
+				case ISS_30:
+					set_brex(dm, ISS_30_DEFAULT_BREX);
+					break;
+				case ISS_40:
+					set_brex(dm, ISS_40_DEFAULT_BREX);
+					break;
+				case ISS_41:
+					set_brex(dm, ISS_41_DEFAULT_BREX);
+					break;
+				default:
+					break;
+			}
 		}
 
 		dm = toissue(dm, issue);
