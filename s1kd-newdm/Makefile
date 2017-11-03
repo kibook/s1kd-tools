@@ -1,5 +1,5 @@
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
-LDFLAGS=`pkg-config --libs libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 SOURCE=s1kd-newdm.c
 OUTPUT=s1kd-newdm
@@ -7,9 +7,10 @@ OUTPUT=s1kd-newdm
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-templates.h: templates/*/*.xml
+templates.h: templates/*/*.xml templates/30/42to30.xsl
 	> templates.h
 	for t in templates/*/*.xml; do xxd -i $$t >> templates.h; done
+	xxd -i templates/30/42to30.xsl >> templates.h
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)

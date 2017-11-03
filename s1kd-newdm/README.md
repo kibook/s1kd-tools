@@ -122,6 +122,8 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   4.0
 
+-   3.0
+
 Prompt (-p) option
 ------------------
 

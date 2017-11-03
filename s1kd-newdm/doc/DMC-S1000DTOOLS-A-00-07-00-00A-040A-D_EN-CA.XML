@@ -40,6 +40,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Added -$ option for selecting different issues of the S1000D spec.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002">
+        <simplePara>Added support for issue 3.0.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -258,6 +264,9 @@
                     </listItem>
                     <listItem>
                       <para>4.0</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+                      <para>3.0</para>
                     </listItem>
                   </randomList>
                 </para>

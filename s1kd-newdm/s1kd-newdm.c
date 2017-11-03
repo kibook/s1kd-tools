@@ -8,6 +8,9 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
+
 #include "templates.h"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
@@ -82,7 +85,7 @@ char brex_dmcode[256] = "";
 char sns_fname[PATH_MAX] = "";
 char issue_date[16] = "";
 
-enum issue { NO_ISS, ISS_42, ISS_41, ISS_40 } issue = NO_ISS;
+enum issue { NO_ISS, ISS_42, ISS_41, ISS_40, ISS_30 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
@@ -94,6 +97,8 @@ enum issue get_issue(const char *iss)
 		return ISS_41;
 	else if (strcmp(iss, "4.0") == 0)
 		return ISS_40;
+	else if (strcmp(iss, "3.0") == 0)
+		return ISS_30;
 	
 	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
 	exit(EXIT_BAD_ISSUE);
@@ -107,6 +112,7 @@ const char *issue_name(enum issue iss)
 		case ISS_42: return "4.2";
 		case ISS_41: return "4.1";
 		case ISS_40: return "4.0";
+		case ISS_30: return "3.0";
 		default: return "";
 	}
 }
@@ -411,6 +417,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_descript_xml;
 				len = templates_42_descript_xml_len;
 				break;
@@ -428,6 +435,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "proced") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_proced_xml;
 				len = templates_42_proced_xml_len;
 				break;
@@ -462,16 +470,17 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "brex") == 0) {
 		switch (iss) {
 			case ISS_42:
-				xml = templates_42_frontmatter_xml;
-				len = templates_42_frontmatter_xml_len;
+			case ISS_30:
+				xml = templates_42_brex_xml;
+				len = templates_42_brex_xml_len;
 				break;
 			case ISS_41:
-				xml = templates_41_frontmatter_xml;
-				len = templates_41_frontmatter_xml_len;
+				xml = templates_41_brex_xml;
+				len = templates_41_brex_xml_len;
 				break;
 			case ISS_40:
-				xml = templates_40_frontmatter_xml;
-				len = templates_40_frontmatter_xml_len;
+				xml = templates_40_brex_xml;
+				len = templates_40_brex_xml_len;
 				break;
 			default:
 				break;
@@ -488,6 +497,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "appliccrossreftable") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_appliccrossreftable_xml;
 				len = templates_42_appliccrossreftable_xml_len;
 				break;
@@ -505,6 +515,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "prdcrossreftable") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_prdcrossreftable_xml;
 				len = templates_42_prdcrossreftable_xml_len;
 				break;
@@ -522,6 +533,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "condcrossreftable") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_condcrossreftable_xml;
 				len = templates_42_condcrossreftable_xml_len;
 				break;
@@ -556,6 +568,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "process") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_process_xml;
 				len = templates_42_process_xml_len;
 				break;
@@ -573,6 +586,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "ipd") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_ipd_xml;
 				len = templates_42_ipd_xml_len;
 				break;
@@ -590,6 +604,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	} else if (strcmp(dmtype, "fault") == 0) {
 		switch (iss) {
 			case ISS_42:
+			case ISS_30:
 				xml = templates_42_fault_xml;
 				len = templates_42_fault_xml_len;
 				break;
@@ -649,6 +664,29 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	}
 
 	return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+}
+
+xmlDocPtr iss42to30(xmlDocPtr doc)
+{
+	xsltStylesheetPtr style;
+	xmlDocPtr styledoc, res, orig;
+
+	orig = xmlCopyDoc(doc, 1);
+
+	styledoc = xmlReadMemory((const char *) templates_30_42to30_xsl,
+		templates_30_42to30_xsl_len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	xmlFreeDoc(doc);
+	xsltFreeStylesheet(style);
+
+	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+
+	xmlFreeDoc(res);
+
+	return orig;
 }
 
 int main(int argc, char **argv)
@@ -963,6 +1001,11 @@ int main(int argc, char **argv)
 
 	if (!no_issue) {
 		sprintf(iss, "_%s-%s", issueNumber, inWork);
+	}
+
+	if (issue == ISS_30) {
+		set_brex(dm, "AE-A-04-10-0301-00A-022A-D");
+		dm = iss42to30(dm);
 	}
 
 	snprintf(dmc, MAX_DATAMODULE_CODE,
