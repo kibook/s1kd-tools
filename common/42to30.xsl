@@ -557,4 +557,110 @@
     </title>
   </xsl:template>
 
+  <xsl:template match="commentCode">
+    <ccode>
+      <xsl:apply-templates select="@*"/>
+    </ccode>
+  </xsl:template>
+
+  <xsl:template match="@senderIdent">
+    <sendid>
+      <xsl:apply-templates/>
+    </sendid>
+  </xsl:template>
+
+  <xsl:template match="@yearOfDataIssue">
+    <diyear>
+      <xsl:apply-templates/>
+    </diyear>
+  </xsl:template>
+
+  <xsl:template match="@seqNumber">
+    <seqnum>
+      <xsl:apply-templates/>
+    </seqnum>
+  </xsl:template>
+
+  <xsl:template match="@commentType">
+    <ctype type="{.}"/>
+  </xsl:template>
+
+  <xsl:template match="commentAddress">
+    <xsl:apply-templates select="commentIdent/commentCode"/>
+    <xsl:apply-templates select="commentAddressItems/issueDate"/>
+    <xsl:apply-templates select="commentIdent/language"/>
+    <xsl:apply-templates select="commentAddressItems/commentOriginator"/>
+  </xsl:template>
+
+  <xsl:template match="commentPriority">
+    <priority>
+      <xsl:apply-templates select="@*"/>
+    </priority>
+  </xsl:template>
+
+  <xsl:template match="@commentPriorityCode">
+    <xsl:attribute name="cprio">
+      <xsl:apply-templates/>
+    </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="comment/identAndStatusSection">
+    <cstatus>
+      <xsl:apply-templates select="@*|node()"/>
+    </cstatus>
+  </xsl:template>
+
+  <xsl:template match="commentStatus">
+    <xsl:apply-templates select="security"/>
+    <xsl:apply-templates select="commentPriority"/>
+    <xsl:apply-templates select="commentResponse"/>
+    <xsl:apply-templates select="commentRefs"/>
+  </xsl:template>
+
+  <xsl:template match="commentOriginator">
+    <corig>
+      <xsl:apply-templates select="@*|node()"/>
+    </corig>
+  </xsl:template>
+
+  <xsl:template match="dispatchAddress">
+    <dispaddr>
+      <xsl:apply-templates select="@*|node()"/>
+    </dispaddr>
+  </xsl:template>
+
+  <xsl:template match="enterprise/enterpriseName">
+    <ent-name>
+      <xsl:apply-templates select="@*|node()"/>
+    </ent-name>
+  </xsl:template>
+
+  <xsl:template match="commentResponse">
+    <response>
+      <xsl:apply-templates select="@*"/>
+    </response>
+  </xsl:template>
+
+  <xsl:template match="@responseType">
+    <xsl:attribute name="rsptype">
+      <xsl:apply-templates/>
+    </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="commentRefs">
+    <crefs>
+      <xsl:apply-templates select="@*|node()"/>
+    </crefs>
+  </xsl:template>
+
+  <xsl:template match="noReferences">
+    <cnorefs/>
+  </xsl:template>
+
+  <xsl:template match="commentContent">
+    <ccontent>
+      <xsl:apply-templates select="@*|node()"/>
+    </ccontent>
+  </xsl:template>
+
 </xsl:stylesheet>

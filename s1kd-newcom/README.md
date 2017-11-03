@@ -55,6 +55,17 @@ Print the file name of the newly created comment.
 -f  
 Overwrite existing file.
 
+-$ &lt;issue&gt;  
+Specify which issue of S1000D to use. Currently supported issues are:
+
+-   4.2 (default)
+
+-   4.1
+
+-   4.0
+
+-   3.0
+
 'defaults' file
 ---------------
 

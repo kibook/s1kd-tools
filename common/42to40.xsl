@@ -20,4 +20,13 @@
     </xsl:attribute>
   </xsl:template>
 
+  <xsl:template match="commentStatus">
+    <xsl:copy>
+      <xsl:apply-templates select="security"/>
+      <xsl:apply-templates select="commentPriority"/>
+      <xsl:apply-templates select="commentResponse"/>
+      <xsl:apply-templates select="commentRefs"/>
+    </xsl:copy>
+  </xsl:template>
+
 </xsl:stylesheet>
