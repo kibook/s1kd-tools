@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="23"/>
+        <issueDate year="2017" month="11" day="02"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -40,9 +40,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -I option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -241,10 +238,29 @@
                 <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-I &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Issue date of the new data module in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>4.2 (default)</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.0</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

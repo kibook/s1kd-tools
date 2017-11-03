@@ -113,6 +113,15 @@ Determine the tech name from the SNS rules of a specified BREX data module. This
 -I &lt;date&gt;  
 Issue date of the new data module in the form of YYYY-MM-DD.
 
+-$ &lt;issue&gt;  
+Specify which issue of S1000D to use. Currently supported issues are:
+
+-   4.2 (default)
+
+-   4.1
+
+-   4.0
+
 Prompt (-p) option
 ------------------
 

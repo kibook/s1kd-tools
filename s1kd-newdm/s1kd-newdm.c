@@ -44,6 +44,7 @@
 #define EXIT_BAD_DMC 3
 #define EXIT_BAD_BREX_DMC 4
 #define EXIT_BAD_DATE 5
+#define EXIT_BAD_ISSUE 6
 
 char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -77,12 +78,38 @@ char techName_content[MAX_TECH_NAME] = "";
 char infoName_content[MAX_INFO_NAME] = "";
 
 char schema[1024] = "";
-
 char brex_dmcode[256] = "";
-
 char sns_fname[PATH_MAX] = "";
-
 char issue_date[16] = "";
+
+enum issue { NO_ISS, ISS_42, ISS_41, ISS_40 } issue = NO_ISS;
+
+#define DEFAULT_S1000D_ISSUE ISS_42
+
+enum issue get_issue(const char *iss)
+{
+	if (strcmp(iss, "4.2") == 0)
+		return ISS_42;
+	else if (strcmp(iss, "4.1") == 0)
+		return ISS_41;
+	else if (strcmp(iss, "4.0") == 0)
+		return ISS_40;
+	
+	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
+	exit(EXIT_BAD_ISSUE);
+
+	return NO_ISS;
+}
+
+const char *issue_name(enum issue iss)
+{
+	switch (iss) {
+		case ISS_42: return "4.2";
+		case ISS_41: return "4.1";
+		case ISS_40: return "4.0";
+		default: return "";
+	}
+}
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -138,6 +165,7 @@ void show_help(void)
 	puts("  -S      Get tech name from BREX SNS.");
 	puts("  -v      Print file name of new data module.");
 	puts("  -f      Overwrite existing file.");
+	puts("  -$      Specify which S1000D issue to use.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#      Data module code");
@@ -214,6 +242,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(brex_dmcode, val);
 	else if (strcmp(key, "sns") == 0 && strcmp(sns_fname, "") == 0)
 		strcpy(sns_fname, val);
+	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
+		issue = get_issue(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -370,6 +400,257 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
+xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
+{
+	unsigned char *xml = NULL;
+	unsigned int len;
+
+	if (strcmp(dmtype, "") == 0) {
+		fprintf(stderr, ERR_PREFIX "No dmtype given.\n");
+		exit(EXIT_UNKNOWN_DMTYPE);
+	} else if (strcmp(dmtype, "descript") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_descript_xml;
+				len = templates_42_descript_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_descript_xml;
+				len = templates_41_descript_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_descript_xml;
+				len = templates_40_descript_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "proced") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_proced_xml;
+				len = templates_42_proced_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_proced_xml;
+				len = templates_41_proced_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_proced_xml;
+				len = templates_40_proced_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "frontmatter") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_frontmatter_xml;
+				len = templates_42_frontmatter_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_frontmatter_xml;
+				len = templates_41_frontmatter_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_frontmatter_xml;
+				len = templates_40_frontmatter_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "brex") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_frontmatter_xml;
+				len = templates_42_frontmatter_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_frontmatter_xml;
+				len = templates_41_frontmatter_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_frontmatter_xml;
+				len = templates_40_frontmatter_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "brdoc") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_brdoc_xml;
+				len = templates_42_brdoc_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "appliccrossreftable") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_appliccrossreftable_xml;
+				len = templates_42_appliccrossreftable_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_appliccrossreftable_xml;
+				len = templates_41_appliccrossreftable_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_appliccrossreftable_xml;
+				len = templates_40_appliccrossreftable_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "prdcrossreftable") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_prdcrossreftable_xml;
+				len = templates_42_prdcrossreftable_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_prdcrossreftable_xml;
+				len = templates_41_prdcrossreftable_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_prdcrossreftable_xml;
+				len = templates_40_prdcrossreftable_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "condcrossreftable") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_condcrossreftable_xml;
+				len = templates_42_condcrossreftable_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_condcrossreftable_xml;
+				len = templates_41_condcrossreftable_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_condcrossreftable_xml;
+				len = templates_40_condcrossreftable_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "comrep") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_comrep_xml;
+				len = templates_42_comrep_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_comrep_xml;
+				len = templates_41_comrep_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_comrep_xml;
+				len = templates_40_comrep_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "process") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_process_xml;
+				len = templates_42_process_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_process_xml;
+				len = templates_41_process_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_process_xml;
+				len = templates_40_process_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "ipd") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_ipd_xml;
+				len = templates_42_ipd_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_ipd_xml;
+				len = templates_41_ipd_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_ipd_xml;
+				len = templates_40_ipd_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "fault") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_fault_xml;
+				len = templates_42_fault_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_fault_xml;
+				len = templates_41_fault_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_fault_xml;
+				len = templates_40_fault_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "checklist") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_checklist_xml;
+				len = templates_42_checklist_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_checklist_xml;
+				len = templates_41_checklist_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_checklist_xml;
+				len = templates_40_checklist_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "learning") == 0) {
+		switch (iss) {
+			case ISS_42:
+				xml = templates_42_learning_xml;
+				len = templates_42_learning_xml_len;
+				break;
+			case ISS_41:
+				xml = templates_41_learning_xml;
+				len = templates_41_learning_xml_len;
+				break;
+			case ISS_40:
+				xml = templates_40_learning_xml;
+				len = templates_40_learning_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else {
+		fprintf(stderr, ERR_PREFIX "Unknown dmtype %s\n", dmtype);
+		exit(EXIT_UNKNOWN_DMTYPE);
+	}
+
+	if (!xml) {
+		fprintf(stderr, ERR_PREFIX "No schema %s for issue %s\n", dmtype, issue_name(iss));
+		exit(EXIT_UNKNOWN_DMTYPE);
+	}
+
+	return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+}
+
 int main(int argc, char **argv)
 {
 	char dmtype[32] = "";
@@ -413,7 +694,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:vfh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:fh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -438,6 +719,7 @@ int main(int argc, char **argv)
 			case 'I': strcpy(issue_date, optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
+			case '$': issue = get_issue(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -592,44 +874,14 @@ int main(int argc, char **argv)
 	if (strcmp(sns_fname, "") != 0 && strcmp(techName_content, "") == 0)
 		set_tech_from_sns(sns_fname);
 
+	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issueNumber, "") == 0) strcpy(issueNumber, "000");
 	if (strcmp(inWork, "") == 0) strcpy(inWork, "01");
 	if (strcmp(languageIsoCode, "") == 0) strcpy(languageIsoCode, "und");
 	if (strcmp(countryIsoCode, "") == 0) strcpy(countryIsoCode, "ZZ");
 	if (strcmp(securityClassification, "") == 0) strcpy(securityClassification, "01");
 
-	if (strcmp(dmtype, "descript") == 0)
-		dm = xmlReadMemory((const char *)templates_descript_xml, templates_descript_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "proced") == 0)
-		dm = xmlReadMemory((const char *) templates_proced_xml, templates_proced_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "frontmatter") == 0)
-		dm = xmlReadMemory((const char *) templates_frontmatter_xml, templates_frontmatter_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "brex") == 0)
-		dm = xmlReadMemory((const char *) templates_brex_xml, templates_brex_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "brdoc") == 0)
-		dm = xmlReadMemory((const char *) templates_brdoc_xml, templates_brdoc_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "appliccrossreftable") == 0)
-		dm = xmlReadMemory((const char *) templates_appliccrossreftable_xml, templates_appliccrossreftable_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "prdcrossreftable") == 0)
-		dm = xmlReadMemory((const char *) templates_prdcrossreftable_xml, templates_prdcrossreftable_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "condcrossreftable") == 0)
-		dm = xmlReadMemory((const char *) templates_condcrossreftable_xml, templates_condcrossreftable_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "comrep") == 0)
-		dm = xmlReadMemory((const char *) templates_comrep_xml, templates_comrep_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "process") == 0)
-		dm = xmlReadMemory((const char *) templates_process_xml, templates_process_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "ipd") == 0)
-		dm = xmlReadMemory((const char *) templates_ipd_xml, templates_ipd_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "fault") == 0)
-		dm = xmlReadMemory((const char *) templates_fault_xml, templates_fault_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "checklist") == 0)
-		dm = xmlReadMemory((const char *) templates_checklist_xml, templates_checklist_xml_len, NULL, NULL, 0);
-	else if (strcmp(dmtype, "learning") == 0)
-		dm = xmlReadMemory((const char *) templates_learning_xml, templates_learning_xml_len, NULL, NULL, 0);
-	else {
-		fprintf(stderr, "ERROR: Unknown dmtype %s\n", dmtype);
-		exit(EXIT_UNKNOWN_DMTYPE);
-	}
+	dm = xml_skeleton(dmtype, issue);
 
 	dmodule = xmlDocGetRootElement(dm);
 	identAndStatusSection = find_child(dmodule, "identAndStatusSection");

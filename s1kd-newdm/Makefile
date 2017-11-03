@@ -7,21 +7,9 @@ OUTPUT=s1kd-newdm
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-templates.h: templates/*
-	xxd -i templates/descript.xml > templates.h
-	xxd -i templates/proced.xml >> templates.h
-	xxd -i templates/frontmatter.xml >> templates.h
-	xxd -i templates/brex.xml >> templates.h
-	xxd -i templates/brdoc.xml >> templates.h
-	xxd -i templates/appliccrossreftable.xml >> templates.h
-	xxd -i templates/comrep.xml >> templates.h
-	xxd -i templates/prdcrossreftable.xml >> templates.h
-	xxd -i templates/condcrossreftable.xml >> templates.h
-	xxd -i templates/process.xml >> templates.h
-	xxd -i templates/ipd.xml >> templates.h
-	xxd -i templates/fault.xml >> templates.h
-	xxd -i templates/checklist.xml >> templates.h
-	xxd -i templates/learning.xml >> templates.h
+templates.h: templates/*/*.xml
+	> templates.h
+	for t in templates/*/*.xml; do xxd -i $$t >> templates.h; done
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
