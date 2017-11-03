@@ -601,16 +601,16 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 
 	switch (iss) {
 		case ISS_41:
-			xml = templates_41_42to41_xsl;
-			len = templates_41_42to41_xsl_len;
+			xml = ___common_42to41_xsl;
+			len = ___common_42to41_xsl_len;
 			break;
 		case ISS_40:
-			xml = templates_40_42to40_xsl;
-			len = templates_40_42to40_xsl_len;
+			xml = ___common_42to40_xsl;
+			len = ___common_42to40_xsl_len;
 			break;
 		case ISS_30:
-			xml = templates_30_42to30_xsl;
-			len = templates_30_42to30_xsl_len;
+			xml = ___common_42to30_xsl;
+			len = ___common_42to30_xsl_len;
 			break;
 		default:
 			return NULL;
