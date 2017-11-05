@@ -23,6 +23,7 @@ void show_help(void)
 	puts("  -i	Create a new issue of the data module");
 	puts("  -N	Omit issue/inwork numbers from filename");
 	puts("  -r      Keep RFUs from old issue");
+	puts("  -R      Only delete change marks associated with an RFU");
 	puts("  -I      Do not change issue date");
 }
 
@@ -65,7 +66,7 @@ void copy(const char *from, const char *to)
 }
 
 /* Remove change markup attributes from elements referencing old RFUs */
-void del_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
+void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx, bool iss30)
 {
 	char xpath[256];
 	xmlXPathObjectPtr obj;
@@ -92,22 +93,68 @@ void del_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 	xmlXPathFreeObject(obj);
 }
 
+/* Remove all change markup attributes */
+void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
+{
+	xmlXPathObjectPtr obj;
+
+	if (iss30) {
+		obj = xmlXPathEvalExpression(BAD_CAST "//*[@change or @mark or @rfc or @level]", ctx);
+	} else {
+		obj = xmlXPathEvalExpression(BAD_CAST "//*[@changeType or @changeMark or @reasonForUpdateRefIds]", ctx);
+	}
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		if (iss30) {
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "change");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "mark");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "rfc");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "level");
+			}
+		} else {
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeType");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeMark");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "reasonForUpdateRefIds");
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+}
+
 /* Delete old RFUs */
-void del_rfus(xmlDocPtr doc)
+void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
 	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST "//reasonForUpdate", ctx);
+	if (iss30) {
+		obj = xmlXPathEvalExpression(BAD_CAST "//rfu", ctx);
+	} else {
+		obj = xmlXPathEvalExpression(BAD_CAST "//reasonForUpdate", ctx);
+	}
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			del_rfu_attrs(obj->nodesetval->nodeTab[i], ctx);
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+		if (only_assoc) {
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				del_assoc_rfu_attrs(obj->nodesetval->nodeTab[i], ctx, iss30);
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			}
+		} else {
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			}
+
+			del_rfu_attrs(ctx, iss30);
 		}
 	}
 
@@ -149,8 +196,12 @@ int main(int argc, char **argv)
 	bool no_issue = false;
 	bool keep_rfus = false;
 	bool set_date = true;
+	bool only_assoc_rfus = false;
 
-	while ((c = getopt(argc, argv, "ivs:NfrIh?")) != -1) {
+	xmlChar *issno_name, *inwork_name;
+	bool iss30 = false;
+
+	while ((c = getopt(argc, argv, "ivs:NfrRIh?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -170,6 +221,9 @@ int main(int argc, char **argv)
 				break;
 			case 'r':
 				keep_rfus = true;
+				break;
+			case 'R':
+				only_assoc_rfus = true;
 				break;
 			case 'I':
 				set_date = false;
@@ -192,7 +246,7 @@ int main(int argc, char **argv)
 		dmdoc = xmlReadFile(dmfile, NULL, XML_PARSE_NONET | XML_PARSE_NOERROR);
 
 		if (dmdoc) {
-			issueInfo = firstXPathNode("//issueInfo", dmdoc);
+			issueInfo = firstXPathNode("//issueInfo|//issno", dmdoc);
 		} else {
 			issueInfo = NULL;
 		}
@@ -203,8 +257,18 @@ int main(int argc, char **argv)
 		}
 
 		if (issueInfo) {
-			issueNumber = (char *) xmlGetProp(issueInfo, (xmlChar *) "issueNumber");
-			inWork = (char *) xmlGetProp(issueInfo, (xmlChar *) "inWork");
+			iss30 = strcmp((char *) issueInfo->name, "issueInfo") != 0;
+
+			if (iss30) {
+				issno_name = BAD_CAST "issno";
+				inwork_name = BAD_CAST "inwork";
+			} else {
+				issno_name = BAD_CAST "issueNumber";
+				inwork_name = BAD_CAST "inWork";
+			}
+
+			issueNumber = (char *) xmlGetProp(issueInfo, issno_name);
+			inWork = (char *) xmlGetProp(issueInfo, inwork_name);
 		} else { /* Get issue/inwork from filename only */
 			char *i;
 
@@ -234,16 +298,16 @@ int main(int argc, char **argv)
 		}
 
 		if (issueInfo) {
-			xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) upissued_issueNumber);
-			xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) upissued_inWork);
+			xmlSetProp(issueInfo, issno_name, BAD_CAST upissued_issueNumber);
+			xmlSetProp(issueInfo, inwork_name, BAD_CAST upissued_inWork);
 
 			/* Delete RFUs when upissuing an official module */
 			if (!keep_rfus && strcmp(inWork, "00") == 0) {
-				del_rfus(dmdoc);
+				del_rfus(dmdoc, only_assoc_rfus, iss30);
 			}
 
 			if (set_date) {
-				issueDate = firstXPathNode("//issueDate", dmdoc);
+				issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
 
 				time(&now);
 				local = localtime(&now);
@@ -262,8 +326,13 @@ int main(int argc, char **argv)
 			if (newissue) {
 				/* Do not change issueType when upissuing from 000 -> 001 */
 				if (issueNumber_int > 0) {
-					if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc)))
-						xmlSetProp(dmStatus, (xmlChar *) "issueType", (xmlChar *) status);
+					if (iss30) {
+						xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
+					} else {
+						if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
+							xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
+						}
+					}
 				}
 			}
 		}
