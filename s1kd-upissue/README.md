@@ -39,6 +39,9 @@ Delete only change markup on elements associated with an RFU (by use of the attr
 -I  
 Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.
 
+-q  
+Keep quality assurance information from old issue. Normally, when upissuing an official data module to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the data module, and so does not require it to be re-verified.
+
 EXAMPLES
 ========
 

@@ -46,6 +46,9 @@
       <reasonForUpdate id="rfu-0002">
         <simplePara>Added -R option to delete only change markup associated with an RFU. The normal behaviour is now to delete all change markup when upissuing an official module.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003">
+        <simplePara>Added -q option to keep quality assurance information from old issue.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -107,6 +110,12 @@
               <listItemTerm>-I</listItemTerm>
               <listItemDefinition>
                 <para>Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Keep quality assurance information from old issue. Normally, when upissuing an official data module to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the data module, and so does not require it to be re-verified.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

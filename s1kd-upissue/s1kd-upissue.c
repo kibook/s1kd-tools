@@ -24,6 +24,7 @@ void show_help(void)
 	puts("  -N	Omit issue/inwork numbers from filename");
 	puts("  -r      Keep RFUs from old issue");
 	puts("  -R      Only delete change marks associated with an RFU");
+	puts("  -q      Keep quality assurance from old issue");
 	puts("  -I      Do not change issue date");
 }
 
@@ -162,6 +163,26 @@ void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 	xmlXPathFreeContext(ctx);
 }
 
+void set_unverified(xmlDocPtr doc, bool iss30)
+{
+	xmlNodePtr qa, cur;
+
+	qa = firstXPathNode(iss30 ? "//qa" : "//qualityAssurance", doc);
+
+	if (!qa)
+		return;
+
+	cur = qa->children;
+	while (cur) {
+		xmlNodePtr next = cur->next;
+		xmlUnlinkNode(cur);
+		xmlFreeNode(cur);
+		cur = next;
+	}
+
+	xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "unverif" : "unverified"), NULL);
+}
+
 int main(int argc, char **argv)
 {
 	char dmfile[256], cpfile[256];
@@ -197,11 +218,12 @@ int main(int argc, char **argv)
 	bool keep_rfus = false;
 	bool set_date = true;
 	bool only_assoc_rfus = false;
+	bool set_unverif = true;
 
 	xmlChar *issno_name, *inwork_name;
 	bool iss30 = false;
 
-	while ((c = getopt(argc, argv, "ivs:NfrRIh?")) != -1) {
+	while ((c = getopt(argc, argv, "ivs:NfrRIqh?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -227,6 +249,9 @@ int main(int argc, char **argv)
 				break;
 			case 'I':
 				set_date = false;
+				break;
+			case 'q':
+				set_unverif = false;
 				break;
 			case 'h':
 			case '?':
@@ -332,6 +357,10 @@ int main(int argc, char **argv)
 						if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
 							xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
 						}
+					}
+
+					if (set_unverif) {
+						set_unverified(dmdoc, iss30);
 					}
 				}
 			}
