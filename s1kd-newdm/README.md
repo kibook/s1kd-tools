@@ -76,6 +76,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   condcrossreftable - Conditions cross-reference table
 
+-   container - Container
+
 -   descript - Descriptive
 
 -   fault - Fault information

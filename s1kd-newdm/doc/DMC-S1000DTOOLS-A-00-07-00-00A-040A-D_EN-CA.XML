@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="02"/>
+        <issueDate year="2017" month="11" day="06"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,10 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Added -$ option for selecting different issues of the S1000D spec.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002">
-        <simplePara>Added support for issue 3.0.</simplePara>
+        <simplePara>Added container template.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -180,6 +177,9 @@
                     <listItem>
                       <para>condcrossreftable - Conditions cross-reference table</para>
                     </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>container - Container</para>
+                    </listItem>
                     <listItem>
                       <para>descript - Descriptive</para>
                     </listItem>
@@ -250,7 +250,7 @@
                 <para>Issue date of the new data module in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
@@ -265,7 +265,7 @@
                     <listItem>
                       <para>4.0</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>3.0</para>
                     </listItem>
                   </randomList>
