@@ -1649,10 +1649,10 @@ int main(int argc, char **argv)
 			referencedApplicGroup = find_child(content, "referencedApplicGroup");
 
 			if (referencedApplicGroup) {
-				strip_applic(referencedApplicGroup, content);
+				strip_applic(referencedApplicGroup, root);
 
 				if (clean || simpl) {
-					clean_applic(referencedApplicGroup, content);
+					clean_applic(referencedApplicGroup, root);
 				}
 
 				if (simpl) {
