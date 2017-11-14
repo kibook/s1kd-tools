@@ -358,8 +358,6 @@ int main(int argc, char **argv)
 
 	FILE *defaults;
 
-	char comment_fname[256];
-
 	char language_fname[4];
 
 	char code[256] = "";
@@ -371,11 +369,13 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	bool overwrite = false;
 
+	char *out = NULL;
+
 	xmlDocPtr defaults_xml;
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:h?")) != -1) {
+	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:h?")) != -1) {
 		switch (i) {
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
@@ -422,6 +422,9 @@ int main(int argc, char **argv)
 				break;
 			case '$':
 				issue = get_issue(optarg);
+				break;
+			case '@':
+				out = strdup(optarg);
 				break;
 			case 'h':
 			case '?':
@@ -590,24 +593,30 @@ int main(int argc, char **argv)
 		comment_doc = toissue(comment_doc, issue);
 	}
 
-	snprintf(comment_fname, 256, "COM-%s-%s-%s-%s-%s_%s-%s.XML",
-		modelIdentCode,
-		senderIdent,
-		yearOfDataIssue,
-		seqNumber,
-		commentType,
-		language_fname,
-		countryIsoCode);
+	if (!out) {
+		char comment_fname[256];
 
-	if (!overwrite && access(comment_fname, F_OK) != -1) {
-		fprintf(stderr, ERR_PREFIX "%s already exists.\n", comment_fname);
+		snprintf(comment_fname, 256, "COM-%s-%s-%s-%s-%s_%s-%s.XML",
+			modelIdentCode,
+			senderIdent,
+			yearOfDataIssue,
+			seqNumber,
+			commentType,
+			language_fname,
+			countryIsoCode);
+
+		out = strdup(comment_fname);
+	}
+
+	if (!overwrite && access(out, F_OK) != -1) {
+		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_COMMENT_EXISTS);
 	}
 
-	xmlSaveFormatFile(comment_fname, comment_doc, 1);
+	xmlSaveFormatFile(out, comment_doc, 1);
 
 	if (verbose)
-		puts(comment_fname);
+		puts(out);
 
 	xmlFreeDoc(comment_doc);
 
