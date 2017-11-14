@@ -1018,5 +1018,7 @@ int main(int argc, char **argv)
 
 	xmlFreeDoc(dm);
 
+	xmlCleanupParser();
+
 	return 0;
 }
