@@ -211,6 +211,8 @@ void show_help(void)
 	puts("  -p    Prompt the user for each value.");
 	puts("  -v    Print file name of comment.");
 	puts("  -f    Overwrite existing file.");
+	puts("  -$    Specify which S1000D issue to use.");
+	puts("  -@    Output to specified file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Comment code");
