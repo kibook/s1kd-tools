@@ -271,6 +271,8 @@ void show_help(void)
 	puts("  -N    Omit issue/inwork from file name.");
 	puts("  -v    Print file name of pub module.");
 	puts("  -f    Overwrite existing file.");
+	puts("  -$    Specify which S1000D issue to use.");
+	puts("  -@    Output to specified file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Publication module code");
@@ -411,8 +413,6 @@ int main(int argc, char **argv)
 	xmlNodePtr responsiblePartnerCompany;
 	xmlNodePtr pmEntry;
 
-	char pm_filename[256];
-
 	int c;
 	int i;
 
@@ -428,7 +428,9 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:h?")) != -1) {
+	char *out = NULL;
+
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:@:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -449,6 +451,7 @@ int main(int argc, char **argv)
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
+			case '@': out = strdup(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -614,26 +617,35 @@ int main(int argc, char **argv)
 		pm_doc = toissue(pm_doc, issue);
 	}
 
-	snprintf(pm_filename, 256, "PMC-%s-%s-%s-%s%s_%s-%s.XML",
-		model_ident_code,
-		pm_issuer,
-		pm_number,
-		pm_volume,
-		iss,
-		language_iso_code,
-		country_iso_code);
+	if (!out) {
+		char pm_filename[256];
 
-	if (!overwrite && access(pm_filename, F_OK) != -1) {
-		fprintf(stderr, ERR_PREFIX "Pub module %s already exists.\n", pm_filename);
+		snprintf(pm_filename, 256, "PMC-%s-%s-%s-%s%s_%s-%s.XML",
+			model_ident_code,
+			pm_issuer,
+			pm_number,
+			pm_volume,
+			iss,
+			language_iso_code,
+			country_iso_code);
+
+		out = strdup(pm_filename);
+	}
+
+	if (!overwrite && access(out, F_OK) != -1) {
+		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_PM_EXISTS);
 	}
 
-	xmlSaveFormatFile(pm_filename, pm_doc, 1);
+	xmlSaveFormatFile(out, pm_doc, 1);
 
 	if (verbose)
-		puts(pm_filename);
+		puts(out);
 
+	free(out);
 	xmlFreeDoc(pm_doc);
+
+	xmlCleanupParser();
 
 	return 0;
 }

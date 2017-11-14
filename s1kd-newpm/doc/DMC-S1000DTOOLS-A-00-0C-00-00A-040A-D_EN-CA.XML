@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="C" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="03"/>
+        <issueDate year="2017" month="11" day="14"/>
         <dmTitle>
           <techName>s1kd-newpm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Added -$ option for selecting different S1000D issues.</simplePara>
+        <simplePara>Add -@ option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -153,7 +153,7 @@
                 <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
@@ -173,6 +173,12 @@
                     </listItem>
                   </randomList>
                 </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save new publication module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
