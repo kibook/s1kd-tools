@@ -372,11 +372,11 @@ int main(int argc, char **argv)
 
 	xmlXPathContextPtr ctxt;
 
-	char outfile[PATH_MAX];
-
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:h?")) != -1) {
+	char *out = NULL;
+
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -393,6 +393,7 @@ int main(int argc, char **argv)
 			case 'v': verbose = 1; break;
 			case 'f': overwrite = 1; break;
 			case '$': issue = get_issue(optarg); break;
+			case '@': out = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -540,23 +541,30 @@ int main(int argc, char **argv)
 		ddn = toissue(ddn, issue);
 	}
 
-	snprintf(outfile, PATH_MAX, "DDN-%s-%s-%s-%s-%s.XML",
-		model_ident_code,
-		sender_ident,
-		receiver_ident,
-		year_of_data_issue,
-		seq_number);
+	if (!out) {
+		char ddn_fname[PATH_MAX];
 
-	if (!overwrite && access(outfile, F_OK) != -1) {
-		fprintf(stderr, ERR_PREFIX "%s already exists.\n", outfile);
+		snprintf(ddn_fname, PATH_MAX, "DDN-%s-%s-%s-%s-%s.XML",
+			model_ident_code,
+			sender_ident,
+			receiver_ident,
+			year_of_data_issue,
+			seq_number);
+
+		out = strdup(ddn_fname);
+	}
+
+	if (!overwrite && access(out, F_OK) != -1) {
+		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_DDN_EXISTS);
 	}
 
-	xmlSaveFile(outfile, ddn);
+	xmlSaveFile(out, ddn);
 
 	if (verbose)
-		puts(outfile);
+		puts(out);
 
+	free(out);
 	xmlFreeDoc(ddn);
 
 	return 0;
