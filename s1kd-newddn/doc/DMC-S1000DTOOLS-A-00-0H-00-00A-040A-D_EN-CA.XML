@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="H" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="03"/>
+        <issueDate year="2017" month="11" day="14"/>
         <dmTitle>
           <techName>s1kd-newddn(1) | General Commands Manual</techName>
         </dmTitle>
@@ -38,17 +38,16 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Add -@ option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara id="name">
         <title>NAME</title>
-        <para>s1kd-newddn - Create an S1000D <acronym acronymType="at01">
-          <acronymTerm>DDN</acronymTerm>
-          <acronymDefinition>Data Dispatch Note</acronymDefinition>
-        </acronym>.</para>
+        <para>s1kd-newddn - Create an S1000D <acronym acronymType="at01"><acronymTerm>DDN</acronymTerm><acronymDefinition>Data Dispatch Note</acronymDefinition></acronym>.</para>
       </levelledPara>
       <levelledPara id="synopsis">
         <title>SYNOPSIS</title>
@@ -172,6 +171,12 @@
                     </listItem>
                   </randomList>
                 </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new DDN as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
