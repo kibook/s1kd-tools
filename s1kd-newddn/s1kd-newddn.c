@@ -569,5 +569,7 @@ int main(int argc, char **argv)
 	free(out);
 	xmlFreeDoc(ddn);
 
+	xmlCleanupParser();
+
 	return 0;
 }
