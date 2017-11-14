@@ -234,6 +234,8 @@ void show_help(void)
 	puts("  -N       Omit issue/inwork from filename.");
 	puts("  -v       Print file name of DML.");
 	puts("  -f       Overwrite existing file.");
+	puts("  -$       Specify which S1000d issue to use.");
+	puts("  -@       Output to specified file.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#       DML code");
@@ -350,13 +352,13 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	bool overwrite = false;
 
-	char dml_fname[PATH_MAX];
-
 	int c;
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:h?")) != -1) {
+	char *out = NULL;
+
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -370,6 +372,7 @@ int main(int argc, char **argv)
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
+			case '@': out = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -463,6 +466,7 @@ int main(int argc, char **argv)
 	xmlXPathFreeObject(results);
 	results = xmlXPathEvalExpression(BAD_CAST "//dmlAddressItems/issueDate", ctxt);
 	issueDate = results->nodesetval->nodeTab[0];
+	xmlXPathFreeObject(results);
 
 	dml_type[0] = tolower(dml_type[0]);
 
@@ -510,36 +514,43 @@ int main(int argc, char **argv)
 		dml_doc = toissue(dml_doc, issue);
 	}
 
-	if (noissue) {
-		snprintf(dml_fname, PATH_MAX,
-			"DML-%s-%s-%s-%s-%s.XML",
-			model_ident_code,
-			sender_ident,
-			dml_type,
-			year_of_data_issue,
-			seq_number);
-	} else {
-		snprintf(dml_fname, PATH_MAX,
-			"DML-%s-%s-%s-%s-%s_%s-%s.XML",
-			model_ident_code,
-			sender_ident,
-			dml_type,
-			year_of_data_issue,
-			seq_number,
-			issue_number,
-			in_work);
+	if (!out) {
+		char dml_fname[PATH_MAX];
+
+		if (noissue) {
+			snprintf(dml_fname, PATH_MAX,
+				"DML-%s-%s-%s-%s-%s.XML",
+				model_ident_code,
+				sender_ident,
+				dml_type,
+				year_of_data_issue,
+				seq_number);
+		} else {
+			snprintf(dml_fname, PATH_MAX,
+				"DML-%s-%s-%s-%s-%s_%s-%s.XML",
+				model_ident_code,
+				sender_ident,
+				dml_type,
+				year_of_data_issue,
+				seq_number,
+				issue_number,
+				in_work);
+		}
+
+		out = strdup(dml_fname);
 	}
 
-	if (!overwrite && access(dml_fname, F_OK) != -1) {
-		fprintf(stderr, ERR_PREFIX "Data module list already exists.\n");
+	if (!overwrite && access(out, F_OK) != -1) {
+		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_DML_EXISTS);
 	}
 
-	xmlSaveFile(dml_fname, dml_doc);
+	xmlSaveFile(out, dml_doc);
 
 	if (verbose)
-		puts(dml_fname);
+		puts(out);
 
+	free(out);
 	xmlFreeDoc(dml_doc);
 
 	xmlCleanupParser();

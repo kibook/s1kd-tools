@@ -60,6 +60,9 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   3.0
 
+-@ &lt;filename&gt;  
+Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 
