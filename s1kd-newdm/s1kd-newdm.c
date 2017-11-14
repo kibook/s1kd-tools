@@ -686,9 +686,11 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	bool overwrite = false;
 
+	char *out = NULL;
+
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:fh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -714,6 +716,7 @@ int main(int argc, char **argv)
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
+			case '@': out = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -979,33 +982,39 @@ int main(int argc, char **argv)
 		dm = toissue(dm, issue);
 	}
 
-	snprintf(dmc, MAX_DATAMODULE_CODE,
-		"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
-		modelIdentCode,
-		systemDiffCode,
-		systemCode,
-		subSystemCode,
-		subSubSystemCode,
-		assyCode,
-		disassyCode,
-		disassyCodeVariant,
-		infoCode,
-		infoCodeVariant,
-		itemLocationCode,
-		learn,
-		iss,
-		languageIsoCode,
-		countryIsoCode);
+	if (!out) {
+		snprintf(dmc, MAX_DATAMODULE_CODE,
+			"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+			modelIdentCode,
+			systemDiffCode,
+			systemCode,
+			subSystemCode,
+			subSubSystemCode,
+			assyCode,
+			disassyCode,
+			disassyCodeVariant,
+			infoCode,
+			infoCodeVariant,
+			itemLocationCode,
+			learn,
+			iss,
+			languageIsoCode,
+			countryIsoCode);
 
-	if (!overwrite && access(dmc, F_OK) != -1) {
+		out = strdup(dmc);
+	}
+
+	if (!overwrite && access(out, F_OK) != -1) {
 		fprintf(stderr, ERR_PREFIX "Data module already exists.\n");
 		exit(EXIT_DM_EXISTS);
 	}
 
-	xmlSaveFormatFile(dmc, dm, 1);
+	xmlSaveFormatFile(out, dm, 1);
 
 	if (verbose)
-		puts(dmc);
+		puts(out);
+
+	free(out);
 
 	xmlFreeDoc(dm);
 
