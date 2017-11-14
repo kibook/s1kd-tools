@@ -164,7 +164,7 @@
             <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
+                <para>Save the new comment as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

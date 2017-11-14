@@ -67,7 +67,7 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -   3.0
 
 -@ &lt;filename&gt;  
-Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.
+Save the new comment as &lt;filename&gt; instead of an automatically named file in the current directory.
 
 'defaults' file
 ---------------
