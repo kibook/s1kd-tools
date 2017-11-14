@@ -176,6 +176,7 @@ void show_help(void)
 	puts("  -v      Print file name of new data module.");
 	puts("  -f      Overwrite existing file.");
 	puts("  -$      Specify which S1000D issue to use.");
+	puts("  -@      Output to specified file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#      Data module code");
