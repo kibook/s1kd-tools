@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="06"/>
+        <issueDate year="2017" month="11" day="14"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Added container template.</simplePara>
+        <simplePara>Add -@ option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -177,7 +177,7 @@
                     <listItem>
                       <para>condcrossreftable - Conditions cross-reference table</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>container - Container</para>
                     </listItem>
                     <listItem>
@@ -270,6 +270,12 @@
                     </listItem>
                   </randomList>
                 </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
