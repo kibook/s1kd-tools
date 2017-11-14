@@ -175,6 +175,8 @@ void show_help(void)
 	puts("  -p               Prompt user for values.");
 	puts("  -v               Print file name of DDN.");
 	puts("  -f               Overwrite existing file.");
+	puts("  -$               Specify which S1000D issue to use.");
+	puts("  -@               Output to specified file.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
