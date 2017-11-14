@@ -620,7 +620,10 @@ int main(int argc, char **argv)
 	if (verbose)
 		puts(out);
 
+	free(out);
 	xmlFreeDoc(comment_doc);
+
+	xmlCleanupParser();
 
 	return 0;
 }
