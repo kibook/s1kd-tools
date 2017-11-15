@@ -248,7 +248,7 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 
 	ctx = xmlXPathNewContext(acronym->doc);
 
-	xmlStrPrintf(xpath, 256, BAD_CAST "//acronym[acronymTerm = '%s']", term);
+	xmlStrPrintf(xpath, 256, "//acronym[acronymTerm = '%s']", term);
 
 	obj = xmlXPathEvalExpression(xpath, ctx);
 
