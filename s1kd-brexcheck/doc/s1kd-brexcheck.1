@@ -142,8 +142,8 @@ This provides a shorthand, such that
 .nf
 \f[C]
 <snsSystem>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
+\ \ <snsCode>00</snsCode>
+\ \ <snsTitle>General</snsTitle>
 </snsSystem>
 \f[]
 .fi
@@ -153,20 +153,20 @@ is equivalent to
 .nf
 \f[C]
 <snsSystem>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
-<snsSubSystem>
-<snsCode>0</snsCode>
-<snsTitle>General</snsTitle>
-<snsSubSubSystem>
-<snsCode>0</snsCode>
-<snsTitle>General</snsTitle>
-<snsAssy>
 \ \ <snsCode>00</snsCode>
 \ \ <snsTitle>General</snsTitle>
-</snsAssy>
-</snsSubSubSystem>
-</snsSubSystem>
+\ \ <snsSubSystem>
+\ \ \ \ <snsCode>0</snsCode>
+\ \ \ \ <snsTitle>General</snsTitle>
+\ \ \ \ <snsSubSubSystem>
+\ \ \ \ \ \ <snsCode>0</snsCode>
+\ \ \ \ \ \ <snsTitle>General</snsTitle>
+\ \ \ \ \ \ <snsAssy>
+\ \ \ \ \ \ \ \ <snsCode>00</snsCode>
+\ \ \ \ \ \ \ \ <snsTitle>General</snsTitle>
+\ \ \ \ \ \ </snsAssy>
+\ \ \ \ </snsSubSubSystem>
+\ \ </snsSubSystem>
 </snsSystem>
 \f[]
 .fi
@@ -184,8 +184,8 @@ This means that given the following...
 .nf
 \f[C]
 <snsSystem>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
+\ \ <snsCode>00</snsCode>
+\ \ <snsTitle>General</snsTitle>
 </snsSystem>
 \f[]
 .fi

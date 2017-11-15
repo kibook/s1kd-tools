@@ -77,27 +77,27 @@ There are three modes for SNS checking: normal, strict, and unstrict. The main d
 -St enables *strict* SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that
 
     <snsSystem>
-    <snsCode>00</snsCode>
-    <snsTitle>General</snsTitle>
+      <snsCode>00</snsCode>
+      <snsTitle>General</snsTitle>
     </snsSystem>
 
 is equivalent to
 
     <snsSystem>
-    <snsCode>00</snsCode>
-    <snsTitle>General</snsTitle>
-    <snsSubSystem>
-    <snsCode>0</snsCode>
-    <snsTitle>General</snsTitle>
-    <snsSubSubSystem>
-    <snsCode>0</snsCode>
-    <snsTitle>General</snsTitle>
-    <snsAssy>
       <snsCode>00</snsCode>
       <snsTitle>General</snsTitle>
-    </snsAssy>
-    </snsSubSubSystem>
-    </snsSubSystem>
+      <snsSubSystem>
+        <snsCode>0</snsCode>
+        <snsTitle>General</snsTitle>
+        <snsSubSubSystem>
+          <snsCode>0</snsCode>
+          <snsTitle>General</snsTitle>
+          <snsAssy>
+            <snsCode>00</snsCode>
+            <snsTitle>General</snsTitle>
+          </snsAssy>
+        </snsSubSubSystem>
+      </snsSubSystem>
     </snsSystem>
 
 Using strict checking will disable this shorthand, and missing optional elements will result in an error.
@@ -105,8 +105,8 @@ Using strict checking will disable this shorthand, and missing optional elements
 -Su enables *unstrict* SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, *any* code used will not produce an error when the relevant optional elements are omitted. This means that given the following...
 
     <snsSystem>
-    <snsCode>00</snsCode>
-    <snsTitle>General</snsTitle>
+      <snsCode>00</snsCode>
+      <snsTitle>General</snsTitle>
     </snsSystem>
 
 ...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
