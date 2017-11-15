@@ -40,43 +40,6 @@ Specify a list of severity levels for business rules.
 -S\[tu\]  
 Check SNS (Standard Numbering System) rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
 
--St enables *strict* SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that
-
-    <snsSystem>
-      <snsCode>00</snsCode>
-      <snsTitle>General</snsTitle>
-    </snsSystem>
-
-is equivalent to
-
-    <snsSystem>
-      <snsCode>00</snsCode>
-      <snsTitle>General</snsTitle>
-      <snsSubSystem>
-        <snsCode>0</snsCode>
-        <snsTitle>General</snsTitle>
-        <snsSubSubSystem>
-          <snsCode>0</snsCode>
-          <snsTitle>General</snsTitle>
-          <snsAssy>
-            <snsCode>00</snsCode>
-            <snsTitle>General</snsTitle>
-          </snsAssy>
-        </snsSubSubSystem>
-      </snsSubSystem>
-    </snsSystem>
-
-Using strict checking will disable this shorthand, and missing optional elements will result in an error.
-
--Su enables *unstrict* SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, *any* code used will not produce an error when the relevant optional elements are omitted. This means that given the following...
-
-    <snsSystem>
-      <snsCode>00</snsCode>
-      <snsTitle>General</snsTitle>
-    </snsSystem>
-
-...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
-
 -n  
 Check notation rules. Any notation names listed in any of the BREX data modules with attribute `allowedNotationFlag` set to "1" or omitted are considered valid notations. If a notation in a data module is not present or has `allowedNotationFlag` set to "0", an error will be returned.
 
@@ -105,6 +68,48 @@ An example of the format of this file is given below:
     </brSeverityLevels>
 
 When the attribute `fail` has a value of "yes" (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is no, the errors are still displayed but are not counted as errors in the exit status code of the tool.
+
+Normal, strict and unstrict SNS check (-S, -St, -Su)
+----------------------------------------------------
+
+There are three modes for SNS checking: normal, strict, and unstrict. The main difference between them is how they handle the optional levels of an SNS description in the BREX.
+
+-St enables *strict* SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that
+
+    <snsSystem>
+    <snsCode>00</snsCode>
+    <snsTitle>General</snsTitle>
+    </snsSystem>
+
+is equivalent to
+
+    <snsSystem>
+    <snsCode>00</snsCode>
+    <snsTitle>General</snsTitle>
+    <snsSubSystem>
+    <snsCode>0</snsCode>
+    <snsTitle>General</snsTitle>
+    <snsSubSubSystem>
+    <snsCode>0</snsCode>
+    <snsTitle>General</snsTitle>
+    <snsAssy>
+      <snsCode>00</snsCode>
+      <snsTitle>General</snsTitle>
+    </snsAssy>
+    </snsSubSubSystem>
+    </snsSubSystem>
+    </snsSystem>
+
+Using strict checking will disable this shorthand, and missing optional elements will result in an error.
+
+-Su enables *unstrict* SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, *any* code used will not produce an error when the relevant optional elements are omitted. This means that given the following...
+
+    <snsSystem>
+    <snsCode>00</snsCode>
+    <snsTitle>General</snsTitle>
+    </snsSystem>
+
+...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
 
 RETURN VALUE
 ============
