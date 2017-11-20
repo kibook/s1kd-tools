@@ -1,0 +1,575 @@
+000  descript             Function, data for plans and description
+001  descript             Title page
+002  descript             List of pages or data modules
+003  descript             Change record or highlights
+004  descript             Access illustration
+005  descript             List of abbreviations
+006  descript             List of terms
+007  descript             List of symbols
+008  descript             Technical standard record
+009  descript             Table of contents
+010  descript             General data
+011  descript             Function
+012  descript             General warnings and cautions and related safety data
+013  descript             Numeric index
+014  descript             Alphabetic and alphanumeric index
+015  descript             List of special materials
+016  descript             List of dangerous materials
+017  descript             List of related data
+018  descript             Introduction
+019  descript             Supplier list
+020  descript             Configuration
+021  descript             Copyright
+022  descript             Business rules
+023  descript             Administrative forms and data
+024  descript             Business rules document
+028  descript             General
+029  descript             Data structure
+030  descript             Technical data
+031  descript             Electrical standard parts data
+033  descript             Technical data (functional breakdown)
+034  descript             Technical data (physical breakdown)
+040  descript             Description
+041  descript             Description of how it is made
+042  descript             Description of function
+043  descript             Description of function attributed to crew (functional breakdown)
+044  descript             Description of function (physical breakdown)
+045  descript             Designated use
+046  descript             Dependence on peripheral systems/equipment
+050  descript             Diagram/List
+051  descript             Wiring diagram
+052  descript             Routing diagram
+053  descript             Connection list
+054  descript             Schematic diagram
+055  descript             Location diagram
+056  descript             Equipment list
+057  descript             Wire list
+058  descript             Harness list
+059  descript             Maintenance envelope diagram
+060  descript             Product support equipment, tools and software
+061  descript             Special support equipment and tools
+062  descript             Standard support equipment and tools
+063  descript             Government supplied support equipment and tools
+064  descript             Locally made support equipment and tools
+065  descript             Software
+066  descript             Support equipment and tools data
+067  descript             Decals and instruction plates
+070  descript             Consumables, materials and expendables
+071  descript             Consumables
+072  descript             Materials
+073  descript             Expendables
+074  descript             Data sheet for dangerous consumables and materials
+075  descript             Parts list
+076  descript             Fluid
+077  descript             Data sheet for consumables and materials
+078  descript             Fasteners
+080  descript             Mixture and solution
+081  descript             Chemical solution
+082  descript             Chemical mixture
+090  descript             Software documentation
+096  descript             Safety critical items and parts
+00A  descript             List of illustrations
+00B  descript             List of support equipment
+00C  descript             List of supplies
+00D  descript             List of spares
+00E  comrep               Functional item numbers common information repository
+00F  comrep               Circuit breakers common information repository
+00G  comrep               Parts common information repository
+00H  comrep               Zones common information repository
+00J  comrep               Access panels and doors common information repository
+00K  comrep               Organizations common information repository
+00L  comrep               Supplies - List of products common information repository
+00M  comrep               Supplies - List of requirements common information repository
+00N  comrep               Support equipment common information repository
+00P  prdcrossreftable     Product Cross-reference Table (PCT)
+00Q  condcrossreftable    Conditions Cross-reference Table (CCT)
+00R  descript             List of effective pages
+00S  descript             List of effective data modules
+00T  descript             Change record
+00U  descript             Highlights
+00V  descript             List of applicable specifications and documentation
+00W  appliccrossreftable  Applicability Cross-reference Table (ACT)
+00X  comrep               Controls and indicators common information repository
+00Y  descript             List of charts and forms
+00Z  descript             List of tables
+0A1  comrep               Functional and/or physical areas repository
+0A2  comrep               Applicability repository
+0A3  appliccrossreftable  Applicability cross-reference table catalog
+0A4  comrep               Warnings - List of warnings in the common information repository
+0A5  comrep               Cautions - List of cautions in the common information repository
+0B0  descript             Maintenance planning information
+0B1  descript             Time limits
+0B2  descript             System maintenance/inspection tasks list
+0B3  descript             Structure maintenance/inspection tasks list
+0B4  descript             Zonal maintenance/inspection tasks list
+0B5  descript             Unscheduled check
+100  proced               Operation
+101  descript             List of consumables associated with operation
+102  descript             List of materials associated with operation
+103  descript             List of expendables associated with operation
+104  descript             List of special support equipment and tools associated with operation
+105  descript             List of support equipment and tools associated with operation
+106  descript             List of software associated with operation
+107  descript             Parts list associated with operation
+110  descript             Controls and indicators
+111  descript             Controls and indicators
+112  descript             Modes of operations
+115  descript             Displays and alerts
+120  proced               Pre-operation
+121  proced               Pre-operation procedure
+122  proced               Siting
+123  proced               Shelter
+125  checklist            Pre-operation procedures checklist
+126  descript             Conditions of readiness
+127  proced               Establish operating position
+130  proced               Normal operation
+131  proced               Normal operation procedure
+132  proced               Start-up procedure for maintenance
+133  proced               Shutdown procedure for maintenance
+134  checklist            Aviation checklist
+135  checklist            Normal operation procedures checklist
+136  checklist            Ground running check
+138  descript             Ground running performance adjustment
+139  proced               Nuclear, biological and chemical procedures
+140  proced               Emergency procedure
+141  proced               Emergency operation procedure
+142  proced               Operation under unusual conditions
+143  proced               Radio interference suppression
+144  descript             Jamming and electronic countermeasures (ECM)
+145  checklist            Emergency operation procedures checklist
+146  proced               Emergency shutdown operation procedure
+150  proced               Post-operation
+151  proced               Post-operation procedure
+155  checklist            Post-operation procedures checklist
+157  proced               Establish maintenance position
+160  proced               Loading/Unloading procedure
+161  proced               Special operation
+162  proced               Non-tactical operation
+169  proced               Mass & Balance
+170  proced               Handling
+171  proced               Lifting
+172  proced               Jacking
+173  proced               Shoring
+174  proced               Towing
+175  proced               Taxiing
+176  proced               Lowering
+177  proced               Stabilizing
+178  proced               Tethering
+179  proced               Debogging
+180  proced               Dispatch deviation
+181  proced               Deactivate for dispatch deviation
+200  proced               Servicing
+201  descript             List of consumables associated with servicing
+202  descript             List of materials associated with servicing
+203  descript             List of expendables associated with servicing
+204  descript             List of special support equipment and tools associated with servicing
+205  descript             List of support equipment and tools associated with servicing
+206  descript             List of software associated with servicing
+207  descript             Parts list associated with servicing
+210  proced               Fill
+211  proced               Refuel
+212  proced               Fill with oik
+213  proced               Fill with oxygen
+214  proced               Fill with nitrogen
+215  proced               Fill with air
+216  proced               Fill with water
+217  proced               Fill with hydrogen
+218  proced               Fill with other liquid
+219  proced               Fill with other gas
+220  proced               Drain liquid and release pressure
+221  proced               Defuel and drain fuel
+222  proced               Drain oil
+223  proced               Release oxygen pressure
+224  proced               Release nitrogen pressure
+225  proced               Release air pressure
+226  proced               Drain water
+227  proced               Release hydrogen pressure
+228  proced               Drain other liquid
+229  proced               Release other gas pressure
+230  proced               Bleed and prime
+231  proced               Bleed
+232  proced               Prime
+233  proced               Dry
+234  proced               Facility requirements associated with servicing
+236  proced               Fill with inert has/inert liquid
+237  proced               Evacuate
+240  proced               Lubrication
+241  proced               Oil
+242  proced               Grease
+243  proced               Dry film
+250  proced               Clean and apply surface protection
+251  proced               Clean with chemical agent
+252  proced               Clean by abrasive blast
+253  proced               Clean by ultrasonics
+254  proced               Clean mechanically
+255  proced               Purge
+256  proced               Polish and apply wax
+257  proced               Paint and apply marking
+258  proced               Other procedure to clean
+259  proced               Other procedure to protect surface
+260  proced               Remove and prevent ice and remove contamination
+261  proced               Remove ice
+262  proced               Prevent ice
+263  proced               Use disinfectant/Sanitize
+264  proced               Remove contamination
+270  proced               Adjust, align and calibrate
+271  proced               Adjust
+272  proced               Align
+273  proced               Calibrate
+274  proced               Harmonize
+275  proced               Grooming
+276  proced               Rig
+277  proced               Compensate
+278  proced               Easily and quickly adjust after a battle damage repair
+279  proced               Easily and quicky align after a battle damage repair
+280  proced               Inspection
+281  proced               Scheduled inspection
+282  proced               Unscheduled inspection
+283  proced               Special regular inspection
+284  proced               Special irregular inspection
+285  proced               Structure inspection for allowable damage limits
+286  proced               Structure inspection for repair
+288  descript             Overhaul and retirement schedule
+289  proced               Check filling quantity
+290  proced               Change of liquid/has
+292  proced               Change of oil
+293  proced               Change of oxygen
+294  proced               Change of nitrogen
+295  proced               Change of air
+296  proced               Change of water
+297  proced               Change of hydrogen
+298  proced               Change of other liquid
+299  proced               Change of other gas
+300  descript             Examinations, tests and checks
+301  descript             List of consumables associated with examinations, test and checks
+302  descript             List of materials associated with examinations, tests and checks
+303  descript             List of expendables associated with examinations, tests and checks
+304  descript             List of special support equipment and tools associated with examinations, tests and checks
+305  descript             List of support equipment and tools associated with examinations, tests and checks
+306  descript             List of software associated with examinations, tests and checks
+307  descript             Parts list associated with examinations, tests and checks
+310  proced               Visual examination
+311  proced               Visual examination without special equipment
+312  proced               Examination with a borescope
+315  descript             QA requirements
+320  proced               Operation test
+321  proced               Unit break-in
+322  proced               Test and inspection
+330  proced               Test preparation
+331  proced               Connection of test equipment
+332  proced               Removal of test equipment
+333  proced               Installation of the unit before the test
+334  proced               Removal of the unit after the test
+335  proced               Final measures
+340  proced               Function test
+341  proced               Manual test
+342  proced               Automatic test
+343  proced               BIT
+344  proced               Compatability test
+345  proced               System test
+346  proced               Other check
+347  proced               Start-up procedure for test
+348  proced               Final acceptance test (FAT)
+349  descript             Test records
+350  proced               Structure test
+351  proced               Test for surface cracks with dye penetrant
+352  proced               Test for surface cracks wth magnetic particles
+353  proced               Test for cracks and other defects with eddy current
+354  proced               Test for cracks and other defects with X-rays
+355  proced               Test for cracks and other defects with ultrasonics
+356  proced               Hardness test
+357  proced               Gamma-ray test
+358  proced               Resonance frequency test
+359  proced               Thermographic test
+360  proced               Design data/tolerances check
+361  proced               Dimensions check
+362  proced               Pressure check
+363  proced               Flow check
+364  proced               Leak check
+365  proced               Continuity check
+366  proced               Resistance check
+367  proced               Electrical power check
+368  proced               Signal strength check
+369  proced               Other check
+370  proced               Monitor the condition
+371  proced               Oil analysis
+372  proced               Vibration analysis
+373  proced               Tracking check
+374  proced               Fuel analysis
+375  proced               Shooting accidental discharge analysis
+376  proced               Check post application of adhesive
+377  proced               Contamination analysis
+390  proced               Sample test
+396  proced               Flight control surface movement
+397  proced               Landing gear movement
+398  proced               Product configuration
+400  fault                Fault reports and isolation procedures
+401  descript             List of consumables associated with fault diagnosis
+402  descript             List of materials associated with fault diagnosis
+403  descript             List of expendables associated with fault diagnosis
+404  descript             List of special support equipment and tools associated with fault diagnosis
+405  descript             List of support equipment and tools associated with fault diagnosis
+406  descript             List of software associated with fault diagnosis
+407  descript             Parts list associated with fault diagnosis
+410  fault                General fault description
+411  fault                Isolated fault
+412  fault                Detected fault
+413  fault                Observed fault
+414  fault                Correlated fault
+415  fault                Impact of fault
+420  fault                General fault isolation procedure
+421  fault                Fault isolation procedure
+422  fault                Fault isolation procedure
+423  fault                Fault isolation procedure
+424  fault                Fault isolation procedure
+425  fault                Fault isolation procedure
+426  fault                Fault isolation procedure
+427  fault                Fault isolation procedure
+428  fault                Fault isolation procedure
+429  descript             Diagnostics
+430  descript             Fault isolation task supporting data
+440  descript             Index
+441  descript             Fault code index
+442  descript             Maintenance message index
+443  proced               Post-troubleshooting shutdown procedure
+500  proced               Disconnect, remove and disassembly procedures
+501  descript             List of consumables associated with removal
+502  descript             List of materials associated with removal
+503  descript             List of expendables associated with removal
+504  descript             List of special support equipment and tools associated with removal
+505  descript             List of support equipment and tools associated with removal
+506  descript             List of software associated with removal
+507  descript             Parts list associated with removal
+510  proced               Disconnect procedure
+520  proced               Removal procedure
+521  proced               Return to basic configuration
+522  proced               Remove support equipment/Remove from support equipment
+523  proced               Preparation before removal
+524  proced               Follow-on maintenance
+525  proced               Ammunition unloading
+526  proced               Deactivate launching device
+530  proced               Disassemble procedure
+531  proced               Disassemble on operation site
+540  proced               Open for access procedure
+550  proced               Unload software procedure
+551  proced               Fault monitoring storage readout (downloading)
+552  proced               Data erasing
+553  proced               Display, copy and print of data
+560  proced               Deactivation procedure
+561  proced               De-energize electrical network
+562  proced               Depressurize hydraulics
+563  proced               Deactivation maintenance practice
+600  descript             Repairs and locally make procedures and data
+601  descript             List of consumables associated with repairs
+602  descript             List of materials associated with repairs
+603  descript             List of expendables associated with repairs
+604  descript             List of special support equipment and tools associated with repairs
+605  descript             List of support equipment and tools associated with repairs
+606  descript             List of software associated with repairs
+607  descript             Parts list associated with repairs
+610  proced               Add material
+611  proced               Insulation
+612  proced               Metalize
+613  proced               Pot
+614  proced               Remetal
+615  proced               Retread
+620  proced               Attach material
+621  proced               Bond
+622  proced               Crimp
+623  proced               Braze
+624  proced               Rivet
+625  proced               Solder
+626  proced               Splice
+627  proced               Weld
+630  proced               Change the mechanical strength/structure of material
+631  proced               Anneal
+632  proced               Case harden
+633  proced               Cure
+634  proced               Normalize
+635  proced               Shot-peen
+636  proced               Temper
+638  proced               Other treatment
+639  proced               Other process to change the mechanical strength/structure of material
+640  proced               Change the surface finish of material
+641  proced               Anodize
+642  proced               Buff
+643  proced               Burnish
+644  proced               Chromate
+645  proced               Hone
+646  proced               Lap
+647  proced               Plate
+648  proced               Polish
+649  proced               Cleanup of dents, cracks and scratches
+650  proced               Remove material
+651  proced               Abrasive blast
+652  proced               Bore/drill/ream
+653  proced               Electrical/electrochemical/chemical etch
+654  proced               Broach
+655  proced               Grind
+656  proced               Mill
+657  proced               Thread/tap
+658  proced               Turn
+659  proced               Other process to remove material
+660  descript             Structure repair procedure and data
+661  descript             Allowable damage
+662  proced               Temporary repair procedure
+663  proced               Standard repair procedure
+664  proced               Special repair procedure
+665  proced               Fly-in repair procedure
+666  descript             Material classification
+667  descript             Structure classification
+668  descript             Allowable damage of composite structures
+669  descript             Allowable damange of mixed structures
+670  descript             Locally make procedure and data
+671  proced               Making of parts
+680  descript             Battle damange repair procedure and data
+681  proced               Damage repair symbol marking
+682  proced               Identification of damaged hardware
+683  proced               Damage assessment
+684  descript             Utilization degradation
+685  proced               Repair procedure
+686  proced               Isolation procedure
+687  proced               Function test after battle damange repair
+688  descript             Battle damage repair kit
+689  proced               Damage repair
+690  descript             Miscellaneous
+691  proced               Marking
+692  proced               Connector repair
+693  proced               Varnish
+700  proced               Assemble, install and connect procedures
+701  descript             List of consumables associated with installation
+702  descript             List of materials associated with installation
+703  descript             List of expendables associated with installation
+704  descript             List of special support equipment and tools associated with installation
+705  descript             List of support equipment and tools associated with installation
+706  descript             List of software associated with installation
+707  descript             Parts list associated with installation
+710  proced               Assemble procedure
+711  proced               Tighten procedure
+712  proced               Lock procedure
+713  proced               Pack procedure
+714  proced               Assemble on operation site
+720  proced               Install procedure
+721  proced               Build up to usable configuration
+722  proced               Install support equipment/Install on support equipment
+723  proced               Preparation before installation
+724  proced               Follow-on maintenance
+725  proced               Ammunition loading
+726  proced               Activate launching device
+727  proced               Site location plans
+728  proced               Foundation preparation
+730  proced               Connect procedure
+740  proced               Close after access procedure
+750  proced               Load software procedure
+752  proced               Data loading
+760  proced               Reactivation procedure
+761  proced               Energize electrical network
+762  proced               Pressurize hydraulics
+800  descript             Package, handling, storage and transportation
+801  descript             List of consumables associated with storage
+802  descript             List of materials associated with storage
+803  descript             List of expendables associated with storage
+804  descript             List of special support equipment and tools associated with storage
+805  descript             List of support equipment and tools associated with storage
+806  descript             List of software associated with storage
+807  descript             Parts list associated with storage
+810  proced               Preservation procedure
+811  proced               Preparation for vehicle transportation
+812  descript             Shipping and storage - General
+820  proced               Procedure to remove preservation material
+830  proced               Procedure to put item in containers
+831  proced               Vehicle loading
+832  proced               Procedure to pack items
+840  proced               Procedure to remove item from containers
+841  proced               Vehicle unloading
+842  proced               Procedure to unpack items
+850  proced               Procedure to keep item serviceable when in storage
+860  proced               Procedure to move item when in storage
+870  proced               Procedure to prepare item for use after storage
+871  proced               Set on condition
+880  proced               Procedure when item got out of storage
+890  descript             Life data of item when in storage
+900  descript             Miscellaneous
+901  descript             Miscellaneous list of consumables
+902  descript             Miscellaneous list of materials
+903  descript             Miscellaneous list of expendables
+904  descript             Miscellaneous list of special support equipment and tools
+905  descript             Miscellaneous list of support equipment and tools
+906  descript             Miscellaneous list of software
+907  descript             Miscellaneous parts list
+910  descript             Miscellaneous
+911  descript             Illustration
+912  proced               Handling procedure
+913  proced               General maintenance procedure
+914  container            Container data module
+915  descript             Facilities
+916  descript             Maintenance allocation
+917  descript             Non-S1000D publication
+920  proced               Change = Remove and install
+921  proced               Change = Remove and install a new item
+922  proced               Change = Remove and install the removed item
+930  descript             Service bulletin
+931  descript             Service bulletin data
+932  descript             Planning information
+933  procedure            Accomplishment procedure - Task set
+934  descript             Material information
+940  descript             Provisioning data
+941  ipd                  Illustrated parts data
+942  ipd                  Numerical index
+950  descript             Composite information
+951  process              Generic process
+952  learning             Generic learning content
+961  descript             Calculation worksheets
+970  descript             Approved vendor processes
+980  descript             Environmentmal protection, fire-fighting and rescue
+981  descript             Air cleaning
+982  descript             Sewage treatment
+989  descript             Fire-fighting and rescue
+990  descript             Neutralization and disposal
+991  descript             Neutralization of ordnance
+992  descript             Neutralization of substance
+996  descript             Disposal of ordnance
+997  descript             Disposal of Product
+998  descript             Disposal of substance
+C00  descript             Computer systems, software and data
+C01  descript             Miscellaneous list of consumables associated with computer systems, software and data
+C02  descript             Miscellaneous list of materials associated with computer systems, software and data
+C03  descript             Miscellaneous list of expendables associated with computer systems, software and data
+C04  descript             Miscellaneous list of special support equipment and tools associated with computer systems, software and data
+C05  descript             Miscellaneous list of support equipment and tools associated with computer systems, software and data
+C06  descript             Miscellaneous list of software associated with computer systems, software and data
+C07  descript             Miscellaneous parts list associated with computer systems, software and data
+C13  descript             Notes
+C14  descript             Problem handling
+C15  descript             Summary of content
+C20  descript             System administration
+C21  descript             System monitoring
+C22  descript             Description of command
+C23  proced               Connect hardware
+C25  descript             System recovery
+C26  proced               Backup and restore
+C27  proced               Reboot
+C30  proced               Coordinate
+C31  proced               Defragmentation
+C32  descript             Input/Output media
+C33  descript             Disk mirroring
+C34  proced               Clear interference
+C35  proced               Time check
+C36  proced               Compatability check
+C50  proced               Manage data
+C51  proced               Move data
+C52  proced               Manipulate/Use data
+C53  descript             Description of data storage
+C60  descript             Programming information
+C61  descript             Program flow chart
+C62  descript             Processing reference guide
+C70  descript             Security and privacy
+C72  descript             Security information
+C73  proced               Security procedures
+C74  descript             List of security/classification codes
+C75  descript             Access control
+C90  descript             Miscellaneous
+C91  descript             Quality assurance
+C92  descript             Vendor information
+C95  descript             Naming conventions
+C96  descript             Technical requirements

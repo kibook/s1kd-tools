@@ -1,0 +1,674 @@
+<?xml version="1.0"?>
+<dmtypes>
+  <type infoCode="000" schema="descript" infoName="Function, data for plans and description"/>
+  <type infoCode="001" schema="descript" infoName="Title page"/>
+  <type infoCode="002" schema="descript" infoName="List of pages or data modules"/>
+  <type infoCode="003" schema="descript" infoName="Change record or highlights"/>
+  <type infoCode="004" schema="descript" infoName="Access illustration"/>
+  <type infoCode="005" schema="descript" infoName="List of abbreviations"/>
+  <type infoCode="006" schema="descript" infoName="List of terms"/>
+  <type infoCode="007" schema="descript" infoName="List of symbols"/>
+  <type infoCode="008" schema="descript" infoName="Technical standard record"/>
+  <type infoCode="009" schema="descript" infoName="Table of contents"/>
+  <type infoCode="010" schema="descript" infoName="General data"/>
+  <type infoCode="011" schema="descript" infoName="Function"/>
+  <type infoCode="012" schema="descript" infoName="General warnings and cautions and related safety data"/>
+  <type infoCode="013" schema="descript" infoName="Numeric index"/>
+  <type infoCode="014" schema="descript" infoName="Alphabetic and alphanumeric index"/>
+  <type infoCode="015" schema="descript" infoName="List of special materials"/>
+  <type infoCode="016" schema="descript" infoName="List of dangerous materials"/>
+  <type infoCode="017" schema="descript" infoName="List of related data"/>
+  <type infoCode="018" schema="descript" infoName="Introduction"/>
+  <type infoCode="019" schema="descript" infoName="Supplier list"/>
+  <type infoCode="020" schema="descript" infoName="Configuration"/>
+  <type infoCode="021" schema="descript" infoName="Copyright"/>
+  <type infoCode="022" schema="descript" infoName="Business rules"/>
+  <type infoCode="023" schema="descript" infoName="Administrative forms and data"/>
+  <type infoCode="024" schema="descript" infoName="Business rules document"/>
+  <!-- 025 thru 027 not available for projects  -->
+  <type infoCode="028" schema="descript" infoName="General"/>
+  <type infoCode="029" schema="descript" infoName="Data structure"/>
+  <type infoCode="030" schema="descript" infoName="Technical data"/>
+  <type infoCode="031" schema="descript" infoName="Electrical standard parts data"/>
+  <!-- 032 not available for projects  -->
+  <type infoCode="033" schema="descript" infoName="Technical data (functional breakdown)"/>
+  <type infoCode="034" schema="descript" infoName="Technical data (physical breakdown)"/>
+  <!-- 035 thru 039 not available for projects  -->
+  <type infoCode="040" schema="descript" infoName="Description"/>
+  <type infoCode="041" schema="descript" infoName="Description of how it is made"/>
+  <type infoCode="042" schema="descript" infoName="Description of function"/>
+  <type infoCode="043" schema="descript" infoName="Description of function attributed to crew (functional breakdown)"/>
+  <type infoCode="044" schema="descript" infoName="Description of function (physical breakdown)"/>
+  <type infoCode="045" schema="descript" infoName="Designated use"/>
+  <type infoCode="046" schema="descript" infoName="Dependence on peripheral systems/equipment"/>
+  <!-- 047 thru 049 not available for projects  -->
+  <type infoCode="050" schema="descript" infoName="Diagram/List"/>
+  <type infoCode="051" schema="descript" infoName="Wiring diagram"/>
+  <type infoCode="052" schema="descript" infoName="Routing diagram"/>
+  <type infoCode="053" schema="descript" infoName="Connection list"/>
+  <type infoCode="054" schema="descript" infoName="Schematic diagram"/>
+  <type infoCode="055" schema="descript" infoName="Location diagram"/>
+  <type infoCode="056" schema="descript" infoName="Equipment list"/>
+  <type infoCode="057" schema="descript" infoName="Wire list"/>
+  <type infoCode="058" schema="descript" infoName="Harness list"/>
+  <type infoCode="059" schema="descript" infoName="Maintenance envelope diagram"/>
+  <type infoCode="060" schema="descript" infoName="Product support equipment, tools and software"/>
+  <type infoCode="061" schema="descript" infoName="Special support equipment and tools"/>
+  <type infoCode="062" schema="descript" infoName="Standard support equipment and tools"/>
+  <type infoCode="063" schema="descript" infoName="Government supplied support equipment and tools"/>
+  <type infoCode="064" schema="descript" infoName="Locally made support equipment and tools"/>
+  <type infoCode="065" schema="descript" infoName="Software"/>
+  <type infoCode="066" schema="descript" infoName="Support equipment and tools data"/>
+  <type infoCode="067" schema="descript" infoName="Decals and instruction plates"/>
+  <!-- 068 thru 069 not available for projects  -->
+  <type infoCode="070" schema="descript" infoName="Consumables, materials and expendables"/>
+  <type infoCode="071" schema="descript" infoName="Consumables"/>
+  <type infoCode="072" schema="descript" infoName="Materials"/>
+  <type infoCode="073" schema="descript" infoName="Expendables"/>
+  <type infoCode="074" schema="descript" infoName="Data sheet for dangerous consumables and materials"/>
+  <type infoCode="075" schema="descript" infoName="Parts list"/>
+  <type infoCode="076" schema="descript" infoName="Fluid"/>
+  <type infoCode="077" schema="descript" infoName="Data sheet for consumables and materials"/>
+  <type infoCode="078" schema="descript" infoName="Fasteners"/>
+  <!-- 079 not available for projects  -->
+  <type infoCode="080" schema="descript" infoName="Mixture and solution"/>
+  <type infoCode="081" schema="descript" infoName="Chemical solution"/>
+  <type infoCode="082" schema="descript" infoName="Chemical mixture"/>
+  <!-- 083 thru 089 not available for projects  -->
+  <type infoCode="090" schema="descript" infoName="Software documentation"/>
+  <!-- 091 thru 095 not available for projects  -->
+  <type infoCode="096" schema="descript" infoName="Safety critical items and parts"/>
+  <!-- 097 thru 099 not available for projects  -->
+  <type infoCode="00A" schema="descript" infoName="List of illustrations"/>
+  <type infoCode="00B" schema="descript" infoName="List of support equipment"/>
+  <type infoCode="00C" schema="descript" infoName="List of supplies"/>
+  <type infoCode="00D" schema="descript" infoName="List of spares"/>
+  <type infoCode="00E" schema="comrep" infoName="Functional item numbers common information repository"/>
+  <type infoCode="00F" schema="comrep" infoName="Circuit breakers common information repository"/>
+  <type infoCode="00G" schema="comrep" infoName="Parts common information repository"/>
+  <type infoCode="00H" schema="comrep" infoName="Zones common information repository"/>
+  <type infoCode="00J" schema="comrep" infoName="Access panels and doors common information repository"/>
+  <type infoCode="00K" schema="comrep" infoName="Organizations common information repository"/>
+  <type infoCode="00L" schema="comrep" infoName="Supplies - List of products common information repository"/>
+  <type infoCode="00M" schema="comrep" infoName="Supplies - List of requirements common information repository"/>
+  <type infoCode="00N" schema="comrep" infoName="Support equipment common information repository"/>
+  <type infoCode="00P" schema="prdcrossreftable" infoName="Product Cross-reference Table (PCT)"/>
+  <type infoCode="00Q" schema="condcrossreftable" infoName="Conditions Cross-reference Table (CCT)"/>
+  <type infoCode="00R" schema="descript" infoName="List of effective pages"/>
+  <type infoCode="00S" schema="descript" infoName="List of effective data modules"/>
+  <type infoCode="00T" schema="descript" infoName="Change record"/>
+  <type infoCode="00U" schema="descript" infoName="Highlights"/>
+  <type infoCode="00V" schema="descript" infoName="List of applicable specifications and documentation"/>
+  <type infoCode="00W" schema="appliccrossreftable" infoName="Applicability Cross-reference Table (ACT)"/>
+  <type infoCode="00X" schema="comrep" infoName="Controls and indicators common information repository"/>
+  <type infoCode="00Y" schema="descript" infoName="List of charts and forms"/>
+  <type infoCode="00Z" schema="descript" infoName="List of tables"/>
+  <type infoCode="0A1" schema="comrep" infoName="Functional and/or physical areas repository"/>
+  <type infoCode="0A2" schema="comrep" infoName="Applicability repository"/>
+  <type infoCode="0A3" schema="appliccrossreftable" infoName="Applicability cross-reference table catalog"/>
+  <type infoCode="0A4" schema="comrep" infoName="Warnings - List of warnings in the common information repository"/>
+  <type infoCode="0A5" schema="comrep" infoName="Cautions - List of cautions in the common information repository"/>
+  <!-- 0A6 thru 0AZ not available for projects  -->
+  <type infoCode="0B0" schema="descript" infoName="Maintenance planning information"/>
+  <type infoCode="0B1" schema="descript" infoName="Time limits"/>
+  <type infoCode="0B2" schema="descript" infoName="System maintenance/inspection tasks list"/>
+  <type infoCode="0B3" schema="descript" infoName="Structure maintenance/inspection tasks list"/>
+  <type infoCode="0B4" schema="descript" infoName="Zonal maintenance/inspection tasks list"/>
+  <type infoCode="0B5" schema="descript" infoName="Unscheduled check"/>
+  <!-- 0B6 thru 0BZ not available for projects -->
+  <type infoCode="100" schema="proced" infoName="Operation"/>
+  <type infoCode="101" schema="descript" infoName="List of consumables associated with operation"/>
+  <type infoCode="102" schema="descript" infoName="List of materials associated with operation"/>
+  <type infoCode="103" schema="descript" infoName="List of expendables associated with operation"/>
+  <type infoCode="104" schema="descript" infoName="List of special support equipment and tools associated with operation"/>
+  <type infoCode="105" schema="descript" infoName="List of support equipment and tools associated with operation"/>
+  <type infoCode="106" schema="descript" infoName="List of software associated with operation"/>
+  <type infoCode="107" schema="descript" infoName="Parts list associated with operation"/>
+  <!-- 108 thru 109 not available for projects -->
+  <type infoCode="110" schema="descript" infoName="Controls and indicators"/>
+  <type infoCode="111" schema="descript" infoName="Controls and indicators"/>
+  <type infoCode="112" schema="descript" infoName="Modes of operations"/>
+  <!-- 113 thru 114 not available for projects -->
+  <type infoCode="115" schema="descript" infoName="Displays and alerts"/>
+  <!-- 116 thru 119 not available for projects -->
+  <type infoCode="120" schema="proced" infoName="Pre-operation"/>
+  <type infoCode="121" schema="proced" infoName="Pre-operation procedure"/>
+  <type infoCode="122" schema="proced" infoName="Siting"/>
+  <type infoCode="123" schema="proced" infoName="Shelter"/>
+  <!-- 124 not available for projects -->
+  <type infoCode="125" schema="checklist" infoName="Pre-operation procedures checklist"/>
+  <type infoCode="126" schema="descript" infoName="Conditions of readiness"/>
+  <type infoCode="127" schema="proced" infoName="Establish operating position"/>
+  <!-- 128 thru 129 not available for projects -->
+  <type infoCode="130" schema="proced" infoName="Normal operation"/>
+  <type infoCode="131" schema="proced" infoName="Normal operation procedure"/>
+  <type infoCode="132" schema="proced" infoName="Start-up procedure for maintenance"/>
+  <type infoCode="133" schema="proced" infoName="Shutdown procedure for maintenance"/>
+  <type infoCode="134" schema="checklist" infoName="Aviation checklist"/>
+  <type infoCode="135" schema="checklist" infoName="Normal operation procedures checklist"/>
+  <type infoCode="136" schema="checklist" infoName="Ground running check"/>
+  <!-- 137 not available for projects -->
+  <type infoCode="138" schema="descript" infoName="Ground running performance adjustment"/>
+  <type infoCode="139" schema="proced" infoName="Nuclear, biological and chemical procedures"/>
+  <type infoCode="140" schema="proced" infoName="Emergency procedure"/>
+  <type infoCode="141" schema="proced" infoName="Emergency operation procedure"/>
+  <type infoCode="142" schema="proced" infoName="Operation under unusual conditions"/>
+  <type infoCode="143" schema="proced" infoName="Radio interference suppression"/>
+  <type infoCode="144" schema="descript" infoName="Jamming and electronic countermeasures (ECM)"/>
+  <type infoCode="145" schema="checklist" infoName="Emergency operation procedures checklist"/>
+  <type infoCode="146" schema="proced" infoName="Emergency shutdown operation procedure"/>
+  <!-- 147 thru 149 not available for projects -->
+  <type infoCode="150" schema="proced" infoName="Post-operation"/>
+  <type infoCode="151" schema="proced" infoName="Post-operation procedure"/>
+  <!-- 152 thru 154 not available for projects -->
+  <type infoCode="155" schema="checklist" infoName="Post-operation procedures checklist"/>
+  <!-- 156 not available for projects -->
+  <type infoCode="157" schema="proced" infoName="Establish maintenance position"/>
+  <!-- 158 thru 159 not available for projects -->
+  <type infoCode="160" schema="proced" infoName="Loading/Unloading procedure"/>
+  <type infoCode="161" schema="proced" infoName="Special operation"/>
+  <type infoCode="162" schema="proced" infoName="Non-tactical operation"/>
+  <!-- 163 thru 168 not available for projects -->
+  <type infoCode="169" schema="proced" infoName="Mass &amp; Balance"/>
+  <type infoCode="170" schema="proced" infoName="Handling"/>
+  <type infoCode="171" schema="proced" infoName="Lifting"/>
+  <type infoCode="172" schema="proced" infoName="Jacking"/>
+  <type infoCode="173" schema="proced" infoName="Shoring"/>
+  <type infoCode="174" schema="proced" infoName="Towing"/>
+  <type infoCode="175" schema="proced" infoName="Taxiing"/>
+  <type infoCode="176" schema="proced" infoName="Lowering"/>
+  <type infoCode="177" schema="proced" infoName="Stabilizing"/>
+  <type infoCode="178" schema="proced" infoName="Tethering"/>
+  <type infoCode="179" schema="proced" infoName="Debogging"/>
+  <type infoCode="180" schema="proced" infoName="Dispatch deviation"/>
+  <type infoCode="181" schema="proced" infoName="Deactivate for dispatch deviation"/>
+  <!-- 182 thru 199 not available for projects -->
+  <type infoCode="200" schema="proced" infoName="Servicing"/>
+  <type infoCode="201" schema="descript" infoName="List of consumables associated with servicing"/>
+  <type infoCode="202" schema="descript" infoName="List of materials associated with servicing"/>
+  <type infoCode="203" schema="descript" infoName="List of expendables associated with servicing"/>
+  <type infoCode="204" schema="descript" infoName="List of special support equipment and tools associated with servicing"/>
+  <type infoCode="205" schema="descript" infoName="List of support equipment and tools associated with servicing"/>
+  <type infoCode="206" schema="descript" infoName="List of software associated with servicing"/>
+  <type infoCode="207" schema="descript" infoName="Parts list associated with servicing"/>
+  <!-- 208 thru 209 not available for projects -->
+  <type infoCode="210" schema="proced" infoName="Fill"/>
+  <type infoCode="211" schema="proced" infoName="Refuel"/>
+  <type infoCode="212" schema="proced" infoName="Fill with oik"/>
+  <type infoCode="213" schema="proced" infoName="Fill with oxygen"/>
+  <type infoCode="214" schema="proced" infoName="Fill with nitrogen"/>
+  <type infoCode="215" schema="proced" infoName="Fill with air"/>
+  <type infoCode="216" schema="proced" infoName="Fill with water"/>
+  <type infoCode="217" schema="proced" infoName="Fill with hydrogen"/>
+  <type infoCode="218" schema="proced" infoName="Fill with other liquid"/>
+  <type infoCode="219" schema="proced" infoName="Fill with other gas"/>
+  <type infoCode="220" schema="proced" infoName="Drain liquid and release pressure"/>
+  <type infoCode="221" schema="proced" infoName="Defuel and drain fuel"/>
+  <type infoCode="222" schema="proced" infoName="Drain oil"/>
+  <type infoCode="223" schema="proced" infoName="Release oxygen pressure"/>
+  <type infoCode="224" schema="proced" infoName="Release nitrogen pressure"/>
+  <type infoCode="225" schema="proced" infoName="Release air pressure"/>
+  <type infoCode="226" schema="proced" infoName="Drain water"/>
+  <type infoCode="227" schema="proced" infoName="Release hydrogen pressure"/>
+  <type infoCode="228" schema="proced" infoName="Drain other liquid"/>
+  <type infoCode="229" schema="proced" infoName="Release other gas pressure"/>
+  <type infoCode="230" schema="proced" infoName="Bleed and prime"/>
+  <type infoCode="231" schema="proced" infoName="Bleed"/>
+  <type infoCode="232" schema="proced" infoName="Prime"/>
+  <type infoCode="233" schema="proced" infoName="Dry"/>
+  <type infoCode="234" schema="proced" infoName="Facility requirements associated with servicing"/>
+  <!-- 235 not available for projects -->
+  <type infoCode="236" schema="proced" infoName="Fill with inert has/inert liquid"/>
+  <type infoCode="237" schema="proced" infoName="Evacuate"/>
+  <!-- 238 thru 239 not available for projects -->
+  <type infoCode="240" schema="proced" infoName="Lubrication"/>
+  <type infoCode="241" schema="proced" infoName="Oil"/>
+  <type infoCode="242" schema="proced" infoName="Grease"/>
+  <type infoCode="243" schema="proced" infoName="Dry film"/>
+  <!-- 244 thru 249 not available for projects -->
+  <type infoCode="250" schema="proced" infoName="Clean and apply surface protection"/>
+  <type infoCode="251" schema="proced" infoName="Clean with chemical agent"/>
+  <type infoCode="252" schema="proced" infoName="Clean by abrasive blast"/>
+  <type infoCode="253" schema="proced" infoName="Clean by ultrasonics"/>
+  <type infoCode="254" schema="proced" infoName="Clean mechanically"/>
+  <type infoCode="255" schema="proced" infoName="Purge"/>
+  <type infoCode="256" schema="proced" infoName="Polish and apply wax"/>
+  <type infoCode="257" schema="proced" infoName="Paint and apply marking"/>
+  <type infoCode="258" schema="proced" infoName="Other procedure to clean"/>
+  <type infoCode="259" schema="proced" infoName="Other procedure to protect surface"/>
+  <type infoCode="260" schema="proced" infoName="Remove and prevent ice and remove contamination"/>
+  <type infoCode="261" schema="proced" infoName="Remove ice"/>
+  <type infoCode="262" schema="proced" infoName="Prevent ice"/>
+  <type infoCode="263" schema="proced" infoName="Use disinfectant/Sanitize"/>
+  <type infoCode="264" schema="proced" infoName="Remove contamination"/>
+  <!-- 265 thru 269 not available for projects -->
+  <type infoCode="270" schema="proced" infoName="Adjust, align and calibrate"/>
+  <type infoCode="271" schema="proced" infoName="Adjust"/>
+  <type infoCode="272" schema="proced" infoName="Align"/>
+  <type infoCode="273" schema="proced" infoName="Calibrate"/>
+  <type infoCode="274" schema="proced" infoName="Harmonize"/>
+  <type infoCode="275" schema="proced" infoName="Grooming"/>
+  <type infoCode="276" schema="proced" infoName="Rig"/>
+  <type infoCode="277" schema="proced" infoName="Compensate"/>
+  <type infoCode="278" schema="proced" infoName="Easily and quickly adjust after a battle damage repair"/>
+  <type infoCode="279" schema="proced" infoName="Easily and quicky align after a battle damage repair"/>
+  <type infoCode="280" schema="proced" infoName="Inspection"/>
+  <type infoCode="281" schema="proced" infoName="Scheduled inspection"/>
+  <type infoCode="282" schema="proced" infoName="Unscheduled inspection"/>
+  <type infoCode="283" schema="proced" infoName="Special regular inspection"/>
+  <type infoCode="284" schema="proced" infoName="Special irregular inspection"/>
+  <type infoCode="285" schema="proced" infoName="Structure inspection for allowable damage limits"/>
+  <type infoCode="286" schema="proced" infoName="Structure inspection for repair"/>
+  <!-- 287 not available for projects -->
+  <type infoCode="288" schema="descript" infoName="Overhaul and retirement schedule"/>
+  <type infoCode="289" schema="proced" infoName="Check filling quantity"/>
+  <type infoCode="290" schema="proced" infoName="Change of liquid/has"/>
+  <!-- 291 not available for projects -->
+  <type infoCode="292" schema="proced" infoName="Change of oil"/>
+  <type infoCode="293" schema="proced" infoName="Change of oxygen"/>
+  <type infoCode="294" schema="proced" infoName="Change of nitrogen"/>
+  <type infoCode="295" schema="proced" infoName="Change of air"/>
+  <type infoCode="296" schema="proced" infoName="Change of water"/>
+  <type infoCode="297" schema="proced" infoName="Change of hydrogen"/>
+  <type infoCode="298" schema="proced" infoName="Change of other liquid"/>
+  <type infoCode="299" schema="proced" infoName="Change of other gas"/>
+  <type infoCode="300" schema="descript" infoName="Examinations, tests and checks"/>
+  <type infoCode="301" schema="descript" infoName="List of consumables associated with examinations, test and checks"/>
+  <type infoCode="302" schema="descript" infoName="List of materials associated with examinations, tests and checks"/>
+  <type infoCode="303" schema="descript" infoName="List of expendables associated with examinations, tests and checks"/>
+  <type infoCode="304" schema="descript" infoName="List of special support equipment and tools associated with examinations, tests and checks"/>
+  <type infoCode="305" schema="descript" infoName="List of support equipment and tools associated with examinations, tests and checks"/>
+  <type infoCode="306" schema="descript" infoName="List of software associated with examinations, tests and checks"/>
+  <type infoCode="307" schema="descript" infoName="Parts list associated with examinations, tests and checks"/>
+  <!-- 308 thru 309 not available for projects -->
+  <type infoCode="310" schema="proced" infoName="Visual examination"/>
+  <type infoCode="311" schema="proced" infoName="Visual examination without special equipment"/>
+  <type infoCode="312" schema="proced" infoName="Examination with a borescope"/>
+  <!-- 313 thru 314 not available for projects -->
+  <type infoCode="315" schema="descript" infoName="QA requirements"/>
+  <!-- 316 thru 319 not available for projects -->
+  <type infoCode="320" schema="proced" infoName="Operation test"/>
+  <type infoCode="321" schema="proced" infoName="Unit break-in"/>
+  <type infoCode="322" schema="proced" infoName="Test and inspection"/>
+  <!-- 323 thru 329 not available for projects -->
+  <type infoCode="330" schema="proced" infoName="Test preparation"/>
+  <type infoCode="331" schema="proced" infoName="Connection of test equipment"/>
+  <type infoCode="332" schema="proced" infoName="Removal of test equipment"/>
+  <type infoCode="333" schema="proced" infoName="Installation of the unit before the test"/>
+  <type infoCode="334" schema="proced" infoName="Removal of the unit after the test"/>
+  <type infoCode="335" schema="proced" infoName="Final measures"/>
+  <!-- 336 thru 339 not available for projects -->
+  <type infoCode="340" schema="proced" infoName="Function test"/>
+  <type infoCode="341" schema="proced" infoName="Manual test"/>
+  <type infoCode="342" schema="proced" infoName="Automatic test"/>
+  <type infoCode="343" schema="proced" infoName="BIT"/>
+  <type infoCode="344" schema="proced" infoName="Compatability test"/>
+  <type infoCode="345" schema="proced" infoName="System test"/>
+  <type infoCode="346" schema="proced" infoName="Other check"/>
+  <type infoCode="347" schema="proced" infoName="Start-up procedure for test"/>
+  <type infoCode="348" schema="proced" infoName="Final acceptance test (FAT)"/>
+  <type infoCode="349" schema="descript" infoName="Test records"/>
+  <type infoCode="350" schema="proced" infoName="Structure test"/>
+  <type infoCode="351" schema="proced" infoName="Test for surface cracks with dye penetrant"/>
+  <type infoCode="352" schema="proced" infoName="Test for surface cracks wth magnetic particles"/>
+  <type infoCode="353" schema="proced" infoName="Test for cracks and other defects with eddy current"/>
+  <type infoCode="354" schema="proced" infoName="Test for cracks and other defects with X-rays"/>
+  <type infoCode="355" schema="proced" infoName="Test for cracks and other defects with ultrasonics"/>
+  <type infoCode="356" schema="proced" infoName="Hardness test"/>
+  <type infoCode="357" schema="proced" infoName="Gamma-ray test"/>
+  <type infoCode="358" schema="proced" infoName="Resonance frequency test"/>
+  <type infoCode="359" schema="proced" infoName="Thermographic test"/>
+  <type infoCode="360" schema="proced" infoName="Design data/tolerances check"/>
+  <type infoCode="361" schema="proced" infoName="Dimensions check"/>
+  <type infoCode="362" schema="proced" infoName="Pressure check"/>
+  <type infoCode="363" schema="proced" infoName="Flow check"/>
+  <type infoCode="364" schema="proced" infoName="Leak check"/>
+  <type infoCode="365" schema="proced" infoName="Continuity check"/>
+  <type infoCode="366" schema="proced" infoName="Resistance check"/>
+  <type infoCode="367" schema="proced" infoName="Electrical power check"/>
+  <type infoCode="368" schema="proced" infoName="Signal strength check"/>
+  <type infoCode="369" schema="proced" infoName="Other check"/>
+  <type infoCode="370" schema="proced" infoName="Monitor the condition"/>
+  <type infoCode="371" schema="proced" infoName="Oil analysis"/>
+  <type infoCode="372" schema="proced" infoName="Vibration analysis"/>
+  <type infoCode="373" schema="proced" infoName="Tracking check"/>
+  <type infoCode="374" schema="proced" infoName="Fuel analysis"/>
+  <type infoCode="375" schema="proced" infoName="Shooting accidental discharge analysis"/>
+  <type infoCode="376" schema="proced" infoName="Check post application of adhesive"/>
+  <type infoCode="377" schema="proced" infoName="Contamination analysis"/>
+  <!-- 378 thru 389 not available for projects -->
+  <type infoCode="390" schema="proced" infoName="Sample test"/>
+  <!-- 391 thru 395 not available for projects -->
+  <type infoCode="396" schema="proced" infoName="Flight control surface movement"/>
+  <type infoCode="397" schema="proced" infoName="Landing gear movement"/>
+  <type infoCode="398" schema="proced" infoName="Product configuration"/>
+  <!-- 399 not available for projects -->
+  <type infoCode="400" schema="fault" infoName="Fault reports and isolation procedures"/>
+  <type infoCode="401" schema="descript" infoName="List of consumables associated with fault diagnosis"/>
+  <type infoCode="402" schema="descript" infoName="List of materials associated with fault diagnosis"/>
+  <type infoCode="403" schema="descript" infoName="List of expendables associated with fault diagnosis"/>
+  <type infoCode="404" schema="descript" infoName="List of special support equipment and tools associated with fault diagnosis"/>
+  <type infoCode="405" schema="descript" infoName="List of support equipment and tools associated with fault diagnosis"/>
+  <type infoCode="406" schema="descript" infoName="List of software associated with fault diagnosis"/>
+  <type infoCode="407" schema="descript" infoName="Parts list associated with fault diagnosis"/>
+  <!-- 408 thru 409 not available for projects -->
+  <type infoCode="410" schema="fault" infoName="General fault description"/>
+  <type infoCode="411" schema="fault" infoName="Isolated fault"/>
+  <type infoCode="412" schema="fault" infoName="Detected fault"/>
+  <type infoCode="413" schema="fault" infoName="Observed fault"/>
+  <type infoCode="414" schema="fault" infoName="Correlated fault"/>
+  <type infoCode="415" schema="fault" infoName="Impact of fault"/>
+  <!-- 416 thru 419 not available for projects -->
+  <type infoCode="420" schema="fault" infoName="General fault isolation procedure"/>
+  <type infoCode="421" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="422" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="423" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="424" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="425" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="426" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="427" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="428" schema="fault" infoName="Fault isolation procedure"/>
+  <type infoCode="429" schema="descript" infoName="Diagnostics"/>
+  <type infoCode="430" schema="descript" infoName="Fault isolation task supporting data"/>
+  <!-- 431 thru 439 not available for projects -->
+  <type infoCode="440" schema="descript" infoName="Index"/>
+  <type infoCode="441" schema="descript" infoName="Fault code index"/>
+  <type infoCode="442" schema="descript" infoName="Maintenance message index"/>
+  <type infoCode="443" schema="proced" infoName="Post-troubleshooting shutdown procedure"/>
+  <!-- 444 thru 449 not available for projects -->
+  <!-- 450 thru 499 not available for projects -->
+  <type infoCode="500" schema="proced" infoName="Disconnect, remove and disassembly procedures"/>
+  <type infoCode="501" schema="descript" infoName="List of consumables associated with removal"/>
+  <type infoCode="502" schema="descript" infoName="List of materials associated with removal"/>
+  <type infoCode="503" schema="descript" infoName="List of expendables associated with removal"/>
+  <type infoCode="504" schema="descript" infoName="List of special support equipment and tools associated with removal"/>
+  <type infoCode="505" schema="descript" infoName="List of support equipment and tools associated with removal"/>
+  <type infoCode="506" schema="descript" infoName="List of software associated with removal"/>
+  <type infoCode="507" schema="descript" infoName="Parts list associated with removal"/>
+  <!-- 508 thru 509 not available for projects -->
+  <type infoCode="510" schema="proced" infoName="Disconnect procedure"/>
+  <!-- 511 thru 519 not available for projects -->
+  <type infoCode="520" schema="proced" infoName="Removal procedure"/>
+  <type infoCode="521" schema="proced" infoName="Return to basic configuration"/>
+  <type infoCode="522" schema="proced" infoName="Remove support equipment/Remove from support equipment"/>
+  <type infoCode="523" schema="proced" infoName="Preparation before removal"/>
+  <type infoCode="524" schema="proced" infoName="Follow-on maintenance"/>
+  <type infoCode="525" schema="proced" infoName="Ammunition unloading"/>
+  <type infoCode="526" schema="proced" infoName="Deactivate launching device"/>
+  <!-- 527 thru 529 not available for projects -->
+  <type infoCode="530" schema="proced" infoName="Disassemble procedure"/>
+  <type infoCode="531" schema="proced" infoName="Disassemble on operation site"/>
+  <!-- 532 thru 539 not available for projects -->
+  <type infoCode="540" schema="proced" infoName="Open for access procedure"/>
+  <!-- 541 thru 549 not available for projects -->
+  <type infoCode="550" schema="proced" infoName="Unload software procedure"/>
+  <type infoCode="551" schema="proced" infoName="Fault monitoring storage readout (downloading)"/>
+  <type infoCode="552" schema="proced" infoName="Data erasing"/>
+  <type infoCode="553" schema="proced" infoName="Display, copy and print of data"/>
+  <!-- 554 thru 559 not available for projects -->
+  <type infoCode="560" schema="proced" infoName="Deactivation procedure"/>
+  <type infoCode="561" schema="proced" infoName="De-energize electrical network"/>
+  <type infoCode="562" schema="proced" infoName="Depressurize hydraulics"/>
+  <type infoCode="563" schema="proced" infoName="Deactivation maintenance practice"/>
+  <!-- 564 thru 599 not available for projects -->
+  <type infoCode="600" schema="descript" infoName="Repairs and locally make procedures and data"/>
+  <type infoCode="601" schema="descript" infoName="List of consumables associated with repairs"/>
+  <type infoCode="602" schema="descript" infoName="List of materials associated with repairs"/>
+  <type infoCode="603" schema="descript" infoName="List of expendables associated with repairs"/>
+  <type infoCode="604" schema="descript" infoName="List of special support equipment and tools associated with repairs"/>
+  <type infoCode="605" schema="descript" infoName="List of support equipment and tools associated with repairs"/>
+  <type infoCode="606" schema="descript" infoName="List of software associated with repairs"/>
+  <type infoCode="607" schema="descript" infoName="Parts list associated with repairs"/>
+  <!-- 608 thru 609 not available for projects -->
+  <type infoCode="610" schema="proced" infoName="Add material"/>
+  <type infoCode="611" schema="proced" infoName="Insulation"/>
+  <type infoCode="612" schema="proced" infoName="Metalize"/>
+  <type infoCode="613" schema="proced" infoName="Pot"/>
+  <type infoCode="614" schema="proced" infoName="Remetal"/>
+  <type infoCode="615" schema="proced" infoName="Retread"/>
+  <!-- 616 thru 619 not available for projects -->
+  <type infoCode="620" schema="proced" infoName="Attach material"/>
+  <type infoCode="621" schema="proced" infoName="Bond"/>
+  <type infoCode="622" schema="proced" infoName="Crimp"/>
+  <type infoCode="623" schema="proced" infoName="Braze"/>
+  <type infoCode="624" schema="proced" infoName="Rivet"/>
+  <type infoCode="625" schema="proced" infoName="Solder"/>
+  <type infoCode="626" schema="proced" infoName="Splice"/>
+  <type infoCode="627" schema="proced" infoName="Weld"/>
+  <!-- 628 thru 629 not available for projects -->
+  <type infoCode="630" schema="proced" infoName="Change the mechanical strength/structure of material"/>
+  <type infoCode="631" schema="proced" infoName="Anneal"/>
+  <type infoCode="632" schema="proced" infoName="Case harden"/>
+  <type infoCode="633" schema="proced" infoName="Cure"/>
+  <type infoCode="634" schema="proced" infoName="Normalize"/>
+  <type infoCode="635" schema="proced" infoName="Shot-peen"/>
+  <type infoCode="636" schema="proced" infoName="Temper"/>
+  <!-- 637 not available for projects -->
+  <type infoCode="638" schema="proced" infoName="Other treatment"/>
+  <type infoCode="639" schema="proced" infoName="Other process to change the mechanical strength/structure of material"/>
+  <type infoCode="640" schema="proced" infoName="Change the surface finish of material"/>
+  <type infoCode="641" schema="proced" infoName="Anodize"/>
+  <type infoCode="642" schema="proced" infoName="Buff"/>
+  <type infoCode="643" schema="proced" infoName="Burnish"/>
+  <type infoCode="644" schema="proced" infoName="Chromate"/>
+  <type infoCode="645" schema="proced" infoName="Hone"/>
+  <type infoCode="646" schema="proced" infoName="Lap"/>
+  <type infoCode="647" schema="proced" infoName="Plate"/>
+  <type infoCode="648" schema="proced" infoName="Polish"/>
+  <type infoCode="649" schema="proced" infoName="Cleanup of dents, cracks and scratches"/>
+  <type infoCode="650" schema="proced" infoName="Remove material"/>
+  <type infoCode="651" schema="proced" infoName="Abrasive blast"/>
+  <type infoCode="652" schema="proced" infoName="Bore/drill/ream"/>
+  <type infoCode="653" schema="proced" infoName="Electrical/electrochemical/chemical etch"/>
+  <type infoCode="654" schema="proced" infoName="Broach"/>
+  <type infoCode="655" schema="proced" infoName="Grind"/>
+  <type infoCode="656" schema="proced" infoName="Mill"/>
+  <type infoCode="657" schema="proced" infoName="Thread/tap"/>
+  <type infoCode="658" schema="proced" infoName="Turn"/>
+  <type infoCode="659" schema="proced" infoName="Other process to remove material"/>
+  <type infoCode="660" schema="descript" infoName="Structure repair procedure and data"/>
+  <type infoCode="661" schema="descript" infoName="Allowable damage"/>
+  <type infoCode="662" schema="proced" infoName="Temporary repair procedure"/>
+  <type infoCode="663" schema="proced" infoName="Standard repair procedure"/>
+  <type infoCode="664" schema="proced" infoName="Special repair procedure"/>
+  <type infoCode="665" schema="proced" infoName="Fly-in repair procedure"/>
+  <type infoCode="666" schema="descript" infoName="Material classification"/>
+  <type infoCode="667" schema="descript" infoName="Structure classification"/>
+  <type infoCode="668" schema="descript" infoName="Allowable damage of composite structures"/>
+  <type infoCode="669" schema="descript" infoName="Allowable damange of mixed structures"/>
+  <type infoCode="670" schema="descript" infoName="Locally make procedure and data"/>
+  <type infoCode="671" schema="proced" infoName="Making of parts"/>
+  <!-- 672 thru 679 not available for projects -->
+  <type infoCode="680" schema="descript" infoName="Battle damange repair procedure and data"/>
+  <type infoCode="681" schema="proced" infoName="Damage repair symbol marking"/>
+  <type infoCode="682" schema="proced" infoName="Identification of damaged hardware"/>
+  <type infoCode="683" schema="proced" infoName="Damage assessment"/>
+  <type infoCode="684" schema="descript" infoName="Utilization degradation"/>
+  <type infoCode="685" schema="proced" infoName="Repair procedure"/>
+  <type infoCode="686" schema="proced" infoName="Isolation procedure"/>
+  <type infoCode="687" schema="proced" infoName="Function test after battle damange repair"/>
+  <type infoCode="688" schema="descript" infoName="Battle damage repair kit"/>
+  <type infoCode="689" schema="proced" infoName="Damage repair"/>
+  <type infoCode="690" schema="descript" infoName="Miscellaneous"/>
+  <type infoCode="691" schema="proced" infoName="Marking"/>
+  <type infoCode="692" schema="proced" infoName="Connector repair"/>
+  <type infoCode="693" schema="proced" infoName="Varnish"/>
+  <!-- 694 thru 699 not available for projects -->
+  <type infoCode="700" schema="proced" infoName="Assemble, install and connect procedures"/>
+  <type infoCode="701" schema="descript" infoName="List of consumables associated with installation"/>
+  <type infoCode="702" schema="descript" infoName="List of materials associated with installation"/>
+  <type infoCode="703" schema="descript" infoName="List of expendables associated with installation"/>
+  <type infoCode="704" schema="descript" infoName="List of special support equipment and tools associated with installation"/>
+  <type infoCode="705" schema="descript" infoName="List of support equipment and tools associated with installation"/>
+  <type infoCode="706" schema="descript" infoName="List of software associated with installation"/>
+  <type infoCode="707" schema="descript" infoName="Parts list associated with installation"/>
+  <!-- 708 thru 709 not available for projects -->
+  <type infoCode="710" schema="proced" infoName="Assemble procedure"/>
+  <type infoCode="711" schema="proced" infoName="Tighten procedure"/>
+  <type infoCode="712" schema="proced" infoName="Lock procedure"/>
+  <type infoCode="713" schema="proced" infoName="Pack procedure"/>
+  <type infoCode="714" schema="proced" infoName="Assemble on operation site"/>
+  <!-- 715 thru 719 not available for projects -->
+  <type infoCode="720" schema="proced" infoName="Install procedure"/>
+  <type infoCode="721" schema="proced" infoName="Build up to usable configuration"/>
+  <type infoCode="722" schema="proced" infoName="Install support equipment/Install on support equipment"/>
+  <type infoCode="723" schema="proced" infoName="Preparation before installation"/>
+  <type infoCode="724" schema="proced" infoName="Follow-on maintenance"/>
+  <type infoCode="725" schema="proced" infoName="Ammunition loading"/>
+  <type infoCode="726" schema="proced" infoName="Activate launching device"/>
+  <type infoCode="727" schema="proced" infoName="Site location plans"/>
+  <type infoCode="728" schema="proced" infoName="Foundation preparation"/>
+  <!-- 729 not available for projects -->
+  <type infoCode="730" schema="proced" infoName="Connect procedure"/>
+  <!-- 731 thru 739 not available for projects -->
+  <type infoCode="740" schema="proced" infoName="Close after access procedure"/>
+  <!-- 741 thru 749 not available for projects -->
+  <type infoCode="750" schema="proced" infoName="Load software procedure"/>
+  <!-- 751 not available for projects -->
+  <type infoCode="752" schema="proced" infoName="Data loading"/>
+  <!-- 753 thru 759 not available for projects -->
+  <type infoCode="760" schema="proced" infoName="Reactivation procedure"/>
+  <type infoCode="761" schema="proced" infoName="Energize electrical network"/>
+  <type infoCode="762" schema="proced" infoName="Pressurize hydraulics"/>
+  <!-- 763 thru 799 not available for projects -->
+  <type infoCode="800" schema="descript" infoName="Package, handling, storage and transportation"/>
+  <type infoCode="801" schema="descript" infoName="List of consumables associated with storage"/>
+  <type infoCode="802" schema="descript" infoName="List of materials associated with storage"/>
+  <type infoCode="803" schema="descript" infoName="List of expendables associated with storage"/>
+  <type infoCode="804" schema="descript" infoName="List of special support equipment and tools associated with storage"/>
+  <type infoCode="805" schema="descript" infoName="List of support equipment and tools associated with storage"/>
+  <type infoCode="806" schema="descript" infoName="List of software associated with storage"/>
+  <type infoCode="807" schema="descript" infoName="Parts list associated with storage"/>
+  <!-- 808 thru 809 not available for projects -->
+  <type infoCode="810" schema="proced" infoName="Preservation procedure"/>
+  <type infoCode="811" schema="proced" infoName="Preparation for vehicle transportation"/>
+  <type infoCode="812" schema="descript" infoName="Shipping and storage - General"/>
+  <!-- 813 thru 819 not available for projects -->
+  <type infoCode="820" schema="proced" infoName="Procedure to remove preservation material"/>
+  <!-- 821 thru 829 not available for projects -->
+  <type infoCode="830" schema="proced" infoName="Procedure to put item in containers"/>
+  <type infoCode="831" schema="proced" infoName="Vehicle loading"/>
+  <type infoCode="832" schema="proced" infoName="Procedure to pack items"/>
+  <!-- 833 thru 839 not available for projects -->
+  <type infoCode="840" schema="proced" infoName="Procedure to remove item from containers"/>
+  <type infoCode="841" schema="proced" infoName="Vehicle unloading"/>
+  <type infoCode="842" schema="proced" infoName="Procedure to unpack items"/>
+  <!-- 843 thru 849 not available for projects -->
+  <type infoCode="850" schema="proced" infoName="Procedure to keep item serviceable when in storage"/>
+  <!-- 851 thru 859 not available for projects -->
+  <type infoCode="860" schema="proced" infoName="Procedure to move item when in storage"/>
+  <!-- 861 thru 869 not available for projects -->
+  <type infoCode="870" schema="proced" infoName="Procedure to prepare item for use after storage"/>
+  <type infoCode="871" schema="proced" infoName="Set on condition"/>
+  <!-- 872 thru 879 not available for projects -->
+  <type infoCode="880" schema="proced" infoName="Procedure when item got out of storage"/>
+  <!-- 881 thru 889 not available for projects -->
+  <type infoCode="890" schema="descript" infoName="Life data of item when in storage"/>
+  <!-- 891 thru 899 not available for projects -->
+  <type infoCode="900" schema="descript" infoName="Miscellaneous"/>
+  <type infoCode="901" schema="descript" infoName="Miscellaneous list of consumables"/>
+  <type infoCode="902" schema="descript" infoName="Miscellaneous list of materials"/>
+  <type infoCode="903" schema="descript" infoName="Miscellaneous list of expendables"/>
+  <type infoCode="904" schema="descript" infoName="Miscellaneous list of special support equipment and tools"/>
+  <type infoCode="905" schema="descript" infoName="Miscellaneous list of support equipment and tools"/>
+  <type infoCode="906" schema="descript" infoName="Miscellaneous list of software"/>
+  <type infoCode="907" schema="descript" infoName="Miscellaneous parts list"/>
+  <!-- 908 thru 909 not available for projects -->
+  <type infoCode="910" schema="descript" infoName="Miscellaneous"/>
+  <type infoCode="911" schema="descript" infoName="Illustration"/>
+  <type infoCode="912" schema="proced" infoName="Handling procedure"/>
+  <type infoCode="913" schema="proced" infoName="General maintenance procedure"/>
+  <type infoCode="914" schema="container" infoName="Container data module"/>
+  <type infoCode="915" schema="descript" infoName="Facilities"/>
+  <type infoCode="916" schema="descript" infoName="Maintenance allocation"/>
+  <type infoCode="917" schema="descript" infoName="Non-S1000D publication"/>
+  <!-- 918 thru 919 not available for projects -->
+  <type infoCode="920" schema="proced" infoName="Change = Remove and install"/>
+  <type infoCode="921" schema="proced" infoName="Change = Remove and install a new item"/>
+  <type infoCode="922" schema="proced" infoName="Change = Remove and install the removed item"/>
+  <!-- 924 thru 929 not available for projects -->
+  <type infoCode="930" schema="descript" infoName="Service bulletin"/>
+  <type infoCode="931" schema="descript" infoName="Service bulletin data"/>
+  <type infoCode="932" schema="descript" infoName="Planning information"/>
+  <type infoCode="933" schema="procedure" infoName="Accomplishment procedure - Task set"/>
+  <type infoCode="934" schema="descript" infoName="Material information"/>
+  <!-- 935 thru 939 not available for projects -->
+  <type infoCode="940" schema="descript" infoName="Provisioning data"/>
+  <type infoCode="941" schema="ipd" infoName="Illustrated parts data"/>
+  <type infoCode="942" schema="ipd" infoName="Numerical index"/>
+  <!-- 943 thru 949 not available for projects -->
+  <type infoCode="950" schema="descript" infoName="Composite information"/>
+  <type infoCode="951" schema="process" infoName="Generic process"/>
+  <type infoCode="952" schema="learning" infoName="Generic learning content"/>
+  <!-- 953 thru 960 not available for projects -->
+  <type infoCode="961" schema="descript" infoName="Calculation worksheets"/>
+  <!-- 962 thru 969 not available for projects -->
+  <type infoCode="970" schema="descript" infoName="Approved vendor processes"/>
+  <!-- 971 thru 979 not available for projects -->
+  <type infoCode="980" schema="descript" infoName="Environmentmal protection, fire-fighting and rescue"/>
+  <type infoCode="981" schema="descript" infoName="Air cleaning"/>
+  <type infoCode="982" schema="descript" infoName="Sewage treatment"/>
+  <!-- 983 thru 988 not available for projects -->
+  <type infoCode="989" schema="descript" infoName="Fire-fighting and rescue"/>
+  <type infoCode="990" schema="descript" infoName="Neutralization and disposal"/>
+  <type infoCode="991" schema="descript" infoName="Neutralization of ordnance"/>
+  <type infoCode="992" schema="descript" infoName="Neutralization of substance"/>
+  <!-- 993 thru 995 not available for projects -->
+  <type infoCode="996" schema="descript" infoName="Disposal of ordnance"/>
+  <type infoCode="997" schema="descript" infoName="Disposal of Product"/>
+  <type infoCode="998" schema="descript" infoName="Disposal of substance"/>
+  <!-- 999 not available for projects -->
+  <type infoCode="C00" schema="descript" infoName="Computer systems, software and data"/>
+  <type infoCode="C01" schema="descript" infoName="Miscellaneous list of consumables associated with computer systems, software and data"/>
+  <type infoCode="C02" schema="descript" infoName="Miscellaneous list of materials associated with computer systems, software and data"/>
+  <type infoCode="C03" schema="descript" infoName="Miscellaneous list of expendables associated with computer systems, software and data"/>
+  <type infoCode="C04" schema="descript" infoName="Miscellaneous list of special support equipment and tools associated with computer systems, software and data"/>
+  <type infoCode="C05" schema="descript" infoName="Miscellaneous list of support equipment and tools associated with computer systems, software and data"/>
+  <type infoCode="C06" schema="descript" infoName="Miscellaneous list of software associated with computer systems, software and data"/>
+  <type infoCode="C07" schema="descript" infoName="Miscellaneous parts list associated with computer systems, software and data"/>
+  <!-- C08 thru C12 not available for projects -->
+  <type infoCode="C13" schema="descript" infoName="Notes"/>
+  <type infoCode="C14" schema="descript" infoName="Problem handling"/>
+  <type infoCode="C15" schema="descript" infoName="Summary of content"/>
+  <!-- C16 thru C19 not available for projects -->
+  <type infoCode="C20" schema="descript" infoName="System administration"/>
+  <type infoCode="C21" schema="descript" infoName="System monitoring"/>
+  <type infoCode="C22" schema="descript" infoName="Description of command"/>
+  <type infoCode="C23" schema="proced" infoName="Connect hardware"/>
+  <!-- C24 not available for projects -->
+  <type infoCode="C25" schema="descript" infoName="System recovery"/>
+  <type infoCode="C26" schema="proced" infoName="Backup and restore"/>
+  <type infoCode="C27" schema="proced" infoName="Reboot"/>
+  <!-- C28 and C29 not available for projects -->
+  <type infoCode="C30" schema="proced" infoName="Coordinate"/>
+  <type infoCode="C31" schema="proced" infoName="Defragmentation"/>
+  <type infoCode="C32" schema="descript" infoName="Input/Output media"/>
+  <type infoCode="C33" schema="descript" infoName="Disk mirroring"/>
+  <type infoCode="C34" schema="proced" infoName="Clear interference"/>
+  <type infoCode="C35" schema="proced" infoName="Time check"/>
+  <type infoCode="C36" schema="proced" infoName="Compatability check"/>
+  <!-- C37 thru C49 not available for projects -->
+  <type infoCode="C50" schema="proced" infoName="Manage data"/>
+  <type infoCode="C51" schema="proced" infoName="Move data"/>
+  <type infoCode="C52" schema="proced" infoName="Manipulate/Use data"/>
+  <type infoCode="C53" schema="descript" infoName="Description of data storage"/>
+  <!-- C54 thru C59 not available for projects -->
+  <type infoCode="C60" schema="descript" infoName="Programming information"/>
+  <type infoCode="C61" schema="descript" infoName="Program flow chart"/>
+  <type infoCode="C62" schema="descript" infoName="Processing reference guide"/>
+  <!-- C63 thru C69 not available for projects -->
+  <type infoCode="C70" schema="descript" infoName="Security and privacy"/>
+  <!-- C71 not available for projects -->
+  <type infoCode="C72" schema="descript" infoName="Security information"/>
+  <type infoCode="C73" schema="proced" infoName="Security procedures"/>
+  <type infoCode="C74" schema="descript" infoName="List of security/classification codes"/>
+  <type infoCode="C75" schema="descript" infoName="Access control"/>
+  <!-- C76 thru C89 not available for projects -->
+  <type infoCode="C90" schema="descript" infoName="Miscellaneous"/>
+  <type infoCode="C91" schema="descript" infoName="Quality assurance"/>
+  <type infoCode="C92" schema="descript" infoName="Vendor information"/>
+  <!-- C93 and C94 not available for projects -->
+  <type infoCode="C95" schema="descript" infoName="Naming conventions"/>
+  <type infoCode="C96" schema="descript" infoName="Technical requirements"/>
+  <!-- C97 thru C99 not available for projects -->
+</dmtypes>
