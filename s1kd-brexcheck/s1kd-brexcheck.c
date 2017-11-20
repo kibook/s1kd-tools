@@ -226,12 +226,12 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	return found;
 }
 
-bool is_invalid(char *allowedObjectFlag, xmlNodeSetPtr nodesetval)
+bool is_invalid(char *allowedObjectFlag, xmlXPathObjectPtr obj)
 {
-	return (strcmp(allowedObjectFlag, "0") == 0 &&
-	        !xmlXPathNodeSetIsEmpty(nodesetval)) ||
-	       (strcmp(allowedObjectFlag, "1") == 0 &&
-	        xmlXPathNodeSetIsEmpty(nodesetval));
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		return obj->boolval;
+	else
+		return strcmp(allowedObjectFlag, "1");
 }
 
 bool is_failure(xmlChar *severity)
@@ -366,7 +366,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 			exit(ERR_INVALID_OBJ_PATH);
 		}
 
-		if (is_invalid(allowedObjectFlag, object->nodesetval)) {
+		if (is_invalid(allowedObjectFlag, object)) {
 			char rpath[PATH_MAX];
 			xmlChar *severity;
 
