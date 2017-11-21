@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="15"/>
+        <issueDate year="2017" month="11" day="20"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Move detailed description of -S from Options list to its own section.</simplePara>
+        <simplePara>Add -c option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +53,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlStuh?] <datamodules>]]></para>
+        <para><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlStupfch?] <datamodules>]]></para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -107,7 +107,7 @@
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-S[tu]</listItemTerm>
-              <listItemDefinition changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemDefinition>
                 <para>Check <acronym acronymType="at01"><acronymTerm>SNS</acronymTerm><acronymDefinition>Standard Numbering System</acronymDefinition></acronym> rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
               </listItemDefinition>
             </definitionListItem>
@@ -128,6 +128,12 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Output only the filenames of modules with BREX/SNS errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

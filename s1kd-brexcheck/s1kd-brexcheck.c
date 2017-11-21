@@ -57,6 +57,7 @@
 #define PROGRESS_BAR_WIDTH 60
 
 enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
+enum object_value_form { SINGLE, RANGE, PATTERN };
 
 enum verbosity verbose = NORMAL;
 bool shortmsg = false;
@@ -69,6 +70,8 @@ bool strict_sns = false;
 bool unstrict_sns = false;
 
 bool check_notation = false;
+
+bool check_values = false;
 
 xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
@@ -226,23 +229,141 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	return found;
 }
 
-bool is_invalid(char *allowedObjectFlag, xmlXPathObjectPtr obj)
+/* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
+bool is_in_range(const char *value, const char *range)
 {
+	char *ran;
+	char *first;
+	char *last;
+	bool ret;
+
+	if (!strchr(range, '~')) {
+		return strcmp(value, range) == 0;
+	}
+
+	ran = malloc(strlen(range) + 1);
+
+	strcpy(ran, range);
+
+	first = strtok(ran, "~");
+	last = strtok(NULL, "~");
+
+	ret = strcmp(value, first) >= 0 && strcmp(value, last) <= 0;
+
+	free(ran);
+
+	return ret;
+}
+
+/* Tests whether a value is in an S1000D set (a|b|c) */
+bool is_in_set(const char *value, const char *set)
+{
+	char *s;
+	char *val = NULL;
+	bool ret = false;
+
+	if (!strchr(set, '|')) {
+		return is_in_range(value, set);
+	}
+
+	s = malloc(strlen(set) + 1);
+
+	strcpy(s, set);
+
+	while ((val = strtok(val ? NULL : s, "|"))) {
+		if (is_in_range(value, val)) {
+			ret = true;
+			break;
+		}
+	}
+
+	free(s);
+
+	return ret;
+}
+
+bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
+{
+	int i;
+	bool ret = false;
+
+	if (xmlXPathNodeSetIsEmpty(values))
+		return true;
+
+	for (i = 0; i < values->nodeNr; ++i) {
+		char *allowed, *value, *form;
+
+		allowed = (char *) xmlGetProp(values->nodeTab[i], BAD_CAST "valueAllowed");
+		form = (char *) xmlGetProp(values->nodeTab[i], BAD_CAST "valueForm");
+		value = (char *) xmlNodeGetContent(node);
+
+		if (form && strcmp(form, "range") == 0) {
+			ret = ret || is_in_set(value, allowed);
+		} else {
+			ret = ret || strcmp(value, allowed) == 0;
+		}
+				
+		xmlFree(allowed);
+		xmlFree(form);
+		xmlFree(value);
+	}
+
+	return ret;
+}
+
+bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	bool ret = true;
+
+	if (xmlXPathNodeSetIsEmpty(nodes))
+		return true;
+
+	ctx = xmlXPathNewContext(rule->doc);
+	ctx->node = rule;
+
+	obj = xmlXPathEvalExpression(BAD_CAST ".//objectValue", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < nodes->nodeNr; ++i) {
+			if (!check_node_values(nodes->nodeTab[i], obj->nodesetval)) {
+				ret = false;
+				break;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return ret;
+}
+
+bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
+{
+	bool invalid = false;
+
 	if (strcmp(allowedObjectFlag, "0") == 0) {
 		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			return obj->boolval;
+			invalid = obj->boolval;
 		} else {
-			return false;
+			invalid = true;
 		}
 	} else if (strcmp(allowedObjectFlag, "1") == 0) {
 		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			return !obj->boolval;
+			invalid = !obj->boolval;
 		} else {
-			return true;
+			invalid = false;
 		}
-	} else {
-		return false;
 	}
+
+	if (!invalid && check_values)
+		invalid = !check_objects_values(rule, obj->nodesetval);
+
+	return invalid;
 }
 
 bool is_failure(xmlChar *severity)
@@ -377,7 +498,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 			exit(ERR_INVALID_OBJ_PATH);
 		}
 
-		if (is_invalid(allowedObjectFlag, object)) {
+		if (is_invalid(rules->nodeTab[i], allowedObjectFlag, object)) {
 			char rpath[PATH_MAX];
 			xmlChar *severity;
 
@@ -433,7 +554,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStuph?] <datamodules>");
+	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStupfch?] <datamodules>");
 	puts("");
 	puts("Options:");
 	puts("  -b <brex>    Use <brex> as the BREX data module");
@@ -445,6 +566,7 @@ void show_help(void)
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict)");
 	puts("  -n           Check notation rules.");
+	puts("  -c           Check object values.");
 	puts("  -p           Display progress bar.");
 	puts("  -f           Output only filenames of invalid modules.");
 	puts("  -h -?        Show this help message.");
@@ -756,9 +878,11 @@ void print_node(xmlNodePtr node)
 	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
 		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
 		char *content = (char *) xmlNodeGetContent(node);
-		printf("  VALUE ALLOWED: %s", content);
+		printf("  VALUE ALLOWED:");
 		if (allowed)
-			printf(" (%s)", allowed);
+			printf(" %s", allowed);
+		if (content && strcmp(content, "") != 0)
+			printf(" (%s)", content);
 		putchar('\n');
 		xmlFree(content);
 		xmlFree(allowed);
@@ -901,7 +1025,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stupfnh?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stupfnch?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -939,6 +1063,7 @@ int main(int argc, char *argv[])
 			case 'p': progress = true; break;
 			case 'f': only_fnames = true; break;
 			case 'n': check_notation = true; break;
+			case 'c': check_values = true; break;
 			case 'h':
 			case '?':
 				show_help();

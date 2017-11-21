@@ -6,7 +6,7 @@ s1kd-brexcheck - Validate S1000D data modules against BREX data modules
 SYNOPSIS
 ========
 
-s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\] \[-vVqDsxlStuh?\] &lt;datamodules&gt;
+s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\] \[-vVqDsxlStupfch?\] &lt;datamodules&gt;
 
 DESCRIPTION
 ===========
@@ -50,6 +50,9 @@ Display a progress bar.
 
 -f  
 Output only the filenames of modules with BREX/SNS errors.
+
+-c  
+When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.
 
 -h -?  
 Show the help/usage message.
