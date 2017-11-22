@@ -1506,6 +1506,7 @@ int main(int argc, char **argv)
 	FILE *list = stdin;
 	char issdate[16] = "";
 	bool stripext = false;
+	bool verbose = false;
 
 	int parseopts = 0;
 
@@ -1516,7 +1517,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:n:u:wNP:p:LI:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:n:u:wNP:p:LI:vh?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1542,6 +1543,7 @@ int main(int argc, char **argv)
 			case 'p': strncpy(product, optarg, 63); break;
 			case 'L': dmlist = true; break;
 			case 'I': strncpy(issdate, optarg, 15); break;
+			case 'v': verbose = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1724,6 +1726,10 @@ int main(int argc, char **argv)
 				if (access(out, F_OK) == 0 && !force_overwrite) {
 					fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
 					exit(EXIT_NO_OVERWRITE);
+				}
+
+				if (verbose) {
+					puts(out);
 				}
 			}
 

@@ -1,7 +1,7 @@
 Usage: s1kd-instance [-s <source>] [-e <ext>|-E] [-c <dmc>] [-l <lang>]
                      [-n <iss>] [-I <date>] [-o <file>|-O <dir>] [-t <techName>]
 		     [-i <infoName>] [-a|-A] [-Y <text>] [-C <comment>]
-		     [-R <CIR> ...] [-S] [<applic>...]
+		     [-R <CIR> ...] [-S] [-v] [<applic>...]
 
 Options:
   -s <source>	The source data module (default is stdin)
@@ -28,4 +28,5 @@ Options:
   -P <PCT>      PCT file to read products from
   -p <id>       ID of product in specified PCT to read applic defs from.
   -L		Source (-s/stdin) is a list of files instead of a DM.
+  -v            Print the file name of the instance when -O is used.
   <applic>...	Any number of applic defs in the form of <ident>:<type>=<value>

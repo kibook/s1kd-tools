@@ -96,6 +96,9 @@ Product ID of the product to read applicability definitions from, using the spec
 -L  
 Source (-s or stdin) is a list of data module/publication module filenames to create instances of, rather than a single data module/publication module.
 
+-v  
+When -O is used, print the automatically generated file name of the instance.
+
 &lt;applic&gt;...  
 Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;
 
