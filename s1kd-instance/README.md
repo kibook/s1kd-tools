@@ -6,7 +6,7 @@ s1kd-instance - Create S1000D data/pub module instances
 SYNOPSIS
 ========
 
-s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-n &lt;iss&gt;\] \[-I &lt;date&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[-L\] \[&lt;applic&gt;...\]
+s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;|-E\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-n &lt;iss&gt;\] \[-I &lt;date&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[-L\] \[&lt;applic&gt;...\]
 
 DESCRIPTION
 ===========
@@ -21,6 +21,9 @@ The source data module or publication module (default is to read from stdin).
 
 -e &lt;ext&gt;  
 Specify an extension on the data module code (DME) or publication module code (PME) for the instance.
+
+-E  
+Remove the extension from an instance produced from an already extended data module or publication module.
 
 -c &lt;dmc&gt;  
 Specify a new data module code (DMC) or publication module code (PMC) for the instance.

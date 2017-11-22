@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="27"/>
+        <issueDate year="2017" month="11" day="22"/>
         <dmTitle>
           <techName>s1kd-instance(1) | General Commands Manual</techName>
         </dmTitle>
@@ -42,7 +42,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Changed -I to -n, and added new -I option to set issue date of instance.</simplePara>
+        <simplePara>Add -E option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -54,7 +54,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-n &lt;iss&gt;] [-I &lt;date&gt;] [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</para>
+        <para>s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;|-E] [-c &lt;dmc&gt;] [-l &lt;lang&gt;] [-n &lt;iss&gt;] [-I &lt;date&gt;] [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f] [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A] [-Y &lt;text&gt;] [-C &lt;comment&gt;] [-R &lt;CIR&gt; ...] [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -76,6 +76,12 @@
                 <para>Specify an extension on the data module code (DME) or publication module code (PME) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-E</listItemTerm>
+              <listItemDefinition>
+                <para>Remove the extension from an instance produced from an already extended data module or publication module.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-c &lt;dmc&gt;</listItemTerm>
               <listItemDefinition>
@@ -89,12 +95,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0001">-n &lt;iss&gt;</listItemTerm>
+              <listItemTerm>-n &lt;iss&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-I &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue date of the instance. By default, the issue date is taken from the source.</para>
@@ -177,10 +183,7 @@
             <definitionListItem>
               <listItemTerm>-R &lt;CIR&gt; ...</listItemTerm>
               <listItemDefinition>
-                <para>Use a <acronym acronymType="at01">
-                  <acronymTerm>CIR</acronymTerm>
-                  <acronymDefinition>Common Information Repository</acronymDefinition>
-                </acronym> to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times. Currently the functional item, warnings/cautions and applicability CIRs are supported.</para>
+                <para>Use a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition>Common Information Repository</acronymDefinition></acronym> to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times. Currently the functional item, warnings/cautions and applicability CIRs are supported.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -204,10 +207,7 @@
             <definitionListItem>
               <listItemTerm>-P &lt;PCT&gt;</listItemTerm>
               <listItemDefinition>
-                <para><acronym acronymType="at01">
-                  <acronymTerm>PCT</acronymTerm>
-                  <acronymDefinition>Product Cross-reference Table</acronymDefinition>
-                </acronym> file to read product definitions from (-p).</para>
+                <para><acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition>Product Cross-reference Table</acronymDefinition></acronym> file to read product definitions from (-p).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

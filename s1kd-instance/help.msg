@@ -1,11 +1,12 @@
-Usage: s1kd-instance [-s <source>] [-c <dmc>] [-l <lang>] [-n <iss>] [-I <date>]
-                     [-o <file>|-O <dir>] [-t <techName>] [-i <infoName>]
-		     [-a|-A] [-Y <text>] [-C <comment>] [-R <CIR> ...] [-S]
-		     [<applic>...]
+Usage: s1kd-instance [-s <source>] [-e <ext>|-E] [-c <dmc>] [-l <lang>]
+                     [-n <iss>] [-I <date>] [-o <file>|-O <dir>] [-t <techName>]
+		     [-i <infoName>] [-a|-A] [-Y <text>] [-C <comment>]
+		     [-R <CIR> ...] [-S] [<applic>...]
 
 Options:
   -s <source>	The source data module (default is stdin)
   -e <ext>	Specify an extension on the data module code (DME).
+  -E            Remove extension from instance.
   -c <DMC>	The new data module code of the data module instance.
   -l <lang>	Specify the language of the data module instance.
   -n <iss>      Set the issue and inwork numbers of the instance.

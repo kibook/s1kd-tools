@@ -1452,6 +1452,16 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	xmlFreeDoc(pct);
 }
 
+void strip_extension(xmlDocPtr doc)
+{
+	xmlNodePtr ext;
+
+	ext = first_xpath_node(doc, "//identExtension");
+
+	xmlUnlinkNode(ext);
+	xmlFreeNode(ext);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1495,6 +1505,7 @@ int main(int argc, char **argv)
 	bool dmlist = false;
 	FILE *list = stdin;
 	char issdate[16] = "";
+	bool stripext = false;
 
 	int parseopts = 0;
 
@@ -1505,11 +1516,12 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:c:o:O:faAt:i:Y:C:l:R:n:u:wNP:p:LI:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:n:u:wNP:p:LI:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
 			case 'e': strncpy(extension, optarg, 255); break;
+			case 'E': stripext = true; break;
 			case 'c': strncpy(code, optarg, 255); break;
 			case 'o': strncpy(out, optarg, PATH_MAX - 1); break;
 			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
@@ -1662,6 +1674,10 @@ int main(int argc, char **argv)
 
 			if (strcmp(extension, "") != 0) {
 				set_extd(doc, extension);
+			}
+
+			if (stripext) {
+				strip_extension(doc);
 			}
 
 			if (strcmp(code, "") != 0) {
