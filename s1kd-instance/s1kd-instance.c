@@ -82,9 +82,16 @@ void define_applic(char *ident, char *type, char *value)
 		assert = xmlNewChild(applicability, NULL, BAD_CAST "assert", NULL);
 		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", BAD_CAST ident);
 		xmlSetProp(assert, BAD_CAST "applicPropertyType",  BAD_CAST type);
+		xmlSetProp(assert, BAD_CAST "applicPropertyValues", BAD_CAST value);
+	} else {
+		if (xmlHasProp(assert, BAD_CAST "applicPropertyValues")) {
+			xmlChar *first_value = xmlGetProp(assert, BAD_CAST "applicPropertyValues");
+			xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
+			xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
+		}
+		xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
+		--napplics;
 	}
-
-	xmlSetProp(assert, BAD_CAST "applicPropertyValues", BAD_CAST value);
 }
 
 /* Find the first child element with a given name */
@@ -288,6 +295,23 @@ bool is_in_set(const char *value, const char *set)
 	return ret;
 }
 
+bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const char *value)
+{
+	xmlNodePtr cur;
+	bool result = false;
+
+	for (cur = multi->children; cur; cur = cur->next) {
+		char *cur_value = (char *) xmlNodeGetContent(cur);
+
+		if (is_in_set(cur_value, value)) {
+			result = true;
+			break;
+		}
+	}
+
+	return result;
+}
+
 /* Tests whether ident:type=value was defined by the user */
 bool is_applic(const char *ident, const char *type, const char *value, bool assume)
 {
@@ -303,7 +327,11 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 		bool match = strcmp(cur_ident, ident) == 0 && strcmp(cur_type, type) == 0;
 
 		if (match) {
-			result = is_in_set(cur_value, value);
+			if (cur_value) {
+				result = is_in_set(cur_value, value);
+			} else {
+				result = result && eval_multi(cur, ident, type, value);
+			}
 		}
 
 		xmlFree(cur_ident);
@@ -736,6 +764,37 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 	}	
 }
 
+xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values)
+{
+	xmlNodePtr assert;
+
+	assert = xmlNewNode(NULL, BAD_CAST "assert");
+
+	xmlSetProp(assert, BAD_CAST "applicPropertyIdent", ident);
+	xmlSetProp(assert, BAD_CAST "applicPropertyType", type);
+	xmlSetProp(assert, BAD_CAST "applicPropertyValues", values);
+
+	return assert;
+}
+
+xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values)
+{
+	xmlNodePtr or, cur;
+
+	or = xmlNewNode(NULL, BAD_CAST "evaluate");
+	xmlSetProp(or, BAD_CAST "andOr", BAD_CAST "or");
+
+	for (cur = values->children; cur; cur = cur->next) {
+		xmlChar *value;
+
+		value = xmlNodeGetContent(cur);
+		xmlAddChild(or, create_assert(ident, type, value));
+		xmlFree(value);
+	}
+
+	return or;
+}
+
 /* Set the applicability for the whole datamodule instance */
 void set_applic(xmlDocPtr doc, char *new_text)
 {
@@ -765,14 +824,15 @@ void set_applic(xmlDocPtr doc, char *new_text)
 	}
 
 	for (cur = applicability->children; cur; cur = cur->next) {
-		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
-		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
-		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
+		xmlChar *cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		xmlChar *cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		xmlChar *cur_value = xmlGetProp(cur, BAD_CAST "applicPropertyValues");
 
-		xmlNodePtr new_assert = xmlNewChild(new_evaluate, NULL, BAD_CAST "assert", NULL);
-		xmlSetProp(new_assert, BAD_CAST "applicPropertyIdent",  BAD_CAST cur_ident);
-		xmlSetProp(new_assert, BAD_CAST "applicPropertyType",   BAD_CAST cur_type);
-		xmlSetProp(new_assert, BAD_CAST "applicPropertyValues", BAD_CAST cur_value);
+		if (cur_value) {
+			xmlAddChild(new_evaluate, create_assert(cur_ident, cur_type, cur_value));
+		} else {
+			xmlAddChild(new_evaluate, create_or(cur_ident, cur_type, cur));
+		}
 
 		xmlFree(cur_ident);
 		xmlFree(cur_type);

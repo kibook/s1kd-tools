@@ -126,3 +126,70 @@ Instance data module code (-c) vs extension (-e)
 ------------------------------------------------
 
 When creating a data module instance, the instance should have the same data module code as the master data module, with an added extension code, the DME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules, it may be desirable or necessary to change the data module code instead. These two options can be used together as well to give an instance a new DMC as well an extension.
+
+Filtering for multiple values of a single property
+--------------------------------------------------
+
+Though not usually the case, it is possible to create an instance which is filtered on multiple values of the same applicabilty property. Given the following:
+
+    <referencedApplicGroup>
+      <applic id="apA">
+        <assert applicPropertyIdent="attr"
+                applicPropertyType="prodattr"
+                applicPropertyValues="A"/>
+      </applic>
+      <applic id="apB">
+        <assert applicPropertyIdent="attr"
+                applicPropertyType="prodattr"
+                applicPropertyValues="B"/>
+      </applic>
+      <applic id="apC">
+        <assert applicPropertyIdent="attr"
+                applicPropertyType="prodattr"
+                applicPropertyValues="C"/>
+      </applic>
+    </referencedApplicGroup>
+    <!-- ... -->
+    <para applicRefId="apA">Applies to A</para>
+    <para applicRefId="apB">Applies to B</para>
+    <para applicRefId="apC">Applies to C</para>
+
+filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property twice in the applicability definition arguments. For example:
+
+    $ s1kd-instance -A -Y "A or C" ... attr:prodattr=A attr:prodattr=C
+
+This would produce the following in the instance:
+
+    <dmStatus>
+      <!-- ... -->
+      <applic>
+        <displayText>
+          <simplePara>A or C</simplePara>
+        </displayText>
+        <evaluate andOr="or">
+          <assert applicPropertyIdent="attr"
+                  applicPropertyType="prodattr"
+                  applicPropertyValues="A"/>
+          <assert applicPropertyIdent="attr"
+                  applicPropertyType="prodattr"
+                  applicPropertyValues="C"/>
+        </evaluate>
+      </applic>
+      <!-- ... ->
+    </dmStatus>
+    <!-- ... -->
+    <referencedApplicGroup>
+      <applic id="apA">
+        <assert applicPropertyIdent="attr"
+                applicPropertyType="prodattr"
+                applicPropertyValues="A"/>
+      </applic>
+      <applic id="apC">
+        <assert applicPropertyIdent="attr"
+                applicPropertyType="prodattr"
+                applicPropertyValues="C"/>
+      </applic>
+    </referencedApplicGroup>
+    <!-- ... -->
+    <para applicRefId="apA">Applies to A</para>
+    <para applicRefId="apC">Applies to C</para>
