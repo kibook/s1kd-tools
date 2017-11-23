@@ -805,7 +805,7 @@ int main(int argc, char **argv)
 			learnEventCode);
 
 		if (n != 11 && n != 13) {
-			fprintf(stderr, ERR_PREFIX "Bad data module code.\n");
+			fprintf(stderr, ERR_PREFIX "Bad data module code: %s\n", dmcode);
 			exit(EXIT_BAD_DMC);
 		}
 	}
