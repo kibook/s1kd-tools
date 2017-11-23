@@ -16,9 +16,10 @@
 #define EXIT_MISSING_SCHEMA 2
 #define EXIT_BAD_IDREF 3
 
-#define INVALID_ID_XPATH "//@internalRefId[not(//@id = .)]|" \
-                         "//@applicRefId[not(//@id = .)]" \
-			 "//@nextActionRefId[not(//@id = .)]"
+#define INVALID_ID_XPATH BAD_CAST \
+	"//@internalRefId[not(//@id = .)]|" \
+        "//@applicRefId[not(//@id = .)]" \
+	"//@nextActionRefId[not(//@id = .)]"
 
 enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
 
@@ -151,23 +152,30 @@ xmlNodePtr first_xpath_node(char *xpath, xmlXPathContextPtr ctx)
 int check_idrefs(xmlDocPtr doc, const char *fname)
 {
 	xmlXPathContextPtr ctx;
-	xmlNodePtr invalid;
+	xmlXPathObjectPtr obj;
+	int err = 0;
 
 	ctx = xmlXPathNewContext(doc);
 
-	invalid = first_xpath_node(INVALID_ID_XPATH, ctx);
+	obj = xmlXPathEvalExpression(INVALID_ID_XPATH, ctx);
 
-	xmlXPathFreeContext(ctx);
-
-	if (invalid) {
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		if (verbosity > SILENT) {
-			xmlChar *id = xmlNodeGetContent(invalid);
-			fprintf(stderr, ERR_PREFIX "No matching ID for '%s' (%s line %u).\n", (char *) id, fname, invalid->parent->line);
+			int i;
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlChar *id = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+				fprintf(stderr, ERR_PREFIX "No matching ID for '%s' (%s line %u).\n", (char *) id, fname, obj->nodesetval->nodeTab[i]->parent->line);
+				xmlFree(id);
+			}
 		}
-		return EXIT_BAD_IDREF;
+
+		err = EXIT_BAD_IDREF;
 	}
 
-	return 0;
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return err;
 }
 
 int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns)
@@ -295,7 +303,7 @@ int main(int argc, char *argv[])
 		xmlSchemaFreeParserCtxt(schema_parsers[i].ctxt);
 	}
 
-	xmlFree(ignore_ns);
+	xmlFreeNode(ignore_ns);
 
 	xmlCleanupParser();
 
