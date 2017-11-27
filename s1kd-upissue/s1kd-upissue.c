@@ -16,16 +16,19 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-viN] DATAMODULE");
+	puts("Usage: " PROG_NAME " [-viNrRqI] [-s <status>] [-1 <type>] [-2 <type>] <datamodules>");
 	putchar('\n');
 	puts("Options:");
-	puts("  -v	Print filename of upissued data module");
-	puts("  -i	Create a new issue of the data module");
-	puts("  -N	Omit issue/inwork numbers from filename");
-	puts("  -r      Keep RFUs from old issue");
-	puts("  -R      Only delete change marks associated with an RFU");
-	puts("  -q      Keep quality assurance from old issue");
-	puts("  -I      Do not change issue date");
+	puts("  -v           Print filename of upissued data module");
+	puts("  -i           Create a new issue of the data module");
+	puts("  -N           Omit issue/inwork numbers from filename");
+	puts("  -s <status>  Set change status type");
+	puts("  -r           Keep RFUs from old issue");
+	puts("  -R           Only delete change marks associated with an RFU");
+	puts("  -q           Keep quality assurance from old issue");
+	puts("  -I           Do not change issue date");
+	puts("  -1 <type>    Set first verification type");
+	puts("  -2 <type>    Set second verification type");
 }
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
@@ -183,6 +186,48 @@ void set_unverified(xmlDocPtr doc, bool iss30)
 	xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "unverif" : "unverified"), NULL);
 }
 
+void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
+{
+	xmlNodePtr qa, unverif;
+
+	if (!(firstver || secondver))
+		return;
+
+	qa = firstXPathNode(iss30 ? "//qa" : "//qualityAssurance", doc);
+
+	if (!qa)
+		return;
+
+	unverif = firstXPathNode(iss30 ? "//unverif" : "//unverified", doc);
+
+	if (unverif) {
+		xmlUnlinkNode(unverif);
+		xmlFreeNode(unverif);
+	}
+
+	if (firstver) {
+		xmlNodePtr ver1;
+		ver1 = firstXPathNode(iss30 ? "//firstver" : "//firstVerification", doc);
+		if (ver1) {
+			xmlUnlinkNode(ver1);
+			xmlFreeNode(ver1);
+		}
+		ver1 = xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "firstver" : "firstVerification"), NULL);
+		xmlSetProp(ver1, BAD_CAST (iss30 ? "type" : "verificationType"), BAD_CAST firstver);
+	}
+
+	if (secondver) {
+		xmlNodePtr ver2;
+		ver2 = firstXPathNode(iss30 ? "//secver" : "//secondVerification", doc);
+		if (ver2) {
+			xmlUnlinkNode(ver2);
+			xmlFreeNode(ver2);
+		}
+		ver2 = xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "secver" : "secondVerification"), NULL);
+		xmlSetProp(ver2, BAD_CAST (iss30 ? "type" : "verificationType"), BAD_CAST secondver);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	char dmfile[256], cpfile[256];
@@ -223,7 +268,10 @@ int main(int argc, char **argv)
 	xmlChar *issno_name, *inwork_name;
 	bool iss30 = false;
 
-	while ((c = getopt(argc, argv, "ivs:NfrRIqh?")) != -1) {
+	char *firstver = NULL;
+	char *secondver = NULL;
+
+	while ((c = getopt(argc, argv, "ivs:NfrRIq1:2:h?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -252,6 +300,12 @@ int main(int argc, char **argv)
 				break;
 			case 'q':
 				set_unverif = false;
+				break;
+			case '1':
+				firstver = strdup(optarg);
+				break;
+			case '2':
+				secondver = strdup(optarg);
 				break;
 			case 'h':
 			case '?':
@@ -326,9 +380,17 @@ int main(int argc, char **argv)
 			xmlSetProp(issueInfo, issno_name, BAD_CAST upissued_issueNumber);
 			xmlSetProp(issueInfo, inwork_name, BAD_CAST upissued_inWork);
 
-			/* Delete RFUs when upissuing an official module */
-			if (!keep_rfus && strcmp(inWork, "00") == 0) {
-				del_rfus(dmdoc, only_assoc_rfus, iss30);
+			/* When upissuing an official module to first inwork issue... */
+			if (strcmp(inWork, "00") == 0) {
+					/* Delete RFUs */
+					if (!keep_rfus) {
+						del_rfus(dmdoc, only_assoc_rfus, iss30);
+					}
+
+					/* Set unverified */
+					if (set_unverif) {
+						set_unverified(dmdoc, iss30);
+					}
 			}
 
 			if (set_date) {
@@ -348,6 +410,8 @@ int main(int argc, char **argv)
 				xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
 			}
 
+			set_qa(dmdoc, firstver, secondver, iss30);
+
 			if (newissue) {
 				/* Do not change issueType when upissuing from 000 -> 001 */
 				if (issueNumber_int > 0) {
@@ -357,10 +421,6 @@ int main(int argc, char **argv)
 						if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
 							xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
 						}
-					}
-
-					if (set_unverif) {
-						set_unverified(dmdoc, iss30);
 					}
 				}
 			}
@@ -401,6 +461,9 @@ int main(int argc, char **argv)
 			xmlFreeDoc(dmdoc);
 		}
 	}
+
+	free(firstver);
+	free(secondver);
 
 	xmlCleanupParser();
 

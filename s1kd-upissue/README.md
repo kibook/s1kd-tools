@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-s1kd-upissue \[-viN\] \[-s &lt;status&gt;\] &lt;files&gt;
+s1kd-upissue \[-viNrRqI\] \[-1 &lt;type&gt;\] \[-2 &lt;type&gt;\] \[-s &lt;status&gt;\] &lt;files&gt;
 
 DESCRIPTION
 ===========
@@ -41,6 +41,12 @@ Do not change issue date. Normally, when upissuing to the next inwork or officia
 
 -q  
 Keep quality assurance information from old issue. Normally, when upissuing an official data module to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the data module, and so does not require it to be re-verified.
+
+-1 &lt;type&gt;  
+Set first verification type (tabtop, onobject, ttandoo).
+
+-2 &lt;type&gt;  
+Set second verification type (tabtop, onobject, ttandoo).
 
 EXAMPLES
 ========

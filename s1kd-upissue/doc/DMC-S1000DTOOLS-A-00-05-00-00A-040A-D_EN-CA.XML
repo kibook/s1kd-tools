@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="5" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="05"/>
+        <issueDate year="2017" month="11" day="27"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,13 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Added support for older issue issue info and change XML markup (3.0 and lower).</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002">
-        <simplePara>Added -R option to delete only change markup associated with an RFU. The normal behaviour is now to delete all change markup when upissuing an official module.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003">
-        <simplePara>Added -q option to keep quality assurance information from old issue.</simplePara>
+        <simplePara>Add -1 and -2 options to set first/second verification types.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -59,7 +53,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-upissue [-viN] [-s &lt;status&gt;] &lt;files&gt;</para>
+        <para>s1kd-upissue [-viNrRqI] [-1 &lt;type&gt;] [-2 &lt;type&gt;] [-s &lt;status&gt;] &lt;files&gt;</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -97,10 +91,10 @@
             <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements. This option prevents their deletion.</para>
+                <para>Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements. This option prevents their deletion.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-R</listItemTerm>
               <listItemDefinition>
                 <para>Delete only change markup on elements associated with an RFU (by use of the attribute <verbatimText verbatimStyle="vs13">reasonForUpdateRefIds</verbatimText>. Change markup on other elements is ignored.</para>
@@ -112,10 +106,22 @@
                 <para>Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-q</listItemTerm>
               <listItemDefinition>
                 <para>Keep quality assurance information from old issue. Normally, when upissuing an official data module to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the data module, and so does not require it to be re-verified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-1 &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set first verification type (tabtop, onobject, ttandoo).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-2 &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set second verification type (tabtop, onobject, ttandoo).</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
