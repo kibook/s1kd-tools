@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="12" day="01"/>
+        <dmTitle>
+          <techName>Namespace exclusion example</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>General</title>
+        <para>This data module contains MathML in order to produce the following:</para>
+        <para>
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>x</mi>
+              <mo>=</mo>
+              <mfrac>
+                <mrow>
+                  <mo form="prefix">−</mo>
+                  <mi>b</mi>
+                  <mo>±</mo>
+                  <msqrt>
+                    <msup>
+                      <mi>b</mi>
+                      <mn>2</mn>
+                    </msup>
+                    <mo>−</mo>
+                    <mn>4</mn>
+                    <mo>⁢</mo>
+                    <mi>a</mi>
+                    <mo>⁢</mo>
+                    <mi>c</mi>
+                  </msqrt>
+                </mrow>
+                <mrow>
+                  <mn>2</mn>
+                  <mo>⁢</mo>
+                  <mi>a</mi>
+                </mrow>
+              </mfrac>
+            </mrow>
+          </math>
+        </para>
+        <para>Since MathML is not supported as of S1000D Issue 4.2, this would normally fail to validate. However, the -X option allows specified XML namespaces to be ignored when validating.</para>
+        <para>To ignore MathML, for example:</para>
+        <para>
+          <verbatimText>$ s1kd-validate -X http://www.w3.org/1998/Math/MathML &lt;data modules&gt;</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
