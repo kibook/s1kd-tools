@@ -1038,7 +1038,7 @@ int main(int argc, char **argv)
 		exit(EXIT_DM_EXISTS);
 	}
 
-	xmlSaveFormatFile(out, dm, 1);
+	xmlSaveFile(out, dm);
 
 	if (verbose)
 		puts(out);
