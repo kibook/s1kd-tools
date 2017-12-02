@@ -90,6 +90,8 @@ char issue_date[16] = "";
 
 xmlChar *remarks = NULL;
 
+bool no_issue = false;
+
 enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
@@ -261,6 +263,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(sns_fname, val);
 	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(val);
+	else if (strcmp(key, "omitIssueInfo") == 0)
+		no_issue = strcasecmp(val, "true") == 0;
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -729,7 +733,6 @@ int main(int argc, char **argv)
 	bool showprompts = false;
 	char dmcode[256] = "";
 	bool skipdmc = false;
-	bool no_issue = false;
 	bool verbose = false;
 	bool overwrite = false;
 
