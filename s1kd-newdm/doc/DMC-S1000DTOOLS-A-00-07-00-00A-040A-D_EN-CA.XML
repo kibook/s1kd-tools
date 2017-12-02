@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="00"/>
+        <issueInfo issueNumber="017" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="14"/>
+        <issueDate year="2017" month="12" day="01"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -40,9 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -@ option.</simplePara>
-      </reasonForUpdate>
+      <reasonForUpdateRef id="rfu-0001">
+        <simplePara>Add -m option.</simplePara>
+      </reasonForUpdateRef>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -272,10 +272,16 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set remarks for the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

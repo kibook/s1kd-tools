@@ -88,6 +88,8 @@ char brex_dmcode[256] = "";
 char sns_fname[PATH_MAX] = "";
 char issue_date[16] = "";
 
+xmlChar *remarks = NULL;
+
 enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
@@ -198,6 +200,7 @@ void show_help(void)
 	puts("  -b      BREX data module code");
 	puts("  -s      Schema");
 	puts("  -I      Issue date");
+	puts("  -m      Remarks");
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -675,6 +678,22 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml)
 	}
 }
 
+void set_remarks(xmlDocPtr doc, xmlChar *text)
+{
+	xmlNodePtr remarks;
+	
+	remarks = firstXPathNode(doc, "//remarks");
+
+	if (text) {
+		xmlNodePtr simplePara;
+		simplePara = xmlNewChild(remarks, NULL, BAD_CAST "simplePara", NULL);
+		xmlNodeSetContent(simplePara, text);
+	} else {
+		xmlUnlinkNode(remarks);
+		xmlFreeNode(remarks);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	char dmc[MAX_DATAMODULE_CODE];
@@ -718,7 +737,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -745,6 +764,7 @@ int main(int argc, char **argv)
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
+			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -951,6 +971,8 @@ int main(int argc, char **argv)
 		xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST originator_enterpriseName);
 	}
 
+	set_remarks(dm, remarks);
+
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(dm, brex_dmcode);
 
@@ -1017,6 +1039,8 @@ int main(int argc, char **argv)
 		puts(out);
 
 	free(out);
+
+	xmlFree(remarks);
 
 	xmlFreeDoc(dm);
 
