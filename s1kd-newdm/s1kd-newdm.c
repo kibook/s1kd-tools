@@ -265,6 +265,8 @@ void copy_default_value(const char *key, const char *val)
 		issue = get_issue(val);
 	else if (strcmp(key, "omitIssueInfo") == 0)
 		no_issue = strcasecmp(val, "true") == 0;
+	else if (strcmp(key, "remarks") == 0 && !remarks)
+		remarks = xmlStrdup(BAD_CAST val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
