@@ -895,6 +895,35 @@ int main(int argc, char **argv)
 		prompt("Schema", schema, 1024);
 	}
 
+	if (strcmp(modelIdentCode, "") == 0 ||
+	    strcmp(systemDiffCode, "") == 0 ||
+	    strcmp(systemCode, "") == 0 ||
+	    strcmp(subSystemCode, "") == 0 ||
+	    strcmp(subSubSystemCode, "") == 0 ||
+	    strcmp(assyCode, "") == 0 ||
+	    strcmp(disassyCode, "") == 0 ||
+	    strcmp(disassyCodeVariant, "") == 0 ||
+	    strcmp(infoCode, "") == 0 ||
+	    strcmp(infoCodeVariant, "") == 0 ||
+	    strcmp(itemLocationCode, "") == 0) {
+
+	    fprintf(stderr, ERR_PREFIX "Missing required DMC components: ");
+	    fprintf(stderr, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s\n",
+		strcmp(modelIdentCode, "") == 0     ? "???" : modelIdentCode,
+		strcmp(systemDiffCode, "") == 0     ? "???" : systemDiffCode,
+		strcmp(systemCode, "") == 0         ? "???" : systemCode,
+		strcmp(subSystemCode, "") == 0      ? "???" : subSystemCode,
+		strcmp(subSubSystemCode, "") == 0   ? "???" : subSubSystemCode,
+		strcmp(assyCode, "") == 0           ? "???" : assyCode,
+		strcmp(disassyCode, "") == 0        ? "???" : disassyCode,
+		strcmp(disassyCodeVariant, "") == 0 ? "???" : disassyCodeVariant,
+		strcmp(infoCode, "") == 0           ? "???" : infoCode,
+		strcmp(infoCodeVariant, "") == 0    ? "???" : infoCodeVariant,
+		strcmp(itemLocationCode, "") == 0   ? "???" : itemLocationCode);
+
+		exit(EXIT_BAD_DMC);
+	}
+
 	if (strcmp(sns_fname, "") != 0 && strcmp(techName_content, "") == 0)
 		set_tech_from_sns(sns_fname);
 
