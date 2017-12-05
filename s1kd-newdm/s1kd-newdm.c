@@ -184,6 +184,7 @@ void show_help(void)
 	puts("  -f      Overwrite existing file.");
 	puts("  -$      Specify which S1000D issue to use.");
 	puts("  -@      Output to specified file.");
+	puts("  -,      Dump default dmtypes XML.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#      Data module code");
@@ -700,6 +701,11 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+void print_dmtypes(void)
+{
+	printf("%.*s", dmtypes_xml_len, dmtypes_xml);
+}
+
 int main(int argc, char **argv)
 {
 	char dmc[MAX_DATAMODULE_CODE];
@@ -742,7 +748,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -770,6 +776,7 @@ int main(int argc, char **argv)
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
+			case ',': print_dmtypes(); exit(0);
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
