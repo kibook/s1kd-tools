@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="00"/>
+        <issueInfo issueNumber="018" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="12" day="01"/>
+        <issueDate year="2017" month="12" day="05"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -m option.</simplePara>
+        <simplePara>Add -, option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -282,6 +282,12 @@
               <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set remarks for the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-,</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

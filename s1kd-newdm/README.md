@@ -132,6 +132,9 @@ Save the new data module as &lt;filename&gt; instead of an automatically named f
 -m &lt;remarks&gt;  
 Set remarks for the new data module.
 
+-,  
+Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.
+
 Prompt (-p) option
 ------------------
 
