@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="9" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="24"/>
+        <issueDate year="2017" month="12" day="05"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | General Commands Manual</techName>
         </dmTitle>
@@ -40,6 +40,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Document -t option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002">
+        <simplePara>Remove list of available names.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -56,7 +62,7 @@
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-metadata</emphasis> tool provides a simple way to fetch and change metadata on S1000D data modules.</para>
       </levelledPara>
-      <levelledPara>
+      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0002">
         <title>OPTIONS</title>
         <para>
           <definitionList>
@@ -64,6 +70,12 @@
               <listItemTerm>-c &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Do not format columns in output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -80,64 +92,6 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara>
-          <title>Available metadata names</title>
-          <para>
-            <randomList>
-              <listItem>
-                <para>act</para>
-              </listItem>
-              <listItem>
-                <para>applic</para>
-              </listItem>
-              <listItem>
-                <para>authorization</para>
-              </listItem>
-              <listItem>
-                <para>brex</para>
-              </listItem>
-              <listItem>
-                <para>language</para>
-              </listItem>
-              <listItem>
-                <para>infoName</para>
-              </listItem>
-              <listItem>
-                <para>issueDate</para>
-              </listItem>
-              <listItem>
-                <para>issueInfo</para>
-              </listItem>
-              <listItem>
-                <para>issueType</para>
-              </listItem>
-              <listItem>
-                <para>originator</para>
-              </listItem>
-              <listItem>
-                <para>originatorCode</para>
-              </listItem>
-              <listItem>
-                <para>responsiblePartnerCompany</para>
-              </listItem>
-              <listItem>
-                <para>responsiblePartnerCompanyCode</para>
-              </listItem>
-              <listItem>
-                <para>schema</para>
-              </listItem>
-              <listItem>
-                <para>securityClassification</para>
-              </listItem>
-              <listItem>
-                <para>techName</para>
-              </listItem>
-              <listItem>
-                <para>type</para>
-              </listItem>
-            </randomList>
-          </para>
-        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLE</title>
