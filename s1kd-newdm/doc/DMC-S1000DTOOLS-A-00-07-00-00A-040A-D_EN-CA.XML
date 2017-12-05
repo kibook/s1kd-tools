@@ -40,9 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdateRef id="rfu-0001">
+      <reasonForUpdate id="rfu-0001">
         <simplePara>Add -m option.</simplePara>
-      </reasonForUpdateRef>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
