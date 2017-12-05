@@ -19,6 +19,8 @@ OPTIONS
 -d &lt;dir&gt;  
 Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.
 
+This can also be accomplished through the use of XML catalogs.
+
 -X &lt;URI&gt;  
 Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.
 
@@ -40,3 +42,17 @@ The -d option can point either to a directory containing the XSD schema files fo
         S1000D_4-2/
             xml_schema_flat/
                 [4.2 XSD files...]
+
+XML catalogs vs. -d option
+--------------------------
+
+XML catalogs provide a more standard method of redirecting public, network-based resources to local copies. As part of using libxml2, there are several locations and environment variables from which this tool will load catalogs.
+
+Below is an example of a catalog file which maps the S1000D schemas to a local directory:
+
+    <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+      <rewriteURI uriStartString="http://www.s1000d.org/"
+                  rewritePrefix="/usr/share/s1kd/schemas/"/>
+    </catalog>
+
+This can be placed in a catalog file automatically loaded by libxml2 (e.g., `/etc/xml/catalog`) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., `XML_CATALOG_FILES`) to remove the need to use the -d option.

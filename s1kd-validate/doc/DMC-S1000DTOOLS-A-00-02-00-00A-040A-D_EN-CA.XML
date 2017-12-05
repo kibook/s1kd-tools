@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="2" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="17"/>
+        <issueDate year="2017" month="12" day="05"/>
         <dmTitle>
           <techName>s1kd-validate(1) | General Commands Manual</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Document usage of XML catalogs as alternative to -d option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -64,6 +67,7 @@
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0001">This can also be accomplished through the use of XML catalogs.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -98,6 +102,18 @@
         xml_schema_flat/
             [4.2 XSD files...]]]></verbatimText>
           </para>
+        </levelledPara>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>XML catalogs vs. -d option</title>
+          <para>XML catalogs provide a more standard method of redirecting public, network-based resources to local copies. As part of using libxml2, there are several locations and environment variables from which this tool will load catalogs.</para>
+          <para>Below is an example of a catalog file which maps the S1000D schemas to a local directory:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <rewriteURI uriStartString="http://www.s1000d.org/"
+              rewritePrefix="/usr/share/s1kd/schemas/"/>
+</catalog>]]></verbatimText>
+          </para>
+          <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>) to remove the need to use the -d option.</para>
         </levelledPara>
       </levelledPara>
     </description>
