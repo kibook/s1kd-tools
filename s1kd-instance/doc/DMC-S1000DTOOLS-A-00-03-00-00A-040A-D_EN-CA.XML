@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="22"/>
+        <issueDate year="2017" month="12" day="09"/>
         <dmTitle>
           <techName>s1kd-instance(1) | General Commands Manual</techName>
         </dmTitle>
@@ -42,13 +42,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -E option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002">
-        <simplePara>Add -v option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003">
-        <simplePara>Add support for filtering on multiple values of a single property.</simplePara>
+        <simplePara>Add support for controls and indicators CIR.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -82,7 +76,7 @@
                 <para>Specify an extension on the data module code (DME) or publication module code (PME) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-E</listItemTerm>
               <listItemDefinition>
                 <para>Remove the extension from an instance produced from an already extended data module or publication module.</para>
@@ -189,7 +183,24 @@
             <definitionListItem>
               <listItemTerm>-R &lt;CIR&gt; ...</listItemTerm>
               <listItemDefinition>
-                <para>Use a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition>Common Information Repository</acronymDefinition></acronym> to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times. Currently the functional item, warnings/cautions and applicability CIRs are supported.</para>
+                <para>Use a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition>Common Information Repository</acronymDefinition></acronym> to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times.</para>
+                <para>Currently supported CIRs:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>Functional items</para>
+                    </listItem>
+                    <listItem>
+                      <para>Controls and indicators</para>
+                    </listItem>
+                    <listItem>
+                      <para>Warnings and cautions</para>
+                    </listItem>
+                    <listItem>
+                      <para>Applicability</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -228,7 +239,7 @@
                 <para>Source (-s or stdin) is a list of data module/publication module filenames to create instances of, rather than a single data module/publication module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
@@ -260,7 +271,7 @@
           <title>Instance data module code (-c) vs extension (-e)</title>
           <para>When creating a data module instance, the instance should have the same data module code as the master data module, with an added extension code, the DME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules, it may be desirable or necessary to change the data module code instead. These two options can be used together as well to give an instance a new DMC as well an extension.</para>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0003">
+        <levelledPara>
           <title>Filtering for multiple values of a single property</title>
           <para>Though not usually the case, it is possible to create an instance which is filtered on multiple values of the same applicabilty property. Given the following:</para>
           <para>

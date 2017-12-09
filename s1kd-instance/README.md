@@ -76,7 +76,17 @@ Set the applicability for the whole data module/publication module using the use
 Add an XML comment to the top of the instance. Useful as another way of identifying a data module/publication module as an instance aside from the source address or extended code, or giving additional information about a particular instance.
 
 -R &lt;CIR&gt; ...  
-Use a CIR (Common Information Repository) to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times. Currently the functional item, warnings/cautions and applicability CIRs are supported.
+Use a CIR (Common Information Repository) to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times.
+
+Currently supported CIRs:
+
+-   Functional items
+
+-   Controls and indicators
+
+-   Warnings and cautions
+
+-   Applicability
 
 -S  
 Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.
