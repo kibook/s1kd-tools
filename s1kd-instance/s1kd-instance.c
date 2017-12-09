@@ -979,7 +979,7 @@ void replace_funcitem_ref(xmlNodePtr ref, xmlNodePtr spec)
 	ctxt = xmlXPathNewContext(spec->doc);
 	ctxt->node = spec;
 
-	results = xmlXPathEvalExpression(BAD_CAST "functionalItemAlts/functionalItem", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST "functionalItemAlts/functionalItem[*]", ctxt);
 
 	if (!xmlXPathNodeSetIsEmpty(results->nodesetval) && results->nodesetval->nodeNr == 1) {
 		spec = results->nodesetval->nodeTab[0];
