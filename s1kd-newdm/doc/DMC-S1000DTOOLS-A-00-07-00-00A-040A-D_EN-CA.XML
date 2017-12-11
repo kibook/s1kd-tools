@@ -43,6 +43,9 @@
       <reasonForUpdate id="rfu-0001">
         <simplePara>Add support for setting default info code variants in the 'dmtypes' file.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002">
+        <simplePara>Add -. option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -288,6 +291,12 @@
               <listItemTerm>-,</listItemTerm>
               <listItemDefinition>
                 <para>Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-.</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the simple text form of the built-in default 'dmtypes'.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

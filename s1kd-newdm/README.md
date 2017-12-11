@@ -135,6 +135,9 @@ Set remarks for the new data module.
 -,  
 Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.
 
+-.  
+Dumps the simple text form of the built-in default 'dmtypes'.
+
 Prompt (-p) option
 ------------------
 

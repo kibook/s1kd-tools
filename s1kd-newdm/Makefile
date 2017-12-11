@@ -14,14 +14,15 @@ templates.h: templates/42/*.xml ../common/42to*.xsl
 	xxd -i ../common/42to40.xsl >> templates.h
 	xxd -i ../common/42to41.xsl >> templates.h
 
-dmtypes.h: dmtypes.xml
+dmtypes.h: dmtypes.xml dmtypes.txt
 	xxd -i dmtypes.xml > dmtypes.h
+	xxd -i dmtypes.txt >> dmtypes.h
 
 $(OUTPUT): $(SOURCE) templates.h dmtypes.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT) templates.h
+	rm -f $(OUTPUT) templates.h dmtypes.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

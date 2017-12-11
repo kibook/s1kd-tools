@@ -715,6 +715,11 @@ void print_dmtypes(void)
 	printf("%.*s", dmtypes_xml_len, dmtypes_xml);
 }
 
+void print_dmtypes_txt(void)
+{
+	printf("%.*s", dmtypes_txt_len, dmtypes_txt);
+}
+
 int main(int argc, char **argv)
 {
 	char dmc[MAX_DATAMODULE_CODE];
@@ -757,7 +762,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -786,6 +791,7 @@ int main(int argc, char **argv)
 			case '@': out = strdup(optarg); break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case ',': print_dmtypes(); exit(0);
+			case '.': print_dmtypes_txt(); exit(0);
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
