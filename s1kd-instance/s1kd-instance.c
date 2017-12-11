@@ -1121,6 +1121,103 @@ void undepend_funcitem_cir(xmlDocPtr dm, xmlDocPtr cir)
 	xmlXPathFreeContext(ctxt2);
 }
 
+/* Zone repository (00H) */
+bool is_zoneref_child(char *name)
+{
+	return strcmp(name, "shortName") == 0 || strcmp(name, "refs") == 0;
+}
+
+void replace_zone_ref(xmlNodePtr ref, xmlNodePtr spec)
+{
+	xmlXPathContextPtr ctxt;
+	xmlXPathObjectPtr results;
+	xmlNodePtr cur;
+
+	ctxt = xmlXPathNewContext(spec->doc);
+	ctxt->node = spec;
+
+	results = xmlXPathEvalExpression(BAD_CAST "zoneAlts/zone[*]", ctxt);
+
+	if (!xmlXPathNodeSetIsEmpty(results->nodesetval) && results->nodesetval->nodeNr == 1) {
+		spec = results->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(results);
+	xmlXPathFreeContext(ctxt);
+
+	while ((cur = ref->children)) {
+		xmlUnlinkNode(cur);
+		xmlFreeNode(cur);
+	}
+
+	for (cur = spec->children; cur; cur = cur->next) {
+		if (is_zoneref_child((char *) cur->name)) {
+			xmlAddChild(ref, xmlCopyNode(cur, 1));
+		}
+	}
+}
+
+bool zone_match(xmlNodePtr ref, xmlNodePtr spc)
+{
+	xmlChar *refnum, *spcnum;
+
+	bool match;
+
+	refnum = xmlGetProp(ref, BAD_CAST "zoneNumber");
+	spcnum = xmlGetProp(spc, BAD_CAST "zoneNumber");
+
+	if (refnum && spcnum)
+		match = xmlStrcmp(refnum, spcnum) == 0;
+	else
+		match = false;
+
+	xmlFree(refnum);
+	xmlFree(spcnum);
+
+	return match;
+}
+
+void undepend_zone_cir(xmlDocPtr dm, xmlDocPtr cir)
+{
+	xmlXPathContextPtr ctxt1;
+	xmlXPathContextPtr ctxt2;
+	xmlXPathObjectPtr results1;
+	xmlXPathObjectPtr results2;
+
+	xmlNodePtr zoneRef;
+	xmlNodePtr zoneSpec;
+	xmlNodePtr zoneIdent;
+
+	int i, j;
+
+	ctxt1 = xmlXPathNewContext(cir);
+	ctxt2 = xmlXPathNewContext(dm);
+
+	results1 = xmlXPathEvalExpression(BAD_CAST "//zoneSpec", ctxt1);
+	results2 = xmlXPathEvalExpression(BAD_CAST "//zoneRef", ctxt2);
+
+	for (i = 0; i < results2->nodesetval->nodeNr; ++i) {
+		zoneRef = results2->nodesetval->nodeTab[i];
+
+		for (j = 0; j < results1->nodesetval->nodeNr; ++j) {
+			zoneSpec = results1->nodesetval->nodeTab[j];
+
+			zoneIdent = find_req_child(zoneSpec, "zoneIdent");
+
+			if (zone_match(zoneRef, zoneIdent)) {
+				replace_zone_ref(zoneRef, zoneSpec);
+				break;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(results1);
+	xmlXPathFreeObject(results2);
+
+	xmlXPathFreeContext(ctxt1);
+	xmlXPathFreeContext(ctxt2);
+}
+
 /* Controls and indicators repository (00X) */
 void replace_cntrlind_ref(xmlNodePtr ref, xmlNodePtr spec)
 {
@@ -1466,6 +1563,8 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 		undepend_applic_cir(dm, cir);
 	} else if (strcmp(cirtype, "controlIndicatorRepository") == 0) {
 		undepend_cntrlind_cir(dm, cir);
+	} else if (strcmp(cirtype, "zoneRepository") == 0) {
+		undepend_zone_cir(dm, cir);
 	} else {
 		fprintf(stderr, ERR_PREFIX "Unsupported CIR type: %s\n", cirtype);
 		add_src = false;

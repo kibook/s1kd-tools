@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="12" day="09"/>
+        <issueDate year="2017" month="12" day="11"/>
         <dmTitle>
           <techName>s1kd-instance(1) | General Commands Manual</techName>
         </dmTitle>
@@ -42,7 +42,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add support for controls and indicators CIR.</simplePara>
+        <simplePara>Add support for zone CIR.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -192,6 +192,9 @@
                     </listItem>
                     <listItem>
                       <para>Controls and indicators</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>Zones</para>
                     </listItem>
                     <listItem>
                       <para>Warnings and cautions</para>

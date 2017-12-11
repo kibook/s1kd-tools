@@ -84,6 +84,8 @@ Currently supported CIRs:
 
 -   Controls and indicators
 
+-   Zones
+
 -   Warnings and cautions
 
 -   Applicability
