@@ -665,6 +665,8 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml)
 
 	for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
 		char *def_key, *def_val, *infname;
+		char code[4], variant[2];
+		int p;
 
 		if (cur->type != XML_ELEMENT_NODE) continue;
 		if (!xmlHasProp(cur, BAD_CAST "infoCode")) continue;
@@ -674,14 +676,21 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml)
 		def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
 		infname = (char *) xmlGetProp(cur, BAD_CAST "infoName");
 
-		if (strcmp(def_key, infoCode) == 0 && strcmp(dmtype, "") == 0)
+		p = sscanf(def_key, "%3s%1s", code, variant);
+
+		if (strcmp(code, infoCode) == 0 &&
+		    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
+		    strcmp(dmtype, "") == 0)
 			strcpy(dmtype, def_val);
 
-		if (infname && strcmp(def_key, infoCode) == 0 && strcmp(infoName_content, "") == 0)
+		if (infname && strcmp(code, infoCode) == 0 &&
+		    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
+		    strcmp(infoName_content, "") == 0)
 			strcpy(infoName_content, infname);
 
 		xmlFree(def_key);
 		xmlFree(def_val);
+		xmlFree(infname);
 	}
 }
 
