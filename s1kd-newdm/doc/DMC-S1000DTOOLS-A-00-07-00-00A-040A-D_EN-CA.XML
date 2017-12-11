@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="12" day="05"/>
+        <issueDate year="2017" month="12" day="11"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -, option.</simplePara>
+        <simplePara>Add support for setting default info code variants in the 'dmtypes' file.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -284,7 +284,7 @@
                 <para>Set remarks for the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-,</listItemTerm>
               <listItemDefinition>
                 <para>Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
@@ -376,6 +376,13 @@ pmVolume                  00]]></verbatimText>
   <type infoCode="520" schema="proced" infoName="Remove procedure"/>
 </dmtypes>]]></verbatimText>
           </para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">Info code variants can also be given specific default schema and info names. To do this, include the variant with the info code:</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs23">258A  proced  Other procedure to clean
+258B  proced  Other procedure to clean, Clean with air
+258C  proced  Other procedure to clean, Clean with water</verbatimText>
+          </para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the 'dmtypes' file. An info code with no variant matches all possible variants.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

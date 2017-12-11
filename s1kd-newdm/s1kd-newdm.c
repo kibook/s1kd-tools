@@ -852,16 +852,24 @@ int main(int argc, char **argv)
 			while (fgets(default_line, 1024, defaults)) {
 				char def_key[32], def_val[256], infname[256];
 				int n;
+				char code[4], variant[2];
+				int p;
 
 				n = sscanf(default_line, "%s %s %[^\n]", def_key, def_val, infname);
 
 				if (n < 2)
 					continue;
 
-				if (strcmp(def_key, infoCode) == 0 && strcmp(dmtype, "") == 0)
+				p = sscanf(def_key, "%3s%1s", code, variant);
+
+				if (strcmp(code, infoCode) == 0 &&
+				    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
+				    strcmp(dmtype, "") == 0)
 					strcpy(dmtype, def_val);
 
-				if (n == 3 && strcmp(def_key, infoCode) == 0 && strcmp(infoName_content, "") == 0)
+				if (n == 3 && strcmp(code, infoCode) == 0 &&
+				    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
+				    strcmp(infoName_content, "") == 0)
 					strcpy(infoName_content, infname);
 			}
 

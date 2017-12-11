@@ -224,6 +224,14 @@ Like the 'defaults' file, the 'dmtypes' file may also be written in an XML forma
       <type infoCode="520" schema="proced" infoName="Remove procedure"/>
     </dmtypes>
 
+Info code variants can also be given specific default schema and info names. To do this, include the variant with the info code:
+
+    258A  proced  Other procedure to clean
+    258B  proced  Other procedure to clean, Clean with air
+    258C  proced  Other procedure to clean, Clean with water
+
+The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the 'dmtypes' file. An info code with no variant matches all possible variants.
+
 EXAMPLE
 =======
 
