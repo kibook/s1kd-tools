@@ -22,7 +22,7 @@
   <type infoCode="019" schema="descript" infoName="Supplier list"/>
   <type infoCode="020" schema="descript" infoName="Configuration"/>
   <type infoCode="021" schema="descript" infoName="Copyright"/>
-  <type infoCode="022" schema="descript" infoName="Business rules"/>
+  <type infoCode="022" schema="brex" infoName="Business rules"/>
   <type infoCode="023" schema="descript" infoName="Administrative forms and data"/>
   <type infoCode="024" schema="descript" infoName="Business rules document"/>
   <!-- 025 thru 027 not available for projects  -->

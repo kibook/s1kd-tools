@@ -20,7 +20,7 @@
 019  descript             Supplier list
 020  descript             Configuration
 021  descript             Copyright
-022  descript             Business rules
+022  brex                 Business rules
 023  descript             Administrative forms and data
 024  descript             Business rules document
 028  descript             General
