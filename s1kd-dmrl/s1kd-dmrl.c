@@ -15,6 +15,8 @@ void showHelp(void)
 	puts("Options:");
 	puts("  -s       Output s1kd-new* commands only.");
 	puts("  -N       Omit issue/inwork numbers.");
+	puts("  -f       Overwrite existing CSDB objects.");
+	puts("  -F       Fail on first error from s1kd-new* commands.");
 	puts("  -h -?    Show usage message.");
 }
 
@@ -26,17 +28,25 @@ int main(int argc, char **argv)
 	int err = 0;
 	bool execute = true;
 	bool noIssue = false;
+	bool failOnFirstErr = false;
+	bool overwrite = false;
 
 	dmrl = xmlReadMemory((const char *) dmrl_xsl, dmrl_xsl_len, NULL, NULL, 0);
 	dmrlStylesheet = xsltParseStylesheetDoc(dmrl);
 
-	while ((i = getopt(argc, argv, "sNh?")) != -1) {
+	while ((i = getopt(argc, argv, "sNfFh?")) != -1) {
 		switch (i) {
 			case 's':
 				execute = false;
 				break;
 			case 'N':
 				noIssue = true;
+				break;
+			case 'f':
+				overwrite = true;
+				break;
+			case 'F':
+				failOnFirstErr = true;
 				break;
 			case 'h':
 			case '?':
@@ -48,17 +58,15 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		xmlDocPtr in, out;
 		xmlChar *content;
-		const char *params[3];
+		const char *params[5];
 
 		in = xmlReadFile(argv[i], NULL, 0);
 
-		if (noIssue) {
-			params[0] = "no-issue";
-			params[1] = "true()";
-			params[2] = NULL;
-		} else {
-			params[0] = NULL;
-		}
+		params[0] = "no-issue";
+		params[1] = noIssue ? "true()" : "false()";
+		params[2] = "overwrite";
+		params[3] = overwrite ? "true()" : "false()";
+		params[4] = NULL;
 
 		out = xsltApplyStylesheet(dmrlStylesheet, in, params);
 
@@ -73,7 +81,7 @@ int main(int argc, char **argv)
 			lines = fmemopen(content, xmlStrlen(content), "r");
 
 			while (fgets(line, LINE_MAX, lines))
-				if ((err = WEXITSTATUS(system(line))) != 0) break;
+				if ((err += WEXITSTATUS(system(line))) != 0 && failOnFirstErr) break;
 
 			fclose(lines);
 		} else {

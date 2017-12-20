@@ -4,6 +4,7 @@
   <!-- Convert a DML to a series of s1kd-new* calls -->
   
   <xsl:param name="no-issue" select="false()"/>
+  <xsl:param name="overwrite" select="false()"/>
 
   <xsl:output method="text"/>
 
@@ -22,18 +23,33 @@
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
         </xsl:if>
+        <xsl:if test="$overwrite">
+          <xsl:text> -f</xsl:text>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="pmRef">
         <xsl:text>s1kd-newpm</xsl:text>
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
         </xsl:if>
+        <xsl:if test="$overwrite">
+          <xsl:text> -f</xsl:text>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="commentRef">
         <xsl:text>s1kd-newcom</xsl:text>
+        <xsl:if test="$overwrite">
+          <xsl:text> -f</xsl:text>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="dmlRef">
         <xsl:text>s1kd-newdml</xsl:text>
+        <xsl:if test="$no-issue">
+          <xsl:text> -N</xsl:text>
+        </xsl:if>
+        <xsl:if test="$overwrite">
+          <xsl:text> -f</xsl:text>
+        </xsl:if>
       </xsl:when>
     </xsl:choose>
     <xsl:apply-templates select="*"/>
