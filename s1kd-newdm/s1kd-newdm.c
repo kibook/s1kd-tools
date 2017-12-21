@@ -21,7 +21,7 @@
 #define MAX_SUB_SUB_SYSTEM_CODE		 1	+ 2
 #define MAX_ASSY_CODE			 4	+ 2
 #define MAX_DISASSY_CODE		 2	+ 2
-#define MAX_DISASSY_CODE_VARIANT	 1	+ 2
+#define MAX_DISASSY_CODE_VARIANT	 3	+ 2
 #define MAX_INFO_CODE			 3	+ 2
 #define MAX_INFO_CODE_VARIANT		 1	+ 2
 #define MAX_ITEM_LOCATION_CODE		 1	+ 2
@@ -209,59 +209,59 @@ void show_help(void)
 void copy_default_value(const char *key, const char *val)
 {
 	if (strcmp(key, "modelIdentCode") == 0 && strcmp(modelIdentCode, "") == 0)
-		strcpy(modelIdentCode, val);
+		strncpy(modelIdentCode, val, MAX_MODEL_IDENT_CODE - 2);
 	else if (strcmp(key, "systemDiffCode") == 0 && strcmp(systemDiffCode, "") == 0)
-		strcpy(systemDiffCode, val);
+		strncpy(systemDiffCode, val, MAX_SYSTEM_DIFF_CODE - 2);
 	else if (strcmp(key, "systemCode") == 0 && strcmp(systemCode, "") == 0)
-		strcpy(systemCode, val);
+		strncpy(systemCode, val, MAX_SYSTEM_CODE - 2);
 	else if (strcmp(key, "subSystemCode") == 0 && strcmp(subSystemCode, "") == 0)
-		strcpy(subSystemCode, val);
+		strncpy(subSystemCode, val, MAX_SUB_SYSTEM_CODE - 2);
 	else if (strcmp(key, "subSubSystemCode") == 0 && strcmp(subSubSystemCode, "") == 0)
-		strcpy(subSubSystemCode, val);
+		strncpy(subSubSystemCode, val, MAX_SUB_SUB_SYSTEM_CODE - 2);
 	else if (strcmp(key, "assyCode") == 0 && strcmp(assyCode, "") == 0)
-		strcpy(assyCode, val);
+		strncpy(assyCode, val, MAX_ASSY_CODE - 2);
 	else if (strcmp(key, "disassyCode") == 0 && strcmp(disassyCode, "") == 0)
-		strcpy(disassyCode, val);
+		strncpy(disassyCode, val, MAX_DISASSY_CODE - 2);
 	else if (strcmp(key, "disassyCodeVariant") == 0 && strcmp(disassyCodeVariant, "") == 0)
-		strcpy(disassyCodeVariant, val);
+		strncpy(disassyCodeVariant, val, MAX_DISASSY_CODE_VARIANT - 2);
 	else if (strcmp(key, "infoCode") == 0 && strcmp(infoCode, "") == 0)
-		strcpy(infoCode, val);
+		strncpy(infoCode, val, MAX_INFO_CODE - 2);
 	else if (strcmp(key, "infoCodeVariant") == 0 && strcmp(infoCodeVariant, "") == 0)
-		strcpy(infoCodeVariant, val);
+		strncpy(infoCodeVariant, val, MAX_INFO_CODE_VARIANT - 2);
 	else if (strcmp(key, "itemLocationCode") == 0 && strcmp(itemLocationCode, "") == 0)
-		strcpy(itemLocationCode, val);
+		strncpy(itemLocationCode, val, MAX_ITEM_LOCATION_CODE - 2);
 	else if (strcmp(key, "learnCode") == 0 && strcmp(learnCode, "") == 0)
-		strcpy(learnCode, val);
+		strncpy(learnCode, val, MAX_LEARN_CODE - 2);
 	else if (strcmp(key, "learnEventCode") == 0 && strcmp(learnEventCode, "") == 0)
-		strcpy(learnEventCode, val);
+		strncpy(learnEventCode, val, MAX_LEARN_EVENT_CODE - 2);
 	else if (strcmp(key, "languageIsoCode") == 0 && strcmp(languageIsoCode, "") == 0)
-		strcpy(languageIsoCode, val);
+		strncpy(languageIsoCode, val, MAX_LANGUAGE_ISO_CODE - 2);
 	else if (strcmp(key, "countryIsoCode") == 0 && strcmp(countryIsoCode, "") == 0)
-		strcpy(countryIsoCode, val);
+		strncpy(countryIsoCode, val, MAX_COUNTRY_ISO_CODE - 2);
 	else if (strcmp(key, "issueNumber") == 0 && strcmp(issueNumber, "") == 0)
-		strcpy(issueNumber, val);
+		strncpy(issueNumber, val, MAX_ISSUE_NUMBER - 2);
 	else if (strcmp(key, "inWork") == 0 && strcmp(inWork, "") == 0)
-		strcpy(inWork, val);
+		strncpy(inWork, val, MAX_IN_WORK - 2);
 	else if (strcmp(key, "securityClassification") == 0 && strcmp(securityClassification, "") == 0)
-		strcpy(securityClassification, val);
+		strncpy(securityClassification, val, MAX_SECURITY_CLASSIFICATION - 2);
 	else if (strcmp(key, "responsiblePartnerCompany") == 0 && strcmp(responsiblePartnerCompany_enterpriseName, "") == 0)
-		strcpy(responsiblePartnerCompany_enterpriseName, val);
+		strncpy(responsiblePartnerCompany_enterpriseName, val, MAX_ENTERPRISE_NAME - 2);
 	else if (strcmp(key, "responsiblePartnerCompanyCode") == 0 && strcmp(responsiblePartnerCompany_enterpriseCode, "") == 0)
-		strcpy(responsiblePartnerCompany_enterpriseCode, val);
+		strncpy(responsiblePartnerCompany_enterpriseCode, val, MAX_ENTERPRISE_CODE - 2);
 	else if (strcmp(key, "originator") == 0 && strcmp(originator_enterpriseName, "") == 0)
-		strcpy(originator_enterpriseName, val);
+		strncpy(originator_enterpriseName, val, MAX_ENTERPRISE_NAME - 2);
 	else if (strcmp(key, "originatorCode") == 0 && strcmp(originator_enterpriseCode, "") == 0)
-		strcpy(originator_enterpriseCode, val);
+		strncpy(originator_enterpriseCode, val, MAX_ENTERPRISE_CODE - 2);
 	else if (strcmp(key, "techName") == 0 && strcmp(techName_content, "") == 0)
-		strcpy(techName_content, val);
+		strncpy(techName_content, val, MAX_TECH_NAME - 2);
 	else if (strcmp(key, "infoName") == 0 && strcmp(infoName_content, "") == 0)
-		strcpy(infoName_content, val);
+		strncpy(infoName_content, val, MAX_INFO_CODE - 2);
 	else if (strcmp(key, "schema") == 0 && strcmp(schema, "") == 0)
-		strcpy(schema, val);
+		strncpy(schema, val, 1023);
 	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
-		strcpy(brex_dmcode, val);
+		strncpy(brex_dmcode, val, 255);
 	else if (strcmp(key, "sns") == 0 && strcmp(sns_fname, "") == 0)
-		strcpy(sns_fname, val);
+		strncpy(sns_fname, val, PATH_MAX - 1);
 	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(val);
 	else if (strcmp(key, "omitIssueInfo") == 0)
