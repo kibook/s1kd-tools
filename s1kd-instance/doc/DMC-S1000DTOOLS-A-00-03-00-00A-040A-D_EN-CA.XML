@@ -306,8 +306,7 @@
           </para>
           <para>This would produce the following in the instance:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[
-<dmStatus>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
   <!-- ... -->
   <applic>
     <displayText>
