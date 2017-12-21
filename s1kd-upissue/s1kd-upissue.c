@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 	struct tm *local;
 	int year, month, day;
 	char year_s[5], month_s[3], day_s[3];
-	char status[32] = "changed";
+	char *status = NULL;
 	bool no_issue = false;
 	bool keep_rfus = false;
 	bool set_date = true;
@@ -280,7 +280,7 @@ int main(int argc, char **argv)
 				verbose = true;
 				break;
 			case 's':
-				strcpy(status, optarg);
+				status = strdup(optarg);
 				break;
 			case 'N':
 				no_issue = true;
@@ -412,16 +412,18 @@ int main(int argc, char **argv)
 
 			set_qa(dmdoc, firstver, secondver, iss30);
 
-			if (newissue) {
-				/* Do not change issueType when upissuing from 000 -> 001 */
-				if (issueNumber_int > 0) {
-					if (iss30) {
-						xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
-					} else {
-						if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
-							xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
-						}
-					}
+			/* Default status is "new" before issue 1, and "changed" after */
+			if (issueNumber_int < 1 && !status) {
+				status = "new";
+			} else if (!status) {
+				status = "changed";
+			}
+
+			if (iss30) {
+				xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
+			} else {
+				if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
+					xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
 				}
 			}
 		}
