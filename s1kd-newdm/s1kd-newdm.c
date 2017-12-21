@@ -1093,7 +1093,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!overwrite && access(out, F_OK) != -1) {
-		fprintf(stderr, ERR_PREFIX "Data module already exists.\n");
+		fprintf(stderr, ERR_PREFIX "Data module already exists: %s\n", out);
 		exit(EXIT_DM_EXISTS);
 	}
 
