@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2017" month="12" day="22"/>
+        <dmTitle>
+          <techName>s1kd-tools(1) | General Commands Manual</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany/>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-tools - Tools for S1000D data</para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <levelledPara>
+          <title>S1000D</title>
+          <para><emphasis>S1000D</emphasis> is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a Common Source Database (CSDB) and validated against a defined set of project "business rules".</para>
+        </levelledPara>
+        <levelledPara>
+          <title>s1kd-tools</title>
+          <para>The <emphasis>s1kd-tools</emphasis> are a set of small tools for creating and manipulating S1000D data. Together, they form a "suite" of tools for producing and maintaining S1000D publications within a CSDB. They may also be used individually, to support other S1000D "suites" (usually from an S1000D "vendor") already in use by a project.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Relationship to the S1000D process</title>
+          <para>The s1kd-tools can support multiple parts of the basic S1000D process:</para>
+          <para>
+            <sequentialList>
+              <listItem>
+                <para><emphasis>Generation:</emphasis> The generation of new CSDB objects is supported by the <emphasis>s1kd-dmrl</emphasis> tool and the <emphasis>s1kd-new*</emphasis> set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new* tools directly.</para>
+              </listItem>
+              <listItem>
+                <para><emphasis>Authoring:</emphasis> These tools support the authoring process.</para>
+                <para>The <emphasis>s1kd-upissue</emphasis> tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.</para>
+                <para>The <emphasis>s1kd-dmls</emphasis> tool lists data modules within a directory.</para>
+                <para>The <emphasis>s1kd-dmref</emphasis> tool can be used to quickly insert references to other data modules within a data module.</para>
+                <para>The <emphasis>s1kd-metadata</emphasis> tool lists and edits S1000D metadata on CSDB objects.</para>
+                <para>The <emphasis>s1kd-transform</emphasis> tool applies XSLT transformations to CSDB objects.</para>
+              </listItem>
+              <listItem>
+                <para><emphasis>Validation:</emphasis> These tools all validate different aspects of CSDB objects.</para>
+                <para>The <emphasis>s1kd-validate</emphasis> tool validates CSDB objects according to their S1000D schema and general correctness as XML documents.</para>
+                <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.</para>
+                <para>The <emphasis>s1kd-checkrefs</emphasis> tool validates references between CSDB objects.</para>
+              </listItem>
+              <listItem>
+                <para><emphasis>Publication:</emphasis> These tools support the production of publications from a CSDB.</para>
+                <para>The <emphasis>s1kd-acronyms</emphasis> tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.</para>
+                <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).</para>
+                <para>The <emphasis>s1kd-neutralize</emphasis> tool generates IETP neutral metadata for CSDB objects.</para>
+                <para>The <emphasis>s1kd-syncrefs</emphasis> tool generates the References table within data modules.</para>
+              </listItem>
+            </sequentialList>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>SEE ALSO</title>
+        <para>S1000D website: <externalPubRef>
+          <externalPubRefIdent>
+            <externalPubTitle>http://www.s1000d.org</externalPubTitle>
+          </externalPubRefIdent>
+        </externalPubRef></para>
+        <para>s1kd-acronyms(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-dmref(1), s1kd-dmrl(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)</para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
