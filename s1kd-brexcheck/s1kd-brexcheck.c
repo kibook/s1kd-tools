@@ -57,7 +57,6 @@
 #define PROGRESS_BAR_WIDTH 60
 
 enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
-enum object_value_form { SINGLE, RANGE, PATTERN };
 
 enum verbosity verbose = NORMAL;
 bool shortmsg = false;
