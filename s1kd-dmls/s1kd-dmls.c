@@ -829,6 +829,12 @@ int main(int argc, char **argv)
 					exit(EXIT_DM_MAX);
 				}
 				strcpy(pms[npms++], argv[i]);
+			} else if (iscom(base)) {
+				if (ncoms == DM_MAX) {
+					fprintf(stderr, ERR_PREFIX "Maximum comments reached (%d).\n", DM_MAX);
+					exit(EXIT_DM_MAX);
+				}
+				strcpy(coms[ncoms++], argv[i]);
 			} else if (is_directory(argv[i], 0)) {
 				list_dir(argv[i], dms, &ndms, pms, &npms, coms, &ncoms, only_writable, recursive);
 			}
