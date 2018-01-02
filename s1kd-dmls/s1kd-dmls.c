@@ -33,6 +33,7 @@
 
 #define SHOW_DM 0x1
 #define SHOW_PM 0x2
+#define SHOW_COM 0x4
 
 int clean_unprintable = 1;
 
@@ -327,7 +328,11 @@ void printdms(char dms[DM_MAX][PATH_MAX], int n, int columns)
 
 			name = (char *) xmlNodeGetContent(enterpriseName);
 
-			printf("%s	", name);
+			if (name) {
+				printf("%s	", name);
+			} else {
+				printf("	");
+			}
 
 			xmlFree(name);
 		}
@@ -338,7 +343,11 @@ void printdms(char dms[DM_MAX][PATH_MAX], int n, int columns)
 
 			name = (char *) xmlNodeGetContent(enterpriseName);
 
-			printf("%s	", name);
+			if (name) {
+				printf("%s	", name);
+			} else {
+				printf("	");
+			}
 
 			xmlFree(name);
 		}
@@ -476,6 +485,111 @@ void printpms(char pms[DM_MAX][PATH_MAX], int n, int columns)
 	}
 }
 
+void printcoms(char coms[DM_MAX][PATH_MAX], int n, int columns)
+{
+	int i;
+
+	for (i = 0; i < n; ++i) {
+		xmlDocPtr com_doc;
+		xmlNodePtr comment;
+		xmlNodePtr identAndStatusSection;
+		xmlNodePtr commentAddress;
+		xmlNodePtr commentIdent;
+		xmlNodePtr commentAddressItems;
+		xmlNodePtr commentTitle;
+		xmlNodePtr commentCode;
+		xmlNodePtr language;
+		xmlNodePtr issueDate;
+
+		com_doc = xmlReadFile(coms[i], NULL, 0);
+
+		comment = xmlDocGetRootElement(com_doc);
+		if (!(identAndStatusSection = find_req_child(comment, "identAndStatusSection", coms[i]))) continue;
+		if (!(commentAddress = find_req_child(identAndStatusSection, "commentAddress", coms[i]))) continue;
+		if (!(commentIdent = find_req_child(commentAddress, "commentIdent", coms[i]))) continue;
+		if (!(commentAddressItems = find_req_child(commentAddress, "commentAddressItems", coms[i]))) continue;
+		if (!(commentCode = find_req_child(commentIdent, "commentCode", coms[i]))) continue;
+		if (!(language = find_req_child(commentIdent, "language", coms[i]))) continue;
+		if (!(issueDate = find_req_child(commentAddressItems, "issueDate", coms[i]))) continue;
+
+		commentTitle = find_child(commentAddressItems, "commentTitle");
+
+
+
+		if ((columns & COL_FNAME) == COL_FNAME) {
+			printf("%s	", coms[i]);
+		}
+
+		if ((columns & COL_CODE) == COL_CODE) {
+			char *modelIdentCode;
+			char *senderIdent;
+			char *yearOfDataIssue;
+			char *seqNumber;
+			char *commentType;
+
+			modelIdentCode  = (char *) xmlGetProp(commentCode, BAD_CAST "modelIdentCode");
+			senderIdent     = (char *) xmlGetProp(commentCode, BAD_CAST "senderIdent");
+			yearOfDataIssue = (char *) xmlGetProp(commentCode, BAD_CAST "yearOfDataIssue");
+			seqNumber       = (char *) xmlGetProp(commentCode, BAD_CAST "seqNumber");
+			commentType     = (char *) xmlGetProp(commentCode, BAD_CAST "commentType");
+
+			printf("%s-%s-%s-%s-%s	", modelIdentCode, senderIdent, yearOfDataIssue, seqNumber, commentType);
+
+			xmlFree(modelIdentCode);
+			xmlFree(senderIdent);
+			xmlFree(yearOfDataIssue);
+			xmlFree(seqNumber);
+			xmlFree(commentType);
+		}
+
+		if ((columns & COL_LANG) == COL_LANG) {
+			char *languageIsoCode;
+			char *countryIsoCode;
+
+			languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+			countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+
+			printf("%s-%s	", languageIsoCode, countryIsoCode);
+
+			xmlFree(languageIsoCode);
+			xmlFree(countryIsoCode);
+		}
+		
+		if ((columns & COL_ISSUE) == COL_ISSUE) {
+			printf("	");
+		}
+
+		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
+			char *year, *month, *day;
+
+			year  = (char *) xmlGetProp(issueDate, BAD_CAST "year");
+			month = (char *) xmlGetProp(issueDate, BAD_CAST "month");
+			day   = (char *) xmlGetProp(issueDate, BAD_CAST "day");
+
+			printf("%s-%s-%s	", year, month, day);
+
+			xmlFree(year);
+			xmlFree(month);
+			xmlFree(day);
+		}
+
+		if (((columns & COL_TITLE) == COL_TITLE) || ((columns & COL_STITLE) == COL_STITLE)) {
+			char *title;
+			title = (char *) xmlNodeGetContent(commentTitle);
+			if (title) {
+				printf("%s	", title);
+			} else {
+				printf("	");
+			}
+			xmlFree(title);
+		}
+
+		printf("\n");
+
+		xmlFreeDoc(com_doc);
+	}
+}
+
 int compare(const void *a, const void *b)
 {
 	return strcasecmp((const char *) a, (const char *) b);
@@ -489,6 +603,11 @@ int isdm(const char *name)
 int ispm(const char *name)
 {
 	return (strncmp(name, "PMC-", 4) == 0 || strncmp(name, "PME-", 4) == 0) && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
+}
+
+int iscom(const char *name)
+{
+	return strncmp(name, "COM-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 void show_help(void)
@@ -535,7 +654,11 @@ int is_directory(const char *path, int recursive)
 	return S_ISDIR(st.st_mode);
 }
 
-void list_dir(const char *path, char dms[DM_MAX][PATH_MAX], int *ndms, char pms[DM_MAX][PATH_MAX], int *npms, int only_writable, int recursive)
+void list_dir(const char *path,
+              char dms[DM_MAX][PATH_MAX], int *ndms,
+              char pms[DM_MAX][PATH_MAX], int *npms,
+	      char coms[DM_MAX][PATH_MAX], int *ncoms,
+	      int only_writable, int recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -575,8 +698,14 @@ void list_dir(const char *path, char dms[DM_MAX][PATH_MAX], int *ndms, char pms[
 				exit(EXIT_DM_MAX);
 			}
 			strcpy(pms[(*npms)++], cpath);
+		} else if (iscom(cur->d_name)) {
+			if (*ncoms == DM_MAX) {
+				fprintf(stderr, ERR_PREFIX "Maximum comments reached (%d).\n", DM_MAX);
+				exit(EXIT_DM_MAX);
+			}
+			strcpy(coms[(*ncoms)++], cpath);
 		} else if (recursive && is_directory(cpath, recursive)) {
-			list_dir(cpath, dms, ndms, pms, npms, only_writable, recursive);
+			list_dir(cpath, dms, ndms, pms, npms, coms, ncoms, only_writable, recursive);
 		}
 	}
 
@@ -603,8 +732,10 @@ int main(int argc, char **argv)
 
 	char (*dms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	char (*pms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
+	char (*coms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	int ndms;
 	int npms;
+	int ncoms;
 
 	int i;
 
@@ -631,7 +762,7 @@ int main(int argc, char **argv)
 	int columns = COL_FNAME;
 	int header = 0;
 
-	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLpDPh?")) != -1) {
+	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLpDPCh?")) != -1) {
 		switch (c) {
 			case 'l': only_latest = 1; break;
 			case 'I': only_official_issue = 1; break;
@@ -650,8 +781,9 @@ int main(int argc, char **argv)
 			case 'H': header = 1; break;
 			case 'w': only_writable = 1; break;
 			case 'R': recursive = 1; break;
-			case 'D': show = SHOW_DM; break;
-			case 'P': show = SHOW_PM; break;
+			case 'D': show = show | SHOW_DM; break;
+			case 'P': show = show | SHOW_PM; break;
+			case 'C': show = show | SHOW_COM; break;
 			case 'h':
 			case '?': show_help();
 				  exit(0);
@@ -660,10 +792,11 @@ int main(int argc, char **argv)
 
 	if (!columns) exit(0);
 
-	if (!show) show = SHOW_DM | SHOW_PM;
+	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM;
 
 	ndms = 0;
 	npms = 0;
+	ncoms = 0;
 	nlatest_dms = 0;
 	nlatest_pms = 0;
 	nissue_dms = 0;
@@ -696,12 +829,12 @@ int main(int argc, char **argv)
 				}
 				strcpy(pms[npms++], argv[i]);
 			} else if (is_directory(argv[i], 0)) {
-				list_dir(argv[i], dms, &ndms, pms, &npms, only_writable, recursive);
+				list_dir(argv[i], dms, &ndms, pms, &npms, coms, &ncoms, only_writable, recursive);
 			}
 		}
 	} else {
 		/* Read dms to list from current directory */
-		list_dir(".", dms, &ndms, pms, &npms, only_writable, recursive);
+		list_dir(".", dms, &ndms, pms, &npms, coms, &ncoms, only_writable, recursive);
 	}
 
 	qsort(dms, ndms, PATH_MAX, compare);
@@ -791,6 +924,10 @@ int main(int argc, char **argv)
 		} else {
 			printpms(pms, npms, columns);
 		}
+	}
+
+	if ((show & SHOW_COM) == SHOW_COM) {
+		printcoms(coms, ncoms, columns);
 	}
 
 	if (dir) {
