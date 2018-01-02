@@ -615,25 +615,26 @@ void show_help(void)
 	puts("Usage: s1kd-dmls [-acfHhilorRTt]");
 	puts("");
 	puts("Options:");
-	puts("  -l	Show only latest issue/inwork version");
-	puts("  -I	Show only official issues");
-	puts("  -f	Do not show filename");
-	puts("  -c	Show data module code");
-	puts("  -n	Show issue info");
-	puts("  -L	Show language info");
-	puts("  -t	Show tech and info name columns");
-	puts("  -T	Show single title column");
-	puts("  -i	Include issue date column");
-	puts("  -r	Include responsible partner company column");
-	puts("  -o	Include originator column");
-	puts("  -a	Include applicability column");
-	puts("  -H	Show headers on columns");
-	puts("  -w	Show only writable data module files");
-	puts("  -R	Recursively search directories");
-	puts("  -p	Print control characters");
-	puts("  -D	List data modules only");
-	puts("  -P	List pub modules only");
-	puts("  -h	Show this help message");
+	puts("  -l      Show only latest issue/inwork version");
+	puts("  -I      Show only official issues");
+	puts("  -f      Do not show filename");
+	puts("  -c      Show data module code");
+	puts("  -n      Show issue info");
+	puts("  -L      Show language info");
+	puts("  -t      Show tech and info name columns");
+	puts("  -T      Show single title column");
+	puts("  -i      Include issue date column");
+	puts("  -r      Include responsible partner company column");
+	puts("  -o      Include originator column");
+	puts("  -a      Include applicability column");
+	puts("  -H      Show headers on columns");
+	puts("  -w      Show only writable data module files");
+	puts("  -R      Recursively search directories");
+	puts("  -p      Print control characters");
+	puts("  -D      List data modules only");
+	puts("  -P      List pub modules only");
+	puts("  -C      List comments only");
+	puts("  -h      Show this help message");
 }
 
 int is_directory(const char *path, int recursive)
