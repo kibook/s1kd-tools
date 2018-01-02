@@ -587,7 +587,7 @@ int is_official_issue(const char *fname)
 {
 	xmlDocPtr doc = xmlReadFile(fname, NULL, 0);
 	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
-	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "string(//dmIdent/issueInfo/@inWork)", ctxt);
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "string(//dmIdent/issueInfo/@inWork|//pmIdent/issueInfo/@inWork)", ctxt);
 	int ret = strcmp((char *) result->stringval, "00") == 0;
 
 	xmlXPathFreeObject(result);
@@ -616,8 +616,14 @@ int main(int argc, char **argv)
 	char (*latest_dms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	int nlatest_dms;
 
+	char (*latest_pms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
+	int nlatest_pms;
+
 	char (*issue_dms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
 	int nissue_dms;
+
+	char (*issue_pms)[PATH_MAX] = malloc(DM_MAX * PATH_MAX);
+	int nissue_pms;
 
 	int recursive = 0;
 	int show = 0;
@@ -659,7 +665,9 @@ int main(int argc, char **argv)
 	ndms = 0;
 	npms = 0;
 	nlatest_dms = 0;
+	nlatest_pms = 0;
 	nissue_dms = 0;
+	nissue_pms = 0;
 
 	if (optind < argc) {
 		/* Read dms to list from arguments */
@@ -706,12 +714,26 @@ int main(int argc, char **argv)
 			}
 		}
 
+		for (i = 0; i < npms; ++i) {
+			if (is_official_issue(pms[i])) {
+				strcpy(issue_pms[nissue_pms++], pms[i]);
+			}
+		}
+
 		if (only_latest) {
 			for (i = 0; i < nissue_dms; ++i) {
 				if (i == 0 || strncmp(issue_dms[i], issue_dms[i - 1], strchr(issue_dms[i], '_') - issue_dms[i]) != 0) {
 					strcpy(latest_dms[nlatest_dms++], issue_dms[i]);
 				} else {
 					strcpy(latest_dms[nlatest_dms - 1], issue_dms[i]);
+				}
+			}
+
+			for (i = 0; i < nissue_pms; ++i) {
+				if (i == 0 || strncpy(issue_pms[i], issue_pms[i - 1], strchr(issue_pms[i], '_') - issue_pms[i]) != 0) {
+					strcpy(latest_pms[nlatest_pms++], issue_pms[i]);
+				} else {
+					strcpy(latest_pms[nlatest_pms - 1], issue_pms[i]);
 				}
 			}
 		}
@@ -721,6 +743,14 @@ int main(int argc, char **argv)
 				strcpy(latest_dms[nlatest_dms++], dms[i]);
 			} else {
 				strcpy(latest_dms[nlatest_dms - 1], dms[i]);
+			}
+		}
+
+		for (i = 0; i < npms; ++i) {
+			if (i == 0 || strncmp(pms[i], pms[i - 1], strchr(pms[i], '_') - pms[i]) != 0) {
+				strcpy(latest_pms[nlatest_pms++], pms[i]);
+			} else {
+				strcpy(latest_pms[nlatest_pms - 1], pms[i]);
 			}
 		}
 	}
@@ -754,7 +784,13 @@ int main(int argc, char **argv)
 	}
 
 	if ((show & SHOW_PM) == SHOW_PM) {
-		printpms(pms, npms, columns);
+		if (only_latest) {
+			printpms(latest_pms, nlatest_pms, columns);
+		} else if (only_official_issue) {
+			printpms(issue_pms, nissue_pms, columns);
+		} else {
+			printpms(pms, npms, columns);
+		}
 	}
 
 	if (dir) {
