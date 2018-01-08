@@ -9,12 +9,12 @@ DESCRIPTION
 S1000D
 ------
 
-*S1000D* is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a Common Source Database (CSDB) and validated against a defined set of project "business rules".
+**S1000D** is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a Common Source Database (CSDB) and validated against a defined set of project "business rules".
 
 s1kd-tools
 ----------
 
-The *s1kd-tools* are a set of small tools for creating and manipulating S1000D data. Together, they form a "suite" of tools for producing and maintaining S1000D publications within a CSDB. They may also be used individually, to support other S1000D "suites" (usually from an S1000D "vendor") already in use by a project.
+The **s1kd-tools** are a set of small tools for creating and manipulating S1000D data. Together, they form a "suite" of tools for producing and maintaining S1000D publications within a CSDB. They may also be used individually, to support other S1000D "suites" (usually from an S1000D "vendor") already in use by a project.
 
 CSDB
 ----
@@ -26,37 +26,37 @@ Relationship to the S1000D process
 
 The s1kd-tools can support multiple parts of the basic S1000D process:
 
-1.  *Generation:* The generation of new CSDB objects is supported by the *s1kd-dmrl* tool and the *s1kd-new\** set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new\* tools directly.
+1.  **Generation:** The generation of new CSDB objects is supported by the **s1kd-dmrl** tool and the **s1kd-new\*** set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new\* tools directly.
 
-2.  *Authoring:* These tools support the authoring process.
+2.  **Authoring:** These tools support the authoring process.
 
-    The *s1kd-upissue* tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.
+    The **s1kd-upissue** tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.
 
-    The *s1kd-dmls* tool lists data modules within a directory.
+    The **s1kd-dmls** tool lists data modules within a directory.
 
-    The *s1kd-dmref* tool can be used to quickly insert references to other data modules within a data module.
+    The **s1kd-dmref** tool can be used to quickly insert references to other data modules within a data module.
 
-    The *s1kd-metadata* tool lists and edits S1000D metadata on CSDB objects.
+    The **s1kd-metadata** tool lists and edits S1000D metadata on CSDB objects.
 
-    The *s1kd-transform* tool applies XSLT transformations to CSDB objects.
+    The **s1kd-transform** tool applies XSLT transformations to CSDB objects.
 
-3.  *Validation:* These tools all validate different aspects of CSDB objects.
+3.  **Validation:** These tools all validate different aspects of CSDB objects.
 
-    The *s1kd-validate* tool validates CSDB objects according to their S1000D schema and general correctness as XML documents.
+    The **s1kd-validate** tool validates CSDB objects according to their S1000D schema and general correctness as XML documents.
 
-    The *s1kd-brexcheck* tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.
+    The **s1kd-brexcheck** tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.
 
-    The *s1kd-checkrefs* tool validates references between CSDB objects.
+    The **s1kd-checkrefs** tool validates references between CSDB objects.
 
-4.  *Publication:* These tools support the production of publications from a CSDB.
+4.  **Publication:** These tools support the production of publications from a CSDB.
 
-    The *s1kd-acronyms* tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.
+    The **s1kd-acronyms** tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.
 
-    The *s1kd-instance* tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).
+    The **s1kd-instance** tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).
 
-    The *s1kd-neutralize* tool generates IETP neutral metadata for CSDB objects.
+    The **s1kd-neutralize** tool generates IETP neutral metadata for CSDB objects.
 
-    The *s1kd-syncrefs* tool generates the References table within data modules.
+    The **s1kd-syncrefs** tool generates the References table within data modules.
 
 SEE ALSO
 ========
