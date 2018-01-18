@@ -475,6 +475,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "brex") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -542,6 +543,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "process") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -554,6 +556,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "ipd") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -566,6 +569,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "fault") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -600,6 +604,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "container") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -612,6 +617,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "crew") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -634,6 +640,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "schedul") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -646,6 +653,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "wrngdata") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -658,6 +666,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "wrngflds") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 			case ISS_41:
@@ -680,6 +689,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "techrep") == 0) {
 		switch (iss) {
+			case ISS_23:
 			case ISS_30:
 			case ISS_40:
 				xml = templates_42_techrep_xml;
