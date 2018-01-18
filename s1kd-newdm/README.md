@@ -98,6 +98,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   sb - Service bulletin
 
+-   schedul - Maintenance planning information
+
 -N  
 Omit issue/inwork numbers from filename.
 

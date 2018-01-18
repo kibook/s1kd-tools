@@ -46,6 +46,9 @@
       <reasonForUpdate id="rfu-0002">
         <simplePara>Add sb template.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003">
+        <simplePara>Add schedul template.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -212,6 +215,9 @@
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0002">
                       <para>sb - Service bulletin</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0003">
+                      <para>schedul - Maintenance planning information</para>
                     </listItem>
                   </randomList>
                 </para>

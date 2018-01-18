@@ -763,4 +763,16 @@
     </frc>
   </xsl:template>
 
+  <xsl:template match="maintPlanning">
+    <schedule>
+      <xsl:apply-templates select="@*|node()"/>
+    </schedule>
+  </xsl:template>
+
+  <xsl:template match="inspectionDefinition">
+    <definspec>
+      <xsl:apply-templates select="@*|node()"/>
+    </definspec>
+  </xsl:template>
+
 </xsl:stylesheet>
