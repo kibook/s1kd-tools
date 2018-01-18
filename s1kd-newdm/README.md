@@ -100,6 +100,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   schedul - Maintenance planning information
 
+-   wrngdata - Wiring data
+
 -N  
 Omit issue/inwork numbers from filename.
 

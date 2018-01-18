@@ -775,4 +775,10 @@
     </definspec>
   </xsl:template>
 
+  <xsl:template match="wiringData">
+    <wrngdata>
+      <xsl:apply-templates select="@*|node()"/>
+    </wrngdata>
+  </xsl:template>
+
 </xsl:stylesheet>
