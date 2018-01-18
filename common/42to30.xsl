@@ -751,4 +751,16 @@
     </addresdm>
   </xsl:template>
 
+  <xsl:template match="crew">
+    <acrw>
+      <xsl:apply-templates select="@*|node()"/>
+    </acrw>
+  </xsl:template>
+
+  <xsl:template match="crewRefCard">
+    <frc>
+      <xsl:apply-templates select="@*|node()"/>
+    </frc>
+  </xsl:template>
+
 </xsl:stylesheet>

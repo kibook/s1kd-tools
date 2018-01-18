@@ -199,7 +199,7 @@ void show_help(void)
 	puts("  -O      Originator CAGE code.");
 	puts("  -t      Tech name");
 	puts("  -i      Info name");
-	puts("  -T      DM type (descript, proced, frontmatter, brex, brdoc)");
+	puts("  -T      DM type (descript, proced, frontmatter, etc.)");
 	puts("  -b      BREX data module code");
 	puts("  -s      Schema");
 	puts("  -I      Issue date");
@@ -601,6 +601,18 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_42:
 				xml = templates_42_container_xml;
 				len = templates_42_container_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "crew") == 0) {
+		switch (iss) {
+			case ISS_30:
+			case ISS_40:
+			case ISS_41:
+			case ISS_42:
+				xml = templates_42_crew_xml;
+				len = templates_42_crew_xml_len;
 				break;
 			default:
 				break;

@@ -78,6 +78,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   container - Container
 
+-   crew - Crew/Operator information
+
 -   descript - Descriptive
 
 -   fault - Fault information
