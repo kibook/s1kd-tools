@@ -781,4 +781,10 @@
     </wrngdata>
   </xsl:template>
 
+  <xsl:template match="wiringFields">
+    <wrngflds>
+      <xsl:apply-templates select="@*|node()"/>
+    </wrngflds>
+  </xsl:template>
+
 </xsl:stylesheet>

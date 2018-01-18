@@ -102,6 +102,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   wrngdata - Wiring data
 
+-   wrngflds - Wiring fields
+
 -N  
 Omit issue/inwork numbers from filename.
 

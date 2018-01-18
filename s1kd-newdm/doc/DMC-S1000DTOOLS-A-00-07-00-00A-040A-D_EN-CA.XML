@@ -52,6 +52,9 @@
       <reasonForUpdate id="rfu-0004">
         <simplePara>Add wrngdata template.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfi-0005">
+        <simplePara>Add wrngflds template.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -224,6 +227,9 @@
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0004">
                       <para>wrngdata - Wiring data</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0005">
+                      <para>wrngflds - Wiring fields</para>
                     </listItem>
                   </randomList>
                 </para>
