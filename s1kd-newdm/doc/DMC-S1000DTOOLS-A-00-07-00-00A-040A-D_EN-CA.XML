@@ -58,6 +58,9 @@
       <reasonForUpdate id="rfu-0006">
         <simplePara>Add scocontent template.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0007">
+        <simplePara>Add techrep template.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -230,6 +233,9 @@
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0006">
                       <para>scocontent - SCO content information</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0007">
+                      <para>techrep - Technical repository (replaced by comrep in issue 4.1)</para>
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0004">
                       <para>wrngdata - Wiring data</para>

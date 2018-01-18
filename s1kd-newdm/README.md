@@ -102,6 +102,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   scocontent - SCO content information
 
+-   techrep - Technical repository (replaced by comrep in issue 4.1)
+
 -   wrngdata - Wiring data
 
 -   wrngflds - Wiring fields

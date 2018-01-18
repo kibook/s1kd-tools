@@ -787,4 +787,10 @@
     </wrngflds>
   </xsl:template>
 
+  <xsl:template match="techRepository">
+    <techrep>
+      <xsl:apply-templates select="@*|node()"/>
+    </techrep>
+  </xsl:template>
+
 </xsl:stylesheet>

@@ -526,7 +526,6 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "comrep") == 0) {
 		switch (iss) {
-			case ISS_40:
 			case ISS_41:
 			case ISS_42:
 				xml = templates_42_comrep_xml;
@@ -669,6 +668,16 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_42:
 				xml = templates_42_scocontent_xml;
 				len = templates_42_scocontent_xml_len;
+				break;
+			default:
+				break;
+		}
+	} else if (strcmp(dmtype, "techrep") == 0) {
+		switch (iss) {
+			case ISS_30:
+			case ISS_40:
+				xml = templates_42_techrep_xml;
+				len = templates_42_techrep_xml_len;
 				break;
 			default:
 				break;
