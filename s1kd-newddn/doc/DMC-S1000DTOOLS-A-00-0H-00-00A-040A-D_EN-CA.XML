@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="H" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="11" day="14"/>
+        <issueDate year="2018" month="01" day="18"/>
         <dmTitle>
           <techName>s1kd-newddn(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -@ option.</simplePara>
+        <simplePara>Add support for issue 2.3.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -169,11 +169,14 @@
                     <listItem>
                       <para>3.0</para>
                     </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>2.3</para>
+                    </listItem>
                   </randomList>
                 </para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new DDN as &lt;filename&gt; instead of an automatically named file in the current directory.</para>

@@ -60,11 +60,12 @@ char brex_dmcode[256] = "";
 char ddn_issue_date[16] = "";
 
 #define DEFAULT_S1000D_ISSUE ISS_42
+#define ISS_23_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
-enum issue { NO_ISS, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 enum issue get_issue(const char *iss)
 {
@@ -76,6 +77,8 @@ enum issue get_issue(const char *iss)
 		return ISS_40;
 	else if (strcmp(iss, "3.0") == 0)
 		return ISS_30;
+	else if (strcmp(iss, "2.3") == 0)
+		return ISS_23;
 	
 	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
 	exit(EXIT_BAD_ISSUE);
@@ -90,6 +93,7 @@ const char *issue_name(enum issue iss)
 		case ISS_41: return "4.1";
 		case ISS_40: return "4.0";
 		case ISS_30: return "3.0";
+		case ISS_23: return "2.3";
 		default: return "";
 	}
 }
@@ -113,6 +117,10 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 		case ISS_30:
 			xml = ___common_42to30_xsl;
 			len = ___common_42to30_xsl_len;
+			break;
+		case ISS_23:
+			xml = ___common_42to23_xsl;
+			len = ___common_42to23_xsl_len;
 			break;
 		default:
 			return NULL;
@@ -526,6 +534,9 @@ int main(int argc, char **argv)
 	if (issue < ISS_42) {
 		if (strcmp(brex_dmcode, "") == 0) {
 			switch (issue) {
+				case ISS_23:
+					set_brex(ddn, ISS_23_DEFAULT_BREX);
+					break;
 				case ISS_30:
 					set_brex(ddn, ISS_30_DEFAULT_BREX);
 					break;
