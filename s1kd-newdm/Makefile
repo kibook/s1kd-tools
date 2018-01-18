@@ -10,6 +10,7 @@ all: $(OUTPUT)
 templates.h: templates/42/*.xml ../common/42to*.xsl
 	> templates.h
 	for t in templates/42/*.xml; do xxd -i $$t >> templates.h; done
+	xxd -i ../common/42to23.xsl >> templates.h
 	xxd -i ../common/42to30.xsl >> templates.h
 	xxd -i ../common/42to40.xsl >> templates.h
 	xxd -i ../common/42to41.xsl >> templates.h

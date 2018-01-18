@@ -61,6 +61,9 @@
       <reasonForUpdate id="rfu-0007">
         <simplePara>Add techrep template.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0008">
+        <simplePara>Add support for issue 2.3.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -306,6 +309,9 @@
                     </listItem>
                     <listItem>
                       <para>3.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.3</para>
                     </listItem>
                   </randomList>
                 </para>
