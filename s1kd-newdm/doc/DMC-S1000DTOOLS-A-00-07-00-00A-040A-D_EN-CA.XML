@@ -40,6 +40,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Add crew template.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002">
+        <simplePara>Add sb template.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -203,6 +209,9 @@
                     </listItem>
                     <listItem>
                       <para>process - Process</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+                      <para>sb - Service bulletin</para>
                     </listItem>
                   </randomList>
                 </para>

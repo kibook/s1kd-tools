@@ -96,6 +96,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   process - Process
 
+-   sb - Service bulletin
+
 -N  
 Omit issue/inwork numbers from filename.
 
