@@ -100,6 +100,8 @@ The type (schema) of the new data module. Supported schemas:
 
 -   schedul - Maintenance planning information
 
+-   scocontent - SCO content information
+
 -   wrngdata - Wiring data
 
 -   wrngflds - Wiring fields

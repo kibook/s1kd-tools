@@ -663,6 +663,16 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			default:
 				break;
 		}
+	} else if (strcmp(dmtype, "scocontent") == 0) {
+		switch (iss) {
+			case ISS_41:
+			case ISS_42:
+				xml = templates_42_scocontent_xml;
+				len = templates_42_scocontent_xml_len;
+				break;
+			default:
+				break;
+		}
 	} else {
 		fprintf(stderr, ERR_PREFIX "Unknown dmtype %s\n", dmtype);
 		exit(EXIT_UNKNOWN_DMTYPE);

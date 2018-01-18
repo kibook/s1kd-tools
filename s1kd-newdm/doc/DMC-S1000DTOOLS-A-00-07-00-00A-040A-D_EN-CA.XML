@@ -52,8 +52,11 @@
       <reasonForUpdate id="rfu-0004">
         <simplePara>Add wrngdata template.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfi-0005">
+      <reasonForUpdate id="rfu-0005">
         <simplePara>Add wrngflds template.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0006">
+        <simplePara>Add scocontent template.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -224,6 +227,9 @@
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0003">
                       <para>schedul - Maintenance planning information</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0006">
+                      <para>scocontent - SCO content information</para>
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0004">
                       <para>wrngdata - Wiring data</para>
