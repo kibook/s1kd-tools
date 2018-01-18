@@ -534,13 +534,6 @@
       <xsl:apply-templates select="security"/>
       <xsl:apply-templates select="responsiblePartnerCompany"/>
       <xsl:apply-templates select="originator"/>
-      <xsl:apply-templates select="applicCrossRefTableRef"/>
-      <xsl:if test="not(applicCrossRefTableRef)">
-        <actref>
-          <refdm/>
-        </actref>
-      </xsl:if>
-      <xsl:apply-templates select="applic"/>
       <xsl:apply-templates select="qualityAssurance"/>
     </pmstatus>
   </xsl:template>
