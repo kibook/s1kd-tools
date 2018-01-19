@@ -47,7 +47,7 @@
         <para>s1kd-flatpm - Flatten a publication module for publishing</para>
       </levelledPara>
       <levelledPara>
-        <title>Synopsis</title>
+        <title>SYNOPSIS</title>
         <para>s1kd-flatpm [-Nxp] &lt;PM&gt; [&lt;DM&gt;...]</para>
       </levelledPara>
       <levelledPara>
