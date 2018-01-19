@@ -3,7 +3,7 @@ NAME
 
 s1kd-flatpm - Flatten a publication module for publishing
 
-Synopsis
+SYNOPSIS
 ========
 
 s1kd-flatpm \[-Nxp\] &lt;PM&gt; \[&lt;DM&gt;...\]
