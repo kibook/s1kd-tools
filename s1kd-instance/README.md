@@ -52,7 +52,7 @@ Output instance(s) in dir, automatically naming them based on:
 
 -   the language and country specified with -L
 
-The issue information is copied from the source or taken as specified in the -I option.
+The issue information is copied from the source or taken as specified in the -n option.
 
 -f  
 Overwrite existing file with same name as the filename generated automatically with -O, if it exists.

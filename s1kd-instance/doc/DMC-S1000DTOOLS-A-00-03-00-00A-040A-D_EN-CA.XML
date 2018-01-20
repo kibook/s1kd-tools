@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="12" day="11"/>
+        <issueDate year="2018" month="01" day="20"/>
         <dmTitle>
           <techName>s1kd-instance(1) | General Commands Manual</techName>
         </dmTitle>
@@ -42,7 +42,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add support for zone CIR.</simplePara>
+        <simplePara>Change reference to -I to -n</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -135,7 +135,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>The issue information is copied from the source or taken as specified in the -I option.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The issue information is copied from the source or taken as specified in the -n option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -193,7 +193,7 @@
                     <listItem>
                       <para>Controls and indicators</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>Zones</para>
                     </listItem>
                     <listItem>
