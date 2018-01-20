@@ -46,9 +46,13 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
     The **s1kd-brexcheck** tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.
 
+    The **s1kd-refls** tool lists references in a CSDB object to generate a list of dependencies on other CSDB objects.
+
     The **s1kd-checkrefs** tool validates references between CSDB objects.
 
 4.  **Publication:** These tools support the production of publications from a CSDB.
+
+    The **s1kd-flatpm** tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.
 
     The **s1kd-acronyms** tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.
 

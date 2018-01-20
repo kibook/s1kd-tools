@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="08"/>
+        <issueDate year="2018" month="01" day="20"/>
         <dmTitle>
           <techName>s1kd-tools(1) | General Commands Manual</techName>
         </dmTitle>
@@ -31,12 +31,8 @@
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
-      <qualityAssurance>
-        <unverified/>
-      </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add CSDB description</simplePara>
-      </reasonForUpdate>
+      <qualityAssurance><unverified/></qualityAssurance>
+      
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,7 +51,7 @@
           <title>s1kd-tools</title>
           <para>The <emphasis>s1kd-tools</emphasis> are a set of small tools for creating and manipulating S1000D data. Together, they form a "suite" of tools for producing and maintaining S1000D publications within a CSDB. They may also be used individually, to support other S1000D "suites" (usually from an S1000D "vendor") already in use by a project.</para>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>CSDB</title>
           <para>Common Source Databases can be implemented in any number of ways. For the purposes of the s1kd-tools, the CSDB is simply a directory within a filesystem. Use of the "File-based transfer" file naming conventions in Chap 7 of the S1000D specification are recommended, and most of the tools will use these conventions when creating or listing CSDB objects represented by files. In order to use these tools in conjuction with other implementations of CSDBs, a project can make use of "transfer packages" also described in Chap 7 to facilitate interchange between the two kinds of CSDB.</para>
         </levelledPara>
@@ -79,10 +75,12 @@
                 <para><emphasis>Validation:</emphasis> These tools all validate different aspects of CSDB objects.</para>
                 <para>The <emphasis>s1kd-validate</emphasis> tool validates CSDB objects according to their S1000D schema and general correctness as XML documents.</para>
                 <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.</para>
+                <para>The <emphasis>s1kd-refls</emphasis> tool lists references in a CSDB object to generate a list of dependencies on other CSDB objects.</para>
                 <para>The <emphasis>s1kd-checkrefs</emphasis> tool validates references between CSDB objects.</para>
               </listItem>
               <listItem>
                 <para><emphasis>Publication:</emphasis> These tools support the production of publications from a CSDB.</para>
+                <para>The <emphasis>s1kd-flatpm</emphasis> tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.</para>
                 <para>The <emphasis>s1kd-acronyms</emphasis> tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.</para>
                 <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).</para>
                 <para>The <emphasis>s1kd-neutralize</emphasis> tool generates IETP neutral metadata for CSDB objects.</para>
