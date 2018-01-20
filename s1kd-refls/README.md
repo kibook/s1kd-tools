@@ -1,0 +1,32 @@
+NAME
+====
+
+s1kd-refls - List references in a CSDB object
+
+SYNOPSIS
+========
+
+s1kd-refls \[-qcaNh?\] &lt;objects&gt;...
+
+DESCRIPTION
+===========
+
+The *s1kd-refls* tool lists external references to other CSDB objects (dmRef, pmRef), optionally matching them to a filename in the current directory. This makes it easy to see what a given CSDB object "depends" on.
+
+OPTIONS
+=======
+
+-q  
+Quiet mode. Errors are not printed.
+
+-c  
+List references in the `content` section of a CSDB object only.
+
+-a  
+List all references, not attempting to match them to an actual filename.
+
+-N  
+Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new\* tools.
+
+-h -?  
+Show help/usage message.
