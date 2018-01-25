@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="24"/>
+        <issueDate year="2018" month="01" day="25"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -i, -l, -t, and -D options.</simplePara>
+        <simplePara>Remove -l, -i, -t, and -D options in favour of using the dmlType code.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -156,30 +156,6 @@
               <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-i</listItemTerm>
-              <listItemDefinition>
-                <para>Include the issue info in the entries of the specified data modules.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-l</listItemTerm>
-              <listItemDefinition>
-                <para>Include the language in the entries of the specified data modules.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-t</listItemTerm>
-              <listItemDefinition>
-                <para>Include the title in the entries of the specified data modules.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-D</listItemTerm>
-              <listItemDefinition>
-                <para>Include the issue date in the entries of the specified data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
