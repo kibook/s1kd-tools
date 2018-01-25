@@ -65,6 +65,18 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -@ &lt;filename&gt;  
 Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.
 
+-i  
+Include the issue info in the entries of the specified data modules.
+
+-l  
+Include the language in the entries of the specified data modules.
+
+-t  
+Include the title in the entries of the specified data modules.
+
+-D  
+Include the issue date in the entries of the specified data modules.
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 

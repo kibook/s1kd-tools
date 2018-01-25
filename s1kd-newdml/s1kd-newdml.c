@@ -186,7 +186,7 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 	return node;
 }	
 
-void addDmRef(const char *str, xmlDocPtr dml)
+void addDmRef(const char *str, xmlDocPtr dml, bool incl_iss, bool incl_lang, bool incl_title, bool incl_date)
 {
 	xmlDocPtr dm;
 	xmlNodePtr dmlContent;
@@ -201,11 +201,27 @@ void addDmRef(const char *str, xmlDocPtr dml)
 	dmRefIdent = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefIdent", NULL);
 	xmlAddChild(dmRefIdent, xmlCopyNode(firstXPathNode("//dmIdent/identExtension", dm), 1));
 	xmlAddChild(dmRefIdent, xmlCopyNode(firstXPathNode("//dmIdent/dmCode", dm), 1));
-	xmlAddChild(dmRefIdent, xmlCopyNode(firstXPathNode("//dmIdent/issueInfo", dm), 1));
-	xmlAddChild(dmRefIdent, xmlCopyNode(firstXPathNode("//dmIdent/language", dm), 1));
-	dmRefAddressItems = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefAddressItems", NULL);
-	xmlAddChild(dmRefAddressItems, xmlCopyNode(firstXPathNode("//dmAddressItems/dmTitle", dm), 1));
-	xmlAddChild(dmRefAddressItems, xmlCopyNode(firstXPathNode("//dmAddressItems/issueDate", dm), 1));
+	
+	if (incl_iss) {
+		xmlAddChild(dmRefIdent, xmlCopyNode(firstXPathNode("//dmIdent/issueInfo", dm), 1));
+	}
+
+	if (incl_lang) {
+		xmlAddChild(dmRefIdent, xmlCopyNode(firstXPathNode("//dmIdent/language", dm), 1));
+	}
+
+	if (incl_title || incl_date) {
+		dmRefAddressItems = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefAddressItems", NULL);
+
+		if (incl_title) {
+			xmlAddChild(dmRefAddressItems, xmlCopyNode(firstXPathNode("//dmAddressItems/dmTitle", dm), 1));
+		}
+
+		if (incl_date) {
+			xmlAddChild(dmRefAddressItems, xmlCopyNode(firstXPathNode("//dmAddressItems/issueDate", dm), 1));
+		}
+	}
+
 	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//dmStatus/security", dm), 1));
 	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//dmStatus/responsiblePartnerCompany", dm), 1));
 }
@@ -244,6 +260,10 @@ void show_help(void)
 	puts("  -f       Overwrite existing file.");
 	puts("  -$       Specify which S1000d issue to use.");
 	puts("  -@       Output to specified file.");
+	puts("  -i       Include issue info in entries.");
+	puts("  -l       Include language in entries.");
+	puts("  -t       Include title in entries.");
+	puts("  -D       Include issue date in entries.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#       DML code");
@@ -365,8 +385,13 @@ int main(int argc, char **argv)
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
+	
+	bool incl_iss = false;
+	bool incl_lang = false;
+	bool incl_title = false;
+	bool incl_date = false;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:iltDh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -381,6 +406,10 @@ int main(int argc, char **argv)
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
+			case 'i': incl_iss = true; break;
+			case 'l': incl_lang = true; break;
+			case 't': incl_title = true; break;
+			case 'D': incl_date = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -499,7 +528,7 @@ int main(int argc, char **argv)
 	dml_type[0] = toupper(dml_type[0]);
 
 	for (c = optind; c < argc; ++c) {
-		addDmRef(argv[c], dml_doc);
+		addDmRef(argv[c], dml_doc, incl_iss, incl_lang, incl_title, incl_date);
 	}
 
 	if (issue < ISS_42) {
