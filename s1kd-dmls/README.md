@@ -64,8 +64,8 @@ Recursively descend in to directories.
 -p  
 Do not replace control characters (\\n, \\t) when printing.
 
--D, -P  
-List data modules/publication modules. If neither is specified, -DP is assumed.
+-D, -P, -C, -M  
+List data modules, publication modules, comments and ICN metadata files respectively. If none are specified, -DPCM is assumed.
 
 -h  
 Show the usage message.

@@ -8,16 +8,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="6" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2018" month="01" day="24"/>
         <dmTitle>
           <techName>s1kd-dmls(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -40,6 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Add support for comments and ICN metadata files.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -156,10 +159,10 @@
                 <para>Do not replace control characters (\n, \t) when printing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-D, -P</listItemTerm>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-D, -P, -C, -M</listItemTerm>
               <listItemDefinition>
-                <para>List data modules/publication modules. If neither is specified, -DP is assumed.</para>
+                <para>List data modules, publication modules, comments and ICN metadata files respectively. If none are specified, -DPCM is assumed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
