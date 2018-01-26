@@ -417,9 +417,9 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(security_classification, def_val);
 	else if (strcmp(def_key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strcpy(brex_dmcode, def_val);
-	else if (strcmp(def_key, "responsiblePartnerCompany") == 0 && strcmp(defaultRpcName, "") == 0)
+	else if (strcmp(def_key, "responsiblePartnerCompany") == 0 && !defaultRpcName)
 		defaultRpcName = strdup(def_val);
-	else if (strcmp(def_key, "responsiblePartnerCompanyCode") == 0 && strcmp(defaultRpcCode, "") == 0)
+	else if (strcmp(def_key, "responsiblePartnerCompanyCode") == 0 && !defaultRpcCode)
 		defaultRpcCode = strdup(def_val);
 }
 
