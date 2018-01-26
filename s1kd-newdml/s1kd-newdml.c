@@ -690,6 +690,37 @@ int main(int argc, char **argv)
 
 	dml_type[0] = toupper(dml_type[0]);
 
+	if (!out) {
+		char dml_fname[PATH_MAX];
+
+		if (noissue) {
+			snprintf(dml_fname, PATH_MAX,
+				"DML-%s-%s-%s-%s-%s.XML",
+				model_ident_code,
+				sender_ident,
+				dml_type,
+				year_of_data_issue,
+				seq_number);
+		} else {
+			snprintf(dml_fname, PATH_MAX,
+				"DML-%s-%s-%s-%s-%s_%s-%s.XML",
+				model_ident_code,
+				sender_ident,
+				dml_type,
+				year_of_data_issue,
+				seq_number,
+				issue_number,
+				in_work);
+		}
+
+		out = strdup(dml_fname);
+	}
+
+	if (!overwrite && access(out, F_OK) != -1) {
+		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
+		exit(EXIT_DML_EXISTS);
+	}
+
 	dmlContent = firstXPathNode("//dmlContent", dml_doc);
 
 	for (c = optind; c < argc; ++c) {
@@ -739,37 +770,6 @@ int main(int argc, char **argv)
 		}
 
 		dml_doc = toissue(dml_doc, issue);
-	}
-
-	if (!out) {
-		char dml_fname[PATH_MAX];
-
-		if (noissue) {
-			snprintf(dml_fname, PATH_MAX,
-				"DML-%s-%s-%s-%s-%s.XML",
-				model_ident_code,
-				sender_ident,
-				dml_type,
-				year_of_data_issue,
-				seq_number);
-		} else {
-			snprintf(dml_fname, PATH_MAX,
-				"DML-%s-%s-%s-%s-%s_%s-%s.XML",
-				model_ident_code,
-				sender_ident,
-				dml_type,
-				year_of_data_issue,
-				seq_number,
-				issue_number,
-				in_work);
-		}
-
-		out = strdup(dml_fname);
-	}
-
-	if (!overwrite && access(out, F_OK) != -1) {
-		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
-		exit(EXIT_DML_EXISTS);
 	}
 
 	xmlSaveFile(out, dml_doc);
