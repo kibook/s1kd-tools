@@ -58,6 +58,9 @@ char issue_date[16] = "";
 
 enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
+char *defaultRpcName = NULL;
+char *defaultRpcCode = NULL;
+
 enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
@@ -300,8 +303,7 @@ void addPmRef(xmlDocPtr pm, xmlNodePtr dmlContent, bool csl)
 
 void addIcnRef(const char *str, xmlNodePtr dmlContent)
 {
-	xmlNodePtr dmlEntry;
-	xmlNodePtr infoEntityRef;
+	xmlNodePtr dmlEntry, infoEntityRef, responsiblePartnerCompany;
 	char *icn;
 
 	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
@@ -313,7 +315,13 @@ void addIcnRef(const char *str, xmlNodePtr dmlContent)
 
 	xmlSetProp(infoEntityRef, BAD_CAST "infoEntityRefIdent", BAD_CAST icn);
 
-	xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
+	responsiblePartnerCompany = xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
+	if (defaultRpcCode) {
+		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST defaultRpcCode);
+	}
+	if (defaultRpcName) {
+		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST defaultRpcName);
+	}
 
 	free(icn);
 }
@@ -350,12 +358,17 @@ void addComRef(xmlDocPtr com, xmlNodePtr dmlContent)
 	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//commentStatus/security", com), 1));
 
 	responsiblePartnerCompany = xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
-	xmlAddChild(responsiblePartnerCompany, xmlCopyNode(firstXPathNode("//commentAddressItems/commentOriginator/dispatchAddress/enterprise/enterpriseName", com), 1));
+	if (defaultRpcCode) {
+		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST defaultRpcCode);
+	}
+	if (defaultRpcName) {
+		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST defaultRpcName);
+	}
 }
 
 void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
 {
-	xmlNodePtr dmlEntry, dmlRef, dmlRefIdent;
+	xmlNodePtr dmlEntry, dmlRef, dmlRefIdent, responsiblePartnerCompany;
 
 	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
 	dmlRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "dmlRef", NULL);
@@ -367,7 +380,13 @@ void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
 		xmlAddChild(dmlRefIdent, xmlCopyNode(firstXPathNode("//dmlIdent/issueInfo", dml), 1));
 	}
 
-	xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
+	responsiblePartnerCompany = xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
+	if (defaultRpcCode) {
+		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST defaultRpcCode);
+	}
+	if (defaultRpcName) {
+		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST defaultRpcName);
+	}
 }
 
 void copy_default_value(const char *def_key, const char *def_val)
@@ -526,7 +545,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:iltDTh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:r:R:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -541,6 +560,8 @@ int main(int argc, char **argv)
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
+			case 'r': defaultRpcName = strdup(optarg); break;
+			case 'R': defaultRpcCode = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -746,6 +767,8 @@ int main(int argc, char **argv)
 		puts(out);
 
 	free(out);
+	free(defaultRpcName);
+	free(defaultRpcCode);
 	xmlFreeDoc(dml_doc);
 
 	xmlCleanupParser();

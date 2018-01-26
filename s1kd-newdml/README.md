@@ -65,6 +65,12 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -@ &lt;filename&gt;  
 Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.
 
+-r &lt;name&gt;  
+Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).
+
+-R &lt;NCAGE&gt;  
+Specifies a default responsible partner company enterprise code for entries which do not carry this in their ID STATUS section (ICN, COM, DML).
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 

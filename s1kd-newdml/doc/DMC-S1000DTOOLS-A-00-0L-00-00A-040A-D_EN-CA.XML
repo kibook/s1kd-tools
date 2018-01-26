@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="25"/>
+        <issueDate year="2018" month="01" day="26"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Remove -l, -i, -t, and -D options in favour of using the dmlType code.</simplePara>
+        <simplePara>Add -r and -R options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -156,6 +156,18 @@
               <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r &lt;name&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-R &lt;NCAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specifies a default responsible partner company enterprise code for entries which do not carry this in their ID STATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
