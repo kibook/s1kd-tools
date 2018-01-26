@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
-
+#include <libgen.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -186,9 +186,14 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 	return node;
 }
 
-bool isdm(const char *name)
+bool isdm(xmlDocPtr doc)
 {
-	return (strncmp(name, "DMC-", 4) == 0 || strncmp(name, "DME-", 4) == 0) && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
+	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "dmodule") == 0;
+}
+
+bool ispm(xmlDocPtr doc)
+{
+	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "pm") == 0;
 }
 
 bool isicn(const char *name)
@@ -196,15 +201,24 @@ bool isicn(const char *name)
 	return strncmp(name, "ICN-", 4) == 0;
 }
 
-void addDmRef(const char *str, xmlDocPtr dml, bool csl)
+bool isimf(xmlDocPtr doc)
 {
-	xmlDocPtr dm;
-	xmlNodePtr dmlContent;
+	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "icnMetadataFile") == 0;
+}
+
+bool iscom(xmlDocPtr doc)
+{
+	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "comment") == 0;
+}
+
+bool isdml(xmlDocPtr doc)
+{
+	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "dml") == 0;
+}
+
+void addDmRef(xmlDocPtr dm, xmlNodePtr dmlContent, bool csl)
+{
 	xmlNodePtr dmRef, dmRefIdent, dmRefAddressItems, dmlEntry;
-
-	dmlContent = firstXPathNode("//dmlContent", dml);
-
-	dm = xmlReadFile(str, NULL, 0);
 
 	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
 
@@ -212,7 +226,11 @@ void addDmRef(const char *str, xmlDocPtr dml, bool csl)
 		xmlChar *issueType;
 
 		issueType = xmlGetProp(firstXPathNode("//dmStatus", dm), BAD_CAST "issueType");
-		xmlSetProp(dmlEntry, BAD_CAST "issueType", issueType);
+
+		if (issueType) {
+			xmlSetProp(dmlEntry, BAD_CAST "issueType", issueType);
+		}
+
 		xmlFree(issueType);
 	}
 
@@ -238,14 +256,53 @@ void addDmRef(const char *str, xmlDocPtr dml, bool csl)
 	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//dmStatus/responsiblePartnerCompany", dm), 1));
 }
 
-void addIcnRef(const char *str, xmlDocPtr dml)
+void addPmRef(xmlDocPtr pm, xmlNodePtr dmlContent, bool csl)
 {
-	xmlNodePtr dmlContent;
+	xmlNodePtr pmRef, pmRefIdent, pmRefAddressItems, dmlEntry;
+
+	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
+
+	if (csl) {
+		xmlChar *issueType;
+
+		issueType = xmlGetProp(firstXPathNode("//pmStatus", pm), BAD_CAST "issueType");
+
+		if (issueType) {
+			xmlSetProp(dmlEntry, BAD_CAST "issueType", issueType);
+		}
+
+		xmlFree(issueType);
+	}
+
+	pmRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "pmRef", NULL);
+	pmRefIdent = xmlNewChild(pmRef, NULL, BAD_CAST "pmRefIdent", NULL);
+	xmlAddChild(pmRefIdent, xmlCopyNode(firstXPathNode("//pmIdent/identExtension", pm), 1));
+	xmlAddChild(pmRefIdent, xmlCopyNode(firstXPathNode("//pmIdent/pmCode", pm), 1));
+
+	if (csl) {
+		xmlAddChild(pmRefIdent, xmlCopyNode(firstXPathNode("//pmIdent/issueInfo", pm), 1));
+	}
+
+	xmlAddChild(pmRefIdent, xmlCopyNode(firstXPathNode("//pmIdent/language", pm), 1));
+
+	pmRefAddressItems = xmlNewChild(pmRef, NULL, BAD_CAST "pmRefAddressItems", NULL);
+	xmlAddChild(pmRefAddressItems, xmlCopyNode(firstXPathNode("//pmAddressItems/pmTitle", pm), 1));
+
+	if (csl) {
+		xmlAddChild(pmRefAddressItems, xmlCopyNode(firstXPathNode("//pmAddressItems/issueDate", pm), 1));
+	}
+
+	xmlAddChild(pmRefAddressItems, xmlCopyNode(firstXPathNode("//pmAddressItems/shortPmTitle", pm), 1));
+
+	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//pmStatus/security", pm), 1));
+	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//pmStatus/responsiblePartnerCompany", pm), 1));
+}
+
+void addIcnRef(const char *str, xmlNodePtr dmlContent)
+{
 	xmlNodePtr dmlEntry;
 	xmlNodePtr infoEntityRef;
 	char *icn;
-
-	dmlContent = firstXPathNode("//dmlContent", dml);
 
 	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
 	infoEntityRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "infoEntityRef", NULL);
@@ -256,7 +313,61 @@ void addIcnRef(const char *str, xmlDocPtr dml)
 
 	xmlSetProp(infoEntityRef, BAD_CAST "infoEntityRefIdent", BAD_CAST icn);
 
+	xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
+
 	free(icn);
+}
+
+void addImfRef(xmlDocPtr imf, xmlNodePtr dmlContent)
+{
+	xmlChar *imfIdentIcn;
+
+	char *icn;
+
+	imfIdentIcn = xmlGetProp(firstXPathNode("//imfIdent/imfCode", imf), BAD_CAST "imfIdentIcn");
+
+	icn = malloc(xmlStrlen(imfIdentIcn) + 5);
+
+	sprintf(icn, "ICN-%s", imfIdentIcn);
+
+	addIcnRef(icn, dmlContent);
+
+	free(icn);
+	xmlFree(imfIdentIcn);
+}
+
+void addComRef(xmlDocPtr com, xmlNodePtr dmlContent)
+{
+	xmlNodePtr dmlEntry, commentRef, commentRefIdent, responsiblePartnerCompany;
+
+	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
+	commentRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "commentRef", NULL);
+	commentRefIdent = xmlNewChild(commentRef, NULL, BAD_CAST "commentRefIdent", NULL);
+
+	xmlAddChild(commentRefIdent, xmlCopyNode(firstXPathNode("//commentIdent/commentCode", com), 1));
+	xmlAddChild(commentRefIdent, xmlCopyNode(firstXPathNode("//commentIdent/language", com), 1));
+
+	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//commentStatus/security", com), 1));
+
+	responsiblePartnerCompany = xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
+	xmlAddChild(responsiblePartnerCompany, xmlCopyNode(firstXPathNode("//commentAddressItems/commentOriginator/dispatchAddress/enterprise/enterpriseName", com), 1));
+}
+
+void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
+{
+	xmlNodePtr dmlEntry, dmlRef, dmlRefIdent;
+
+	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
+	dmlRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "dmlRef", NULL);
+	dmlRefIdent = xmlNewChild(dmlRef, NULL, BAD_CAST "dmlRefIdent", NULL);
+
+	xmlAddChild(dmlRefIdent, xmlCopyNode(firstXPathNode("//dmlIdent/dmlCode", dml), 1));
+
+	if (csl) {
+		xmlAddChild(dmlRefIdent, xmlCopyNode(firstXPathNode("//dmlIdent/issueInfo", dml), 1));
+	}
+
+	xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
 }
 
 void copy_default_value(const char *def_key, const char *def_val)
@@ -394,7 +505,7 @@ int main(int argc, char **argv)
 {
 	xmlDocPtr dml_doc;
 
-	xmlNodePtr dmlCode, issueInfo, security, issueDate;
+	xmlNodePtr dmlCode, issueInfo, security, issueDate, dmlContent;
 	
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
@@ -547,11 +658,31 @@ int main(int argc, char **argv)
 
 	dml_type[0] = toupper(dml_type[0]);
 
+	dmlContent = firstXPathNode("//dmlContent", dml_doc);
+
 	for (c = optind; c < argc; ++c) {
-		if (isdm(argv[c])) {
-			addDmRef(argv[c], dml_doc, strcmp(dml_type, "S") == 0);
-		} else if (isicn(argv[c])) {
-			addIcnRef(argv[c], dml_doc);
+		xmlDocPtr doc = xmlReadFile(argv[c], NULL, XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
+
+		if (doc) {
+			if (isdm(doc)) {
+				addDmRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
+			} else if (ispm(doc)) {
+				addPmRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
+			} else if (isimf(doc)) {
+				addImfRef(doc, dmlContent);
+			} else if (iscom(doc)) {
+				addComRef(doc, dmlContent);
+			} else if (isdml(doc)) {
+				addDmlRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
+			}
+
+			xmlFreeDoc(doc);
+		} else {
+			char *base = basename(argv[c]);
+
+			if (isicn(base)) {
+				addIcnRef(base, dmlContent);
+			}
 		}
 	}
 
