@@ -303,8 +303,9 @@ void addPmRef(xmlDocPtr pm, xmlNodePtr dmlContent, bool csl)
 
 void addIcnRef(const char *str, xmlNodePtr dmlContent)
 {
-	xmlNodePtr dmlEntry, infoEntityRef, responsiblePartnerCompany;
+	xmlNodePtr dmlEntry, infoEntityRef, responsiblePartnerCompany, security;
 	char *icn;
+	char *sec;
 
 	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
 	infoEntityRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "infoEntityRef", NULL);
@@ -313,7 +314,12 @@ void addIcnRef(const char *str, xmlNodePtr dmlContent)
 	strcpy(icn, str);
 	strtok(icn, ".");
 
+	sec = strrchr(icn, '-') + 1;
+
 	xmlSetProp(infoEntityRef, BAD_CAST "infoEntityRefIdent", BAD_CAST icn);
+
+	security = xmlNewChild(dmlEntry, NULL, BAD_CAST "security", NULL);
+	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
 
 	responsiblePartnerCompany = xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
 	if (defaultRpcCode) {
@@ -379,6 +385,8 @@ void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
 	if (csl) {
 		xmlAddChild(dmlRefIdent, xmlCopyNode(firstXPathNode("//dmlIdent/issueInfo", dml), 1));
 	}
+
+	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//dmlStatus/security", dml), 1));
 
 	responsiblePartnerCompany = xmlNewChild(dmlEntry, NULL, BAD_CAST "responsiblePartnerCompany", NULL);
 	if (defaultRpcCode) {
