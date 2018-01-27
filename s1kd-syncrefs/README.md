@@ -6,7 +6,7 @@ s1kd-syncrefs - Synchronize references in a data module
 SYNOPSIS
 ========
 
-s1kd-syncrefs \[-o &lt;out&gt;\] &lt;datamodules&gt;
+s1kd-syncrefs \[-df\] \[-o &lt;out&gt;\] \[&lt;data module&gt;...\]
 
 DESCRIPTION
 ===========
@@ -16,8 +16,14 @@ The *s1kd-syncrefs* tool copies all external references (dmRef, pmRef, externalP
 OPTIONS
 =======
 
--o &lt;out&gt;  
-The resulting data module is output to the file &lt;out&gt; instead of overwriting the original data module. This option only makes sense when &lt;datamodules&gt; contains only a single data module to synchronize. - can be specified to print to stdout.
+-d  
+Delete the &lt;refs&gt; element.
 
-&lt;datamodules&gt;  
-The data modules to synchronize references in. Each data module will be overwritten as a result of this command.
+-f  
+Overwrite the data modules automatically.
+
+-o &lt;out&gt;  
+The resulting XML is written to &lt;out&gt; instead of stdout.
+
+&lt;data module&gt;...  
+The data module(s) to synchronize references in. Default is to read from stdin.

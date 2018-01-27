@@ -248,28 +248,34 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-o <out>] <dms>");
 	puts("");
 	puts("Options:");
-	puts("  -o <out>	Output to <out> instead of overwriting (- for stdout)");
+	puts("  -o <out>	Output to <out> instead of stdout");
+	puts("  -f              Overwrite the data modules automatically");
+	puts("  -d              Delete the references table");
 	puts("  <dms>		Any number of data modules");
 }
 
 int main(int argc, char *argv[])
 {
-	int c;
 	int i;
 
 	xmlDocPtr dm;
 
 	xmlNodePtr dmodule;
 	
-	char out[256] = "";
+	char out[PATH_MAX] = "-";
 
-	while ((c = getopt(argc, argv, "o:dh?")) != -1) {
-		switch (c) {
+	bool overwrite = false;
+
+	while ((i = getopt(argc, argv, "o:dfh?")) != -1) {
+		switch (i) {
 			case 'o':
 				strcpy(out, optarg);
 				break;
 			case 'd':
 				only_delete = true;
+				break;
+			case 'f':
+				overwrite = true;
 				break;
 			case 'h':
 			case '?':
@@ -278,19 +284,27 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	for (i = optind; i < argc; ++i) {
-		dm = xmlReadFile(argv[i], NULL, XML_PARSE_NONET);
+	if (optind < argc) {
+		for (i = optind; i < argc; ++i) {
+			dm = xmlReadFile(argv[i], NULL, XML_PARSE_NONET);
 
-		dmodule = xmlDocGetRootElement(dm);
+			dmodule = xmlDocGetRootElement(dm);
 
-		sync_refs(dmodule);
+			sync_refs(dmodule);
 
-		if (strcmp(out, "") != 0) {
-			xmlSaveFormatFile(out, dm, 1);
-		} else {
-			xmlSaveFormatFile(argv[i], dm, 1);
+			if (overwrite) {
+				xmlSaveFile(argv[i], dm);
+			} else {
+				xmlSaveFile(out, dm);
+			}
+
+			xmlFreeDoc(dm);
 		}
-
+	} else {
+		dm = xmlReadFile("-", NULL, XML_PARSE_NONET);
+		dmodule = xmlDocGetRootElement(dm);
+		sync_refs(dmodule);
+		xmlSaveFile(out, dm);
 		xmlFreeDoc(dm);
 	}
 

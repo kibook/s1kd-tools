@@ -8,16 +8,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="1" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2018" month="01" day="27"/>
         <dmTitle>
           <techName>s1kd-syncrefs(1) | General Commands Manual</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -40,6 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Change the behaviour of the tool, making better use of stdin/stdout and not overwriting by default.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -50,7 +53,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-syncrefs [-o &lt;out&gt;] &lt;datamodules&gt;</para>
+        <para>s1kd-syncrefs [-df] [-o &lt;out&gt;] [&lt;data module&gt;...]</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -61,15 +64,27 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-o &lt;out&gt;</listItemTerm>
+              <listItemTerm>-d</listItemTerm>
               <listItemDefinition>
-                <para>The resulting data module is output to the file &lt;out&gt; instead of overwriting the original data module. This option only makes sense when &lt;datamodules&gt; contains only a single data module to synchronize. - can be specified to print to stdout.</para>
+                <para>Delete the &lt;refs&gt; element.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>&lt;datamodules&gt;</listItemTerm>
+              <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>The data modules to synchronize references in. Each data module will be overwritten as a result of this command.</para>
+                <para>Overwrite the data modules automatically.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;out&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The resulting XML is written to &lt;out&gt; instead of stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;data module&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>The data module(s) to synchronize references in. Default is to read from stdin.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
