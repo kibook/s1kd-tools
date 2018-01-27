@@ -6,12 +6,12 @@ s1kd-transform - Apply XSL transformations to data modules
 SYNOPSIS
 ========
 
-s1kd-transform \[-h?\] \[-s &lt;stylesheet&gt; ...\] \[-i\] \[-o &lt;file&gt;\] &lt;datamodules&gt;
+s1kd-transform \[-s &lt;stylesheet&gt; ...\] \[-o &lt;file&gt;\] \[-ifh?\] \[&lt;data module&gt; ...\]
 
 DESCRIPTION
 ===========
 
-Applies an XSLT stylesheet to S1000D data modules. The original data module files are overwritten, but their DTD is preserved.
+Applies an XSLT stylesheet to S1000D data modules. The DTD of any specified data modules is preserved in the resulting output.
 
 OPTIONS
 =======
@@ -26,10 +26,13 @@ An XSLT stylesheet file to apply to each data module. Multiple stylesheets can b
 Includes an "identity" template in to each specified stylesheet.
 
 -o &lt;file&gt;  
-Output to &lt;file&gt; instead of overwriting the original data module file. This option only makes sense when the input is a single data module.
+Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single data module.
 
-&lt;datamodules&gt;  
-Any number of data modules to apply all specified stylesheets to. The original files are overwritten with the results of the transformations.
+-f  
+Overwrite the specified data module(s) instead of writing to stdout.
+
+&lt;data module&gt; ...  
+Any number of data modules to apply all specified stylesheets to.
 
 Identity template
 -----------------

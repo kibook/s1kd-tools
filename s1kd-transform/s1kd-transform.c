@@ -70,7 +70,7 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 	return src;
 }
 	
-void transformFile(const char *path, xmlNodePtr stylesheets, const char *out)
+void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
 {
 	xmlDocPtr doc;
 
@@ -78,10 +78,10 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out)
 
 	doc = transformDoc(doc, stylesheets);
 
-	if (out) {
-		xmlSaveFile(out, doc);
-	} else {
+	if (overwrite) {
 		xmlSaveFile(path, doc);
+	} else {
+		xmlSaveFile(out, doc);
 	}
 
 	xmlFreeDoc(doc);
@@ -105,11 +105,12 @@ int main(int argc, char **argv)
 
 	xmlNodePtr stylesheets;
 
-	char *out = NULL;
+	char *out = strdup("-");
+	bool overwrite = false;
 
 	stylesheets = xmlNewNode(NULL, BAD_CAST "stylesheets");
 
-	while ((i = getopt(argc, argv, "s:io:h?")) != -1) {
+	while ((i = getopt(argc, argv, "s:io:fh?")) != -1) {
 		switch (i) {
 			case 's':
 				xmlNewChild(stylesheets, NULL, BAD_CAST "stylesheet", BAD_CAST optarg);
@@ -118,7 +119,11 @@ int main(int argc, char **argv)
 				includeIdentity = true;
 				break;
 			case 'o':
+				free(out);
 				out = strdup(optarg);
+				break;
+			case 'f':
+				overwrite = true;
 				break;
 			case 'h':
 			case '?':
@@ -127,8 +132,12 @@ int main(int argc, char **argv)
 		}
 	}
 
-	for (i = optind; i < argc; ++i) {
-		transformFile(argv[i], stylesheets, out);
+	if (optind < argc) {
+		for (i = optind; i < argc; ++i) {
+			transformFile(argv[i], stylesheets, out, overwrite);
+		}
+	} else {
+		transformFile("-", stylesheets, out, overwrite);
 	}
 
 	if (out) {
