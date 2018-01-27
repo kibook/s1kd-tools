@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 			transformFile(argv[i], stylesheets, out, overwrite);
 		}
 	} else {
-		transformFile("-", stylesheets, out, overwrite);
+		transformFile("-", stylesheets, out, false);
 	}
 
 	if (out) {

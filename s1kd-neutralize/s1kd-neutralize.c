@@ -12,7 +12,7 @@
 
 #define PROG_NAME "s1kd-neutralize"
 
-void neutralizeFile(const char *fname, const char *outfile)
+void neutralizeFile(const char *fname, const char *outfile, bool overwrite)
 {
 	xmlDocPtr doc, res, styledoc, orig;
 	xsltStylesheetPtr style;
@@ -42,10 +42,11 @@ void neutralizeFile(const char *fname, const char *outfile)
 
 	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
 
-	if (outfile)
-		xmlSaveFile(outfile, orig);
-	else
+	if (overwrite) {
 		xmlSaveFile(fname, orig);
+	} else {
+		xmlSaveFile(outfile, orig);
+	}
 
 	xmlFreeDoc(res);
 	xmlFreeDoc(orig);
@@ -53,22 +54,28 @@ void neutralizeFile(const char *fname, const char *outfile)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-o <file>] [-rh?] <datamodules>");
+	puts("Usage: " PROG_NAME " [-o <file>] [-fh?] [<data module> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -o <file>  Output to <file> instead of overwriting.");
+	puts("  -o <file>  Output to <file> instead of stdout.");
+	puts("  -f         Overwrite data modules automatically.");
 	puts("  -h -?      Show usage message.");
 }
 
 int main(int argc, char **argv)
 {
 	int i;
-	char *outfile = NULL;
+	char *outfile = strdup("-");
+	bool overwrite = false;
 
-	while ((i = getopt(argc, argv, "ro:h?")) != -1) {
+	while ((i = getopt(argc, argv, "o:fh?")) != -1) {
 		switch (i) {
 			case 'o':
+				free(outfile);
 				outfile = strdup(optarg);
+				break;
+			case 'f':
+				overwrite = true;
 				break;
 			case 'h':
 			case '?':
@@ -77,8 +84,12 @@ int main(int argc, char **argv)
 		}
 	}
 
-	for (i = optind; i < argc; ++i) {
-		neutralizeFile(argv[i], outfile);
+	if (optind < argc) {
+		for (i = optind; i < argc; ++i) {
+			neutralizeFile(argv[i], outfile, overwrite);
+		}
+	} else {
+		neutralizeFile("-", outfile, false);
 	}
 
 	free(outfile);

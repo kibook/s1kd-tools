@@ -6,7 +6,7 @@ s1kd-neutralize - S1000D IETP neutral translation of data modules
 SYNOPSIS
 ========
 
-s1kd-neutralize \[-o &lt;file&gt;\] \[-rh?\] &lt;datamodules&gt;
+s1kd-neutralize \[-o &lt;file&gt;\] \[-fh?\] \[&lt;data module&gt; ...\]
 
 DESCRIPTION
 ===========
@@ -21,7 +21,10 @@ OPTIONS
 =======
 
 -o &lt;file&gt;  
-Output neutralized data module XML to &lt;file&gt; instead of overwriting the source data module.
+Output neutralized data module XML to &lt;file&gt; instead of stdout.
+
+-f  
+Overwrite specified data module(s) automatically.
 
 -h -?  
 Show usage message.
@@ -46,8 +49,7 @@ EXAMPLE
       </dmRefAddressItems>
     </dmRef>
 
-    $ s1kd-neutralize $DMOD
-    $ xmllint --xpath "//description/dmRef" $DMOD
+    $ s1kd-neutralize $DMOD | xmllint --xpath "//description/dmRef" -
     <dmRef xlink:type="simple"
     xlink:href="URN:S1000D:DMC-XLINKTEST-A-00-00-01-00A-040A-D"
     xlink:title="XLink test - Referenced data module">
