@@ -23,6 +23,7 @@ bool verbose = false;
 bool validateOnly = true;
 bool failOnInvalid = false;
 bool checkExtPubRefs = false;
+bool listInvalid = false;
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -400,7 +401,11 @@ void validityError(xmlNodePtr ref, const char *fname)
 		getExtPubCode(code, firstXPathNode("externalPubRefIdent", ref->doc, ref), false, false);
 	}
 
-	fprintf(stderr, ERR_PREFIX "%s (Line %d): invalid reference to %s %s.\n", fname, ref->line, prefix, code);
+	if (listInvalid) {
+		printf("%s\n", code);
+	} else {
+		fprintf(stderr, ERR_PREFIX "%s (Line %d): invalid reference to %s %s.\n", fname, ref->line, prefix, code);
+	}
 
 	if (failOnInvalid)
 		exit(EXIT_VALIDITY_ERR);
@@ -491,7 +496,8 @@ void showHelp(void)
 	puts("  -c             Only check references in content section of targets.");
 	puts("  -u             Update address items of references.");
 	puts("  -F             Fail on first invalid reference, returning error code.");
-	puts("  -e             Check externalPubRefs");
+	puts("  -e             Check externalPubRefs.");
+	puts("  -l             List invalid references.");
 	puts("  -v             Verbose output.");
 	puts("  -h -?          Show help/usage message.");
 }
@@ -589,7 +595,7 @@ int main(int argc, char **argv)
 	char *source = NULL;
 	char *target = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFveh?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFvelh?")) != -1) {
 		switch (i) {
 			case 's':
 				source = strdup(optarg);
@@ -611,6 +617,9 @@ int main(int argc, char **argv)
 				break;
 			case 'e':
 				checkExtPubRefs = true;
+				break;
+			case 'l':
+				listInvalid = true;
 				break;
 			case 'h':
 			case '?':

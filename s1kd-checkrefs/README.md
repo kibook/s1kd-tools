@@ -6,7 +6,7 @@ s1kd-checkrefs - Check and update references in S1000D modules
 SYNOPSIS
 ========
 
-s1kd-checkrefs \[-s &lt;source&gt;\] \[-t &lt;target&gt;\] \[-cuFvh?\] &lt;modules&gt;...
+s1kd-checkrefs \[-s &lt;source&gt;\] \[-t &lt;target&gt;\] \[-cuFelvh?\] &lt;modules&gt;...
 
 DESCRIPTION
 ===========
@@ -33,6 +33,9 @@ Fail on first invalid reference and return an error code.
 
 -e  
 Check/update external publication references against a pre-defined list of publications.
+
+-l  
+List all invalid references found.
 
 -v  
 Verbose output.
