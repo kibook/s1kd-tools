@@ -25,6 +25,9 @@ The filename to output to. Default is to write to stdout.
 -f  
 Overwrite source file instead of writing to stdout.
 
+-F  
+Use the whole path given for the ICN file as the SYSTEM ID.
+
 -h -?  
 Show help/usage message.
 

@@ -14,6 +14,7 @@ void showHelp(void)
 	puts("  -s <src>  Source filename.");
 	puts("  -o <out>  Output filename.");
 	puts("  -f        Overwrite source file.");
+	puts("  -F        Include full ICN file path.");
 	puts("  -h -?     Show help/usage message.");
 	puts("  <ICN>...  ICNs to add.");
 }
@@ -41,7 +42,9 @@ void addIcn(xmlDocPtr doc, const char *path, bool fullpath)
 	infoEntityIdent = strtok(base, ".");
 	notation = strtok(NULL, "");
 
-	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, BAD_CAST path, BAD_CAST notation);
+	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
+		XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL,
+		BAD_CAST (fullpath ? path : base), BAD_CAST notation);
 	addNotation(doc, notation, notation);
 
 	free(full);
@@ -59,7 +62,7 @@ int main(int argc, char **argv)
 	src = strdup("-");
 	out = strdup("-");
 
-	while ((i = getopt(argc, argv, "s:o:fh?")) != -1) {
+	while ((i = getopt(argc, argv, "s:o:fFh?")) != -1) {
 		switch (i) {
 			case 's':
 				free(src);
@@ -71,6 +74,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'F':
+				fullpath = true;
 				break;
 			case 'h':
 			case '?':

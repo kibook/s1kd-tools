@@ -77,6 +77,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-F</listItemTerm>
+              <listItemDefinition>
+                <para>Use the whole path given for the ICN file as the SYSTEM ID.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
