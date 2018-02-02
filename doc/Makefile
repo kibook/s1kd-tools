@@ -11,7 +11,7 @@ EXAMPLE_OUT=../EXAMPLE.md
 
 MAN_PREFIX=/usr/local/share/man/man1
 
-all: s1kd-tools.1 $(OUTPUT1) $(OUTPUT2) $(OUTPUT3) $(EXAMPLE_OUT)
+all: s1kd-tools.1
 
 $(OUTPUT1): $(SOURCE1)
 	s1kd2db $(SOURCE1) | pandoc -f docbook -t markdown_github -s -o $@
