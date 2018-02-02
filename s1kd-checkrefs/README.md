@@ -6,7 +6,7 @@ s1kd-checkrefs - Check and update references in S1000D modules
 SYNOPSIS
 ========
 
-s1kd-checkrefs \[-s &lt;source&gt;\] \[-t &lt;target&gt;\] \[-cuFelvh?\] &lt;modules&gt;...
+s1kd-checkrefs \[-s &lt;source&gt;\] \[-t &lt;target&gt;\] \[-d &lt;dir&gt;\] \[-cuFelvh?\] &lt;modules&gt;...
 
 DESCRIPTION
 ===========
@@ -21,6 +21,9 @@ Use only the specified module as the source of address items. Only references to
 
 -t &lt;target&gt;  
 Only check and/or update references within this module. All other modules will only be used as sources.
+
+-d &lt;dir&gt;  
+Check references between data modules in the specified directory. Additional data modules can still be specified with -s.
 
 -c  
 Only check/update references within the content section of modules.

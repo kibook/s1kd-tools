@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdbool.h>
+#include <dirent.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
@@ -10,6 +11,7 @@
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_VALIDITY_ERR 1
+#define EXIT_NO_FILE 2
 
 #define ADDR_PATH     "//dmAddress|//pmAddress"
 #define ADDR_PATH_EXT "//dmAddress|//pmAddress|//externalPubAddress"
@@ -488,7 +490,7 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-cuFevh?]");
+	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-d <dir>] [-cuFelvh?]");
 	puts("");
 	puts("Options:");
 	puts("  -s <source>    Use only <source> as source.");
@@ -498,8 +500,25 @@ void showHelp(void)
 	puts("  -F             Fail on first invalid reference, returning error code.");
 	puts("  -e             Check externalPubRefs.");
 	puts("  -l             List invalid references.");
+	puts("  -d <dir>       Check data modules in directory <dir>.");
 	puts("  -v             Verbose output.");
 	puts("  -h -?          Show help/usage message.");
+}
+
+bool isS1000D(const char *fname)
+{
+	return (strncmp(fname, "DMC-", 4) == 0 ||
+		strncmp(fname, "DME-", 4) == 0 ||
+		strncmp(fname, "PMC-", 4) == 0 ||
+		strncmp(fname, "PME-", 4) == 0 ||
+		strncmp(fname, "COM-", 4) == 0 ||
+		strncmp(fname, "IMF-", 4) == 0 ||
+		strncmp(fname, "DDN-", 4) == 0 ||
+		strncmp(fname, "DML-", 4) == 0 ||
+		strncmp(fname, "UPF-", 4) == 0 ||
+		strncmp(fname, "UPE-", 4) == 0 ||
+		strncmp(fname, "SMC-", 4) == 0 ||
+		strncmp(fname, "SME-", 4) == 0) && strncasecmp(fname + strlen(fname) - 4, ".XML", 4) == 0;
 }
 
 void addAddress(const char *fname, xmlNodePtr addresses)
@@ -507,15 +526,15 @@ void addAddress(const char *fname, xmlNodePtr addresses)
 	xmlDocPtr doc;
 	xmlNodePtr root;
 
-	doc = xmlReadFile(fname, NULL, 0);
+	doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
 
 	if (!doc)
 		return;
 
+	root = xmlDocGetRootElement(doc);
+
 	if (verbose)
 		printf("Registering %s...\n", fname);
-
-	root = xmlDocGetRootElement(doc);
 
 	if (checkExtPubRefs && strcmp((char *) root->name, "externalPubs") == 0) {
 		xmlXPathContextPtr ctx;
@@ -548,7 +567,7 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly)
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
-	doc = xmlReadFile(fname, NULL, 0);
+	doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
 
 	if (!doc)
 		return;
@@ -584,6 +603,46 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly)
 	xmlFreeDoc(doc);
 }
 
+void addDirectory(const char *path, xmlNodePtr addresses)
+{
+	DIR *dir;
+	struct dirent *cur;
+
+	dir = opendir(path);
+
+	if (!dir) {
+		fprintf(stderr, ERR_PREFIX "Directory %s does not exist.\n", path);
+		exit(EXIT_NO_FILE);
+	}
+
+	while ((cur = readdir(dir))) {
+		if (isS1000D(cur->d_name)) {
+			char fname[PATH_MAX];
+			sprintf(fname, "%s/%s", path, cur->d_name);
+			addAddress(fname, addresses);
+		}
+	}
+
+	closedir(dir);
+}
+
+void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly)
+{
+	DIR *dir;
+	struct dirent *cur;
+
+	dir = opendir(path);
+
+	while ((cur = readdir(dir))) {
+		if (isS1000D(cur->d_name)) {
+			char fname[PATH_MAX];
+			sprintf(fname, "%s/%s", path, cur->d_name);
+			updateRefsFile(fname, addresses, contentOnly);
+		}
+	}
+
+	closedir(dir);
+}
 
 int main(int argc, char **argv)
 {
@@ -594,8 +653,9 @@ int main(int argc, char **argv)
 	bool contentOnly = false;
 	char *source = NULL;
 	char *target = NULL;
+	char *directory = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFvelh?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFveld:h?")) != -1) {
 		switch (i) {
 			case 's':
 				source = strdup(optarg);
@@ -621,6 +681,9 @@ int main(int argc, char **argv)
 			case 'l':
 				listInvalid = true;
 				break;
+			case 'd':
+				directory = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -629,6 +692,10 @@ int main(int argc, char **argv)
 	}
 
 	addresses = xmlNewNode(NULL, BAD_CAST "addresses");
+
+	if (directory) {
+		addDirectory(directory, addresses);
+	}
 
 	if (source) {
 		addAddress(source, addresses);
@@ -640,16 +707,17 @@ int main(int argc, char **argv)
 
 	if (target) {
 		updateRefsFile(target, addresses, contentOnly);
+	} else if (directory) {
+		updateRefsDirectory(directory, addresses, contentOnly);
 	} else {
 		for (i = optind; i < argc; ++i) {
 			updateRefsFile(argv[i], addresses, contentOnly);
 		}
 	}
 
-	if (source)
-		free(source);
-	if (target)
-		free(target);
+	free(source);
+	free(target);
+	free(directory);
 
 	xmlFreeNode(addresses);
 

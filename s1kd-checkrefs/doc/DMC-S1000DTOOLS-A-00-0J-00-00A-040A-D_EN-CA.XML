@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001">
         <simplePara>Add -l option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002">
+        <simplePara>Add -d option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -51,7 +54,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-checkrefs [-s &lt;source&gt;] [-t &lt;target&gt;] [-cuFelvh?] &lt;modules&gt;...</para>
+        <para>s1kd-checkrefs [-s &lt;source&gt;] [-t &lt;target&gt;] [-d &lt;dir&gt;] [-cuFelvh?] &lt;modules&gt;...</para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -71,6 +74,12 @@
               <listItemTerm>-t &lt;target&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Only check and/or update references within this module. All other modules will only be used as sources.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Check references between data modules in the specified directory. Additional data modules can still be specified with -s.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -97,7 +106,7 @@
                 <para>Check/update external publication references against a pre-defined list of publications.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>List all invalid references found.</para>

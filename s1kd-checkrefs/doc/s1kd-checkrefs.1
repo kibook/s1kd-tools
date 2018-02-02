@@ -7,7 +7,8 @@
 s1kd\-checkrefs \- Check and update references in S1000D modules
 .SH SYNOPSIS
 .PP
-s1kd\-checkrefs [\-s <source>] [\-t <target>] [\-cuFelvh?] <modules>...
+s1kd\-checkrefs [\-s <source>] [\-t <target>] [\-d <dir>] [\-cuFelvh?]
+<modules>...
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-checkrefs\f[] tool takes a list of S1000D data modules
@@ -28,6 +29,12 @@ other modules.
 .B \-t <target>
 Only check and/or update references within this module.
 All other modules will only be used as sources.
+.RS
+.RE
+.TP
+.B \-d <dir>
+Check references between data modules in the specified directory.
+Additional data modules can still be specified with \-s.
 .RS
 .RE
 .TP
