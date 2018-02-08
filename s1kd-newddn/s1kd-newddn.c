@@ -67,6 +67,19 @@ char ddn_issue_date[16] = "";
 
 enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
+char *template_dir = NULL;
+
+xmlDocPtr xml_skeleton(void)
+{
+	if (template_dir) {
+		char src[PATH_MAX];
+		sprintf(src, "%s/ddn.xml", template_dir);
+		return xmlReadFile(src, NULL, 0);
+	} else {
+		return xmlReadMemory((const char *) templates_ddn_xml, templates_ddn_xml_len, NULL, NULL, 0);
+	}
+}
+
 enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
@@ -185,6 +198,7 @@ void show_help(void)
 	puts("  -f               Overwrite existing file.");
 	puts("  -$               Specify which S1000D issue to use.");
 	puts("  -@               Output to specified file.");
+	puts("  -%               Use templates in specified directory.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
@@ -262,6 +276,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(brex_dmcode, def_val);
 	if (strcmp(def_key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(def_val);
+	if (strcmp(def_key, "templates") == 0 && !template_dir)
+		template_dir = strdup(def_val);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -386,7 +402,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -404,6 +420,7 @@ int main(int argc, char **argv)
 			case 'f': overwrite = 1; break;
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
+			case '%': template_dir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -484,7 +501,7 @@ int main(int argc, char **argv)
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
 
-	ddn = xmlReadMemory((const char *) templates_ddn_xml, templates_ddn_xml_len, NULL, NULL, 0);
+	ddn = xml_skeleton();
 
 	ctxt = xmlXPathNewContext(ddn);
 
@@ -578,6 +595,7 @@ int main(int argc, char **argv)
 		puts(out);
 
 	free(out);
+	free(template_dir);
 	xmlFreeDoc(ddn);
 
 	xmlCleanupParser();
