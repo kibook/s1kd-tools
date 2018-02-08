@@ -388,9 +388,6 @@ int main(int argc, char **argv)
 	xmlNodePtr commentPriority;
 	xmlNodePtr commentResponse;
 
-
-	FILE *defaults;
-
 	char language_fname[4];
 
 	char code[256] = "";
@@ -490,6 +487,8 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(defaults_xml);
 	} else {
+		FILE *defaults;
+
 		defaults = fopen(defaults_fname, "r");
 
 		if (defaults) {
@@ -498,7 +497,7 @@ int main(int argc, char **argv)
 			while (fgets(default_line, 1024, defaults)) {
 				char def_key[32], def_val[256];
 
-				if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+				if (sscanf(default_line, "%31s %255[^\n]", def_key, def_val) != 2)
 					continue;
 
 				copy_default_value(def_key, def_val);
