@@ -19,6 +19,7 @@
 #define EXIT_BAD_BREX_DMC 3
 #define EXIT_BAD_DATE 4
 #define EXIT_BAD_ISSUE 5
+#define EXIT_BAD_TEMPLATE 6
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -67,6 +68,12 @@ xmlDocPtr xml_skeleton(void)
 	if (template_dir) {
 		char src[PATH_MAX];
 		sprintf(src, "%s/comment.xml", template_dir);
+
+		if (access(src, F_OK) == -1) {
+			fprintf(stderr, ERR_PREFIX "No schema comment in template directory \"%s\".\n", template_dir);
+			exit(EXIT_BAD_TEMPLATE);
+		}
+
 		return xmlReadFile(src, NULL, 0);
 	} else {
 		return xmlReadMemory((const char *) comment_xml, comment_xml_len, NULL, NULL, 0);
