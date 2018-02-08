@@ -937,7 +937,7 @@ int main(int argc, char **argv)
 		while (fgets(default_line, 1024, defaults)) {
 			char def_key[32], def_val[256];
 
-			if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+			if (sscanf(default_line, "%31s %255[^\n]", def_key, def_val) != 2)
 				continue;
 
 			copy_default_value(def_key, def_val);
@@ -983,7 +983,7 @@ int main(int argc, char **argv)
 				char code[4], variant[2];
 				int p;
 
-				n = sscanf(default_line, "%s %s %[^\n]", def_key, def_val, infname);
+				n = sscanf(default_line, "%31s %255s %255[^\n]", def_key, def_val, infname);
 
 				if (n < 2)
 					continue;
