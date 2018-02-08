@@ -835,7 +835,6 @@ void print_dmtypes_txt(void)
 
 int main(int argc, char **argv)
 {
-	char dmc[MAX_DATAMODULE_CODE];
 	char learn[6] = "";
 	char iss[8] = "";
 
@@ -1188,6 +1187,8 @@ int main(int argc, char **argv)
 	}
 
 	if (!out) {
+		char dmc[MAX_DATAMODULE_CODE];
+
 		snprintf(dmc, MAX_DATAMODULE_CODE,
 			"DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
 			modelIdentCode,
