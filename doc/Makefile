@@ -33,7 +33,3 @@ install:
 
 clean:
 	rm -f s1kd-tools.1
-	rm -f $(OUTPUT1)
-	rm -f $(OUTPUT2)
-	rm -f $(OUTPUT3)
-	rm -f $(EXAMPLE_OUT)
