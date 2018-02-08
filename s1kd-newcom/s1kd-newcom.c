@@ -60,6 +60,19 @@ char issue_date[16] = "";
 
 enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
+char *template_dir = NULL;
+
+xmlDocPtr xml_skeleton(void)
+{
+	if (template_dir) {
+		char src[PATH_MAX];
+		sprintf(src, "%s/comment.xml", template_dir);
+		return xmlReadFile(src, NULL, 0);
+	} else {
+		return xmlReadMemory((const char *) comment_xml, comment_xml_len, NULL, NULL, 0);
+	}
+}
+
 enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
@@ -221,6 +234,7 @@ void show_help(void)
 	puts("  -f    Overwrite existing file.");
 	puts("  -$    Specify which S1000D issue to use.");
 	puts("  -@    Output to specified file.");
+	puts("  -%    Use templates in specified directory.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Comment code");
@@ -262,6 +276,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(commentPriorityCode, def_val);
 	else if (strcmp(def_key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strcpy(brex_dmcode, def_val);
+	else if (strcmp(def_key, "templates") == 0 && !template_dir)
+		template_dir = strdup(def_val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -385,7 +401,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:h?")) != -1) {
+	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:h?")) != -1) {
 		switch (i) {
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
@@ -436,6 +452,9 @@ int main(int argc, char **argv)
 			case '@':
 				out = strdup(optarg);
 				break;
+			case '%':
+				template_dir = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -482,7 +501,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	comment_doc = xmlReadMemory((const char *) comment_xml, comment_xml_len, NULL, NULL, 0);
+	comment_doc = xml_skeleton();
 
 	if (strcmp(code, "") != 0) {
 		int n;
@@ -632,6 +651,7 @@ int main(int argc, char **argv)
 		puts(out);
 
 	free(out);
+	free(template_dir);
 	xmlFreeDoc(comment_doc);
 
 	xmlCleanupParser();
