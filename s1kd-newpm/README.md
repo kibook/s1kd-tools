@@ -77,6 +77,9 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -@ &lt;filename&gt;  
 Save new publication module as &lt;filename&gt; instead of an automatically named file in the current directory.
 
+-% &lt;dir&gt;  
+Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named `pm.xml` in &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+
 'defaults' file
 ---------------
 

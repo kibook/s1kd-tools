@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="C" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="18"/>
+        <issueDate year="2018" month="02" day="08"/>
         <dmTitle>
           <techName>s1kd-newpm(1) | General Commands Manual</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add support for issue 2.3.</simplePara>
+        <simplePara>Add -% option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -171,7 +171,7 @@
                     <listItem>
                       <para>3.0</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.3</para>
                     </listItem>
                   </randomList>
@@ -182,6 +182,12 @@
               <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save new publication module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">pm.xml</verbatimText> in &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

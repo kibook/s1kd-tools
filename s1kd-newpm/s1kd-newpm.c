@@ -22,6 +22,7 @@
 #define EXIT_BAD_BREX_DMC 3
 #define EXIT_BAD_DATE 4
 #define EXIT_BAD_ISSUE 5
+#define EXIT_BAD_TEMPLATE 6
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -61,6 +62,25 @@ char issue_date[16] = "";
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
 enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+
+char *template_dir = NULL;
+
+xmlDocPtr xml_skeleton(void)
+{
+	if (template_dir) {
+		char src[PATH_MAX];
+		sprintf(src, "%s/pm.xml", template_dir);
+
+		if (access(src, F_OK) == -1) {
+			fprintf(stderr, ERR_PREFIX "No schema pm in template directory \"%s\".\n", template_dir);
+			exit(EXIT_BAD_TEMPLATE);
+		}
+
+		return xmlReadFile(src, NULL, 0);
+	} else {
+		return xmlReadMemory((const char *) pm_xml, pm_xml_len, NULL, NULL, 0);
+	}
+}
 
 enum issue get_issue(const char *iss)
 {
@@ -281,6 +301,7 @@ void show_help(void)
 	puts("  -f    Overwrite existing file.");
 	puts("  -$    Specify which S1000D issue to use.");
 	puts("  -@    Output to specified file.");
+	puts("  -%    Use template in specified directory.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Publication module code");
@@ -323,6 +344,8 @@ void copy_default_value(const char *key, const char *val)
 		strcpy(brex_dmcode, val);
 	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(val);
+	else if (strcmp(key, "templates") == 0 && !template_dir)
+		template_dir = strdup(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -438,7 +461,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:@:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:@:%:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -460,6 +483,7 @@ int main(int argc, char **argv)
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
+			case '%': template_dir = strdup(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -510,7 +534,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	pm_doc = xmlReadMemory((const char *) pm_xml, pm_xml_len, NULL, NULL, 0);
+	pm_doc = xml_skeleton();
 
 	if (strcmp(pmcode, "") != 0) {
 		int n;
@@ -654,6 +678,7 @@ int main(int argc, char **argv)
 		puts(out);
 
 	free(out);
+	free(template_dir);
 	xmlFreeDoc(pm_doc);
 
 	xmlCleanupParser();
