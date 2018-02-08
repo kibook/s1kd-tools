@@ -22,6 +22,7 @@
 #define EXIT_BAD_BREX_DMC 4
 #define EXIT_BAD_DATE 5
 #define EXIT_BAD_ISSUE 6
+#define EXIT_BAD_TEMPLATE 7
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -60,6 +61,25 @@ enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 char *defaultRpcName = NULL;
 char *defaultRpcCode = NULL;
+
+char *template_dir = NULL;
+
+xmlDocPtr xml_skeleton(void)
+{
+	if (template_dir) {
+		char src[PATH_MAX];
+		sprintf(src, "%s/dml.xml", template_dir);
+
+		if (access(src, F_OK) == -1) {
+			fprintf(stderr, ERR_PREFIX "No schema dml found in template directory \"%s\".\n", template_dir);
+			exit(EXIT_BAD_TEMPLATE);
+		}
+
+		return xmlReadFile(src, NULL, 0);
+	} else {
+		return xmlReadMemory((const char *) dml_xml, dml_xml_len, NULL, NULL, 0);
+	}
+}
 
 enum issue get_issue(const char *iss)
 {
@@ -421,6 +441,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		defaultRpcName = strdup(def_val);
 	else if (strcmp(def_key, "responsiblePartnerCompanyCode") == 0 && !defaultRpcCode)
 		defaultRpcCode = strdup(def_val);
+	else if (strcmp(def_key, "templates") == 0 && !template_dir)
+		template_dir = strdup(def_val);
 }
 
 void show_help(void)
@@ -435,6 +457,7 @@ void show_help(void)
 	puts("  -f       Overwrite existing file.");
 	puts("  -$       Specify which S1000d issue to use.");
 	puts("  -@       Output to specified file.");
+	puts("  -%       Use template in specified directory.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#       DML code");
@@ -443,6 +466,8 @@ void show_help(void)
 	puts("  -c       Security classification");
 	puts("  -b       BREX data module code");
 	puts("  -I       Issue date");
+	puts("  -r       Default RPC name");
+	puts("  -R       Default RPC code");
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -556,7 +581,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:r:R:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -573,6 +598,7 @@ int main(int argc, char **argv)
 			case '@': out = strdup(optarg); break;
 			case 'r': defaultRpcName = strdup(optarg); break;
 			case 'R': defaultRpcCode = strdup(optarg); break;
+			case '%': template_dir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -651,7 +677,7 @@ int main(int argc, char **argv)
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
 
-	dml_doc = xmlReadMemory((const char *) dml_xml, dml_xml_len, NULL, NULL, 0);
+	dml_doc = xml_skeleton();
 
 	ctxt = xmlXPathNewContext(dml_doc);
 
@@ -780,6 +806,7 @@ int main(int argc, char **argv)
 	free(out);
 	free(defaultRpcName);
 	free(defaultRpcCode);
+	free(template_dir);
 	xmlFreeDoc(dml_doc);
 
 	xmlCleanupParser();

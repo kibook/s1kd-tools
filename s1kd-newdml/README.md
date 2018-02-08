@@ -74,6 +74,9 @@ Specifies a default responsible partner company enterprise code for entries whic
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 
+-% &lt;dir&gt;  
+Use the XML template in the specified directory instead of the built-in template. The template must be named `dml.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+
 -h -?  
 Show usage message.
 

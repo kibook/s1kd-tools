@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="26"/>
+        <issueDate year="2018" month="02" day="08"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -r and -R options.</simplePara>
+        <simplePara>Add -% option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -158,13 +158,13 @@
                 <para>Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-r &lt;name&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-R &lt;NCAGE&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specifies a default responsible partner company enterprise code for entries which do not carry this in their ID STATUS section (ICN, COM, DML).</para>
@@ -174,6 +174,12 @@
               <listItemTerm>&lt;datamodules&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Any number of data module file names to automatically add to the list.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">dml.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
