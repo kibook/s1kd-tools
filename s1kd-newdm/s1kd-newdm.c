@@ -434,25 +434,6 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
-xmlDocPtr xml_skeleton_custom(const char *dmtype, enum issue iss, const char *dir)
-{
-	char src[PATH_MAX];
-
-	if (strcmp(dmtype, "") == 0) {
-		fprintf(stderr, ERR_PREFIX "No dmtype given.\n");
-		exit(EXIT_UNKNOWN_DMTYPE);
-	}
-
-	sprintf(src, "%s/%s.xml", dir, dmtype);
-
-	if (access(src, F_OK) == -1) {
-		fprintf(stderr, ERR_PREFIX "No schema %s in template directory \"%s\".\n", dmtype, dir);
-		exit(EXIT_UNKNOWN_DMTYPE);
-	}
-
-	return xmlReadFile(src, NULL, 0);
-}
-
 xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 {
 	unsigned char *xml = NULL;
@@ -461,6 +442,16 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	if (strcmp(dmtype, "") == 0) {
 		fprintf(stderr, ERR_PREFIX "No dmtype given.\n");
 		exit(EXIT_UNKNOWN_DMTYPE);
+	} else if (template_dir) {
+		char src[PATH_MAX];
+		sprintf(src, "%s/%s.xml", template_dir, dmtype);
+
+		if (access(src, F_OK) == -1) {
+			fprintf(stderr, ERR_PREFIX "No schema %s in template directory \"%s\".\n", dmtype, template_dir);
+			exit(EXIT_UNKNOWN_DMTYPE);
+		}
+
+		return xmlReadFile(src, NULL, 0);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
 			case ISS_23:
@@ -1087,11 +1078,7 @@ int main(int argc, char **argv)
 	if (strcmp(countryIsoCode, "") == 0) strcpy(countryIsoCode, "ZZ");
 	if (strcmp(securityClassification, "") == 0) strcpy(securityClassification, "01");
 
-	if (template_dir) {
-		dm = xml_skeleton_custom(dmtype, issue, template_dir);
-	} else {
-		dm = xml_skeleton(dmtype, issue);
-	}
+	dm = xml_skeleton(dmtype, issue);
 
 	dmodule = xmlDocGetRootElement(dm);
 	identAndStatusSection = find_child(dmodule, "identAndStatusSection");
