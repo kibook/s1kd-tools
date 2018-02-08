@@ -154,6 +154,9 @@ Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a s
 -.  
 Dumps the simple text form of the built-in default 'dmtypes'.
 
+-% &lt;dir&gt;  
+Use XML templates in the specified directory instead of the built-in templates.
+
 Prompt (-p) option
 ------------------
 
@@ -250,6 +253,15 @@ Info code variants can also be given specific default schema and info names. To 
     258C  proced  Other procedure to clean, Clean with water
 
 The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the 'dmtypes' file. An info code with no variant matches all possible variants.
+
+Custom XML templates (-%)
+-------------------------
+
+A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named `<schema>.xml`, where `<schema>` is the name of the schema, matching one of the schema names in the 'dmtypes' file or the schema specified with the -T option.
+
+The templates must be written to conform to the default S1000D issue of this tool (currently 4.2). They will be automatically transformed when another issue is specified with the -$ option.
+
+The 'templates' default can also be specified in the 'defaults' file to use these custom templates by default.
 
 EXAMPLE
 =======

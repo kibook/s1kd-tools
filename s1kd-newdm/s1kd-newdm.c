@@ -101,6 +101,8 @@ enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
+char *template_dir = NULL;
+
 enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
@@ -188,7 +190,9 @@ void show_help(void)
 	puts("  -f      Overwrite existing file.");
 	puts("  -$      Specify which S1000D issue to use.");
 	puts("  -@      Output to specified file.");
+	puts("  -%      Use templates in specified directory.");
 	puts("  -,      Dump default dmtypes XML.");
+	puts("  -.      Dump default dmtypes text file.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#      Data module code");
@@ -272,6 +276,8 @@ void copy_default_value(const char *key, const char *val)
 		no_issue = strcasecmp(val, "true") == 0;
 	else if (strcmp(key, "remarks") == 0 && !remarks)
 		remarks = xmlStrdup(BAD_CAST val);
+	else if (strcmp(key, "templates") == 0 && !template_dir)
+		template_dir = strdup(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -426,6 +432,25 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
 	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
+}
+
+xmlDocPtr xml_skeleton_custom(const char *dmtype, enum issue iss, const char *dir)
+{
+	char src[PATH_MAX];
+
+	if (strcmp(dmtype, "") == 0) {
+		fprintf(stderr, ERR_PREFIX "No dmtype given.\n");
+		exit(EXIT_UNKNOWN_DMTYPE);
+	}
+
+	sprintf(src, "%s/%s.xml", dir, dmtype);
+
+	if (access(src, F_OK) == -1) {
+		fprintf(stderr, ERR_PREFIX "No schema %s in template directory \"%s\".\n", dmtype, dir);
+		exit(EXIT_UNKNOWN_DMTYPE);
+	}
+
+	return xmlReadFile(src, NULL, 0);
 }
 
 xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
@@ -859,7 +884,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -889,6 +914,7 @@ int main(int argc, char **argv)
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case ',': print_dmtypes(); exit(0);
 			case '.': print_dmtypes_txt(); exit(0);
+			case '%': template_dir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -1061,7 +1087,11 @@ int main(int argc, char **argv)
 	if (strcmp(countryIsoCode, "") == 0) strcpy(countryIsoCode, "ZZ");
 	if (strcmp(securityClassification, "") == 0) strcpy(securityClassification, "01");
 
-	dm = xml_skeleton(dmtype, issue);
+	if (template_dir) {
+		dm = xml_skeleton_custom(dmtype, issue, template_dir);
+	} else {
+		dm = xml_skeleton(dmtype, issue);
+	}
 
 	dmodule = xmlDocGetRootElement(dm);
 	identAndStatusSection = find_child(dmodule, "identAndStatusSection");
@@ -1203,6 +1233,7 @@ int main(int argc, char **argv)
 		puts(out);
 
 	free(out);
+	free(template_dir);
 
 	xmlFree(remarks);
 
