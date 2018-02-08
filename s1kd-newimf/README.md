@@ -57,3 +57,6 @@ Print the file name of the newly created IMF.
 
 -f  
 Overwrite existing file.
+
+-% &lt;dir&gt;  
+Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named `icnmetadata.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="D" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="23"/>
+        <issueDate year="2018" month="02" day="08"/>
         <dmTitle>
           <techName>s1kd-newimf(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -I option.</simplePara>
+        <simplePara>Add -% option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -127,7 +127,7 @@
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-I &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new ICN metadata file in the form of YYYY-MM-DD.</para>
@@ -143,6 +143,12 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">icnmetadata.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

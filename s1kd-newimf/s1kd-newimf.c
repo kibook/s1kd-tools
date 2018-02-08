@@ -15,6 +15,7 @@
 #define EXIT_IMF_EXISTS 1
 #define EXIT_BAD_BREX_DMC 2
 #define EXIT_BAD_DATE 3
+#define EXIT_BAD_TEMPLATE 4
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -42,6 +43,25 @@ char icn_title[256] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+
+char *template_dir = NULL;
+
+xmlDocPtr xml_skeleton(void)
+{
+	if (template_dir) {
+		char src[PATH_MAX];
+		sprintf(src, "%s/icnmetadata.xml", template_dir);
+
+		if (access(src, F_OK) == -1) {
+			fprintf(stderr, ERR_PREFIX "No schema icnmetadata in template directory \"%s\".\n", template_dir);
+			exit(EXIT_BAD_TEMPLATE);
+		}
+
+		return xmlReadFile(src, NULL, 0);
+	} else {
+		return xmlReadMemory((const char *) icnmetadata_xml, icnmetadata_xml_len, NULL, NULL, 0);
+	}
+}
 
 void prompt(const char *prompt, char *str, int n)
 {
@@ -109,6 +129,7 @@ void show_help(void)
 	puts("  -N          Omit issue/inwork numbers from filename.");
 	puts("  -v          Print file name of IMF.");
 	puts("  -f          Overwrite existing file.");
+	puts("  -% <dir>    Use template in specified directory.");
 	puts("  <icns>      1 or more ICNs to generate a metadata file for.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
@@ -134,6 +155,10 @@ void copy_default_value(const char *def_key, const char *def_val)
 	copy_def_val(originator, "originator", def_key, def_val);
 	copy_def_val(originator_code, "originatorCode", def_key, def_val);
 	copy_def_val(brex_dmcode, "brex", def_key, def_val);
+	
+	if (strcmp(def_key, "templates") == 0 && !template_dir) {
+		template_dir = strdup(def_val);
+	}
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -241,7 +266,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:I:vfh?")) != -1) {
+	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:h?")) != -1) {
 		switch (i) {
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -258,6 +283,7 @@ int main(int argc, char **argv)
 			case 'I': strncpy(issue_date, optarg, 15); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
+			case '%': template_dir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -323,7 +349,7 @@ int main(int argc, char **argv)
 
 		if (n != 1) continue;
 
-		template = xmlReadMemory((const char *) icnmetadata_xml, icnmetadata_xml_len, NULL, NULL, 0);
+		template = xml_skeleton();
 
 		ctx = xmlXPathNewContext(template);
 
@@ -384,6 +410,8 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(template);
 	}
+
+	free(template_dir);
 
 	return 0;
 }
