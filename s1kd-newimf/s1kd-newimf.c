@@ -315,7 +315,7 @@ int main(int argc, char **argv)
 		while (fgets(defaults_line, 1024, defaults)) {
 			char def_key[32], def_val[256];
 
-			if (sscanf(defaults_line, "%s %[^\n]", def_key, def_val) != 2)
+			if (sscanf(defaults_line, "%31s %255[^\n]", def_key, def_val) != 2)
 				continue;
 
 			copy_default_value(def_key, def_val);
@@ -345,7 +345,7 @@ int main(int argc, char **argv)
 		xmlNodePtr node;
 		xmlXPathContextPtr ctx;
 
-		n = sscanf(argv[i], "ICN-%[^.].%*s", icn);
+		n = sscanf(argv[i], "ICN-%255[^.].%*s", icn);
 
 		if (n != 1) continue;
 

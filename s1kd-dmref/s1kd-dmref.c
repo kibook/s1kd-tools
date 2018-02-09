@@ -56,20 +56,10 @@ void printref(const char *ref, const char *fname, int opts)
 
 	xmlNode *dmRef;
 	xmlNode *dmRefIdent;
-	xmlNode *identExtension;
 	xmlNode *dmCode;
 
-	xmlNode *dmRefAddressItems;
 	
 	xmlDocPtr doc;
-	xmlNode* ref_dmodule;
-	xmlNode *ref_identAndStatusSection;
-	xmlNode *ref_dmAddress;
-	xmlNode *ref_dmIdent;
-	xmlNode *ref_dmAddressItems;
-	xmlNode *ref_dmTitle;
-	xmlNode *ref_language;
-	xmlNode *ref_issueInfo;
 
 	xmlBufferPtr buf;
 
@@ -83,7 +73,7 @@ void printref(const char *ref, const char *fname, int opts)
 	is_dme = strncmp(dmc, "DME-", 4) == 0;
 
 	if (is_dme) {
-		if (sscanf(dmc, "DME-%[^-]-%[^-]-%*s", extension_producer, extension_code) != 2) {
+		if (sscanf(dmc, "DME-%255[^-]-%255[^-]-%*s", extension_producer, extension_code) != 2) {
 			fprintf(stderr, ERR_PREFIX "Data module extended code invalid: %s\n", dmc);
 			exit(EXIT_BAD_INPUT);
 		}
@@ -97,7 +87,7 @@ void printref(const char *ref, const char *fname, int opts)
 		code = strtok(NULL, "");
 	}
 
-	n = sscanf(code, "%[^-]-%[^-]-%[^-]-%1s%1s-%[^-]-%2s%[^-]-%3s%1s-%1s-%3s%1s",
+	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
@@ -121,6 +111,7 @@ void printref(const char *ref, const char *fname, int opts)
 	dmRefIdent = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefIdent", NULL);
 
 	if (is_dme) {
+		xmlNode *identExtension;
 		identExtension = xmlNewChild(dmRefIdent, NULL, BAD_CAST "identExtension", NULL);
 		xmlSetProp(identExtension, BAD_CAST "extensionProducer", BAD_CAST extension_producer);
 		xmlSetProp(identExtension, BAD_CAST "extensionCode", BAD_CAST extension_code);
@@ -144,6 +135,13 @@ void printref(const char *ref, const char *fname, int opts)
 	if (strcmp(learn_event_code, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learn_event_code);
 
 	if (opts) {
+		xmlNode* ref_dmodule;
+		xmlNode *ref_identAndStatusSection;
+		xmlNode *ref_dmAddress;
+		xmlNode *ref_dmIdent;
+		xmlNode *ref_dmAddressItems;
+		xmlNode *ref_dmTitle;
+
 		doc = xmlReadFile(fname, NULL, 0);
 
 		if (!doc) {
@@ -159,16 +157,19 @@ void printref(const char *ref, const char *fname, int opts)
 		ref_dmTitle = find_child(ref_dmAddressItems, "dmTitle");
 
 		if (hasopt(opts, OPT_ISSUE)) {
+			xmlNode *ref_issueInfo;
 			ref_issueInfo = find_child(ref_dmIdent, "issueInfo");
 			xmlAddChild(dmRefIdent, xmlCopyNode(ref_issueInfo, 1));
 		}
 
 		if (hasopt(opts, OPT_LANG)) {
+			xmlNode *ref_language;
 			ref_language = find_child(ref_dmIdent, "language");
 			xmlAddChild(dmRefIdent, xmlCopyNode(ref_language, 1));
 		}
 
 		if (hasopt(opts, OPT_TITLE)) {
+			xmlNode *dmRefAddressItems;
 			dmRefAddressItems = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefAddressItems", NULL);
 			xmlAddChild(dmRefAddressItems, xmlCopyNode(ref_dmTitle, 1));
 		}
@@ -218,10 +219,7 @@ void show_help(void)
 
 int main(int argc, char **argv)
 {
-	char fname[PATH_MAX];
 	char scratch[PATH_MAX];
-	char *base;
-	int i;
 	int c;
 
 	int opts = 0;
@@ -237,7 +235,12 @@ int main(int argc, char **argv)
 	}
 
 	if (optind < argc) {
+		int i;
+
 		for (i = optind; i < argc; ++i) {
+			char fname[PATH_MAX];
+			char *base;
+
 			strcpy(fname, argv[i]);
 			strcpy(scratch, fname);
 			base = basename(scratch);

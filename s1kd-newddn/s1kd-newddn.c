@@ -382,7 +382,6 @@ int main(int argc, char **argv)
 {
 	int c;
 
-	FILE *defaults;
 	char defaults_fname[PATH_MAX] = "defaults";
 
 	char ddncode[256] = "";
@@ -454,6 +453,8 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(defaults_xml);
 	} else {
+		FILE *defaults;
+
 		defaults = fopen(defaults_fname, "r");
 		if (defaults) {
 			char default_line[1024];
@@ -461,7 +462,7 @@ int main(int argc, char **argv)
 			while (fgets(default_line, 1024, defaults)) {
 				char def_key[32], def_val[256];
 
-				if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+				if (sscanf(default_line, "%31s %255[^\n]", def_key, def_val) != 2)
 					continue;
 
 				copy_default_value(def_key, def_val);
@@ -474,7 +475,7 @@ int main(int argc, char **argv)
 	if (strcmp(ddncode, "") != 0) {
 		int n;
 
-		n = sscanf(ddncode, "%[^-]-%[^-]-%[^-]-%[^-]-%[^-]",
+		n = sscanf(ddncode, "%14[^-]-%5[^-]-%5[^-]-%4[^-]-%5[^-]",
 			model_ident_code,
 			sender_ident,
 			receiver_ident,

@@ -243,9 +243,6 @@ int main(int argc, char **argv)
 	char upissued_issueNumber[32];
 	char upissued_inWork[32];
 
-	int issueNumber_int;
-	int inWork_int;
-
 	int c;
 
 	bool verbose = false;
@@ -315,6 +312,9 @@ int main(int argc, char **argv)
 	}
 
 	for (i = optind; i < argc; i++) {
+		int issueNumber_int;
+		int inWork_int;
+
 		strcpy(dmfile, argv[i]);
 
 		if (access(dmfile, F_OK) == -1) {
@@ -414,9 +414,9 @@ int main(int argc, char **argv)
 
 			/* Default status is "new" before issue 1, and "changed" after */
 			if (issueNumber_int < 1 && !status) {
-				status = "new";
+				status = strdup("new");
 			} else if (!status) {
-				status = "changed";
+				status = strdup("changed");
 			}
 
 			if (iss30) {
@@ -466,6 +466,7 @@ int main(int argc, char **argv)
 
 	free(firstver);
 	free(secondver);
+	free(status);
 
 	xmlCleanupParser();
 

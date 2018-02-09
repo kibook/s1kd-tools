@@ -524,7 +524,7 @@ int main(int argc, char **argv)
 				char def_key[32];
 				char def_val[256];
 
-				if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+				if (sscanf(default_line, "%31s %255[^\n]", def_key, def_val) != 2)
 					continue;
 
 				copy_default_value(def_key, def_val);

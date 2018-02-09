@@ -106,8 +106,6 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	char pm_fname_temp[256];
 	char fs_pm_fname[256] = "";
 
-	int i;
-
 	xmlNodePtr xi;
 	xmlDocPtr doc;
 	xmlNodePtr pm;
@@ -138,6 +136,8 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	}
 
 	if (language) {
+		int i;
+
 		language_iso_code = (char *)  xmlGetProp(language, BAD_CAST "languageIsoCode");
 		country_iso_code = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
 	
@@ -210,8 +210,6 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	char dm_fname_temp[256];
 	char fs_dm_fname[256] = "";
 
-	int i;
-
 	xmlNodePtr xi;
 	xmlDocPtr doc;
 	xmlNodePtr dmodule;
@@ -256,6 +254,8 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	}
 
 	if (language) {
+		int i;
+
 		language_iso_code = (char *)  xmlGetProp(language, BAD_CAST "languageIsoCode");
 		country_iso_code = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
 	

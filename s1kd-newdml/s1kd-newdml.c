@@ -330,8 +330,7 @@ void addIcnRef(const char *str, xmlNodePtr dmlContent)
 	dmlEntry = xmlNewChild(dmlContent, NULL, BAD_CAST "dmlEntry", NULL);
 	infoEntityRef = xmlNewChild(dmlEntry, NULL, BAD_CAST "infoEntityRef", NULL);
 
-	icn = malloc(strlen(str));
-	strcpy(icn, str);
+	icn = strdup(str);
 	strtok(icn, ".");
 
 	sec = strrchr(icn, '-') + 1;
@@ -566,7 +565,6 @@ int main(int argc, char **argv)
 	xmlXPathObjectPtr results;
 
 	char defaults_fname[PATH_MAX] = "defaults";
-	FILE *defaults;
 
 	bool showprompts = false;
 	char code[256];
@@ -625,6 +623,8 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(defaults_xml);
 	} else {
+		FILE *defaults;
+
 		defaults = fopen(defaults_fname, "r");
 
 		if (defaults) {
@@ -633,7 +633,7 @@ int main(int argc, char **argv)
 			while (fgets(default_line, 1024, defaults)) {
 				char def_key[32], def_val[256];
 
-				if (sscanf(default_line, "%s %[^\n]", def_key, def_val) != 2)
+				if (sscanf(default_line, "%31s %255[^\n]", def_key, def_val) != 2)
 					continue;
 
 				copy_default_value(def_key, def_val);

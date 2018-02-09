@@ -132,23 +132,6 @@ void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
 	xmlXPathFreeContext(ctxt);
 }
 
-xmlNodePtr first_xpath_node(char *xpath, xmlXPathContextPtr ctx)
-{
-	xmlXPathObjectPtr obj;
-	xmlNodePtr node;
-
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
-
-	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		node = NULL;
-	else
-		node = obj->nodesetval->nodeTab[0];
-	
-	xmlXPathFreeObject(obj);
-
-	return node;
-}
-
 int check_idrefs(xmlDocPtr doc, const char *fname)
 {
 	xmlXPathContextPtr ctx;
