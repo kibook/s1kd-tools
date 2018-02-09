@@ -24,6 +24,9 @@ This can also be accomplished through the use of XML catalogs.
 -X &lt;URI&gt;  
 Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.
 
+-f  
+List invalid files.
+
 -v -q -D  
 Set the verbosity of the output, verbose, quiet, and debug. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.
 

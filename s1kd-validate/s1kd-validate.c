@@ -87,11 +87,12 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-vqD] <dms>");
+	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-fvqD] <dms>");
 	puts("");
 	puts("Options:");
 	puts("  -d <dir> Search for schemas in <dir> instead of using the URL.");
 	puts("  -X <URI> Exclude namespace from validation by URI.");
+	puts("  -f       List invalid files.");
 	puts("  -v       Verbose output.");
 	puts("  -q       Silent (not output).");
 	puts("  -D       Debug output.");
@@ -161,7 +162,7 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 	return err;
 }
 
-int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns)
+int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list)
 {
 	xmlDocPtr doc;
 	xmlNodePtr dmodule;
@@ -244,6 +245,10 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		}
 	}
 
+	if (list && verbosity > SILENT && err) {
+		printf("%s\n", fname);
+	}
+
 	xmlFreeDoc(doc);
 
 	return err;
@@ -254,28 +259,30 @@ int main(int argc, char *argv[])
 	int c, i;
 	char schema_dir[256] = "";
 	int err = 0;
+	int list_invalid = 0;
 
 	xmlNodePtr ignore_ns;
 
 	ignore_ns = xmlNewNode(NULL, BAD_CAST "ignorens");
 
-	while ((c = getopt(argc, argv, "vqDd:X:h?")) != -1) {
+	while ((c = getopt(argc, argv, "vqDd:X:fh?")) != -1) {
 		switch (c) {
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 'D': verbosity = DEBUG; break;
 			case 'd': strcpy(schema_dir, optarg); break;
 			case 'X': add_ignore_ns(ignore_ns, optarg); break;
+			case 'f': list_invalid = 1; break;
 			case 'h': 
 			case '?': show_help(); exit(0);
 		}
 	}
 
 	if (optind >= argc) {
-		err = validate_file("-", schema_dir, ignore_ns);
+		err = validate_file("-", schema_dir, ignore_ns, list_invalid);
 	} else {
 		for (i = optind; i < argc; ++i) {
-			err += validate_file(argv[i], schema_dir, ignore_ns);
+			err += validate_file(argv[i], schema_dir, ignore_ns, list_invalid);
 		}
 	}
 
