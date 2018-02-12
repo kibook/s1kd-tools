@@ -18,7 +18,7 @@
 
 #define INVALID_ID_XPATH BAD_CAST \
 	"//@internalRefId[not(//@id = .)]|" \
-        "//@applicRefId[not(//@id = .)]" \
+        "//@applicRefId[not(//@id = .)]|" \
 	"//@nextActionRefId[not(//@id = .)]"
 
 enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
