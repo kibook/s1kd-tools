@@ -32,14 +32,15 @@ void addNotation(xmlDocPtr doc, const char *name, const char *sysId)
 
 void addIcn(xmlDocPtr doc, const char *path, bool fullpath)
 {
-	char *full, *base;
+	char *full, *base, *name;
 	char *infoEntityIdent;
 	char *notation;
 
 	full = strdup(path);
 	base = basename(full);
+	name = strdup(base);
 
-	infoEntityIdent = strtok(base, ".");
+	infoEntityIdent = strtok(name, ".");
 	notation = strtok(NULL, "");
 
 	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
@@ -47,6 +48,7 @@ void addIcn(xmlDocPtr doc, const char *path, bool fullpath)
 		BAD_CAST (fullpath ? path : base), BAD_CAST notation);
 	addNotation(doc, notation, notation);
 
+	free(name);
 	free(full);
 }
 
