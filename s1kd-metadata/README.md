@@ -28,7 +28,7 @@ When editing metadata, overwrite the module. The default is to output the modifi
 -n &lt;name&gt;  
 The name of the piece of metadata to fetch. If no name is specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.
 
--n &lt;value&gt;  
+-v &lt;value&gt;  
 The new value for the piece of metadata.
 
 &lt;module&gt;  

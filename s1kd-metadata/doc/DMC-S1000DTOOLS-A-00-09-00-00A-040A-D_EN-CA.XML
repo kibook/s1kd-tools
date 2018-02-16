@@ -91,7 +91,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0001">-n &lt;value&gt;</listItemTerm>
+              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0001">-v &lt;value&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The new value for the piece of metadata.</para>
               </listItemDefinition>
