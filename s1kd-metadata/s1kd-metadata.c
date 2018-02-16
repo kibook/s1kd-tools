@@ -608,43 +608,22 @@ int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-metadata [-c <file>] [-t] <module> [<name> [<value>]]");
+	puts("Usage: s1kd-metadata [-c <file>] [-tf] [-n <name> [-v <value>]] [<module>]");
 	puts("");
 	puts("Options:");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
 	puts("  -t           Do not format columns in output.");
-	puts("  <module>     S1000D data module to view/edit metadata on.");
-	puts("  <name>       Specific metadata name to view/edit.");
-	puts("  <value>      Edit the value of the metadata specified.");
+	puts("  -f           Overwrite modules when editing metadata.");
+	puts("  -n <name>    Specific metadata name to view/edit.");
+	puts("  -v <value>   Edit the value of the metadata specified.");
+	puts("  <module>     S1000D module to view/edit metadata on.");
 }
 
-int main(int argc, char **argv)
+int show_or_edit_metadata(const char *fname, const char *metadata_fname, const char *key, const char *val, int formatall, int overwrite)
 {
-	const char *fname, *key, *val;
 	int err;
-
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctxt;
-
-	int c;
-	char *metadata_fname = NULL;
-	int formatall = 1;
-
-	while ((c = getopt(argc, argv, "c:th?")) != -1) {
-		switch (c) {
-			case 'c':
-				metadata_fname = malloc(strlen(optarg));
-				strcpy(metadata_fname, optarg);
-				break;
-			case 't': formatall = 0; break;
-			case 'h':
-			case '?': show_help(); exit(0);
-		}
-	}
-
-	fname = argv[optind];
-	key = argc > optind + 1 ? argv[optind + 1] : NULL;
-	val = argc > optind + 2 ? argv[optind + 2] : NULL;
 
 	doc = xmlReadFile(fname, NULL, 0);
 
@@ -677,15 +656,17 @@ int main(int argc, char **argv)
 	xmlXPathFreeContext(ctxt);
 
 	if (val || metadata_fname) {
-		if (access(fname, W_OK) != -1) {
-			xmlSaveFile(fname, doc);
+		if (overwrite) {
+			if (access(fname, W_OK) != -1) {
+				xmlSaveFile(fname, doc);
+			} else {
+				fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
+				exit(EXIT_NO_WRITE);
+			}
 		} else {
-			fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
-			exit(EXIT_NO_WRITE);
+			xmlSaveFile("-", doc);
 		}
 	}
-
-	if (metadata_fname) free(metadata_fname);
 
 	xmlFreeDoc(doc);
 
@@ -712,4 +693,41 @@ int main(int argc, char **argv)
 	}
 
 	return err;
+}
+
+int main(int argc, char **argv)
+{
+	char *key = NULL, *val = NULL;
+	int ret = 0;
+
+	int i;
+	char *metadata_fname = NULL;
+	int formatall = 1;
+	int overwrite = 0;
+
+	while ((i = getopt(argc, argv, "c:tn:v:fh?")) != -1) {
+		switch (i) {
+			case 'c': metadata_fname = strdup(optarg); break;
+			case 't': formatall = 0; break;
+			case 'n': key = strdup(optarg); break;
+			case 'v': val = strdup(optarg); break;
+			case 'f': overwrite = 1; break;
+			case 'h':
+			case '?': show_help(); exit(0);
+		}
+	}
+
+	if (optind < argc) {
+		for (i = optind; i < argc; ++i) {
+			show_or_edit_metadata(argv[i], metadata_fname, key, val, formatall, overwrite);
+		}
+	} else {
+		show_or_edit_metadata("-", metadata_fname, key, val, formatall, overwrite);
+	}
+
+	free(metadata_fname);
+	free(key);
+	free(val);
+
+	return ret;
 }
