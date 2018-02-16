@@ -6,11 +6,18 @@
 .PP
 s1kd\-instance \- Create S1000D data/pub module instances
 .SH SYNOPSIS
-.PP
-s1kd\-instance [\-s <src>] [\-e <ext>|\-E] [\-c <dmc>] [\-l <lang>] [\-n
-<iss>] [\-I <date>] [\-u <sec>] [\-o <file>|\-O <dir>] [\-f] [\-t
-<techName>] [\-i <infoName>] [\-a|\-A] [\-Y <text>] [\-C <comment>] [\-R
-<CIR> ...] [\-S] [\-N] [\-P <PCT> \-p <id>] [\-L] [<applic>...]
+.IP
+.nf
+\f[C]
+s1kd\-instance\ [\-s\ <src>]\ [\-e\ <ext>|\-E]\ [\-c\ <dmc>]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-l\ <lang>]\ [\-n\ <iss>]\ [\-I\ <date>]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-u\ <sec>]\ [\-o\ <file>|\-O\ <dir>]\ [\-f]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-t\ <techName>]\ [\-i\ <infoName>]\ [\-a|\-A]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-Y\ <text>]\ [\-C\ <comment>]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-R\ <CIR>\ ...]\ [\-S]\ [\-N]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-P\ <PCT>\ \-p\ <id>]\ [\-L]\ [<applic>...]
+\f[]
+.fi
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-instance\f[] tool filters a master S1000D data module on
@@ -258,21 +265,21 @@ Given the following:
 .nf
 \f[C]
 <referencedApplicGroup>
-\ \ <applic\ id="apA">
-\ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="A"/>
-\ \ </applic>
-\ \ <applic\ id="apB">
-\ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="B"/>
-\ \ </applic>
-\ \ <applic\ id="apC">
-\ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="C"/>
-\ \ </applic>
+<applic\ id="apA">
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+<applic\ id="apB">
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/>
+</applic>
+<applic\ id="apC">
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/>
+</applic>
 </referencedApplicGroup>
 <!\-\-\ ...\ \-\->
 <para\ applicRefId="apA">Applies\ to\ A</para>
@@ -283,8 +290,8 @@ Given the following:
 .PP
 filtering can be applied such that the instance will be applicable to
 both A and C, but not B.
-This is done by specifying a property twice in the applicability
-definition arguments.
+This is done by specifying a property multiple times in the
+applicability definition arguments.
 For example:
 .IP
 .nf
@@ -299,33 +306,33 @@ This would produce the following in the instance:
 \f[C]
 <dmStatus>
 \ \ <!\-\-\ ...\ \-\->
-\ \ <applic>
-\ \ \ \ <displayText>
-\ \ \ \ \ \ <simplePara>A\ or\ C</simplePara>
-\ \ \ \ </displayText>
-\ \ \ \ <evaluate\ andOr="or">
-\ \ \ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="A"/>
-\ \ \ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="C"/>
-\ \ \ \ </evaluate>
-\ \ </applic>
-\ \ <!\-\-\ ...\ \->
+<applic>
+<displayText>
+<simplePara>A\ or\ C</simplePara>
+</displayText>
+<evaluate\ andOr="or">
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/>
+</evaluate>
+</applic>
+<!\-\-\ ...\ \->
 </dmStatus>
 <!\-\-\ ...\ \-\->
 <referencedApplicGroup>
-\ \ <applic\ id="apA">
-\ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="A"/>
-\ \ </applic>
-\ \ <applic\ id="apC">
-\ \ \ \ <assert\ applicPropertyIdent="attr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyType="prodattr"
-\ \ \ \ \ \ \ \ \ \ \ \ applicPropertyValues="C"/>
-\ \ </applic>
+<applic\ id="apA">
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+<applic\ id="apC">
+<assert\ applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/>
+</applic>
 </referencedApplicGroup>
 <!\-\-\ ...\ \-\->
 <para\ applicRefId="apA">Applies\ to\ A</para>

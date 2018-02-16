@@ -6,7 +6,13 @@ s1kd-instance - Create S1000D data/pub module instances
 SYNOPSIS
 ========
 
-s1kd-instance \[-s &lt;src&gt;\] \[-e &lt;ext&gt;|-E\] \[-c &lt;dmc&gt;\] \[-l &lt;lang&gt;\] \[-n &lt;iss&gt;\] \[-I &lt;date&gt;\] \[-u &lt;sec&gt;\] \[-o &lt;file&gt;|-O &lt;dir&gt;\] \[-f\] \[-t &lt;techName&gt;\] \[-i &lt;infoName&gt;\] \[-a|-A\] \[-Y &lt;text&gt;\] \[-C &lt;comment&gt;\] \[-R &lt;CIR&gt; ...\] \[-S\] \[-N\] \[-P &lt;PCT&gt; -p &lt;id&gt;\] \[-L\] \[&lt;applic&gt;...\]
+    s1kd-instance [-s <src>] [-e <ext>|-E] [-c <dmc>]
+                  [-l <lang>] [-n <iss>] [-I <date>]
+                  [-u <sec>] [-o <file>|-O <dir>] [-f]
+                  [-t <techName>] [-i <infoName>] [-a|-A]
+                  [-Y <text>] [-C <comment>]
+                  [-R <CIR> ...] [-S] [-N]
+                  [-P <PCT> -p <id>] [-L] [<applic>...]
 
 DESCRIPTION
 ===========
@@ -145,28 +151,28 @@ Filtering for multiple values of a single property
 Though not usually the case, it is possible to create an instance which is filtered on multiple values of the same applicabilty property. Given the following:
 
     <referencedApplicGroup>
-      <applic id="apA">
-        <assert applicPropertyIdent="attr"
-                applicPropertyType="prodattr"
-                applicPropertyValues="A"/>
-      </applic>
-      <applic id="apB">
-        <assert applicPropertyIdent="attr"
-                applicPropertyType="prodattr"
-                applicPropertyValues="B"/>
-      </applic>
-      <applic id="apC">
-        <assert applicPropertyIdent="attr"
-                applicPropertyType="prodattr"
-                applicPropertyValues="C"/>
-      </applic>
+    <applic id="apA">
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="apB">
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    <applic id="apC">
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="C"/>
+    </applic>
     </referencedApplicGroup>
     <!-- ... -->
     <para applicRefId="apA">Applies to A</para>
     <para applicRefId="apB">Applies to B</para>
     <para applicRefId="apC">Applies to C</para>
 
-filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property twice in the applicability definition arguments. For example:
+filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property multiple times in the applicability definition arguments. For example:
 
     $ s1kd-instance -A -Y "A or C" ... attr:prodattr=A attr:prodattr=C
 
@@ -174,33 +180,33 @@ This would produce the following in the instance:
 
     <dmStatus>
       <!-- ... -->
-      <applic>
-        <displayText>
-          <simplePara>A or C</simplePara>
-        </displayText>
-        <evaluate andOr="or">
-          <assert applicPropertyIdent="attr"
-                  applicPropertyType="prodattr"
-                  applicPropertyValues="A"/>
-          <assert applicPropertyIdent="attr"
-                  applicPropertyType="prodattr"
-                  applicPropertyValues="C"/>
-        </evaluate>
-      </applic>
-      <!-- ... ->
+    <applic>
+    <displayText>
+    <simplePara>A or C</simplePara>
+    </displayText>
+    <evaluate andOr="or">
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="C"/>
+    </evaluate>
+    </applic>
+    <!-- ... ->
     </dmStatus>
     <!-- ... -->
     <referencedApplicGroup>
-      <applic id="apA">
-        <assert applicPropertyIdent="attr"
-                applicPropertyType="prodattr"
-                applicPropertyValues="A"/>
-      </applic>
-      <applic id="apC">
-        <assert applicPropertyIdent="attr"
-                applicPropertyType="prodattr"
-                applicPropertyValues="C"/>
-      </applic>
+    <applic id="apA">
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="apC">
+    <assert applicPropertyIdent="attr"
+    applicPropertyType="prodattr"
+    applicPropertyValues="C"/>
+    </applic>
     </referencedApplicGroup>
     <!-- ... -->
     <para applicRefId="apA">Applies to A</para>
