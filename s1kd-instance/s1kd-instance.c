@@ -10,8 +10,10 @@
 #include <ctype.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/transform.h>
 
 #include "strings.h"
+#include "identity.h"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX "s1kd-instance: ERROR: "
@@ -1520,10 +1522,56 @@ void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
 	xmlXPathFreeContext(ctxt);
 }
 
+/* Add an "identity" template to an XSL stylesheet */
+void add_identity(xmlDocPtr style)
+{
+	xmlDocPtr identity;
+	xmlNodePtr stylesheet, first, template;
+
+	identity = xmlReadMemory((const char *) identity_xsl, identity_xsl_len, NULL, NULL, 0);
+	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
+
+	stylesheet = xmlDocGetRootElement(style);
+
+	first = xmlFirstElementChild(stylesheet);
+
+	if (first) {
+		xmlAddPrevSibling(first, xmlCopyNode(template, 1));
+	} else {
+		xmlAddChild(stylesheet, xmlCopyNode(template, 1));
+	}
+
+	xmlFreeDoc(identity);
+}
+
+/* Use user-supplied XSL script to resolve CIR references. */
+void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, const char *cir_xsl)
+{
+	xmlDocPtr styledoc, res, muxdoc;
+	xmlNodePtr mux;
+	xsltStylesheetPtr style;
+
+	muxdoc = xmlNewDoc(BAD_CAST "1.0");
+	mux = xmlNewNode(NULL, BAD_CAST "mux");
+	xmlDocSetRootElement(muxdoc, mux);
+	xmlAddChild(mux, xmlCopyNode(xmlDocGetRootElement(dm), 1));
+	xmlAddChild(mux, xmlCopyNode(xmlDocGetRootElement(cir), 1));
+
+	styledoc = xmlReadFile(cir_xsl, NULL, 0);
+	add_identity(styledoc);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, muxdoc, NULL);
+
+	xsltFreeStylesheet(style);
+	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, "/mux/dmodule[1]"), 1));
+	xmlFreeDoc(res);
+	xmlFreeDoc(muxdoc);
+}
+
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
-
-void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
+void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src, const char *cir_xsl)
 {
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
@@ -1555,7 +1603,9 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src)
 
 	cirtype = (char *) cirnode->name;
 
-	if (strcmp(cirtype, "functionalItemRepository") == 0) {
+	if (cir_xsl) {
+		undepend_cir_xsl(dm, cir, cir_xsl);
+	} else if (strcmp(cirtype, "functionalItemRepository") == 0) {
 		undepend_funcitem_cir(dm, cir);
 	} else if (strcmp(cirtype, "warningRepository") == 0 || strcmp(cirtype, "cautionRepository") == 0) {
 		undepend_warncaut_cir(dm, cir);
@@ -1754,7 +1804,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:n:u:wNP:p:LI:vh?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:r:n:u:wNP:p:LI:vh?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1772,6 +1822,7 @@ int main(int argc, char **argv)
 			case 'C': strncpy(comment_text, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
+			case 'r': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
 			case 'n': strncpy(issinfo, optarg, 6); break;
 			case 'u': strncpy(secu, optarg, 2); break;
 			case 'w': wholedm = true; break;
@@ -1874,6 +1925,7 @@ int main(int argc, char **argv)
 
 			for (cir = cirs->children; cir; cir = cir->next) {
 				char *cirdocfname = (char *) xmlNodeGetContent(cir);
+				char *cirxsl = (char *) xmlGetProp(cir, BAD_CAST "xsl");
 
 				if (access(cirdocfname, F_OK) == -1) {
 					fprintf(stderr, ERR_PREFIX "Could not find CIR %s.", cirdocfname);
@@ -1887,14 +1939,15 @@ int main(int argc, char **argv)
 					continue;
 				}
 
-				if (strcmp((char *) root->name, "pm") == 0) {
-					undepend_cir(doc, cirdoc, false);
+				if (xmlStrcmp(root->name, BAD_CAST "pm") == 0) {
+					undepend_cir(doc, cirdoc, false, cirxsl);
 				} else {
-					undepend_cir(doc, cirdoc, add_source_ident);
+					undepend_cir(doc, cirdoc, add_source_ident, cirxsl);
 				}
 
 				xmlFreeDoc(cirdoc);
 				xmlFree(cirdocfname);
+				xmlFree(cirxsl);
 			}
 
 			referencedApplicGroup = find_child(content, "referencedApplicGroup");

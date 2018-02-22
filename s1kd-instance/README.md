@@ -11,7 +11,7 @@ SYNOPSIS
                   [-u <sec>] [-o <file>|-O <dir>] [-f]
                   [-t <techName>] [-i <infoName>] [-a|-A]
                   [-Y <text>] [-C <comment>]
-                  [-R <CIR> ...] [-S] [-N]
+                  [-R <CIR> ...] [-r <XSL>] [-S] [-N]
                   [-P <PCT> -p <id>] [-L] [<applic>...]
 
 DESCRIPTION
@@ -95,6 +95,9 @@ Currently supported CIRs:
 -   Warnings and cautions
 
 -   Applicability
+
+-r &lt;XSL&gt;  
+Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.
 
 -S  
 Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.
@@ -211,3 +214,47 @@ This would produce the following in the instance:
     <!-- ... -->
     <para applicRefId="apA">Applies to A</para>
     <para applicRefId="apC">Applies to C</para>
+
+Resolving CIR dependencies with a custom XSLT script (-r)
+---------------------------------------------------------
+
+A CIR contains more information about an item than can be captured in a data module's reference to it. If this additional information is required, there are two methods to include it:
+
+-   Distribute the CIR with the data module so the extra information can be linked to
+
+-   "Flatten" the information to fit in the data module's schema.
+
+A custom XSLT script can be supplied with the -r option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:
+
+    <xsl:stylesheet
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    version="1.0">
+    <xsl:template match="functionalItemRef">
+    <xsl:variable name="fin" select"@functionalItemNumber"/>
+    <xsl:variable name="spec" select="$cir//functionalItemSpec[
+    functionalItemIdent/@functionalItemNumber = $fin]"/>
+    <xsl:value-of select="$spec/name"/>
+    </xsl:template>
+    </xsl:stylesheet>
+
+This script would resolve a `functionalItemRef` by "flattening" it to the value of the `name` element obtained from the CIR.
+
+The example CIR would contain a specification like:
+
+    <functionalItemSpec>
+    <functionalItemIdent functionalItemNumber="ABC" functionalItemType="fit01"/>
+    <name>Hydraulic pump</name>
+    <functionalItemAlts>
+    <functionalItem/>
+    </functionalItemAlts>
+    </functionalItemSpec>
+
+The source data module would contain a reference:
+
+    <para>The <functionalItemRef functionalItemNumber="ABC"/> is an item in the system.</para>
+
+And the resulting XML would be:
+
+    <para>The Hydraulic pump is an item in the system.</para>
+
+The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element `mux` contains two `dmodule` elements. The first is the source data module, and the second is one of the CIR data modules supplied with -R. The CIR data module is first filtered on the defined applicability.

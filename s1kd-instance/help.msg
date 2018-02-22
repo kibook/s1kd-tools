@@ -23,6 +23,7 @@ Options:
   -S		Do not include <sourceDmIdent> or <repositorySourceDmIdent> in instance.
   -C <comment>	Add an XML comment to the top of the data module instance.
   -R <CIR>      Resolve externalized items using the given CIR.
+  -r <XSL>      Use custom XSLT to resolve CIR references.
   -w            Check the applic of the whole DM.
   -N            Omit issue/inwork numbers from automatic filename.
   -P <PCT>      PCT file to read products from

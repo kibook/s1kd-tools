@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="20"/>
+        <issueDate year="2018" month="02" day="21"/>
         <dmTitle>
           <techName>s1kd-instance(1) | General Commands Manual</techName>
         </dmTitle>
@@ -42,7 +42,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001">
-        <simplePara>Change reference to -I to -n</simplePara>
+        <simplePara>Add -r option to allow custom CIR dependency resolution.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -60,8 +60,9 @@
               [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f]
               [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A]
               [-Y &lt;text&gt;] [-C &lt;comment&gt;]
-              [-R &lt;CIR&gt; ...] [-S] [-N]
-              [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</verbatimText></para>
+              [-R &lt;CIR&gt; ...] [-r &lt;XSL&gt;] [-S] [-N]
+              [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -142,7 +143,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The issue information is copied from the source or taken as specified in the -n option.</para>
+                <para>The issue information is copied from the source or taken as specified in the -n option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -211,6 +212,12 @@
                     </listItem>
                   </randomList>
                 </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r &lt;XSL&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -347,6 +354,54 @@ applicPropertyValues="C"/>
 <para applicRefId="apA">Applies to A</para>
 <para applicRefId="apC">Applies to C</para>]]></verbatimText>
           </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Resolving CIR dependencies with a custom XSLT script (-r)</title>
+          <para>A CIR contains more information about an item than can be captured in a data module's reference to it. If this additional information is required, there are two methods to include it:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>Distribute the CIR with the data module so the extra information can be linked to</para>
+              </listItem>
+              <listItem>
+                <para>"Flatten" the information to fit in the data module's schema.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>A custom XSLT script can be supplied with the -r option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[
+<xsl:stylesheet
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+version="1.0">
+<xsl:template match="functionalItemRef">
+<xsl:variable name="fin" select"@functionalItemNumber"/>
+<xsl:variable name="spec" select="$cir//functionalItemSpec[
+functionalItemIdent/@functionalItemNumber = $fin]"/>
+<xsl:value-of select="$spec/name"/>
+</xsl:template>
+</xsl:stylesheet>]]></verbatimText>
+          </para>
+          <para>This script would resolve a <verbatimText verbatimStyle="vs12">functionalItemRef</verbatimText> by "flattening" it to the value of the <verbatimText verbatimStyle="vs12">name</verbatimText> element obtained from the CIR.</para>
+          <para>The example CIR would contain a specification like:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<functionalItemSpec>
+<functionalItemIdent functionalItemNumber="ABC" functionalItemType="fit01"/>
+<name>Hydraulic pump</name>
+<functionalItemAlts>
+<functionalItem/>
+</functionalItemAlts>
+</functionalItemSpec>]]></verbatimText>
+          </para>
+          <para>The source data module would contain a reference:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<para>The <functionalItemRef functionalItemNumber="ABC"/> is an item in the system.</para>]]></verbatimText>
+          </para>
+          <para>And the resulting XML would be:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<para>The Hydraulic pump is an item in the system.</para>]]></verbatimText>
+          </para>
+          <para>The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element <verbatimText verbatimStyle="vs12">mux</verbatimText> contains two <verbatimText verbatimStyle="vs12">dmodule</verbatimText> elements. The first is the source data module, and the second is one of the CIR data modules supplied with -R. The CIR data module is first filtered on the defined applicability.</para>
         </levelledPara>
       </levelledPara>
     </description>
