@@ -266,4 +266,4 @@ The 'templates' default can also be specified in the 'defaults' file to use thes
 EXAMPLE
 =======
 
-s1kd-newdm -\# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript
+    $ s1kd-newdm -# S1000DTOOLS-A-00-07-00-00A-040A-D

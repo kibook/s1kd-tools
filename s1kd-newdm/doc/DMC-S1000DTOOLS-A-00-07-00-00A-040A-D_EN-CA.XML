@@ -431,7 +431,9 @@ pmVolume                  00]]></verbatimText>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLE</title>
-        <para>s1kd-newdm -# S1000DTOOLS-A-00-07-00-00A-040A-D -T descript</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">$ s1kd-newdm -# S1000DTOOLS-A-00-07-00-00A-040A-D</verbatimText>
+        </para>
       </levelledPara>
     </description>
   </content>
