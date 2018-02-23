@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="P" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="01" day="20"/>
+        <issueDate year="2018" month="02" day="23"/>
         <dmTitle>
-          <techName>s1kd-refls(1) | General Commands Manual</techName>
+          <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -48,7 +51,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-refls [-qcaNh?] &lt;objects&gt;...</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-refls [-qcaNh?] &lt;objects&gt;...</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -57,11 +62,11 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
-              <listItemTerm>-q</listItemTerm>
+              <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
-                <para>Quiet mode. Errors are not printed.</para>
+                <para>List all references, not attempting to match them to an actual filename.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -71,9 +76,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-a</listItemTerm>
+              <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
-                <para>List all references, not attempting to match them to an actual filename.</para>
+                <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -83,9 +88,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm>-q</listItemTerm>
               <listItemDefinition>
-                <para>Show help/usage message.</para>
+                <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
