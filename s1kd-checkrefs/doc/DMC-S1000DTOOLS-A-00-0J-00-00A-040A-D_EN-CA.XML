@@ -132,17 +132,17 @@
           <para>The root element of the XML file is the <verbatimText verbatimStyle="vs12">externalPubs</verbatimText> element. Each external publication is represented by an element <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText>. The identifying elements of the publication are stored in the <verbatimText verbatimStyle="vs12">externalPubIdent</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefIdent</verbatimText> element). The address items are stored in the <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefAddressItems</verbatimText> element).</para>
           <para>Example:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
 <externalPubs>
-  <externalPubAddress>
-    <externalPubIdent>
-      <externalPubCode>s1kd-checkrefs</externalPubCode>
-      <externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
-    </externalPubIdent>
-    <externalPubAddressItems>
-      <externalPubIssueDate year="2017" month="08" day="14"/>
-    </externalPubAddressItems>
-  </externalPubAddress>
+<externalPubAddress>
+<externalPubIdent>
+<externalPubCode>s1kd-checkrefs</externalPubCode>
+<externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
+</externalPubIdent>
+<externalPubAddressItems>
+<externalPubIssueDate year="2017" month="08" day="14"/>
+</externalPubAddressItems>
+</externalPubAddress>
 </externalPubs>]]></verbatimText>
           </para>
         </levelledPara>

@@ -58,13 +58,13 @@ Example:
 
     <?xml version="1.0"?>
     <externalPubs>
-      <externalPubAddress>
-        <externalPubIdent>
-          <externalPubCode>s1kd-checkrefs</externalPubCode>
-          <externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
-        </externalPubIdent>
-        <externalPubAddressItems>
-          <externalPubIssueDate year="2017" month="08" day="14"/>
-        </externalPubAddressItems>
-      </externalPubAddress>
+    <externalPubAddress>
+    <externalPubIdent>
+    <externalPubCode>s1kd-checkrefs</externalPubCode>
+    <externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
+    </externalPubIdent>
+    <externalPubAddressItems>
+    <externalPubIssueDate year="2017" month="08" day="14"/>
+    </externalPubAddressItems>
+    </externalPubAddress>
     </externalPubs>
