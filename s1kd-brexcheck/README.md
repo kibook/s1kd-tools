@@ -6,12 +6,12 @@ s1kd-brexcheck - Validate S1000D data modules against BREX data modules
 SYNOPSIS
 ========
 
-s1kd-brexcheck \[-b &lt;brex&gt;\] \[-I &lt;path&gt;\] \[-w &lt;severities&gt;\] \[-vVqDsxlStupfch?\] &lt;datamodules&gt;
+    s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlStupfch?] <datamodules>
 
 DESCRIPTION
 ===========
 
-The *s1kd-brexcheck* tool validates an S1000D data module using the context rules of one or multiple BREX (Business Rules EXchange) data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.
+The *s1kd-brexcheck* tool validates an S1000D data module using the context rules, SNS rules, and/or notation rules of one or multiple BREX (Business Rules EXchange) data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.
 
 OPTIONS
 =======
@@ -19,26 +19,20 @@ OPTIONS
 -b &lt;brex&gt;  
 Check the data modules against this BREX. Multiple BREX data modules can be specified by adding this option multiple times. When no BREX data modules are specified, the BREX data module referenced in &lt;brexDmRef&gt; in the data module is attempted to be used instead.
 
+-c  
+When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.
+
+-f  
+Output only the filenames of modules with BREX/SNS errors.
+
+-h -?  
+Show the help/usage message.
+
 -I &lt;path&gt;  
 Add a search path for BREX data modules. By default, only the current directory is searched.
 
--v -V -q -D  
-Verbosity of the output.
-
--s  
-Use shortened, single-line messages to report BREX errors instead of multiline indented messages.
-
--x  
-Output an XML report instead of a plain-text one.
-
 -l  
 Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified data modules) will also be checked against.
-
--w &lt;severities&gt;  
-Specify a list of severity levels for business rules.
-
--S\[tu\]  
-Check SNS (Standard Numbering System) rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
 
 -n  
 Check notation rules. Any notation names listed in any of the BREX data modules with attribute `allowedNotationFlag` set to "1" or omitted are considered valid notations. If a notation in a data module is not present or has `allowedNotationFlag` set to "0", an error will be returned.
@@ -48,14 +42,20 @@ For notations not included but not explicitly excluded, the `objectUse` of the f
 -p  
 Display a progress bar.
 
--f  
-Output only the filenames of modules with BREX/SNS errors.
+-S\[tu\]  
+Check SNS (Standard Numbering System) rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.
 
--c  
-When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.
+-s  
+Use shortened, single-line messages to report BREX errors instead of multiline indented messages.
 
--h -?  
-Show the help/usage message.
+-v -V -q -D  
+Verbosity of the output.
+
+-w &lt;severities&gt;  
+Specify a list of severity levels for business rules.
+
+-x  
+Output an XML report instead of a plain-text one.
 
 Business rule severity levels (-w)
 ----------------------------------
