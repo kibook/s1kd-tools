@@ -6,7 +6,7 @@ s1kd-dmls - List data modules
 SYNOPSIS
 ========
 
-s1kd-dmls \[-acfHhilorTtpDP\]
+    s1kd-dmls [-acfHhilorTtpDP]
 
 DESCRIPTION
 ===========
@@ -16,56 +16,56 @@ The *s1kd-dmls* tool lists data modules in a directory, with various options for
 OPTIONS
 =======
 
--l  
-Show only the latest issue/inwork version of data modules.
-
--I  
-Show only official issues of data modules (inwork = 00).
-
--f  
-Do not show filename column.
+-a  
+Include the applicability column.
 
 -c  
 Show data module code column.
 
--n  
-Show issue info (issueNumber-inWork).
+-D, -P, -C, -M  
+List data modules, publication modules, comments and ICN metadata files respectively. If none are specified, -DPCM is assumed.
 
--L  
-Show language info (languageIsoCode-countryIsoCode).
-
--t  
-Show tech and info name columns.
-
--T  
-Show title in single column (techName - infoName).
-
--i  
-Include the issue date column.
-
--r  
-Include the responsible partner company column.
-
--o  
-Include the originator column.
-
--a  
-Include the applicability column.
+-f  
+Do not show filename column.
 
 -H  
 Show headers on columns.
 
--w  
-Show only writable data module files.
+-h -?  
+Show the usage message.
 
--R  
-Recursively descend in to directories.
+-I  
+Show only official issues of data modules (inwork = 00).
+
+-i  
+Include the issue date column.
+
+-L  
+Show language info (languageIsoCode-countryIsoCode).
+
+-l  
+Show only the latest issue/inwork version of data modules.
+
+-n  
+Show issue info (issueNumber-inWork).
+
+-o  
+Include the originator column.
 
 -p  
 Do not replace control characters (\\n, \\t) when printing.
 
--D, -P, -C, -M  
-List data modules, publication modules, comments and ICN metadata files respectively. If none are specified, -DPCM is assumed.
+-R  
+Recursively descend in to directories.
 
--h  
-Show the usage message.
+-r  
+Include the responsible partner company column.
+
+-T  
+Show title in single column (techName - infoName).
+
+-t  
+Show tech and info name columns.
+
+-w  
+Show only writable data module files.
