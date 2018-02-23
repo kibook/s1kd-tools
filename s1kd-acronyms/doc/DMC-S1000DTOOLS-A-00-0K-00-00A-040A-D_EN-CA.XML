@@ -6,12 +6,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="K" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="10" day="30"/>
+        <issueDate year="2018" month="02" day="22"/>
         <dmTitle>
-          <techName>s1kd-acronyms(1) | General Commands Manual</techName>
+          <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -38,14 +38,11 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -m option for automatically marking up acronyms.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002">
-        <simplePara>Add -i option for choosing acronyms interactively when multiple definitions are available.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003">
-        <simplePara>Add -I option for confirming acronyms interactively.</simplePara>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Add more detail to description.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -57,28 +54,20 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-acronyms [-pxdtiIh?] [-n &lt;#&gt;] [-T &lt;types&gt;] [-m &lt;acronyms&gt;] [-o &lt;file&gt;] [&lt;datamodules&gt;]</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-acronyms [-pxdtiIh?] [-n &lt;#&gt;] [-T &lt;types&gt;]
+              [-m &lt;acronyms&gt;] [-o &lt;file&gt;]
+              [&lt;datamodules&gt;]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-acronyms</emphasis> tool generates a list of unique acronyms used in S1000D data modules.</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-acronyms</emphasis> tool generates a list of unique acronyms used in S1000D data modules. It can also mark up acronyms in data modules automatically based on an existing list.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
-            <definitionListItem>
-              <listItemTerm>-p</listItemTerm>
-              <listItemDefinition>
-                <para>Pretty print text/XML output.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-x</listItemTerm>
-              <listItemDefinition>
-                <para>Use XML output instead of plain text.</para>
-              </listItemDefinition>
-            </definitionListItem>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>-d</listItemTerm>
               <listItemDefinition>
@@ -86,9 +75,23 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-t</listItemTerm>
+              <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
-                <para>Format XML output as an S1000D <verbatimText verbatimStyle="vs12">&lt;table&gt;</verbatimText>.</para>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i -I</listItemTerm>
+              <listItemDefinition>
+                <para>Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.</para>
+                <para>When not in interactive mode, the first definition found will be used.</para>
+                <para>The -I option prompts for all acronyms, not just those with multiple definitions. This can be useful if some occurrences of the acronym term should be ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m &lt;acronyms&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the <verbatimText verbatimStyle="vs12">acronym</verbatimText> element in the list.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -98,35 +101,33 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>-o &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Output to &lt;file&gt; instead of stdout. When used with the -m option, output to &lt;file&gt; instead of overwriting the existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Pretty print text/XML output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-T &lt;types&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Only search for acronyms with an attribute <verbatimText verbatimStyle="vs13">acronymType</verbatimText> whose value is contained within the string &lt;types&gt;.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-m &lt;acronyms&gt;</listItemTerm>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
-                <para>Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the <verbatimText verbatimStyle="vs12">acronym</verbatimText> element in the list.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002 rfu-0003">
-              <listItemTerm>-i -I</listItemTerm>
-              <listItemDefinition>
-                <para>Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.</para>
-                <para>When not in interactive mode, the first definition found will be used.</para>
-                <para>The -I option prompts for all acronyms, not just those with multiple definitions. This can be useful if some occurrences of the acronym term should be ignored.</para>
+                <para>Format XML output as an S1000D <verbatimText verbatimStyle="vs12">&lt;table&gt;</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o &lt;file&gt;</listItemTerm>
-              <listItemDefinition changeType="modify" reasonForUpdateRefIds="rfu-0001">
-                <para>Output to &lt;file&gt; instead of stdout. When used with the -m option, output to &lt;file&gt; instead of overwriting the existing file.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm>-x</listItemTerm>
               <listItemDefinition>
-                <para>Show help/usage message.</para>
+                <para>Use XML output instead of plain text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
