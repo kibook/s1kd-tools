@@ -6,12 +6,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="08"/>
+        <issueDate year="2018" month="02" day="23"/>
         <dmTitle>
-          <techName>s1kd-newdml(1) | General Commands Manual</techName>
+          <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -% option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -51,7 +51,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-newdml [options] &lt;datamodules&gt;</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-newdml [options] [&lt;datamodules&gt;]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -60,71 +62,11 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
-            <definitionListItem>
-              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Specify the 'defaults' file name.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-p</listItemTerm>
-              <listItemDefinition>
-                <para>Prompts the user for any values left unspecified.</para>
-              </listItemDefinition>
-            </definitionListItem>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>-# &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The data management list code of the new DML.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The issue number of the new data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The inwork number of the new data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The security classification of the new data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-N</listItemTerm>
-              <listItemDefinition>
-                <para>Omit the issue/inwork numbers from filename.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>BREX data module code.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-I &lt;date&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The issue date of the new DML in the form of YYYY-MM-DD.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
-              <listItemDefinition>
-                <para>Print the file name of the newly created DML.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
-              <listItemDefinition>
-                <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -159,9 +101,63 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-r &lt;name&gt;</listItemTerm>
+              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
+                <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">dml.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the 'defaults' file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue date of the new DML in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N</listItemTerm>
+              <listItemDefinition>
+                <para>Omit the issue/inwork numbers from filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Prompts the user for any values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -171,21 +167,27 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>&lt;datamodules&gt;</listItemTerm>
+              <listItemTerm>-r &lt;name&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Any number of data module file names to automatically add to the list.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">dml.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
+                <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
-                <para>Show usage message.</para>
+                <para>Print the file name of the newly created DML.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The inwork number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;datamodules&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Any number of data module file names to automatically add to the list.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
