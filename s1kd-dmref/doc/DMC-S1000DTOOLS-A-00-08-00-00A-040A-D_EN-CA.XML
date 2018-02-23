@@ -8,16 +8,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2018" month="02" day="22"/>
         <dmTitle>
-          <techName>s1kd-dmref(1) | General Commands Manual</techName>
+          <techName>s1kd-dmref(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -40,6 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -50,7 +53,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-dmref [-tlih?] [&lt;code&gt;|&lt;filename&gt;]</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-dmref [-tlih?] [&lt;code&gt;|&lt;filename&gt;]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -59,17 +64,11 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
-              <listItemTerm>-t</listItemTerm>
+              <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
-                <para>Include the dmTitle in the reference (target must be a file).</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
-              <listItemDefinition>
-                <para>Include the language information in the reference (target must be a file)</para>
+                <para>Show the usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -79,9 +78,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
-                <para>Show the usage message.</para>
+                <para>Include the language information in the reference (target must be a file)</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Include the dmTitle in the reference (target must be a file).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -96,14 +101,14 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-dmref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
+          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ s1kd-dmref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
 <dmRef>
-  <dmRefIdent>
-    <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A"
+<dmRefIdent>
+<dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A"
 systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00"
 disassyCode="00" disassyCodeVariant="A" infoCode="040"
 infoCodeVariant="A" itemLocationCode="D"/>
-  </dmRefIdent>
+</dmRefIdent>
 </dmRef>]]></verbatimText>
         </para>
       </levelledPara>
