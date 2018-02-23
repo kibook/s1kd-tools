@@ -6,7 +6,7 @@ s1kd-flatpm - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-s1kd-flatpm \[-Nxp\] &lt;PM&gt; \[&lt;DM&gt;...\]
+    s1kd-flatpm [-Nxp] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -18,20 +18,20 @@ Data modules are searched for in the current directory using the data module cod
 OPTIONS
 =======
 
+-h -?  
+Show help/usage message.
+
 -N  
 Assume that the files representing the referenced data modules do not include the issue info in their filenames, i.e. they were created using the -N option of the s1kd-new\* tools.
-
--x  
-Use XInclude rather than copying each data module's contents directly inside the publication module. DTD entities in data modules will only be carried over to the final publication when using this option, otherwise they do not carry over when copying the data module.
 
 -p  
 Instead of the "flat" PM format, use a "publication" XML format, where the root element `publication` contains XInclude references to the publication module and the referenced data modules.
 
--h -?  
-Show help/usage message.
-
-&lt;PM&gt;  
-The publication module to flatten.
+-x  
+Use XInclude rather than copying each data module's contents directly inside the publication module. DTD entities in data modules will only be carried over to the final publication when using this option, otherwise they do not carry over when copying the data module.
 
 &lt;DM&gt;...  
 When using the -p option, the filenames to include can be specified manually as additional arguments instead of searching for them in the current directory. When not using the -p option, additional arguments are ignored.
+
+&lt;PM&gt;  
+The publication module to flatten.
