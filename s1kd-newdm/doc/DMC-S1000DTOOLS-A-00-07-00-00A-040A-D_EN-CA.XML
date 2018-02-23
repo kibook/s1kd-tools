@@ -8,12 +8,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="08"/>
+        <issueDate year="2018" month="02" day="23"/>
         <dmTitle>
-          <techName>s1kd-newdm(1) | General Commands Manual</techName>
+          <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -40,8 +40,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -% option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +53,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-newdm [options]</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-newdm [options]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -62,25 +64,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
-            <definitionListItem>
-              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Specify the 'defaults' file name.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-D &lt;dmtypes&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Specify the 'dmtypes' file name.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-p</listItemTerm>
-              <listItemDefinition>
-                <para>Prompts the user for any values left unspecified.</para>
-              </listItemDefinition>
-            </definitionListItem>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>-# &lt;DMC&gt;</listItemTerm>
               <listItemDefinition>
@@ -88,9 +72,58 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-L &lt;language&gt;</listItemTerm>
+              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The language ISO code of the new data module.</para>
+                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>4.2 (default)</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>3.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.3</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use XML templates in the specified directory instead of the built-in templates.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-,</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-.</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the simple text form of the built-in default 'dmtypes'.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -100,39 +133,63 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The issue number of the new data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The inwork number of the new data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-c &lt;sec&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The security classification of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-r &lt;RPC&gt;</listItemTerm>
+              <listItemTerm>-D &lt;dmtypes&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The responsible partner company enterprise name of the new data module.</para>
+                <para>Specify the 'dmtypes' file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The CAGE code of the responsible partner company.</para>
+                <para>Specify the 'defaults' file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
+              <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>The originator enterprise name of the new data module.</para>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Issue date of the new data module in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i &lt;info&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The info name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L &lt;language&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The language ISO code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set remarks for the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N</listItemTerm>
+              <listItemDefinition>
+                <para>Omit issue/inwork numbers from filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue number of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -142,15 +199,39 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-t &lt;tech&gt;</listItemTerm>
+              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The tech name of the new data module.</para>
+                <para>The originator enterprise name of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-i &lt;info&gt;</listItemTerm>
+              <listItemTerm>-p</listItemTerm>
               <listItemDefinition>
-                <para>The info name of the new data module.</para>
+                <para>Prompts the user for any values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the responsible partner company.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r &lt;RPC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The responsible partner company enterprise name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s &lt;schema&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The schema URL.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -230,15 +311,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-N</listItemTerm>
+              <listItemTerm>-t &lt;tech&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Omit issue/inwork numbers from filename.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>BREX data module code.</para>
+                <para>The tech name of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -248,82 +323,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Overwrite existing file.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-s &lt;schema&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The schema URL.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-I &lt;date&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Issue date of the new data module in the form of YYYY-MM-DD.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
-                <para>
-                  <randomList>
-                    <listItem>
-                      <para>4.2 (default)</para>
-                    </listItem>
-                    <listItem>
-                      <para>4.1</para>
-                    </listItem>
-                    <listItem>
-                      <para>4.0</para>
-                    </listItem>
-                    <listItem>
-                      <para>3.0</para>
-                    </listItem>
-                    <listItem>
-                      <para>2.3</para>
-                    </listItem>
-                  </randomList>
-                </para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Set remarks for the new data module.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-,</listItemTerm>
-              <listItemDefinition>
-                <para>Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-.</listItemTerm>
-              <listItemDefinition>
-                <para>Dumps the simple text form of the built-in default 'dmtypes'.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Use XML templates in the specified directory instead of the built-in templates.</para>
+                <para>The inwork number of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -420,7 +422,7 @@ pmVolume                  00]]></verbatimText>
           </para>
           <para>The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the 'dmtypes' file. An info code with no variant matches all possible variants.</para>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Custom XML templates (-%)</title>
           <para>A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named <verbatimText verbatimStyle="vs02">&lt;schema&gt;.xml</verbatimText>, where <verbatimText verbatimStyle="vs02">&lt;schema&gt;</verbatimText> is the name of the schema, matching one of the schema names in the 'dmtypes' file or the schema specified with the -T option.</para>
           <para>The templates must be written to conform to the default S1000D issue of this tool (currently 4.2). They will be automatically transformed when another issue is specified with the -$ option.</para>

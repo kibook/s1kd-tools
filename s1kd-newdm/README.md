@@ -6,7 +6,7 @@ s1kd-newdm - Create a new S1000D data module
 SYNOPSIS
 ========
 
-s1kd-newdm \[options\]
+    s1kd-newdm [options]
 
 DESCRIPTION
 ===========
@@ -16,50 +16,90 @@ The *s1kd-newdm* tool creates a new S1000D data module with the data module code
 OPTIONS
 =======
 
--d &lt;defaults&gt;  
-Specify the 'defaults' file name.
-
--D &lt;dmtypes&gt;  
-Specify the 'dmtypes' file name.
-
--p  
-Prompts the user for any values left unspecified.
-
 -\# &lt;DMC&gt;  
 The data module code of the new data module.
 
--L &lt;language&gt;  
-The language ISO code of the new data module.
+-$ &lt;issue&gt;  
+Specify which issue of S1000D to use. Currently supported issues are:
+
+-   4.2 (default)
+
+-   4.1
+
+-   4.0
+
+-   3.0
+
+-   2.3
+
+-@ &lt;filename&gt;  
+Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.
+
+-% &lt;dir&gt;  
+Use XML templates in the specified directory instead of the built-in templates.
+
+-,  
+Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.
+
+-.  
+Dumps the simple text form of the built-in default 'dmtypes'.
+
+-b &lt;BREX&gt;  
+BREX data module code.
 
 -C &lt;country&gt;  
 The country ISO code of the new data module.
 
--n &lt;issue&gt;  
-The issue number of the new data module.
-
--w &lt;inwork&gt;  
-The inwork number of the new data module.
-
 -c &lt;sec&gt;  
 The security classification of the new data module.
 
--r &lt;RPC&gt;  
-The responsible partner company enterprise name of the new data module.
+-D &lt;dmtypes&gt;  
+Specify the 'dmtypes' file name.
 
--R &lt;CAGE&gt;  
-The CAGE code of the responsible partner company.
+-d &lt;defaults&gt;  
+Specify the 'defaults' file name.
 
--o &lt;orig&gt;  
-The originator enterprise name of the new data module.
+-f  
+Overwrite existing file.
+
+-I &lt;date&gt;  
+Issue date of the new data module in the form of YYYY-MM-DD.
+
+-i &lt;info&gt;  
+The info name of the new data module.
+
+-L &lt;language&gt;  
+The language ISO code of the new data module.
+
+-m &lt;remarks&gt;  
+Set remarks for the new data module.
+
+-N  
+Omit issue/inwork numbers from filename.
+
+-n &lt;issue&gt;  
+The issue number of the new data module.
 
 -O &lt;CAGE&gt;  
 The CAGE code of the originator.
 
--t &lt;tech&gt;  
-The tech name of the new data module.
+-o &lt;orig&gt;  
+The originator enterprise name of the new data module.
 
--i &lt;info&gt;  
-The info name of the new data module.
+-p  
+Prompts the user for any values left unspecified.
+
+-R &lt;CAGE&gt;  
+The CAGE code of the responsible partner company.
+
+-r &lt;RPC&gt;  
+The responsible partner company enterprise name of the new data module.
+
+-S &lt;BREX&gt;  
+Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.
+
+-s &lt;schema&gt;  
+The schema URL.
 
 -T &lt;schema&gt;  
 The type (schema) of the new data module. Supported schemas:
@@ -108,54 +148,14 @@ The type (schema) of the new data module. Supported schemas:
 
 -   wrngflds - Wiring fields
 
--N  
-Omit issue/inwork numbers from filename.
-
--b &lt;BREX&gt;  
-BREX data module code.
+-t &lt;tech&gt;  
+The tech name of the new data module.
 
 -v  
 Print the file name of the newly created data module.
 
--f  
-Overwrite existing file.
-
--s &lt;schema&gt;  
-The schema URL.
-
--S &lt;BREX&gt;  
-Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.
-
--I &lt;date&gt;  
-Issue date of the new data module in the form of YYYY-MM-DD.
-
--$ &lt;issue&gt;  
-Specify which issue of S1000D to use. Currently supported issues are:
-
--   4.2 (default)
-
--   4.1
-
--   4.0
-
--   3.0
-
--   2.3
-
--@ &lt;filename&gt;  
-Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.
-
--m &lt;remarks&gt;  
-Set remarks for the new data module.
-
--,  
-Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.
-
--.  
-Dumps the simple text form of the built-in default 'dmtypes'.
-
--% &lt;dir&gt;  
-Use XML templates in the specified directory instead of the built-in templates.
+-w &lt;inwork&gt;  
+The inwork number of the new data module.
 
 Prompt (-p) option
 ------------------
