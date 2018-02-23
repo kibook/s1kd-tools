@@ -19,9 +19,9 @@ DESCRIPTION
 
 The *s1kd-instance* tool produces an "instance" of an S1000D data module or publication module, derived from a "master" (or "source") module. The tool supports multiple methods of instantiating a module:
 
--   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference table).
+-   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
 
--   Using a CIR (Common Information Repository) to produce a standalone instance from a CIR-dependant master.
+-   Using a CIR (Common Information Repository) to produce a standalone instance from a CIR-dependent master.
 
 -   Changing various pieces of metadata in the instance.
 

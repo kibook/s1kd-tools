@@ -73,10 +73,10 @@
         <para>
           <randomList>
             <listItem>
-              <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition id="acr-PCT">Product Cross-reference table</acronymDefinition></acronym>.</para>
+              <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition></acronym>.</para>
             </listItem>
             <listItem>
-              <para>Using a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition></acronym> to produce a standalone instance from a CIR-dependant master.</para>
+              <para>Using a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition></acronym> to produce a standalone instance from a CIR-dependent master.</para>
             </listItem>
             <listItem>
               <para>Changing various pieces of metadata in the instance.</para>
