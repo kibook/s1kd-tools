@@ -6,12 +6,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="J" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="01"/>
+        <issueDate year="2018" month="02" day="22"/>
         <dmTitle>
-          <techName>s1kd-checkrefs(1) | General Commands Manual</techName>
+          <techName>s1kd-checkrefs(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -l option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002">
-        <simplePara>Add -d option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -54,7 +51,10 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-checkrefs [-s &lt;source&gt;] [-t &lt;target&gt;] [-d &lt;dir&gt;] [-cuFelvh?] &lt;modules&gt;...</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-checkrefs [-s &lt;source&gt;] [-t &lt;target&gt;]
+               [-d &lt;dir&gt;] [-cuFelvh?] &lt;modules&gt;...</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -76,7 +76,7 @@
                 <para>Only check and/or update references within this module. All other modules will only be used as sources.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Check references between data modules in the specified directory. Additional data modules can still be specified with -s.</para>
@@ -106,7 +106,7 @@
                 <para>Check/update external publication references against a pre-defined list of publications.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>List all invalid references found.</para>

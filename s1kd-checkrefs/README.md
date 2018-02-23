@@ -6,7 +6,8 @@ s1kd-checkrefs - Check and update references in S1000D modules
 SYNOPSIS
 ========
 
-s1kd-checkrefs \[-s &lt;source&gt;\] \[-t &lt;target&gt;\] \[-d &lt;dir&gt;\] \[-cuFelvh?\] &lt;modules&gt;...
+    s1kd-checkrefs [-s <source>] [-t <target>]
+                   [-d <dir>] [-cuFelvh?] <modules>...
 
 DESCRIPTION
 ===========
