@@ -17,35 +17,35 @@ The *s1kd-checkrefs* tool takes a list of S1000D data modules and pub modules, a
 OPTIONS
 =======
 
+-c  
+Only check/update references within the content section of modules.
+
+-d &lt;dir&gt;  
+Check references between data modules in the specified directory. Additional data modules can still be specified with -s.
+
+-e  
+Check/update external publication references against a pre-defined list of publications.
+
+-F  
+Fail on first invalid reference and return an error code.
+
+-h -?  
+Show help/usage message
+
+-l  
+List all invalid references found.
+
 -s &lt;source&gt;  
 Use only the specified module as the source of address items. Only references to this module will be checked and/or updated in all other modules.
 
 -t &lt;target&gt;  
 Only check and/or update references within this module. All other modules will only be used as sources.
 
--d &lt;dir&gt;  
-Check references between data modules in the specified directory. Additional data modules can still be specified with -s.
-
--c  
-Only check/update references within the content section of modules.
-
 -u  
 Update the address items of all valid references found within the specified modules.
 
--F  
-Fail on first invalid reference and return an error code.
-
--e  
-Check/update external publication references against a pre-defined list of publications.
-
--l  
-List all invalid references found.
-
 -v  
 Verbose output.
-
--h -?  
-Show help/usage message
 
 External publication list (-e)
 ------------------------------

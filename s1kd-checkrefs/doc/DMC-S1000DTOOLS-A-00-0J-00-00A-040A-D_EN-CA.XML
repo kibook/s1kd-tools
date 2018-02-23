@@ -63,7 +63,43 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>Only check/update references within the content section of modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Check references between data modules in the specified directory. Additional data modules can still be specified with -s.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e</listItemTerm>
+              <listItemDefinition>
+                <para>Check/update external publication references against a pre-defined list of publications.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F</listItemTerm>
+              <listItemDefinition>
+                <para>Fail on first invalid reference and return an error code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>List all invalid references found.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-s &lt;source&gt;</listItemTerm>
               <listItemDefinition>
@@ -77,51 +113,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Check references between data modules in the specified directory. Additional data modules can still be specified with -s.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-c</listItemTerm>
-              <listItemDefinition>
-                <para>Only check/update references within the content section of modules.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-u</listItemTerm>
               <listItemDefinition>
                 <para>Update the address items of all valid references found within the specified modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-F</listItemTerm>
-              <listItemDefinition>
-                <para>Fail on first invalid reference and return an error code.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-e</listItemTerm>
-              <listItemDefinition>
-                <para>Check/update external publication references against a pre-defined list of publications.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
-              <listItemDefinition>
-                <para>List all invalid references found.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
-              <listItemDefinition>
-                <para>Show help/usage message</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
