@@ -252,7 +252,8 @@ This script would resolve a `functionalItemRef` by "flattening" it to the value 
 The example CIR would contain a specification like:
 
     <functionalItemSpec>
-    <functionalItemIdent functionalItemNumber="ABC" functionalItemType="fit01"/>
+    <functionalItemIdent functionalItemNumber="ABC"
+    functionalItemType="fit01"/>
     <name>Hydraulic pump</name>
     <functionalItemAlts>
     <functionalItem/>
@@ -261,7 +262,11 @@ The example CIR would contain a specification like:
 
 The source data module would contain a reference:
 
-    <para>The <functionalItemRef functionalItemNumber="ABC"/> is an item in the system.</para>
+    <para>
+    The
+    <functionalItemRef functionalItemNumber="ABC"/>
+    is an item in the system.
+    </para>
 
 And the resulting XML would be:
 

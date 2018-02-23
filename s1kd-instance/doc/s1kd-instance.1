@@ -395,7 +395,8 @@ The example CIR would contain a specification like:
 .nf
 \f[C]
 <functionalItemSpec>
-<functionalItemIdent\ functionalItemNumber="ABC"\ functionalItemType="fit01"/>
+<functionalItemIdent\ functionalItemNumber="ABC"
+functionalItemType="fit01"/>
 <name>Hydraulic\ pump</name>
 <functionalItemAlts>
 <functionalItem/>
@@ -408,7 +409,11 @@ The source data module would contain a reference:
 .IP
 .nf
 \f[C]
-<para>The\ <functionalItemRef\ functionalItemNumber="ABC"/>\ is\ an\ item\ in\ the\ system.</para>
+<para>
+The
+<functionalItemRef\ functionalItemNumber="ABC"/>
+is\ an\ item\ in\ the\ system.
+</para>
 \f[]
 .fi
 .PP
