@@ -383,12 +383,12 @@ pmVolume                  00]]></verbatimText>
           </para>
           <para>Alternatively, the 'defaults' file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
 <defaults>
-  <!-- General -->
-  <default ident="modelIdentCode" value="S1000DTOOLS"/>
-  <default ident="securityClassification" value="01"/>
-  [...]
+<!-- General -->
+<default ident="modelIdentCode" value="S1000DTOOLS"/>
+<default ident="securityClassification" value="01"/>
+[...]
 </defaults>]]></verbatimText>
           </para>
         </levelledPara>
@@ -407,11 +407,11 @@ pmVolume                  00]]></verbatimText>
           </para>
           <para>Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
+            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0">
 <dmtypes>
-  <type infoCode="022" schema="brex"/>
-  <type infoCode="040" schema="descript" infoName="Description"/>
-  <type infoCode="520" schema="proced" infoName="Remove procedure"/>
+<type infoCode="022" schema="brex"/>
+<type infoCode="040" schema="descript" infoName="Description"/>
+<type infoCode="520" schema="proced" infoName="Remove procedure"/>
 </dmtypes>]]></verbatimText>
           </para>
           <para>Info code variants can also be given specific default schema and info names. To do this, include the variant with the info code:</para>

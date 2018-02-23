@@ -216,10 +216,10 @@ Alternatively, the 'defaults' file can be written using an XML format, containin
 
     <?xml version="1.0"?>
     <defaults>
-      <!-- General -->
-      <default ident="modelIdentCode" value="S1000DTOOLS"/>
-      <default ident="securityClassification" value="01"/>
-      [...]
+    <!-- General -->
+    <default ident="modelIdentCode" value="S1000DTOOLS"/>
+    <default ident="securityClassification" value="01"/>
+    [...]
     </defaults>
 
 'dmtypes' file
@@ -241,9 +241,9 @@ Like the 'defaults' file, the 'dmtypes' file may also be written in an XML forma
 
     <?xml version="1.0">
     <dmtypes>
-      <type infoCode="022" schema="brex"/>
-      <type infoCode="040" schema="descript" infoName="Description"/>
-      <type infoCode="520" schema="proced" infoName="Remove procedure"/>
+    <type infoCode="022" schema="brex"/>
+    <type infoCode="040" schema="descript" infoName="Description"/>
+    <type infoCode="520" schema="proced" infoName="Remove procedure"/>
     </dmtypes>
 
 Info code variants can also be given specific default schema and info names. To do this, include the variant with the info code:
