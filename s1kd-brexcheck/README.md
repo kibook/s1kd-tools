@@ -6,7 +6,8 @@ s1kd-brexcheck - Validate S1000D data modules against BREX data modules
 SYNOPSIS
 ========
 
-    s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlStupfch?] <datamodules>
+    s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+                   [-vVqDsxlStupfch?] <datamodules>
 
 DESCRIPTION
 ===========

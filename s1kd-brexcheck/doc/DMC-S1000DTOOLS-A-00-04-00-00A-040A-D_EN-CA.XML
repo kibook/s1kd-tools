@@ -52,7 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>] [-vVqDsxlStupfch?] <datamodules>]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+               [-vVqDsxlStupfch?] <datamodules>]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
