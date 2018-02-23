@@ -8,12 +8,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="2" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="09"/>
+        <issueDate year="2018" month="02" day="23"/>
         <dmTitle>
-          <techName>s1kd-validate(1) | General Commands Manual</techName>
+          <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -40,8 +40,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -f option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +53,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-vqD] [&lt;datamodules&gt;]</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-vqD] [&lt;datamodule&gt;...]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -62,18 +64,12 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.</para>
                 <para>This can also be accomplished through the use of XML catalogs.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-X &lt;URI&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -89,9 +85,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>&lt;datamodules&gt;</listItemTerm>
+              <listItemTerm>-X &lt;URI&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Any number of data modules to validate.</para>
+                <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;datamodule&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Any number of data modules to validate. If none are specified, input is read from stdin.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -115,8 +117,8 @@
           <para>Below is an example of a catalog file which maps the S1000D schemas to a local directory:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-  <rewriteURI uriStartString="http://www.s1000d.org/"
-              rewritePrefix="/usr/share/s1kd/schemas/"/>
+<rewriteURI uriStartString="http://www.s1000d.org/"
+rewritePrefix="/usr/share/s1kd/schemas/"/>
 </catalog>]]></verbatimText>
           </para>
           <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>) to remove the need to use the -d option.</para>
