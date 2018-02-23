@@ -6,7 +6,7 @@ s1kd-metadata - View and edit S1000D data module metadata
 SYNOPSIS
 ========
 
-s1kd-metadata \[-c &lt;file&gt;\] \[-tf\] \[-n &lt;name&gt; \[-v &lt;value&gt;\]\] \[&lt;module&gt;\]
+    s1kd-metadata [-c <file>] [-tf] [-n <name> [-v <value>]] [<module>]
 
 DESCRIPTION
 ===========
@@ -19,17 +19,17 @@ OPTIONS
 -c &lt;file&gt;  
 Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).
 
--t  
-Do not format columns in output.
-
 -f  
 When editing metadata, overwrite the module. The default is to output the modified module to stdout.
 
 -n &lt;name&gt;  
 The name of the piece of metadata to fetch. If no name is specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.
 
+-t  
+Do not format columns in output.
+
 -v &lt;value&gt;  
-The new value for the piece of metadata.
+The new value for the piece of metadata specified by -n.
 
 &lt;module&gt;  
 The module to show/edit metadata on. The default is to read from stdin.
@@ -42,8 +42,7 @@ EXAMPLE
 
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
     issueDate                      2017-08-14
-    techName                       s1kd-metadata(1) | General Commands Ma
-    nual
+    techName                       s1kd-metadata(1) | s1kd-tools
     responsiblePartnerCompany      khzae.net
     originator                     khzae.net
     securityClassification         01
@@ -58,7 +57,7 @@ EXAMPLE
     dmCode                         S1000DTOOLS-A-00-09-00-00A-040A-D
 
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML \
-      techName 'New title'
+      -n techName -v 'New title'
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML \
-      techName
+      -n techName
     New title
