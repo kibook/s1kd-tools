@@ -6,7 +6,7 @@ s1kd-newcom - Create a new S1000D comment.
 SYNOPSIS
 ========
 
-s1kd-newcom \[options\]
+    s1kd-newcom [options]
 
 DESCRIPTION
 ===========
@@ -16,44 +16,8 @@ The *s1kd-newcom* tool creates a new S1000D comment with the code and metadata s
 OPTIONS
 =======
 
--d &lt;defaults&gt;  
-Specify the 'defaults' file name.
-
--p  
-Prompt the user for values left unspecified.
-
 -\# &lt;code&gt;  
 The code of the comment, in the form of MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.
-
--L &lt;lang&gt;  
-The language ISO code of the new comment.
-
--C &lt;country&gt;  
-The country ISO code of the new comment.
-
--c &lt;sec&gt;  
-The security classification of the new comment.
-
--o &lt;orig&gt;  
-The enterprise name of the originator of the comment.
-
--t &lt;title&gt;  
-The title of the new comment.
-
--r &lt;type&gt;  
-The response type of the new comment.
-
--b &lt;BREX&gt;  
-BREX data module code.
-
--I &lt;date&gt;  
-The issue date of the new comment in the form of YYYY-MM-DD.
-
--v  
-Print the file name of the newly created comment.
-
--f  
-Overwrite existing file.
 
 -$ &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
@@ -73,6 +37,42 @@ Save the new comment as &lt;filename&gt; instead of an automatically named file 
 
 -% &lt;dir&gt;  
 Use the XML template in the specified directory instead of the built-in template. The template must be named `comment.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+
+-b &lt;BREX&gt;  
+BREX data module code.
+
+-C &lt;country&gt;  
+The country ISO code of the new comment.
+
+-c &lt;sec&gt;  
+The security classification of the new comment.
+
+-d &lt;defaults&gt;  
+Specify the 'defaults' file name.
+
+-f  
+Overwrite existing file.
+
+-I &lt;date&gt;  
+The issue date of the new comment in the form of YYYY-MM-DD.
+
+-L &lt;lang&gt;  
+The language ISO code of the new comment.
+
+-o &lt;orig&gt;  
+The enterprise name of the originator of the comment.
+
+-p  
+Prompt the user for values left unspecified.
+
+-r &lt;type&gt;  
+The response type of the new comment.
+
+-t &lt;title&gt;  
+The title of the new comment.
+
+-v  
+Print the file name of the newly created comment.
 
 'defaults' file
 ---------------

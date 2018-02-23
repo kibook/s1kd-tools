@@ -6,12 +6,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="G" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="08"/>
+        <issueDate year="2018" month="02" day="23"/>
         <dmTitle>
-          <techName>s1kd-newcom(1) | General Commands Manual</techName>
+          <techName>s1kd-newcom(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001">
-        <simplePara>Add -% option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve organization and formatting.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -51,7 +51,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-newcom [options]</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">s1kd-newcom [options]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
@@ -60,83 +62,11 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
-            <definitionListItem>
-              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Specify the 'defaults' file name.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-p</listItemTerm>
-              <listItemDefinition>
-                <para>Prompt the user for values left unspecified.</para>
-              </listItemDefinition>
-            </definitionListItem>
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>-# &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The code of the comment, in the form of MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-L &lt;lang&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The language ISO code of the new comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-C &lt;country&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The country ISO code of the new comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The security classification of the new comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The enterprise name of the originator of the comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-t &lt;title&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The title of the new comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-r &lt;type&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The response type of the new comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>BREX data module code.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-I &lt;date&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>The issue date of the new comment in the form of YYYY-MM-DD.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
-              <listItemDefinition>
-                <para>Print the file name of the newly created comment.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
-              <listItemDefinition>
-                <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -170,10 +100,82 @@
                 <para>Save the new comment as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-% &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">comment.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C &lt;country&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The country ISO code of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the 'defaults' file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue date of the new comment in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L &lt;lang&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The language ISO code of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The enterprise name of the originator of the comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Prompt the user for values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The response type of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;title&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The title of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created comment.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
