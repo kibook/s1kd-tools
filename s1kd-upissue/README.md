@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-s1kd-upissue \[-viNrRqI\] \[-1 &lt;type&gt;\] \[-2 &lt;type&gt;\] \[-s &lt;status&gt;\] &lt;files&gt;
+    s1kd-upissue [-viNrRqI] [-1 <type>] [-2 <type>] [-s <status>] <files>
 
 DESCRIPTION
 ===========
@@ -18,35 +18,35 @@ Any files using an S1000D-esque naming convention, placing the issue and in-work
 OPTIONS
 =======
 
--v  
-Print the file name of the upissued data module.
-
--i  
-Increase the issue number of the data module. By default, the in-work issue is increased.
-
--s &lt;status&gt;  
-Set the status of the new issue. Default is 'changed'.
-
--N  
-Omit issue/inwork numbers from filename.
-
--r  
-Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements. This option prevents their deletion.
-
--R  
-Delete only change markup on elements associated with an RFU (by use of the attribute `reasonForUpdateRefIds`. Change markup on other elements is ignored.
-
--I  
-Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.
-
--q  
-Keep quality assurance information from old issue. Normally, when upissuing an official data module to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the data module, and so does not require it to be re-verified.
-
 -1 &lt;type&gt;  
 Set first verification type (tabtop, onobject, ttandoo).
 
 -2 &lt;type&gt;  
 Set second verification type (tabtop, onobject, ttandoo).
+
+-I  
+Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.
+
+-i  
+Increase the issue number of the data module. By default, the in-work issue is increased.
+
+-N  
+Omit issue/inwork numbers from filename.
+
+-q  
+Keep quality assurance information from old issue. Normally, when upissuing an official data module to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the data module, and so does not require it to be re-verified.
+
+-R  
+Delete only change markup on elements associated with an RFU (by use of the attribute `reasonForUpdateRefIds`. Change markup on other elements is ignored.
+
+-r  
+Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements. This option prevents their deletion.
+
+-s &lt;status&gt;  
+Set the status of the new issue. Default is 'changed'.
+
+-v  
+Print the file name of the upissued data module.
 
 EXAMPLES
 ========
@@ -76,11 +76,11 @@ Data module without issue/inwork in filename
     DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-US.XML
 
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
-      issueInfo
+      -n issueInfo
     000-01
     $ s1kd-upissue -N DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
     $ s1kd-metadata DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
-      issueInfo
+      -n issueInfo
     000-02
 
 Non-XML file with issue/inwork in filename
