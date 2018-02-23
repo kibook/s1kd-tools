@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="22"/>
+        <issueDate year="2018" month="02" day="23"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+        <simplePara>Reformat XML examples.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -63,7 +63,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-b &lt;brex&gt;</listItemTerm>
               <listItemDefinition>
@@ -150,10 +150,10 @@
           <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The -w option takes an XML file containing a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
 <brSeverityLevels>
-  <brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
-  <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
+<brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
+<brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
 </brSeverityLevels>]]></verbatimText>
           </para>
           <para>When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of "yes" (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is no, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
@@ -163,36 +163,36 @@
           <para>There are three modes for SNS checking: normal, strict, and unstrict. The main difference between them is how they handle the optional levels of an SNS description in the BREX.</para>
           <para>-St enables <emphasis>strict</emphasis> SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
-  <snsCode>00</snsCode>
-  <snsTitle>General</snsTitle>
+            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<snsSystem>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
 </snsSystem>]]></verbatimText>
           </para>
           <para>is equivalent to</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
-  <snsCode>00</snsCode>
-  <snsTitle>General</snsTitle>
-  <snsSubSystem>
-    <snsCode>0</snsCode>
-    <snsTitle>General</snsTitle>
-    <snsSubSubSystem>
-      <snsCode>0</snsCode>
-      <snsTitle>General</snsTitle>
-      <snsAssy>
-        <snsCode>00</snsCode>
-        <snsTitle>General</snsTitle>
-      </snsAssy>
-    </snsSubSubSystem>
-  </snsSubSystem>
+            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<snsSystem>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
+<snsSubSystem>
+<snsCode>0</snsCode>
+<snsTitle>General</snsTitle>
+<snsSubSubSystem>
+<snsCode>0</snsCode>
+<snsTitle>General</snsTitle>
+<snsAssy>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
+</snsAssy>
+</snsSubSubSystem>
+</snsSubSystem>
 </snsSystem>]]></verbatimText>
           </para>
           <para>Using strict checking will disable this shorthand, and missing optional elements will result in an error.</para>
           <para>-Su enables <emphasis>unstrict</emphasis> SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, <emphasis>any</emphasis> code used will not produce an error when the relevant optional elements are omitted. This means that given the following...</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
-  <snsCode>00</snsCode>
-  <snsTitle>General</snsTitle>
+            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<snsSystem>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
 </snsSystem>]]></verbatimText>
           </para>
           <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
@@ -205,12 +205,12 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
 <listItem id="stp-0001">
-  <para>List items shouldn't be used as steps...</para>
+<para>List items shouldn't be used as steps...</para>
 </listItem>
 [...]
 <para>Refer to <internalRef internalRefId="stp-0001"
