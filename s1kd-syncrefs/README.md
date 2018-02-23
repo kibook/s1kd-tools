@@ -6,7 +6,7 @@ s1kd-syncrefs - Synchronize references in a data module
 SYNOPSIS
 ========
 
-s1kd-syncrefs \[-df\] \[-o &lt;out&gt;\] \[&lt;data module&gt;...\]
+`s1kd-syncrefs [-df] [-o <out>] [<data module>...]`
 
 DESCRIPTION
 ===========
