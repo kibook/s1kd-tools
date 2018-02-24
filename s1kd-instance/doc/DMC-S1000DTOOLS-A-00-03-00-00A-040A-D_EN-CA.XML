@@ -199,13 +199,13 @@
             <definitionListItem>
               <listItemTerm>-P &lt;PCT&gt;</listItemTerm>
               <listItemDefinition>
-                <para><acronymTerm internalRefId="acr-PCT">PCT</acronymTerm>Product Cross-reference Table file to read product definitions from (-p).</para>
+                <para><acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> file to read product definitions from (-p).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-p &lt;id&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).</para>
+                <para>Product ID of the product to read applicability definitions from, using the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

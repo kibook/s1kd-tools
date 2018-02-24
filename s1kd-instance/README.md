@@ -86,7 +86,7 @@ If any of the above are not specified, the information is copied from the source
 Output instance to file instead of stdout.
 
 -P &lt;PCT&gt;  
-PCTProduct Cross-reference Table file to read product definitions from (-p).
+PCT file to read product definitions from (-p).
 
 -p &lt;id&gt;  
 Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).
