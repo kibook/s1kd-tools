@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="023" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="23"/>
+        <issueDate year="2018" month="02" day="24"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+        <simplePara>Correct list of attributes in 'dmtypes' XML file description.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +53,7 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <para>
           <verbatimText verbatimStyle="vs24">s1kd-newdm [options]</verbatimText>
         </para>
       </levelledPara>
@@ -64,7 +64,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-# &lt;DMC&gt;</listItemTerm>
               <listItemDefinition>
@@ -383,7 +383,7 @@ pmVolume                  00]]></verbatimText>
           </para>
           <para>Alternatively, the 'defaults' file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
 <defaults>
 <!-- General -->
 <default ident="modelIdentCode" value="S1000DTOOLS"/>
@@ -405,9 +405,9 @@ pmVolume                  00]]></verbatimText>
 040    descript    Description
 520    proced      Remove procedure]]></verbatimText>
           </para>
-          <para>Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>.</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText>, an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>, and optionally an attribute <verbatimText verbatimStyle="vs13">infoName</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0">
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
 <dmtypes>
 <type infoCode="022" schema="brex"/>
 <type infoCode="040" schema="descript" infoName="Description"/>
@@ -431,7 +431,7 @@ pmVolume                  00]]></verbatimText>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLE</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <para>
           <verbatimText verbatimStyle="vs24">$ s1kd-newdm -# S1000DTOOLS-A-00-07-00-00A-040A-D</verbatimText>
         </para>
       </levelledPara>

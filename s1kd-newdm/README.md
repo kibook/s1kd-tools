@@ -237,7 +237,7 @@ Each line consists of an info code, a schema identifier, and optionally a defaul
     040    descript    Description
     520    proced      Remove procedure
 
-Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute `infoCode` and an attribute `schema`.
+Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute `infoCode`, an attribute `schema`, and optionally an attribute `infoName`.
 
     <?xml version="1.0">
     <dmtypes>
