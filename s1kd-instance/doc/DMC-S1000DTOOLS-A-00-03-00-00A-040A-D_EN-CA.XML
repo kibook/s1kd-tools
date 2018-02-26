@@ -503,8 +503,7 @@ is an item in the system.
 <xsl:copy>
 <xsl:apply-templates select="@*|node()"/>
 </xsl:copy>
-</xsl:template>]]>
-            </verbatimText>
+</xsl:template>]]></verbatimText>
           </para>
           <para changeType="add" reasonForUpdateRefIds="rfu-0002">This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
           <para changeType="add" reasonForUpdateRefIds="rfu-0002">The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.</para>

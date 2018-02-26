@@ -331,7 +331,6 @@ An "identity" template is automatically inserted in to the custom XSLT script, e
     <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
     </xsl:template>
-                
 
 This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.
 
