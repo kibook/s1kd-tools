@@ -324,4 +324,15 @@ And the resulting XML would be:
 
 The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element `mux` contains two `dmodule` elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.
 
+An "identity" template is automatically inserted in to the custom XSLT script, equivalent to the following:
+
+    <xsl:template match="@*|node()">
+    <xsl:copy>
+    <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+    </xsl:template>
+                
+
+This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.
+
 The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.
