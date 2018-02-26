@@ -18,6 +18,7 @@
         (not($itemOriginator) or $itemOriginator = @itemOriginator)
       ]"/>
       <xsl:variable name="functionalItemSpec" select="$functionalItemIdent/parent::functionalItemSpec"/>
+      <xsl:variable name="functionalItem" select="$functionalItemSpec/functionalItemAlts/functionalItem[1]"/>
       <functionalItemRef>
         <xsl:choose>
           <xsl:when test="$functionalItemSpec">
@@ -28,8 +29,22 @@
             <xsl:apply-templates select="$functionalItemIdent/@contextIdent"/>
             <xsl:apply-templates select="$functionalItemIdent/@manufacturerCodeValue"/>
             <xsl:apply-templates select="$functionalItemIdent/@itemOriginator"/>
-            <xsl:apply-templates select="$functionalItemSpec/name"/>
-            <xsl:apply-templates select="$functionalItemSpec/shortName"/>
+            <xsl:choose>
+              <xsl:when test="$functionalItem/name">
+                <xsl:apply-templates select="$functionalItem/name"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="$functionalItemSpec/name"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+              <xsl:when test="$functionalItem/shortName">
+                <xsl:apply-templates select="$functionalItem/shortName"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="$functionalItemSpec/shortName"/>
+              </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates select="$functionalItemSpec/refs"/>
           </xsl:when>
           <xsl:otherwise>
