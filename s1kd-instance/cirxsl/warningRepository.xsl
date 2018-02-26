@@ -8,13 +8,22 @@
   </xsl:template>
 
   <xsl:template match="warningRef">
-    <xsl:variable name="win" select="@warningIdentNumber"/>
-    <xsl:variable name="ident" select="//warningIdent[@warningIdentNumber = $win]"/>
-    <xsl:variable name="spec" select="$ident/parent::warningSpec"/>
-    <warning>
-      <xsl:copy-of select="@id"/>
-      <xsl:copy-of select="$spec/warningAndCautionPara"/>
-    </warning>
+    <xsl:variable name="warningIdentNumber" select="@warningIdentNumber"/>
+    <xsl:variable name="warningIdent" select="//warningIdent[$warningIdentNumber = @warningIdentNumber]"/>
+    <xsl:variable name="warningSpec" select="$warningIdent/parent::warningSpec"/>
+    <xsl:choose>
+      <xsl:when test="$warningSpec">
+        <warning>
+          <xsl:apply-templates select="@id"/>
+          <xsl:apply-templates select="$warningSpec/warningAndCautionPara"/>
+        </warning>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

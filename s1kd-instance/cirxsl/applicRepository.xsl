@@ -8,14 +8,14 @@
   </xsl:template>
 
   <xsl:template match="applicRef">
-    <xsl:variable name="aiv" select="@applicIdentValue"/>
-    <xsl:variable name="ident" select="//applicSpecIdent[@applicIdentValue = $aiv]"/>
-    <xsl:variable name="spec" select="$ident/parent::applicSpec"/>
-    <xsl:variable name="mapid" select="$spec/@applicMapRefId"/>
-    <xsl:variable name="map" select="$spec/ancestor::content//applic[@id = $mapid]"/>
+    <xsl:variable name="applicIdentValue" select="@applicIdentValue"/>
+    <xsl:variable name="applicSpecIdent" select="//applicSpecIdent[$applicIdentValue = @applicIdentValue]"/>
+    <xsl:variable name="applicSpec" select="$applicSpecIdent/parent::applicSpec"/>
+    <xsl:variable name="applicMapRefId" select="$applicSpec/@applicMapRefId"/>
+    <xsl:variable name="applic" select="$spec/ancestor::content//applic[@id = $applicMapRefId]"/>
     <applic>
-      <xsl:copy-of select="@id"/>
-      <xsl:copy-of select="$map/*"/>
+      <xsl:apply-templates select="@id"/>
+      <xsl:apply-templates select="$applic/node()"/>
     </applic>
   </xsl:template>
 
