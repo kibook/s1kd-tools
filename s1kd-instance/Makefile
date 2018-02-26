@@ -15,11 +15,15 @@ strings.h: help.msg
 identity.h: identity.xsl
 	xxd -i identity.xsl > identity.h
 
-$(OUTPUT): $(SOURCE) strings.h identity.h
+cirxsl.h: cirxsl/*.xsl
+	> cirxsl.h
+	for f in cirxsl/*.xsl; do xxd -i "$$f" >> cirxsl.h; done
+
+$(OUTPUT): $(SOURCE) strings.h identity.h cirxsl.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT) strings.h identity.h
+	rm -f $(OUTPUT) strings.h identity.h cirxsl.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

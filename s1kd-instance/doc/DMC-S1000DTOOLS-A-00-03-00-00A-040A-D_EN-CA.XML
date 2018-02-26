@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This document was created with Syntext Serna Free. -->
-<!DOCTYPE dmodule [
-<!ENTITY % ISOEntities PUBLIC "ISO 8879-1986//ENTITIES ISO Character Entities 20030531//EN//XML" "http://www.s1000d.org/S1000D_4-2/ent/ISOEntities">
-]>
+<!DOCTYPE dmodule>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="23"/>
+        <issueDate year="2018" month="02" day="26"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,11 +38,11 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Provide a set of built-in XSLT scripts for resolving CIR items.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Limit width of examples to 70 chars.</simplePara>
+        <simplePara>Clarify custom XSLT example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -63,11 +60,12 @@
               [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f]
               [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A]
               [-Y &lt;text&gt;] [-C &lt;comment&gt;]
-              [-R &lt;CIR&gt; ...] [-r &lt;XSL&gt;] [-S] [-N]
-              [-P &lt;PCT&gt; -p &lt;id&gt;] [-L] [&lt;applic&gt;...]</verbatimText>
+              [-R &lt;CIR&gt; ...] [-r &lt;XSL&gt;] [-x &lt;CIR&gt;]
+              [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L]
+              [&lt;applic&gt;...]</verbatimText>
         </para>
       </levelledPara>
-      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-instance</emphasis> tool produces an "instance" of an S1000D data module or publication module, derived from a "master" (or "source") module. The tool supports multiple methods of instantiating a module:</para>
         <para>
@@ -88,7 +86,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-A</listItemTerm>
               <listItemDefinition>
@@ -210,28 +208,50 @@
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-R &lt;CIR&gt; ...</listItemTerm>
-              <listItemDefinition>
+              <listItemDefinition changeType="modify" reasonForUpdateRefIds="rfu-0001">
                 <para>Use a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times.</para>
-                <para>Currently supported CIRs:</para>
+                <para>The following CIRs have some built-in support:</para>
                 <para>
                   <randomList>
                     <listItem>
-                      <para>Functional items</para>
-                    </listItem>
-                    <listItem>
-                      <para>Controls and indicators</para>
-                    </listItem>
-                    <listItem>
-                      <para>Zones</para>
-                    </listItem>
-                    <listItem>
-                      <para>Warnings and cautions</para>
+                      <para>Access points</para>
                     </listItem>
                     <listItem>
                       <para>Applicability</para>
                     </listItem>
+                    <listItem>
+                      <para>Cautions</para>
+                    </listItem>
+                    <listItem>
+                      <para>Circuit breakers</para>
+                    </listItem>
+                    <listItem>
+                      <para>Controls/indicators</para>
+                    </listItem>
+                    <listItem>
+                      <para>Enterprises</para>
+                    </listItem>
+                    <listItem>
+                      <para>Functional items</para>
+                    </listItem>
+                    <listItem>
+                      <para>Parts</para>
+                    </listItem>
+                    <listItem>
+                      <para>Supplies</para>
+                    </listItem>
+                    <listItem>
+                      <para>Tools</para>
+                    </listItem>
+                    <listItem>
+                      <para>Warnings</para>
+                    </listItem>
+                    <listItem>
+                      <para>Zones</para>
+                    </listItem>
                   </randomList>
                 </para>
+                <para>The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -r option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -x option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -274,6 +294,53 @@
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
                 <para>Check the applicability of the whole module against the user-defined applicability. If the whole module is not applicable, then no instance is created.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-x &lt;CIR&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -r option.</para>
+                <para>The following types currently have built-in XSLT and can therefore be used as values for &lt;CIR&gt;:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>accessPointRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>applicRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>cautionRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>circuitBreakerRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>controlIndicatorRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>enterpriseRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>functionalItemRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>partRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>supplyRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>toolRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>warningRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>zoneRepository</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -404,7 +471,7 @@ functionalItemIdent/@functionalItemNumber = $fin]"/>
           <para>This script would resolve a <verbatimText verbatimStyle="vs12">functionalItemRef</verbatimText> by "flattening" it to the value of the <verbatimText verbatimStyle="vs12">name</verbatimText> element obtained from the CIR.</para>
           <para>The example CIR would contain a specification like:</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<functionalItemSpec>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<functionalItemSpec>
 <functionalItemIdent functionalItemNumber="ABC"
 functionalItemType="fit01"/>
 <name>Hydraulic pump</name>
@@ -415,17 +482,21 @@ functionalItemType="fit01"/>
           </para>
           <para>The source data module would contain a reference:</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<para>
 The
 <functionalItemRef functionalItemNumber="ABC"/>
 is an item in the system.
 </para>]]></verbatimText>
           </para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0002">The command would resemble:</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <verbatimText verbatimStyle="vs24">$ s1kd-instance -s &lt;src&gt; -R &lt;CIR&gt; -r &lt;custom XSLT&gt;</verbatimText>
+          </para>
           <para>And the resulting XML would be:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<para>The Hydraulic pump is an item in the system.</para>]]></verbatimText>
           </para>
-          <para>The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element <verbatimText verbatimStyle="vs12">mux</verbatimText> contains two <verbatimText verbatimStyle="vs12">dmodule</verbatimText> elements. The first is the source data module, and the second is one of the CIR data modules supplied with -R. The CIR data module is first filtered on the defined applicability.</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0002">The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element <verbatimText verbatimStyle="vs12">mux</verbatimText> contains two <verbatimText verbatimStyle="vs12">dmodule</verbatimText> elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.</para>
         </levelledPara>
       </levelledPara>
     </description>

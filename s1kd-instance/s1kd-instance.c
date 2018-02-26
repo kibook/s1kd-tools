@@ -14,6 +14,7 @@
 
 #include "strings.h"
 #include "identity.h"
+#include "cirxsl.h"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX "s1kd-instance: ERROR: "
@@ -297,6 +298,7 @@ bool is_in_set(const char *value, const char *set)
 	return ret;
 }
 
+/* Evaluate multiple values for a property */
 bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const char *value)
 {
 	xmlNodePtr cur;
@@ -962,566 +964,6 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 	free_ident(&ident);
 }
 
-
-/* These functions make a CIR-dependant data module standalone given specified
- * CIR data modules. See mainly Chapter 4.13.1 in the Issue 4.2 spec.*/
-
-/* Functional item repository (00E) */
-bool is_funcitemref_child(char *name)
-{
-	return strcmp(name, "name") == 0 || strcmp(name, "shortName") == 0 || strcmp(name, "refs") == 0;
-}
-
-void replace_funcitem_ref(xmlNodePtr ref, xmlNodePtr spec)
-{
-	xmlXPathContextPtr ctxt;
-	xmlXPathObjectPtr results;
-	xmlNodePtr cur;
-
-	ctxt = xmlXPathNewContext(spec->doc);
-	ctxt->node = spec;
-
-	results = xmlXPathEvalExpression(BAD_CAST "functionalItemAlts/functionalItem[*]", ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(results->nodesetval) && results->nodesetval->nodeNr == 1) {
-		spec = results->nodesetval->nodeTab[0];
-	}
-
-	xmlXPathFreeObject(results);
-	xmlXPathFreeContext(ctxt);
-
-	while ((cur = ref->children)) {
-		xmlUnlinkNode(cur);
-		xmlFreeNode(cur);
-	}
-
-	for (cur = spec->children; cur; cur = cur->next) {
-		if (is_funcitemref_child((char *) cur->name)) {
-			xmlAddChild(ref, xmlCopyNode(cur, 1));
-		}
-	}
-}
-
-bool funcitem_match(xmlNodePtr ref, xmlNodePtr spc)
-{
-	xmlChar *refnum, *spcnum;
-	xmlChar *reffit, *spcfit;
-	xmlChar *refins, *spcins;
-	xmlChar *refctx, *spcctx;
-	xmlChar *refman, *spcman;
-	xmlChar *reforg, *spcorg;
-
-	bool match;
-
-	refnum = xmlGetProp(ref, BAD_CAST "functionalItemNumber");
-	spcnum = xmlGetProp(spc, BAD_CAST "functionalItemNumber");
-
-	match = refnum == NULL;
-	if (refnum && spcnum) match = xmlStrcmp(refnum, spcnum) == 0;
-
-	xmlFree(refnum);
-	xmlFree(spcnum);
-
-	if (!match) return false;
-
-	reffit = xmlGetProp(ref, BAD_CAST "functionalItemType");
-	spcfit = xmlGetProp(spc, BAD_CAST "functionalItemType");
-
-	match = reffit == NULL;
-	if (reffit && spcfit) match = xmlStrcmp(reffit, spcfit) == 0;
-
-	xmlFree(reffit);
-	xmlFree(spcfit);
-
-	if (!match) return false;
-
-	refins = xmlGetProp(ref, BAD_CAST "installationIdent");
-	spcins = xmlGetProp(spc, BAD_CAST "installationIdent");
-
-	match = refins == NULL;
-	if (refins && spcins) match = xmlStrcmp(refins, spcins) == 0;
-
-	xmlFree(refins);
-	xmlFree(spcins);
-
-	if (!match) return false;
-
-	refctx = xmlGetProp(ref, BAD_CAST "contextIdent");
-	spcctx = xmlGetProp(spc, BAD_CAST "contextIdent");
-
-	match = refctx == NULL;
-	if (refctx && spcctx) match = xmlStrcmp(refctx, spcctx) == 0;
-
-	xmlFree(refctx);
-	xmlFree(spcctx);
-
-	if (!match) return false;
-
-	refman = xmlGetProp(ref, BAD_CAST "manufacturerCodeValue");
-	spcman = xmlGetProp(spc, BAD_CAST "manufacturerCodeValue");
-
-	match = refman == NULL;
-	if (refman && spcman) match = xmlStrcmp(refman, spcman) == 0;
-
-	xmlFree(refman);
-	xmlFree(spcman);
-
-	if (!match) return false;
-
-	reforg = xmlGetProp(ref, BAD_CAST "itemOriginator");
-	spcorg = xmlGetProp(spc, BAD_CAST "itemOriginator");
-
-	match = reforg == NULL;
-	if (reforg && spcorg) match = xmlStrcmp(reforg, spcorg) == 0;
-
-	xmlFree(reforg);
-	xmlFree(spcorg);
-
-	if (!match) return false;
-
-	return true;
-}
-
-void undepend_funcitem_cir(xmlDocPtr dm, xmlDocPtr cir)
-{
-	xmlXPathContextPtr ctxt1;
-	xmlXPathContextPtr ctxt2;
-	xmlXPathObjectPtr results1;
-	xmlXPathObjectPtr results2;
-
-	xmlNodePtr functionalItemRef;
-	xmlNodePtr functionalItemSpec;
-	xmlNodePtr functionalItemIdent;
-
-	int i, j;
-
-	ctxt1 = xmlXPathNewContext(cir);
-	ctxt2 = xmlXPathNewContext(dm);
-
-	results1 = xmlXPathEvalExpression(BAD_CAST "//functionalItemSpec", ctxt1);
-	results2 = xmlXPathEvalExpression(BAD_CAST "//functionalItemRef", ctxt2);
-
-	for (i = 0; i < results2->nodesetval->nodeNr; ++i) {
-		functionalItemRef = results2->nodesetval->nodeTab[i];
-
-		for (j = 0; j < results1->nodesetval->nodeNr; ++j) {
-			functionalItemSpec = results1->nodesetval->nodeTab[j];
-
-			functionalItemIdent = find_req_child(functionalItemSpec, "functionalItemIdent");
-
-			if (funcitem_match(functionalItemRef, functionalItemIdent)) {
-				replace_funcitem_ref(functionalItemRef, functionalItemSpec);
-				break;
-			}
-		}
-	}
-
-	xmlXPathFreeObject(results1);
-	xmlXPathFreeObject(results2);
-
-	xmlXPathFreeContext(ctxt1);
-	xmlXPathFreeContext(ctxt2);
-}
-
-/* Zone repository (00H) */
-bool is_zoneref_child(char *name)
-{
-	return strcmp(name, "shortName") == 0 || strcmp(name, "refs") == 0;
-}
-
-void replace_zone_ref(xmlNodePtr ref, xmlNodePtr spec)
-{
-	xmlXPathContextPtr ctxt;
-	xmlXPathObjectPtr results;
-	xmlNodePtr cur;
-
-	ctxt = xmlXPathNewContext(spec->doc);
-	ctxt->node = spec;
-
-	results = xmlXPathEvalExpression(BAD_CAST "zoneAlts/zone[*]", ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(results->nodesetval) && results->nodesetval->nodeNr == 1) {
-		spec = results->nodesetval->nodeTab[0];
-	}
-
-	xmlXPathFreeObject(results);
-	xmlXPathFreeContext(ctxt);
-
-	while ((cur = ref->children)) {
-		xmlUnlinkNode(cur);
-		xmlFreeNode(cur);
-	}
-
-	for (cur = spec->children; cur; cur = cur->next) {
-		if (is_zoneref_child((char *) cur->name)) {
-			xmlAddChild(ref, xmlCopyNode(cur, 1));
-		}
-	}
-}
-
-bool zone_match(xmlNodePtr ref, xmlNodePtr spc)
-{
-	xmlChar *refnum, *spcnum;
-
-	bool match;
-
-	refnum = xmlGetProp(ref, BAD_CAST "zoneNumber");
-	spcnum = xmlGetProp(spc, BAD_CAST "zoneNumber");
-
-	if (refnum && spcnum)
-		match = xmlStrcmp(refnum, spcnum) == 0;
-	else
-		match = false;
-
-	xmlFree(refnum);
-	xmlFree(spcnum);
-
-	return match;
-}
-
-void undepend_zone_cir(xmlDocPtr dm, xmlDocPtr cir)
-{
-	xmlXPathContextPtr ctxt1;
-	xmlXPathContextPtr ctxt2;
-	xmlXPathObjectPtr results1;
-	xmlXPathObjectPtr results2;
-
-	xmlNodePtr zoneRef;
-	xmlNodePtr zoneSpec;
-	xmlNodePtr zoneIdent;
-
-	int i, j;
-
-	ctxt1 = xmlXPathNewContext(cir);
-	ctxt2 = xmlXPathNewContext(dm);
-
-	results1 = xmlXPathEvalExpression(BAD_CAST "//zoneSpec", ctxt1);
-	results2 = xmlXPathEvalExpression(BAD_CAST "//zoneRef", ctxt2);
-
-	for (i = 0; i < results2->nodesetval->nodeNr; ++i) {
-		zoneRef = results2->nodesetval->nodeTab[i];
-
-		for (j = 0; j < results1->nodesetval->nodeNr; ++j) {
-			zoneSpec = results1->nodesetval->nodeTab[j];
-
-			zoneIdent = find_req_child(zoneSpec, "zoneIdent");
-
-			if (zone_match(zoneRef, zoneIdent)) {
-				replace_zone_ref(zoneRef, zoneSpec);
-				break;
-			}
-		}
-	}
-
-	xmlXPathFreeObject(results1);
-	xmlXPathFreeObject(results2);
-
-	xmlXPathFreeContext(ctxt1);
-	xmlXPathFreeContext(ctxt2);
-}
-
-/* Controls and indicators repository (00X) */
-void replace_cntrlind_ref(xmlNodePtr ref, xmlNodePtr spec)
-{
-	xmlNodePtr cur;
-
-	while ((cur = ref->children)) {
-		xmlUnlinkNode(cur);
-		xmlFreeNode(cur);
-	}
-
-	for (cur = spec->children; cur; cur = cur->next) {
-		if (xmlStrcmp(cur->name, BAD_CAST "shortName") == 0) {
-			xmlAddChild(ref, xmlCopyNode(cur, 1));
-		} else if (xmlStrcmp(cur->name, BAD_CAST "controlIndicatorName") == 0) {
-			xmlNodePtr copy = xmlCopyNode(cur, 1);
-			xmlNodeSetName(copy, BAD_CAST "name");
-			xmlAddChild(ref, copy);
-		}
-	}
-}
-
-bool cntrlind_match(xmlNodePtr ref, xmlNodePtr spc)
-{
-	xmlChar *refnum, *spcnum;
-	bool match;
-
-	refnum = xmlGetProp(ref, BAD_CAST "controlIndicatorNumber");
-	spcnum = xmlGetProp(spc, BAD_CAST "controlIndicatorNumber");
-
-	match = refnum == NULL;
-	if (refnum && spcnum) match = xmlStrcmp(refnum, spcnum) == 0;
-
-	xmlFree(refnum);
-	xmlFree(spcnum);
-
-	return match;
-}
-
-void undepend_cntrlind_cir(xmlDocPtr dm, xmlDocPtr cir)
-{
-	xmlXPathContextPtr ctxt1;
-	xmlXPathContextPtr ctxt2;
-	xmlXPathObjectPtr results1;
-	xmlXPathObjectPtr results2;
-
-	xmlNodePtr controlIndicatorRef;
-	xmlNodePtr controlIndicatorSpec;
-
-	int i, j;
-
-	ctxt1 = xmlXPathNewContext(cir);
-	ctxt2 = xmlXPathNewContext(dm);
-
-	results1 = xmlXPathEvalExpression(BAD_CAST "//controlIndicatorSpec", ctxt1);
-	results2 = xmlXPathEvalExpression(BAD_CAST "//controlIndicatorRef", ctxt2);
-
-	for (i = 0; i < results2->nodesetval->nodeNr; ++i) {
-		controlIndicatorRef = results2->nodesetval->nodeTab[i];
-
-		for (j = 0; j < results1->nodesetval->nodeNr; ++j) {
-			controlIndicatorSpec = results1->nodesetval->nodeTab[j];
-
-			if (cntrlind_match(controlIndicatorRef, controlIndicatorSpec)) {
-				replace_cntrlind_ref(controlIndicatorRef, controlIndicatorSpec);
-				break;
-			}
-		}
-	}
-
-	xmlXPathFreeObject(results1);
-	xmlXPathFreeObject(results2);
-
-	xmlXPathFreeContext(ctxt1);
-	xmlXPathFreeContext(ctxt2);
-}
-
-/* Warnings and cautions repositories (0A4, 0A5) */
-bool warncautref_match(xmlNodePtr ref, xmlNodePtr spec)
-{
-	char *refname, *specname, *refident, *specident;
-
-	xmlNodePtr ident;
-
-	bool match;
-
-	refname   = (char *) ref->name;
-	specname  = (char *) spec->name;
-
-	if (strcmp(refname, "warningRef") == 0 && strcmp(specname, "warningSpec") != 0) return false;
-	if (strcmp(refname, "cautionRef") == 0 && strcmp(specname, "cautionSpec") != 0) return false;
-
-	if (strcmp(refname, "warningRef") == 0) {
-		refident = (char *) xmlGetProp(ref, BAD_CAST "warningIdentNumber");
-	} else {
-		refident = (char *) xmlGetProp(ref, BAD_CAST "cautionIdentNumber");
-	}
-
-	if (strcmp(specname, "warningSpec") == 0) {
-		ident = find_req_child(spec, "warningIdent");
-		specident = (char *) xmlGetProp(ident, BAD_CAST "warningIdentNumber");
-	} else {
-		ident = find_req_child(spec, "cautionIdent");
-		specident = (char *) xmlGetProp(ident, BAD_CAST "cautionIdentNumber");
-	}
-
-	match = strcmp(refident, specident) == 0;
-
-	xmlFree(refident);
-	xmlFree(specident);
-
-	return match;
-}
-
-bool is_warncautref_child(char *name)
-{
-	return strcmp(name, "warningAndCautionPara") == 0;
-}
-
-void replace_warncaut_ref(xmlNodePtr ref, xmlNodePtr spec)
-{
-	xmlNodePtr cur, new;
-	xmlChar *id;
-
-	if (strcmp((char *) ref->name, "warningRef") == 0) {
-		new = xmlNewNode(NULL, BAD_CAST "warning");
-	} else {
-		new = xmlNewNode(NULL, BAD_CAST "caution");
-	}
-
-	id = xmlGetProp(ref, BAD_CAST "id");
-	xmlSetProp(new, BAD_CAST "id", id);
-	xmlFree(id);
-
-	for (cur = spec->children; cur; cur = cur->next) {
-		if (is_warncautref_child((char *) cur->name)) {
-			xmlAddChild(new, xmlCopyNode(cur, 1));
-		}
-	}
-
-	new = xmlAddNextSibling(ref, new);
-
-	xmlUnlinkNode(ref);
-	xmlFreeNode(ref);
-}
-
-void undepend_warncaut_cir(xmlDocPtr dm, xmlDocPtr cir)
-{
-	xmlXPathContextPtr ctxt1, ctxt2;
-	xmlXPathObjectPtr results1, results2;
-
-	xmlNodePtr warningsAndCautionsRef;
-	xmlNodePtr spec;
-	xmlNodePtr cur, next;
-
-	int i;
-
-	ctxt1 = xmlXPathNewContext(cir);
-
-	results1 = xmlXPathEvalExpression(BAD_CAST "//warningSpec|//cautionSpec", ctxt1);
-
-	ctxt2 = xmlXPathNewContext(dm);
-	results2 = xmlXPathEvalExpression(BAD_CAST "//warningsAndCautionsRef", ctxt2);
-	warningsAndCautionsRef = results2->nodesetval->nodeTab[0];
-	xmlXPathFreeObject(results2);
-	xmlXPathFreeContext(ctxt2);
-
-	cur = warningsAndCautionsRef->children;
-	while (cur) {
-		next = cur->next;
-
-		if (cur->type == XML_ELEMENT_NODE) {
-			for (i = 0; i < results1->nodesetval->nodeNr; ++i) {
-				spec = results1->nodesetval->nodeTab[i];
-
-				if (warncautref_match(cur, spec)) {
-					replace_warncaut_ref(cur, spec);
-				}
-			}
-		}
-
-		cur = next;
-	}
-
-	xmlNodeSetName(warningsAndCautionsRef, BAD_CAST "warningsAndCautions");
-
-	xmlXPathFreeObject(results1);
-	xmlXPathFreeContext(ctxt1);
-}
-
-/* Applicability repository (0A2) */
-
-void replace_applic_ref(xmlNodePtr ref, xmlNodePtr applic)
-{
-	xmlChar *id;
-	xmlNodePtr a;
-
-	a = xmlAddNextSibling(ref, xmlCopyNode(applic, 1));
-	id = xmlGetProp(ref, BAD_CAST "id");
-	xmlSetProp(a, BAD_CAST "id", id);
-	xmlFree(id);
-	xmlUnlinkNode(ref);
-	xmlFreeNode(ref);
-}
-
-void replace_applic_refs(xmlDocPtr dm, xmlNodePtr applicSpecIdent, xmlNodePtr applic)
-{
-	char xpath[256], *applicIdentValue;
-	xmlXPathContextPtr ctxt;
-	xmlXPathObjectPtr results;
-
-	ctxt = xmlXPathNewContext(dm);
-
-	applicIdentValue = (char *) xmlGetProp(applicSpecIdent, BAD_CAST "applicIdentValue");
-	snprintf(xpath, 256, "//applicRef[@applicIdentValue='%s']", applicIdentValue);
-	xmlFree(applicIdentValue);
-
-	results = xmlXPathEvalExpression(BAD_CAST xpath, ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
-		int i;
-
-		for (i = 0; i < results->nodesetval->nodeNr; ++i) {
-			replace_applic_ref(results->nodesetval->nodeTab[i], applic);
-		}
-	}
-
-	xmlXPathFreeObject(results);
-	xmlXPathFreeContext(ctxt);
-}
-
-void replace_referenced_applic_group_ref(xmlDocPtr dm)
-{
-	xmlXPathContextPtr ctxt;
-	xmlXPathObjectPtr result;
-
-	ctxt = xmlXPathNewContext(dm);
-	result = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroupRef", ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-		xmlNodePtr referencedApplicGroupRef, referencedApplicGroup, cur;
-
-		referencedApplicGroupRef = result->nodesetval->nodeTab[0];
-
-		referencedApplicGroup = xmlNewNode(NULL, BAD_CAST "referencedApplicGroup");
-		referencedApplicGroup = xmlAddNextSibling(referencedApplicGroupRef, referencedApplicGroup);
-
-		for (cur = referencedApplicGroupRef->children; cur; cur = cur->next)
-			if (strcmp((char *) cur->name, "applic") == 0)
-				xmlAddChild(referencedApplicGroup, xmlCopyNode(cur, 1));
-
-		xmlUnlinkNode(referencedApplicGroupRef);
-		xmlFreeNode(referencedApplicGroupRef);
-	}
-
-	xmlXPathFreeObject(result);
-	xmlXPathFreeContext(ctxt);
-}
-
-void undepend_applic_cir(xmlDocPtr dm, xmlDocPtr cir)
-{
-	xmlXPathContextPtr ctxt;
-	xmlXPathObjectPtr results1;
-
-	ctxt = xmlXPathNewContext(cir);
-
-	results1 = xmlXPathEvalExpression(BAD_CAST "//applicSpec", ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(results1->nodesetval)) {
-		int i;
-
-		for (i = 0; i < results1->nodesetval->nodeNr; ++i) {
-			char *applicMapRefId, xpath[256];
-			xmlNodePtr applicSpec, applicSpecIdent, applic;
-			xmlXPathObjectPtr results2;
-			
-			applicSpec = results1->nodesetval->nodeTab[i];
-
-			ctxt->node = applicSpec;
-			results2 = xmlXPathEvalExpression(BAD_CAST "applicSpecIdent", ctxt);
-			applicSpecIdent = results2->nodesetval->nodeTab[0];
-			xmlXPathFreeObject(results2);
-
-			applicMapRefId = (char *) xmlGetProp(applicSpec, BAD_CAST "applicMapRefId");
-			snprintf(xpath, 256, "//referencedApplicGroup/applic[@id='%s']", applicMapRefId);
-			xmlFree(applicMapRefId);
-			results2 = xmlXPathEvalExpression(BAD_CAST xpath, ctxt);
-
-			if (!xmlXPathNodeSetIsEmpty(results2->nodesetval)) {
-				applic = results2->nodesetval->nodeTab[0];
-				replace_applic_refs(dm, applicSpecIdent, applic);
-			}
-
-			xmlXPathFreeObject(results2);
-		}
-
-		replace_referenced_applic_group_ref(dm);
-	}
-
-	xmlXPathFreeObject(results1);
-	xmlXPathFreeContext(ctxt);
-}
-
 /* Add an "identity" template to an XSL stylesheet */
 void add_identity(xmlDocPtr style)
 {
@@ -1544,12 +986,71 @@ void add_identity(xmlDocPtr style)
 	xmlFreeDoc(identity);
 }
 
-/* Use user-supplied XSL script to resolve CIR references. */
-void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, const char *cir_xsl)
+/* Get the appropriate built-in CIR repository XSLT by name */
+bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 {
-	xmlDocPtr styledoc, res, muxdoc;
+	if (strcmp(cirtype, "accessPointRepository") == 0) {
+		*xsl = cirxsl_accessPointRepository_xsl;
+		*len = cirxsl_accessPointRepository_xsl_len;
+	} else if (strcmp(cirtype, "applicRepository") == 0) {
+		*xsl = cirxsl_applicRepository_xsl;
+		*len = cirxsl_applicRepository_xsl_len;
+	} else if (strcmp(cirtype, "cautionRepository") == 0) {
+		*xsl = cirxsl_cautionRepository_xsl;
+		*len = cirxsl_cautionRepository_xsl_len;
+	} else if (strcmp(cirtype, "circuitBreakerRepository") == 0) {
+		*xsl = cirxsl_circuitBreakerRepository_xsl;
+		*len = cirxsl_circuitBreakerRepository_xsl_len;
+	} else if (strcmp(cirtype, "controlIndicatorRepository") == 0) {
+		*xsl = cirxsl_controlIndicatorRepository_xsl;
+		*len = cirxsl_controlIndicatorRepository_xsl_len;
+	} else if (strcmp(cirtype, "enterpriseRepository") == 0) {
+		*xsl = cirxsl_enterpriseRepository_xsl;
+		*len = cirxsl_enterpriseRepository_xsl_len;
+	} else if (strcmp(cirtype, "functionalItemRepository") == 0) {
+		*xsl = cirxsl_functionalItemRepository_xsl;
+		*len = cirxsl_functionalItemRepository_xsl_len;
+	} else if (strcmp(cirtype, "partRepository") == 0) {
+		*xsl = cirxsl_partRepository_xsl;
+		*len = cirxsl_partRepository_xsl_len;
+	} else if (strcmp(cirtype, "supplyRepository") == 0) {
+		*xsl = cirxsl_supplyRepository_xsl;
+		*len = cirxsl_supplyRepository_xsl_len;
+	} else if (strcmp(cirtype, "toolRepository") == 0) {
+		*xsl = cirxsl_toolRepository_xsl;
+		*len = cirxsl_toolRepository_xsl_len;
+	} else if (strcmp(cirtype, "warningRepository") == 0) {
+		*xsl = cirxsl_warningRepository_xsl;
+		*len = cirxsl_warningRepository_xsl_len;
+	} else if (strcmp(cirtype, "zoneRepository") == 0) {
+		*xsl = cirxsl_zoneRepository_xsl;
+		*len = cirxsl_zoneRepository_xsl_len;
+	} else {
+		fprintf(stderr, ERR_PREFIX "No built-in XSLT for CIR type: %s\n", cirtype);
+		return false;
+	}
+
+	return true;
+}
+
+/* Dump built-in XSLT for resolving CIR repository dependencies */
+void dump_cir_xsl(const char *repo)
+{
+	unsigned char *xsl;
+	unsigned int len;
+
+	if (get_cir_xsl(repo, &xsl, &len)) {
+		printf("%.*s", len, xsl);
+	} else {
+		exit(EXIT_BAD_ARG);
+	}
+}
+
+/* Use user-supplied XSL script to resolve CIR references. */
+void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
+{
+	xmlDocPtr res, muxdoc;
 	xmlNodePtr mux;
-	xsltStylesheetPtr style;
 
 	muxdoc = xmlNewDoc(BAD_CAST "1.0");
 	mux = xmlNewNode(NULL, BAD_CAST "mux");
@@ -1557,13 +1058,8 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, const char *cir_xsl)
 	xmlAddChild(mux, xmlCopyNode(xmlDocGetRootElement(dm), 1));
 	xmlAddChild(mux, xmlCopyNode(xmlDocGetRootElement(cir), 1));
 
-	styledoc = xmlReadFile(cir_xsl, NULL, 0);
-	add_identity(styledoc);
-	style = xsltParseStylesheetDoc(styledoc);
-
 	res = xsltApplyStylesheet(style, muxdoc, NULL);
 
-	xsltFreeStylesheet(style);
 	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, "/mux/dmodule[1]"), 1));
 	xmlFreeDoc(res);
 	xmlFreeDoc(muxdoc);
@@ -1571,8 +1067,9 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, const char *cir_xsl)
 
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
-void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src, const char *cir_xsl)
+void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl)
 {
+	xmlDocPtr cir;
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
 
@@ -1581,6 +1078,15 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src, const char *cir_xsl
 	xmlNodePtr referencedApplicGroup;
 
 	char *cirtype;
+
+	xmlDocPtr styledoc = NULL;
+
+	cir = xmlReadFile(cirdocfname, NULL, 0);
+
+	if (!cir) {
+		fprintf(stderr, ERR_PREFIX "%s is not a valid CIR data module.\n", cirdocfname);
+		exit(EXIT_BAD_XML);
+	}
 
 	ctxt = xmlXPathNewContext(cir);
 
@@ -1598,26 +1104,36 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src, const char *cir_xsl
 	xmlXPathFreeObject(results);
 
 	results = xmlXPathEvalExpression(BAD_CAST "//content/commonRepository/*[position()=last()]", ctxt);
+
+	if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
+		fprintf(stderr, ERR_PREFIX "%s is not a valid CIR data module.\n", cirdocfname);
+		exit(EXIT_BAD_XML);
+	}
+
 	cirnode = results->nodesetval->nodeTab[0];
 	xmlXPathFreeObject(results);
 
 	cirtype = (char *) cirnode->name;
 
 	if (cir_xsl) {
-		undepend_cir_xsl(dm, cir, cir_xsl);
-	} else if (strcmp(cirtype, "functionalItemRepository") == 0) {
-		undepend_funcitem_cir(dm, cir);
-	} else if (strcmp(cirtype, "warningRepository") == 0 || strcmp(cirtype, "cautionRepository") == 0) {
-		undepend_warncaut_cir(dm, cir);
-	} else if (strcmp(cirtype, "applicRepository") == 0) {
-		undepend_applic_cir(dm, cir);
-	} else if (strcmp(cirtype, "controlIndicatorRepository") == 0) {
-		undepend_cntrlind_cir(dm, cir);
-	} else if (strcmp(cirtype, "zoneRepository") == 0) {
-		undepend_zone_cir(dm, cir);
+		styledoc = xmlReadFile(cir_xsl, NULL, 0);
 	} else {
-		fprintf(stderr, ERR_PREFIX "Unsupported CIR type: %s\n", cirtype);
-		add_src = false;
+		unsigned char *xsl = NULL;
+		unsigned int len = 0;
+
+		if (!get_cir_xsl(cirtype, &xsl, &len)) {
+			add_src = false;
+		}
+
+		styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	}
+
+	if (styledoc) {
+		xsltStylesheetPtr style;
+		add_identity(styledoc);
+		style = xsltParseStylesheetDoc(styledoc);
+		undepend_cir_xsl(dm, cir, style);
+		xsltFreeStylesheet(style);
 	}
 
 	xmlXPathFreeContext(ctxt);
@@ -1644,6 +1160,8 @@ void undepend_cir(xmlDocPtr dm, xmlDocPtr cir, bool add_src, const char *cir_xsl
 			xmlAddChild(repositorySourceDmIdent, xmlCopyNode(cur, 1));
 		}
 	}
+
+	xmlFreeDoc(cir);
 }
 
 void set_issue(xmlDocPtr dm, char *issinfo)
@@ -1798,13 +1316,12 @@ int main(int argc, char **argv)
 	int parseopts = 0;
 
 	xmlNodePtr cirs, cir;
-	xmlDocPtr cirdoc;
 
 	opterr = 1;
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:r:n:u:wNP:p:LI:vh?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:r:n:u:wNP:p:LI:vx:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1832,6 +1349,7 @@ int main(int argc, char **argv)
 			case 'L': dmlist = true; break;
 			case 'I': strncpy(issdate, optarg, 15); break;
 			case 'v': verbose = true; break;
+			case 'x': dump_cir_xsl(optarg); exit(0);
 			case 'h':
 			case '?':
 				show_help();
@@ -1932,20 +1450,12 @@ int main(int argc, char **argv)
 					continue;
 				}
 
-				cirdoc = xmlReadFile(cirdocfname, NULL, 0);
-
-				if (!cirdoc) {
-					fprintf(stderr, ERR_PREFIX "CIR %s is invalid.", cirdocfname);
-					continue;
-				}
-
 				if (xmlStrcmp(root->name, BAD_CAST "pm") == 0) {
-					undepend_cir(doc, cirdoc, false, cirxsl);
+					undepend_cir(doc, cirdocfname, false, cirxsl);
 				} else {
-					undepend_cir(doc, cirdoc, add_source_ident, cirxsl);
+					undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
 				}
 
-				xmlFreeDoc(cirdoc);
 				xmlFree(cirdocfname);
 				xmlFree(cirxsl);
 			}

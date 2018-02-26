@@ -11,8 +11,9 @@ SYNOPSIS
                   [-u <sec>] [-o <file>|-O <dir>] [-f]
                   [-t <techName>] [-i <infoName>] [-a|-A]
                   [-Y <text>] [-C <comment>]
-                  [-R <CIR> ...] [-r <XSL>] [-S] [-N]
-                  [-P <PCT> -p <id>] [-L] [<applic>...]
+                  [-R <CIR> ...] [-r <XSL>] [-x <CIR>]
+                  [-S] [-N] [-P <PCT> -p <id>] [-L]
+                  [<applic>...]
 
 DESCRIPTION
 ===========
@@ -94,17 +95,33 @@ Product ID of the product to read applicability definitions from, using the spec
 -R &lt;CIR&gt; ...  
 Use a CIR to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times.
 
-Currently supported CIRs:
+The following CIRs have some built-in support:
+
+-   Access points
+
+-   Applicability
+
+-   Cautions
+
+-   Circuit breakers
+
+-   Controls/indicators
+
+-   Enterprises
 
 -   Functional items
 
--   Controls and indicators
+-   Parts
+
+-   Supplies
+
+-   Tools
+
+-   Warnings
 
 -   Zones
 
--   Warnings and cautions
-
--   Applicability
+The methods of resolving the dependencies for a CIR can be changed by specifying a custom XSLT script with the -r option. The built-in XSLT used for the above CIR data modules can be dumped with the -x option.
 
 -r &lt;XSL&gt;  
 Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.
@@ -126,6 +143,35 @@ When -O is used, print the automatically generated file name of the instance.
 
 -w  
 Check the applicability of the whole module against the user-defined applicability. If the whole module is not applicable, then no instance is created.
+
+-x &lt;CIR&gt;  
+Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -r option.
+
+The following types currently have built-in XSLT and can therefore be used as values for &lt;CIR&gt;:
+
+-   accessPointRepository
+
+-   applicRepository
+
+-   cautionRepository
+
+-   circuitBreakerRepository
+
+-   controlIndicatorRepository
+
+-   enterpriseRepository
+
+-   functionalItemRepository
+
+-   partRepository
+
+-   supplyRepository
+
+-   toolRepository
+
+-   warningRepository
+
+-   zoneRepository
 
 -Y &lt;text&gt;  
 Set the applicability for the whole module using the user-defined applicability values, using text as the new display text.
@@ -268,8 +314,12 @@ The source data module would contain a reference:
     is an item in the system.
     </para>
 
+The command would resemble:
+
+    $ s1kd-instance -s <src> -R <CIR> -r <custom XSLT>
+
 And the resulting XML would be:
 
     <para>The Hydraulic pump is an item in the system.</para>
 
-The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element `mux` contains two `dmodule` elements. The first is the source data module, and the second is one of the CIR data modules supplied with -R. The CIR data module is first filtered on the defined applicability.
+The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element `mux` contains two `dmodule` elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.
