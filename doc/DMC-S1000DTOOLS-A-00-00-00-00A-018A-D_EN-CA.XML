@@ -17,8 +17,12 @@
     </dmAddress>
     <dmStatus issueType="changed">
       <security securityClassification="01"/>
-      <responsiblePartnerCompany/>
-      <originator/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
       <applic>
         <displayText>
           <simplePara>All</simplePara>
@@ -31,8 +35,9 @@
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
-      <qualityAssurance><unverified/></qualityAssurance>
-      
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
     </dmStatus>
   </identAndStatusSection>
   <content>
