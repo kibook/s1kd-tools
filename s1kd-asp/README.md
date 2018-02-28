@@ -6,7 +6,7 @@ s1kd-asp - Applicability statement preprocessor
 SYNOPSIS
 ========
 
-s1kd-asp \[-a &lt;ID&gt;\] \[-fx\] \[&lt;modules&gt;...\]
+    s1kd-asp [-a <ID>] [-fx] [<modules>...]
 
 DESCRIPTION
 ===========

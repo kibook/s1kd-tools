@@ -48,7 +48,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para>s1kd-asp [-a &lt;ID&gt;] [-fx] [&lt;modules&gt;...]</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-asp [-a &lt;ID&gt;] [-fx] [&lt;modules&gt;...]</verbatimText>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
