@@ -90,6 +90,17 @@ Once the DMRL is prepared, the **s1kd-dmrl** tool can be used to automatically p
 
 Information not included in the DMRL entry for a CSDB object is pulled from the `defaults` file (and the `dmtypes` file for data modules).
 
+Creating CSDB objects on-the-fly
+--------------------------------
+
+Data modules and other CSDB objects can also be created in an "on-the-fly" manner, without the use of a DMRL, by invoking the s1kd-new\* set of tools directly, as with s1kd-newdml above. For example, to create a new data module:
+
+    $ s1kd-newdm -# MYPRJ-A-00-00-00-00A-040A-D
+
+This would create the file `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML` in your CSDB folder.
+
+Each of the s1kd-new\* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the `defaults` and `dmtypes` files.
+
 Data module workflow
 ====================
 
