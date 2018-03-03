@@ -8,10 +8,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <string.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xinclude.h>
+#include <libxslt/transform.h>
 #include "elements_list.h"
+#include "generateDisplayText.h"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -22,6 +25,8 @@ xmlChar *dmApplicId;
  *
  * Read from elements_list.h*/
 xmlChar *applicElemsXPath;
+
+char *customGenDispTextXsl = NULL;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -167,6 +172,61 @@ void addDmApplic(xmlNodePtr dmodule)
 	}
 }
 
+void dumpGenDispTextXsl(void)
+{
+	printf("%.*s", generateDisplayText_xsl_len, generateDisplayText_xsl);
+}
+
+void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
+{
+	xmlDocPtr styledoc, res, muxdoc;
+	xsltStylesheetPtr style;
+	xmlNodePtr mux, cur, muxacts, muxccts;
+
+	muxdoc = xmlNewDoc(BAD_CAST "1.0");
+	mux = xmlNewNode(NULL, BAD_CAST "mux");
+	xmlDocSetRootElement(muxdoc, mux);
+
+	xmlAddChild(mux, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+	muxacts = xmlNewChild(mux, NULL, BAD_CAST "acts", NULL);
+	muxccts = xmlNewChild(mux, NULL, BAD_CAST "ccts", NULL);
+	for (cur = acts->children; cur; cur = cur->next) {
+		xmlDocPtr act;
+		xmlChar *path;
+		path = xmlNodeGetContent(cur);
+		act = xmlReadFile((char *) path, NULL, 0);
+		xmlAddChild(muxacts, xmlCopyNode(xmlDocGetRootElement(act), 1));
+		xmlFreeDoc(act);
+		xmlFree(path);
+	}
+	for (cur = ccts->children; cur; cur = cur->next) {
+		xmlDocPtr cct;
+		xmlChar *path;
+		path = xmlNodeGetContent(cur);
+		cct = xmlReadFile((char *) path, NULL, 0);
+		xmlAddChild(muxccts, xmlCopyNode(xmlDocGetRootElement(cct), 1));
+		xmlFreeDoc(cct);
+		xmlFree(path);
+	}
+
+	if (customGenDispTextXsl) {
+		styledoc = xmlReadFile(customGenDispTextXsl, NULL, 0);
+	} else {
+		styledoc = xmlReadMemory((const char *) generateDisplayText_xsl,
+			generateDisplayText_xsl_len, NULL, NULL, 0);
+	}
+
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, muxdoc, NULL);
+
+	xmlDocSetRootElement(doc, xmlCopyNode(firstXPathNode(res, NULL, "/mux/dmodule"), 1));
+
+	xmlFreeDoc(res);
+	xmlFreeDoc(muxdoc);
+	xsltFreeStylesheet(style);
+}
+
 void processDmodule(xmlNodePtr dmodule)
 {
 	xmlXPathContextPtr ctx;
@@ -193,7 +253,8 @@ void processDmodules(xmlNodeSetPtr dmodules)
 	}
 }
 
-void processFile(const char *in, const char *out, bool xincl)
+void processFile(const char *in, const char *out, bool xincl, bool process,
+	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -205,13 +266,19 @@ void processFile(const char *in, const char *out, bool xincl)
 		xmlXIncludeProcess(doc);
 	}
 
-	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST "//dmodule", ctx);
+	if (process) {
+		ctx = xmlXPathNewContext(doc);
+		obj = xmlXPathEvalExpression(BAD_CAST "//dmodule", ctx);
 
-	processDmodules(obj->nodesetval);
+		processDmodules(obj->nodesetval);
 
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+	}
+
+	if (genDispText) {
+		generateDisplayText(doc, acts, ccts);
+	}
 
 	xmlSaveFile(out, doc);
 
@@ -220,12 +287,18 @@ void processFile(const char *in, const char *out, bool xincl)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-asp [-a <ID>] [-fh?] [<modules>]");
+	puts("Usage: s1kd-asp [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-dfxh?] [<modules>]");
 	puts("");
 	puts("Options:");
-	puts("  -a <ID>  Use <ID> for DM-level applic.");
-	puts("  -f       Overwrite input file(s).");
-	puts("  -h -?    Show help/usage message.");
+	puts("  -A <ACT>  Use <ACT> when generating display text.");
+	puts("  -a <ID>   Use <ID> for DM-level applic.");
+	puts("  -C <CCT>  Use <CCT> when generating display text.");
+	puts("  -d        Dump built-in XSLT for generating display text.");
+	puts("  -f        Overwrite input file(s).");
+	puts("  -G <XSL>  Use custom XSLT script to generate display text.");
+	puts("  -g        Generate display text for applicability statements.");
+	puts("  -p        Convert semantic applicability to presentation applicability.");
+	puts("  -h -?     Show help/usage message.");
 }
 
 int main(int argc, char **argv)
@@ -233,19 +306,44 @@ int main(int argc, char **argv)
 	int i;
 	bool overwrite = false;
 	bool xincl = false;
+	bool genDispText = false;
+	bool process = false;
+	
+	xmlNodePtr acts, ccts;
 
 	dmApplicId = xmlStrdup(DEFAULT_DM_APPLIC_ID);
 
 	applicElemsXPath = xmlStrndup(elements_list, elements_list_len);
 
-	while ((i = getopt(argc, argv, "a:fxh?")) != -1) {
+	acts = xmlNewNode(NULL, BAD_CAST "acts");
+	ccts = xmlNewNode(NULL, BAD_CAST "ccts");
+
+	while ((i = getopt(argc, argv, "A:a:C:dfG:gpxh?")) != -1) {
 		switch (i) {
+			case 'A':
+				xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST optarg);
+				break;
 			case 'a':
 				xmlFree(dmApplicId);
 				dmApplicId = xmlStrdup(BAD_CAST optarg);
 				break;
+			case 'C':
+				xmlNewChild(ccts, NULL, BAD_CAST "cct", BAD_CAST optarg);
+				break;
+			case 'd':
+				dumpGenDispTextXsl();
+				exit(0);
 			case 'f':
 				overwrite = true;
+				break;
+			case 'G':
+				customGenDispTextXsl = strdup(optarg);
+				break;
+			case 'g':
+				genDispText = true;
+				break;
+			case 'p':
+				process = true;
 				break;
 			case 'x':
 				xincl = true;
@@ -258,15 +356,21 @@ int main(int argc, char **argv)
 	}
 
 	if (optind >= argc) {
-		processFile("-", "-", xincl);
+		processFile("-", "-", xincl, process, genDispText, acts, ccts);
 	} else {
 		for (i = optind; i < argc; ++i) {
-			processFile(argv[i], overwrite ? argv[i] : "-", xincl);
+			processFile(argv[i], overwrite ? argv[i] : "-", xincl,
+				process, genDispText, acts, ccts);
 		}
 	}
 
 	xmlFree(dmApplicId);
 	xmlFree(applicElemsXPath);
+
+	xmlFreeNode(acts);
+	xmlFreeNode(ccts);
+
+	free(customGenDispTextXsl);
 
 	xmlCleanupParser();
 
