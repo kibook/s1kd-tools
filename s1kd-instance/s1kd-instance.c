@@ -11,6 +11,7 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/transform.h>
+#include <libexslt/exslt.h>
 
 #include "strings.h"
 #include "identity.h"
@@ -1330,6 +1331,8 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
+	exsltRegisterAll();
+
 	opterr = 1;
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
@@ -1558,6 +1561,7 @@ int main(int argc, char **argv)
 
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
+	xsltCleanupGlobals();
 	xmlCleanupParser();
 
 	return 0;
