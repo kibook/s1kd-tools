@@ -6,6 +6,7 @@
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#include <libexslt/exslt.h>
 #include "identity.h"
 
 bool includeIdentity = false;
@@ -34,7 +35,7 @@ void addIdentity(xmlDocPtr style)
 xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 {
 	xmlDocPtr src;
-	xmlNodePtr cur;
+	xmlNodePtr cur, old;
 
 	src = xmlCopyDoc(doc, 1);
 
@@ -63,7 +64,8 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 		doc = res;
 	}
 
-	xmlDocSetRootElement(src, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+	old = xmlDocSetRootElement(src, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+	xmlFreeNode(old);
 
 	xmlFreeDoc(doc);
 
@@ -108,6 +110,8 @@ int main(int argc, char **argv)
 	char *out = strdup("-");
 	bool overwrite = false;
 
+	exsltRegisterAll();
+
 	stylesheets = xmlNewNode(NULL, BAD_CAST "stylesheets");
 
 	while ((i = getopt(argc, argv, "s:io:fh?")) != -1) {
@@ -143,6 +147,11 @@ int main(int argc, char **argv)
 	if (out) {
 		free(out);
 	}
+
+	xmlFreeNode(stylesheets);
+
+	xsltCleanupGlobals();
+	xmlCleanupParser();
 
 	return 0;
 }
