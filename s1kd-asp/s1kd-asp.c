@@ -182,7 +182,7 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 {
 	xmlDocPtr styledoc, res, muxdoc;
 	xsltStylesheetPtr style;
-	xmlNodePtr mux, cur, muxacts, muxccts;
+	xmlNodePtr mux, cur, muxacts, muxccts, new, old;
 
 	muxdoc = xmlNewDoc(BAD_CAST "1.0");
 	mux = xmlNewNode(NULL, BAD_CAST "mux");
@@ -221,7 +221,9 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 
 	res = xsltApplyStylesheet(style, muxdoc, NULL);
 
-	xmlDocSetRootElement(doc, xmlCopyNode(firstXPathNode(res, NULL, "/mux/dmodule"), 1));
+	new = xmlCopyNode(firstXPathNode(res, NULL, "/mux/dmodule"), 1);
+	old = xmlDocSetRootElement(doc, new);
+	xmlFreeNode(old);
 
 	xmlFreeDoc(res);
 	xmlFreeDoc(muxdoc);
@@ -375,6 +377,7 @@ int main(int argc, char **argv)
 
 	free(customGenDispTextXsl);
 
+	xsltCleanupGlobals();
 	xmlCleanupParser();
 
 	return 0;
