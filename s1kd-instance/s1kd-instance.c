@@ -323,6 +323,10 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 
 	bool result = assume;
 
+	if (!(ident || type || value)) {
+		return assume;
+	}
+
 	for (cur = applicability->children; cur; cur = cur->next) {
 		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
 		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
@@ -534,7 +538,13 @@ void simpl_applic(xmlNodePtr node)
 		char *type   = (char *) xmlGetProp(node, BAD_CAST "applicPropertyType");
 		char *values = (char *) xmlGetProp(node, BAD_CAST "applicPropertyValues");
 
-		if (is_applic(ident, type, values, false) || !is_applic(ident, type, values, true)) {
+		bool uneeded = is_applic(ident, type, values, false) || !is_applic(ident, type, values, true);
+
+		xmlFree(ident);
+		xmlFree(type);
+		xmlFree(values);
+
+		if (uneeded) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
 			return;
@@ -563,7 +573,7 @@ void simpl_evaluate(xmlNodePtr evaluate)
 
 	if (nchild < 2) {
 		xmlNodePtr child;
-		
+
 		child = find_child(evaluate, "assert");
 		if (!child) child = find_child(evaluate, "evaluate");
 		xmlAddNextSibling(evaluate, child);
@@ -575,12 +585,15 @@ void simpl_evaluate(xmlNodePtr evaluate)
 /* Simplify <evaluate> elements recursively. */
 void simpl_applic_evals(xmlNodePtr node)
 {
-	xmlNodePtr cur;
+	xmlNodePtr cur, next;
 
-	for (cur = node->children; cur; cur = cur->next) {
+	cur = node->children;
+	while (cur) {
+		next = cur->next;
 		if (cur->type == XML_ELEMENT_NODE) {
 			simpl_applic_evals(cur);
 		}
+		cur = next;
 	}
 
 	if (strcmp((char *) node->name, "evaluate") == 0) {
