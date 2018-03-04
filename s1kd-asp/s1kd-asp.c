@@ -13,6 +13,7 @@
 #include <libxml/xpath.h>
 #include <libxml/xinclude.h>
 #include <libxslt/transform.h>
+#include <libexslt/exslt.h>
 #include "elements_list.h"
 #include "generateDisplayText.h"
 
@@ -310,6 +311,8 @@ int main(int argc, char **argv)
 	bool process = false;
 	
 	xmlNodePtr acts, ccts;
+
+	exsltRegisterAll();
 
 	dmApplicId = xmlStrdup(DEFAULT_DM_APPLIC_ID);
 

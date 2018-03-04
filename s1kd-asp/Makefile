@@ -1,8 +1,8 @@
 SOURCE=s1kd-asp.c
 OUTPUT=s1kd-asp
 
-CFLAGS=-Wall -pedantic-errors -g `pkg-config --cflags libxml-2.0 libxslt`
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
+CFLAGS=-Wall -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt libexslt`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 INSTALL_PREFIX=/usr/bin
 
