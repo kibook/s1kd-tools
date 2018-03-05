@@ -984,7 +984,7 @@ void add_identity(xmlDocPtr style)
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
 
-	identity = xmlReadMemory((const char *) identity_xsl, identity_xsl_len, NULL, NULL, 0);
+	identity = xmlReadMemory((const char *) ___common_identity_xsl, ___common_identity_xsl_len, NULL, NULL, 0);
 	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
 
 	stylesheet = xmlDocGetRootElement(style);

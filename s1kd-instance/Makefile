@@ -12,8 +12,8 @@ all: $(OUTPUT)
 strings.h: help.msg
 	xxd -i help.msg > strings.h
 
-identity.h: identity.xsl
-	xxd -i identity.xsl > identity.h
+identity.h: ../common/identity.xsl
+	xxd -i ../common/identity.xsl > identity.h
 
 cirxsl.h: cirxsl/*.xsl
 	> cirxsl.h

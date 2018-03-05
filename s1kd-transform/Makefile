@@ -9,8 +9,8 @@ INSTALL_PREFIX=/usr/bin
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-identity.h: identity.xsl
-	xxd -i identity.xsl > identity.h
+identity.h: ../common/identity.xsl
+	xxd -i ../common/identity.xsl > identity.h
 
 $(OUTPUT): $(SOURCE) identity.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
