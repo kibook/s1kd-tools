@@ -1,18 +1,18 @@
 NAME
 ====
 
-s1kd-asp - Applicability statement preprocessor
+s1kd-aspp - Applicability statement preprocessor
 
 SYNOPSIS
 ========
 
-    s1kd-asp [-g [-A <ACT>]... [-C <CCT>]... [-G <XSL>]]
-             [-p [-a <ID>]] [-dfxh?] [<modules>...]
+    s1kd-aspp [-g [-A <ACT>]... [-C <CCT>]... [-G <XSL>]]
+              [-p [-a <ID>]] [-dfxh?] [<modules>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-asp* tool has two main functions:
+The *s1kd-aspp* tool has two main functions:
 
 -   Generates display text for applicability statements. The text is derived from the logic described by the `assert` and `evaluate` elements.
 
@@ -89,7 +89,7 @@ If ACTs or CCTs are supplied which define display names for a property, this wil
 
 When supplied with the -A option:
 
-    $ s1kd-asp -g -A <ACT> <DM>
+    $ s1kd-aspp -g -A <ACT> <DM>
 
 The resulting XML would instead contain:
 
@@ -178,7 +178,7 @@ There are two parts which are difficult to do in an XSLT stylesheet:
 
 -   A statement is shown on Step 4 despite not having attribute `applicRefId` because the applicability has changed back to that of the whole data module.
 
-Using the s1kd-asp tool, the above XML would produce the following output:
+Using the s1kd-aspp tool, the above XML would produce the following output:
 
     <dmodule>
     <identAndStatusSection>

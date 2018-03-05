@@ -314,7 +314,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-asp [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-dfxh?] [<modules>]");
+	puts("Usage: s1kd-aspp [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-dfxh?] [<modules>]");
 	puts("");
 	puts("Options:");
 	puts("  -A <ACT>  Use <ACT> when generating display text.");

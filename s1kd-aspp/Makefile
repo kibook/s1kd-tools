@@ -1,5 +1,5 @@
-SOURCE=s1kd-asp.c
-OUTPUT=s1kd-asp
+SOURCE=s1kd-aspp.c
+OUTPUT=s1kd-aspp
 
 CFLAGS=-Wall -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt libexslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
