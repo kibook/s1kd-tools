@@ -5,12 +5,6 @@
   xmlns:str="http://exslt.org/strings"
   extension-element-prefixes="str">
 
-  <xsl:template match="@*|node()">
-    <xsl:copy>
-      <xsl:apply-templates select="@*|node()"/>
-    </xsl:copy>
-  </xsl:template>
-
   <xsl:template match="applic">
     <applic>
       <xsl:apply-templates select="@*"/>

@@ -16,6 +16,7 @@
 #include <libexslt/exslt.h>
 #include "elements_list.h"
 #include "generateDisplayText.h"
+#include "identity.h"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -178,6 +179,27 @@ void dumpGenDispTextXsl(void)
 	printf("%.*s", generateDisplayText_xsl_len, generateDisplayText_xsl);
 }
 
+void addIdentity(xmlDocPtr style)
+{
+	xmlDocPtr identity;
+	xmlNodePtr stylesheet, first, template;
+
+	identity = xmlReadMemory((const char *) ___common_identity_xsl, ___common_identity_xsl_len, NULL, NULL, 0);
+	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
+
+	stylesheet = xmlDocGetRootElement(style);
+
+	first = xmlFirstElementChild(stylesheet);
+
+	if (first) {
+		xmlAddPrevSibling(first, xmlCopyNode(template, 1));
+	} else {
+		xmlAddChild(stylesheet, xmlCopyNode(template, 1));
+	}
+
+	xmlFreeDoc(identity);
+}
+
 void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 {
 	xmlDocPtr styledoc, res, muxdoc;
@@ -216,6 +238,8 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 		styledoc = xmlReadMemory((const char *) generateDisplayText_xsl,
 			generateDisplayText_xsl_len, NULL, NULL, 0);
 	}
+
+	addIdentity(styledoc);
 
 	style = xsltParseStylesheetDoc(styledoc);
 

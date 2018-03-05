@@ -9,7 +9,7 @@ INSTALL_PREFIX=/usr/bin
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-$(OUTPUT): $(SOURCE) elements_list.h generateDisplayText.h
+$(OUTPUT): $(SOURCE) elements_list.h generateDisplayText.h identity.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 elements_list.h: elements.list
@@ -17,6 +17,9 @@ elements_list.h: elements.list
 
 generateDisplayText.h: generateDisplayText.xsl
 	xxd -i generateDisplayText.xsl > generateDisplayText.h
+
+identity.h: ../common/identity.xsl
+	xxd -i ../common/identity.xsl > identity.h
 
 install: $(OUTPUT)
 	cp $(OUTPUT) $(INSTALL_PREFIX)/
@@ -26,4 +29,5 @@ clean:
 	rm -f $(OUTPUT)
 	rm -f elements_list.h
 	rm -f generateDisplayText.h
+	rm -f identity.h
 	$(MAKE) -C doc clean

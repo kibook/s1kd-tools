@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="Q" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="03"/>
+        <issueDate year="2018" month="03" day="04"/>
         <dmTitle>
           <techName>s1kd-asp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add display text generation function</simplePara>
+        <simplePara>Add automatic identity template to XSLT.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -58,8 +58,8 @@
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-asp</emphasis> tool has two main functions:</para>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <para>The <emphasis>s1kd-asp</emphasis> tool has two main functions:</para>
+        <para>
           <randomList>
             <listItem>
               <para>Generates display text for applicability statements. The text is derived from the logic described by the <verbatimText verbatimStyle="vs12">assert</verbatimText> and <verbatimText verbatimStyle="vs12">evaluate</verbatimText> elements.</para>
@@ -76,7 +76,7 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-A &lt;ACT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add an ACT to use when generating display text for product attributes. Multiple ACT data modules can be used by specifying this option multiple times.</para>
@@ -88,13 +88,13 @@
                 <para>The ID to use for the inline applicability annotation representing the whole data module's applicability. Default is "applic-0000".</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-C &lt;CCT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add a CCT to use when generating display text for conditions. Multiple CCT data modules can be used by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-d</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
@@ -106,19 +106,19 @@
                 <para>Overwrite input data module(s) rather than outputting to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-G &lt;XSLT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use custom XSLT to generate display text for applicability statements.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-g</listItemTerm>
               <listItemDefinition>
                 <para>Generate display text for applicability statements.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-p</listItemTerm>
               <listItemDefinition>
                 <para>Preprocess applicability statements to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet. The applicability in the resulting XML is no longer semantically correct.</para>
@@ -139,7 +139,7 @@
           </definitionList>
         </para>
       </levelledPara>
-      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>EXAMPLES</title>
         <levelledPara>
           <title>Generating display text</title>
@@ -183,7 +183,17 @@ applicPropertyValues="A"/>
 </displayText>
 </applic>]]></verbatimText>
           </para>
-          <para>The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -d option can be used to dump the built-in XSLT as a starting point for a custom script.</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -d option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="@*|node()">
+<xsl:copy>
+<xsl:apply-templates select="@*|node()"/>
+</xsl:copy>
+</xsl:template>]]></verbatimText>
+          </para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <simplePara>This means any elements or attributes not matched by a more specific template in the script are copied.</simplePara>
+          </para>
         </levelledPara>
         <levelledPara>
           <title>Creating presentation applicability statements</title>

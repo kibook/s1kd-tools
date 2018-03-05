@@ -101,7 +101,15 @@ The resulting XML would instead contain:
     </displayText>
     </applic>
 
-The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -d option can be used to dump the built-in XSLT as a starting point for a custom script.
+The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -d option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:
+
+    <xsl:template match="@*|node()">
+    <xsl:copy>
+    <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+    </xsl:template>
+
+This means any elements or attributes not matched by a more specific template in the script are copied.
 
 Creating presentation applicability statements
 ----------------------------------------------
