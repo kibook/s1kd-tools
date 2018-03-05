@@ -2,7 +2,7 @@ all:
 	$(MAKE) -C doc
 	$(MAKE) -C s1kd-acronyms
 	$(MAKE) -C s1kd-addicn
-	$(MAKE) -C s1kd-asp
+	$(MAKE) -C s1kd-aspp
 	$(MAKE) -C s1kd-brexcheck
 	$(MAKE) -C s1kd-checkrefs
 	$(MAKE) -C s1kd-dmls
@@ -28,7 +28,7 @@ clean:
 	$(MAKE) -C doc clean
 	$(MAKE) -C s1kd-acronyms clean
 	$(MAKE) -C s1kd-addicn clean
-	$(MAKE) -C s1kd-asp clean
+	$(MAKE) -C s1kd-aspp clean
 	$(MAKE) -C s1kd-brexcheck clean
 	$(MAKE) -C s1kd-checkrefs clean
 	$(MAKE) -C s1kd-dmls clean
@@ -54,7 +54,7 @@ install:
 	$(MAKE) -C doc install
 	$(MAKE) -C s1kd-acronyms install
 	$(MAKE) -C s1kd-addicn install
-	$(MAKE) -C s1kd-asp install
+	$(MAKE) -C s1kd-aspp install
 	$(MAKE) -C s1kd-brexcheck install
 	$(MAKE) -C s1kd-checkrefs install
 	$(MAKE) -C s1kd-dmls install
