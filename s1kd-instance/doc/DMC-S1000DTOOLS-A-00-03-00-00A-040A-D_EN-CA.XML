@@ -408,7 +408,7 @@ applicPropertyValues="C"/>
           <para>This would produce the following in the instance:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
-  <!-- ... -->
+<!-- ... -->
 <applic>
 <displayText>
 <simplePara>A or C</simplePara>

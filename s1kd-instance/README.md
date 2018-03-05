@@ -238,7 +238,7 @@ filtering can be applied such that the instance will be applicable to both A and
 This would produce the following in the instance:
 
     <dmStatus>
-      <!-- ... -->
+    <!-- ... -->
     <applic>
     <displayText>
     <simplePara>A or C</simplePara>
