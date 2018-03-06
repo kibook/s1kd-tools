@@ -631,12 +631,12 @@ void simpl_applic_clean(xmlNode* referencedApplicGroup)
 /* Add metadata linking the data module instance with the master data module */
 void add_source(xmlDocPtr doc)
 {
-	xmlNodePtr ident, status, sourceIdent, security, cur;
+	xmlNodePtr ident, status, sourceIdent, node, cur;
 
 	ident       = first_xpath_node(doc, "//dmIdent|//pmIdent");
 	status      = first_xpath_node(doc, "//dmStatus|//pmStatus");
 	sourceIdent = first_xpath_node(doc, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent");
-	security    = first_xpath_node(doc, "//dmStatus/security|//pmStatus/security");
+	node        = first_xpath_node(doc, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security)[1]");
 
 	if (sourceIdent) {
 		xmlUnlinkNode(sourceIdent);
@@ -649,7 +649,7 @@ void add_source(xmlDocPtr doc)
 		sourceIdent = xmlNewNode(NULL, BAD_CAST "sourcePmIdent");
 	}
 
-	sourceIdent = xmlAddPrevSibling(security, sourceIdent);
+	sourceIdent = xmlAddPrevSibling(node, sourceIdent);
 
 	for (cur = ident->children; cur; cur = cur->next) {
 		xmlAddChild(sourceIdent, xmlCopyNode(cur, 1));
