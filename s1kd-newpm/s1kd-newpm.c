@@ -461,6 +461,8 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
+	char *lang, *lang_l, *lang_c;
+
 	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:@:%:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
@@ -570,12 +572,36 @@ int main(int argc, char **argv)
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
-	if (strcmp(language_iso_code, "") == 0) strcpy(language_iso_code, "und");
-	if (strcmp(country_iso_code, "") == 0) strcpy(country_iso_code, "ZZ");
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
+
+	/* Try reading the ISO language and country codes from the environment,
+	 * otherwise default to "und" (undetermined) for language and ZZ for
+	 * country.
+	 */
+	lang = strdup(getenv("LANG"));
+	lang_l = strtok(lang, "_");
+	lang_c = strtok(NULL, ".");
+	if (strcmp(language_iso_code, "") == 0) {
+		if (lang_l) {
+			strncpy(language_iso_code, lang_l, 3);
+		} else {
+			strcpy(language_iso_code, "und");
+		}
+	}
+	if (strcmp(country_iso_code, "") == 0) {
+		if (lang_c) {
+			strncpy(country_iso_code, lang_c, 2);
+		} else {
+			strcpy(country_iso_code, "ZZ");
+		}
+	}
+	free(lang);
 
 	for (i = 0; language_iso_code[i]; ++i) {
 		language_iso_code[i] = tolower(language_iso_code[i]);
+	}
+	for (i = 0; country_iso_code[i]; ++i) {
+		country_iso_code[i] = toupper(country_iso_code[i]);
 	}
 
 	pm = xmlDocGetRootElement(pm_doc);
