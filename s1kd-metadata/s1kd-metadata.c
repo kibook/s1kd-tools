@@ -397,6 +397,27 @@ int edit_comment_response(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "responseType", val);
 }
 
+int create_ent_name(xmlNodePtr node, const char *val)
+{
+	return xmlNewChild(node, NULL, BAD_CAST "enterpriseName", BAD_CAST val) == NULL;
+}
+
+int create_rpc_name(xmlXPathContextPtr ctxt, const char *val)
+{
+	xmlNodePtr node;
+	node = first_xpath_node("//responsiblePartnerCompany", ctxt);
+	if (!node) return EXIT_INVALID_CREATE;
+	return create_ent_name(node, val);
+}
+
+int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
+{
+	xmlNodePtr node;
+	node = first_xpath_node("//originator", ctxt);
+	if (!node) return EXIT_INVALID_CREATE;
+	return create_ent_name(node, val);
+}
+
 struct metadata metadata[] = {
 	{"issueDate",
 	 	"//issueDate",
@@ -417,12 +438,12 @@ struct metadata metadata[] = {
 		"//responsiblePartnerCompany/enterpriseName",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		create_rpc_name},
 	{"originator",
 		"//originator/enterpriseName",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		create_orig_name},
 	{"responsiblePartnerCompanyCode",
 		"//responsiblePartnerCompany/@enterpriseCode",
 		show_ent_code,
