@@ -15,7 +15,7 @@ xmlNodePtr pub;
 
 void show_help(void)
 {
-	puts("Usage: s1kd-flatpm [-Nxh?] <pubmodule>");
+	puts("Usage: s1kd-flatpm [-Npxh?] <pubmodule>");
 	puts("");
 	puts("Options:");
 	puts("  -N     Assume issue/inwork numbers are omitted.");
