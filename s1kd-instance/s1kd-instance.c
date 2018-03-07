@@ -1,8 +1,3 @@
-/* Filters an S1000D data module on user-supplied applicability definitions,
- * producing a new data module instance with non-applicable elements and
- * (optionally) unused applicability statements removed.
- */
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -28,6 +23,12 @@
 #define EXIT_BAD_XML 6 /* Invalid XML/S1000D */
 #define EXIT_BAD_ARG 7 /* Malformed argument */
 #define EXIT_BAD_DATE 8 /* Malformed issue date */
+
+/* When using the -g option, these are set as the values for the
+ * originator.
+ */
+#define DEFAULT_ORIG_CODE "S1KDI"
+#define DEFAULT_ORIG_NAME "s1kd-instance tool"
 
 /* Convenient structure for all strings related to uniquely identifying a
  * data module or pub module.
@@ -1178,6 +1179,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 	xmlFreeDoc(cir);
 }
 
+/* Set the issue and inwork numbers of the instance. */
 void set_issue(xmlDocPtr dm, char *issinfo)
 {
 	char issue[4], inwork[3];
@@ -1194,6 +1196,7 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
 }
 
+/* Set the issue date of the instance. */
 void set_issue_date(xmlDocPtr doc, const char *issdate)
 {
 	char year_s[5], month_s[3], day_s[3];
@@ -1211,13 +1214,67 @@ void set_issue_date(xmlDocPtr doc, const char *issdate)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
-
+/* Set the securty classification of the instance. */
 void set_security(xmlDocPtr dm, char *sec)
 {
 	xmlNodePtr security = first_xpath_node(dm, "//dmStatus/security|//pmStatus/security");
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
 }
 
+/* Get the originator of the master. If it has no originator
+ * (e.g. pub modules do not require one) then create one in the
+ * instance.
+ */
+xmlNodePtr find_or_create_orig(xmlDocPtr doc)
+{
+	xmlNodePtr orig, rpc;
+	orig = first_xpath_node(doc, "//originator");
+	if (!orig) {
+		orig = xmlNewNode(NULL, BAD_CAST "originator");
+		rpc = first_xpath_node(doc, "//responsiblePartnerCompany");
+		orig = xmlAddNextSibling(rpc, orig);
+	}
+	return orig;
+}
+
+/* Set the originator of the instance.
+ *
+ * When origspec == NULL, a default code and name are used to identify this
+ * tool as the originator.
+ *
+ * Otherwise, origspec is a string in the form of "CODE/NAME", where CODE is
+ * the NCAGE code and NAME is the enterprise name.
+ */
+void set_orig(xmlDocPtr doc, char *origspec)
+{
+	xmlNodePtr originator, enterpriseName;
+	const char *code, *name;
+
+	if (origspec) {
+		code = strtok(origspec, "/");
+		name = strtok(NULL, "");
+	} else {
+		code = DEFAULT_ORIG_CODE;
+		name = DEFAULT_ORIG_NAME;
+	}
+
+	originator = find_or_create_orig(doc);
+
+	if (code) {
+		xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST code);
+	}
+
+	if (name) {
+		enterpriseName = find_child(originator, "enterpriseName");	
+		if (enterpriseName) {
+			xmlNodeSetContent(enterpriseName, BAD_CAST name);
+		} else {
+			enterpriseName = xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
+		}
+	}
+}
+
+/* Determine if the whole data module is applicable. */
 bool check_wholedm_applic(xmlDocPtr dm)
 {
 	xmlNodePtr applic;
@@ -1227,6 +1284,9 @@ bool check_wholedm_applic(xmlDocPtr dm)
 	return eval_applic_stmt(applic, true);
 }
 
+/* Read applicability definitions from the <assign> elements of a
+ * product instance in the specified PCT data module.\
+ */
 void load_applic_from_pct(const char *pctfname, const char *product)
 {
 	xmlDocPtr pct;
@@ -1271,6 +1331,7 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	xmlFreeDoc(pct);
 }
 
+/* Remove the extended identification from the instance. */
 void strip_extension(xmlDocPtr doc)
 {
 	xmlNodePtr ext;
@@ -1326,6 +1387,8 @@ int main(int argc, char **argv)
 	char issdate[16] = "";
 	bool stripext = false;
 	bool verbose = false;
+	bool setorig = false;
+	char *origspec = NULL;
 
 	int parseopts = 0;
 
@@ -1337,7 +1400,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:r:n:u:wNP:p:LI:vx:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:r:n:u:wNP:p:LI:vx:gG:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1366,6 +1429,8 @@ int main(int argc, char **argv)
 			case 'I': strncpy(issdate, optarg, 15); break;
 			case 'v': verbose = true; break;
 			case 'x': dump_cir_xsl(optarg); exit(0);
+			case 'g': setorig = true; break;
+			case 'G': origspec = strdup(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1524,6 +1589,10 @@ int main(int argc, char **argv)
 				set_security(doc, secu);
 			}
 
+			if (setorig) {
+				set_orig(doc, origspec);
+			}
+
 			if (strcmp(comment_text, "") != 0) {
 				comment = xmlNewComment(BAD_CAST comment_text);
 				identAndStatusSection = find_child(root, "identAndStatusSection");
@@ -1559,6 +1628,7 @@ int main(int argc, char **argv)
 
 	if (list != stdin) fclose(list);
 
+	free(origspec);
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();

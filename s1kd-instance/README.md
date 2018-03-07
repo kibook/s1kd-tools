@@ -11,6 +11,7 @@ SYNOPSIS
                   [-u <sec>] [-o <file>|-O <dir>] [-f]
                   [-t <techName>] [-i <infoName>] [-a|-A]
                   [-Y <text>] [-C <comment>]
+                  [-g [-G <CODE>/<NAME>]]
                   [-R <CIR> ...] [-r <XSL>] [-x <CIR>]
                   [-S] [-N] [-P <PCT> -p <id>] [-L]
                   [<applic>...]
@@ -51,6 +52,12 @@ Specify an extension on the data module code (DME) or publication module code (P
 
 -f  
 Overwrite existing file with same name as the filename generated automatically with -O, if it exists.
+
+-G &lt;CODE&gt;/&lt;NAME&gt;  
+When using the -g option, instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.
+
+-g  
+Set the originator of the instance. When this option is specified, the code "`S1KDI`" and the name "`s1kd-instance tool`" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.
 
 -I &lt;date&gt;  
 Set the issue date of the instance. By default, the issue date is taken from the source.
