@@ -629,7 +629,7 @@ int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-metadata [-c <file>] [-tf] [-n <name> [-v <value>]] [<module>]");
+	puts("Usage: s1kd-metadata [-c <file>] [-tf] [-n <name> [-v <value>]]... [<module>]");
 	puts("");
 	puts("Options:");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
@@ -640,57 +640,8 @@ void show_help(void)
 	puts("  <module>     S1000D module to view/edit metadata on.");
 }
 
-int show_or_edit_metadata(const char *fname, const char *metadata_fname, const char *key, const char *val, int formatall, int overwrite)
+void show_err(int err, const char *key, const char *val, const char *fname)
 {
-	int err;
-	xmlDocPtr doc;
-	xmlXPathContextPtr ctxt;
-
-	doc = xmlReadFile(fname, NULL, 0);
-
-	ctxt = xmlXPathNewContext(doc);
-
-	if (key) {
-		if (val) {
-			err = edit_metadata(ctxt, key, val);
-		} else {
-			err = show_metadata(ctxt, key);
-		}
-	} else {
-		if (metadata_fname) {
-			FILE *input;
-
-			if (strcmp(metadata_fname, "-") == 0) {
-				input = stdin;
-			} else {
-				input = fopen(metadata_fname, "r");
-			}
-
-			err = edit_all_metadata(input, ctxt);
-
-			fclose(input);
-		} else {
-			err = show_all_metadata(ctxt, formatall);
-		}
-	}
-
-	xmlXPathFreeContext(ctxt);
-
-	if (val || metadata_fname) {
-		if (overwrite) {
-			if (access(fname, W_OK) != -1) {
-				xmlSaveFile(fname, doc);
-			} else {
-				fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
-				exit(EXIT_NO_WRITE);
-			}
-		} else {
-			xmlSaveFile("-", doc);
-		}
-	}
-
-	xmlFreeDoc(doc);
-
 	switch (err) {
 		case EXIT_INVALID_METADATA:
 			if (val) {
@@ -712,13 +663,92 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname, const c
 			fprintf(stderr, ERR_PREFIX "%s is not valid metadata for %s\n", key, fname);
 			break;
 	}
+}
+
+int show_or_edit_metadata(const char *fname, const char *metadata_fname, xmlNodePtr keys, int formatall, int overwrite)
+{
+	int err;
+	xmlDocPtr doc;
+	xmlXPathContextPtr ctxt;
+	char *key = NULL, *val = NULL;
+
+	doc = xmlReadFile(fname, NULL, 0);
+
+	ctxt = xmlXPathNewContext(doc);
+
+
+	if (keys->children) {
+		xmlNodePtr cur;
+		for (cur = keys->children; cur; cur = cur->next) {
+			key = (char *) xmlGetProp(cur, BAD_CAST "name");
+			val = (char *) xmlGetProp(cur, BAD_CAST "value");
+
+			if (val) {
+				err = edit_metadata(ctxt, key, val);
+			} else {
+				err = show_metadata(ctxt, key);
+			}
+
+			show_err(err, key, val, fname);
+		}
+	} else {
+		if (metadata_fname) {
+			FILE *input;
+
+			if (strcmp(metadata_fname, "-") == 0) {
+				input = stdin;
+			} else {
+				input = fopen(metadata_fname, "r");
+			}
+
+			err = edit_all_metadata(input, ctxt);
+
+			fclose(input);
+		} else {
+			err = show_all_metadata(ctxt, formatall);
+		}
+
+		show_err(err, key, val, fname);
+	}
+
+	xmlXPathFreeContext(ctxt);
+
+	if (val || metadata_fname) {
+		if (overwrite) {
+			if (access(fname, W_OK) != -1) {
+				xmlSaveFile(fname, doc);
+			} else {
+				fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
+				exit(EXIT_NO_WRITE);
+			}
+		} else {
+			xmlSaveFile("-", doc);
+		}
+	}
+
+	xmlFreeDoc(doc);
+
 
 	return err;
 }
 
+void add_key(xmlNodePtr keys, const char *name)
+{
+	xmlNodePtr key;
+	key = xmlNewChild(keys, NULL, BAD_CAST "key", NULL);
+	xmlSetProp(key, BAD_CAST "name", BAD_CAST name);
+}
+
+void add_val(xmlNodePtr keys, const char *val)
+{
+	xmlNodePtr key;
+	key = keys->last;
+	xmlSetProp(key, BAD_CAST "value", BAD_CAST val);
+}
+
 int main(int argc, char **argv)
 {
-	char *key = NULL, *val = NULL;
+	xmlNodePtr keys;
 	int ret = 0;
 
 	int i;
@@ -726,12 +756,14 @@ int main(int argc, char **argv)
 	int formatall = 1;
 	int overwrite = 0;
 
+	keys = xmlNewNode(NULL, BAD_CAST "keys");
+
 	while ((i = getopt(argc, argv, "c:tn:v:fh?")) != -1) {
 		switch (i) {
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 't': formatall = 0; break;
-			case 'n': key = strdup(optarg); break;
-			case 'v': val = strdup(optarg); break;
+			case 'n': add_key(keys, optarg); break;
+			case 'v': add_val(keys, optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'h':
 			case '?': show_help(); exit(0);
@@ -740,15 +772,14 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			show_or_edit_metadata(argv[i], metadata_fname, key, val, formatall, overwrite);
+			show_or_edit_metadata(argv[i], metadata_fname, keys, formatall, overwrite);
 		}
 	} else {
-		show_or_edit_metadata("-", metadata_fname, key, val, formatall, overwrite);
+		show_or_edit_metadata("-", metadata_fname, keys, formatall, overwrite);
 	}
 
 	free(metadata_fname);
-	free(key);
-	free(val);
+	xmlFreeNode(keys);
 
 	return ret;
 }
