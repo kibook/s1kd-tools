@@ -311,6 +311,26 @@ void show_language(xmlNodePtr node)
 	xmlFree(country_iso_code);
 }
 
+void show_language_iso_code(xmlNodePtr node)
+{
+	show_simple_attr(node, "languageIsoCode");
+}
+
+int edit_language_iso_code(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "languageIsoCode", val);
+}
+
+void show_country_iso_code(xmlNodePtr node)
+{
+	show_simple_attr(node, "countryIsoCode");
+}
+
+int edit_country_iso_code(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "countryIsoCode", val);
+}
+
 void show_issue_info(xmlNodePtr node)
 {
 	char *issue_number = (char *) xmlGetProp(node, BAD_CAST "issueNumber");
@@ -320,6 +340,26 @@ void show_issue_info(xmlNodePtr node)
 	
 	xmlFree(issue_number);
 	xmlFree(in_work);
+}
+
+void show_issue_number(xmlNodePtr node)
+{
+	show_simple_attr(node, "issueNumber");
+}
+
+int edit_issue_number(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "issueNumber", val);
+}
+
+void show_in_work(xmlNodePtr node)
+{
+	show_simple_attr(node, "inWork");
+}
+
+int edit_in_work(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "inWork", val);
 }
 
 int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
@@ -459,6 +499,11 @@ struct metadata metadata[] = {
 		show_simple_node,
 		edit_simple_node,
 		create_comment_title},
+	{"countryIsoCode",
+		"//language/@countryIsoCode",
+		show_country_iso_code,
+		edit_country_iso_code,
+		NULL},
 	{"dmCode",
 		"//dmIdent/dmCode",
 		show_dmcode,
@@ -479,20 +524,25 @@ struct metadata metadata[] = {
 		show_issue_date,
 		edit_issue_date,
 		NULL},
-	{"issueInfo",
-		"//issueInfo",
-		show_issue_info,
-		NULL,
+	{"issueNumber",
+		"//issueInfo/@issueNumber",
+		show_issue_number,
+		edit_issue_number,
+		NULL},
+	{"inWork",
+		"//issueInfo/@inWork",
+		show_in_work,
+		edit_in_work,
 		NULL},
 	{"issueType",
 		"//dmStatus/@issueType|//pmStatus/@issueType",
 		show_issue_type,
 		edit_issue_type,
 		NULL},
-	{"language",
-		"//language",
-		show_language,
-		NULL,
+	{"languageIsoCode",
+		"//language/@languageIsoCode",
+		show_language_iso_code,
+		edit_language_iso_code,
 		NULL},
 	{"originator",
 		"//originator/enterpriseName",
