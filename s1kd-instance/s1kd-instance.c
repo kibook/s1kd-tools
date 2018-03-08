@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 
