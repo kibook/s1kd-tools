@@ -6,7 +6,7 @@ s1kd-metadata - View and edit S1000D data module metadata
 SYNOPSIS
 ========
 
-    s1kd-metadata [-c <file>] [-tf]
+    s1kd-metadata [-c <file>] [-0fTt]
                   [-n <name> [-v <value>]]... [<module>]
 
 DESCRIPTION
@@ -17,6 +17,9 @@ The *s1kd-metadata* tool provides a simple way to fetch and change metadata on S
 OPTIONS
 =======
 
+-0  
+Print a null-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.
+
 -c &lt;file&gt;  
 Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).
 
@@ -26,8 +29,11 @@ When editing metadata, overwrite the module. The default is to output the modifi
 -n &lt;name&gt;  
 The name of the piece of metadata to fetch. This option can be specified multiple times to fetch multiple pieces of metadata. If -n is not specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.
 
--t  
+-T  
 Do not format columns in output.
+
+-t  
+Print a tab-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.
 
 -v &lt;value&gt;  
 The new value for the last piece of metadata specified by -n. Each -n can be followed by a -v to edit multiple pieces of metadata.
