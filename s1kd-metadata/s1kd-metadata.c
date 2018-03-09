@@ -459,6 +459,11 @@ int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
 	return create_ent_name(node, val);
 }
 
+void show_url(xmlNodePtr node, char endl)
+{
+	printf("%s%c", node->doc->URL, endl);
+}
+
 struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -508,6 +513,11 @@ struct metadata metadata[] = {
 	{"dmCode",
 		"//dmIdent/dmCode",
 		show_dmcode,
+		NULL,
+		NULL},
+	{"url",
+		"/",
+		show_url,
 		NULL,
 		NULL},
 	{"icnTitle",
