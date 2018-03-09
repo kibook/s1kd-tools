@@ -769,7 +769,7 @@ void list_metadata_keys(xmlNodePtr keys, int formatall)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-metadata [-c <file>] [-0flTt] [-n <name> [-v <value>]]... [<module>]");
+	puts("Usage: s1kd-metadata [-c <file>] [-0fHTt] [-n <name> [-v <value>]]... [<module>]");
 	puts("");
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
