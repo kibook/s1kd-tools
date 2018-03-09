@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="001" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="12" day="21"/>
+        <issueDate year="2018" month="03" day="09"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>'defaults' file identifiers</infoName>
@@ -442,7 +442,7 @@
                   </para>
                 </entry>
                 <entry>
-                  <para>Filename of BREX data module</para>
+                  <para>Data module code of BREX data module</para>
                 </entry>
               </row>
               <row>
@@ -498,6 +498,16 @@
               <row>
                 <entry>
                   <para>
+                    <verbatimText verbatimStyle="vs14">templates</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Path to custom XML templates directory</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
                     <verbatimText verbatimStyle="vs14">yearOfDataIssue</verbatimText>
                   </para>
                 </entry>
@@ -514,49 +524,50 @@
         <para>
           <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
 <defaults>
-  <default ident="assyCode" value="00"/>
-  <default ident="authorization" value="khzae.net"/>
-  <default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/>
-  <default ident="city" value="Toronto"/>
-  <default ident="commentPriorityCode" value="cp01"/>
-  <default ident="commentType" value="Q"/>
-  <default ident="countryIsoCode" value="CA"/>
-  <default ident="country" value="Canada"/>
-  <default ident="disassyCodeVariant" value="A"/>
-  <default ident="disassyCode" value="00"/>
-  <default ident="dmlType" value="C"/>
-  <default ident="infoCodeVariant" value="A"/>
-  <default ident="infoCode" value="040"/>
-  <default ident="infoName" value="Description"/>
-  <default ident="inWork" value="01"/>
-  <default ident="issueNumber" value="000"/>
-  <default ident="issue" value="4.2"/>
-  <default ident="itemLocationCode" value="D"/>
-  <default ident="languageIsoCode" value="en"/>
-  <default ident="learnCode" value="H10"/>
-  <default ident="learnEventCode" value="A"/>
-  <default ident="modelIdentCode" value="MYPRJ"/>
-  <default ident="originatorCode" value="12345"/>
-  <default ident="originator" value="khzae.net"/>
-  <default ident="pmIssuer" value="12345"/>
-  <default ident="pmNumber" value="00000"/>
-  <default ident="pmVolume" value="00"/>
-  <default ident="receiverCity" value="Toronto"/>
-  <default ident="receiverCountry" value="Canada"/>
-  <default ident="receiverIdent" value="12345"/>
-  <default ident="remarks" value="Comments on a data module"/>
-  <default ident="responsiblePartnerCompanyCode" value="12345"/>
-  <default ident="responsiblePartnerCompany" value="khzae.net"/>
-  <default ident="schema" value="descript.xsd"/>
-  <default ident="securityClassification" value="01"/>
-  <default ident="senderIdent" value="12345"/>
-  <default ident="seqNumber" value="00001"/>
-  <default ident="sns" value="DMC-MYPRJ-A-00-00-00-00A-022A-D_EN-CA.XML"/>
-  <default ident="subSubSystem" value="0"/>
-  <default ident="subSystem" value="0"/>
-  <default ident="systemCode" value="00"/>
-  <default ident="techName" value="My project"/>
-  <default ident="yearOfDataIssue" value="2017"/>
+<default ident="assyCode" value="00"/>
+<default ident="authorization" value="khzae.net"/>
+<default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/>
+<default ident="city" value="Toronto"/>
+<default ident="commentPriorityCode" value="cp01"/>
+<default ident="commentType" value="Q"/>
+<default ident="countryIsoCode" value="CA"/>
+<default ident="country" value="Canada"/>
+<default ident="disassyCodeVariant" value="A"/>
+<default ident="disassyCode" value="00"/>
+<default ident="dmlType" value="C"/>
+<default ident="infoCodeVariant" value="A"/>
+<default ident="infoCode" value="040"/>
+<default ident="infoName" value="Description"/>
+<default ident="inWork" value="01"/>
+<default ident="issueNumber" value="000"/>
+<default ident="issue" value="4.2"/>
+<default ident="itemLocationCode" value="D"/>
+<default ident="languageIsoCode" value="en"/>
+<default ident="learnCode" value="H10"/>
+<default ident="learnEventCode" value="A"/>
+<default ident="modelIdentCode" value="MYPRJ"/>
+<default ident="originatorCode" value="12345"/>
+<default ident="originator" value="khzae.net"/>
+<default ident="pmIssuer" value="12345"/>
+<default ident="pmNumber" value="00000"/>
+<default ident="pmVolume" value="00"/>
+<default ident="receiverCity" value="Toronto"/>
+<default ident="receiverCountry" value="Canada"/>
+<default ident="receiverIdent" value="12345"/>
+<default ident="remarks" value="Comments on a data module"/>
+<default ident="responsiblePartnerCompanyCode" value="12345"/>
+<default ident="responsiblePartnerCompany" value="khzae.net"/>
+<default ident="schema" value="descript.xsd"/>
+<default ident="securityClassification" value="01"/>
+<default ident="senderIdent" value="12345"/>
+<default ident="seqNumber" value="00001"/>
+<default ident="sns" value="MYPRJ-A-00-00-00-00A-022A-D"/>
+<default ident="subSubSystem" value="0"/>
+<default ident="subSystem" value="0"/>
+<default ident="systemCode" value="00"/>
+<default ident="techName" value="My project"/>
+<default ident="templates" value="/usr/share/s1kd-tools/templ"/>
+<default ident="yearOfDataIssue" value="2017"/>
 </defaults>]]></verbatimText>
         </para>
       </levelledPara>
@@ -600,13 +611,13 @@ schema                         descript.xsd
 securityClassification         01
 senderIdent                    12345
 seqNumber                      00001
-sns                            DMC-MYPRJ-A-00-00-00-00A-022A-D_EN-CA.XML
+sns                            MYPRJ-A-00-00-00-00A-022A-D
 subSubSystem                   0
 subSystem                      0
 systemCode                     00
 techName                       My project
-yearOfDataIssue                2017
-        </verbatimText>
+templates                      /usr/share/s1kd-tools/templ
+yearOfDataIssue                2017</verbatimText>
         </para>
       </levelledPara>
     </description>
