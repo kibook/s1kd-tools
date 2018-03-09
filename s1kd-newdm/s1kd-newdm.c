@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <dirent.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
-
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 
@@ -371,11 +371,42 @@ void set_sns_title(xmlNodePtr snsTitle)
 	xmlFree(title);
 }
 
-void set_tech_from_sns(const char *fname)
+/* Find the filename of the latest version of a BREX DM in the current directory
+ * by its code.
+ */
+bool find_brex_file(char *dst, const char *code)
+{
+	DIR *dir;
+	struct dirent *cur;
+	int n = strlen(code);
+	bool found = false;
+
+	dir = opendir(".");
+
+	strcpy(dst, "");
+
+	while ((cur = readdir(dir))) {
+		if (strncmp(code, cur->d_name + 4, n) == 0 && strcmp(cur->d_name, dst) > 0) {
+			strcpy(dst, cur->d_name);
+			found = true;
+		}
+	}
+
+	closedir(dir);
+
+	return found;
+}
+
+void set_tech_from_sns(const char *code)
 {
 	xmlDocPtr brex;
 	char xpath[256];
 	xmlNodePtr snsTitle;
+	char fname[PATH_MAX];
+
+	if (!find_brex_file(fname, code)) {
+		return;
+	}
 
 	brex = xmlReadFile(fname, NULL, 0);
 
