@@ -9,7 +9,7 @@ s1kd\-metadata \- View and edit S1000D data module metadata
 .IP
 .nf
 \f[C]
-s1kd\-metadata\ [\-c\ <file>]\ [\-0fTt]
+s1kd\-metadata\ [\-c\ <file>]\ [\-0flTt]
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-n\ <name>\ [\-v\ <value>]]...\ [<module>]
 \f[]
 .fi
@@ -37,6 +37,12 @@ specified).
 .B \-f
 When editing metadata, overwrite the module.
 The default is to output the modified module to stdout.
+.RS
+.RE
+.TP
+.B \-l
+Lists all available metadata with a short description of each.
+Specify specific metadata to describe with the \-n option.
 .RS
 .RE
 .TP

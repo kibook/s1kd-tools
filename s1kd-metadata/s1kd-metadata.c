@@ -24,6 +24,7 @@ struct metadata {
 	void (*show)(xmlNodePtr, char endl);
 	int (*edit)(xmlNodePtr, const char *);
 	int (*create)(xmlXPathContextPtr, const char *val);
+	char *descr;
 };
 
 xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
@@ -469,142 +470,170 @@ struct metadata metadata[] = {
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
 		show_dmcode,
 		edit_dmcode,
-		create_act_ref},
+		create_act_ref,
+		"ACT data module code"},
 	{"applic",
 		"//applic/displayText/simplePara",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		NULL,
+		"Whole data module applicability"},
 	{"authorization",
 		"//ddnStatus/authorization",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		NULL,
+		"Authorization for a DDN"},
 	{"brex",
 		"//brexDmRef/dmRef/dmRefIdent/dmCode",
 		show_dmcode,
 		edit_dmcode,
-		NULL},
+		NULL,
+		"BREX data module code"},
 	{"commentCode",
 		"//commentIdent/commentCode",
 		show_comment_code,
 		NULL,
-		NULL},
+		NULL,
+		"Comment code"},
 	{"commentPriority",
 		"//commentStatus/commentPriority/@commentPriorityCode",
 		show_comment_priority,
 		edit_comment_priority,
-		NULL},
+		NULL,
+		"Priority code of a comment"},
 	{"commentResponse",
 		"//commentStatus/commentResponse/@responseType",
 		show_comment_response,
 		edit_comment_response,
-		NULL},
+		NULL,
+		"Response type of a comment"},
 	{"commentTitle",
 		"//commentAddressItems/commentTitle",
 		show_simple_node,
 		edit_simple_node,
-		create_comment_title},
+		create_comment_title,
+		"Title of a comment"},
 	{"countryIsoCode",
 		"//language/@countryIsoCode",
 		show_country_iso_code,
 		edit_country_iso_code,
-		NULL},
+		NULL,
+		"Country ISO code (CA, US, GB...)"},
 	{"dmCode",
 		"//dmIdent/dmCode",
 		show_dmcode,
 		NULL,
-		NULL},
+		NULL,
+		"Data module code"},
 	{"url",
 		"/",
 		show_url,
 		NULL,
-		NULL},
+		NULL,
+		"URL of the document"},
 	{"icnTitle",
 		"//imfAddressItems/icnTitle",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		NULL,
+		"Title of an IMF"},
 	{"infoName",
 		"//dmAddressItems/dmTitle/infoName",
 		show_simple_node,
 		edit_info_name,
-		create_info_name},
+		create_info_name,
+		"Information name of a data module"},
 	{"issueDate",
 	 	"//issueDate",
 		show_issue_date,
 		edit_issue_date,
-		NULL},
+		NULL,
+		"Issue date in ISO 8601 format (YYYY-MM-DD)"},
 	{"issueNumber",
 		"//issueInfo/@issueNumber",
 		show_issue_number,
 		edit_issue_number,
-		NULL},
+		NULL,
+		"Issue number (NNN)"},
 	{"inWork",
 		"//issueInfo/@inWork",
 		show_in_work,
 		edit_in_work,
-		NULL},
+		NULL,
+		"Inwork issue number (NN)"},
 	{"issueType",
 		"//dmStatus/@issueType|//pmStatus/@issueType",
 		show_issue_type,
 		edit_issue_type,
-		NULL},
+		NULL,
+		"Issue type (new, changed, deleted...)"},
 	{"languageIsoCode",
 		"//language/@languageIsoCode",
 		show_language_iso_code,
 		edit_language_iso_code,
-		NULL},
+		NULL,
+		"Language ISO code (en, fr, es...)"},
 	{"originator",
 		"//originator/enterpriseName",
 		show_simple_node,
 		edit_simple_node,
-		create_orig_name},
+		create_orig_name,
+		"Name of the originator"},
 	{"originatorCode",
 		"//originator/@enterpriseCode",
 		show_ent_code,
 		edit_ent_code,
-		create_orig_ent_code},
+		create_orig_ent_code,
+		"NCAGE code of the originator"},
 	{"pmTitle",
 		"//pmAddressItems/pmTitle",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		NULL,
+		"Title of a publication module"},
 	{"responsiblePartnerCompany",
 		"//responsiblePartnerCompany/enterpriseName",
 		show_simple_node,
 		edit_simple_node,
-		create_rpc_name},
+		create_rpc_name,
+		"Name of the RPC"},
 	{"responsiblePartnerCompanyCode",
 		"//responsiblePartnerCompany/@enterpriseCode",
 		show_ent_code,
 		edit_ent_code,
-		create_rpc_ent_code},
+		create_rpc_ent_code,
+		"NCAGE code of the RPC"},
 	{"schema",
 		"/*",
 		show_schema,
 		edit_schema,
-		NULL},
+		NULL,
+		"XML schema URI"},
 	{"securityClassification",
 		"//security",
 		show_sec_class,
 		edit_sec_class,
-		NULL},
+		NULL,
+		"Security classification (01, 02...)"},
 	{"shortPmTitle",
 		"//pmAddressItems/shortPmTitle",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		NULL,
+		"Short title of a publication module"},
 	{"techName",
 		"//dmAddressItems/dmTitle/techName",
 		show_simple_node,
 		edit_simple_node,
-		NULL},
+		NULL,
+		"Technical name of a data module"},
 	{"type",
 		"/*",
 		show_type,
 		NULL,
-		NULL},
+		NULL,
+		"Name of the root element of the document"},
 	{NULL}
 };
 
@@ -693,15 +722,63 @@ int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 	return 0;
 }
 
+void list_metadata_key(const char *key, const char *descr, int formatall)
+{
+	int n = KEY_COLUMN_WIDTH - strlen(key);
+	int j;
+	printf("%s", key);
+	if (formatall) {
+		for (j = 0; j < n; ++j) putchar(' ');
+	} else {
+		putchar('\t');
+	}
+	printf("%s", descr);
+	putchar('\n');
+}
+
+int has_key(xmlNodePtr keys, const char *key)
+{
+	if (keys->children) {
+		xmlNodePtr cur;
+		for (cur = keys->children; cur; cur = cur->next) {
+			xmlChar *name;
+			int match;
+
+			name = xmlGetProp(cur, BAD_CAST "name");
+			match = xmlStrcmp(name, BAD_CAST key) == 0;
+			xmlFree(name);
+
+			if (match) return 1;
+		}
+
+		return 0;
+	}
+
+	return 1;
+}
+
+void list_metadata_keys(xmlNodePtr keys, int formatall)
+{
+	int i;
+	for (i = 0; metadata[i].key; ++i) {
+		if (has_key(keys, metadata[i].key)) {
+			list_metadata_key(metadata[i].key, metadata[i].descr, formatall);
+		}
+	}
+}
+
 void show_help(void)
 {
-	puts("Usage: s1kd-metadata [-c <file>] [-tf] [-n <name> [-v <value>]]... [<module>]");
+	puts("Usage: s1kd-metadata [-c <file>] [-0flTt] [-n <name> [-v <value>]]... [<module>]");
 	puts("");
 	puts("Options:");
+	puts("  -0           Use null-delimited fields.");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
-	puts("  -t           Do not format columns in output.");
 	puts("  -f           Overwrite modules when editing metadata.");
+	puts("  -l           List information on available metadata.");
 	puts("  -n <name>    Specific metadata name to view/edit.");
+	puts("  -T           Do not format columns in output.");
+	puts("  -t           Use tab-delimited fields.");
 	puts("  -v <value>   Edit the value of the metadata specified.");
 	puts("  <module>     S1000D module to view/edit metadata on.");
 }
@@ -827,14 +904,16 @@ int main(int argc, char **argv)
 	int formatall = 1;
 	int overwrite = 0;
 	char endl = '\n';
+	int list_keys = 0;
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:fn:Ttv:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:fln:Ttv:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
+			case 'l': list_keys = 1; break;
 			case 'n': add_key(keys, optarg); break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;
@@ -844,7 +923,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (optind < argc) {
+	if (list_keys) {
+		list_metadata_keys(keys, formatall);
+	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			show_or_edit_metadata(argv[i], metadata_fname, keys,
 				formatall, overwrite, endl);
