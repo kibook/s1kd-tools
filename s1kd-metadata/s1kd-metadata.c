@@ -775,7 +775,7 @@ void show_help(void)
 	puts("  -0           Use null-delimited fields.");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
 	puts("  -f           Overwrite modules when editing metadata.");
-	puts("  -l           List information on available metadata.");
+	puts("  -H           List information on available metadata.");
 	puts("  -n <name>    Specific metadata name to view/edit.");
 	puts("  -T           Do not format columns in output.");
 	puts("  -t           Use tab-delimited fields.");
@@ -908,12 +908,12 @@ int main(int argc, char **argv)
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:fln:Ttv:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:fHn:Ttv:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
-			case 'l': list_keys = 1; break;
+			case 'H': list_keys = 1; break;
 			case 'n': add_key(keys, optarg); break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;

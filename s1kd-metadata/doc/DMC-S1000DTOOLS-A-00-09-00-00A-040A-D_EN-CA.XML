@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="9" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="08"/>
+        <issueDate year="2018" month="03" day="09"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,13 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change '-t' to '-T'.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Add configurable delimiters.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt02">
-        <simplePara>Add -l option.</simplePara>
+        <simplePara>Change -l to -H.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -60,8 +54,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002 rfu-0003">
-s1kd-metadata [-c &lt;file&gt;] [-0flTt]
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-metadata [-c &lt;file&gt;] [-0fHTth?]
               [-n &lt;name&gt; [-v &lt;value&gt;]]... [&lt;module&gt;]</verbatimText>
         </para>
       </levelledPara>
@@ -73,7 +66,7 @@ s1kd-metadata [-c &lt;file&gt;] [-0flTt]
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-0</listItemTerm>
               <listItemDefinition>
                 <para>Print a null-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.</para>
@@ -91,8 +84,8 @@ s1kd-metadata [-c &lt;file&gt;] [-0flTt]
                 <para>When editing metadata, overwrite the module. The default is to output the modified module to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0003">
-              <listItemTerm>-l</listItemTerm>
+            <definitionListItem>
+              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0001">-H</listItemTerm>
               <listItemDefinition>
                 <para>Lists all available metadata with a short description of each. Specify specific metadata to describe with the -n option.</para>
               </listItemDefinition>
@@ -103,13 +96,13 @@ s1kd-metadata [-c &lt;file&gt;] [-0flTt]
                 <para>The name of the piece of metadata to fetch. This option can be specified multiple times to fetch multiple pieces of metadata. If -n is not specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-T</listItemTerm>
               <listItemDefinition>
                 <para>Do not format columns in output.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
                 <para>Print a tab-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.</para>
