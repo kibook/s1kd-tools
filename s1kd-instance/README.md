@@ -10,7 +10,7 @@ SYNOPSIS
                   [-l <lang>] [-n <iss>] [-I <date>]
                   [-u <sec>] [-o <file>|-O <dir>] [-f]
                   [-t <techName>] [-i <infoName>] [-a|-A]
-                  [-Y <text>] [-C <comment>]
+                  [-y|-Y <text>] [-C <comment>]
                   [-g [-G <CODE>/<NAME>]]
                   [-R <CIR> ...] [-r <XSL>] [-x <CIR>]
                   [-S] [-N] [-P <PCT> -p <id>] [-L]
@@ -182,6 +182,9 @@ The following types currently have built-in XSLT and can therefore be used as va
 
 -Y &lt;text&gt;  
 Set the applicability for the whole module using the user-defined applicability values, using text as the new display text.
+
+-y  
+Set the applicability for the whole data module using the user-defined applicability values, with no display text.
 
 &lt;applic&gt;...  
 Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;

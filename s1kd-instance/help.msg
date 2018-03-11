@@ -35,4 +35,5 @@ Options:
   -w            Check the applic of the whole DM.
   -x <CIR>      Dump default XSLT for resolving CIR references.
   -Y <text>     Set applic for DM with text as the display text.
+  -y            Set applic for DM based on the user-defined defs.
   <applic>...   Any number of applic defs in the form of <ident>:<type>=<value>

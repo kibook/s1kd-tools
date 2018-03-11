@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="07"/>
+        <issueDate year="2018" month="03" day="10"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -g and -G options.</simplePara>
+        <simplePara>Add -y option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -56,7 +56,7 @@
               [-l &lt;lang&gt;] [-n &lt;iss&gt;] [-I &lt;date&gt;]
               [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f]
               [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A]
-              [-Y &lt;text&gt;] [-C &lt;comment&gt;]
+              [-y|-Y &lt;text&gt;] [-C &lt;comment&gt;]
               [-g [-G &lt;CODE&gt;/&lt;NAME&gt;]]
               [-R &lt;CIR&gt; ...] [-r &lt;XSL&gt;] [-x &lt;CIR&gt;]
               [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L]
@@ -127,13 +127,13 @@
                 <para>Overwrite existing file with same name as the filename generated automatically with -O, if it exists.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-G &lt;CODE&gt;/&lt;NAME&gt;</listItemTerm>
               <listItemDefinition>
                 <para>When using the -g option, instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-g</listItemTerm>
               <listItemDefinition>
                 <para>Set the originator of the instance. When this option is specified, the code "<verbatimText verbatimStyle="vs14">S1KDI</verbatimText>" and the name "<verbatimText verbatimStyle="vs14">s1kd-instance tool</verbatimText>" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.</para>
@@ -357,6 +357,12 @@
               <listItemTerm>-Y &lt;text&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the applicability for the whole module using the user-defined applicability values, using text as the new display text.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-y</listItemTerm>
+              <listItemDefinition>
+                <para>Set the applicability for the whole data module using the user-defined applicability values, with no display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -832,9 +832,11 @@ void set_applic(xmlDocPtr doc, char *new_text)
 	new_applic = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlAddNextSibling(applic, new_applic);
 
-	new_displayText = xmlNewChild(new_applic, NULL, BAD_CAST "displayText", NULL);
-	new_simplePara = xmlNewChild(new_displayText, NULL, BAD_CAST "simplePara", NULL);
-	xmlNodeSetContent(new_simplePara, BAD_CAST new_text);
+	if (strcmp(new_text, "") != 0) {
+		new_displayText = xmlNewChild(new_applic, NULL, BAD_CAST "displayText", NULL);
+		new_simplePara = xmlNewChild(new_displayText, NULL, BAD_CAST "simplePara", NULL);
+		xmlNodeSetContent(new_simplePara, BAD_CAST new_text);
+	}
 
 	if (napplics > 1) {
 		new_evaluate = xmlNewChild(new_applic, NULL, BAD_CAST "evaluate", NULL);
@@ -1370,6 +1372,7 @@ int main(int argc, char **argv)
 	char info[256] = "";
 	bool autoname = false;
 	char dir[PATH_MAX] = "";
+	bool new_applic = false;
 	char new_display_text[256] = "";
 	char comment_text[256] = "";
 	char extension[256] = "";
@@ -1401,7 +1404,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:C:l:R:r:n:u:wNP:p:LI:vx:gG:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1415,7 +1418,8 @@ int main(int argc, char **argv)
 			case 'A': simpl = true; break;
 			case 't': strncpy(tech, optarg, 255); break;
 			case 'i': strncpy(info, optarg, 255); break;
-			case 'Y': strncpy(new_display_text, optarg, 255); break;
+			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
+			case 'y': new_applic = true; break;
 			case 'C': strncpy(comment_text, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
@@ -1574,7 +1578,7 @@ int main(int argc, char **argv)
 				set_lang(doc, language);
 			}
 
-			if (strcmp(new_display_text, "") != 0) {
+			if (new_applic && napplics > 0) {
 				set_applic(doc, new_display_text);
 			}
 
