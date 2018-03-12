@@ -1,17 +1,17 @@
 NAME
 ====
 
-s1kd-flatpm - Flatten a publication module for publishing
+s1kd-flatten - Flatten a publication module for publishing
 
 SYNOPSIS
 ========
 
-    s1kd-flatpm [-Nxp] <PM> [<DM>...]
+    s1kd-flatten [-Nxp] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-flatpm* tool combines a publication module and the data modules it references in to a single file for use with a publishing system.
+The *s1kd-flatten* tool combines a publication module and the data modules it references in to a single file for use with a publishing system.
 
 Data modules are searched for in the current directory using the data module code, language and/or issue info provided in each reference.
 

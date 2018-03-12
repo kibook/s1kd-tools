@@ -1,5 +1,5 @@
-SOURCE=s1kd-flatpm.c
-OUTPUT=s1kd-flatpm
+SOURCE=s1kd-flatten.c
+OUTPUT=s1kd-flatten
 
 CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
 LDFLAGS=`pkg-config --libs libxml-2.0`

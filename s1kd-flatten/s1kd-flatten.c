@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <libxml/tree.h>
 
+#define PROG_NAME "s1kd-flatten"
+
 int xinclude = 0;
 int no_issue = 0;
 
@@ -15,7 +17,7 @@ xmlNodePtr pub;
 
 void show_help(void)
 {
-	puts("Usage: s1kd-flatpm [-Npxh?] <pubmodule>");
+	puts("Usage: " PROG_NAME " [-Npxh?] <pubmodule>");
 	puts("");
 	puts("Options:");
 	puts("  -N     Assume issue/inwork numbers are omitted.");

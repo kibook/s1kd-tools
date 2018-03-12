@@ -8,7 +8,7 @@ all:
 	$(MAKE) -C s1kd-dmls
 	$(MAKE) -C s1kd-dmref
 	$(MAKE) -C s1kd-dmrl
-	$(MAKE) -C s1kd-flatpm
+	$(MAKE) -C s1kd-flatten
 	$(MAKE) -C s1kd-instance
 	$(MAKE) -C s1kd-metadata
 	$(MAKE) -C s1kd-neutralize
@@ -34,7 +34,7 @@ clean:
 	$(MAKE) -C s1kd-dmls clean
 	$(MAKE) -C s1kd-dmref clean
 	$(MAKE) -C s1kd-dmrl clean
-	$(MAKE) -C s1kd-flatpm clean
+	$(MAKE) -C s1kd-flatten clean
 	$(MAKE) -C s1kd-instance clean
 	$(MAKE) -C s1kd-metadata clean
 	$(MAKE) -C s1kd-neutralize clean
@@ -60,7 +60,7 @@ install:
 	$(MAKE) -C s1kd-dmls install
 	$(MAKE) -C s1kd-dmref install
 	$(MAKE) -C s1kd-dmrl install
-	$(MAKE) -C s1kd-flatpm install
+	$(MAKE) -C s1kd-flatten install
 	$(MAKE) -C s1kd-instance install
 	$(MAKE) -C s1kd-metadata install
 	$(MAKE) -C s1kd-neutralize install
