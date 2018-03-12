@@ -30,7 +30,7 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
 2.  **Authoring:** These tools support the authoring process.
 
-    The **s1kd-upissue** tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.
+    The **s1kd-addicn** tool creates the notation and entity elements to reference an ICN in a data module.
 
     The **s1kd-dmls** tool lists data modules within a directory.
 
@@ -39,6 +39,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     The **s1kd-metadata** tool lists and edits S1000D metadata on CSDB objects.
 
     The **s1kd-transform** tool applies XSLT transformations to CSDB objects.
+
+    The **s1kd-upissue** tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.
 
 3.  **Validation:** These tools all validate different aspects of CSDB objects.
 
@@ -52,9 +54,11 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
 4.  **Publication:** These tools support the production of publications from a CSDB.
 
-    The **s1kd-flatpm** tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.
+    The **s1kd-flatten** tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.
 
     The **s1kd-acronyms** tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.
+
+    The **s1kd-aspp** tool preprocesses applicability statements in a data module, generating display text and "presentation" applicability statements.
 
     The **s1kd-instance** tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).
 
@@ -67,4 +71,4 @@ SEE ALSO
 
 S1000D website: http://www.s1000d.org
 
-s1kd-acronyms(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-dmref(1), s1kd-dmrl(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)
+s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-dmref(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)
