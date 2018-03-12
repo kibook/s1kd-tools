@@ -1345,6 +1345,32 @@ void strip_extension(xmlDocPtr doc)
 	xmlFreeNode(ext);
 }
 
+void delete_xpath(xmlDocPtr doc, const char *xpath)
+{
+
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+void remove_emptry_pmentries(xmlDocPtr doc)
+{
+	delete_xpath(doc, "//pmEntry[not(dmRef|pmRef|externalPubRef)]");
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1397,6 +1423,8 @@ int main(int argc, char **argv)
 	int parseopts = 0;
 
 	xmlNodePtr cirs, cir;
+
+	bool ispm;
 
 	exsltRegisterAll();
 
@@ -1520,6 +1548,8 @@ int main(int argc, char **argv)
 
 		root = xmlDocGetRootElement(doc);
 
+		ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
+
 		content = find_req_child(root, "content");
 
 		if (!wholedm || check_wholedm_applic(doc)) {
@@ -1536,7 +1566,7 @@ int main(int argc, char **argv)
 					continue;
 				}
 
-				if (xmlStrcmp(root->name, BAD_CAST "pm") == 0) {
+				if (ispm) {
 					undepend_cir(doc, cirdocfname, false, cirxsl);
 				} else {
 					undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
@@ -1608,6 +1638,10 @@ int main(int argc, char **argv)
 				}
 
 				xmlAddPrevSibling(identAndStatusSection, comment);
+			}
+
+			if (ispm) {
+				remove_emptry_pmentries(doc);
 			}
 
 			if (autoname) {
