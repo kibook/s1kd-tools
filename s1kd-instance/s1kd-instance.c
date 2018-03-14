@@ -10,8 +10,7 @@
 #include <libexslt/exslt.h>
 
 #include "strings.h"
-#include "identity.h"
-#include "cirxsl.h"
+#include "xsl.h"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX "s1kd-instance: ERROR: "
@@ -1366,9 +1365,39 @@ void delete_xpath(xmlDocPtr doc, const char *xpath)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Removes invalid empty sections in a PM after all references have
+ * been filtered out.
+ */
 void remove_emptry_pmentries(xmlDocPtr doc)
 {
 	delete_xpath(doc, "//pmEntry[not(dmRef|pmRef|externalPubRef)]");
+}
+
+/* General XSLT transformation with embedded stylesheet, preserving the DTD. */
+void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
+{
+	xmlDocPtr styledoc, res, src;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	add_identity(styledoc);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	src = xmlCopyDoc(doc, 1);
+	res = xsltApplyStylesheet(style, src, NULL);
+	xmlFreeDoc(src);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+void flatten_alts(xmlDocPtr doc)
+{
+	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len);
 }
 
 /* Print a usage message */
@@ -1419,6 +1448,7 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	bool setorig = false;
 	char *origspec = NULL;
+	bool flat_alts = false;
 
 	int parseopts = 0;
 
@@ -1432,7 +1462,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:h?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:Fh?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1463,7 +1493,8 @@ int main(int argc, char **argv)
 			case 'v': verbose = true; break;
 			case 'x': dump_cir_xsl(optarg); exit(0);
 			case 'g': setorig = true; break;
-			case 'G': origspec = strdup(optarg); break;
+			case 'G': setorig = true; origspec = strdup(optarg); break;
+			case 'F': flat_alts = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1642,6 +1673,10 @@ int main(int argc, char **argv)
 
 			if (ispm) {
 				remove_emptry_pmentries(doc);
+			}
+
+			if (flat_alts) {
+				flatten_alts(doc);
 			}
 
 			if (autoname) {

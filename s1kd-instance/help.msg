@@ -11,6 +11,7 @@ Options:
   -c <DMC>      The new data module code of the data module instance.
   -E            Remove extension from instance.
   -e <ext>      Specify an extension on the data module code (DME).
+  -F            Flatten alts elements.
   -f            Overwrite file with same name as automatic output, if it exists.
   -G            Use custom NCAGE/name for originator.
   -g            Set originator of the instance to identify this tool.
