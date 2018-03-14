@@ -34,9 +34,9 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
     The **s1kd-dmls** tool lists data modules within a directory.
 
-    The **s1kd-dmref** tool can be used to quickly insert references to other data modules within a data module.
-
     The **s1kd-metadata** tool lists and edits S1000D metadata on CSDB objects.
+
+    The **s1kd-ref** tool can be used to quickly insert references to other CSDB objects.
 
     The **s1kd-transform** tool applies XSLT transformations to CSDB objects.
 
