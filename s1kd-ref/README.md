@@ -1,17 +1,17 @@
 NAME
 ====
 
-s1kd-dmref - Generate XML to reference a data module
+s1kd-ref - Generate XML to reference CSDB objects
 
 SYNOPSIS
 ========
 
-    s1kd-dmref [-tlih?] [<code>|<filename>]
+    s1kd-ref [-tlih?] [<code>|<filename>]
 
 DESCRIPTION
 ===========
 
-The *s1kd-dmref* tool generates the XML for a &lt;dmRef&gt; element using the specified code or data module filename. When using a filename, it can parse the data module to include the issue, language, and/or title information in the reference.
+The *s1kd-ref* tool generates the XML for S1000D reference elements using the specified code or filename. When using a filename, it can parse the CSDB object to include the issue, language, and/or title information in the reference.
 
 OPTIONS
 =======
@@ -29,12 +29,12 @@ Include the language information in the reference (target must be a file)
 Include the dmTitle in the reference (target must be a file).
 
 &lt;code&gt;|&lt;filename&gt;  
-Either a data module code, including the prefix DMC or DME (for extended identification), or the filename of a data module.
+Either a code, including the prefix (DMC, PMC, etc.), or the filename of a CSDB object.
 
 EXAMPLE
 =======
 
-    $ s1kd-dmref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
+    $ s1kd-ref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
     <dmRef>
     <dmRefIdent>
     <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A"

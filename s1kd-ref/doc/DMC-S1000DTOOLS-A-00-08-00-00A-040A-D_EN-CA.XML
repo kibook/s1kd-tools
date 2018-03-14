@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE dmodule [
-<!ENTITY % ISOEntities PUBLIC "ISO 8879-1986//ENTITIES ISO Character Entities 20030531//EN//XML" "http://www.s1000d.org/S1000D_4-2/ent/ISOEntities">
-]>
+<!DOCTYPE dmodule>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="22"/>
+        <issueDate year="2018" month="03" day="14"/>
         <dmTitle>
-          <techName>s1kd-dmref(1) | s1kd-tools</techName>
+          <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -40,31 +38,28 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-dmref - Generate XML to reference a data module</para>
+        <para>s1kd-ref - Generate XML to reference CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
-          <verbatimText verbatimStyle="vs24">s1kd-dmref [-tlih?] [&lt;code&gt;|&lt;filename&gt;]</verbatimText>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-ref [-tlih?] [&lt;code&gt;|&lt;filename&gt;]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-dmref</emphasis> tool generates the XML for a &lt;dmRef&gt; element using the specified code or data module filename. When using a filename, it can parse the data module to include the issue, language, and/or title information in the reference.</para>
+        <para>The <emphasis>s1kd-ref</emphasis> tool generates the XML for S1000D reference elements using the specified code or filename. When using a filename, it can parse the CSDB object to include the issue, language, and/or title information in the reference.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
@@ -92,7 +87,7 @@
             <definitionListItem>
               <listItemTerm>&lt;code&gt;|&lt;filename&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Either a data module code, including the prefix DMC or DME (for extended identification), or the filename of a data module.</para>
+                <para>Either a code, including the prefix (DMC, PMC, etc.), or the filename of a CSDB object.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -101,7 +96,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ s1kd-dmref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
 <dmRef>
 <dmRefIdent>
 <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A"
