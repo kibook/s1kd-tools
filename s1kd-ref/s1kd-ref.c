@@ -60,19 +60,47 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	return first;
 }
 
-void dump_node(xmlNodePtr node)
+xmlNodePtr find_or_create_refs(xmlDocPtr doc)
+{
+	xmlNodePtr refs;
+
+	refs = first_xpath_node(doc, NULL, "//content//refs");
+
+	if (!refs) {
+		xmlNodePtr content, child;
+		content = first_xpath_node(doc, NULL, "//content");
+		child = xmlFirstElementChild(content);
+		refs = xmlNewNode(NULL, BAD_CAST "refs");
+		if (child) {
+			refs = xmlAddPrevSibling(child, refs);
+		} else {
+			refs = xmlAddChild(content ,refs);
+		}
+	}
+
+	return refs;
+}
+
+void dump_node(xmlNodePtr node, const char *dst)
 {
 	xmlBufferPtr buf;
 	buf = xmlBufferCreate();
 	xmlNodeDump(buf, NULL, node, 0, 1);
-	puts((char *) buf->content);
+	if (strcmp(dst, "-") == 0) {
+		puts((char *) buf->content);
+	} else {
+		FILE *f;
+		f = fopen(dst, "w");
+		fputs((char *) buf->content, f);
+		fclose(f);
+	}
 	xmlBufferFree(buf);
 }
 
 #define PME_FMT "PME-%255[^-]-%255[^-]-%14[^-]-%5s-%5s-%2s"
 #define PMC_FMT "PMC-%14[^-]-%5s-%5s-%2s"
 
-void print_pm_ref(const char *ref, const char *fname, int opts)
+xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 {
 	char extension_producer[256] = "";
 	char extension_code[256]     = "";
@@ -137,7 +165,7 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_pm_title;
 
 		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read file: %s\n", ref);
+			fprintf(stderr, ERR_PREFIX "Could not read publication module: %s\n", ref);
 			exit(EXIT_MISSING_FILE);
 		}
 
@@ -163,15 +191,13 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 		xmlFreeDoc(doc);
 	}
 
-	dump_node(pm_ref);
-
-	xmlFreeNode(pm_ref);
+	return pm_ref;
 }
 
 #define DME_FMT "DME-%255[^-]-%255[^-]-%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s"
 #define DMC_FMT "DMC-%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s"
 
-void print_dm_ref(const char *ref, const char *fname, int opts)
+xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 {
 	char extension_producer[256] = "";
 	char extension_code[256]     = "";
@@ -277,7 +303,7 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dm_title;
 
 		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read file: %s\n", ref);
+			fprintf(stderr, ERR_PREFIX "Could not read data module: %s\n", ref);
 			exit(EXIT_MISSING_FILE);
 		}
 
@@ -303,14 +329,12 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 		xmlFreeDoc(doc);
 	}
 
-	dump_node(dm_ref);
-
-	xmlFreeNode(dm_ref);
+	return dm_ref;
 }
 
 #define COM_FMT "COM-%14[^-]-%5s-%4s-%5s-%1s"
 
-void print_com_ref(const char *ref, const char *fname, int opts)
+xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 {
 	char model_ident_code[15]  = "";
 	char sender_ident[6]       = "";
@@ -351,7 +375,7 @@ void print_com_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_comment_ident;
 
 		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read file: %s\n", ref);
+			fprintf(stderr, ERR_PREFIX "Could not read comment: %s\n", ref);
 			exit(EXIT_MISSING_FILE);
 		}
 
@@ -365,12 +389,10 @@ void print_com_ref(const char *ref, const char *fname, int opts)
 		xmlFreeDoc(doc);
 	}
 
-	dump_node(comment_ref);
-
-	xmlFreeNode(comment_ref);
+	return comment_ref;
 }
 
-void print_icn_ref(const char *ref, const char *fname, int opts)
+xmlNodePtr new_icn_ref(const char *ref, const char *fname, int opts)
 {
 	xmlNodePtr info_entity_ref;
 
@@ -378,9 +400,7 @@ void print_icn_ref(const char *ref, const char *fname, int opts)
 
 	xmlSetProp(info_entity_ref, BAD_CAST "infoEntityRefIdent", BAD_CAST ref);
 
-	dump_node(info_entity_ref);
-
-	xmlFreeNode(info_entity_ref);
+	return info_entity_ref;
 }
 
 bool is_pm(const char *ref)
@@ -403,17 +423,53 @@ bool is_icn(const char *ref)
 	return strncmp(ref, "ICN-", 4) == 0;
 }
 
-void printref(const char *ref, const char *fname, int opts)
+void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 {
-	if (is_dm(ref)) {
-		print_dm_ref(ref, fname, opts);
-	} else if (is_pm(ref)) {
-		print_pm_ref(ref, fname, opts);
-	} else if (is_com(ref)) {
-		print_com_ref(ref, fname, opts);
-	} else if (is_icn(ref)) {
-		print_icn_ref(ref, fname, opts);
+	xmlDocPtr doc;
+	xmlNodePtr refs;
+
+	if (!(doc = xmlReadFile(src, NULL, 0))) {
+		fprintf(stderr, ERR_PREFIX "Could not read source data module: %s\n", src);
+		exit(EXIT_MISSING_FILE);
 	}
+
+	refs = find_or_create_refs(doc);
+	xmlAddChild(refs, xmlCopyNode(ref, 1));
+
+	xmlSaveFile(dst, doc);
+}
+
+void print_ref(const char *src, const char *dst, const char *ref, const char *fname, int opts, bool insert_refs, bool overwrite)
+{
+	xmlNodePtr node;
+	xmlNodePtr (*f)(const char *, const char *, int);
+
+	if (is_dm(ref)) {
+		f = new_dm_ref;
+	} else if (is_pm(ref)) {
+		f = new_pm_ref;
+	} else if (is_com(ref)) {
+		f = new_com_ref;
+	} else if (is_icn(ref)) {
+		f = new_icn_ref;
+	} else {
+		fprintf(stderr, ERR_PREFIX "Unknown reference type: %s\n", ref);
+		exit(EXIT_BAD_INPUT);
+	}
+
+	node = f(ref, fname, opts);
+
+	if (insert_refs) {
+		if (overwrite) {
+			add_ref(src, src, node);
+		} else {
+			add_ref(src, dst, node);
+		}
+	} else {
+		dump_node(node, dst);
+	}
+
+	xmlFreeNode(node);
 }
 
 char *trim(char *str)
@@ -434,16 +490,20 @@ char *trim(char *str)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-tlih?] [<code>|<file>]");
+	puts("Usage: " PROG_NAME " [-filrth?] [-s <src>] [-o <dst>] [<code>|<file>]");
 	puts("");
 	puts("Options:");
-	puts("  -t      Include title (target must be file)");
-	puts("  -l      Include language (target must be file)");
-	puts("  -i      Include issue info (target must be file)");
-	puts("  -h -?   Show this help message.");
-	puts("  <code>  The code of the reference (must include prefix DMC/PMC/etc.).");
-	puts("  <file>  A file to reference.");
-	puts("          -t/-i/-l can then be used to include the title, issue, and language.");
+	puts("  -f        Overwrite source data module instead of writing to stdout.");
+	puts("  -i        Include issue info (target must be file)");
+	puts("  -l        Include language (target must be file)");
+	puts("  -o <dst>  Output to <dst> instead of stdout.");
+	puts("  -r        Add reference to data module's <refs> table.");
+	puts("  -s <src>  Source data module to add references to.");
+	puts("  -t        Include title (target must be file)");
+	puts("  -h -?     Show this help message.");
+	puts("  <code>    The code of the reference (must include prefix DMC/PMC/etc.).");
+	puts("  <file>    A file to reference.");
+	puts("            -t/-i/-l can then be used to include the title, issue, and language.");
 }
 
 int main(int argc, char **argv)
@@ -451,12 +511,20 @@ int main(int argc, char **argv)
 	char scratch[PATH_MAX];
 	int i;
 	int opts = 0;
+	bool insert_refs = false;
+	char src[PATH_MAX] = "-";
+	char dst[PATH_MAX] = "-";
+	bool overwrite = false;
 
-	while ((i = getopt(argc, argv, "tilh?")) != -1) {
+	while ((i = getopt(argc, argv, "filo:rs:th?")) != -1) {
 		switch (i) {
-			case 't': opts |= OPT_TITLE; break;
+			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;
 			case 'l': opts |= OPT_LANG; break;
+			case 'o': strcpy(dst, optarg); break;
+			case 'r': insert_refs = true; break;
+			case 's': strcpy(src, optarg); break;
+			case 't': opts |= OPT_TITLE; break;
 			case '?':
 			case 'h': show_help(); exit(EXIT_SUCCESS);
 		}
@@ -470,11 +538,12 @@ int main(int argc, char **argv)
 			strcpy(fname, argv[i]);
 			strcpy(scratch, fname);
 			base = basename(scratch);
-			printref(base, fname, opts);
+
+			print_ref(src, dst, base, fname, opts, insert_refs, overwrite);
 		}
 	} else {
 		while (fgets(scratch, PATH_MAX, stdin)) {
-			printref(trim(scratch), NULL, opts);
+			print_ref(src, dst, trim(scratch), NULL, opts, insert_refs, overwrite);
 		}
 	}
 

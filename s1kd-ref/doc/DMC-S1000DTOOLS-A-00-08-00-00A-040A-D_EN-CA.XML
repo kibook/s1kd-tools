@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="14"/>
+        <issueDate year="2018" month="03" day="15"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -f, -o, -r, and -s options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Correct definition of -t option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-ref [-tlih?] [&lt;code&gt;|&lt;filename&gt;]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ref [-filrth?] [-s &lt;src&gt;] [-o &lt;dst&gt;]
+         [&lt;code&gt;|&lt;filename&gt;]...</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -60,6 +67,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite source data module instead of writing to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
@@ -78,10 +91,28 @@
                 <para>Include the language information in the reference (target must be a file)</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-o &lt;dst&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Output to &lt;dst&gt; instead of stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r</listItemTerm>
+              <listItemDefinition>
+                <para>Add the generated reference to the source data module's <verbatimText verbatimStyle="vs12">refs</verbatimText> table rather than printing the XML to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-s &lt;src&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a source data module &lt;src&gt; to add references to when using the -r option.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
-                <para>Include the dmTitle in the reference (target must be a file).</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Include the title in the reference (target must be a file).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
