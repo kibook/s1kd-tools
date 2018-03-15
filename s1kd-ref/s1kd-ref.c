@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
-#include <libxml/tree.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-ref"
 
@@ -22,6 +23,12 @@ bool hasopt(int opts, int opt)
 	return (opts & opt) == opt;
 }
 
+void lowercase(char *s)
+{
+	int i;
+	for (i = 0; s[i]; ++i) s[i] = tolower(s[i]);
+}
+
 xmlNode *find_child(xmlNode *parent, char *name)
 {
 	xmlNode *cur;
@@ -33,6 +40,24 @@ xmlNode *find_child(xmlNode *parent, char *name)
 	}
 
 	return NULL;
+}
+
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
 }
 
 void dump_node(xmlNodePtr node)
@@ -49,7 +74,6 @@ void dump_node(xmlNodePtr node)
 
 void print_pm_ref(const char *ref, const char *fname, int opts)
 {
-	char full_code[1024];
 	char extension_producer[256] = "";
 	char extension_code[256]     = "";
 	char model_ident_code[15]    = "";
@@ -62,12 +86,10 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 	bool is_extended;
 	int n;
 
-	strcpy(full_code, ref);
-
-	is_extended = strncmp(full_code, "PME-", 4) == 0;
+	is_extended = strncmp(ref, "PME-", 4) == 0;
 
 	if (is_extended) {
-		n = sscanf(full_code, PME_FMT,
+		n = sscanf(ref, PME_FMT,
 			extension_producer,
 			extension_code,
 			model_ident_code,
@@ -75,17 +97,17 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 			pm_number,
 			pm_volume);
 		if (n != 6) {
-			fprintf(stderr, ERR_PREFIX "Publication module extended code invalid: %s\n", full_code);
+			fprintf(stderr, ERR_PREFIX "Publication module extended code invalid: %s\n", ref);
 			exit(EXIT_BAD_INPUT);
 		}
 	} else {
-		n = sscanf(full_code, PMC_FMT,
+		n = sscanf(ref, PMC_FMT,
 			model_ident_code,
 			pm_issuer,
 			pm_number,
 			pm_volume);
 		if (n != 4) {
-			fprintf(stderr, ERR_PREFIX "Publication module code invalid: %s\n", full_code);
+			fprintf(stderr, ERR_PREFIX "Publication module code invalid: %s\n", ref);
 			exit(EXIT_BAD_INPUT);
 		}
 	}
@@ -109,8 +131,6 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 
 	if (opts) {
 		xmlDocPtr doc;
-		xmlNodePtr ref_pm;
-		xmlNodePtr ref_ident_and_status_section;
 		xmlNodePtr ref_pm_address;
 		xmlNodePtr ref_pm_ident;
 		xmlNodePtr ref_pm_address_items;
@@ -121,9 +141,7 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 			exit(EXIT_MISSING_FILE);
 		}
 
-		ref_pm = xmlDocGetRootElement(doc);
-		ref_ident_and_status_section = find_child(ref_pm, "identAndStatusSection");
-		ref_pm_address = find_child(ref_ident_and_status_section, "pmAddress");
+		ref_pm_address = first_xpath_node(doc, NULL, "//pmAddress");
 		ref_pm_ident = find_child(ref_pm_address, "pmIdent");
 		ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
 		ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
@@ -155,7 +173,6 @@ void print_pm_ref(const char *ref, const char *fname, int opts)
 
 void print_dm_ref(const char *ref, const char *fname, int opts)
 {
-	char full_code[1024];
 	char extension_producer[256] = "";
 	char extension_code[256]     = "";
 	char model_ident_code[15]    = "";
@@ -178,12 +195,10 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 	bool has_learn;
 	int n;
 
-	strcpy(full_code, ref);
-
-	is_extended = strncmp(full_code, "DME-", 4) == 0;
+	is_extended = strncmp(ref, "DME-", 4) == 0;
 
 	if (is_extended) {
-		n = sscanf(full_code, DME_FMT,
+		n = sscanf(ref, DME_FMT,
 			extension_producer,
 			extension_code,
 			model_ident_code,
@@ -200,12 +215,12 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 			learn_code,
 			learn_event_code);
 		if (n != 15 && n != 13) {
-			fprintf(stderr, ERR_PREFIX "Data module extended code invalid: %s\n", full_code);
+			fprintf(stderr, ERR_PREFIX "Data module extended code invalid: %s\n", ref);
 			exit(EXIT_BAD_INPUT);
 		}
 		has_learn = n == 15;
 	} else {
-		n = sscanf(full_code, DMC_FMT,
+		n = sscanf(ref, DMC_FMT,
 			model_ident_code,
 			system_diff_code,
 			system_code,
@@ -220,7 +235,7 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 			learn_code,
 			learn_event_code);
 		if (n != 13 && n != 11) {
-			fprintf(stderr, ERR_PREFIX "Data module code invalid: %s\n", full_code);
+			fprintf(stderr, ERR_PREFIX "Data module code invalid: %s\n", ref);
 			exit(EXIT_BAD_INPUT);
 		}
 		has_learn = n == 13;
@@ -256,8 +271,6 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 
 	if (opts) {
 		xmlDocPtr doc;
-		xmlNodePtr ref_dmodule;
-		xmlNodePtr ref_ident_and_status_section;
 		xmlNodePtr ref_dm_address;
 		xmlNodePtr ref_dm_ident;
 		xmlNodePtr ref_dm_address_items;
@@ -268,9 +281,7 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 			exit(EXIT_MISSING_FILE);
 		}
 
-		ref_dmodule = xmlDocGetRootElement(doc);
-		ref_ident_and_status_section = find_child(ref_dmodule, "identAndStatusSection");
-		ref_dm_address = find_child(ref_ident_and_status_section, "dmAddress");
+		ref_dm_address = first_xpath_node(doc, NULL, "//dmAddress");
 		ref_dm_ident = find_child(ref_dm_address, "dmIdent");
 		ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
 		ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
@@ -297,6 +308,81 @@ void print_dm_ref(const char *ref, const char *fname, int opts)
 	xmlFreeNode(dm_ref);
 }
 
+#define COM_FMT "COM-%14[^-]-%5s-%4s-%5s-%1s"
+
+void print_com_ref(const char *ref, const char *fname, int opts)
+{
+	char model_ident_code[15]  = "";
+	char sender_ident[6]       = "";
+	char year_of_data_issue[5] = "";
+	char seq_number[6]         = "";
+	char comment_type[2]       = "";
+
+	int n;
+
+	xmlNodePtr comment_ref, comment_ref_ident, comment_code;
+
+	n = sscanf(ref, COM_FMT,
+		model_ident_code,
+		sender_ident,
+		year_of_data_issue,
+		seq_number,
+		comment_type);
+	if (n != 5) {
+		fprintf(stderr, ERR_PREFIX "Comment code invalid: %s\n", ref);
+		exit(EXIT_BAD_INPUT);
+	}
+
+	lowercase(comment_type);
+
+	comment_ref = xmlNewNode(NULL, BAD_CAST "commentRef");
+	comment_ref_ident = xmlNewChild(comment_ref, NULL, BAD_CAST "commentRefIdent", NULL);
+	comment_code = xmlNewChild(comment_ref_ident, NULL, BAD_CAST "commentCode", NULL);
+
+	xmlSetProp(comment_code, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+	xmlSetProp(comment_code, BAD_CAST "senderIdent", BAD_CAST sender_ident);
+	xmlSetProp(comment_code, BAD_CAST "yearOfDataIssue", BAD_CAST year_of_data_issue);
+	xmlSetProp(comment_code, BAD_CAST "seqNumber", BAD_CAST seq_number);
+	xmlSetProp(comment_code, BAD_CAST "commentType", BAD_CAST comment_type);
+
+	if (opts) {
+		xmlDocPtr doc;
+		xmlNodePtr ref_comment_address;
+		xmlNodePtr ref_comment_ident;
+
+		if (!(doc = xmlReadFile(fname, NULL, 0))) {
+			fprintf(stderr, ERR_PREFIX "Could not read file: %s\n", ref);
+			exit(EXIT_MISSING_FILE);
+		}
+
+		ref_comment_address = first_xpath_node(doc, NULL, "//commentAddress");
+		ref_comment_ident = find_child(ref_comment_address, "commentIdent");
+
+		if (hasopt(opts, OPT_LANG)) {
+			xmlAddChild(comment_ref_ident, xmlCopyNode(find_child(ref_comment_ident, "language"), 1));
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	dump_node(comment_ref);
+
+	xmlFreeNode(comment_ref);
+}
+
+void print_icn_ref(const char *ref, const char *fname, int opts)
+{
+	xmlNodePtr info_entity_ref;
+
+	info_entity_ref = xmlNewNode(NULL, BAD_CAST "infoEntityRef");
+
+	xmlSetProp(info_entity_ref, BAD_CAST "infoEntityRefIdent", BAD_CAST ref);
+
+	dump_node(info_entity_ref);
+
+	xmlFreeNode(info_entity_ref);
+}
+
 bool is_pm(const char *ref)
 {
 	return strncmp(ref, "PMC-", 4) == 0 || strncmp(ref, "PME-", 4) == 0;
@@ -307,12 +393,26 @@ bool is_dm(const char *ref)
 	return strncmp(ref, "DMC-", 4) == 0 || strncmp(ref, "DME-", 4) == 0;
 }
 
+bool is_com(const char *ref)
+{
+	return strncmp(ref, "COM-", 4) == 0;
+}
+
+bool is_icn(const char *ref)
+{
+	return strncmp(ref, "ICN-", 4) == 0;
+}
+
 void printref(const char *ref, const char *fname, int opts)
 {
 	if (is_dm(ref)) {
 		print_dm_ref(ref, fname, opts);
 	} else if (is_pm(ref)) {
 		print_pm_ref(ref, fname, opts);
+	} else if (is_com(ref)) {
+		print_com_ref(ref, fname, opts);
+	} else if (is_icn(ref)) {
+		print_icn_ref(ref, fname, opts);
 	}
 }
 
