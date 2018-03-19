@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="14"/>
+        <issueDate year="2018" month="03" day="19"/>
         <dmTitle>
           <techName>s1kd-tools(1) | General Commands Manual</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Rename s1kd-dmref to s1kd-ref.</simplePara>
+        <simplePara>Add s1kd-defaults tool.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -70,8 +70,9 @@
             <sequentialList>
               <listItem>
                 <para><emphasis>Generation:</emphasis> The generation of new CSDB objects is supported by the <emphasis>s1kd-dmrl</emphasis> tool and the <emphasis>s1kd-new*</emphasis> set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new* tools directly.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-defaults</emphasis> tool is used to manage the files which contain default metadata for new CSDB objects.</para>
               </listItem>
-              <listItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItem>
                 <para><emphasis>Authoring:</emphasis> These tools support the authoring process.</para>
                 <para>The <emphasis>s1kd-addicn</emphasis> tool creates the notation and entity elements to reference an ICN in a data module.</para>
                 <para>The <emphasis>s1kd-dmls</emphasis> tool lists data modules within a directory.</para>
@@ -103,7 +104,7 @@
       <levelledPara>
         <title>SEE ALSO</title>
         <para>S1000D website: <externalPubRef><externalPubRefIdent><externalPubTitle>http://www.s1000d.org</externalPubTitle></externalPubRefIdent></externalPubRef></para>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-defaults(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)</para>
       </levelledPara>
     </description>
   </content>

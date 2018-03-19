@@ -28,6 +28,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
 1.  **Generation:** The generation of new CSDB objects is supported by the **s1kd-dmrl** tool and the **s1kd-new\*** set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new\* tools directly.
 
+    The **s1kd-defaults** tool is used to manage the files which contain default metadata for new CSDB objects.
+
 2.  **Authoring:** These tools support the authoring process.
 
     The **s1kd-addicn** tool creates the notation and entity elements to reference an ICN in a data module.
@@ -71,4 +73,4 @@ SEE ALSO
 
 S1000D website: http://www.s1000d.org
 
-s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)
+s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-defaults(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)

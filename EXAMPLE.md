@@ -13,7 +13,11 @@ This first step is to create a folder for the new S1000D project. Example:
     $ mkdir myproject
     $ cd myproject
 
-After that, you should create two files: `defaults` and `dmtypes`.
+After that, you should create two files: `defaults` and `dmtypes`. These files can be created automatically using the **s1kd-defaults** tool to initialize the new CSDB:
+
+    $ s1kd-defaults -i
+
+Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.
 
 `defaults` file
 ---------------
