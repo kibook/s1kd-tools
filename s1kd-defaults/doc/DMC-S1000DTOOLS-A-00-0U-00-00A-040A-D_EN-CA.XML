@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="U" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="03" day="19"/>
+        <dmTitle>
+          <techName>s1kd-defaults(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-defaults - 'defaults' and 'dmtypes' files management tool</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-defaults [-Ddfth?] [&lt;file&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-defaults</emphasis> tool generates a basic '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' and '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' files.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-D</listItemTerm>
+              <listItemDefinition>
+                <para>Convert a '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d</listItemTerm>
+              <listItemDefinition>
+                <para>Convert a '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite the existing file after conversion.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i</listItemTerm>
+              <listItemDefinition>
+                <para>Initialize a new CSDB by generating both the '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' and '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' files in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Output using the simple text format. Otherwise, the XML format is used by default.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;file&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Names of files to convert. If none are specified, the default names of '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' (for the -d option) or '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' (for the -D option) in the current directory are used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Initializing a new CSDB, using the XML format</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ mkdir mycsdb
+$ cd mycsdb
+$ s1kd-defaults -i</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Initializing a new CSDB, using the simple text format</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ mkdir mycsdb
+$ cd mycsdb
+$ s1kd-defaults -ti</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Generating a custom-named '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' file</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults &gt; custom-defaults.xml</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Converting a simple text formatted file to XML</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults -df</verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
