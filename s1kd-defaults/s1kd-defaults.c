@@ -21,13 +21,14 @@ enum file {NONE, DEFAULTS, DMTYPES};
 /* Show the help/usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Ddfth?] [<file>...]");
+	puts("Usage: " PROG_NAME " [-Ddfith?] [<file>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
 	puts("  -D         Convert a dmtypes file.");
 	puts("  -d         Convert a defaults file.");
 	puts("  -f         Overwrite an existing file.");
+	puts("  -i         Initialize a new CSDB.");
 	puts("  -t         Output in the simple text format.");
 }
 
