@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="U" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="19"/>
+        <issueDate year="2018" month="03" day="20"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -s option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-defaults [-Ddfth?] [&lt;file&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-defaults [-Ddfisth?] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -84,16 +87,16 @@
                 <para>Initialize a new CSDB by generating both the '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' and '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' files in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-s</listItemTerm>
+              <listItemDefinition>
+                <para>Sort the entries alphabetically for either file/output format.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
                 <para>Output using the simple text format. Otherwise, the XML format is used by default.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>&lt;file&gt;...</listItemTerm>
-              <listItemDefinition>
-                <para>Names of files to convert. If none are specified, the default names of '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' (for the -d option) or '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' (for the -D option) in the current directory are used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -102,13 +105,19 @@
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;file&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Names of files to convert. If none are specified, the default names of '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' (for the -d option) or '<verbatimText verbatimStyle="vs02">dmtypes</verbatimText>' (for the -D option) in the current directory are used.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLES</title>
         <levelledPara>
-          <title>Initializing a new CSDB, using the XML format</title>
+          <title>Initialize a new CSDB, using the XML format</title>
           <para>
             <verbatimText verbatimStyle="vs24">$ mkdir mycsdb
 $ cd mycsdb
@@ -116,7 +125,7 @@ $ s1kd-defaults -i</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
-          <title>Initializing a new CSDB, using the simple text format</title>
+          <title>Initialize a new CSDB, using the simple text format</title>
           <para>
             <verbatimText verbatimStyle="vs24">$ mkdir mycsdb
 $ cd mycsdb
@@ -124,15 +133,21 @@ $ s1kd-defaults -ti</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
-          <title>Generating a custom-named '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' file</title>
+          <title>Generate a custom-named '<verbatimText verbatimStyle="vs02">defaults</verbatimText>' file</title>
           <para>
             <verbatimText verbatimStyle="vs24">$ s1kd-defaults &gt; custom-defaults.xml</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
-          <title>Converting a simple text formatted file to XML</title>
+          <title>Convert a simple text formatted file to XML</title>
           <para>
             <verbatimText verbatimStyle="vs24">$ s1kd-defaults -df</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Sort entries and output in text format</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults -dts custom-defaults.txt</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

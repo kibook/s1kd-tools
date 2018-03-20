@@ -21,7 +21,7 @@ enum file {NONE, DEFAULTS, DMTYPES};
 /* Show the help/usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Ddfith?] [<file>...]");
+	puts("Usage: " PROG_NAME " [-Ddfisth?] [<file>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
@@ -29,6 +29,7 @@ void show_help(void)
 	puts("  -d         Convert a defaults file.");
 	puts("  -f         Overwrite an existing file.");
 	puts("  -i         Initialize a new CSDB.");
+	puts("  -s         Sort entries.");
 	puts("  -t         Output in the simple text format.");
 }
 
@@ -45,6 +46,12 @@ xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 	xsltFreeStylesheet(style);
 
 	return res;
+}
+
+/* Sort entries in defaults/dmtypes files. */
+xmlDocPtr sort_entries(xmlDocPtr doc)
+{
+	return transform_doc(doc, xsl_sort_xsl, xsl_sort_xsl_len);
 }
 
 /* Convert XML defaults to the simple text version. */
@@ -66,6 +73,14 @@ xmlDocPtr text_defaults_to_xml(const char *path)
 	char line[1024];
 	xmlDocPtr doc;
 	xmlNodePtr defaults;
+
+	if (!path) {
+		return NULL;
+	}
+
+	if ((doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+		return doc;
+	}
 
 	if (strcmp(path, "-") == 0) {
 		f = stdin;
@@ -101,6 +116,10 @@ xmlDocPtr text_dmtypes_to_xml(const char *path)
 	char line[1024];
 	xmlDocPtr doc;
 	xmlNodePtr dmtypes;
+
+	if ((doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+		return doc;
+	}
 
 	if (strcmp(path, "-") == 0) {
 		f = stdin;
@@ -217,24 +236,47 @@ void dump_defaults_text(const char *fname, bool overwrite)
 	xmlFreeDoc(doc);
 }
 
-/* Convert an XML defaults/dmtypes file to the simple text version. */
-void xml_to_text(const char *path, bool overwrite)
+xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort)
 {
-	xmlDocPtr doc, res;
-	const xmlChar *name;
+	xmlDocPtr doc;
 
-	doc = xmlReadFile(path, NULL, 0);
-
-	if (!doc) {
-		return;
+	switch (f) {
+		case NONE:
+		case DEFAULTS:
+			doc = text_defaults_to_xml(path);
+			break;
+		case DMTYPES:
+			doc = text_dmtypes_to_xml(path);
+			break;
 	}
 
-	name = xmlDocGetRootElement(doc)->name;
+	if (sort) {
+		xmlDocPtr res;
+		res = sort_entries(doc);
+		xmlFreeDoc(doc);
+		doc = res;
+	}
 
-	if (xmlStrcmp(name, BAD_CAST "defaults") == 0) {
-		res = xml_defaults_to_text(doc);
-	} else {
-		res = xml_dmtypes_to_text(doc);
+	return doc;
+}
+
+/* Convert an XML defaults/dmtypes file to the simple text version. */
+void xml_to_text(const char *path, enum file f, bool overwrite, bool sort)
+{
+	xmlDocPtr doc, res;
+
+	if (!(doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+		doc = simple_text_to_xml(path, f, sort);
+	}
+
+	switch (f) {
+		case NONE:
+		case DEFAULTS:
+			res = xml_defaults_to_text(doc);
+			break;
+		case DMTYPES:
+			res = xml_dmtypes_to_text(doc);
+			break;
 	}
 
 	if (res->children) {
@@ -256,18 +298,17 @@ void xml_to_text(const char *path, bool overwrite)
 }
 
 /* Convert a simple text defaults/dmtypes file to the XML version. */
-void text_to_xml(const char *path, enum file f, bool overwrite)
+void text_to_xml(const char *path, enum file f, bool overwrite, bool sort)
 {
 	xmlDocPtr doc;
 
-	switch (f) {
-		case NONE: return;
-		case DEFAULTS:
-			doc = text_defaults_to_xml(path);
-			break;
-		case DMTYPES:
-			doc = text_dmtypes_to_xml(path);
-			break;
+	doc = simple_text_to_xml(path, f, sort);
+
+	if (sort) {
+		xmlDocPtr res;
+		res = sort_entries(doc);
+		xmlFreeDoc(doc);
+		doc = res;
 	}
 
 	if (overwrite) {
@@ -279,19 +320,19 @@ void text_to_xml(const char *path, enum file f, bool overwrite)
 	xmlFreeDoc(doc);
 }
 
-void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite)
+void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort)
 {
 	if (fmt == TEXT) {
 		if (f == NONE) {
-			dump_defaults_xml(fname, overwrite);
+			dump_defaults_text(fname, overwrite);
 		} else {
-			xml_to_text(fname, overwrite);
+			xml_to_text(fname, f, overwrite, sort);
 		}
 	} else if (fmt == XML) {
 		if (f == NONE) {
 			dump_defaults_xml(fname, overwrite);
 		} else {
-			text_to_xml(fname, f, overwrite);
+			text_to_xml(fname, f, overwrite, sort);
 		}
 	}
 }
@@ -304,8 +345,9 @@ int main(int argc, char **argv)
 	char *fname = NULL;
 	bool overwrite = false;
 	bool initialize = false;
+	bool sort = false;
 
-	while ((i = getopt(argc, argv, "Ddfith?")) != -1) {
+	while ((i = getopt(argc, argv, "Ddfisth?")) != -1) {
 		switch (i) {
 			case 'D':
 				f = DMTYPES;
@@ -320,6 +362,9 @@ int main(int argc, char **argv)
 				break;
 			case 'i':
 				initialize = true;
+				break;
+			case 's':
+				sort = true;
 				break;
 			case 't':
 				fmt = TEXT;
@@ -341,10 +386,10 @@ int main(int argc, char **argv)
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			convert_or_dump(fmt, f, argv[i], overwrite);
+			convert_or_dump(fmt, f, argv[i], overwrite, sort);
 		}
 	} else {
-		convert_or_dump(fmt, f, fname, overwrite);
+		convert_or_dump(fmt, f, fname, overwrite, sort);
 	}
 
 	free(fname);

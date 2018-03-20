@@ -6,7 +6,7 @@ s1kd-defaults - 'defaults' and 'dmtypes' files management tool
 SYNOPSIS
 ========
 
-    s1kd-defaults [-Ddfth?] [<file>...]
+    s1kd-defaults [-Ddfisth?] [<file>...]
 
 DESCRIPTION
 ===========
@@ -28,38 +28,46 @@ Overwrite the existing file after conversion.
 -i  
 Initialize a new CSDB by generating both the '`defaults`' and '`dmtypes`' files in the current directory.
 
+-s  
+Sort the entries alphabetically for either file/output format.
+
 -t  
 Output using the simple text format. Otherwise, the XML format is used by default.
-
-&lt;file&gt;...  
-Names of files to convert. If none are specified, the default names of '`defaults`' (for the -d option) or '`dmtypes`' (for the -D option) in the current directory are used.
 
 -h -?  
 Show help/usage message.
 
+&lt;file&gt;...  
+Names of files to convert. If none are specified, the default names of '`defaults`' (for the -d option) or '`dmtypes`' (for the -D option) in the current directory are used.
+
 EXAMPLES
 ========
 
-Initializing a new CSDB, using the XML format
----------------------------------------------
+Initialize a new CSDB, using the XML format
+-------------------------------------------
 
     $ mkdir mycsdb
     $ cd mycsdb
     $ s1kd-defaults -i
 
-Initializing a new CSDB, using the simple text format
------------------------------------------------------
+Initialize a new CSDB, using the simple text format
+---------------------------------------------------
 
     $ mkdir mycsdb
     $ cd mycsdb
     $ s1kd-defaults -ti
 
-Generating a custom-named '`defaults`' file
--------------------------------------------
+Generate a custom-named '`defaults`' file
+-----------------------------------------
 
     $ s1kd-defaults > custom-defaults.xml
 
-Converting a simple text formatted file to XML
-----------------------------------------------
+Convert a simple text formatted file to XML
+-------------------------------------------
 
     $ s1kd-defaults -df
+
+Sort entries and output in text format
+--------------------------------------
+
+    $ s1kd-defaults -dts custom-defaults.txt

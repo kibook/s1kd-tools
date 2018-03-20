@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <defaults>
-  <default ident="countryIsoCode" value="ZZ"/>
-  <default ident="languageIsoCode" value="und"/>
+  <default ident="countryIsoCode" value="CA"/>
   <default ident="inWork" value="01"/>
   <default ident="issueNumber" value="000"/>
+  <default ident="languageIsoCode" value="en"/>
   <default ident="securityClassification" value="01"/>
 </defaults>
