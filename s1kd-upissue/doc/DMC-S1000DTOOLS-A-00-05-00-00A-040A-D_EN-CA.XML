@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="5" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="23"/>
+        <issueDate year="2018" month="03" day="20"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,8 +40,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -d option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,8 +53,8 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
-          <verbatimText verbatimStyle="vs24">s1kd-upissue [-viNrRqI] [-1 &lt;type&gt;] [-2 &lt;type&gt;] [-s &lt;status&gt;] &lt;files&gt;</verbatimText>
+        <para>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-upissue [-dviNrRqI] [-1 &lt;type&gt;] [-2 &lt;type&gt;] [-s &lt;status&gt;] &lt;files&gt;</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -65,7 +65,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-1 &lt;type&gt;</listItemTerm>
               <listItemDefinition>
@@ -76,6 +76,12 @@
               <listItemTerm>-2 &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set second verification type (tabtop, onobject, ttandoo).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-d</listItemTerm>
+              <listItemDefinition>
+                <para>Do not actually create or modify any files, only print the name of the file that would be created or modified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

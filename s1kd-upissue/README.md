@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-viNrRqI] [-1 <type>] [-2 <type>] [-s <status>] <files>
+    s1kd-upissue [-dviNrRqI] [-1 <type>] [-2 <type>] [-s <status>] <files>
 
 DESCRIPTION
 ===========
@@ -23,6 +23,9 @@ Set first verification type (tabtop, onobject, ttandoo).
 
 -2 &lt;type&gt;  
 Set second verification type (tabtop, onobject, ttandoo).
+
+-d  
+Do not actually create or modify any files, only print the name of the file that would be created or modified.
 
 -I  
 Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.

@@ -16,9 +16,10 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-viNrRqI] [-s <status>] [-1 <type>] [-2 <type>] <datamodules>");
+	puts("Usage: " PROG_NAME " [-dviNrRqI] [-s <status>] [-1 <type>] [-2 <type>] <datamodules>");
 	putchar('\n');
 	puts("Options:");
+	puts("  -d           Do not write anything, only print new filename.");
 	puts("  -v           Print filename of upissued data module");
 	puts("  -i           Create a new issue of the data module");
 	puts("  -N           Omit issue/inwork numbers from filename");
@@ -261,6 +262,7 @@ int main(int argc, char **argv)
 	bool set_date = true;
 	bool only_assoc_rfus = false;
 	bool set_unverif = true;
+	bool dry_run = false;
 
 	xmlChar *issno_name, *inwork_name;
 	bool iss30 = false;
@@ -268,7 +270,7 @@ int main(int argc, char **argv)
 	char *firstver = NULL;
 	char *secondver = NULL;
 
-	while ((c = getopt(argc, argv, "ivs:NfrRIq1:2:h?")) != -1) {
+	while ((c = getopt(argc, argv, "ivs:NfrRIq1:2:dh?")) != -1) {
 		switch (c) {
 			case 'i':
 				newissue = true;
@@ -303,6 +305,10 @@ int main(int argc, char **argv)
 				break;
 			case '2':
 				secondver = strdup(optarg);
+				break;
+			case 'd':
+				dry_run = true;
+				verbose = true;
 				break;
 			case 'h':
 			case '?':
@@ -444,15 +450,17 @@ int main(int argc, char **argv)
 			strncpy(i + 4, upissued_inWork, 2);
 		}
 
-		if (!overwrite && access(dmfile, F_OK) != -1) {
-			fprintf(stderr, ERR_PREFIX "%s already exists.\n", dmfile);
-			exit(EXIT_NO_OVERWRITE);
-		}
+		if (!dry_run) {
+			if (!overwrite && access(dmfile, F_OK) != -1) {
+				fprintf(stderr, ERR_PREFIX "%s already exists.\n", dmfile);
+				exit(EXIT_NO_OVERWRITE);
+			}
 
-		if (dmdoc) {
-			xmlSaveFormatFile(dmfile, dmdoc, 1);
-		} else { /* Copy non-XML file */
-			copy(cpfile, dmfile);
+			if (dmdoc) {
+				xmlSaveFormatFile(dmfile, dmdoc, 1);
+			} else { /* Copy non-XML file */
+				copy(cpfile, dmfile);
+			}
 		}
 
 		if (verbose) {
