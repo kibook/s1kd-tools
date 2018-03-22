@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
+#ifdef _WIN32
+#include <string.h>
+#endif
 #include <libxml/tree.h>
 #include <libxml/debugXML.h>
 #include <libxslt/xslt.h>
@@ -16,7 +19,9 @@ void showHelp(void)
 	puts("  -s       Output s1kd-new* commands only.");
 	puts("  -N       Omit issue/inwork numbers.");
 	puts("  -f       Overwrite existing CSDB objects.");
+	#ifndef _WIN32
 	puts("  -F       Fail on first error from s1kd-new* commands.");
+	#endif
 	puts("  -h -?    Show usage message.");
 }
 
@@ -28,7 +33,9 @@ int main(int argc, char **argv)
 	int err = 0;
 	bool execute = true;
 	bool noIssue = false;
+	#ifndef _WIN32
 	bool failOnFirstErr = false;
+	#endif
 	bool overwrite = false;
 
 	dmrl = xmlReadMemory((const char *) dmrl_xsl, dmrl_xsl_len, NULL, NULL, 0);
@@ -45,9 +52,11 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
+			#ifndef _WIN32
 			case 'F':
 				failOnFirstErr = true;
 				break;
+			#endif
 			case 'h':
 			case '?':
 				showHelp();
@@ -75,6 +84,16 @@ int main(int argc, char **argv)
 		content = xmlNodeGetContent(out->children);
 
 		if (execute) {
+			#ifdef _WIN32
+			/* FIXME: Implement alternative to fmemopen and
+			 * WEXITSTATUS in order to use the -F ("fail on first
+			 * error") option on a Windows system.
+			 */
+			char *line = NULL;
+			while ((line = strtok(line ? NULL : (char *) content, "\n"))) {
+				system(line);
+			}
+			#else
 			FILE *lines;
 			char line[LINE_MAX];
 
@@ -84,6 +103,7 @@ int main(int argc, char **argv)
 				if ((err += WEXITSTATUS(system(line))) != 0 && failOnFirstErr) break;
 
 			fclose(lines);
+			#endif
 		} else {
 			fputs((char *) content, stdout);
 		}
