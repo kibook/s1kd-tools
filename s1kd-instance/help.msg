@@ -5,8 +5,8 @@ Usage: s1kd-instance [-s <source>] [-e <ext>|-E] [-c <dmc>] [-l <lang>]
                      [-R <CIR> ...] [-S] [-v] [<applic>...]
 
 Options:
-  -A            Remove unused applicability annotations and simplify statements.
-  -a            Remove unused applicability annotations but not statements.
+  -A            Simplify and remove unused applicability annotations.
+  -a            Only remove unused applicability annotation references.
   -C <comment>  Add an XML comment to the top of the data module instance.
   -c <DMC>      The new data module code of the data module instance.
   -E            Remove extension from instance.
@@ -37,4 +37,4 @@ Options:
   -x <CIR>      Dump default XSLT for resolving CIR references.
   -Y <text>     Set applic for DM with text as the display text.
   -y            Set applic for DM based on the user-defined defs.
-  <applic>...   Any number of applic defs in the form of <ident>:<type>=<value>
+  <applic>...   Any number of assigns in the form of <ident>:<type>=<value>
