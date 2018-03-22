@@ -12,7 +12,7 @@ Options:
   -E            Remove extension from instance.
   -e <ext>      Specify an extension on the data module code (DME).
   -F            Flatten alts elements.
-  -f            Overwrite file with same name as automatic output, if it exists.
+  -f            When using -O, overwrite file with same name if it exists.
   -G            Use custom NCAGE/name for originator.
   -g            Set originator of the instance to identify this tool.
   -h -?         Show this help/usage message.
