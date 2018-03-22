@@ -101,6 +101,10 @@ enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
+/* ISO language and country codes if none can be determined. */
+#define DEFAULT_LANGUAGE_ISO_CODE "und"
+#define DEFAULT_COUNTRY_ISO_CODE "ZZ"
+
 char *template_dir = NULL;
 
 enum issue get_issue(const char *iss)
@@ -854,14 +858,50 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+/* Dump the built-in dmtypes XML or text */
 void print_dmtypes(void)
 {
 	printf("%.*s", dmtypes_xml_len, dmtypes_xml);
 }
-
 void print_dmtypes_txt(void)
 {
 	printf("%.*s", dmtypes_txt_len, dmtypes_txt);
+}
+
+/* Try reading the ISO language and country codes from the environment,
+ * otherwise default to "und" (undetermined) for language and ZZ for
+ * country.
+ */
+void set_env_lang(void)
+{
+	char *env, *lang, *lang_l, *lang_c;
+
+	if (!(env = getenv("LANG"))) {
+		strcpy(languageIsoCode, DEFAULT_LANGUAGE_ISO_CODE);
+		strcpy(countryIsoCode, DEFAULT_COUNTRY_ISO_CODE);
+		return;
+	}
+
+	lang = strdup(env);
+	lang_l = strtok(lang, "_");
+	lang_c = strtok(NULL, ".");
+
+	if (strcmp(languageIsoCode, "") == 0) {
+		if (lang_l) {
+			strncpy(languageIsoCode, lang_l, 3);
+		} else {
+			strcpy(languageIsoCode, DEFAULT_LANGUAGE_ISO_CODE);
+		}
+	}
+	if (strcmp(countryIsoCode, "") == 0) {
+		if (lang_c) {
+			strncpy(countryIsoCode, lang_c, 2);
+		} else {
+			strcpy(countryIsoCode, DEFAULT_COUNTRY_ISO_CODE);
+		}
+	}
+
+	free(lang);
 }
 
 int main(int argc, char **argv)
@@ -904,8 +944,6 @@ int main(int argc, char **argv)
 	char *out = NULL;
 
 	xmlDocPtr defaults_xml;
-
-	char *lang, *lang_l, *lang_c;
 
 	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:h?")) != -1) {
 		switch (c) {
@@ -1108,29 +1146,7 @@ int main(int argc, char **argv)
 	if (strcmp(inWork, "") == 0) strcpy(inWork, "01");
 	if (strcmp(securityClassification, "") == 0) strcpy(securityClassification, "01");
 
-	/* Try reading the ISO language and country codes from the environment,
-	 * otherwise default to "und" (undetermined) for language and ZZ for
-	 * country.
-	 */
-	lang = strdup(getenv("LANG"));
-	lang_l = strtok(lang, "_");
-	lang_c = strtok(NULL, ".");
-	if (strcmp(languageIsoCode, "") == 0) {
-		if (lang_l) {
-			strncpy(languageIsoCode, lang_l, 3);
-		} else {
-			strcpy(languageIsoCode, "und");
-		}
-	}
-	if (strcmp(countryIsoCode, "") == 0) {
-		if (lang_c) {
-			strncpy(countryIsoCode, lang_c, 2);
-		} else {
-			strcpy(countryIsoCode, "ZZ");
-		}
-	}
-	free(lang);
-
+	set_env_lang();
 	for (i = 0; languageIsoCode[i]; ++i) {
 		languageIsoCode[i] = tolower(languageIsoCode[i]);
 	}

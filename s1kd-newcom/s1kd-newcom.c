@@ -59,6 +59,9 @@ char issue_date[16] = "";
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
+#define DEFAULT_LANGUAGE_ISO_CODE "und"
+#define DEFAULT_COUNTRY_ISO_CODE "ZZ"
+
 enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 char *template_dir = NULL;
@@ -364,6 +367,42 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
+/* Try reading the ISO language and country codes from the environment,
+ * otherwise default to "und" (undetermined) for language and ZZ for
+ * country.
+ */
+void set_env_lang(void)
+{
+	char *env, *lang, *lang_l, *lang_c;
+
+	if (!(env = getenv("LANG"))) {
+		strcpy(languageIsoCode, DEFAULT_LANGUAGE_ISO_CODE);
+		strcpy(countryIsoCode, DEFAULT_COUNTRY_ISO_CODE);
+		return;
+	}
+
+	lang = strdup(env);
+	lang_l = strtok(lang, "_");
+	lang_c = strtok(NULL, ".");
+
+	if (strcmp(languageIsoCode, "") == 0) {
+		if (lang_l) {
+			strncpy(languageIsoCode, lang_l, 3);
+		} else {
+			strcpy(languageIsoCode, DEFAULT_LANGUAGE_ISO_CODE);
+		}
+	}
+	if (strcmp(countryIsoCode, "") == 0) {
+		if (lang_c) {
+			strncpy(countryIsoCode, lang_c, 2);
+		} else {
+			strcpy(countryIsoCode, DEFAULT_COUNTRY_ISO_CODE);
+		}
+	}
+
+	free(lang);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr comment_doc;
@@ -402,8 +441,6 @@ int main(int argc, char **argv)
 	char *out = NULL;
 
 	xmlDocPtr defaults_xml;
-
-	char *lang, *lang_l, *lang_c;
 
 	int i;
 
@@ -549,31 +586,10 @@ int main(int argc, char **argv)
 	if (strcmp(responseType, "") == 0) strcpy(responseType, "rt02");
 	if (strcmp(commentPriorityCode, "") == 0) strcpy(commentPriorityCode, "cp01");
 
-	/* Try reading the ISO language and country codes from the environment,
-	 * otherwise default to "und" (undetermined) for language and ZZ for
-	 * country.
-	 */
-	lang = strdup(getenv("LANG"));
-	lang_l = strtok(lang, "_");
-	lang_c = strtok(NULL, ".");
-	if (strcmp(languageIsoCode, "") == 0) {
-		if (lang_l) {
-			strncpy(languageIsoCode, lang_l, 3);
-		} else {
-			strcpy(languageIsoCode, "und");
-		}
-	}
-	if (strcmp(countryIsoCode, "") == 0) {
-		if (lang_c) {
-			strncpy(countryIsoCode, lang_c, 2);
-		} else {
-			strcpy(countryIsoCode, "ZZ");
-		}
-	}
-	free(lang);
-
+	set_env_lang();
 	for (i = 0; languageIsoCode[i]; ++i) languageIsoCode[i] = tolower(languageIsoCode[i]);
 	for (i = 0; countryIsoCode[i]; ++i) countryIsoCode[i] = toupper(countryIsoCode[i]);
+
 	for (i = 0; commentType[i]; ++i) commentType[i] = tolower(commentType[i]);
 
 	comment = xmlDocGetRootElement(comment_doc);

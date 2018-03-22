@@ -61,6 +61,9 @@ char issue_date[16] = "";
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
+#define DEFAULT_LANGUAGE_ISO_CODE "und"
+#define DEFAULT_COUNTRY_ISO_CODE "ZZ"
+
 enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 char *template_dir = NULL;
@@ -425,6 +428,42 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
+/* Try reading the ISO language and country codes from the environment,
+ * otherwise default to "und" (undetermined) for language and ZZ for
+ * country.
+ */
+void set_env_lang(void)
+{
+	char *env, *lang, *lang_l, *lang_c;
+
+	if (!(env = getenv("LANG"))) {
+		strcpy(language_iso_code, DEFAULT_LANGUAGE_ISO_CODE);
+		strcpy(country_iso_code, DEFAULT_COUNTRY_ISO_CODE);
+		return;
+	}
+
+	lang = strdup(env);
+	lang_l = strtok(lang, "_");
+	lang_c = strtok(NULL, ".");
+
+	if (strcmp(language_iso_code, "") == 0) {
+		if (lang_l) {
+			strncpy(language_iso_code, lang_l, 3);
+		} else {
+			strcpy(language_iso_code, DEFAULT_LANGUAGE_ISO_CODE);
+		}
+	}
+	if (strcmp(country_iso_code, "") == 0) {
+		if (lang_c) {
+			strncpy(country_iso_code, lang_c, 2);
+		} else {
+			strcpy(country_iso_code, DEFAULT_COUNTRY_ISO_CODE);
+		}
+	}
+
+	free(lang);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;
@@ -460,8 +499,6 @@ int main(int argc, char **argv)
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
-
-	char *lang, *lang_l, *lang_c;
 
 	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:@:%:h?")) != -1) {
 		switch (c) {
@@ -574,29 +611,7 @@ int main(int argc, char **argv)
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
 
-	/* Try reading the ISO language and country codes from the environment,
-	 * otherwise default to "und" (undetermined) for language and ZZ for
-	 * country.
-	 */
-	lang = strdup(getenv("LANG"));
-	lang_l = strtok(lang, "_");
-	lang_c = strtok(NULL, ".");
-	if (strcmp(language_iso_code, "") == 0) {
-		if (lang_l) {
-			strncpy(language_iso_code, lang_l, 3);
-		} else {
-			strcpy(language_iso_code, "und");
-		}
-	}
-	if (strcmp(country_iso_code, "") == 0) {
-		if (lang_c) {
-			strncpy(country_iso_code, lang_c, 2);
-		} else {
-			strcpy(country_iso_code, "ZZ");
-		}
-	}
-	free(lang);
-
+	set_env_lang();
 	for (i = 0; language_iso_code[i]; ++i) {
 		language_iso_code[i] = tolower(language_iso_code[i]);
 	}
