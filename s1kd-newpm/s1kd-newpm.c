@@ -437,8 +437,12 @@ void set_env_lang(void)
 	char *env, *lang, *lang_l, *lang_c;
 
 	if (!(env = getenv("LANG"))) {
-		strcpy(language_iso_code, DEFAULT_LANGUAGE_ISO_CODE);
-		strcpy(country_iso_code, DEFAULT_COUNTRY_ISO_CODE);
+		if (strcmp(language_iso_code, "") == 0) {
+			strcpy(language_iso_code, DEFAULT_LANGUAGE_ISO_CODE);
+		}
+		if (strcmp(country_iso_code, "") == 0) {
+			strcpy(country_iso_code, DEFAULT_COUNTRY_ISO_CODE);
+		}
 		return;
 	}
 
