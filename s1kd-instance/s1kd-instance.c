@@ -1322,6 +1322,8 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 
 			define_applic(ident, type, value);
 
+			napplics++;
+
 			xmlFree(ident);
 			xmlFree(type);
 			xmlFree(value);
