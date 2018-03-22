@@ -177,21 +177,25 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 /* Obtain some defaults values from the environment. */
 void set_defaults(xmlDocPtr doc)
 {
-	char *lang, *lang_l, *lang_c;
-	xmlNodePtr liso, ciso;
+	char *env;
 
-	lang = strdup(getenv("LANG"));
-	lang_l = strtok(lang, "_");
-	lang_c = strtok(NULL, ".");
+	if ((env = getenv("LANG"))) {
+		char *lang, *lang_l, *lang_c;
+		xmlNodePtr liso, ciso;
 
-	liso = first_xpath_node(doc, NULL, "//default[@ident = 'languageIsoCode']");
-	ciso = first_xpath_node(doc, NULL, "//default[@ident = 'countryIsoCode']");
-	
-	if (lang_l) {
-		xmlSetProp(liso, BAD_CAST "value", BAD_CAST lang_l);
-	}
-	if (lang_c) {
-		xmlSetProp(ciso, BAD_CAST "value", BAD_CAST lang_c);
+		lang = strdup(env);
+		lang_l = strtok(lang, "_");
+		lang_c = strtok(NULL, ".");
+
+		liso = first_xpath_node(doc, NULL, "//default[@ident = 'languageIsoCode']");
+		ciso = first_xpath_node(doc, NULL, "//default[@ident = 'countryIsoCode']");
+
+		if (lang_l) {
+			xmlSetProp(liso, BAD_CAST "value", BAD_CAST lang_l);
+		}
+		if (lang_c) {
+			xmlSetProp(ciso, BAD_CAST "value", BAD_CAST lang_c);
+		}
 	}
 }
 
