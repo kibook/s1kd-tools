@@ -37,4 +37,4 @@ Default: /usr/local/share/man/man1
 
 For example:
 
-    $ make INSTALL_PREFIX=/usr/local/bin
+    $ make INSTALL_PREFIX=/usr/local/bin install

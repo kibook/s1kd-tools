@@ -99,7 +99,7 @@
         </para>
         <para>For example:</para>
         <para>
-          <verbatimText verbatimStyle="vs24">$ make INSTALL_PREFIX=/usr/local/bin</verbatimText>
+          <verbatimText verbatimStyle="vs24">$ make INSTALL_PREFIX=/usr/local/bin install</verbatimText>
         </para>
       </levelledPara>
     </description>
