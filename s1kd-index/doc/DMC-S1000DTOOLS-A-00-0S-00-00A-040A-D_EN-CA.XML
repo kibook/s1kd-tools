@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="S" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="03" day="22"/>
+        <dmTitle>
+          <techName>s1kd-index(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-index - Flag index keywords in a data module</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-index [-fih?] [-I &lt;index&gt;] [&lt;module&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-index</emphasis> tool adds index flags to a data module based on a user-defined set of keywords.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite input module(s).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;index&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Flag the terms in the specified &lt;index&gt; XML file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i</listItemTerm>
+              <listItemDefinition>
+                <para>Ignore case when flagging terms.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>Given the following in a data module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
+<title>General</title>
+<para>The s1kd-tools are a set of small tools for manipulating S1000D XML data.</para>
+</levelledPara>]]></verbatimText>
+        </para>
+        <para>And the following index file:</para>
+        <para>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<index>
+<indexFlag indexLevelOne="S1000D"/>
+<indexFlag indexLevelTwo="S10000D" indexLevelTwo="s1kd-tools"/>
+<indexFlag indexLevelOne="data"/>
+<indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
+</index>]]></verbatimText>
+        </para>
+        <para>Then the s1kd-index command:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-index -I &lt;INDEX&gt;.XML &lt;DM&gt;.XML</verbatimText>
+        </para>
+        <para>Would result in the following:</para>
+        <para>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
+<title>General</title>
+<para>The s1kd-tools<indexFlag indexLevelOne="S1000D" indexLevelTwo="s1kd-tools"/> are a set of small tools for manipulating S1000D<indexFlag indexLevelOne="S1000D"/> XML<indexFlag indexLevelOne="data" indexLevelTwo="XML"/> data<indexFlag indexLevelOne="data"/>.</para>
+</levelledPara>]]></verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

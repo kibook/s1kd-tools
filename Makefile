@@ -7,9 +7,9 @@ all:
 	$(MAKE) -C s1kd-checkrefs
 	$(MAKE) -C s1kd-defaults
 	$(MAKE) -C s1kd-dmls
-	$(MAKE) -C s1kd-ref
 	$(MAKE) -C s1kd-dmrl
 	$(MAKE) -C s1kd-flatten
+	$(MAKE) -C s1kd-index
 	$(MAKE) -C s1kd-instance
 	$(MAKE) -C s1kd-metadata
 	$(MAKE) -C s1kd-neutralize
@@ -19,6 +19,7 @@ all:
 	$(MAKE) -C s1kd-newdml
 	$(MAKE) -C s1kd-newimf
 	$(MAKE) -C s1kd-newpm
+	$(MAKE) -C s1kd-ref
 	$(MAKE) -C s1kd-refls
 	$(MAKE) -C s1kd-syncrefs
 	$(MAKE) -C s1kd-transform
@@ -34,9 +35,9 @@ clean:
 	$(MAKE) -C s1kd-checkrefs clean
 	$(MAKE) -C s1kd-defaults clean
 	$(MAKE) -C s1kd-dmls clean
-	$(MAKE) -C s1kd-ref clean
 	$(MAKE) -C s1kd-dmrl clean
 	$(MAKE) -C s1kd-flatten clean
+	$(MAKE) -C s1kd-index clean
 	$(MAKE) -C s1kd-instance clean
 	$(MAKE) -C s1kd-metadata clean
 	$(MAKE) -C s1kd-neutralize clean
@@ -46,6 +47,7 @@ clean:
 	$(MAKE) -C s1kd-newdml clean
 	$(MAKE) -C s1kd-newimf clean
 	$(MAKE) -C s1kd-newpm clean
+	$(MAKE) -C s1kd-ref clean
 	$(MAKE) -C s1kd-refls clean
 	$(MAKE) -C s1kd-syncrefs clean
 	$(MAKE) -C s1kd-transform clean
@@ -61,9 +63,9 @@ install:
 	$(MAKE) -C s1kd-checkrefs install
 	$(MAKE) -C s1kd-defaults install
 	$(MAKE) -C s1kd-dmls install
-	$(MAKE) -C s1kd-ref install
 	$(MAKE) -C s1kd-dmrl install
 	$(MAKE) -C s1kd-flatten install
+	$(MAKE) -C s1kd-index install
 	$(MAKE) -C s1kd-instance install
 	$(MAKE) -C s1kd-metadata install
 	$(MAKE) -C s1kd-neutralize install
@@ -73,6 +75,7 @@ install:
 	$(MAKE) -C s1kd-newdml install
 	$(MAKE) -C s1kd-newimf install
 	$(MAKE) -C s1kd-newpm install
+	$(MAKE) -C s1kd-ref install
 	$(MAKE) -C s1kd-refls install
 	$(MAKE) -C s1kd-syncrefs install
 	$(MAKE) -C s1kd-transform install

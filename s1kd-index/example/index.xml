@@ -1,0 +1,6 @@
+<index>
+  <indexFlag indexLevelOne="data"/>
+  <indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
+  <indexFlag indexLevelOne="S1000D"/>
+  <indexFlag indexLevelOne="S1000D" indexLevelTwo="s1kd-tools"/>
+</index>
