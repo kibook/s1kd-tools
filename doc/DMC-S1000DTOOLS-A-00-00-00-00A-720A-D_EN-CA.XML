@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="720" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="03" day="23"/>
+        <dmTitle>
+          <techName>s1kd-tools</techName>
+          <infoName>Install procedure</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>Requirements</title>
+        <para>To build the executables:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>coreutils and binutils</para>
+            </listItem>
+            <listItem>
+              <para>xxd</para>
+            </listItem>
+          </randomList>
+        </para>
+        <para>To build the documentation from source:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>s1kd2db XSLT script</para>
+            </listItem>
+            <listItem>
+              <para>pandoc</para>
+            </listItem>
+          </randomList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>Building the executables</title>
+        <para>Run the following commands to build the executables, and install both the executables and documentation:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ make
+# make install</verbatimText>
+        </para>
+        <para>To change where these are installed, specify either of the following make variables:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>INSTALL_PREFIX</listItemTerm>
+              <listItemDefinition>
+                <para>Prefix where the executables will be installed.</para>
+                <para>Default: /usr/bin</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>MAN_PREFIX</listItemTerm>
+              <listItemDefinition>
+                <para>Prefix where the manpages will be installed.</para>
+                <para>Default: /usr/local/share/man/man1</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>For example:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ make INSTALL_PREFIX=/usr/local/bin</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

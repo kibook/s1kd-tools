@@ -1,35 +1,47 @@
-SOURCE1=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
-SOURCE2=DMC-S1000DTOOLS-A-00-00-00-00A-018A-D_EN-CA.XML
-SOURCE3=DMC-S1000DTOOLS-A-00-00-00-00A-014A-D_EN-CA.XML
-
-OUTPUT1=../README.md
-OUTPUT2=../INTRO.md
-OUTPUT3=../DEFAULTS.md
-
+README_SRC=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
+INTRO_SRC=DMC-S1000DTOOLS-A-00-00-00-00A-018A-D_EN-CA.XML
+DEFAULTS_SRC=DMC-S1000DTOOLS-A-00-00-00-00A-014A-D_EN-CA.XML
+INSTALL_SRC=DMC-S1000DTOOLS-A-00-00-00-00A-720A-D_EN-CA.XML
 EXAMPLE_SRC=DMC-S1000DTOOLS-A-00-00-00-00A-130A-D_EN-CA.XML
-EXAMPLE_OUT=../EXAMPLE.md
+
+README=../README.md
+INTRO=../INTRO.md
+DEFAULTS=../DEFAULTS.md
+INSTALL=../INSTALL.md
+EXAMPLE=../EXAMPLE.md
+
+S1KD2DB=s1kd2db
+S1KD2DB_FLAGS+=-param include.emphasis.role 1
+
+PANDOC_MD=pandoc -f docbook -t markdown_github -s
+PANDOC_MAN=pandoc -f docbook -t man -s
+
+MANPAGE=s1kd-tools.1
 
 MAN_PREFIX=/usr/local/share/man/man1
 
-all: s1kd-tools.1
+all: $(MANPAGE)
 
-$(OUTPUT1): $(SOURCE1)
-	s1kd2db $(SOURCE1) | pandoc -f docbook -t markdown_github -s -o $@
+$(README): $(README_SRC)
+	$(S1KD2DB) $(README_SRC) | $(PANDOC_MD) -o $(README)
 
-$(OUTPUT2): $(SOURCE2)
-	s1kd2db $(SOURCE2) -param include.emphasis.role 1 | pandoc -f docbook -t markdown_github -s -o $@
+$(INTRO): $(INTRO_SRC)
+	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INTRO)
 
-$(OUTPUT3): $(SOURCE3)
-	s1kd2db $(SOURCE3) -param include.emphasis.role 1 | pandoc -f docbook -t markdown_github -s -o $@
+$(DEFAULTS): $(DEFAULTS_SRC)
+	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(DEFAULTS)
 
-$(EXAMPLE_OUT): $(EXAMPLE_SRC)
-	s1kd2db $(EXAMPLE_SRC) -param include.emphasis.role 1 | pandoc -f docbook -t markdown_github -s -o $(EXAMPLE_OUT)
+$(INSTALL): $(INSTALL_SRC)
+	$(S1KD2DB) $(INSTALL_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INSTALL)
 
-s1kd-tools.1: $(SOURCE2)
-	s1kd2db $(SOURCE2) -param include.emphasis.role 1 | pandoc -f docbook -t man -s -o $@
+$(EXAMPLE): $(EXAMPLE_SRC)
+	$(S1KD2DB) $(EXAMPLE_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(EXAMPLE)
+
+$(MANPAGE): $(INTRO_SRC)
+	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $(MANPAGE)
 
 install:
-	cp s1kd-tools.1 $(MAN_PREFIX)/
+	cp $(MANPAGE) $(MAN_PREFIX)/
 
 clean:
-	rm -f s1kd-tools.1
+	rm -f $(MANPAGE)
