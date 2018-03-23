@@ -54,6 +54,9 @@
             <listItem>
               <para>xxd</para>
             </listItem>
+            <listItem>
+              <para>libxml2, libxslt, libexslt</para>
+            </listItem>
           </randomList>
         </para>
         <para>To build the documentation from source:</para>

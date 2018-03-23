@@ -7,6 +7,8 @@ To build the executables:
 
 -   xxd
 
+-   libxml2, libxslt, libexslt
+
 To build the documentation from source:
 
 -   s1kd2db XSLT script
