@@ -1271,7 +1271,7 @@ void set_orig(xmlDocPtr doc, char *origspec)
 		if (enterpriseName) {
 			xmlNodeSetContent(enterpriseName, BAD_CAST name);
 		} else {
-			enterpriseName = xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
+			xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
 		}
 	}
 }
@@ -1456,7 +1456,6 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
-	bool ispm;
 
 	exsltRegisterAll();
 
@@ -1566,6 +1565,8 @@ int main(int argc, char **argv)
 	}
 
 	while (1) {
+		bool ispm;
+
 		if (dmlist) {
 			if (!fgets(src, PATH_MAX - 1, list)) break;
 			strtok(src, "\t\n");
@@ -1580,9 +1581,7 @@ int main(int argc, char **argv)
 		}
 
 		root = xmlDocGetRootElement(doc);
-
 		ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
-
 		content = find_req_child(root, "content");
 
 		if (!wholedm || check_wholedm_applic(doc)) {
