@@ -439,17 +439,18 @@ xmlDocPtr sortAcronyms(xmlDocPtr doc)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-pxdth?] [-n <#>] [-T <types>] [-o <file>] [<datamodules>]");
+	puts("Usage: " PROG_NAME " [-dfptxh?] [-m <list>] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
 	puts("");
 	puts("Options:");
-	puts("  -p          Pretty print text/XML output");
-	puts("  -n <#>      Minimum spaces after term in pretty printed output");
-	puts("  -x          Output XML instead of text");
 	puts("  -d          Format XML output as definitionList");
-	puts("  -t          Format XML output as table");
-	puts("  -T <types>  Only search for acronyms of these types");
-	puts("  -o <file>   Output to <file> instead of stdout");
+	puts("  -f          Overwrite data modules when marking up acronyms");
 	puts("  -m <list>   Add markup for acronyms");
+	puts("  -n <#>      Minimum spaces after term in pretty printed output");
+	puts("  -o <file>   Output to <file> instead of stdout");
+	puts("  -p          Pretty print text/XML output");
+	puts("  -T <types>  Only search for acronyms of these types");
+	puts("  -t          Format XML output as table");
+	puts("  -x          Output XML instead of text");
 	puts("  -h -?  Show usage message");
 }
 
@@ -463,10 +464,10 @@ int main(int argc, char **argv)
 	bool xmlOut = false;
 	char *types = NULL;
 	char *out = strdup("-");
-	bool outarg = false;
 	char *markup = NULL;
+	bool overwrite = false;
 
-	while ((i = getopt(argc, argv, "pn:xdtT:o:m:iIh?")) != -1) {
+	while ((i = getopt(argc, argv, "pn:xdtT:o:m:iIfh?")) != -1) {
 		switch (i) {
 			case 'p':
 				prettyPrint = true;
@@ -487,7 +488,6 @@ int main(int argc, char **argv)
 				types = strdup(optarg);
 				break;
 			case 'o':
-				outarg = true;
 				free(out);
 				out = strdup(optarg);
 				break;
@@ -500,6 +500,9 @@ int main(int argc, char **argv)
 			case 'I':
 				interactive = true;
 				alwaysAsk = true;
+				break;
+			case 'f':
+				overwrite = true;
 				break;
 			case 'h':
 			case '?':
@@ -529,10 +532,10 @@ int main(int argc, char **argv)
 		}
 
 		for (i = optind; i < argc; ++i) {
-			if (outarg) {
-				markupAcronymsInFile(argv[i], acronyms, out);
-			} else {
+			if (overwrite) {
 				markupAcronymsInFile(argv[i], acronyms, argv[i]);
+			} else {
+				markupAcronymsInFile(argv[i], acronyms, out);
 			}
 		}
 

@@ -6,7 +6,7 @@ s1kd-acronyms - Generate a list of acronyms from S1000D data modules
 SYNOPSIS
 ========
 
-    s1kd-acronyms [-pxdtiIh?] [-n <#>] [-T <types>]
+    s1kd-acronyms [-dfptxh?] [-n <#>] [-T <types>]
                   [-m <acronyms>] [-o <file>]
                   [<datamodules>]
 
@@ -20,6 +20,9 @@ OPTIONS
 
 -d  
 Format XML output as an S1000D `<definitionList>`.
+
+-f  
+When marking up acronyms with the -m option, overwrite the input data modules instead of writing to stdout.
 
 -h -?  
 Show help/usage message.
@@ -38,10 +41,10 @@ Instead of listing acronyms, automatically markup acronyms given in the &lt;acro
 Minimum number of spaces after the term in pretty-printed text output.
 
 -o &lt;file&gt;  
-Output to &lt;file&gt; instead of stdout. When used with the -m option, output to &lt;file&gt; instead of overwriting the existing file.
+Output to &lt;file&gt; instead of stdout.
 
 -p  
-Pretty print text/XML output.
+Pretty print text/XML acronym list output.
 
 -T &lt;types&gt;  
 Only search for acronyms with an attribute `acronymType` whose value is contained within the string &lt;types&gt;.
