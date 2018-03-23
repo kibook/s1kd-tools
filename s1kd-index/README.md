@@ -35,7 +35,10 @@ Given the following in a data module:
 
     <levelledPara>
     <title>General</title>
-    <para>The s1kd-tools are a set of small tools for manipulating S1000D XML data.</para>
+    <para>
+    The s1kd-tools are a set of small tools for manipulating S1000D XML
+    data.
+    </para>
     </levelledPara>
 
 And the following index file:
@@ -55,5 +58,11 @@ Would result in the following:
 
     <levelledPara>
     <title>General</title>
-    <para>The s1kd-tools<indexFlag indexLevelOne="S1000D" indexLevelTwo="s1kd-tools"/> are a set of small tools for manipulating S1000D<indexFlag indexLevelOne="S1000D"/> XML<indexFlag indexLevelOne="data" indexLevelTwo="XML"/> data<indexFlag indexLevelOne="data"/>.</para>
+    <para>
+    The s1kd-tools<indexFlag indexLevelOne="S1000D"
+    indexLevelTwo="s1kd-tools"/> are a set of small tools for
+    manipulating S1000D<indexFlag indexLevelOne="S1000D"/>
+    XML<indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
+    data<indexFlag indexLevelOne="data"/>.
+    </para>
     </levelledPara>

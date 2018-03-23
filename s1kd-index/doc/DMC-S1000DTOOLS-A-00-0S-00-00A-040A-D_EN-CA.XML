@@ -93,7 +93,10 @@
         <para>
           <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
 <title>General</title>
-<para>The s1kd-tools are a set of small tools for manipulating S1000D XML data.</para>
+<para>
+The s1kd-tools are a set of small tools for manipulating S1000D XML
+data.
+</para>
 </levelledPara>]]></verbatimText>
         </para>
         <para>And the following index file:</para>
@@ -113,7 +116,13 @@
         <para>
           <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
 <title>General</title>
-<para>The s1kd-tools<indexFlag indexLevelOne="S1000D" indexLevelTwo="s1kd-tools"/> are a set of small tools for manipulating S1000D<indexFlag indexLevelOne="S1000D"/> XML<indexFlag indexLevelOne="data" indexLevelTwo="XML"/> data<indexFlag indexLevelOne="data"/>.</para>
+<para>
+The s1kd-tools<indexFlag indexLevelOne="S1000D"
+indexLevelTwo="s1kd-tools"/> are a set of small tools for
+manipulating S1000D<indexFlag indexLevelOne="S1000D"/>
+XML<indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
+data<indexFlag indexLevelOne="data"/>.
+</para>
 </levelledPara>]]></verbatimText>
         </para>
       </levelledPara>
