@@ -439,11 +439,15 @@ xmlDocPtr sortAcronyms(xmlDocPtr doc)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-dfptxh?] [-m <list>] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
+	puts("Usage:");
+	puts("  " PROG_NAME " -h?");
+	puts("  " PROG_NAME " [-dptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
+	puts("  " PROG_NAME " [-m <list>] [-fiI] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
 	puts("  -d          Format XML output as definitionList");
 	puts("  -f          Overwrite data modules when marking up acronyms");
+	puts("  -i -I       Markup acronyms in interactive modes");
 	puts("  -m <list>   Add markup for acronyms");
 	puts("  -n <#>      Minimum spaces after term in pretty printed output");
 	puts("  -o <file>   Output to <file> instead of stdout");

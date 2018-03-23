@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
         <simplePara>Change default behaviour of markup mode to output to stdout instead of overwriting, and add -f option to actually overwrite.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Format usage example with multiple patterns to better show the differing functions of the tool.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,9 +55,11 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-acronyms [-dfptxh?] [-n &lt;#&gt;] [-T &lt;types&gt;]
-              [-m &lt;acronyms&gt;] [-o &lt;file&gt;]
-              [&lt;datamodules&gt;]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">s1kd-acronyms -h?
+s1kd-acronyms [-dptx] [-n &lt;#&gt;] [-o &lt;file&gt;]
+              [-T &lt;types&gt;] [&lt;dmodule&gt;...]
+s1kd-acronyms [-fiI] [-m &lt;list&gt;] [-o &lt;file&gt;]
+              [&lt;dmodule&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>

@@ -6,9 +6,11 @@ s1kd-acronyms - Generate a list of acronyms from S1000D data modules
 SYNOPSIS
 ========
 
-    s1kd-acronyms [-dfptxh?] [-n <#>] [-T <types>]
-                  [-m <acronyms>] [-o <file>]
-                  [<datamodules>]
+    s1kd-acronyms -h?
+    s1kd-acronyms [-dptx] [-n <#>] [-o <file>]
+                  [-T <types>] [<dmodule>...]
+    s1kd-acronyms [-fiI] [-m <list>] [-o <file>]
+                  [<dmodule>...]
 
 DESCRIPTION
 ===========
