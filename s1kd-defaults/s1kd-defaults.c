@@ -132,11 +132,11 @@ xmlDocPtr text_dmtypes_to_xml(const char *path)
 	xmlDocSetRootElement(doc, dmtypes);
 
 	while (fgets(line, 1024, f)) {
-		char code[5], schema[64], infname[256];
+		char code[6], schema[64], infname[256];
 		int n;
 		xmlNodePtr type;
 
-		n = sscanf(line, "%5s %64s %255[^\n]", code, schema, infname);
+		n = sscanf(line, "%5s %63s %255[^\n]", code, schema, infname);
 
 		if (n < 2) {
 			continue;
@@ -196,6 +196,8 @@ void set_defaults(xmlDocPtr doc)
 		if (lang_c) {
 			xmlSetProp(ciso, BAD_CAST "value", BAD_CAST lang_c);
 		}
+
+		free(lang);
 	}
 }
 
