@@ -56,11 +56,13 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
 4.  **Publication:** These tools support the production of publications from a CSDB.
 
-    The **s1kd-flatten** tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.
-
     The **s1kd-acronyms** tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.
 
     The **s1kd-aspp** tool preprocesses applicability statements in a data module, generating display text and "presentation" applicability statements.
+
+    The **s1kd-flatten** tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.
+
+    The **s1kd-index** tool flags index keywords in a data module based on a user-defined list.
 
     The **s1kd-instance** tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).
 
@@ -73,4 +75,4 @@ SEE ALSO
 
 S1000D website: http://www.s1000d.org
 
-s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-defaults(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)
+s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-dmls(1), s1kd-defaults(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-index(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)
