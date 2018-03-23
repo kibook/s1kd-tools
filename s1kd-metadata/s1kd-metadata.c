@@ -302,17 +302,6 @@ int edit_issue_type(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "issueType", val);
 }
 
-void show_language(xmlNodePtr node, char endl)
-{
-	char *language_iso_code = (char *) xmlGetProp(node, BAD_CAST "languageIsoCode");
-	char *country_iso_code  = (char *) xmlGetProp(node, BAD_CAST "countryIsoCode");
-
-	printf("%s-%s%c", language_iso_code, country_iso_code, endl);
-
-	xmlFree(language_iso_code);
-	xmlFree(country_iso_code);
-}
-
 void show_language_iso_code(xmlNodePtr node, char endl)
 {
 	show_simple_attr(node, "languageIsoCode", endl);
@@ -331,17 +320,6 @@ void show_country_iso_code(xmlNodePtr node, char endl)
 int edit_country_iso_code(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "countryIsoCode", val);
-}
-
-void show_issue_info(xmlNodePtr node, char endl)
-{
-	char *issue_number = (char *) xmlGetProp(node, BAD_CAST "issueNumber");
-	char *in_work      = (char *) xmlGetProp(node, BAD_CAST "inWork");
-
-	printf("%s-%s%c", issue_number, in_work, endl);
-	
-	xmlFree(issue_number);
-	xmlFree(in_work);
 }
 
 void show_issue_number(xmlNodePtr node, char endl)
@@ -725,9 +703,9 @@ int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 void list_metadata_key(const char *key, const char *descr, int formatall)
 {
 	int n = KEY_COLUMN_WIDTH - strlen(key);
-	int j;
 	printf("%s", key);
 	if (formatall) {
+		int j;
 		for (j = 0; j < n; ++j) putchar(' ');
 	} else {
 		putchar('\t');
