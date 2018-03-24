@@ -45,7 +45,9 @@ void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 	xmlDocPtr doc, styleDoc, result;
 	xsltStylesheetPtr style;
 
-	doc = xmlReadFile(path, NULL, 0);
+	if (!(doc = xmlReadFile(path, NULL, 0))) {
+		return;
+	}
 
 	styleDoc = xmlReadMemory((const char *) stylesheets_acronyms_xsl, stylesheets_acronyms_xsl_len, NULL, NULL, 0);
 
@@ -437,17 +439,61 @@ xmlDocPtr sortAcronyms(xmlDocPtr doc)
 	return sorted;
 }
 
+void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *out, bool overwrite)
+{
+	FILE *f;
+	char line[LINE_MAX];
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, LINE_MAX, f)) {
+		strtok(line, "\t\n");
+
+		if (overwrite) {
+			markupAcronymsInFile(line, acronyms, line);
+		} else {
+			markupAcronymsInFile(line, acronyms, out);
+		}
+	}
+
+	fclose(f);
+}
+
+void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
+{
+	FILE *f;
+	char line[LINE_MAX];
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, LINE_MAX, f)) {
+		strtok(line, "\t\n");
+		findAcronymsInFile(acronyms, line);
+	}
+
+	fclose(f);
+}
+
 void showHelp(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-dptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
-	puts("  " PROG_NAME " [-m <list>] [-fiI] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " [-dLptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
+	puts("  " PROG_NAME " [-m <list>] [-fiIL] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
 	puts("  -d          Format XML output as definitionList");
 	puts("  -f          Overwrite data modules when marking up acronyms");
 	puts("  -i -I       Markup acronyms in interactive modes");
+	puts("  -L          Input is a list of file names");
 	puts("  -m <list>   Add markup for acronyms");
 	puts("  -n <#>      Minimum spaces after term in pretty printed output");
 	puts("  -o <file>   Output to <file> instead of stdout");
@@ -470,8 +516,9 @@ int main(int argc, char **argv)
 	char *out = strdup("-");
 	char *markup = NULL;
 	bool overwrite = false;
+	bool list = false;
 
-	while ((i = getopt(argc, argv, "pn:xdtT:o:m:iIfh?")) != -1) {
+	while ((i = getopt(argc, argv, "pn:xdtT:o:m:iIfLh?")) != -1) {
 		switch (i) {
 			case 'p':
 				prettyPrint = true;
@@ -508,6 +555,9 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
+			case 'L':
+				list = true;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -532,11 +582,17 @@ int main(int argc, char **argv)
 		idStylesheet = xsltParseStylesheetDoc(idStylesheetDoc);
 
 		if (optind >= argc) {
-			markupAcronymsInFile("-", acronyms, out);
+			if (list) {
+				markupAcronymsInList(NULL, acronyms, out, overwrite);
+			} else {
+				markupAcronymsInFile("-", acronyms, out);
+			}
 		}
 
 		for (i = optind; i < argc; ++i) {
-			if (overwrite) {
+			if (list) {
+				markupAcronymsInList(argv[i], acronyms, out, overwrite);
+			} else if (overwrite) {
 				markupAcronymsInFile(argv[i], acronyms, argv[i]);
 			} else {
 				markupAcronymsInFile(argv[i], acronyms, out);
@@ -551,11 +607,19 @@ int main(int argc, char **argv)
 		xmlDocSetRootElement(doc, acronyms);
 
 		if (optind >= argc) {
-			findAcronymsInFile(acronyms, "-");
+			if (list) {
+				findAcronymsInList(acronyms, NULL);
+			} else {
+				findAcronymsInFile(acronyms, "-");
+			}
 		}
 
 		for (i = optind; i < argc; ++i) {
-			findAcronymsInFile(acronyms, argv[i]);
+			if (list) {
+				findAcronymsInList(acronyms, argv[i]);
+			} else {
+				findAcronymsInFile(acronyms, argv[i]);
+			}
 		}
 
 		doc = removeNonUniqueAcronyms(doc);

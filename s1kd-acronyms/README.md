@@ -7,9 +7,9 @@ SYNOPSIS
 ========
 
     s1kd-acronyms -h?
-    s1kd-acronyms [-dptx] [-n <#>] [-o <file>]
+    s1kd-acronyms [-dLptx] [-n <#>] [-o <file>]
                   [-T <types>] [<dmodule>...]
-    s1kd-acronyms [-fiI] [-m <list>] [-o <file>]
+    s1kd-acronyms [-fiIL] [-m <list>] [-o <file>]
                   [<dmodule>...]
 
 DESCRIPTION
@@ -35,6 +35,9 @@ Markup acronyms in interactive mode. If the specified acronyms list contains mul
 When not in interactive mode, the first definition found will be used.
 
 The -I option prompts for all acronyms, not just those with multiple definitions. This can be useful if some occurrences of the acronym term should be ignored.
+
+-L  
+Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.
 
 -m &lt;acronyms&gt;  
 Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the `acronym` element in the list.
