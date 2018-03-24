@@ -944,8 +944,8 @@ int main(int argc, char **argv)
 	bool skipdmc = false;
 	bool verbose = false;
 	bool overwrite = false;
-
 	char *out = NULL;
+	bool tech_name_flag = false;
 
 	xmlDocPtr defaults_xml;
 
@@ -963,7 +963,7 @@ int main(int argc, char **argv)
 			case 'R': strcpy(responsiblePartnerCompany_enterpriseCode, optarg); break;
 			case 'o': strcpy(originator_enterpriseName, optarg); break;
 			case 'O': strcpy(originator_enterpriseCode, optarg); break;
-			case 't': strcpy(techName_content, optarg); break;
+			case 't': strcpy(techName_content, optarg); tech_name_flag = true; break;
 			case 'i': strcpy(infoName_content, optarg); break;
 			case 'T': strcpy(dmtype, optarg); break;
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
@@ -984,7 +984,6 @@ int main(int argc, char **argv)
 			case '?': show_help(); exit(0);
 		}
 	}
-
 
 	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
@@ -1142,7 +1141,7 @@ int main(int argc, char **argv)
 		exit(EXIT_BAD_DMC);
 	}
 
-	if (strcmp(sns_fname, "") != 0 && strcmp(techName_content, "") == 0)
+	if (strcmp(sns_fname, "") != 0 && !tech_name_flag)
 		set_tech_from_sns(sns_fname);
 
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
