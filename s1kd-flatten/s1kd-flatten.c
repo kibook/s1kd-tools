@@ -17,7 +17,7 @@ xmlNodePtr pub;
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Npxh?] <pubmodule>");
+	puts("Usage: " PROG_NAME " [-Npxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -N     Assume issue/inwork numbers are omitted.");
@@ -353,7 +353,11 @@ int main(int argc, char **argv)
 		}
 	}
 
-	pm_fname = argv[optind];
+	if (optind < argc) {
+		pm_fname = argv[optind];
+	} else {
+		pm_fname = "-";
+	}
 
 	pm_doc = xmlReadFile(pm_fname, NULL, 0);
 
