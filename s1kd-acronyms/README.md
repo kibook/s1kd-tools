@@ -1,7 +1,7 @@
 NAME
 ====
 
-s1kd-acronyms - Generate a list of acronyms from S1000D data modules
+s1kd-acronyms - Manage acronyms in S1000D data modules
 
 SYNOPSIS
 ========
@@ -11,14 +11,24 @@ SYNOPSIS
                   [-T <types>] [<dmodule>...]
     s1kd-acronyms [-fiIL] [-m <list>] [-o <file>]
                   [<dmodule>...]
+    s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-acronyms* tool generates a list of unique acronyms used in S1000D data modules. It can also mark up acronyms in data modules automatically based on an existing list.
+The *s1kd-acronyms* tool is used to manage acronyms in S1000D data modules in one of three ways:
+
+-   Generate a list of unique acronyms used in all specified data modules.
+
+-   Mark up acronyms automatically based on a specified list.
+
+-   Remove acronym markup.
 
 OPTIONS
 =======
+
+-D  
+Remove acronym markup, flattening it to the acronym term.
 
 -d  
 Format XML output as an S1000D `<definitionList>`.
@@ -60,5 +70,5 @@ Format XML output as an S1000D `<table>`.
 -x  
 Use XML output instead of plain text.
 
-&lt;datamodules&gt;  
-Data modules to find acronyms in.
+&lt;dmodule&gt;...  
+Data modules to find acronyms in. If none are specified, input is taken from stdin.

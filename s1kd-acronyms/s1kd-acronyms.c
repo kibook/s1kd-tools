@@ -482,14 +482,79 @@ void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 	fclose(f);
 }
 
+void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+{
+	xmlDocPtr styledoc, src, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	src = xmlCopyDoc(doc, 1);
+
+	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, src, NULL);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+	
+	xmlFreeDoc(src);
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+void deleteAcronyms(xmlDocPtr doc)
+{
+	transformDoc(doc, stylesheets_delete_xsl, stylesheets_delete_xsl_len);
+}
+
+void deleteAcronymsInFile(const char *fname, const char *out)
+{
+	xmlDocPtr doc;
+
+	doc = xmlReadFile(fname, NULL, 0);
+	
+	deleteAcronyms(doc);
+
+	xmlSaveFile(out, doc);
+
+	xmlFreeDoc(doc);
+}
+
+void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
+{
+	FILE *f;
+	char line[LINE_MAX];
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, LINE_MAX, f)) {
+		strtok(line, "\t\n");
+		
+		if (overwrite) {
+			deleteAcronymsInFile(line, line);
+		} else {
+			deleteAcronymsInFile(line, out);
+		}
+	}
+
+	fclose(f);
+}
+
 void showHelp(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " [-dLptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
 	puts("  " PROG_NAME " [-m <list>] [-fiIL] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " -D [-fL] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
+	puts("  -D          Remove acronym markup");
 	puts("  -d          Format XML output as definitionList");
 	puts("  -f          Overwrite data modules when marking up acronyms");
 	puts("  -i -I       Markup acronyms in interactive modes");
@@ -508,7 +573,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	xmlDocPtr doc;
+	xmlDocPtr doc = NULL;
 	xmlNodePtr acronyms;
 
 	bool xmlOut = false;
@@ -517,8 +582,9 @@ int main(int argc, char **argv)
 	char *markup = NULL;
 	bool overwrite = false;
 	bool list = false;
+	bool delete = false;
 
-	while ((i = getopt(argc, argv, "pn:xdtT:o:m:iIfLh?")) != -1) {
+	while ((i = getopt(argc, argv, "pn:xDdtT:o:m:iIfLh?")) != -1) {
 		switch (i) {
 			case 'p':
 				prettyPrint = true;
@@ -528,6 +594,9 @@ int main(int argc, char **argv)
 				break;
 			case 'x':
 				xmlOut = true;
+				break;
+			case 'D':
+				delete = true;
 				break;
 			case 'd':
 				xmlFormat = DEFLIST;
@@ -566,7 +635,25 @@ int main(int argc, char **argv)
 	}
 
 
-	if (markup) {
+	if (delete) {
+		if (optind >= argc) {
+			if (list) {
+				deleteAcronymsInList(NULL, out, overwrite);
+			} else {
+				deleteAcronymsInFile("-", out);
+			}
+		}
+
+		for (i = optind; i < argc; ++i) {
+			if (list) {
+				deleteAcronymsInList(argv[i], out, overwrite);
+			} else if (overwrite) {
+				deleteAcronymsInFile(argv[i], argv[i]);
+			} else {
+				deleteAcronymsInFile(argv[i], out);
+			}
+		}
+	} else if (markup) {
 		xmlDocPtr termStylesheetDoc, idStylesheetDoc;
 
 		doc = xmlReadFile(markup, NULL, 0);

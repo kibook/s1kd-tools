@@ -18,6 +18,7 @@ stylesheets.h: stylesheets/*.xsl
 	xxd -i stylesheets/sort.xsl     >> stylesheets.h
 	xxd -i stylesheets/term.xsl     >> stylesheets.h
 	xxd -i stylesheets/id.xsl       >> stylesheets.h
+	xxd -i stylesheets/delete.xsl   >> stylesheets.h
 
 $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
