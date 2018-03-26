@@ -442,7 +442,7 @@ xmlDocPtr sortAcronyms(xmlDocPtr doc)
 void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *out, bool overwrite)
 {
 	FILE *f;
-	char line[LINE_MAX];
+	char line[PATH_MAX];
 
 	if (fname) {
 		f = fopen(fname, "r");
@@ -450,7 +450,7 @@ void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *ou
 		f = stdin;
 	}
 
-	while (fgets(line, LINE_MAX, f)) {
+	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\n");
 
 		if (overwrite) {
@@ -466,7 +466,7 @@ void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *ou
 void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 {
 	FILE *f;
-	char line[LINE_MAX];
+	char line[PATH_MAX];
 
 	if (fname) {
 		f = fopen(fname, "r");
@@ -474,7 +474,7 @@ void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 		f = stdin;
 	}
 
-	while (fgets(line, LINE_MAX, f)) {
+	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\n");
 		findAcronymsInFile(acronyms, line);
 	}
@@ -524,7 +524,7 @@ void deleteAcronymsInFile(const char *fname, const char *out)
 void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 {
 	FILE *f;
-	char line[LINE_MAX];
+	char line[PATH_MAX];
 
 	if (fname) {
 		f = fopen(fname, "r");
@@ -532,7 +532,7 @@ void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 		f = stdin;
 	}
 
-	while (fgets(line, LINE_MAX, f)) {
+	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\n");
 		
 		if (overwrite) {
