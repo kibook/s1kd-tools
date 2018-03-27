@@ -672,6 +672,23 @@ int main(int argc, char **argv)
 		prompt("Security classification", security_classification, 4);
 	}
 
+	if (strcmp(model_ident_code, "") == 0 ||
+	    strcmp(sender_ident, "") == 0 ||
+	    strcmp(dml_type, "") == 0 ||
+	    strcmp(year_of_data_issue, "") == 0 ||
+	    strcmp(seq_number, "") == 0) {
+
+		fprintf(stderr, ERR_PREFIX "Missing required DML code components: ");
+		fprintf(stderr, "DML-%s-%s-%s-%s-%s\n",
+			strcmp(model_ident_code, "") == 0   ? "???" : model_ident_code,
+			strcmp(sender_ident, "") == 0       ? "???" : sender_ident,
+			strcmp(dml_type, "") == 0           ? "???" : dml_type,
+			strcmp(year_of_data_issue, "") == 0 ? "???" : year_of_data_issue,
+			strcmp(seq_number, "") == 0         ? "???" : seq_number);
+
+		exit(EXIT_BAD_CODE);
+	}
+
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
