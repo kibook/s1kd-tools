@@ -585,6 +585,22 @@ int main(int argc, char **argv)
 		prompt("Comment priority code", commentPriorityCode, 6);
 	}
 
+	if (strcmp(modelIdentCode, "") == 0 ||
+		strcmp(senderIdent, "") == 0 ||
+		strcmp(yearOfDataIssue, "") == 0 ||
+		strcmp(seqNumber, "") == 0 ||
+		strcmp(commentType, "") == 0) {
+		fprintf(stderr, ERR_PREFIX "Missing required comment code components: ");
+		fprintf(stderr, "COM-%s-%s-%s-%s-%s\n",
+			strcmp(modelIdentCode, "") == 0  ? "???" : modelIdentCode,
+			strcmp(senderIdent, "") == 0     ? "???" : senderIdent,
+			strcmp(yearOfDataIssue, "") == 0 ? "???" : yearOfDataIssue,
+			strcmp(seqNumber, "") == 0       ? "???" : seqNumber,
+			strcmp(commentType, "") == 0     ? "???" : commentType);
+
+		exit(EXIT_BAD_CODE);
+	}
+
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(securityClassification, "") == 0) strcpy(securityClassification, "01");
 	if (strcmp(responseType, "") == 0) strcpy(responseType, "rt02");
