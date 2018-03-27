@@ -85,7 +85,7 @@
               <listItemTerm>INSTALL_PREFIX</listItemTerm>
               <listItemDefinition>
                 <para>Prefix where the executables will be installed.</para>
-                <para>Default: /usr/bin</para>
+                <para>Default: /usr/local/bin</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

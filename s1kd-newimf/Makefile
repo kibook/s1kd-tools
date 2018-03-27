@@ -4,6 +4,8 @@ LDFLAGS=`pkg-config --libs libxml-2.0`
 SOURCE=s1kd-newimf.c
 OUTPUT=s1kd-newimf
 
+INSTALL_PREFIX=/usr/local/bin
+
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
@@ -18,5 +20,5 @@ clean:
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	cp $(OUTPUT) /usr/bin/
+	cp $(OUTPUT) $(INSTALL_PREFIX)/
 	$(MAKE) -C doc install

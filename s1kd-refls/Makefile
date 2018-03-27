@@ -4,7 +4,7 @@ OUTPUT=s1kd-refls
 CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
-INSTALL_PREFIX=/usr/bin
+INSTALL_PREFIX=/usr/local/bin
 
 all: $(OUTPUT)
 	$(MAKE) -C doc

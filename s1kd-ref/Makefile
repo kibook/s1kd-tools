@@ -4,7 +4,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0`
 SOURCE=s1kd-ref.c
 OUTPUT=s1kd-ref
 
-INSTALL_PREFIX=/usr/bin
+INSTALL_PREFIX=/usr/local/bin
 
 all: $(OUTPUT)
 	$(MAKE) -C doc

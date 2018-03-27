@@ -4,6 +4,8 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 SOURCE=s1kd-newpm.c
 OUTPUT=s1kd-newpm
 
+INSTALL_PREFIX=/usr/local/bin
+
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
@@ -22,5 +24,5 @@ clean:
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	cp $(OUTPUT) /usr/bin/
+	cp $(OUTPUT) $(INSTALL_PREFIX)/
 	$(MAKE) -C doc install

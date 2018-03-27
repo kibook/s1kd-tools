@@ -28,7 +28,7 @@ To change where these are installed, specify either of the following make variab
 INSTALL\_PREFIX  
 Prefix where the executables will be installed.
 
-Default: /usr/bin
+Default: /usr/local/bin
 
 MAN\_PREFIX  
 Prefix where the manpages will be installed.

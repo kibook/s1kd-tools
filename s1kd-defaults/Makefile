@@ -4,7 +4,7 @@ OUTPUT=s1kd-defaults
 CFLAGS=-Wall -pedantic-errors -g `pkg-config --cflags libxml-2.0 libxslt libexslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
-INSTALL_PREFIX=/usr/bin
+INSTALL_PREFIX=/usr/local/bin
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
