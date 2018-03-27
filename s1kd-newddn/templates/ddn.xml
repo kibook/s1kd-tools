@@ -44,8 +44,5 @@
       </brexDmRef>
     </ddnStatus>
   </identAndStatusSection>
-  <ddnContent>
-    <deliveryList>
-    </deliveryList>
-  </ddnContent>
+  <ddnContent><deliveryList></deliveryList></ddnContent>
 </ddn>
