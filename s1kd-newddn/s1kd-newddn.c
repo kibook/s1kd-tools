@@ -506,6 +506,23 @@ int main(int argc, char **argv)
 		prompt("Authorization", authorization, 256);
 	}
 
+	if (strcmp(model_ident_code, "") == 0 ||
+	    strcmp(sender_ident, "") == 0 ||
+	    strcmp(receiver_ident, "") == 0 ||
+	    strcmp(year_of_data_issue, "") == 0 ||
+	    strcmp(seq_number, "") == 0) {
+
+	    fprintf(stderr, ERR_PREFIX "Missing required DDN code components: ");
+	    fprintf(stderr, "DDN-%s-%s-%s-%s-%s\n",
+		strcmp(model_ident_code, "") == 0   ? "???" : model_ident_code,
+		strcmp(sender_ident, "") == 0       ? "???" : sender_ident,
+		strcmp(receiver_ident, "") == 0     ? "???" : receiver_ident,
+		strcmp(year_of_data_issue, "") == 0 ? "???" : year_of_data_issue,
+		strcmp(seq_number, "") == 0         ? "???" : seq_number);
+
+		exit(EXIT_MALFORMED_CODE);
+	}
+
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
 
