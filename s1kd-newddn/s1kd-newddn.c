@@ -554,7 +554,12 @@ int main(int argc, char **argv)
 
 	xmlXPathFreeContext(ctxt);
 
-	populate_list(delivery_list, argc, argv, optind);
+	if (optind < argc) {
+		populate_list(delivery_list, argc, argv, optind);
+	} else {
+		xmlUnlinkNode(delivery_list);
+		xmlFreeNode(delivery_list);
+	}
 
 	if (issue < ISS_42) {
 		if (strcmp(brex_dmcode, "") == 0) {
