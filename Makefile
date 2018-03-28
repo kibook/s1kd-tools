@@ -6,7 +6,7 @@ all:
 	$(MAKE) -C s1kd-brexcheck
 	$(MAKE) -C s1kd-checkrefs
 	$(MAKE) -C s1kd-defaults
-	$(MAKE) -C s1kd-dmls
+	$(MAKE) -C s1kd-ls
 	$(MAKE) -C s1kd-dmrl
 	$(MAKE) -C s1kd-flatten
 	$(MAKE) -C s1kd-index
@@ -34,7 +34,7 @@ clean:
 	$(MAKE) -C s1kd-brexcheck clean
 	$(MAKE) -C s1kd-checkrefs clean
 	$(MAKE) -C s1kd-defaults clean
-	$(MAKE) -C s1kd-dmls clean
+	$(MAKE) -C s1kd-ls clean
 	$(MAKE) -C s1kd-dmrl clean
 	$(MAKE) -C s1kd-flatten clean
 	$(MAKE) -C s1kd-index clean
@@ -62,7 +62,7 @@ install:
 	$(MAKE) -C s1kd-brexcheck install
 	$(MAKE) -C s1kd-checkrefs install
 	$(MAKE) -C s1kd-defaults install
-	$(MAKE) -C s1kd-dmls install
+	$(MAKE) -C s1kd-ls install
 	$(MAKE) -C s1kd-dmrl install
 	$(MAKE) -C s1kd-flatten install
 	$(MAKE) -C s1kd-index install

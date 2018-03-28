@@ -26,7 +26,8 @@
 
 #define DM_MAX 10240
 
-#define ERR_PREFIX "s1kd-dmls: ERROR: "
+#define PROG_NAME "s1kd-ls"
+#define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_MAX 1
 #define EXIT_BAD_XML 2
@@ -706,7 +707,7 @@ int isimf(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-dmls [-acfHhilorRTt]");
+	puts("Usage: " PROG_NAME " [-acfHhilorRTt]");
 	puts("");
 	puts("Options:");
 	puts("  -l      Show only latest issue/inwork version");
