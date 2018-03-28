@@ -8,7 +8,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="9" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2018" month="03" day="28"/>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -L option.</simplePara>
+        <simplePara>Add -e option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -54,7 +54,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-metadata [-c &lt;file&gt;] [-0fHLTth?]
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-metadata [-c &lt;file&gt;] [-0efHLTth?]
               [-n &lt;name&gt; [-v &lt;value&gt;]]... [&lt;module&gt;]</verbatimText>
         </para>
       </levelledPara>
@@ -78,6 +78,12 @@
                 <para>Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-e</listItemTerm>
+              <listItemDefinition>
+                <para>When showing all metadata, only list editable items. This is useful when creating a file for use with the -c option.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
@@ -90,7 +96,7 @@
                 <para>Lists all available metadata with a short description of each. Specify specific metadata to describe with the -n option.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-L</listItemTerm>
               <listItemDefinition>
                 <para>Treat input as a list of data module filenames to read or edit metadata on, rather than a data module itself.</para>

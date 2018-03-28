@@ -45,6 +45,25 @@ xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
 	return node;
 }
 
+xmlChar *first_xpath_value(xmlNodePtr node, const char *expr)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlChar *first;
+
+	ctx = xmlXPathNewContext(node->doc);
+	ctx->node  = node;
+
+	obj = xmlXPathEvalExpression(BAD_CAST expr, ctx);
+
+	first = obj->type == XPATH_UNDEFINED ? NULL : xmlStrdup(obj->stringval);
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
+}
+
 void show_issue_date(xmlNodePtr issue_date, char endl)
 {
 	char *year, *month, *day;
@@ -443,6 +462,20 @@ void show_url(xmlNodePtr node, char endl)
 	printf("%s%c", node->doc->URL, endl);
 }
 
+void show_title(xmlNodePtr node, char endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0) {
+		xmlChar *tech, *info;
+		tech = first_xpath_value(node, "string(techName)");
+		info = first_xpath_value(node, "string(infoName)");
+		printf("%s - %s%c", (char *) tech, (char *) info, endl);
+		xmlFree(tech);
+		xmlFree(info);
+	} else {
+		show_simple_node(node, endl);
+	}
+}
+
 struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -606,6 +639,12 @@ struct metadata metadata[] = {
 		edit_simple_node,
 		NULL,
 		"Technical name of a data module"},
+	{"title",
+		"//dmAddressItems/dmTitle|//pmAddressItems/pmTitle|//commentAddressItems/commentTitle|//imfAddressItems/icnTitle",
+		show_title,
+		NULL,
+		NULL,
+		"Title of a CSDB object"},
 	{"type",
 		"/*",
 		show_type,
@@ -661,12 +700,15 @@ int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *val)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, char endl)
+int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, char endl, int only_editable)
 {
 	int i;
 
 	for (i = 0; metadata[i].key; ++i) {
 		xmlNodePtr node;
+
+		if (only_editable && !metadata[i].edit) continue;
+
 		if ((node = first_xpath_node(metadata[i].path, ctxt))) {
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
@@ -752,6 +794,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
+	puts("  -e           Include only editable metadata when showing all.");
 	puts("  -f           Overwrite modules when editing metadata.");
 	puts("  -H           List information on available metadata.");
 	puts("  -L           Input is a list of filenames.");
@@ -788,7 +831,7 @@ void show_err(int err, const char *key, const char *val, const char *fname)
 }
 
 int show_or_edit_metadata(const char *fname, const char *metadata_fname,
-	xmlNodePtr keys, int formatall, int overwrite, char endl)
+	xmlNodePtr keys, int formatall, int overwrite, char endl, int only_editable)
 {
 	int err;
 	xmlDocPtr doc;
@@ -834,7 +877,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 
 			fclose(input);
 	} else {
-			err = show_all_metadata(ctxt, formatall, endl);
+			err = show_all_metadata(ctxt, formatall, endl, only_editable);
 	}
 
 	xmlXPathFreeContext(ctxt);
@@ -876,7 +919,7 @@ void add_val(xmlNodePtr keys, const char *val)
 }
 
 int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
-	xmlNodePtr keys, int formatall, int overwrite, char endl)
+	xmlNodePtr keys, int formatall, int overwrite, char endl, int only_editable)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -890,7 +933,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
-		err += show_or_edit_metadata(path, metadata_fname, keys, formatall, overwrite, endl);
+		err += show_or_edit_metadata(path, metadata_fname, keys, formatall, overwrite, endl, only_editable);
 	}
 
 	fclose(f);
@@ -910,13 +953,15 @@ int main(int argc, char **argv)
 	char endl = '\n';
 	int list_keys = 0;
 	int islist = 0;
+	int only_editable = 0;
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:fHLn:Ttv:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:efHLn:Ttv:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
+			case 'e': only_editable = 1; break;
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
 			case 'L': islist = 1; break;
@@ -936,19 +981,19 @@ int main(int argc, char **argv)
 			if (islist) {
 				err += show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
-					overwrite, endl);
+					overwrite, endl, only_editable);
 			} else {
 				err += show_or_edit_metadata(argv[i],
 					metadata_fname, keys, formatall,
-					overwrite, endl);
+					overwrite, endl, only_editable);
 			}
 		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
-			overwrite, endl);
+			overwrite, endl, only_editable);
 	} else {
 		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
-			overwrite, endl);
+			overwrite, endl, only_editable);
 	}
 
 	free(metadata_fname);
