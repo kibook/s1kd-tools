@@ -747,13 +747,14 @@ void list_metadata_keys(xmlNodePtr keys, int formatall)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-metadata [-c <file>] [-0fHTt] [-n <name> [-v <value>]]... [<module>]");
+	puts("Usage: " PROG_NAME " [-c <file>] [-0fHLTt] [-n <name> [-v <value>]]... [<module>]");
 	puts("");
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
 	puts("  -f           Overwrite modules when editing metadata.");
 	puts("  -H           List information on available metadata.");
+	puts("  -L           Input is a list of filenames.");
 	puts("  -n <name>    Specific metadata name to view/edit.");
 	puts("  -T           Do not format columns in output.");
 	puts("  -t           Use tab-delimited fields.");
@@ -792,30 +793,36 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	int err;
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctxt;
-	char *key = NULL, *val = NULL;
+	int edit = 0;
 
 	doc = xmlReadFile(fname, NULL, 0);
 
 	ctxt = xmlXPathNewContext(doc);
 
-
 	if (keys->children) {
 		xmlNodePtr cur;
 		for (cur = keys->children; cur; cur = cur->next) {
+			char *key = NULL, *val = NULL;
+
 			key = (char *) xmlGetProp(cur, BAD_CAST "name");
 			val = (char *) xmlGetProp(cur, BAD_CAST "value");
 
 			if (val) {
+				edit = 1;
 				err = edit_metadata(ctxt, key, val);
 			} else {
 				err = show_metadata(ctxt, key, endl);
 			}
 
 			show_err(err, key, val, fname);
+
+			xmlFree(key);
+			xmlFree(val);
 		}
-	} else {
-		if (metadata_fname) {
+	} else if (metadata_fname) {
 			FILE *input;
+
+			edit = 1;
 
 			if (strcmp(metadata_fname, "-") == 0) {
 				input = stdin;
@@ -826,11 +833,8 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 			err = edit_all_metadata(input, ctxt);
 
 			fclose(input);
-		} else {
+	} else {
 			err = show_all_metadata(ctxt, formatall, endl);
-		}
-
-		show_err(err, key, val, fname);
 	}
 
 	xmlXPathFreeContext(ctxt);
@@ -839,7 +843,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		putchar('\n');
 	}
 
-	if (val || metadata_fname) {
+	if (edit) {
 		if (overwrite) {
 			if (access(fname, W_OK) != -1) {
 				xmlSaveFile(fname, doc);
@@ -853,7 +857,6 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	}
 
 	xmlFreeDoc(doc);
-
 
 	return err;
 }
@@ -872,10 +875,33 @@ void add_val(xmlNodePtr keys, const char *val)
 	xmlSetProp(key, BAD_CAST "value", BAD_CAST val);
 }
 
+int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
+	xmlNodePtr keys, int formatall, int overwrite, char endl)
+{
+	FILE *f;
+	char path[PATH_MAX];
+	int err = 0;
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(path, PATH_MAX, f)) {
+		strtok(path, "\t\n");
+		err += show_or_edit_metadata(path, metadata_fname, keys, formatall, overwrite, endl);
+	}
+
+	fclose(f);
+
+	return err;
+}
+
 int main(int argc, char **argv)
 {
 	xmlNodePtr keys;
-	int ret = 0;
+	int err = 0;
 
 	int i;
 	char *metadata_fname = NULL;
@@ -883,15 +909,17 @@ int main(int argc, char **argv)
 	int overwrite = 0;
 	char endl = '\n';
 	int list_keys = 0;
+	int islist = 0;
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:fHn:Ttv:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:fHLn:Ttv:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
+			case 'L': islist = 1; break;
 			case 'n': add_key(keys, optarg); break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;
@@ -905,16 +933,28 @@ int main(int argc, char **argv)
 		list_metadata_keys(keys, formatall);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			show_or_edit_metadata(argv[i], metadata_fname, keys,
-				formatall, overwrite, endl);
+			if (islist) {
+				err += show_or_edit_metadata_list(argv[i],
+					metadata_fname, keys, formatall,
+					overwrite, endl);
+			} else {
+				err += show_or_edit_metadata(argv[i],
+					metadata_fname, keys, formatall,
+					overwrite, endl);
+			}
 		}
+	} else if (islist) {
+		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
+			overwrite, endl);
 	} else {
-		show_or_edit_metadata("-", metadata_fname, keys, formatall,
+		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
 			overwrite, endl);
 	}
 
 	free(metadata_fname);
 	xmlFreeNode(keys);
 
-	return ret;
+	xmlCleanupParser();
+
+	return err;
 }
