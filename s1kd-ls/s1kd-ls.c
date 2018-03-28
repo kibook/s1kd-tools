@@ -3,26 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <stdlib.h>
 #include <sys/stat.h>
-#include <stdbool.h>
-
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
-
-#define COL_ISSDATE	0x001
-#define COL_RPC		0x002
-#define COL_ORIG	0x004
-#define COL_TECH	0x008
-#define COL_INFO	0x010
-#define COL_APPLIC	0x020
-#define COL_STITLE	0x040
-#define COL_FNAME	0x080
-#define COL_CODE	0x100
-#define COL_ISSUE	0x200
-#define COL_LANG	0x400
-
-#define COL_TITLE	(COL_TECH | COL_INFO)
-#define COL_ALL		(COL_ISSDATE | COL_RPC | COL_ORIG | COL_TECH | COL_INFO | COL_APPLIC | COL_FNAME | COL_CODE | COL_ISSUE | COL_LANG)
 
 #define DM_MAX 10240
 
@@ -37,646 +19,11 @@
 #define SHOW_COM 0x4
 #define SHOW_IMF 0x8
 
-int clean_unprintable = 1;
-
-struct dmident {
-	bool extended;
-	char *extensionProducer;
-	char *extensionCode;
-	char *modelIdentCode;
-	char *systemDiffCode;
-	char *systemCode;
-	char *subSystemCode;
-	char *subSubSystemCode;
-	char *assyCode;
-	char *disassyCode;
-	char *disassyCodeVariant;
-	char *infoCode;
-	char *infoCodeVariant;
-	char *itemLocationCode;
-	char *learnCode;
-	char *learnEventCode;
-	char *issueNumber;
-	char *inWork;
-	char *languageIsoCode;
-	char *countryIsoCode;
-};
-
-xmlNodePtr find_child(xmlNodePtr parent, const char *childname)
-{
-	xmlNodePtr cur;
-
-	for (cur = parent->children; cur; cur = cur->next) {
-		if (strcmp((char *) cur->name, childname) == 0) {
-			return cur;
-		}
-	}
-
-	return NULL;
-}
-
-xmlNodePtr find_req_child(xmlNodePtr parent, const char *name, const char *fname)
-{
-	xmlNodePtr child;
-
-	if (!(child = find_child(parent, name))) {
-		fprintf(stderr, ERR_PREFIX "Element %s missing child element %s (%s).\n", (char *) parent->name, name, fname);
-	}
-
-	return child;
-}
-
-bool init_ident(struct dmident *ident, xmlDocPtr dm, const char *fname)
-{
-	xmlNodePtr dmodule;
-	xmlNodePtr identAndStatusSection;
-	xmlNodePtr dmAddress;
-	xmlNodePtr dmIdent;
-	xmlNodePtr identExtension;
-	xmlNodePtr dmCode;
-	xmlNodePtr language;
-	xmlNodePtr issueInfo;
-
-	dmodule = xmlDocGetRootElement(dm);
-	if (!(identAndStatusSection = find_req_child(dmodule, "identAndStatusSection", fname))) return false;
-	if (!(dmAddress = find_req_child(identAndStatusSection, "dmAddress", fname))) return false;
-	if (!(dmIdent = find_req_child(dmAddress, "dmIdent", fname))) return false;
-	identExtension = find_child(dmIdent, "identExtension");
-	if (!(dmCode = find_req_child(dmIdent, "dmCode", fname))) return false;
-	if (!(language = find_req_child(dmIdent, "language", fname))) return false;
-	if (!(issueInfo = find_req_child(dmIdent, "issueInfo", fname))) return false;
-
-	ident->modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-	ident->systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-	ident->systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
-	ident->subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-	ident->subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-	ident->assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
-	ident->disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
-	ident->disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
-	ident->infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
-	ident->infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
-	ident->itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
-	ident->learnCode          = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
-	ident->learnEventCode     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
-
-	ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-	ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
-
-	ident->languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-	ident->countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
-
-	if (identExtension) {
-		ident->extended = true;
-		ident->extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
-		ident->extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
-	} else {
-		ident->extended = false;
-	}
-
-	return true;
-}
-
-void free_ident(struct dmident *ident)
-{
-	if (ident->extended) {
-		xmlFree(ident->extensionProducer);
-		xmlFree(ident->extensionCode);
-	}
-	xmlFree(ident->modelIdentCode);
-	xmlFree(ident->systemDiffCode);
-	xmlFree(ident->systemCode);
-	xmlFree(ident->subSystemCode);
-	xmlFree(ident->subSubSystemCode);
-	xmlFree(ident->assyCode);
-	xmlFree(ident->disassyCode);
-	xmlFree(ident->disassyCodeVariant);
-	xmlFree(ident->infoCode);
-	xmlFree(ident->infoCodeVariant);
-	xmlFree(ident->itemLocationCode);
-	xmlFree(ident->learnCode);
-	xmlFree(ident->learnEventCode);
-	xmlFree(ident->issueNumber);
-	xmlFree(ident->inWork);
-	xmlFree(ident->languageIsoCode);
-	xmlFree(ident->countryIsoCode);
-}
-
-xmlNodePtr getElementByName(xmlNodePtr root, const char *name)
-{
-	xmlNodePtr cur;
-
-	for (cur = root->children; cur; cur = cur->next) {
-		xmlNodePtr elem;
-
-		if (strcmp((char *) cur->name, name) == 0) {
-			return cur;
-		} else if ((elem = getElementByName(cur, name))) {
-			return elem;
-		}
-	}
-
-	return NULL;
-}
-
-void clean(char *s)
+void printfiles(char files[DM_MAX][PATH_MAX], int n)
 {
 	int i;
-
-	for (i = 0; s[i]; ++i) {
-		switch (s[i]) {
-			case '\n':
-			case '\t':
-				s[i] = ' ';
-		}
-	}
-}
-
-void printdms(char dms[DM_MAX][PATH_MAX], int n, int columns)
-{
-	int i;
-
-	xmlDocPtr dm;
-	xmlNodePtr dmodule;
-	xmlNodePtr identAndStatusSection;
-	xmlNodePtr dmAddress;
-	xmlNodePtr dmAddressItems;
-	xmlNodePtr dmTitle;
-	xmlNodePtr techName;
-	xmlNodePtr infoName;
-	xmlNodePtr issueDate;
-	xmlNodePtr dmStatus;
-	xmlNodePtr responsiblePartnerCompany;
-	xmlNodePtr originator;
-	xmlNodePtr enterpriseName;
-	xmlNodePtr applic;
-	xmlNodePtr displayText;
-	xmlNodePtr simplePara;
-
-	char *year;
-	char *month;
-	char *day;
-
-	char *name;
-
-	char *display;
-
-	struct dmident ident;
-
 	for (i = 0; i < n; ++i) {
-		char *tech, *info;
-
-		#ifndef _WIN32
-		char real[PATH_MAX];
-		#endif
-
-		#ifdef _WIN32
-		dm = xmlReadFile(dms[i], NULL, 0);
-		#else
-		if (readlink(dms[i], real, PATH_MAX) != -1) {
-			dm = xmlReadFile(real, NULL, 0);
-		} else {
-			dm = xmlReadFile(dms[i], NULL, 0);
-		}
-		#endif
-
-		if (!dm) continue;
-
-		if (!init_ident(&ident, dm, dms[i])) continue;
-
-		dmodule = xmlDocGetRootElement(dm);
-		if (!(identAndStatusSection = find_req_child(dmodule, "identAndStatusSection", dms[i]))) continue;
-		if (!(dmAddress = find_req_child(identAndStatusSection, "dmAddress", dms[i]))) continue;
-		if (!(dmAddressItems = find_req_child(dmAddress, "dmAddressItems", dms[i]))) continue;
-		if (!(dmTitle = find_req_child(dmAddressItems, "dmTitle", dms[i]))) continue;
-		if (!(techName = find_req_child(dmTitle, "techName", dms[i]))) continue;
-		infoName = find_child(dmTitle, "infoName");
-
-		if (!(dmStatus = find_req_child(identAndStatusSection, "dmStatus", dms[i]))) continue;
-
-		tech = (char *) xmlNodeGetContent(techName);
-		info = (char *) xmlNodeGetContent(infoName);
-
-		if (clean_unprintable) clean(tech);
-		if (clean_unprintable && info) clean(info);
-
-		if ((columns & COL_FNAME) == COL_FNAME) {
-			printf("%s	", dms[i]);
-		}
-
-		if ((columns & COL_CODE) == COL_CODE) {
-			if (ident.extended) {
-				printf("%s-%s-", ident.extensionProducer, ident.extensionCode);
-			}
-
-			printf("%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
-				ident.modelIdentCode,
-				ident.systemDiffCode,
-				ident.systemCode,
-				ident.subSystemCode, ident.subSubSystemCode,
-				ident.assyCode,
-				ident.disassyCode, ident.disassyCodeVariant,
-				ident.infoCode, ident.infoCodeVariant,
-				ident.itemLocationCode);
-
-			if (ident.learnCode && ident.learnEventCode) {
-				printf("-%s%s", ident.learnCode, ident.learnEventCode);
-			}
-
-			printf("	");
-		}
-
-		if ((columns & COL_LANG) == COL_LANG) {
-			printf("%s-%s	", ident.languageIsoCode, ident.countryIsoCode);
-		}
-
-		if ((columns & COL_ISSUE) == COL_ISSUE) {
-			printf("%s-%s	", ident.issueNumber, ident.inWork);
-		}
-
-		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
-			issueDate = find_child(dmAddressItems, "issueDate");
-			year  = (char *) xmlGetProp(issueDate, (xmlChar *) "year");
-			month = (char *) xmlGetProp(issueDate, (xmlChar *) "month");
-			day   = (char *) xmlGetProp(issueDate, (xmlChar *) "day");
-
-			printf("%s-%s-%s	", year, month, day);
-
-			xmlFree(year);
-			xmlFree(month);
-			xmlFree(day);
-		}
-
-		if ((columns & COL_STITLE) == COL_STITLE) {
-			printf("%s", tech);
-
-			if (infoName) {
-				printf(" - %s", info);
-			}
-
-			putchar('\t');
-		} else {
-			if ((columns & COL_TECH) == COL_TECH) {
-				printf("%s	", tech);
-			}
-			if ((columns & COL_INFO) == COL_INFO) {
-				printf("%s	", infoName ? info : " ");
-			}
-		}
-
-		if ((columns & COL_RPC) == COL_RPC) {
-			responsiblePartnerCompany = find_child(dmStatus, "responsiblePartnerCompany");
-			enterpriseName = find_child(responsiblePartnerCompany, "enterpriseName");
-
-			name = (char *) xmlNodeGetContent(enterpriseName);
-
-			if (name) {
-				printf("%s	", name);
-			} else {
-				printf("	");
-			}
-
-			xmlFree(name);
-		}
-
-		if ((columns & COL_ORIG) == COL_ORIG) {
-			originator = find_child(dmStatus, "originator");
-			enterpriseName = find_child(originator, "enterpriseName");
-
-			name = (char *) xmlNodeGetContent(enterpriseName);
-
-			if (name) {
-				printf("%s	", name);
-			} else {
-				printf("	");
-			}
-
-			xmlFree(name);
-		}
-
-		if ((columns & COL_APPLIC) == COL_APPLIC) {
-			applic = find_child(dmStatus, "applic");
-			displayText = find_child(applic, "displayText");
-			simplePara = find_child(displayText, "simplePara");
-
-			display = (char *) xmlNodeGetContent(simplePara);
-
-			printf("%s	", display);
-
-			xmlFree(display);
-		}
-
-		printf("\n");
-
-		free_ident(&ident);
-		
-		xmlFree(tech);
-		xmlFree(info);
-
-		xmlFreeDoc(dm);
-	}
-}
-
-void printpms(char pms[DM_MAX][PATH_MAX], int n, int columns)
-{
-	int i;
-	xmlDocPtr pm_doc;
-	xmlNodePtr pm;
-	xmlNodePtr identAndStatusSection;
-	xmlNodePtr pmAddress;
-	xmlNodePtr pmIdent;
-	xmlNodePtr pmAddressItems;
-	xmlNodePtr pmTitle;
-	xmlNodePtr pmCode;
-	xmlNodePtr language;
-	xmlNodePtr issueInfo;
-	xmlNodePtr issueDate;
-
-	for (i = 0; i < n; ++i) {
-		char *title;
-
-		pm_doc = xmlReadFile(pms[i], NULL, 0);
-
-		pm = xmlDocGetRootElement(pm_doc);
-		if (!(identAndStatusSection = find_req_child(pm, "identAndStatusSection", pms[i]))) continue;
-		if (!(pmAddress = find_req_child(identAndStatusSection, "pmAddress", pms[i]))) continue;
-		if (!(pmIdent = find_req_child(pmAddress, "pmIdent", pms[i]))) continue;
-		if (!(pmAddressItems = find_req_child(pmAddress, "pmAddressItems", pms[i]))) continue;
-		if (!(pmTitle = find_req_child(pmAddressItems, "pmTitle", pms[i]))) continue;
-		if (!(pmCode = find_req_child(pmIdent, "pmCode", pms[i]))) continue;
-		if (!(language = find_req_child(pmIdent, "language", pms[i]))) continue;
-		if (!(issueInfo = find_req_child(pmIdent, "issueInfo", pms[i]))) continue;
-		if (!(issueDate = find_req_child(pmAddressItems, "issueDate", pms[i]))) continue;
-
-		title = (char *) xmlNodeGetContent(pmTitle);
-
-		if (clean_unprintable) clean(title);
-
-		if ((columns & COL_FNAME) == COL_FNAME) {
-			printf("%s	", pms[i]);
-		}
-
-		if ((columns & COL_CODE) == COL_CODE) {
-			char *modelIdentCode;
-			char *pmIssuer;
-			char *pmNumber;
-			char *pmVolume;
-
-			modelIdentCode = (char *) xmlGetProp(pmCode, BAD_CAST "modelIdentCode");
-			pmIssuer       = (char *) xmlGetProp(pmCode, BAD_CAST "pmIssuer");
-			pmNumber       = (char *) xmlGetProp(pmCode, BAD_CAST "pmNumber");
-			pmVolume       = (char *) xmlGetProp(pmCode, BAD_CAST "pmVolume");
-
-			printf("%s-%s-%s-%s	", modelIdentCode, pmIssuer, pmNumber, pmVolume);
-
-			xmlFree(modelIdentCode);
-			xmlFree(pmIssuer);
-			xmlFree(pmNumber);
-			xmlFree(pmVolume);
-		}
-
-		if ((columns & COL_LANG) == COL_LANG) {
-			char *languageIsoCode;
-			char *countryIsoCode;
-
-			languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-			countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
-
-			printf("%s-%s	", languageIsoCode, countryIsoCode);
-
-			xmlFree(languageIsoCode);
-			xmlFree(countryIsoCode);
-		}
-
-		if ((columns & COL_ISSUE) == COL_ISSUE) {
-			char *issueNumber;
-			char *inWork;
-
-			issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-			inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
-
-			printf("%s-%s	", issueNumber, inWork);
-
-			xmlFree(issueNumber);
-			xmlFree(inWork);
-		}
-
-		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
-			char *year, *month, *day;
-
-			year  = (char *) xmlGetProp(issueDate, BAD_CAST "year");
-			month = (char *) xmlGetProp(issueDate, BAD_CAST "month");
-			day   = (char *) xmlGetProp(issueDate, BAD_CAST "day");
-
-			printf("%s-%s-%s	", year, month, day);
-
-			xmlFree(year);
-			xmlFree(month);
-			xmlFree(day);
-		}
-
-		if (((columns & COL_TITLE) == COL_TITLE) || ((columns & COL_STITLE) == COL_STITLE)) {
-			printf("%s	", title);
-		}
-
-		printf("\n");
-
-		xmlFree(title);
-
-		xmlFreeDoc(pm_doc);
-	}
-}
-
-void printcoms(char coms[DM_MAX][PATH_MAX], int n, int columns)
-{
-	int i;
-
-	for (i = 0; i < n; ++i) {
-		xmlDocPtr com_doc;
-		xmlNodePtr comment;
-		xmlNodePtr identAndStatusSection;
-		xmlNodePtr commentAddress;
-		xmlNodePtr commentIdent;
-		xmlNodePtr commentAddressItems;
-		xmlNodePtr commentTitle;
-		xmlNodePtr commentCode;
-		xmlNodePtr language;
-		xmlNodePtr issueDate;
-
-		com_doc = xmlReadFile(coms[i], NULL, 0);
-
-		comment = xmlDocGetRootElement(com_doc);
-		if (!(identAndStatusSection = find_req_child(comment, "identAndStatusSection", coms[i]))) continue;
-		if (!(commentAddress = find_req_child(identAndStatusSection, "commentAddress", coms[i]))) continue;
-		if (!(commentIdent = find_req_child(commentAddress, "commentIdent", coms[i]))) continue;
-		if (!(commentAddressItems = find_req_child(commentAddress, "commentAddressItems", coms[i]))) continue;
-		if (!(commentCode = find_req_child(commentIdent, "commentCode", coms[i]))) continue;
-		if (!(language = find_req_child(commentIdent, "language", coms[i]))) continue;
-		if (!(issueDate = find_req_child(commentAddressItems, "issueDate", coms[i]))) continue;
-
-		commentTitle = find_child(commentAddressItems, "commentTitle");
-
-
-
-		if ((columns & COL_FNAME) == COL_FNAME) {
-			printf("%s	", coms[i]);
-		}
-
-		if ((columns & COL_CODE) == COL_CODE) {
-			char *modelIdentCode;
-			char *senderIdent;
-			char *yearOfDataIssue;
-			char *seqNumber;
-			char *commentType;
-
-			modelIdentCode  = (char *) xmlGetProp(commentCode, BAD_CAST "modelIdentCode");
-			senderIdent     = (char *) xmlGetProp(commentCode, BAD_CAST "senderIdent");
-			yearOfDataIssue = (char *) xmlGetProp(commentCode, BAD_CAST "yearOfDataIssue");
-			seqNumber       = (char *) xmlGetProp(commentCode, BAD_CAST "seqNumber");
-			commentType     = (char *) xmlGetProp(commentCode, BAD_CAST "commentType");
-
-			printf("%s-%s-%s-%s-%s	", modelIdentCode, senderIdent, yearOfDataIssue, seqNumber, commentType);
-
-			xmlFree(modelIdentCode);
-			xmlFree(senderIdent);
-			xmlFree(yearOfDataIssue);
-			xmlFree(seqNumber);
-			xmlFree(commentType);
-		}
-
-		if ((columns & COL_LANG) == COL_LANG) {
-			char *languageIsoCode;
-			char *countryIsoCode;
-
-			languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-			countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
-
-			printf("%s-%s	", languageIsoCode, countryIsoCode);
-
-			xmlFree(languageIsoCode);
-			xmlFree(countryIsoCode);
-		}
-		
-		if ((columns & COL_ISSUE) == COL_ISSUE) {
-			printf("	");
-		}
-
-		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
-			char *year, *month, *day;
-
-			year  = (char *) xmlGetProp(issueDate, BAD_CAST "year");
-			month = (char *) xmlGetProp(issueDate, BAD_CAST "month");
-			day   = (char *) xmlGetProp(issueDate, BAD_CAST "day");
-
-			printf("%s-%s-%s	", year, month, day);
-
-			xmlFree(year);
-			xmlFree(month);
-			xmlFree(day);
-		}
-
-		if (((columns & COL_TITLE) == COL_TITLE) || ((columns & COL_STITLE) == COL_STITLE)) {
-			char *title;
-			title = (char *) xmlNodeGetContent(commentTitle);
-			if (title) {
-				printf("%s	", title);
-			} else {
-				printf("	");
-			}
-			xmlFree(title);
-		}
-
-		printf("\n");
-
-		xmlFreeDoc(com_doc);
-	}
-}
-
-void printimfs(char imfs[DM_MAX][PATH_MAX], int n, int columns)
-{
-	int i;
-
-	for (i = 0; i < n; ++i) {
-		xmlDocPtr imf_doc;
-		xmlNodePtr icnMetadataFile;
-		xmlNodePtr imfIdentAndStatusSection;
-		xmlNodePtr imfAddress;
-		xmlNodePtr imfIdent;
-		xmlNodePtr imfAddressItems;
-		xmlNodePtr icnTitle;
-		xmlNodePtr imfCode;
-		xmlNodePtr issueInfo;
-		xmlNodePtr issueDate;
-
-		imf_doc = xmlReadFile(imfs[i], NULL, 0);
-
-		icnMetadataFile = xmlDocGetRootElement(imf_doc);
-		if (!(imfIdentAndStatusSection = find_req_child(icnMetadataFile, "imfIdentAndStatusSection", imfs[i]))) continue;
-		if (!(imfAddress = find_req_child(imfIdentAndStatusSection, "imfAddress", imfs[i]))) continue;
-		if (!(imfIdent = find_req_child(imfAddress, "imfIdent", imfs[i]))) continue;
-		if (!(imfAddressItems = find_req_child(imfAddress, "imfAddressItems", imfs[i]))) continue;
-		if (!(imfCode = find_req_child(imfIdent, "imfCode", imfs[i]))) continue;
-		if (!(issueInfo = find_req_child(imfIdent, "issueInfo", imfs[i]))) continue;
-		if (!(issueDate = find_req_child(imfAddressItems, "issueDate", imfs[i]))) continue;
-
-		icnTitle = find_child(imfAddressItems, "icnTitle");
-
-		if ((columns & COL_FNAME) == COL_FNAME) {
-			printf("%s	", imfs[i]);
-		}
-
-		if ((columns & COL_CODE) == COL_CODE) {
-			char *imfIdentIcn = (char *) xmlGetProp(imfCode, BAD_CAST "imfIdentIcn");
-
-			printf("%s	", imfIdentIcn);
-
-			xmlFree(imfIdentIcn);
-		}
-
-		if ((columns & COL_LANG) == COL_LANG) {
-			printf("	");
-		}
-
-		if ((columns & COL_ISSUE) == COL_ISSUE) {
-			char *issueNumber, *inWork;
-
-			issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-			inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
-
-			printf("%s-%s	", issueNumber, inWork);
-
-			xmlFree(issueNumber);
-			xmlFree(inWork);
-		}
-
-		if ((columns & COL_ISSDATE) == COL_ISSDATE) {
-			char *year, *month, *day;
-
-			year  = (char *) xmlGetProp(issueDate, BAD_CAST "year");
-			month = (char *) xmlGetProp(issueDate, BAD_CAST "month");
-			day   = (char *) xmlGetProp(issueDate, BAD_CAST "day");
-
-			printf("%s-%s-%s	", year, month, day);
-
-			xmlFree(year);
-			xmlFree(month);
-			xmlFree(day);
-		}
-
-		if (((columns & COL_TITLE) == COL_TITLE) || ((columns & COL_STITLE) == COL_STITLE)) {
-			char *title;
-			title = (char *) xmlNodeGetContent(icnTitle);
-			if (title) {
-				printf("%s	", title);
-			} else {
-				printf("	");
-			}
-			xmlFree(title);
-		}
-
-		printf("\n");
-
-		xmlFreeDoc(imf_doc);
+		printf("%s\n", files[i]);
 	}
 }
 
@@ -707,27 +54,15 @@ int isimf(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-acfHhilorRTt]");
+	puts("Usage: " PROG_NAME " [-CDilMPrw]");
 	puts("");
 	puts("Options:");
 	puts("  -l      Show only latest issue/inwork version");
-	puts("  -I      Show only official issues");
-	puts("  -f      Do not show filename");
-	puts("  -c      Show data module code");
-	puts("  -n      Show issue info");
-	puts("  -L      Show language info");
-	puts("  -t      Show tech and info name columns");
-	puts("  -T      Show single title column");
-	puts("  -i      Include issue date column");
-	puts("  -r      Include responsible partner company column");
-	puts("  -o      Include originator column");
-	puts("  -a      Include applicability column");
-	puts("  -H      Show headers on columns");
+	puts("  -i      Show only official issues");
 	puts("  -w      Show only writable data module files");
-	puts("  -R      Recursively search directories");
-	puts("  -p      Print control characters");
+	puts("  -r      Recursively search directories");
 	puts("  -D      List data modules");
-	puts("  -P      List pub modules");
+	puts("  -P      List publication modules");
 	puts("  -C      List comments");
 	puts("  -M      List ICN metadata files");
 	puts("  -h      Show this help message");
@@ -823,16 +158,9 @@ void list_dir(const char *path,
 
 int is_official_issue(const char *fname)
 {
-	xmlDocPtr doc = xmlReadFile(fname, NULL, 0);
-	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
-	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "string(//dmIdent/issueInfo/@inWork|//pmIdent/issueInfo/@inWork)", ctxt);
-	int ret = strcmp((char *) result->stringval, "00") == 0;
-
-	xmlXPathFreeObject(result);
-	xmlXPathFreeContext(ctxt);
-	xmlFreeDoc(doc);
-
-	return ret;
+	char inwork[3] = "";
+	sscanf(fname, "%*[^_]_%*[^-]-%2s", inwork);
+	return strcmp(inwork, "00") == 0;
 }
 
 int main(int argc, char **argv)
@@ -876,39 +204,21 @@ int main(int argc, char **argv)
 	int recursive = 0;
 	int show = 0;
 
-	int columns = COL_FNAME;
-	int header = 0;
-
-	while ((c = getopt(argc, argv, "fclItTiroaAHwRnLpDPCMh?")) != -1) {
+	while ((c = getopt(argc, argv, "CDilMPrwh?")) != -1) {
 		switch (c) {
-			case 'l': only_latest = 1; break;
-			case 'I': only_official_issue = 1; break;
-			case 'f': columns &= ~COL_FNAME; break;
-			case 'c': columns |= COL_CODE; break;
-			case 'n': columns |= COL_ISSUE; break;
-			case 'L': columns |= COL_LANG; break;
-			case 't': columns |= COL_TITLE; break;
-			case 'T': columns |= COL_STITLE; break;
-			case 'p': clean_unprintable = 0; break;
-			case 'i': columns |= COL_ISSDATE; break;
-			case 'r': columns |= COL_RPC; break;
-			case 'o': columns |= COL_ORIG; break;
-			case 'a': columns |= COL_APPLIC; break;
-			case 'A': columns |= COL_ALL; break;
-			case 'H': header = 1; break;
-			case 'w': only_writable = 1; break;
-			case 'R': recursive = 1; break;
-			case 'D': show = show | SHOW_DM; break;
-			case 'P': show = show | SHOW_PM; break;
 			case 'C': show = show | SHOW_COM; break;
+			case 'D': show = show | SHOW_DM; break;
+			case 'i': only_official_issue = 1; break;
+			case 'l': only_latest = 1; break;
 			case 'M': show = show | SHOW_IMF; break;
+			case 'P': show = show | SHOW_PM; break;
+			case 'r': recursive = 1; break;
+			case 'w': only_writable = 1; break;
 			case 'h':
 			case '?': show_help();
 				  exit(0);
 		}
 	}
-
-	if (!columns) exit(0);
 
 	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_IMF;
 
@@ -1048,55 +358,37 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (header) {
-		if ((columns & COL_FNAME) == COL_FNAME) printf("FILENAME	");
-		if ((columns & COL_CODE) == COL_CODE) printf("CODE	");
-		if ((columns & COL_LANG) == COL_LANG) printf("LANG	");
-		if ((columns & COL_ISSUE) == COL_ISSUE) printf("ISSUE	");
-		if ((columns & COL_ISSDATE) == COL_ISSDATE) printf("DATE	");
-		if ((columns & COL_STITLE) == COL_STITLE) {
-			printf("TITLE	");
-		} else {
-			if ((columns & COL_TECH) == COL_TECH) printf("TECH NAME/TITLE	");
-			if ((columns & COL_INFO) == COL_INFO) printf("INFO NAME	");
-		}
-		if ((columns & COL_RPC) == COL_RPC) printf("RPC	");
-		if ((columns & COL_ORIG) == COL_ORIG) printf("ORIG	");
-		if ((columns & COL_APPLIC) == COL_APPLIC) printf("APPLIC	");
-		printf("\n");
-	}
-
 	if ((show & SHOW_DM) == SHOW_DM) {
 		if (only_latest) {
-			printdms(latest_dms, nlatest_dms, columns);
+			printfiles(latest_dms, nlatest_dms);
 		} else if (only_official_issue) {
-			printdms(issue_dms, nissue_dms, columns);
+			printfiles(issue_dms, nissue_dms);
 		} else {
-			printdms(dms, ndms, columns);
+			printfiles(dms, ndms);
 		}
 	}
 
 	if ((show & SHOW_PM) == SHOW_PM) {
 		if (only_latest) {
-			printpms(latest_pms, nlatest_pms, columns);
+			printfiles(latest_pms, nlatest_pms);
 		} else if (only_official_issue) {
-			printpms(issue_pms, nissue_pms, columns);
+			printfiles(issue_pms, nissue_pms);
 		} else {
-			printpms(pms, npms, columns);
+			printfiles(pms, npms);
 		}
 	}
 
 	if ((show & SHOW_COM) == SHOW_COM) {
-		printcoms(coms, ncoms, columns);
+		printfiles(coms, ncoms);
 	}
 
 	if ((show & SHOW_IMF) == SHOW_IMF) {
 		if (only_latest) {
-			printimfs(latest_imfs, nlatest_imfs, columns);
+			printfiles(latest_imfs, nlatest_imfs);
 		} else if (only_official_issue) {
-			printimfs(issue_imfs, nissue_imfs, columns);
+			printfiles(issue_imfs, nissue_imfs);
 		} else {
-			printimfs(imfs, nimfs, columns);
+			printfiles(imfs, nimfs);
 		}
 	}
 
@@ -1107,10 +399,14 @@ int main(int argc, char **argv)
 
 	free(dms);
 	free(pms);
+	free(coms);
+	free(imfs);
 	free(latest_dms);
+	free(latest_pms);
+	free(latest_imfs);
 	free(issue_dms);
-
-	xmlCleanupParser();
+	free(issue_pms);
+	free(issue_imfs);
 
 	return 0;
 }
