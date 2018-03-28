@@ -8,12 +8,12 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="6" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="22"/>
+        <issueDate year="2018" month="03" day="28"/>
         <dmTitle>
-          <techName>s1kd-dmls(1) | s1kd-tools</techName>
+          <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -41,7 +41,13 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+        <simplePara>Rename to s1kd-ls.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
+        <simplePara>Remove functionality which is duplicated by s1kd-metadata.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02">
+        <simplePara>Add support for DDNs and DMLs.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -49,50 +55,26 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-dmls - List data modules</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003">s1kd-ls - List CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
-          <verbatimText verbatimStyle="vs24">s1kd-dmls [-acfHhilorTtpDP]</verbatimText>
+        <para>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002 rfu-0003">s1kd-ls [-CDiLlMPrwX]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-dmls</emphasis> tool lists data modules in a directory, with various options for columns for data module metadata which can be useful for sorting them with other tools.</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002 rfu-0003">The <emphasis>s1kd-ls</emphasis> tool lists CSDB objects in a directory hierarchy.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0002 rfu-0003">
             <definitionListItem>
-              <listItemTerm>-a</listItemTerm>
+              <listItemTerm>-C, -D, -L, -M, -P, -X</listItemTerm>
               <listItemDefinition>
-                <para>Include the applicability column.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-c</listItemTerm>
-              <listItemDefinition>
-                <para>Show data module code column.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-D, -P, -C, -M</listItemTerm>
-              <listItemDefinition>
-                <para>List data modules, publication modules, comments and ICN metadata files respectively. If none are specified, -DPCM is assumed.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
-              <listItemDefinition>
-                <para>Do not show filename column.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-H</listItemTerm>
-              <listItemDefinition>
-                <para>Show headers on columns.</para>
+                <para>List comments, data modules, data management lists, publication modules, and data dispatch notes respectively. If none are specified, -CDLMPX is assumed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -102,21 +84,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-I</listItemTerm>
-              <listItemDefinition>
-                <para>Show only official issues of data modules (inwork = 00).</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
-                <para>Include the issue date column.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-L</listItemTerm>
-              <listItemDefinition>
-                <para>Show language info (languageIsoCode-countryIsoCode).</para>
+                <para>Show only official issues of data modules (inwork = 00).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -126,45 +96,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-n</listItemTerm>
-              <listItemDefinition>
-                <para>Show issue info (issueNumber-inWork).</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-o</listItemTerm>
-              <listItemDefinition>
-                <para>Include the originator column.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-p</listItemTerm>
-              <listItemDefinition>
-                <para>Do not replace control characters (\n, \t) when printing.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-R</listItemTerm>
-              <listItemDefinition>
-                <para>Recursively descend in to directories.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
-                <para>Include the responsible partner company column.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-T</listItemTerm>
-              <listItemDefinition>
-                <para>Show title in single column (techName - infoName).</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-t</listItemTerm>
-              <listItemDefinition>
-                <para>Show tech and info name columns.</para>
+                <para>Recursively descend in to directories.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
