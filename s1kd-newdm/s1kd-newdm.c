@@ -475,7 +475,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	unsigned int len;
 
 	if (strcmp(dmtype, "") == 0) {
-		fprintf(stderr, ERR_PREFIX "No dmtype given.\n");
+		fprintf(stderr, ERR_PREFIX "No schema defined for info code %s%s.\n", infoCode, infoCodeVariant);
 		exit(EXIT_UNKNOWN_DMTYPE);
 	} else if (template_dir) {
 		char src[PATH_MAX];
@@ -750,7 +750,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 				break;
 		}
 	} else {
-		fprintf(stderr, ERR_PREFIX "Unknown dmtype %s\n", dmtype);
+		fprintf(stderr, ERR_PREFIX "Unknown schema %s\n", dmtype);
 		exit(EXIT_UNKNOWN_DMTYPE);
 	}
 
