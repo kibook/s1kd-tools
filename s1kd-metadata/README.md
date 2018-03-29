@@ -8,9 +8,9 @@ SYNOPSIS
 
     s1kd-metadata [-h?]
     s1kd-metadata -H [-n <name>]...
-    s1kd-metadata -c <file> [-fL] [<object>...]
-    s1kd-metadata [-n <name> [-v <value>]]... [-0efLTt] [<object>...]
-    s1kd-metadata -F <fmt> [-L] [<object>...]
+    s1kd-metadata -c <file> [-fLq] [<object>...]
+    s1kd-metadata [-n <name> [-v <value>]]... [-0efLqTt] [<object>...]
+    s1kd-metadata -F <fmt> [-Lq] [<object>...]
 
 DESCRIPTION
 ===========
@@ -43,6 +43,9 @@ Treat input as a list of object filenames to read or edit metadata on, rather th
 
 -n &lt;name&gt;  
 The name of the piece of metadata to fetch. This option can be specified multiple times to fetch multiple pieces of metadata. If -n is not specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.
+
+-q  
+Quiet mode. Non-fatal errors such as a missing piece of optional metadata in an object will not be printed to stderr.
 
 -T  
 Do not format columns in output.

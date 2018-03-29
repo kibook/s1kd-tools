@@ -21,6 +21,8 @@
 
 #define FMTSTR_DELIM '%'
 
+enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
+
 struct metadata {
 	char *key;
 	char *path;
@@ -819,9 +821,9 @@ void show_help(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " [-h?]");
 	puts("  " PROG_NAME " -H [-n <name>]...");
-	puts("  " PROG_NAME " -c <file> [-fL] [<module>...]");
-	puts("  " PROG_NAME " [-0fLTt] [-n <name> [-v <value>]]... [<module>]");
-	puts("  " PROG_NAME " -F <fmt> [-L] [<module>...]");
+	puts("  " PROG_NAME " -c <file> [-fLq] [<module>...]");
+	puts("  " PROG_NAME " [-0fLqTt] [-n <name> [-v <value>]]... [<module>]");
+	puts("  " PROG_NAME " -F <fmt> [-Lq] [<module>...]");
 	puts("");
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
@@ -831,6 +833,7 @@ void show_help(void)
 	puts("  -H           List information on available metadata.");
 	puts("  -L           Input is a list of filenames.");
 	puts("  -n <name>    Specific metadata name to view/edit.");
+	puts("  -q           Quiet mode, do not show non-fatal errors.");
 	puts("  -T           Do not format columns in output.");
 	puts("  -t           Use tab-delimited fields.");
 	puts("  -v <value>   Edit the value of the metadata specified.");
@@ -839,6 +842,8 @@ void show_help(void)
 
 void show_err(int err, const char *key, const char *val, const char *fname)
 {
+	if (verbosity < NORMAL) return;
+
 	switch (err) {
 		case EXIT_INVALID_METADATA:
 			if (val) {
@@ -862,13 +867,18 @@ void show_err(int err, const char *key, const char *val, const char *fname)
 	}
 }
 
-int show_metadata_keyn(xmlXPathContextPtr ctx, const char *key, int n)
+int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 {
 	int i;
+	char *key;
+
+	key = strndup(k, n);
+
 	for (i = 0; metadata[i].key; ++i) {
-		if (strncmp(metadata[i].key, key, n) == 0) {
+		if (strcmp(metadata[i].key, key) == 0) {
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctx))) {
+				show_err(EXIT_MISSING_METADATA, key, NULL, NULL);
 				return EXIT_MISSING_METADATA;
 			}
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
@@ -877,6 +887,7 @@ int show_metadata_keyn(xmlXPathContextPtr ctx, const char *key, int n)
 		}
 	}
 
+	show_err(EXIT_INVALID_METADATA, key, NULL, NULL);
 	return EXIT_INVALID_METADATA;
 }
 
@@ -895,7 +906,7 @@ int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
 				e = strchr(k, FMTSTR_DELIM);
 				if (!e) break;
 				n = e - k;
-				show_metadata_keyn(ctx, k, n);
+				show_metadata_fmtstr_key(ctx, k, n);
 				i += n + 1;
 			}
 		} else if (fmt[i] == '\\') {
@@ -1060,7 +1071,7 @@ int main(int argc, char **argv)
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:eF:fHLn:Ttv:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:eF:fHLn:Ttv:qh?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
@@ -1073,6 +1084,7 @@ int main(int argc, char **argv)
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;
 			case 'v': add_val(keys, optarg); break;
+			case 'q': verbosity = SILENT; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}

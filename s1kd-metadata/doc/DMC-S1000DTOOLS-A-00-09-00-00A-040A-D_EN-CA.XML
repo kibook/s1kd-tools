@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="9" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="28"/>
+        <issueDate year="2018" month="03" day="29"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,13 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -e option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Add -F option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Use multiple usage examples.</simplePara>
+        <simplePara>Add -q option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -60,11 +54,11 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002 rfu-0003"><![CDATA[s1kd-metadata [-h?]
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-metadata [-h?]
 s1kd-metadata -H [-n <name>]...
-s1kd-metadata -c <file> [-fL] [<object>...]
-s1kd-metadata [-n <name> [-v <value>]]... [-0efLTt] [<object>...]
-s1kd-metadata -F <fmt> [-L] [<object>...]]]></verbatimText>
+s1kd-metadata -c <file> [-fLq] [<object>...]
+s1kd-metadata [-n <name> [-v <value>]]... [-0efLqTt] [<object>...]
+s1kd-metadata -F <fmt> [-Lq] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -87,7 +81,7 @@ s1kd-metadata -F <fmt> [-L] [<object>...]]]></verbatimText>
                 <para>Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-e</listItemTerm>
               <listItemDefinition>
                 <para>When showing all metadata, only list editable items. This is useful when creating a file for use with the -c option.</para>
@@ -121,6 +115,12 @@ s1kd-metadata -F <fmt> [-L] [<object>...]]]></verbatimText>
               <listItemTerm>-n &lt;name&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The name of the piece of metadata to fetch. This option can be specified multiple times to fetch multiple pieces of metadata. If -n is not specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Non-fatal errors such as a missing piece of optional metadata in an object will not be printed to stderr.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
