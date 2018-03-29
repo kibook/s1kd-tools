@@ -81,17 +81,19 @@ int isdml(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-CDilMPrw]");
+	puts("Usage: " PROG_NAME " [-CDiLlMPrwX]");
 	puts("");
 	puts("Options:");
 	puts("  -C     List comments");
 	puts("  -D     List data modules");
 	puts("  -i     Show only official issues");
+	puts("  -L     List DMLs");
 	puts("  -l     Show only latest issue/inwork version");
 	puts("  -M     List ICN metadata files");
 	puts("  -P     List publication modules");
 	puts("  -r     Recursively search directories");
 	puts("  -w     Show only writable data module files");
+	puts("  -X     List DDNs");
 	puts("  -h -?  Show this help message");
 }
 
@@ -296,7 +298,7 @@ int main(int argc, char **argv)
 			case 'P': show |= SHOW_PM; break;
 			case 'r': recursive = 1; break;
 			case 'w': only_writable = 1; break;
-			case 'X': show |= SHOW_DDN;
+			case 'X': show |= SHOW_DDN; break;
 			case 'h':
 			case '?': show_help();
 				  exit(0);
