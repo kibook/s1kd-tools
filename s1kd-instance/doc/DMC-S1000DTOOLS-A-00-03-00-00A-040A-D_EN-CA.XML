@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="13"/>
+        <issueDate year="2018" month="03" day="29"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -F option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Change behaviour of -G option.</simplePara>
+        <simplePara>Add -X option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,11 +52,11 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;|-E] [-c &lt;dmc&gt;]
+          <verbatimText verbatimStyle="vs24">s1kd-instance [-s &lt;src&gt;] [-e &lt;ext&gt;|-E] [-c &lt;dmc&gt;]
               [-l &lt;lang&gt;] [-n &lt;iss&gt;] [-I &lt;date&gt;]
               [-u &lt;sec&gt;] [-o &lt;file&gt;|-O &lt;dir&gt;] [-f]
               [-t &lt;techName&gt;] [-i &lt;infoName&gt;] [-a|-A]
-              [-y|-Y &lt;text&gt;] [-C &lt;comment&gt;]
+              [-y|-Y &lt;text&gt;] [-C &lt;comment&gt;] [-X &lt;path&gt;]
               [-g|-G &lt;CODE&gt;/&lt;NAME&gt;] [-F]
               [-R &lt;CIR&gt; ...] [-r &lt;XSL&gt;] [-x &lt;CIR&gt;]
               [-S] [-N] [-P &lt;PCT&gt; -p &lt;id&gt;] [-L]
@@ -103,7 +100,7 @@
             <definitionListItem>
               <listItemTerm>-C &lt;comment&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Add an XML comment to the top of the instance. Useful as another way of identifying a module as an instance aside from the source address or extended code, or giving additional information about a particular instance.</para>
+                <para>Add an XML comment to an instance. Useful as another way of identifying a module as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -124,7 +121,7 @@
                 <para>Specify an extension on the data module code (DME) or publication module code (PME) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-F</listItemTerm>
               <listItemDefinition>
                 <para>After filtering, "alts" elements containing only one child element will be "flattened" by replacing them with the applicable child element. Alts elements with multiple child elements are left untouched.</para>
@@ -139,7 +136,7 @@
             <definitionListItem>
               <listItemTerm>-G &lt;CODE&gt;/&lt;NAME&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Similar to the -g option, but instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.</para>
+                <para>Similar to the -g option, but instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -313,6 +310,12 @@
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
                 <para>Check the applicability of the whole module against the user-defined applicability. If the whole module is not applicable, then no instance is created.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-X &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

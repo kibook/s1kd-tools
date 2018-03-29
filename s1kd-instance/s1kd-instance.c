@@ -126,7 +126,7 @@ xmlNodePtr find_req_child(xmlNodePtr parent, const char *name)
 	return child;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, char *path)
+xmlNodePtr first_xpath_node(xmlDocPtr doc, const char *path)
 {
 	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
 	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST path, ctxt);
@@ -1402,6 +1402,24 @@ void flatten_alts(xmlDocPtr doc)
 	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len);
 }
 
+/* Insert a custom comment. */
+void insert_comment(xmlDocPtr doc, const char *text, const char *path)
+{
+	xmlNodePtr comment, pos;
+
+	comment = xmlNewComment(BAD_CAST text);
+	pos = first_xpath_node(doc, path);
+
+	if (!pos)
+		return;
+
+	if (pos->children) {
+		xmlAddPrevSibling(pos->children, comment);
+	} else {
+		xmlAddChild(pos, comment);
+	}
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1413,9 +1431,7 @@ int main(int argc, char **argv)
 	xmlDocPtr doc;
 	xmlNodePtr root;
 	xmlNodePtr content;
-	xmlNodePtr identAndStatusSection;
 	xmlNodePtr referencedApplicGroup;
-	xmlNodePtr comment;
 
 	int i;
 	int c;
@@ -1432,6 +1448,7 @@ int main(int argc, char **argv)
 	bool new_applic = false;
 	char new_display_text[256] = "";
 	char comment_text[256] = "";
+	char comment_path[256] = "/";
 	char extension[256] = "";
 	char language[256] = "";
 	bool add_source_ident = true;
@@ -1463,7 +1480,7 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:Fh?")) != -1) {
+	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:h?")) != -1) {
 		switch (c) {
 			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
 			case 'S': add_source_ident = false; break;
@@ -1480,6 +1497,7 @@ int main(int argc, char **argv)
 			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
 			case 'y': new_applic = true; break;
 			case 'C': strncpy(comment_text, optarg, 255); break;
+			case 'X': strncpy(comment_path, optarg, 255); break;
 			case 'l': strncpy(language, optarg, 255); break;
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
 			case 'r': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
@@ -1661,15 +1679,7 @@ int main(int argc, char **argv)
 			}
 
 			if (strcmp(comment_text, "") != 0) {
-				comment = xmlNewComment(BAD_CAST comment_text);
-				identAndStatusSection = find_child(root, "identAndStatusSection");
-
-				if (!identAndStatusSection) {
-					fprintf(stderr, ERR_PREFIX "Data module missing child identAndStatusSection.");
-					exit(EXIT_BAD_XML);
-				}
-
-				xmlAddPrevSibling(identAndStatusSection, comment);
+				insert_comment(doc, comment_text, comment_path);
 			}
 
 			if (ispm) {

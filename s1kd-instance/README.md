@@ -10,7 +10,7 @@ SYNOPSIS
                   [-l <lang>] [-n <iss>] [-I <date>]
                   [-u <sec>] [-o <file>|-O <dir>] [-f]
                   [-t <techName>] [-i <infoName>] [-a|-A]
-                  [-y|-Y <text>] [-C <comment>]
+                  [-y|-Y <text>] [-C <comment>] [-X <path>]
                   [-g|-G <CODE>/<NAME>] [-F]
                   [-R <CIR> ...] [-r <XSL>] [-x <CIR>]
                   [-S] [-N] [-P <PCT> -p <id>] [-L]
@@ -39,7 +39,7 @@ Remove unused applicability annotations and simplify/remove unused applicability
 Remove unused applicability annotations but not statements.
 
 -C &lt;comment&gt;  
-Add an XML comment to the top of the instance. Useful as another way of identifying a module as an instance aside from the source address or extended code, or giving additional information about a particular instance.
+Add an XML comment to an instance. Useful as another way of identifying a module as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
 
 -c &lt;dmc&gt;  
 Specify a new data module code (DMC) or publication module code (PMC) for the instance.
@@ -153,6 +153,9 @@ When -O is used, print the automatically generated file name of the instance.
 
 -w  
 Check the applicability of the whole module against the user-defined applicability. If the whole module is not applicable, then no instance is created.
+
+-X &lt;path&gt;  
+The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.
 
 -x &lt;CIR&gt;  
 Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -r option.

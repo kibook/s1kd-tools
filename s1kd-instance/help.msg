@@ -1,7 +1,7 @@
 Usage: s1kd-instance [-s <source>] [-e <ext>|-E] [-c <dmc>] [-l <lang>]
                      [-n <iss>] [-I <date>] [-o <file>|-O <dir>]
                      [-t <techName>] [-i <infoName>] [-a|-A] [-Y <text>]
-                     [-C <comment>] [-g [-G <CODE>/<NAME>]]
+                     [-C <comment>] [-X <path>] [-g [-G <CODE>/<NAME>]]
                      [-R <CIR> ...] [-S] [-v] [<applic>...]
 
 Options:
@@ -34,6 +34,7 @@ Options:
   -u <sec>      Set the security classification of the instance.
   -v            Print the file name of the instance when -O is used.
   -w            Check the applic of the whole DM.
+  -X            XPath where the -C comment will be inserted.
   -x <CIR>      Dump default XSLT for resolving CIR references.
   -Y <text>     Set applic for DM with text as the display text.
   -y            Set applic for DM based on the user-defined defs.
