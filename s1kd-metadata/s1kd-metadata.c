@@ -872,7 +872,8 @@ int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 	int i;
 	char *key;
 
-	key = strndup(k, n);
+	key = malloc(n + 1);
+	sprintf(key, "%.*s", n, k);
 
 	for (i = 0; metadata[i].key; ++i) {
 		if (strcmp(metadata[i].key, key) == 0) {
