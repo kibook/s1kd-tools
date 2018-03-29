@@ -15,6 +15,7 @@
 #define EXIT_MISSING_METADATA 4
 #define EXIT_NO_EDIT 5
 #define EXIT_INVALID_CREATE 6
+#define EXIT_NO_FILE 7
 
 #define KEY_COLUMN_WIDTH 31
 
@@ -991,7 +992,10 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	int err = 0;
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, ERR_PREFIX "Could not read list file '%s'.\n", fname);
+			exit(EXIT_NO_FILE);
+		}
 	} else {
 		f = stdin;
 	}
