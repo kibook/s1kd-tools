@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <sys/stat.h>
 
 /* Maximum number of CSDB objects of each type. */
