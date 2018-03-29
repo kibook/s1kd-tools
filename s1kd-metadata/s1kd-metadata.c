@@ -1006,7 +1006,9 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 			formatall, overwrite, endl, only_editable, fmtstr);
 	}
 
-	fclose(f);
+	if (fname) {
+		fclose(f);
+	}
 
 	return err;
 }
