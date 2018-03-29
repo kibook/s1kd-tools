@@ -48,18 +48,22 @@ xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
 	return node;
 }
 
-xmlChar *first_xpath_value(xmlNodePtr node, const char *expr)
+xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	xmlChar *first;
+	xmlNodePtr first;
 
 	ctx = xmlXPathNewContext(node->doc);
 	ctx->node  = node;
 
 	obj = xmlXPathEvalExpression(BAD_CAST expr, ctx);
 
-	first = obj->type == XPATH_UNDEFINED ? NULL : xmlStrdup(obj->stringval);
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		first = NULL;
+	} else {
+		first = obj->nodesetval->nodeTab[0];
+	}
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
@@ -474,11 +478,20 @@ void show_url(xmlNodePtr node, int endl)
 void show_title(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0) {
-		xmlChar *title;
-		title = first_xpath_value(node, "concat(techName, ' - ', infoName)");
-		printf("%s", (char *) title);
+		xmlNodePtr tech, info;
+		xmlChar *tech_content;
+		tech = first_xpath_node_local(node, "techName");
+		info = first_xpath_node_local(node, "infoName");
+		tech_content = xmlNodeGetContent(tech);
+		printf("%s", (char *) tech_content);
+		xmlFree(tech_content);
+		if (info) {
+			xmlChar *info_content;
+			info_content = xmlNodeGetContent(info);
+			printf(" - %s", info_content);
+			xmlFree(info_content);
+		}
 		if (endl > -1) putchar(endl);
-		xmlFree(title);
 	} else {
 		show_simple_node(node, endl);
 	}
@@ -871,9 +884,12 @@ int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
 				++i;
 			} else {
 				const char *k;
+				const char *e;
 				int n;
 				k = fmt + i + 1;
-				n = strchr(k, FMTSTR_DELIM) - k;
+				e = strchr(k, FMTSTR_DELIM);
+				if (!e) break;
+				n = e - k;
 				show_metadata_keyn(ctx, k, n);
 				i += n + 1;
 			}
