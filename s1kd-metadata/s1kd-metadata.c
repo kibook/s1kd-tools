@@ -691,6 +691,7 @@ int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 		if (strcmp(key, metadata[i].key) == 0) {
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctxt))) {
+				putchar(endl);
 				return EXIT_MISSING_METADATA;
 			}
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
@@ -867,6 +868,13 @@ void show_err(int err, const char *key, const char *val, const char *fname)
 	}
 }
 
+int show_path(const char *fname, int endl)
+{
+	printf("%s", fname);
+	if (endl > -1) putchar(endl);
+	return 0;
+}
+
 int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 {
 	int i;
@@ -892,7 +900,7 @@ int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
+int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
 {
 	int i;
 	for (i = 0; fmt[i]; ++i) {
@@ -907,7 +915,13 @@ int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
 				e = strchr(k, FMTSTR_DELIM);
 				if (!e) break;
 				n = e - k;
-				show_metadata_fmtstr_key(ctx, k, n);
+
+				if (strncmp(k, "path", n) == 0) {
+					show_path(fname, -1);
+				} else {
+					show_metadata_fmtstr_key(ctx, k, n);
+				}
+
 				i += n + 1;
 			}
 		} else if (fmt[i] == '\\') {
@@ -925,13 +939,6 @@ int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
 	return 0;
 }
 
-int show_path(const char *fname, int endl)
-{
-	printf("%s", fname);
-	if (endl > -1) putchar(endl);
-	return 0;
-}
-
 int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
 	int only_editable, const char *fmtstr)
@@ -946,7 +953,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	ctxt = xmlXPathNewContext(doc);
 
 	if (fmtstr) {
-		err = show_metadata_fmtstr(ctxt, fmtstr);
+		err = show_metadata_fmtstr(fname, ctxt, fmtstr);
 	} else if (keys->children) {
 		xmlNodePtr cur;
 		for (cur = keys->children; cur; cur = cur->next) {
