@@ -618,6 +618,12 @@ struct metadata metadata[] = {
 		edit_ent_code,
 		create_orig_ent_code,
 		"NCAGE code of the originator"},
+	{"path",
+		"false()",
+		NULL,
+		NULL,
+		NULL,
+		"Filesystem path of object"},
 	{"pmTitle",
 		"//pmAddressItems/pmTitle",
 		show_simple_node,
@@ -883,8 +889,7 @@ int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
 				putchar(FMTSTR_DELIM);
 				++i;
 			} else {
-				const char *k;
-				const char *e;
+				const char *k, *e;
 				int n;
 				k = fmt + i + 1;
 				e = strchr(k, FMTSTR_DELIM);
@@ -905,6 +910,13 @@ int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
 		}
 	}
 	putchar('\n');
+	return 0;
+}
+
+int show_path(const char *fname, int endl)
+{
+	printf("%s", fname);
+	if (endl > -1) putchar(endl);
 	return 0;
 }
 
@@ -934,6 +946,8 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 			if (val) {
 				edit = 1;
 				err = edit_metadata(ctxt, key, val);
+			} else if (strcmp(key, "path") == 0) {
+				err = show_path(fname, endl);
 			} else {
 				err = show_metadata(ctxt, key, endl);
 			}
