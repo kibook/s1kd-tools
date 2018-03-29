@@ -18,10 +18,12 @@
 
 #define KEY_COLUMN_WIDTH 31
 
+#define FMTSTR_DELIM '%'
+
 struct metadata {
 	char *key;
 	char *path;
-	void (*show)(xmlNodePtr, char endl);
+	void (*show)(xmlNodePtr, int endl);
 	int (*edit)(xmlNodePtr, const char *);
 	int (*create)(xmlXPathContextPtr, const char *val);
 	char *descr;
@@ -64,7 +66,7 @@ xmlChar *first_xpath_value(xmlNodePtr node, const char *expr)
 	return first;
 }
 
-void show_issue_date(xmlNodePtr issue_date, char endl)
+void show_issue_date(xmlNodePtr issue_date, int endl)
 {
 	char *year, *month, *day;
 
@@ -72,7 +74,8 @@ void show_issue_date(xmlNodePtr issue_date, char endl)
 	month = (char *) xmlGetProp(issue_date, BAD_CAST "month");
 	day   = (char *) xmlGetProp(issue_date, BAD_CAST "day");
 
-	printf("%s-%s-%s%c", year, month, day, endl);
+	printf("%s-%s-%s", year, month, day);
+	if (endl > -1) putchar(endl);
 
 	xmlFree(year);
 	xmlFree(month);
@@ -94,10 +97,11 @@ int edit_issue_date(xmlNodePtr issue_date, const char *val)
 	return 0;
 }
 
-void show_simple_node(xmlNodePtr node, char endl)
+void show_simple_node(xmlNodePtr node, int endl)
 {
 	char *content = (char *) xmlNodeGetContent(node);
-	printf("%s%c", content, endl);
+	printf("%s", content);
+	if (endl > -1) putchar(endl);
 	xmlFree(content);
 }
 
@@ -117,10 +121,11 @@ int create_info_name(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-void show_simple_attr(xmlNodePtr node, const char *attr, char endl)
+void show_simple_attr(xmlNodePtr node, const char *attr, int endl)
 {
 	char *text = (char *) xmlGetProp(node, BAD_CAST attr);
-	printf("%s%c", text, endl);
+	printf("%s", text);
+	if (endl > -1) putchar(endl);
 	xmlFree(text);
 }
 
@@ -147,7 +152,7 @@ int create_simple_attr(xmlXPathContextPtr ctxt, const char *nodepath, const char
 	return 0;
 }
 
-void show_ent_code(xmlNodePtr node, char endl)
+void show_ent_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "enterpriseCode", endl);
 }
@@ -169,7 +174,7 @@ int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-void show_sec_class(xmlNodePtr node, char endl)
+void show_sec_class(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "securityClassification", endl);
 }
@@ -179,7 +184,7 @@ int edit_sec_class(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "securityClassification", val);
 }
 
-void show_schema(xmlNodePtr node, char endl)
+void show_schema(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "noNamespaceSchemaLocation", endl);
 }
@@ -200,12 +205,13 @@ int edit_info_name(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_type(xmlNodePtr node, char endl)
+void show_type(xmlNodePtr node, int endl)
 {
-	printf("%s%c", node->name, endl);
+	printf("%s", node->name);
+	if (endl > -1) putchar(endl);
 }
 
-void show_dmcode(xmlNodePtr node, char endl)
+void show_dmcode(xmlNodePtr node, int endl)
 {
 	char *model_ident_code      = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
 	char *system_diff_code      = (char *) xmlGetProp(node, BAD_CAST "systemDiffCode");
@@ -225,7 +231,7 @@ void show_dmcode(xmlNodePtr node, char endl)
 
 	if (learn_code && learn_event_code) sprintf(learn, "-%s%s", learn_code, learn_event_code);
 
-	printf("%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%c",
+	printf("%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
@@ -237,8 +243,8 @@ void show_dmcode(xmlNodePtr node, char endl)
 		info_code,
 		info_code_variant,
 		item_location_code,
-		learn,
-		endl);
+		learn);
+	if (endl > -1) putchar(endl);
 
 	xmlFree(model_ident_code);
 	xmlFree(system_diff_code);
@@ -311,7 +317,7 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-void show_issue_type(xmlNodePtr node, char endl)
+void show_issue_type(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "issueType", endl);
 }
@@ -321,7 +327,7 @@ int edit_issue_type(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "issueType", val);
 }
 
-void show_language_iso_code(xmlNodePtr node, char endl)
+void show_language_iso_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "languageIsoCode", endl);
 }
@@ -331,7 +337,7 @@ int edit_language_iso_code(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "languageIsoCode", val);
 }
 
-void show_country_iso_code(xmlNodePtr node, char endl)
+void show_country_iso_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "countryIsoCode", endl);
 }
@@ -341,7 +347,7 @@ int edit_country_iso_code(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "countryIsoCode", val);
 }
 
-void show_issue_number(xmlNodePtr node, char endl)
+void show_issue_number(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "issueNumber", endl);
 }
@@ -351,7 +357,7 @@ int edit_issue_number(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "issueNumber", val);
 }
 
-void show_in_work(xmlNodePtr node, char endl)
+void show_in_work(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "inWork", endl);
 }
@@ -388,7 +394,7 @@ int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
 	return edit_simple_node(node, val);
 }
 
-void show_comment_code(xmlNodePtr node, char endl)
+void show_comment_code(xmlNodePtr node, int endl)
 {
 	char *model_ident_code;
 	char *sender_ident;
@@ -402,12 +408,13 @@ void show_comment_code(xmlNodePtr node, char endl)
 	seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
 	comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
 
-	printf("%s-%s-%s-%s-%s%c",
+	printf("%s-%s-%s-%s-%s",
 		model_ident_code,
 		sender_ident,
 		year_of_data_issue,
 		seq_number,
-		comment_type, endl);
+		comment_type);
+	if (endl > -1) putchar(endl);
 	
 	xmlFree(model_ident_code);
 	xmlFree(sender_ident);
@@ -416,7 +423,7 @@ void show_comment_code(xmlNodePtr node, char endl)
 	xmlFree(comment_type);
 }
 
-void show_comment_priority(xmlNodePtr node, char endl)
+void show_comment_priority(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "commentPriorityCode", endl);
 }
@@ -426,7 +433,7 @@ int edit_comment_priority(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "commentPriorityCode", val);
 }
 
-void show_comment_response(xmlNodePtr node, char endl)
+void show_comment_response(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "responseType", endl);
 }
@@ -457,20 +464,20 @@ int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
 	return create_ent_name(node, val);
 }
 
-void show_url(xmlNodePtr node, char endl)
+void show_url(xmlNodePtr node, int endl)
 {
-	printf("%s%c", node->doc->URL, endl);
+	printf("%s", node->doc->URL);
+	if (endl > -1) putchar(endl);
 }
 
-void show_title(xmlNodePtr node, char endl)
+void show_title(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0) {
-		xmlChar *tech, *info;
-		tech = first_xpath_value(node, "string(techName)");
-		info = first_xpath_value(node, "string(infoName)");
-		printf("%s - %s%c", (char *) tech, (char *) info, endl);
-		xmlFree(tech);
-		xmlFree(info);
+		xmlChar *title;
+		title = first_xpath_value(node, "concat(techName, ' - ', infoName)");
+		printf("%s", (char *) title);
+		if (endl > -1) putchar(endl);
+		xmlFree(title);
 	} else {
 		show_simple_node(node, endl);
 	}
@@ -654,7 +661,7 @@ struct metadata metadata[] = {
 	{NULL}
 };
 
-int show_metadata(xmlXPathContextPtr ctxt, const char *key, char endl)
+int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 {
 	int i;
 
@@ -700,7 +707,7 @@ int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *val)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, char endl, int only_editable)
+int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, int endl, int only_editable)
 {
 	int i;
 
@@ -789,7 +796,12 @@ void list_metadata_keys(xmlNodePtr keys, int formatall)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-c <file>] [-0fHLTt] [-n <name> [-v <value>]]... [<module>]");
+	puts("Usage:");
+	puts("  " PROG_NAME " [-h?]");
+	puts("  " PROG_NAME " -H [-n <name>]...");
+	puts("  " PROG_NAME " -c <file> [-fL] [<module>...]");
+	puts("  " PROG_NAME " [-0fLTt] [-n <name> [-v <value>]]... [<module>]");
+	puts("  " PROG_NAME " -F <fmt> [-L] [<module>...]");
 	puts("");
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
@@ -830,8 +842,58 @@ void show_err(int err, const char *key, const char *val, const char *fname)
 	}
 }
 
+int show_metadata_keyn(xmlXPathContextPtr ctx, const char *key, int n)
+{
+	int i;
+	for (i = 0; metadata[i].key; ++i) {
+		if (strncmp(metadata[i].key, key, n) == 0) {
+			xmlNodePtr node;
+			if (!(node = first_xpath_node(metadata[i].path, ctx))) {
+				return EXIT_MISSING_METADATA;
+			}
+			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
+			metadata[i].show(node, -1);
+			return EXIT_SUCCESS;
+		}
+	}
+
+	return EXIT_INVALID_METADATA;
+}
+
+int show_metadata_fmtstr(xmlXPathContextPtr ctx, const char *fmt)
+{
+	int i;
+	for (i = 0; fmt[i]; ++i) {
+		if (fmt[i] == FMTSTR_DELIM) {
+			if (fmt[i + 1] == FMTSTR_DELIM) {
+				putchar(FMTSTR_DELIM);
+				++i;
+			} else {
+				const char *k;
+				int n;
+				k = fmt + i + 1;
+				n = strchr(k, FMTSTR_DELIM) - k;
+				show_metadata_keyn(ctx, k, n);
+				i += n + 1;
+			}
+		} else if (fmt[i] == '\\') {
+			switch (fmt[i + 1]) {
+				case 'n': putchar('\n'); ++i; break;
+				case 't': putchar('\t'); ++i; break;
+				case '0': putchar('\0'); ++i; break;
+				default: putchar(fmt[i]);
+			}
+		} else {
+			putchar(fmt[i]);
+		}
+	}
+	putchar('\n');
+	return 0;
+}
+
 int show_or_edit_metadata(const char *fname, const char *metadata_fname,
-	xmlNodePtr keys, int formatall, int overwrite, char endl, int only_editable)
+	xmlNodePtr keys, int formatall, int overwrite, int endl,
+	int only_editable, const char *fmtstr)
 {
 	int err;
 	xmlDocPtr doc;
@@ -842,7 +904,9 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 
 	ctxt = xmlXPathNewContext(doc);
 
-	if (keys->children) {
+	if (fmtstr) {
+		err = show_metadata_fmtstr(ctxt, fmtstr);
+	} else if (keys->children) {
 		xmlNodePtr cur;
 		for (cur = keys->children; cur; cur = cur->next) {
 			char *key = NULL, *val = NULL;
@@ -919,7 +983,8 @@ void add_val(xmlNodePtr keys, const char *val)
 }
 
 int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
-	xmlNodePtr keys, int formatall, int overwrite, char endl, int only_editable)
+	xmlNodePtr keys, int formatall, int overwrite, int endl,
+	int only_editable, const char *fmtstr)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -933,7 +998,8 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
-		err += show_or_edit_metadata(path, metadata_fname, keys, formatall, overwrite, endl, only_editable);
+		err += show_or_edit_metadata(path, metadata_fname, keys,
+			formatall, overwrite, endl, only_editable, fmtstr);
 	}
 
 	fclose(f);
@@ -950,18 +1016,20 @@ int main(int argc, char **argv)
 	char *metadata_fname = NULL;
 	int formatall = 1;
 	int overwrite = 0;
-	char endl = '\n';
+	int endl = '\n';
 	int list_keys = 0;
 	int islist = 0;
 	int only_editable = 0;
+	char *fmtstr = NULL;
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:efHLn:Ttv:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:eF:fHLn:Ttv:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 'e': only_editable = 1; break;
+			case 'F': fmtstr = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
 			case 'L': islist = 1; break;
@@ -981,19 +1049,19 @@ int main(int argc, char **argv)
 			if (islist) {
 				err += show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
-					overwrite, endl, only_editable);
+					overwrite, endl, only_editable, fmtstr);
 			} else {
 				err += show_or_edit_metadata(argv[i],
 					metadata_fname, keys, formatall,
-					overwrite, endl, only_editable);
+					overwrite, endl, only_editable, fmtstr);
 			}
 		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
-			overwrite, endl, only_editable);
+			overwrite, endl, only_editable, fmtstr);
 	} else {
 		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
-			overwrite, endl, only_editable);
+			overwrite, endl, only_editable, fmtstr);
 	}
 
 	free(metadata_fname);
