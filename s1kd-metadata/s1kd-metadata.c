@@ -1053,7 +1053,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
 
-		if (i > 0) {
+		if (!keys->children && i > 0) {
 			putchar('\n');
 		}
 
@@ -1109,7 +1109,7 @@ int main(int argc, char **argv)
 		list_metadata_keys(keys, formatall);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			if (i > optind) {
+			if (!keys->children && i > optind) {
 				putchar('\n');
 			}
 
