@@ -822,9 +822,9 @@ void show_help(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " [-h?]");
 	puts("  " PROG_NAME " -H [-n <name>]...");
-	puts("  " PROG_NAME " -c <file> [-fLq] [<module>...]");
-	puts("  " PROG_NAME " [-0fLqTt] [-n <name> [-v <value>]]... [<module>]");
-	puts("  " PROG_NAME " -F <fmt> [-Lq] [<module>...]");
+	puts("  " PROG_NAME " -c <file> [-flq] [<module>...]");
+	puts("  " PROG_NAME " [-0flqTt] [-n <name> [-v <value>]]... [<module>]");
+	puts("  " PROG_NAME " -F <fmt> [-lq] [<module>...]");
 	puts("");
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
@@ -832,7 +832,7 @@ void show_help(void)
 	puts("  -e           Include only editable metadata when showing all.");
 	puts("  -f           Overwrite modules when editing metadata.");
 	puts("  -H           List information on available metadata.");
-	puts("  -L           Input is a list of filenames.");
+	puts("  -l           Input is a list of filenames.");
 	puts("  -n <name>    Specific metadata name to view/edit.");
 	puts("  -q           Quiet mode, do not show non-fatal errors.");
 	puts("  -T           Do not format columns in output.");
@@ -1079,7 +1079,7 @@ int main(int argc, char **argv)
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 
-	while ((i = getopt(argc, argv, "0c:eF:fHLn:Ttv:qh?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:eF:fHln:Ttv:qh?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
@@ -1087,7 +1087,7 @@ int main(int argc, char **argv)
 			case 'F': fmtstr = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
-			case 'L': islist = 1; break;
+			case 'l': islist = 1; break;
 			case 'n': add_key(keys, optarg); break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;

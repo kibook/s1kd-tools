@@ -8,9 +8,9 @@ SYNOPSIS
 
     s1kd-metadata [-h?]
     s1kd-metadata -H [-n <name>]...
-    s1kd-metadata -c <file> [-fLq] [<object>...]
-    s1kd-metadata [-n <name> [-v <value>]]... [-0efLqTt] [<object>...]
-    s1kd-metadata -F <fmt> [-Lq] [<object>...]
+    s1kd-metadata -c <file> [-flq] [<object>...]
+    s1kd-metadata [-n <name> [-v <value>]]... [-0eflqTt] [<object>...]
+    s1kd-metadata -F <fmt> [-lq] [<object>...]
 
 DESCRIPTION
 ===========
@@ -38,7 +38,7 @@ When editing metadata, overwrite the object. The default is to output the modifi
 -H  
 Lists all available metadata with a short description of each. Specify specific metadata to describe with the -n option.
 
--L  
+-l  
 Treat input as a list of object filenames to read or edit metadata on, rather than an object itself.
 
 -n &lt;name&gt;  
