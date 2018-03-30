@@ -936,7 +936,6 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 			putchar(fmt[i]);
 		}
 	}
-	putchar('\n');
 	return 0;
 }
 
@@ -997,10 +996,6 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 
 	xmlXPathFreeContext(ctxt);
 
-	if (endl != '\n') {
-		putchar('\n');
-	}
-
 	if (edit) {
 		if (overwrite) {
 			if (access(fname, W_OK) != -1) {
@@ -1053,13 +1048,17 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
 
-		if (!keys->children && i > 0) {
+		if (i > 0) {
 			putchar('\n');
 		}
 
 		err += show_or_edit_metadata(path, metadata_fname, keys,
 			formatall, overwrite, endl, only_editable, fmtstr);
 		++i;
+	}
+
+	if (endl != '\n') {
+		putchar('\n');
 	}
 
 	if (fname) {
@@ -1091,7 +1090,7 @@ int main(int argc, char **argv)
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 'e': only_editable = 1; break;
-			case 'F': fmtstr = strdup(optarg); break;
+			case 'F': fmtstr = strdup(optarg); endl = -1; break;
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
 			case 'l': islist = 1; break;
@@ -1109,7 +1108,7 @@ int main(int argc, char **argv)
 		list_metadata_keys(keys, formatall);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			if (!keys->children && i > optind) {
+			if (i > optind) {
 				putchar('\n');
 			}
 
@@ -1122,6 +1121,10 @@ int main(int argc, char **argv)
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr);
 			}
+		}
+
+		if (endl != '\n') {
+			putchar('\n');
 		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
