@@ -669,7 +669,8 @@ struct metadata metadata[] = {
 		NULL,
 		"Technical name of a data module"},
 	{"title",
-		"//dmAddressItems/dmTitle|//pmAddressItems/pmTitle|//commentAddressItems/commentTitle|//imfAddressItems/icnTitle",
+		"//dmAddressItems/dmTitle|//pmAddressItems/pmTitle|"
+		"//commentAddressItems/commentTitle|//imfAddressItems/icnTitle",
 		show_title,
 		NULL,
 		NULL,
@@ -1038,7 +1039,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 {
 	FILE *f;
 	char path[PATH_MAX];
-	int err = 0;
+	int err = 0, i = 0;
 
 	if (fname) {
 		if (!(f = fopen(fname, "r"))) {
@@ -1051,8 +1052,14 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
+
+		if (i > 0) {
+			putchar('\n');
+		}
+
 		err += show_or_edit_metadata(path, metadata_fname, keys,
 			formatall, overwrite, endl, only_editable, fmtstr);
+		++i;
 	}
 
 	if (fname) {
@@ -1102,6 +1109,10 @@ int main(int argc, char **argv)
 		list_metadata_keys(keys, formatall);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
+			if (i > optind) {
+				putchar('\n');
+			}
+
 			if (islist) {
 				err += show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
