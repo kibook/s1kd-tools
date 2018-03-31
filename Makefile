@@ -19,6 +19,7 @@ all:
 	$(MAKE) -C s1kd-newdml
 	$(MAKE) -C s1kd-newimf
 	$(MAKE) -C s1kd-newpm
+	$(MAKE) -C s1kd-newupf
 	$(MAKE) -C s1kd-ref
 	$(MAKE) -C s1kd-refls
 	$(MAKE) -C s1kd-syncrefs
@@ -47,6 +48,7 @@ clean:
 	$(MAKE) -C s1kd-newdml clean
 	$(MAKE) -C s1kd-newimf clean
 	$(MAKE) -C s1kd-newpm clean
+	$(MAKE) -C s1kd-newupf clean
 	$(MAKE) -C s1kd-ref clean
 	$(MAKE) -C s1kd-refls clean
 	$(MAKE) -C s1kd-syncrefs clean
@@ -75,6 +77,7 @@ install:
 	$(MAKE) -C s1kd-newdml install
 	$(MAKE) -C s1kd-newimf install
 	$(MAKE) -C s1kd-newpm install
+	$(MAKE) -C s1kd-newupf install
 	$(MAKE) -C s1kd-ref install
 	$(MAKE) -C s1kd-refls install
 	$(MAKE) -C s1kd-syncrefs install
