@@ -32,11 +32,13 @@
 #define SHOW_DDN 0x10
 #define SHOW_DML 0x20
 
+char sep = '\n';
+
 void printfiles(char files[OBJECT_MAX][PATH_MAX], int n)
 {
 	int i;
 	for (i = 0; i < n; ++i) {
-		printf("%s\n", files[i]);
+		printf("%s%c", files[i], sep);
 	}
 }
 
@@ -85,6 +87,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-CDiLlMPrwX]");
 	puts("");
 	puts("Options:");
+	puts("  -0     Output null-delimited list");
 	puts("  -C     List comments");
 	puts("  -D     List data modules");
 	puts("  -i     Show only official issues");
@@ -247,19 +250,7 @@ int main(int argc, char **argv)
 	char (*imfs)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
 	char (*ddns)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
 	char (*dmls)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int ndms;
-	int npms;
-	int ncoms;
-	int nimfs;
-	int nddns;
-	int ndmls;
-
-	int i;
-
-	int c;
-	int only_latest = 0;
-	int only_official_issue = 0;
-	int only_writable = 0;
+	int ndms, npms, ncoms, nimfs, nddns, ndmls;
 
 	char (*latest_dms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
 	int nlatest_dms;
@@ -285,11 +276,17 @@ int main(int argc, char **argv)
 	char (*issue_dmls)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
 	int nissue_dmls;
 
+	int only_latest = 0;
+	int only_official_issue = 0;
+	int only_writable = 0;
 	int recursive = 0;
 	int show = 0;
 
-	while ((c = getopt(argc, argv, "CDiLlMPrwXh?")) != -1) {
-		switch (c) {
+	int i;
+
+	while ((i = getopt(argc, argv, "0CDiLlMPrwXh?")) != -1) {
+		switch (i) {
+			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;
 			case 'D': show |= SHOW_DM; break;
 			case 'i': only_official_issue = 1; break;

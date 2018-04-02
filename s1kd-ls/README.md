@@ -6,7 +6,7 @@ s1kd-ls - List CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ls [-CDiLlMPrwX]
+    s1kd-ls [-0CDiLlMPrwX]
 
 DESCRIPTION
 ===========
@@ -15,6 +15,9 @@ The *s1kd-ls* tool lists CSDB objects in a directory hierarchy.
 
 OPTIONS
 =======
+
+-0  
+Output a null-delimited list of CSDB object paths.
 
 -C, -D, -L, -M, -P, -X  
 List comments, data modules, data management lists, ICN metadata files, publication modules, and data dispatch notes respectively. If none are specified, -CDLMPX is assumed.
