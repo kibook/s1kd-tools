@@ -17,6 +17,7 @@
 #define OPT_TITLE (int) 0x01
 #define OPT_ISSUE (int) 0x02
 #define OPT_LANG  (int) 0x04
+#define OPT_DATE  (int) 0x08
 
 bool hasopt(int opts, int opt)
 {
@@ -163,6 +164,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_pm_ident;
 		xmlNodePtr ref_pm_address_items;
 		xmlNodePtr ref_pm_title;
+		xmlNodePtr ref_pm_issue_date;
 
 		if (!(doc = xmlReadFile(fname, NULL, 0))) {
 			fprintf(stderr, ERR_PREFIX "Could not read publication module: %s\n", ref);
@@ -173,6 +175,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		ref_pm_ident = find_child(ref_pm_address, "pmIdent");
 		ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
 		ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
+		ref_pm_issue_date = find_child(ref_pm_address_items, "issueDate");
 
 		if (hasopt(opts, OPT_ISSUE)) {
 			xmlAddChild(pm_ref_ident, xmlCopyNode(find_child(ref_pm_ident, "issueInfo"), 1));
@@ -182,10 +185,16 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			xmlAddChild(pm_ref_ident, xmlCopyNode(find_child(ref_pm_ident, "language"), 1));
 		}
 
-		if (hasopt(opts, OPT_TITLE)) {
+		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
 			xmlNodePtr pm_ref_address_items;
 			pm_ref_address_items = xmlNewChild(pm_ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
-			xmlAddChild(pm_ref_address_items, xmlCopyNode(ref_pm_title, 1));
+
+			if (hasopt(opts, OPT_TITLE)) {
+				xmlAddChild(pm_ref_address_items, xmlCopyNode(ref_pm_title, 1));
+			}
+			if (hasopt(opts, OPT_DATE)) {
+				xmlAddChild(pm_ref_address_items, xmlCopyNode(ref_pm_issue_date, 1));
+			}
 		}
 
 		xmlFreeDoc(doc);
@@ -301,6 +310,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dm_ident;
 		xmlNodePtr ref_dm_address_items;
 		xmlNodePtr ref_dm_title;
+		xmlNodePtr ref_dm_issue_date;
 
 		if (!(doc = xmlReadFile(fname, NULL, 0))) {
 			fprintf(stderr, ERR_PREFIX "Could not read data module: %s\n", ref);
@@ -311,6 +321,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		ref_dm_ident = find_child(ref_dm_address, "dmIdent");
 		ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
 		ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
+		ref_dm_issue_date = find_child(ref_dm_address_items, "issueDate");
 
 		if (hasopt(opts, OPT_ISSUE)) {
 			xmlAddChild(dm_ref_ident, xmlCopyNode(find_child(ref_dm_ident, "issueInfo"), 1));
@@ -320,10 +331,16 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			xmlAddChild(dm_ref_ident, xmlCopyNode(find_child(ref_dm_ident, "language"), 1));
 		}
 
-		if (hasopt(opts, OPT_TITLE)) {
+		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
 			xmlNodePtr dm_ref_address_items;
 			dm_ref_address_items = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
-			xmlAddChild(dm_ref_address_items, xmlCopyNode(ref_dm_title, 1));
+
+			if (hasopt(opts, OPT_TITLE)) {
+				xmlAddChild(dm_ref_address_items, xmlCopyNode(ref_dm_title, 1));
+			}
+			if (hasopt(opts, OPT_DATE)) {
+				xmlAddChild(dm_ref_address_items, xmlCopyNode(ref_dm_issue_date, 1));
+			}
 		}
 
 		xmlFreeDoc(doc);
@@ -500,6 +517,7 @@ void show_help(void)
 	puts("  -r        Add reference to data module's <refs> table.");
 	puts("  -s <src>  Source data module to add references to.");
 	puts("  -t        Include title (target must be file)");
+	puts("  -d        Include issue date (target must be file)");
 	puts("  -h -?     Show this help message.");
 	puts("  <code>    The code of the reference (must include prefix DMC/PMC/etc.).");
 	puts("  <file>    A file to reference.");
@@ -516,7 +534,7 @@ int main(int argc, char **argv)
 	char dst[PATH_MAX] = "-";
 	bool overwrite = false;
 
-	while ((i = getopt(argc, argv, "filo:rs:th?")) != -1) {
+	while ((i = getopt(argc, argv, "filo:rs:tdh?")) != -1) {
 		switch (i) {
 			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;
@@ -525,6 +543,7 @@ int main(int argc, char **argv)
 			case 'r': insert_refs = true; break;
 			case 's': strcpy(src, optarg); break;
 			case 't': opts |= OPT_TITLE; break;
+			case 'd': opts |= OPT_DATE; break;
 			case '?':
 			case 'h': show_help(); exit(EXIT_SUCCESS);
 		}

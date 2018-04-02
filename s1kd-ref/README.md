@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-filrth?] [-s <src>] [-o <dst>]
+    s1kd-ref [-filrtdh?] [-s <src>] [-o <dst>]
              [<code>|<filename>]...
 
 DESCRIPTION
@@ -16,6 +16,9 @@ The *s1kd-ref* tool generates the XML for S1000D reference elements using the sp
 
 OPTIONS
 =======
+
+-d  
+Include the issue date in the reference (target must be a file)
 
 -f  
 Overwrite source data module instead of writing to stdout.
