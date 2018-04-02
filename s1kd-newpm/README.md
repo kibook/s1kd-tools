@@ -47,7 +47,10 @@ The country ISO code of the new publication module.
 -c &lt;sec&gt;  
 The security classification of the new publication module.
 
--d  
+-D  
+Include issue date in referenced data modules.
+
+-d &lt;defaults&gt;  
 Specify the 'defaults' file name.
 
 -f  

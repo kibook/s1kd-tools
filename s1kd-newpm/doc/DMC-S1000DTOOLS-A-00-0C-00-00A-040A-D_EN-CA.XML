@@ -46,6 +46,12 @@
       <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
         <simplePara>Add -T option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02">
+        <simplePara>Add -D option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
+        <simplePara>Fix definition of -d option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -129,8 +135,14 @@
                 <para>The security classification of the new publication module.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-D</listItemTerm>
+              <listItemDefinition>
+                <para>Include issue date in referenced data modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d</listItemTerm>
+              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0004">-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the 'defaults' file name.</para>
               </listItemDefinition>
