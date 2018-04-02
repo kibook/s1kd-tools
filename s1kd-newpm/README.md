@@ -56,8 +56,14 @@ Overwrite existing file.
 -I &lt;date&gt;  
 The issue date of the new publication module in the form of YYYY-MM-DD.
 
+-i  
+Include issue information in referenced data modules.
+
 -L &lt;language&gt;  
 The language ISO code of the new publication module.
+
+-l  
+Include language information in referenced data modules.
 
 -n &lt;issue&gt;  
 The issue number of the new publication module.
@@ -70,6 +76,9 @@ The CAGE code of the responsible partner company.
 
 -r &lt;RPC&gt;  
 The responsible partner company enterprise name of the new publication module.
+
+-T  
+Include titles in referenced data modules.
 
 -t &lt;title&gt;  
 The title of the new publication module.

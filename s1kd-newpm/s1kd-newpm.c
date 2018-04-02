@@ -222,10 +222,10 @@ xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 	return node;
 }
 
-void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool include_language)
+void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool include_language, bool include_title)
 {
 	xmlNodePtr ident_extension, dm_code, issue_info, language;
-	xmlNodePtr dm_ref, dm_ref_ident;
+	xmlNodePtr dm_ref, dm_ref_ident, dm_ref_address_items;
 
 	xmlDocPtr dmodule;
 	xmlXPathContextPtr ctx;
@@ -258,6 +258,11 @@ void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool in
 
 	if (include_language) {
 		xmlAddChild(dm_ref_ident, xmlCopyNode(language, 1));
+	}
+
+	if (include_title) {
+		dm_ref_address_items = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
+		xmlAddChild(dm_ref_address_items, xmlCopyNode(first_xpath_node("//dmAddressItems/dmTitle", ctx), 1));
 	}
 
 	xmlAddChild(pmEntry, dm_ref);
@@ -294,7 +299,7 @@ void set_issue_date(xmlNodePtr issueDate)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-newpm [options]");
+	puts("Usage: s1kd-newpm [options] [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -d    Specify the 'defaults' file name.");
@@ -305,6 +310,9 @@ void show_help(void)
 	puts("  -$    Specify which S1000D issue to use.");
 	puts("  -@    Output to specified file.");
 	puts("  -%    Use template in specified directory.");
+	puts("  -i    Include issue info in referenced data modules.");
+	puts("  -l    Include language info in referenced data modules.");
+	puts("  -T    Include titles in referenced data modules.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#    Publication module code");
@@ -498,13 +506,14 @@ int main(int argc, char **argv)
 	char iss[8] = "";
 	bool include_issue_info = false;
 	bool include_language = false;
+	bool include_title = false;
 	bool verbose = false;
 	bool overwrite = false;
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:Nilb:I:vf$:@:%:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -520,6 +529,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 'i': include_issue_info = true; break;
 			case 'l': include_language = true; break;
+			case 'T': include_title = true; break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'I': strcpy(issue_date, optarg); break;
 			case 'v': verbose = true; break;
@@ -680,7 +690,7 @@ int main(int argc, char **argv)
 		set_brex(pm_doc, brex_dmcode);
 
 	for (i = optind; i < argc; ++i) {
-		add_dm_ref(pmEntry, argv[i], include_issue_info, include_language);
+		add_dm_ref(pmEntry, argv[i], include_issue_info, include_language, include_title);
 	}
 
 	for (i = 0; language_iso_code[i]; ++i) {
