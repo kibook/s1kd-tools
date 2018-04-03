@@ -499,6 +499,71 @@ void show_title(xmlNodePtr node, int endl)
 	}
 }
 
+void show_model_ident_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "modelIdentCode", endl);
+}
+
+void show_system_diff_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "systemDiffCode", endl);
+}
+
+void show_system_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "systemCode", endl);
+}
+
+void show_sub_system_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "subSystemCode", endl);
+}
+
+void show_sub_sub_system_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "subSubSystemCode", endl);
+}
+
+void show_assy_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "assyCode", endl);
+}
+
+void show_disassy_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "disassyCode", endl);
+}
+
+void show_disassy_code_variant(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "disassyCodeVariant", endl);
+}
+
+void show_info_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "infoCode", endl);
+}
+
+void show_info_code_variant(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "infoCodeVariant", endl);
+}
+
+void show_item_location_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "itemLocationCode", endl);
+}
+
+void show_learn_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "learnCode", endl);
+}
+
+void show_learn_event_code(xmlNodePtr node, int endl)
+{
+	show_simple_attr(node, "learnEventCode", endl);
+}
+
 struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -512,6 +577,12 @@ struct metadata metadata[] = {
 		edit_simple_node,
 		NULL,
 		"Whole data module applicability"},
+	{"assyCode",
+		"//@assyCode",
+		show_assy_code,
+		NULL,
+		NULL,
+		"Assembly code"},
 	{"authorization",
 		"//ddnStatus/authorization",
 		show_simple_node,
@@ -554,6 +625,18 @@ struct metadata metadata[] = {
 		edit_country_iso_code,
 		NULL,
 		"Country ISO code (CA, US, GB...)"},
+	{"disassyCode",
+		"//@disassyCode",
+		show_disassy_code,
+		NULL,
+		NULL,
+		"Disassembly code"},
+	{"disassyCodeVariant",
+		"//@disassyCodeVariant",
+		show_disassy_code_variant,
+		NULL,
+		NULL,
+		"Disassembly code variant"},
 	{"dmCode",
 		"//dmIdent/dmCode",
 		show_dmcode,
@@ -572,12 +655,30 @@ struct metadata metadata[] = {
 		edit_simple_node,
 		NULL,
 		"Title of an IMF"},
+	{"infoCode",
+		"//@infoCode",
+		show_info_code,
+		NULL,
+		NULL,
+		"Information code"},
+	{"infoCodeVariant",
+		"//@infoCodeVariant",
+		show_info_code_variant,
+		NULL,
+		NULL,
+		"Information code variant"},
 	{"infoName",
 		"//dmAddressItems/dmTitle/infoName",
 		show_simple_node,
 		edit_info_name,
 		create_info_name,
 		"Information name of a data module"},
+	{"inWork",
+		"//issueInfo/@inWork",
+		show_in_work,
+		edit_in_work,
+		NULL,
+		"Inwork issue number (NN)"},
 	{"issueDate",
 	 	"//issueDate",
 		show_issue_date,
@@ -590,24 +691,42 @@ struct metadata metadata[] = {
 		edit_issue_number,
 		NULL,
 		"Issue number (NNN)"},
-	{"inWork",
-		"//issueInfo/@inWork",
-		show_in_work,
-		edit_in_work,
-		NULL,
-		"Inwork issue number (NN)"},
 	{"issueType",
 		"//dmStatus/@issueType|//pmStatus/@issueType",
 		show_issue_type,
 		edit_issue_type,
 		NULL,
 		"Issue type (new, changed, deleted...)"},
+	{"itemLocationCode",
+		"//@itemLocationCode",
+		show_item_location_code,
+		NULL,
+		NULL,
+		"Item location code"},
 	{"languageIsoCode",
 		"//language/@languageIsoCode",
 		show_language_iso_code,
 		edit_language_iso_code,
 		NULL,
 		"Language ISO code (en, fr, es...)"},
+	{"learnCode",
+		"//@learnCode",
+		show_learn_code,
+		NULL,
+		NULL,
+		"Learn code"},
+	{"learnEventCode",
+		"//@learnEventCode",
+		show_learn_event_code,
+		NULL,
+		NULL,
+		"Learn event code"},
+	{"modelIdentCode",
+		"//@modelIdentCode",
+		show_model_ident_code,
+		NULL,
+		NULL,
+		"Model identification code"},
 	{"originator",
 		"//originator/enterpriseName",
 		show_simple_node,
@@ -662,6 +781,30 @@ struct metadata metadata[] = {
 		edit_simple_node,
 		NULL,
 		"Short title of a publication module"},
+	{"subSubSystemCode",
+		"//@subSubSystemCode",
+		show_sub_sub_system_code,
+		NULL,
+		NULL,
+		"Subsubsystem code"},
+	{"subSystemCode",
+		"//@subSystemCode",
+		show_sub_system_code,
+		NULL,
+		NULL,
+		"Subsystem code"},
+	{"systemCode",
+		"//@systemCode",
+		show_system_code,
+		NULL,
+		NULL,
+		"System code"},
+	{"systemDiffCode",
+		"//@systemDiffCode",
+		show_system_diff_code,
+		NULL,
+		NULL,
+		"System difference code"},
 	{"techName",
 		"//dmAddressItems/dmTitle/techName",
 		show_simple_node,
@@ -808,11 +951,11 @@ int has_key(xmlNodePtr keys, const char *key)
 	return 1;
 }
 
-void list_metadata_keys(xmlNodePtr keys, int formatall)
+void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable)
 {
 	int i;
 	for (i = 0; metadata[i].key; ++i) {
-		if (has_key(keys, metadata[i].key)) {
+		if (has_key(keys, metadata[i].key) && (!only_editable || metadata[i].edit)) {
 			list_metadata_key(metadata[i].key, metadata[i].descr, formatall);
 		}
 	}
@@ -889,15 +1032,18 @@ int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctx))) {
 				show_err(EXIT_MISSING_METADATA, key, NULL, NULL);
+				free(key);
 				return EXIT_MISSING_METADATA;
 			}
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 			metadata[i].show(node, -1);
+			free(key);
 			return EXIT_SUCCESS;
 		}
 	}
 
 	show_err(EXIT_INVALID_METADATA, key, NULL, NULL);
+	free(key);
 	return EXIT_INVALID_METADATA;
 }
 
@@ -1105,7 +1251,7 @@ int main(int argc, char **argv)
 	}
 
 	if (list_keys) {
-		list_metadata_keys(keys, formatall);
+		list_metadata_keys(keys, formatall, only_editable);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (i > optind) {
