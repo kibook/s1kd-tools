@@ -44,7 +44,20 @@ void printfiles(char files[OBJECT_MAX][PATH_MAX], int n)
 
 int compare(const void *a, const void *b)
 {
-	return strcasecmp((const char *) a, (const char *) b);
+	char *sa, *sb, *ba, *bb;
+	int d;
+
+	sa = strdup((const char *) a);
+	sb = strdup((const char *) b);
+	ba = basename(sa);
+	bb = basename(sb);
+
+	d = strcasecmp(ba, bb);
+
+	free(sa);
+	free(sb);
+
+	return d;
 }
 
 int isxml(const char *name)
@@ -224,11 +237,25 @@ int extract_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PAT
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
-		if (i == 0 || strncmp(files[i], files[i - 1], strchr(files[i], '_') - files[i]) != 0) {
+		char *name1, *name2, *base1, *base2;
+
+		name1 = strdup(files[i]);
+		base1 = basename(name1);
+		if (i > 0) {
+			name2 = strdup(files[i - 1]);
+			base2 = basename(name2);
+		} else {
+			name2 = NULL;
+		}
+
+		if (i == 0 || strncmp(base1, base2, strchr(base1, '_') - base1) != 0) {
 			strcpy(latest[nlatest++], files[i]);
 		} else {
 			strcpy(latest[nlatest - 1], files[i]);
 		}
+
+		free(name1);
+		free(name2);
 	}
 	return nlatest;
 }
@@ -238,9 +265,14 @@ int extract_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX]
 {
 	int i, nofficial = 0;
 	for (i = 0; i < nfiles; ++i) {
-		if (is_official_issue(files[i])) {
+		char *name = strdup(files[i]);
+		char *base = basename(name);
+
+		if (is_official_issue(base)) {
 			strcpy(official[nofficial++], files[i]);
 		}
+
+		free(name);
 	}
 	return nofficial;
 }
@@ -422,44 +454,52 @@ int main(int argc, char **argv)
 		if (ndmls) nlatest_dmls = extract_latest(latest_dmls, dmls, ndmls);
 	}
 
-	if (nlatest_dms && only_latest) {
-		printfiles(latest_dms, nlatest_dms);
-	} else if (nissue_dms && only_official_issue) {
-		printfiles(issue_dms, nissue_dms);
-	} else if (ndms) {
-		printfiles(dms, ndms);
+	if (ndms) {
+		if (only_latest) {
+			printfiles(latest_dms, nlatest_dms);
+		} else if (only_official_issue) {
+			printfiles(issue_dms, nissue_dms);
+		} else {
+			printfiles(dms, ndms);
+		}
 	}
 
-	if (nlatest_pms && only_latest) {
-		printfiles(latest_pms, nlatest_pms);
-	} else if (nissue_pms && only_official_issue) {
-		printfiles(issue_pms, nissue_pms);
-	} else if (npms) {
-		printfiles(pms, npms);
+	if (npms) {
+		if (only_latest) {
+			printfiles(latest_pms, nlatest_pms);
+		} else if (only_official_issue) {
+			printfiles(issue_pms, nissue_pms);
+		} else {
+			printfiles(pms, npms);
+		}
 	}
 
 	if (ncoms) {
 		printfiles(coms, ncoms);
 	}
 
-	if (nlatest_imfs && only_latest) {
-		printfiles(latest_imfs, nlatest_imfs);
-	} else if (nissue_imfs && only_official_issue) {
-		printfiles(issue_imfs, nissue_imfs);
-	} else if (nimfs) {
-		printfiles(imfs, nimfs);
+	if (nimfs) {
+		if (only_latest) {
+			printfiles(latest_imfs, nlatest_imfs);
+		} else if (only_official_issue) {
+			printfiles(issue_imfs, nissue_imfs);
+		} else {
+			printfiles(imfs, nimfs);
+		}
 	}
 
 	if (nddns) {
 		printfiles(ddns, nddns);
 	}
 
-	if (nlatest_dmls && only_latest) {
-		printfiles(latest_dmls, nlatest_dmls);
-	} else if (nissue_dmls && only_official_issue) {
-		printfiles(issue_dmls, nissue_dmls);
-	} else if (ndmls) {
-		printfiles(dmls, ndmls);
+	if (ndmls) {
+		if (only_latest) {
+			printfiles(latest_dmls, nlatest_dmls);
+		} else if (only_official_issue) {
+			printfiles(issue_dmls, nissue_dmls);
+		} else {
+			printfiles(dmls, ndmls);
+		}
 	}
 
 	if (dir) {
