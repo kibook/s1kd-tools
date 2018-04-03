@@ -119,6 +119,11 @@ int is_directory(const char *path, int recursive)
 	return S_ISDIR(st.st_mode);
 }
 
+int hasopt(int opts, int opt)
+{
+	return ((opts & opt) == opt);
+}
+
 /* Find CSDB objects in a given directory. */
 void list_dir(const char *path,
               char dms[OBJECT_MAX][PATH_MAX], int *ndms,
@@ -155,37 +160,37 @@ void list_dir(const char *path,
 			continue;
 		else if (only_writable && access(cur->d_name, W_OK) != 0)
 			continue;
-		else if (isdm(cur->d_name)) {
+		else if (dms && isdm(cur->d_name)) {
 			if (*ndms == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_DM, OBJECT_MAX);
 				exit(EXIT_OBJECT_MAX);
 			}
 			strcpy(dms[(*ndms)++], cpath);
-		} else if (ispm(cur->d_name)) {
+		} else if (pms && ispm(cur->d_name)) {
 			if (*npms == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_PM, OBJECT_MAX);
 				exit(EXIT_OBJECT_MAX);
 			}
 			strcpy(pms[(*npms)++], cpath);
-		} else if (iscom(cur->d_name)) {
+		} else if (coms && iscom(cur->d_name)) {
 			if (*ncoms == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_COM, OBJECT_MAX);
 				exit(EXIT_OBJECT_MAX);
 			}
 			strcpy(coms[(*ncoms)++], cpath);
-		} else if (isimf(cur->d_name)) {
+		} else if (imfs && isimf(cur->d_name)) {
 			if (*nimfs == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_IMF, OBJECT_MAX);
 				exit(EXIT_OBJECT_MAX);
 			}
 			strcpy(imfs[(*nimfs)++], cpath);
-		} else if (isddn(cur->d_name)) {
+		} else if (ddns && isddn(cur->d_name)) {
 			if (*nddns == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_DDN, OBJECT_MAX);
 				exit(EXIT_OBJECT_MAX);
 			}
 			strcpy(ddns[(*nddns)++], cpath);
-		} else if (isdml(cur->d_name)) {
+		} else if (dmls && isdml(cur->d_name)) {
 			if (*ndmls == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_DML, OBJECT_MAX);
 				exit(EXIT_OBJECT_MAX);
@@ -244,37 +249,25 @@ int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
 
-	char (*dms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	char (*pms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	char (*coms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	char (*imfs)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	char (*ddns)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	char (*dmls)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int ndms, npms, ncoms, nimfs, nddns, ndmls;
+	char (*dms)[PATH_MAX] = NULL;
+	char (*pms)[PATH_MAX] = NULL;
+	char (*coms)[PATH_MAX] = NULL;
+	char (*imfs)[PATH_MAX] = NULL;
+	char (*ddns)[PATH_MAX] = NULL;
+	char (*dmls)[PATH_MAX] = NULL;
+	int ndms = 0, npms = 0, ncoms = 0, nimfs = 0, nddns = 0, ndmls = 0;
 
-	char (*latest_dms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nlatest_dms;
+	char (*latest_dms)[PATH_MAX] = NULL;
+	char (*latest_pms)[PATH_MAX] = NULL;
+	char (*latest_imfs)[PATH_MAX] = NULL;
+	char (*latest_dmls)[PATH_MAX] = NULL;
+	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0;
 
-	char (*latest_pms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nlatest_pms;
-
-	char (*latest_imfs)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nlatest_imfs;
-
-	char (*latest_dmls)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nlatest_dmls;
-
-	char (*issue_dms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nissue_dms;
-
-	char (*issue_pms)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nissue_pms;
-
-	char (*issue_imfs)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nissue_imfs;
-
-	char (*issue_dmls)[PATH_MAX] = malloc(OBJECT_MAX * PATH_MAX);
-	int nissue_dmls;
+	char (*issue_dms)[PATH_MAX] = NULL;
+	char (*issue_pms)[PATH_MAX] = NULL;
+	char (*issue_imfs)[PATH_MAX] = NULL;
+	char (*issue_dmls)[PATH_MAX] = NULL;
+	int nissue_dms = 0, nissue_pms = 0, nissue_imfs = 0, nissue_dmls = 0;
 
 	int only_latest = 0;
 	int only_official_issue = 0;
@@ -305,25 +298,32 @@ int main(int argc, char **argv)
 
 	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_IMF | SHOW_DDN | SHOW_DML;
 
-	ndms = 0;
-	nlatest_dms = 0;
-	nissue_dms = 0;
-
-	npms = 0;
-	nlatest_pms = 0;
-	nissue_pms = 0;
-
-	ncoms = 0;
-
-	nimfs = 0;
-	nlatest_imfs = 0;
-	nissue_imfs = 0;
-
-	nddns = 0;
-
-	ndmls = 0;
-	nlatest_dmls = 0;
-	nissue_dmls = 0;
+	if (hasopt(show, SHOW_DM)) {
+		dms = malloc(OBJECT_MAX * PATH_MAX);
+		latest_dms = malloc(OBJECT_MAX * PATH_MAX);
+		issue_dms = malloc(OBJECT_MAX * PATH_MAX);
+	}
+	if (hasopt(show, SHOW_PM)) {
+		pms = malloc(OBJECT_MAX * PATH_MAX);
+		latest_pms = malloc(OBJECT_MAX * PATH_MAX);
+		issue_pms = malloc(OBJECT_MAX * PATH_MAX);
+	}
+	if (hasopt(show, SHOW_COM)) {
+		coms = malloc(OBJECT_MAX * PATH_MAX);
+	}
+	if (hasopt(show, SHOW_IMF)) {
+		imfs = malloc(OBJECT_MAX * PATH_MAX);
+		latest_imfs = malloc(OBJECT_MAX * PATH_MAX);
+		issue_imfs = malloc(OBJECT_MAX * PATH_MAX);
+	}
+	if (hasopt(show, SHOW_DDN)) {
+		ddns = malloc(OBJECT_MAX * PATH_MAX);
+	}
+	if (hasopt(show, SHOW_DML)) {
+		dmls = malloc(OBJECT_MAX * PATH_MAX);
+		latest_dmls = malloc(OBJECT_MAX * PATH_MAX);
+		issue_dmls = malloc(OBJECT_MAX * PATH_MAX);
+	}
 
 	if (optind < argc) {
 		/* Read dms to list from arguments */
@@ -339,37 +339,37 @@ int main(int argc, char **argv)
 			if (only_writable && access(argv[i], W_OK) != 0)
 				continue;
 
-			if (isdm(base)) {
+			if (dms && isdm(base)) {
 				if (ndms == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_DM, OBJECT_MAX);
 					exit(EXIT_OBJECT_MAX);
 				}
 				strcpy(dms[ndms++], argv[i]);
-			} else if (ispm(base)) {
+			} else if (pms && ispm(base)) {
 				if (npms == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_PM, OBJECT_MAX);
 					exit(EXIT_OBJECT_MAX);
 				}
 				strcpy(pms[npms++], argv[i]);
-			} else if (iscom(base)) {
+			} else if (coms && iscom(base)) {
 				if (ncoms == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_COM, OBJECT_MAX);
 					exit(EXIT_OBJECT_MAX);
 				}
 				strcpy(coms[ncoms++], argv[i]);
-			} else if (isimf(base)) {
+			} else if (imfs && isimf(base)) {
 				if (nimfs == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_IMF, OBJECT_MAX);
 					exit(EXIT_OBJECT_MAX);
 				}
 				strcpy(imfs[nimfs++], argv[i]);
-			} else if (isddn(base)) {
+			} else if (ddns && isddn(base)) {
 				if (nddns == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_DDN, OBJECT_MAX);
 					exit(EXIT_OBJECT_MAX);
 				}
 				strcpy(ddns[nddns++], argv[i]);
-			} else if (isdml(base)) {
+			} else if (dmls && isdml(base)) {
 				if (ndmls == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_DML, OBJECT_MAX);
 					exit(EXIT_OBJECT_MAX);
@@ -398,93 +398,88 @@ int main(int argc, char **argv)
 			only_writable, recursive);
 	}
 
-	qsort(dms, ndms, PATH_MAX, compare);
-	qsort(pms, npms, PATH_MAX, compare);
-	qsort(imfs, nimfs, PATH_MAX, compare);
-	qsort(dmls, ndmls, PATH_MAX, compare);
+	if (ndms) qsort(dms, ndms, PATH_MAX, compare);
+	if (npms) qsort(pms, npms, PATH_MAX, compare);
+	if (nimfs) qsort(imfs, nimfs, PATH_MAX, compare);
+	if (ndmls) qsort(dmls, ndmls, PATH_MAX, compare);
 
 	if (only_official_issue) {
-		nissue_dms = extract_official(issue_dms, dms, ndms);
-		nissue_pms = extract_official(issue_pms, pms, npms);
-		nissue_imfs = extract_official(issue_imfs, imfs, nimfs);
-		nissue_dmls = extract_official(issue_dmls, dmls, ndmls);
+		if (ndms) nissue_dms = extract_official(issue_dms, dms, ndms);
+		if (npms) nissue_pms = extract_official(issue_pms, pms, npms);
+		if (nimfs) nissue_imfs = extract_official(issue_imfs, imfs, nimfs);
+		if (ndmls) nissue_dmls = extract_official(issue_dmls, dmls, ndmls);
 
 		if (only_latest) {
-			nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
-			nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
-			nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
-			nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
+			if (nissue_dms) nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
+			if (nissue_pms) nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
+			if (nissue_imfs) nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
+			if (nissue_dmls) nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
 		}
 	} else if (only_latest) {
-		nlatest_dms = extract_latest(latest_dms, dms, ndms);
-		nlatest_pms = extract_latest(latest_pms, pms, npms);
-		nlatest_imfs = extract_latest(latest_imfs, imfs, nimfs);
-		nlatest_dmls = extract_latest(latest_dmls, dmls, ndmls);
+		if (ndms) nlatest_dms = extract_latest(latest_dms, dms, ndms);
+		if (npms) nlatest_pms = extract_latest(latest_pms, pms, npms);
+		if (nimfs) nlatest_imfs = extract_latest(latest_imfs, imfs, nimfs);
+		if (ndmls) nlatest_dmls = extract_latest(latest_dmls, dmls, ndmls);
 	}
 
-	if ((show & SHOW_DM) == SHOW_DM) {
-		if (only_latest) {
-			printfiles(latest_dms, nlatest_dms);
-		} else if (only_official_issue) {
-			printfiles(issue_dms, nissue_dms);
-		} else {
-			printfiles(dms, ndms);
-		}
+	if (nlatest_dms && only_latest) {
+		printfiles(latest_dms, nlatest_dms);
+	} else if (nissue_dms && only_official_issue) {
+		printfiles(issue_dms, nissue_dms);
+	} else if (ndms) {
+		printfiles(dms, ndms);
 	}
 
-	if ((show & SHOW_PM) == SHOW_PM) {
-		if (only_latest) {
-			printfiles(latest_pms, nlatest_pms);
-		} else if (only_official_issue) {
-			printfiles(issue_pms, nissue_pms);
-		} else {
-			printfiles(pms, npms);
-		}
+	if (nlatest_pms && only_latest) {
+		printfiles(latest_pms, nlatest_pms);
+	} else if (nissue_pms && only_official_issue) {
+		printfiles(issue_pms, nissue_pms);
+	} else if (npms) {
+		printfiles(pms, npms);
 	}
 
-	if ((show & SHOW_COM) == SHOW_COM) {
+	if (ncoms) {
 		printfiles(coms, ncoms);
 	}
 
-	if ((show & SHOW_IMF) == SHOW_IMF) {
-		if (only_latest) {
-			printfiles(latest_imfs, nlatest_imfs);
-		} else if (only_official_issue) {
-			printfiles(issue_imfs, nissue_imfs);
-		} else {
-			printfiles(imfs, nimfs);
-		}
+	if (nlatest_imfs && only_latest) {
+		printfiles(latest_imfs, nlatest_imfs);
+	} else if (nissue_imfs && only_official_issue) {
+		printfiles(issue_imfs, nissue_imfs);
+	} else if (nimfs) {
+		printfiles(imfs, nimfs);
 	}
 
-	if ((show & SHOW_DDN) == SHOW_DDN) {
+	if (nddns) {
 		printfiles(ddns, nddns);
 	}
 
-	if ((show & SHOW_DML) == SHOW_DML) {
-		if (only_latest) {
-			printfiles(latest_dmls, nlatest_dmls);
-		} else if (only_official_issue) {
-			printfiles(issue_dmls, nissue_dmls);
-		} else {
-			printfiles(dmls, ndmls);
-		}
+	if (nlatest_dmls && only_latest) {
+		printfiles(latest_dmls, nlatest_dmls);
+	} else if (nissue_dmls && only_official_issue) {
+		printfiles(issue_dmls, nissue_dmls);
+	} else if (ndmls) {
+		printfiles(dmls, ndmls);
 	}
 
 	if (dir) {
 		closedir(dir);
-
 	}
 
 	free(dms);
+	free(latest_dms);
+	free(issue_dms);
 	free(pms);
+	free(latest_pms);
+	free(issue_pms);
 	free(coms);
 	free(imfs);
-	free(latest_dms);
-	free(latest_pms);
 	free(latest_imfs);
-	free(issue_dms);
-	free(issue_pms);
 	free(issue_imfs);
+	free(ddns);
+	free(dmls);
+	free(latest_dmls);
+	free(issue_dmls);
 
 	return 0;
 }
