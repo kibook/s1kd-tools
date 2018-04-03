@@ -332,29 +332,29 @@ int main(int argc, char **argv)
 
 	if (hasopt(show, SHOW_DM)) {
 		dms = malloc(OBJECT_MAX * PATH_MAX);
-		latest_dms = malloc(OBJECT_MAX * PATH_MAX);
-		issue_dms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest) latest_dms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue) issue_dms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_PM)) {
 		pms = malloc(OBJECT_MAX * PATH_MAX);
-		latest_pms = malloc(OBJECT_MAX * PATH_MAX);
-		issue_pms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest) latest_pms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue) issue_pms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_COM)) {
 		coms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_IMF)) {
 		imfs = malloc(OBJECT_MAX * PATH_MAX);
-		latest_imfs = malloc(OBJECT_MAX * PATH_MAX);
-		issue_imfs = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest) latest_imfs = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue) issue_imfs = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DDN)) {
 		ddns = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DML)) {
 		dmls = malloc(OBJECT_MAX * PATH_MAX);
-		latest_dmls = malloc(OBJECT_MAX * PATH_MAX);
-		issue_dmls = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest) latest_dmls = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue) issue_dmls = malloc(OBJECT_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
