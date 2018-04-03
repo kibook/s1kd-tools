@@ -6,11 +6,7 @@ s1kd-metadata - View and edit S1000D CSDB object metadata
 SYNOPSIS
 ========
 
-    s1kd-metadata [-h?]
-    s1kd-metadata -H [-n <name>]...
-    s1kd-metadata -c <file> [-flq] [<object>...]
-    s1kd-metadata [-n <name> [-v <value>]]... [-0eflqTt] [<object>...]
-    s1kd-metadata -F <fmt> [-lq] [<object>...]
+    s1kd-metadata [options] [<object>...]
 
 DESCRIPTION
 ===========
@@ -56,6 +52,9 @@ Print a tab-delimited list of values of the pieces of metadata specified with -n
 -v &lt;value&gt;  
 The new value for the last piece of metadata specified by -n. Each -n can be followed by a -v to edit multiple pieces of metadata.
 
+-w &lt;name&gt;=&lt;value&gt;  
+Show or edit metadata only on objects where metadata &lt;name&gt; has a value of &lt;value&gt;.
+
 &lt;object&gt;...  
 The object(s) to show/edit metadata on. The default is to read from stdin.
 
@@ -97,3 +96,6 @@ EXAMPLE
     $ s1kd-metadata -F "%techName% (%issueDate%) %issueType%" DMC-*.XML
     New title (2017-08-14) new
     s1kd-aspp(1) | s1kd-tools (2018-03-28) changed
+
+    $ s1kd-metadata -F "%techName%" -w subSubSystemCode=Q DMC-*.XML
+    s1kd-aspp(1) | s1kd-tools

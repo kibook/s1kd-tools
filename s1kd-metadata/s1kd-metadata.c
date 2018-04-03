@@ -16,6 +16,7 @@
 #define EXIT_NO_EDIT 5
 #define EXIT_INVALID_CREATE 6
 #define EXIT_NO_FILE 7
+#define EXIT_CONDITION_UNMET 8
 
 #define KEY_COLUMN_WIDTH 31
 
@@ -963,12 +964,7 @@ void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable)
 
 void show_help(void)
 {
-	puts("Usage:");
-	puts("  " PROG_NAME " [-h?]");
-	puts("  " PROG_NAME " -H [-n <name>]...");
-	puts("  " PROG_NAME " -c <file> [-flq] [<module>...]");
-	puts("  " PROG_NAME " [-0flqTt] [-n <name> [-v <value>]]... [<module>]");
-	puts("  " PROG_NAME " -F <fmt> [-lq] [<module>...]");
+	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -0           Use null-delimited fields.");
@@ -982,12 +978,13 @@ void show_help(void)
 	puts("  -T           Do not format columns in output.");
 	puts("  -t           Use tab-delimited fields.");
 	puts("  -v <value>   Edit the value of the metadata specified.");
+	puts("  -w <cond>    Only list info when object metadata meets <cond>.");
 	puts("  <module>     S1000D module to view/edit metadata on.");
 }
 
-void show_err(int err, const char *key, const char *val, const char *fname)
+int show_err(int err, const char *key, const char *val, const char *fname)
 {
-	if (verbosity < NORMAL) return;
+	if (verbosity < NORMAL) return err;
 
 	switch (err) {
 		case EXIT_INVALID_METADATA:
@@ -1010,6 +1007,8 @@ void show_err(int err, const char *key, const char *val, const char *fname)
 			fprintf(stderr, ERR_PREFIX "%s is not valid metadata for %s\n", key, fname);
 			break;
 	}
+
+	return err;
 }
 
 int show_path(const char *fname, int endl)
@@ -1085,59 +1084,91 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 	return 0;
 }
 
+int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
+{
+	xmlChar *key, *val;
+	int i, cmp = 0;
+
+	key = xmlGetProp(cond, BAD_CAST "key");
+	val = xmlGetProp(cond, BAD_CAST "val");
+
+	for (i = 0; metadata[i].key; ++i) {
+		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
+			xmlNodePtr node;
+			xmlChar *content;
+			node = first_xpath_node(metadata[i].path, ctx);
+			content = xmlNodeGetContent(node);
+			cmp = xmlStrcmp(content, val) == 0;
+			xmlFree(content);
+			break;
+		}
+	}
+
+	return cmp;
+}
+
 int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
-	int only_editable, const char *fmtstr)
+	int only_editable, const char *fmtstr, xmlNodePtr conds)
 {
-	int err;
+	int err = 0;
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctxt;
 	int edit = 0;
+	xmlNodePtr cond;
 
 	doc = xmlReadFile(fname, NULL, 0);
 
 	ctxt = xmlXPathNewContext(doc);
 
-	if (fmtstr) {
-		err = show_metadata_fmtstr(fname, ctxt, fmtstr);
-	} else if (keys->children) {
-		xmlNodePtr cur;
-		for (cur = keys->children; cur; cur = cur->next) {
-			char *key = NULL, *val = NULL;
-
-			key = (char *) xmlGetProp(cur, BAD_CAST "name");
-			val = (char *) xmlGetProp(cur, BAD_CAST "value");
-
-			if (val) {
-				edit = 1;
-				err = edit_metadata(ctxt, key, val);
-			} else if (strcmp(key, "path") == 0) {
-				err = show_path(fname, endl);
-			} else {
-				err = show_metadata(ctxt, key, endl);
-			}
-
-			show_err(err, key, val, fname);
-
-			xmlFree(key);
-			xmlFree(val);
+	for (cond = conds->children; cond; cond = cond->next) {
+		if (!condition_met(ctxt, cond)) {
+			err = EXIT_CONDITION_UNMET;
 		}
-	} else if (metadata_fname) {
-			FILE *input;
+	}
 
-			edit = 1;
+	if (!err) {
+		if (fmtstr) {
+			err = show_metadata_fmtstr(fname, ctxt, fmtstr);
+		} else if (keys->children) {
+			xmlNodePtr cur;
+			for (cur = keys->children; cur; cur = cur->next) {
+				char *key = NULL, *val = NULL;
 
-			if (strcmp(metadata_fname, "-") == 0) {
-				input = stdin;
-			} else {
-				input = fopen(metadata_fname, "r");
+				key = (char *) xmlGetProp(cur, BAD_CAST "name");
+				val = (char *) xmlGetProp(cur, BAD_CAST "value");
+
+				if (val) {
+					edit = 1;
+					err = edit_metadata(ctxt, key, val);
+				} else if (strcmp(key, "path") == 0) {
+					err = show_path(fname, endl);
+				} else {
+					err = show_metadata(ctxt, key, endl);
+				}
+
+				show_err(err, key, val, fname);
+
+				xmlFree(key);
+				xmlFree(val);
 			}
+		} else if (metadata_fname) {
+				FILE *input;
 
-			err = edit_all_metadata(input, ctxt);
+				edit = 1;
 
-			fclose(input);
-	} else {
-			err = show_all_metadata(ctxt, formatall, endl, only_editable);
+				if (strcmp(metadata_fname, "-") == 0) {
+					input = stdin;
+				} else {
+					input = fopen(metadata_fname, "r");
+				}
+
+				err = edit_all_metadata(input, ctxt);
+
+				fclose(input);
+		} else {
+				err = show_all_metadata(ctxt, formatall, endl, only_editable);
+		}
 	}
 
 	xmlXPathFreeContext(ctxt);
@@ -1174,13 +1205,27 @@ void add_val(xmlNodePtr keys, const char *val)
 	xmlSetProp(key, BAD_CAST "value", BAD_CAST val);
 }
 
+void add_cond(xmlNodePtr conds, const char *expr)
+{
+	xmlNodePtr cond;
+	char *e, *k, *v;
+
+	e = strdup(expr);
+	k = strtok(e, "=");
+	v = strtok(NULL, "");
+
+	cond = xmlNewChild(conds, NULL, BAD_CAST "cond", NULL);
+	xmlSetProp(cond, BAD_CAST "key", BAD_CAST k);
+	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
+}
+
 int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
-	int only_editable, const char *fmtstr)
+	int only_editable, const char *fmtstr, xmlNodePtr conds)
 {
 	FILE *f;
 	char path[PATH_MAX];
-	int err = 0, i = 0;
+	int err = 0, i = 0, last_err = 0;
 
 	if (fname) {
 		if (!(f = fopen(fname, "r"))) {
@@ -1194,16 +1239,17 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
 
-		if (i > 0) {
+		if (i > 0 && last_err != EXIT_CONDITION_UNMET) {
 			putchar('\n');
 		}
 
-		err += show_or_edit_metadata(path, metadata_fname, keys,
-			formatall, overwrite, endl, only_editable, fmtstr);
+		last_err = show_or_edit_metadata(path, metadata_fname, keys,
+			formatall, overwrite, endl, only_editable, fmtstr, conds);
+		err += last_err;
 		++i;
 	}
 
-	if (endl != '\n') {
+	if (endl != '\n' && last_err != EXIT_CONDITION_UNMET) {
 		putchar('\n');
 	}
 
@@ -1217,6 +1263,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 int main(int argc, char **argv)
 {
 	xmlNodePtr keys;
+	xmlNodePtr conds;
 	int err = 0;
 
 	int i;
@@ -1230,8 +1277,9 @@ int main(int argc, char **argv)
 	char *fmtstr = NULL;
 
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
+	conds = xmlNewNode(NULL, BAD_CAST "conds");
 
-	while ((i = getopt(argc, argv, "0c:eF:fHln:Ttv:qh?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:eF:fHln:Ttv:qw:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
@@ -1245,6 +1293,7 @@ int main(int argc, char **argv)
 			case 't': endl = '\t'; break;
 			case 'v': add_val(keys, optarg); break;
 			case 'q': verbosity = SILENT; break;
+			case 'w': add_cond(conds, optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -1253,35 +1302,42 @@ int main(int argc, char **argv)
 	if (list_keys) {
 		list_metadata_keys(keys, formatall, only_editable);
 	} else if (optind < argc) {
+		int last_err = 0;
+
 		for (i = optind; i < argc; ++i) {
-			if (i > optind) {
+			if (i > optind && last_err != EXIT_CONDITION_UNMET) {
 				putchar('\n');
 			}
 
 			if (islist) {
-				err += show_or_edit_metadata_list(argv[i],
+				last_err = show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
-					overwrite, endl, only_editable, fmtstr);
+					overwrite, endl, only_editable, fmtstr,
+					conds);
 			} else {
-				err += show_or_edit_metadata(argv[i],
+				last_err = show_or_edit_metadata(argv[i],
 					metadata_fname, keys, formatall,
-					overwrite, endl, only_editable, fmtstr);
+					overwrite, endl, only_editable, fmtstr,
+					conds);
 			}
 		}
 
-		if (endl != '\n') {
+		err += last_err;
+
+		if (endl != '\n' && last_err != EXIT_CONDITION_UNMET) {
 			putchar('\n');
 		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr);
+			overwrite, endl, only_editable, fmtstr, conds);
 	} else {
 		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr);
+			overwrite, endl, only_editable, fmtstr, conds);
 	}
 
 	free(metadata_fname);
 	xmlFreeNode(keys);
+	xmlFreeNode(conds);
 
 	xmlCleanupParser();
 

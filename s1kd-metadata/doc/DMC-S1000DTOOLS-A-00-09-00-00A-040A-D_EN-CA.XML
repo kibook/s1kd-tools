@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="9" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="29"/>
+        <issueDate year="2018" month="04" day="03"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change -L to -l.</simplePara>
+        <simplePara>Add -w option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Simpify usage example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -54,11 +57,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-metadata [-h?]
-s1kd-metadata -H [-n <name>]...
-s1kd-metadata -c <file> [-flq] [<object>...]
-s1kd-metadata [-n <name> [-v <value>]]... [-0eflqTt] [<object>...]
-s1kd-metadata -F <fmt> [-lq] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-metadata [options] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -106,7 +105,7 @@ s1kd-metadata -F <fmt> [-lq] [<object>...]]]></verbatimText>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0001">-l</listItemTerm>
+              <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Treat input as a list of object filenames to read or edit metadata on, rather than an object itself.</para>
               </listItemDefinition>
@@ -141,6 +140,12 @@ s1kd-metadata -F <fmt> [-lq] [<object>...]]]></verbatimText>
                 <para>The new value for the last piece of metadata specified by -n. Each -n can be followed by a -v to edit multiple pieces of metadata.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-w &lt;name&gt;=&lt;value&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Show or edit metadata only on objects where metadata &lt;name&gt; has a value of &lt;value&gt;.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>&lt;object&gt;...</listItemTerm>
               <listItemDefinition>
@@ -153,7 +158,7 @@ s1kd-metadata -F <fmt> [-lq] [<object>...]]]></verbatimText>
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[
 
 $ ls
 DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
@@ -188,7 +193,10 @@ s1kd-aspp(1) | s1kd-tools
 
 $ s1kd-metadata -F "%techName% (%issueDate%) %issueType%" DMC-*.XML
 New title (2017-08-14) new
-s1kd-aspp(1) | s1kd-tools (2018-03-28) changed]]></verbatimText>
+s1kd-aspp(1) | s1kd-tools (2018-03-28) changed
+
+$ s1kd-metadata -F "%techName%" -w subSubSystemCode=Q DMC-*.XML
+s1kd-aspp(1) | s1kd-tools]]></verbatimText>
         </para>
       </levelledPara>
     </description>
