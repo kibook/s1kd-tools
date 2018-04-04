@@ -126,22 +126,32 @@ xmlNodePtr find_req_child(xmlNodePtr parent, const char *name)
 	return child;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, const char *path)
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 {
-	xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
-	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST path, ctxt);
-	xmlNodePtr ret;
-	
-	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-		ret = NULL;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	if (doc) {
+		ctx = xmlXPathNewContext(doc);
 	} else {
-		ret = result->nodesetval->nodeTab[0];
+		ctx = xmlXPathNewContext(node->doc);
 	}
 
-	xmlXPathFreeObject(result);
-	xmlXPathFreeContext(ctxt);
+	ctx->node = node;
 
-	return ret;
+	obj = xmlXPathEvalExpression(BAD_CAST path, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		first = NULL;
+	} else {
+		first = obj->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
 }
 
 /* Copy strings related to uniquely identifying a data module. The strings are
@@ -150,14 +160,14 @@ void init_ident(struct ident *ident, xmlDocPtr doc)
 {
 	xmlNodePtr moduleIdent, identExtension, code, language, issueInfo;
 
-	moduleIdent = first_xpath_node(doc, "//dmIdent|//pmIdent");
+	moduleIdent = first_xpath_node(doc, NULL, "//dmIdent|//pmIdent");
 
 	ident->ispm = strcmp((char *) moduleIdent->name, "pmIdent") == 0;
 
-	identExtension = first_xpath_node(doc, "//dmIdent/identExtension|//pmIdent/identExtension");
-	code = first_xpath_node(doc, "//dmIdent/dmCode|//pmIdent/pmCode");
-	language = first_xpath_node(doc, "//dmIdent/language|//pmIdent/language");
-	issueInfo = first_xpath_node(doc, "//dmIdent/issueInfo|//pmIdent/issueInfo");
+	identExtension = first_xpath_node(doc, NULL, "//dmIdent/identExtension|//pmIdent/identExtension");
+	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode");
+	language = first_xpath_node(doc, NULL, "//dmIdent/language|//pmIdent/language");
+	issueInfo = first_xpath_node(doc, NULL, "//dmIdent/issueInfo|//pmIdent/issueInfo");
 
 	ident->modelIdentCode     = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
 
@@ -360,13 +370,18 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 /* Tests whether an <assert> element is applicable */
 bool eval_assert(xmlNodePtr assert, bool assume)
 {
+	xmlNodePtr ident_attr, type_attr, values_attr;
 	char *ident, *type, *values;
 
 	bool ret;
 
-	ident  = (char *) xmlGetProp(assert, BAD_CAST "applicPropertyIdent");
-	type   = (char *) xmlGetProp(assert, BAD_CAST "applicPropertyType");
-	values = (char *) xmlGetProp(assert, BAD_CAST "applicPropertyValues");
+	ident_attr  = first_xpath_node(NULL, assert, "@applicPropertyIdent|@actidref");
+	type_attr   = first_xpath_node(NULL, assert, "@applicPropertyType|@actreftype");
+	values_attr = first_xpath_node(NULL, assert, "@applicPropertyValues|@actvalues");
+
+	ident  = (char *) xmlNodeGetContent(ident_attr);
+	type   = (char *) xmlNodeGetContent(type_attr);
+	values = (char *) xmlNodeGetContent(values_attr);
 
 	ret = is_applic(ident, type, values, assume);
 
@@ -470,13 +485,16 @@ xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
+	xmlNodePtr attr;
 
-	if (xmlHasProp(node, BAD_CAST "applicRefId")) {
-		char *applicRefId;
+	attr = first_xpath_node(NULL, node, "@applicRefId|@refapplic");
+
+	if (attr) {
+		xmlChar *applicRefId;
 		xmlNodePtr applic;
 
-		applicRefId = (char *) xmlGetProp(node, BAD_CAST "applicRefId");
-		applic = get_element_by_id(referencedApplicGroup, applicRefId);
+		applicRefId = xmlNodeGetContent(attr);
+		applic = get_element_by_id(referencedApplicGroup, (char *) applicRefId);
 		xmlFree(applicRefId);
 
 		if (applic && !eval_applic_stmt(applic, true)) {
@@ -536,9 +554,13 @@ void simpl_applic(xmlNodePtr node)
 			return;
 		}
 	} else if (strcmp((char *) node->name, "assert") == 0) {
-		char *ident  = (char *) xmlGetProp(node, BAD_CAST "applicPropertyIdent");
-		char *type   = (char *) xmlGetProp(node, BAD_CAST "applicPropertyType");
-		char *values = (char *) xmlGetProp(node, BAD_CAST "applicPropertyValues");
+		xmlNodePtr ident_attr  = first_xpath_node(NULL, node, "@applicPropertyIdent|@actidref");
+		xmlNodePtr type_attr   = first_xpath_node(NULL, node, "@applicPropertyType|@actreftype");
+		xmlNodePtr values_attr = first_xpath_node(NULL, node, "@applicPropertyValues|@actvalues");
+
+		char *ident  = (char *) xmlNodeGetContent(ident_attr);
+		char *type   = (char *) xmlNodeGetContent(type_attr);
+		char *values = (char *) xmlNodeGetContent(values_attr);
 
 		bool uneeded = is_applic(ident, type, values, false) || !is_applic(ident, type, values, true);
 
@@ -632,22 +654,28 @@ void simpl_applic_clean(xmlNode* referencedApplicGroup)
 /* Add metadata linking the data module instance with the master data module */
 void add_source(xmlDocPtr doc)
 {
-	xmlNodePtr ident, status, sourceIdent, node, cur;
+	xmlNodePtr ident, sourceIdent, node, cur;
+	const xmlChar *type;
 
-	ident       = first_xpath_node(doc, "//dmIdent|//pmIdent");
-	status      = first_xpath_node(doc, "//dmStatus|//pmStatus");
-	sourceIdent = first_xpath_node(doc, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent");
-	node        = first_xpath_node(doc, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security)[1]");
+	ident       = first_xpath_node(doc, NULL, "//dmIdent|//pmIdent|//dmaddres");
+	sourceIdent = first_xpath_node(doc, NULL, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
+	node        = first_xpath_node(doc, NULL, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
 
 	if (sourceIdent) {
 		xmlUnlinkNode(sourceIdent);
 		xmlFreeNode(sourceIdent);
 	}
 
-	if (strcmp((char *) status->name, "dmStatus") == 0) {
+	type = ident->name;
+
+	if (xmlStrcmp(type, BAD_CAST "dmIdent") == 0) {
 		sourceIdent = xmlNewNode(NULL, BAD_CAST "sourceDmIdent");
-	} else {
+	} else if (xmlStrcmp(type, BAD_CAST "pmIdent") == 0) {
 		sourceIdent = xmlNewNode(NULL, BAD_CAST "sourcePmIdent");
+	} else if (xmlStrcmp(type, BAD_CAST "dmaddres") == 0) {
+		sourceIdent = xmlNewNode(NULL, BAD_CAST "srcdmaddres");
+	} else {
+		return;
 	}
 
 	sourceIdent = xmlAddPrevSibling(node, sourceIdent);
@@ -663,8 +691,8 @@ void set_extd(xmlDocPtr doc, const char *extension)
 	xmlNodePtr identExtension, code;
 	char *ext, *extensionProducer, *extensionCode;
 
-	identExtension = first_xpath_node(doc, "//dmIdent/identExtension|//pmIdent/identExtension");
-	code = first_xpath_node(doc, "//dmIdent/dmCode|//pmIdent/pmCode");
+	identExtension = first_xpath_node(doc, NULL, "//dmIdent/identExtension|//pmIdent/identExtension");
+	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode");
 
 	ext = strdup(extension);
 
@@ -703,7 +731,7 @@ void set_code(xmlDocPtr doc, const char *new_code)
 
 	int n;
 
-	code = first_xpath_node(doc, "//dmIdent/dmCode|//pmIdent/pmCode");
+	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode");
 
 	n = sscanf(new_code,
 		"%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
@@ -767,9 +795,9 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 {
 	xmlNodePtr dmTitle, techName, infoName;
 	
-	dmTitle  = first_xpath_node(doc, "//dmAddressItems/dmTitle");
-	techName = first_xpath_node(doc, "//dmAddressItems/dmTitle/techName|//pmAddressItems/pmTitle");
-	infoName = first_xpath_node(doc, "//dmAddressItems/dmTitle/infoName");
+	dmTitle  = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle");
+	techName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/techName|//pmAddressItems/pmTitle");
+	infoName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/infoName");
 
 	if (strcmp(tech, "") != 0) {
 		xmlNodeSetContent(techName, BAD_CAST tech);
@@ -826,7 +854,7 @@ void set_applic(xmlDocPtr doc, char *new_text)
 
 	xmlNodePtr applic;
 
-	applic = first_xpath_node(doc, "//dmStatus/applic|//pmStatus/applic");
+	applic = first_xpath_node(doc, NULL, "//dmStatus/applic|//pmStatus/applic");
 
 	new_applic = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlAddNextSibling(applic, new_applic);
@@ -874,7 +902,7 @@ void set_lang(xmlDocPtr doc, char *lang)
 
 	int i;
 
-	language = first_xpath_node(doc, "//dmIdent/language|//pmIdent/language");
+	language = first_xpath_node(doc, NULL, "//dmIdent/language|//pmIdent/language");
 
 	language_iso_code = strtok(lang, "-");
 	country_iso_code = strtok(NULL, "");
@@ -1077,7 +1105,7 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 
 	res = xsltApplyStylesheet(style, muxdoc, NULL);
 
-	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, "/mux/dmodule[1]"), 1));
+	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, "/mux/dmodule[1]"), 1));
 	xmlFreeDoc(res);
 	xmlFreeDoc(muxdoc);
 }
@@ -1192,7 +1220,7 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 		exit(EXIT_MISSING_ARGS);
 	}
 
-	issueInfo = first_xpath_node(dm, "//dmIdent/issueInfo|//pmIdent/issueInfo");
+	issueInfo = first_xpath_node(dm, NULL, "//dmIdent/issueInfo|//pmIdent/issueInfo");
 
 	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
@@ -1204,7 +1232,7 @@ void set_issue_date(xmlDocPtr doc, const char *issdate)
 	char year_s[5], month_s[3], day_s[3];
 	xmlNodePtr issueDate;
 
-	issueDate = first_xpath_node(doc, "//issueDate");
+	issueDate = first_xpath_node(doc, NULL, "//issueDate");
 
 	if (sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
 		fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issdate);
@@ -1219,7 +1247,7 @@ void set_issue_date(xmlDocPtr doc, const char *issdate)
 /* Set the securty classification of the instance. */
 void set_security(xmlDocPtr dm, char *sec)
 {
-	xmlNodePtr security = first_xpath_node(dm, "//dmStatus/security|//pmStatus/security");
+	xmlNodePtr security = first_xpath_node(dm, NULL, "//dmStatus/security|//pmStatus/security");
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
 }
 
@@ -1230,10 +1258,10 @@ void set_security(xmlDocPtr dm, char *sec)
 xmlNodePtr find_or_create_orig(xmlDocPtr doc)
 {
 	xmlNodePtr orig, rpc;
-	orig = first_xpath_node(doc, "//originator");
+	orig = first_xpath_node(doc, NULL, "//originator");
 	if (!orig) {
 		orig = xmlNewNode(NULL, BAD_CAST "originator");
-		rpc = first_xpath_node(doc, "//responsiblePartnerCompany");
+		rpc = first_xpath_node(doc, NULL, "//responsiblePartnerCompany");
 		orig = xmlAddNextSibling(rpc, orig);
 	}
 	return orig;
@@ -1281,7 +1309,7 @@ bool check_wholedm_applic(xmlDocPtr dm)
 {
 	xmlNodePtr applic;
 
-	applic = first_xpath_node(dm, "//dmStatus/applic|//pmStatus/applic");
+	applic = first_xpath_node(dm, NULL, "//dmStatus/applic|//pmStatus/applic");
 
 	return eval_applic_stmt(applic, true);
 }
@@ -1340,7 +1368,7 @@ void strip_extension(xmlDocPtr doc)
 {
 	xmlNodePtr ext;
 
-	ext = first_xpath_node(doc, "//identExtension");
+	ext = first_xpath_node(doc, NULL, "//identExtension");
 
 	xmlUnlinkNode(ext);
 	xmlFreeNode(ext);
@@ -1408,7 +1436,7 @@ void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 	xmlNodePtr comment, pos;
 
 	comment = xmlNewComment(BAD_CAST text);
-	pos = first_xpath_node(doc, path);
+	pos = first_xpath_node(doc, NULL, path);
 
 	if (!pos)
 		return;
@@ -1430,7 +1458,6 @@ int main(int argc, char **argv)
 {
 	xmlDocPtr doc;
 	xmlNodePtr root;
-	xmlNodePtr content;
 	xmlNodePtr referencedApplicGroup;
 
 	int i;
@@ -1600,7 +1627,6 @@ int main(int argc, char **argv)
 
 		root = xmlDocGetRootElement(doc);
 		ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
-		content = find_req_child(root, "content");
 
 		if (!wholedm || check_wholedm_applic(doc)) {
 			if (add_source_ident) {
@@ -1626,7 +1652,7 @@ int main(int argc, char **argv)
 				xmlFree(cirxsl);
 			}
 
-			referencedApplicGroup = find_child(content, "referencedApplicGroup");
+			referencedApplicGroup = first_xpath_node(doc, NULL, "//referencedApplicGroup|//inlineapplics");
 
 			if (referencedApplicGroup) {
 				strip_applic(referencedApplicGroup, root);
