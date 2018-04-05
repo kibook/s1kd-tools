@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <string.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
@@ -8,6 +9,9 @@
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
+
+#define PRE_TERM_DELIM " "
+#define POST_TERM_DELIM " .,"
 
 /* Help/usage message */
 void show_help(void)
@@ -41,36 +45,65 @@ xmlChar *last_level(xmlNodePtr flag)
 	return NULL;
 }
 
+bool is_term(xmlChar *content, int content_len, int i, xmlChar *term, int term_len, bool ignorecase)
+{
+	xmlChar *sub;
+	bool is;
+	char s, e;
+
+	sub = xmlStrsub(content, i, term_len);
+
+	s = i == 0 ? ' ' : (char) content[i - 1];
+	e = i + term_len == content_len - 1 ? ' ' : (char) content[i + term_len];
+
+	is = strchr(PRE_TERM_DELIM, s) &&
+	     (ignorecase ? xmlStrcasecmp(sub, term) : xmlStrcmp(sub, term)) == 0 &&
+	     strchr(POST_TERM_DELIM, e);
+
+	xmlFree(sub);
+
+	return is;
+}
+
 /* Insert indexFlag elements after matched terms. */
 void gen_index_node(xmlNodePtr node, xmlNodePtr flag, bool ignorecase)
 {
-	xmlChar *flagtext, *s1;
-	const xmlChar *s2;
+	xmlChar *content;
+	xmlChar *term;
+	int term_len, content_len;
+	int i;
 
-	flagtext = last_level(flag);
-	s1 = xmlNodeGetContent(node);
+	content = xmlNodeGetContent(node);
+	content_len = xmlStrlen(content);
 
-	if (ignorecase) {
-		s2 = xmlStrcasestr(s1, flagtext);
-	} else {
-		s2 = xmlStrstr(s1, flagtext);
+	term = last_level(flag);
+	term_len = xmlStrlen(term);
+
+	i = 0;
+	while (i + term_len < content_len) {
+		if (is_term(content, content_len, i, term, term_len, ignorecase)) {
+			xmlChar *s1 = xmlStrndup(content, i + term_len);
+			xmlChar *s2 = xmlStrsub(content, i + term_len, xmlStrlen(content));
+			xmlNodePtr acr;
+
+			xmlFree(content);
+
+			xmlNodeSetContent(node, s1);
+			xmlFree(s1);
+
+			acr = xmlAddNextSibling(node, xmlCopyNode(flag, 1));
+			node = xmlAddNextSibling(acr, xmlNewText(s2));
+
+			content = s2;
+			content_len = xmlStrlen(s2);
+			i = 0;
+		} else {
+			++i;
+		}
 	}
 
-	if (s2) {
-		xmlChar *s3;
-
-		s2 = s2 + xmlStrlen(flagtext);
-		s3 = xmlStrndup(s1, s2 - s1);
-
-		xmlNodeSetContent(node, s3);
-		flag = xmlAddNextSibling(node, xmlCopyNode(flag, 1));
-		node = xmlAddNextSibling(flag, xmlNewText(s2));
-
-		xmlFree(s3);
-	}
-
-	xmlFree(s1);
-	xmlFree(flagtext);
+	xmlFree(term);
+	xmlFree(content);
 }
 
 /* Flag an individual term in all applicable elements in a module. */
