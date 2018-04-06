@@ -41,24 +41,27 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
         <simplePara>Add -L option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Use generic term "CSDB object" instead of "data module".</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-brexcheck - Validate S1000D data modules against BREX data modules</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-brexcheck - Validate S1000D CSDB objects against BREX data modules</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-               [-vVqDsxlStupfcLh?] <datamodules>]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+               [-vVqDsxlStupfcLh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates an S1000D data module using the context rules, SNS rules, and/or notation rules of one or multiple <acronym acronymType="at01"><acronymTerm>BREX</acronymTerm><acronymDefinition>Business Rules EXchange</acronymDefinition></acronym> data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.</para>
+        <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates S1000D CSDB objects using the context, SNS, and/or notation rules of one or multiple <acronym acronymType="at01"><acronymTerm>BREX</acronymTerm><acronymDefinition>Business Rules EXchange</acronymDefinition></acronym> data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -67,7 +70,7 @@
             <definitionListItem>
               <listItemTerm>-b &lt;brex&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Check the data modules against this BREX. Multiple BREX data modules can be specified by adding this option multiple times. When no BREX data modules are specified, the BREX data module referenced in &lt;brexDmRef&gt; in the data module is attempted to be used instead.</para>
+                <para>Check the CSDB objects against this BREX. Multiple BREX data modules can be specified by adding this option multiple times. When no BREX data modules are specified, the BREX data module referenced in &lt;brexDmRef&gt; in the CSDB object is attempted to be used instead.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -79,7 +82,7 @@
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>Output only the filenames of modules with BREX/SNS errors.</para>
+                <para>Output only the filenames of CSDB objects with BREX/SNS errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -103,13 +106,13 @@
             <definitionListItem>
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
-                <para>Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified data modules) will also be checked against.</para>
+                <para>Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified CSDB objects) will also be checked against.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-n</listItemTerm>
               <listItemDefinition>
-                <para>Check notation rules. Any notation names listed in any of the BREX data modules with attribute <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "1" or omitted are considered valid notations. If a notation in a data module is not present or has <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "0", an error will be returned.</para>
+                <para>Check notation rules. Any notation names listed in any of the BREX data modules with attribute <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "1" or omitted are considered valid notations. If a notation in a CSDB object is not present or has <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "0", an error will be returned.</para>
                 <para>For notations not included but not explicitly excluded, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the first inclusion rule will be returned with the error. For explicitly excluded notations, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the explicit exclusion rule is returned.</para>
               </listItemDefinition>
             </definitionListItem>

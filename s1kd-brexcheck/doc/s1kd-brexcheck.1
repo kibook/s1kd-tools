@@ -4,31 +4,31 @@
 .hy
 .SH NAME
 .PP
-s1kd\-brexcheck \- Validate S1000D data modules against BREX data
+s1kd\-brexcheck \- Validate S1000D CSDB objects against BREX data
 modules
 .SH SYNOPSIS
 .IP
 .nf
 \f[C]
 s1kd\-brexcheck\ [\-b\ <brex>]\ [\-I\ <path>]\ [\-w\ <severities>]
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-vVqDsxlStupfcLh?]\ <datamodules>
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-vVqDsxlStupfcLh?]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
 .PP
-The \f[I]s1kd\-brexcheck\f[] tool validates an S1000D data module using
-the context rules, SNS rules, and/or notation rules of one or multiple
-BREX (Business Rules EXchange) data modules.
+The \f[I]s1kd\-brexcheck\f[] tool validates S1000D CSDB objects using
+the context, SNS, and/or notation rules of one or multiple BREX
+(Business Rules EXchange) data modules.
 All errors are displayed with the <objectUse> message, the line number,
 and a representation of the invalid XML tree.
 .SH OPTIONS
 .TP
 .B \-b <brex>
-Check the data modules against this BREX.
+Check the CSDB objects against this BREX.
 Multiple BREX data modules can be specified by adding this option
 multiple times.
 When no BREX data modules are specified, the BREX data module referenced
-in <brexDmRef> in the data module is attempted to be used instead.
+in <brexDmRef> in the CSDB object is attempted to be used instead.
 .RS
 .RE
 .TP
@@ -39,7 +39,7 @@ the value of each object is within the allowed set of values.
 .RE
 .TP
 .B \-f
-Output only the filenames of modules with BREX/SNS errors.
+Output only the filenames of CSDB objects with BREX/SNS errors.
 .RS
 .RE
 .TP
@@ -63,7 +63,7 @@ object itself.
 .B \-l
 Use the layered BREX concept.
 BREX data modules referenced by other BREX data modules (either
-specified with \-b or referenced by the specified data modules) will
+specified with \-b or referenced by the specified CSDB objects) will
 also be checked against.
 .RS
 .RE
@@ -73,7 +73,7 @@ Check notation rules.
 Any notation names listed in any of the BREX data modules with attribute
 \f[C]allowedNotationFlag\f[] set to "1" or omitted are considered valid
 notations.
-If a notation in a data module is not present or has
+If a notation in a CSDB object is not present or has
 \f[C]allowedNotationFlag\f[] set to "0", an error will be returned.
 .RS
 .PP
