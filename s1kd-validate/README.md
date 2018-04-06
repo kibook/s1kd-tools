@@ -1,17 +1,17 @@
 NAME
 ====
 
-s1kd-validate - Validate an S1000D data module against its schema
+s1kd-validate - Validate S1000D CSDB objects against their schemas
 
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-X <URI>] [-vqD] [<datamodule>...]
+    s1kd-validate [-d <dir>] [-X <URI>] [-lvqD] [<object>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-validate* tool validates an S1000D data module, checking whether it is a valid XML file and if it is valid against its own S1000D schema.
+The *s1kd-validate* tool validates S1000D CSDB objects, checking whether they are valid XML files and if they are valid against their own S1000D schemas.
 
 OPTIONS
 =======
@@ -24,14 +24,17 @@ This can also be accomplished through the use of XML catalogs.
 -f  
 List invalid files.
 
+-l  
+Treat input as a list of object names to validate, rather than an object itself.
+
 -v -q -D  
 Set the verbosity of the output, verbose, quiet, and debug. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.
 
 -X &lt;URI&gt;  
 Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.
 
-&lt;datamodule&gt;...  
-Any number of data modules to validate. If none are specified, input is read from stdin.
+&lt;object&gt;...  
+Any number of CSDB objects to validate. If none are specified, input is read from stdin.
 
 Multi-spec directory with -d option
 -----------------------------------

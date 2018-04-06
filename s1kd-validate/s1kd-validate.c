@@ -87,12 +87,13 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-fvqD] <dms>");
+	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-flvqD] <dms>");
 	puts("");
 	puts("Options:");
 	puts("  -d <dir> Search for schemas in <dir> instead of using the URL.");
 	puts("  -X <URI> Exclude namespace from validation by URI.");
 	puts("  -f       List invalid files.");
+	puts("  -l       Treat input as list of filenames.");
 	puts("  -v       Verbose output.");
 	puts("  -q       Silent (not output).");
 	puts("  -D       Debug output.");
@@ -254,18 +255,45 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	return err;
 }
 
+int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns, int list_invalid)
+{
+	FILE *f;
+	char path[PATH_MAX];
+	int err;
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	err = 0;
+
+	while (fgets(path, PATH_MAX, f)) {
+		strtok(path, "\t\n");
+		err += validate_file(path, schema_dir, ignore_ns, list_invalid);
+	}
+
+	if (fname) {
+		fclose(f);
+	}
+
+	return err;
+}
+
 int main(int argc, char *argv[])
 {
 	int c, i;
 	char schema_dir[256] = "";
 	int err = 0;
 	int list_invalid = 0;
+	int is_list = 0;
 
 	xmlNodePtr ignore_ns;
 
 	ignore_ns = xmlNewNode(NULL, BAD_CAST "ignorens");
 
-	while ((c = getopt(argc, argv, "vqDd:X:fh?")) != -1) {
+	while ((c = getopt(argc, argv, "vqDd:X:flh?")) != -1) {
 		switch (c) {
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
@@ -273,17 +301,24 @@ int main(int argc, char *argv[])
 			case 'd': strcpy(schema_dir, optarg); break;
 			case 'X': add_ignore_ns(ignore_ns, optarg); break;
 			case 'f': list_invalid = 1; break;
+			case 'l': is_list = 1; break;
 			case 'h': 
 			case '?': show_help(); exit(0);
 		}
 	}
 
-	if (optind >= argc) {
-		err = validate_file("-", schema_dir, ignore_ns, list_invalid);
-	} else {
+	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			err += validate_file(argv[i], schema_dir, ignore_ns, list_invalid);
+			if (is_list) {
+				err += validate_file_list(argv[i], schema_dir, ignore_ns, list_invalid);
+			} else {
+				err += validate_file(argv[i], schema_dir, ignore_ns, list_invalid);
+			}
 		}
+	} else if (is_list) {
+		err = validate_file_list(NULL, schema_dir, ignore_ns, list_invalid);
+	} else {
+		err = validate_file("-", schema_dir, ignore_ns, list_invalid);
 	}
 
 	for (i = 0; i < schema_parser_count; ++i) {
