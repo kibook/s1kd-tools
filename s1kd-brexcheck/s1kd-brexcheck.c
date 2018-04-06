@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <dirent.h>
+#include <libgen.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -109,7 +110,8 @@ bool is_xml_file(const char *fname)
 	return strcasecmp(fname + (strlen(fname) - 4), ".XML") == 0;
 }
 
-bool search_brex_fname(char *fname, const char *dpath, const char *dmcode)
+/* Search for the BREX in a specified directory. */
+bool search_brex_fname(char *fname, const char *dpath, const char *dmcode, int len)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -121,7 +123,7 @@ bool search_brex_fname(char *fname, const char *dpath, const char *dmcode)
 	dir = opendir(dpath);
 
 	while ((cur = readdir(dir))) {
-		if (strncmp(cur->d_name, dmcode, strlen(dmcode)) == 0) {
+		if (strncmp(cur->d_name, dmcode, len) == 0) {
 
 			sprintf(tmp_fname, "%s/%s", dpath, cur->d_name);
 
@@ -138,8 +140,34 @@ bool search_brex_fname(char *fname, const char *dpath, const char *dmcode)
 	return found;
 }
 
+/* Search for the BREX in the list of CSDB objects to be checked. */
+bool search_brex_fname_from_dmods(char *fname,
+	char dmod_fnames[DMOD_MAX][PATH_MAX], int num_dmod_fnames,
+	char *dmcode, int len)
+{
+	int i;
+	bool found = false;
+
+	for (i = 0; i < num_dmod_fnames; ++i) {
+		char *name, *base;
+
+		name = strdup(dmod_fnames[i]);
+		base = basename(name);
+		found = strncmp(base, dmcode, len) == 0;
+		free(name);
+
+		if (found) {
+			strcpy(fname, dmod_fnames[i]);
+			break;
+		}
+	}
+
+	return found;
+}
+
+/* Find the filename of a BREX data module referenced by a CSDB object. */
 bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_MAX][PATH_MAX],
-	int nspaths)
+	int nspaths, char dmod_fnames[DMOD_MAX][PATH_MAX], int num_dmod_fnames)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
@@ -159,6 +187,7 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	char *itemLocationCode;
 
 	char dmcode[256];
+	int len;
 
 	bool found;
 
@@ -211,14 +240,23 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	xmlFree(infoCodeVariant);
 	xmlFree(itemLocationCode);
 
-	found = search_brex_fname(fname, ".", dmcode);
+	len = strlen(dmcode);
 
+	/* Look for the BREX in the current directory. */
+	found = search_brex_fname(fname, ".", dmcode, len);
+
+	/* Look for the BREX in any of the specified search paths. */
 	if (!found) {
 		int i;
 
 		for (i = 0; i < nspaths; ++i) {
-			found = search_brex_fname(fname, spaths[i], dmcode);
+			found = search_brex_fname(fname, spaths[i], dmcode, len);
 		}
+	}
+
+	/* Look for the BREX in the list of objects to check. */
+	if (!found) {
+		found = search_brex_fname_from_dmods(fname, dmod_fnames, num_dmod_fnames, dmcode, len);
 	}
 
 	if (verbose >= INFO && found) {
@@ -949,7 +987,7 @@ bool brex_exists(char fname[PATH_MAX], char fnames[BREX_MAX][PATH_MAX], int nfna
 	return false;
 }
 
-int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[BREX_PATH_MAX][PATH_MAX], int nspaths)
+int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[BREX_PATH_MAX][PATH_MAX], int nspaths, char dmod_fnames[DMOD_MAX][PATH_MAX], int num_dmod_fnames)
 {
 	int i;
 	int total = nfnames;
@@ -961,14 +999,14 @@ int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[B
 
 		doc = xmlReadFile(fnames[i], NULL, 0);
 
-		found = find_brex_fname_from_doc(fname, doc, spaths, nspaths);
+		found = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
 
 		if (!found) {
 			fprintf(stderr, E_NOBREX_LAYER, fnames[i]);
 		} else if (!brex_exists(fname, fnames, nfnames, spaths, nspaths)) {
 			strcpy(fnames[total++], fname);
 
-			total = add_layered_brex(fnames, total, spaths, nspaths);
+			total = add_layered_brex(fnames, total, spaths, nspaths, dmod_fnames, num_dmod_fnames);
 		}
 
 		xmlFreeDoc(doc);
@@ -1151,7 +1189,7 @@ int main(int argc, char *argv[])
 
 		if (num_brex_fnames == 0) {
 			if (!find_brex_fname_from_doc(brex_fnames[0], dmod_doc,
-				brex_search_paths, num_brex_search_paths)) {
+				brex_search_paths, num_brex_search_paths, dmod_fnames, num_dmod_fnames)) {
 				if (use_stdin) {
 					if (verbose > SILENT) fprintf(stderr, E_NOBREX_STDIN);
 				} else {
@@ -1173,7 +1211,8 @@ int main(int argc, char *argv[])
 		if (layered) {
 			num_brex_fnames = add_layered_brex(brex_fnames,
 				num_brex_fnames, brex_search_paths,
-				num_brex_search_paths);
+				num_brex_search_paths,
+				dmod_fnames, num_dmod_fnames);
 		}
 
 		status += check_brex(dmod_doc, dmod_fnames[i],
