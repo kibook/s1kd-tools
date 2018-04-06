@@ -553,7 +553,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStupfch?] <datamodules>");
+	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStupfcLh?] <datamodules>");
 	puts("");
 	puts("Options:");
 	puts("  -b <brex>    Use <brex> as the BREX data module");
@@ -568,6 +568,7 @@ void show_help(void)
 	puts("  -c           Check object values.");
 	puts("  -p           Display progress bar.");
 	puts("  -f           Output only filenames of invalid modules.");
+	puts("  -L           Input is a list of data module filenames.");
 	puts("  -h -?        Show this help message.");
 }
 
@@ -997,6 +998,33 @@ void show_progress(float cur, float total)
 	fflush(stderr);
 }
 
+void add_dmod_list(const char *fname, char dmod_fnames[DMOD_MAX][PATH_MAX], int *num_dmod_fnames)
+{
+	FILE *f;
+	char path[PATH_MAX];
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(path, PATH_MAX, f)) {
+		strtok(path, "\t\n");
+
+		if (*num_dmod_fnames == DMOD_MAX) {
+			if (verbose > SILENT) fprintf(stderr, E_MAXDMOD);
+			exit(ERR_MAX_DMOD);
+		}
+
+		strcpy(dmod_fnames[(*num_dmod_fnames)++], path);
+	}
+
+	if (fname) {
+		fclose(f);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	int c;
@@ -1020,11 +1048,12 @@ int main(int argc, char *argv[])
 	bool layered = false;
 	bool progress = false;
 	bool only_fnames = false;
+	bool is_list = false;
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:Stupfnch?")) != -1) {
+	while ((c = getopt(argc, argv, "b:I:xvVDqslw:StupfncLh?")) != -1) {
 		switch (c) {
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
@@ -1063,6 +1092,7 @@ int main(int argc, char *argv[])
 			case 'f': only_fnames = true; break;
 			case 'n': check_notation = true; break;
 			case 'c': check_values = true; break;
+			case 'L': is_list = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1072,13 +1102,19 @@ int main(int argc, char *argv[])
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			if (i == DMOD_MAX) {
-				if (verbose > SILENT) fprintf(stderr, E_MAXDMOD);
-				exit(ERR_MAX_DMOD);
+			if (is_list) {
+				add_dmod_list(argv[i], dmod_fnames, &num_dmod_fnames);
 			} else {
+				if (num_dmod_fnames == DMOD_MAX) {
+					if (verbose > SILENT) fprintf(stderr, E_MAXDMOD);
+					exit(ERR_MAX_DMOD);
+				}
+
 				strcpy(dmod_fnames[num_dmod_fnames++], argv[i]);
 			}
 		}
+	} else if (is_list) {
+		add_dmod_list(NULL, dmod_fnames, &num_dmod_fnames);
 	} else {
 		strcpy(dmod_fnames[num_dmod_fnames++], "-");
 		use_stdin = true;

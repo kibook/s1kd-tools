@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-                   [-vVqDsxlStupfch?] <datamodules>
+                   [-vVqDsxlStupfcLh?] <datamodules>
 
 DESCRIPTION
 ===========
@@ -31,6 +31,9 @@ Show the help/usage message.
 
 -I &lt;path&gt;  
 Add a search path for BREX data modules. By default, only the current directory is searched.
+
+-L  
+Treat input as a list of object filenames to check, rather than an object itself.
 
 -l  
 Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified data modules) will also be checked against.

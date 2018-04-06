@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="23"/>
+        <issueDate year="2018" month="04" day="06"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Reformat XML examples.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -L option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,8 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-               [-vVqDsxlStupfch?] <datamodules>]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+               [-vVqDsxlStupfcLh?] <datamodules>]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -92,6 +92,12 @@
               <listItemTerm>-I &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add a search path for BREX data modules. By default, only the current directory is searched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of object filenames to check, rather than an object itself.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -150,7 +156,7 @@
           <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The -w option takes an XML file containing a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
 <brSeverityLevels>
 <brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
 <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
@@ -163,14 +169,14 @@
           <para>There are three modes for SNS checking: normal, strict, and unstrict. The main difference between them is how they handle the optional levels of an SNS description in the BREX.</para>
           <para>-St enables <emphasis>strict</emphasis> SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<snsSystem>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
 <snsCode>00</snsCode>
 <snsTitle>General</snsTitle>
 </snsSystem>]]></verbatimText>
           </para>
           <para>is equivalent to</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<snsSystem>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
 <snsCode>00</snsCode>
 <snsTitle>General</snsTitle>
 <snsSubSystem>
@@ -190,7 +196,7 @@
           <para>Using strict checking will disable this shorthand, and missing optional elements will result in an error.</para>
           <para>-Su enables <emphasis>unstrict</emphasis> SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, <emphasis>any</emphasis> code used will not produce an error when the relevant optional elements are omitted. This means that given the following...</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<snsSystem>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
 <snsCode>00</snsCode>
 <snsTitle>General</snsTitle>
 </snsSystem>]]></verbatimText>
@@ -205,7 +211,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
