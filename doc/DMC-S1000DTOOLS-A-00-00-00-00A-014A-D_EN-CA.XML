@@ -39,6 +39,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add missing receiver and sender identifiers.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -335,6 +338,16 @@
                   <para>2 digits</para>
                 </entry>
               </row>
+              <row changeType="add" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">receiver</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
               <row>
                 <entry>
                   <para>
@@ -413,6 +426,14 @@
                 </entry>
                 <entry>
                   <para>2 digits</para>
+                </entry>
+              </row>
+              <row changeType="add" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para><verbatimText verbatimStyle="vs14">sender</verbatimText></para>
+                </entry>
+                <entry>
+                  <para>string</para>
                 </entry>
               </row>
               <row>
@@ -551,6 +572,7 @@
 <default ident="pmIssuer" value="12345"/>
 <default ident="pmNumber" value="00000"/>
 <default ident="pmVolume" value="00"/>
+<default ident="receiver" value="khzae.net"/>
 <default ident="receiverCity" value="Toronto"/>
 <default ident="receiverCountry" value="Canada"/>
 <default ident="receiverIdent" value="12345"/>
@@ -601,6 +623,7 @@ originator                     khzae.net
 pmIssuer                       12345
 pmNumber                       00000
 pmVolume                       00
+receiver                       khzae.net
 receiverCity                   Toronto
 receiverCountry                Canada
 receiverIdent                  12345
@@ -609,6 +632,7 @@ responsiblePartnerCompanyCode  12345
 responsiblePartnerCompany      khzae.net
 schema                         descript.xsd
 securityClassification         01
+sender                         khzae.net
 senderIdent                    12345
 seqNumber                      00001
 sns                            MYPRJ-A-00-00-00-00A-022A-D

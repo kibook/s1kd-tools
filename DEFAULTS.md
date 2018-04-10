@@ -35,6 +35,7 @@ Alphabetic index
 | `pmIssuer`                      | 5-character NCAGE code                   |
 | `pmNumber`                      | 5 alphanumeric characters                |
 | `pmVolume`                      | 2 digits                                 |
+| `receiver`                      | string                                   |
 | `receiverCity`                  | string                                   |
 | `receiverCountry`               | string                                   |
 | `receiverIdent`                 | 5-character NCAGE code                   |
@@ -43,6 +44,7 @@ Alphabetic index
 | `responsiblePartnerCompany`     | string                                   |
 | `schema`                        | URI                                      |
 | `securityClassification`        | 2 digits                                 |
+| `sender`                        | string                                   |
 | `senderIdent`                   | 5-character NCAGE code                   |
 | `seqNumber`                     | 00001-99999                              |
 | `sns`                           | Data module code of BREX data module     |
@@ -86,6 +88,7 @@ Example - XML format
     <default ident="pmIssuer" value="12345"/>
     <default ident="pmNumber" value="00000"/>
     <default ident="pmVolume" value="00"/>
+    <default ident="receiver" value="khzae.net"/>
     <default ident="receiverCity" value="Toronto"/>
     <default ident="receiverCountry" value="Canada"/>
     <default ident="receiverIdent" value="12345"/>
@@ -135,6 +138,7 @@ Example - Simple text format
     pmIssuer                       12345
     pmNumber                       00000
     pmVolume                       00
+    receiver                       khzae.net
     receiverCity                   Toronto
     receiverCountry                Canada
     receiverIdent                  12345
@@ -143,6 +147,7 @@ Example - Simple text format
     responsiblePartnerCompany      khzae.net
     schema                         descript.xsd
     securityClassification         01
+    sender                         khzae.net
     senderIdent                    12345
     seqNumber                      00001
     sns                            MYPRJ-A-00-00-00-00A-022A-D
