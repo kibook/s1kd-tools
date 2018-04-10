@@ -515,16 +515,14 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
 
 	for (i = 0; i < rules->nodeNr; ++i) {
-		char *allowedObjectFlag;
-		char *path;
-		char *use;
+		xmlChar *allowedObjectFlag, *path, *use;
 
 		objectPath = find_child(rules->nodeTab[i], "objectPath");
 		objectUse = find_child(rules->nodeTab[i], "objectUse");
 
-		allowedObjectFlag = (char *) xmlGetProp(objectPath, BAD_CAST "allowedObjectFlag");
-		path = (char *) xmlNodeGetContent(objectPath);
-		use  = (char *) xmlNodeGetContent(objectUse);
+		allowedObjectFlag = xmlGetProp(objectPath, BAD_CAST "allowedObjectFlag");
+		path = xmlNodeGetContent(objectPath);
+		use  = xmlNodeGetContent(objectUse);
 
 		object = xmlXPathEvalExpression(BAD_CAST path, context);
 
@@ -535,9 +533,10 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 			exit(ERR_INVALID_OBJ_PATH);
 		}
 
-		if (is_invalid(rules->nodeTab[i], allowedObjectFlag, object)) {
+		if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object)) {
 			char rpath[PATH_MAX];
 			xmlChar *severity;
+			xmlNodePtr err_path;
 
 			severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel");
 
@@ -557,8 +556,9 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 				}
 			}
 
-			xmlNewChild(brexError, NULL, BAD_CAST "objectPath", BAD_CAST path);
-			xmlNewChild(brexError, NULL, BAD_CAST "objectUse", BAD_CAST use);
+			err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
+			xmlSetProp(err_path, BAD_CAST "allowedObjectFlag", allowedObjectFlag);
+			xmlNewChild(brexError, NULL, BAD_CAST "objectUse", use);
 
 			add_object_values(brexError, rules->nodeTab[i]);
 
