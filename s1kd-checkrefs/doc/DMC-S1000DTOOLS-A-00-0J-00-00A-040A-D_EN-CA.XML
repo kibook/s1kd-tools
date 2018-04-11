@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="J" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="22"/>
+        <issueDate year="2018" month="04" day="11"/>
         <dmTitle>
           <techName>s1kd-checkrefs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -L option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -51,9 +51,9 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <para>
           <verbatimText verbatimStyle="vs24">s1kd-checkrefs [-s &lt;source&gt;] [-t &lt;target&gt;]
-               [-d &lt;dir&gt;] [-cuFelvh?] &lt;modules&gt;...</verbatimText>
+               [-d &lt;dir&gt;] [-cuFeLlvh?] &lt;modules&gt;...</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -63,7 +63,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-c</listItemTerm>
               <listItemDefinition>
@@ -92,6 +92,12 @@
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of data module filenames, rather than a data module itself.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -132,7 +138,7 @@
           <para>The root element of the XML file is the <verbatimText verbatimStyle="vs12">externalPubs</verbatimText> element. Each external publication is represented by an element <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText>. The identifying elements of the publication are stored in the <verbatimText verbatimStyle="vs12">externalPubIdent</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefIdent</verbatimText> element). The address items are stored in the <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefAddressItems</verbatimText> element).</para>
           <para>Example:</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
 <externalPubs>
 <externalPubAddress>
 <externalPubIdent>

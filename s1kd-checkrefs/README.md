@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-checkrefs [-s <source>] [-t <target>]
-                   [-d <dir>] [-cuFelvh?] <modules>...
+                   [-d <dir>] [-cuFeLlvh?] <modules>...
 
 DESCRIPTION
 ===========
@@ -31,6 +31,9 @@ Fail on first invalid reference and return an error code.
 
 -h -?  
 Show help/usage message
+
+-L  
+Treat input as a list of data module filenames, rather than a data module itself.
 
 -l  
 List all invalid references found.

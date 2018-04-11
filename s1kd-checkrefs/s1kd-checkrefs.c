@@ -569,11 +569,13 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly)
 
 	doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
 
-	if (!doc)
+	if (!doc) {
 		return;
+	}
 
-	if (verbose)
+	if (verbose) {
 		printf("Checking refs in %s...\n", fname);
+	}
 
 	ctx = xmlXPathNewContext(doc);
 
@@ -644,9 +646,44 @@ void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnl
 	closedir(dir);
 }
 
+xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr paths)
+{
+	FILE *f;
+	char path[PATH_MAX];
+
+	if (fname) {
+		f = fopen(fname, "r");
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(path, PATH_MAX, f)) {
+		strtok(path, "\t\n");
+		addAddress(path, addresses);
+		xmlNewChild(paths, NULL, BAD_CAST "path", BAD_CAST path);
+	}
+
+	if (fname) {
+		fclose(f);
+	}
+
+	return paths;
+}
+
+void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly)
+{
+	xmlNodePtr cur;
+	for (cur = paths->children; cur; cur = cur->next) {
+		char *path;
+		path = (char *) xmlNodeGetContent(cur);
+		updateRefsFile(path, addresses, contentOnly);
+		xmlFree(path);
+	}
+}
+
 int main(int argc, char **argv)
 {
-	xmlNodePtr addresses;
+	xmlNodePtr addresses, paths;
 
 	int i;
 
@@ -654,8 +691,9 @@ int main(int argc, char **argv)
 	char *source = NULL;
 	char *target = NULL;
 	char *directory = NULL;
+	bool isList = false;
 
-	while ((i = getopt(argc, argv, "s:t:cuFveld:h?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFveld:Lh?")) != -1) {
 		switch (i) {
 			case 's':
 				source = strdup(optarg);
@@ -684,6 +722,9 @@ int main(int argc, char **argv)
 			case 'd':
 				directory = strdup(optarg);
 				break;
+			case 'L':
+				isList = true;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -692,6 +733,7 @@ int main(int argc, char **argv)
 	}
 
 	addresses = xmlNewNode(NULL, BAD_CAST "addresses");
+	paths = xmlNewNode(NULL, BAD_CAST "paths");
 
 	if (directory) {
 		addDirectory(directory, addresses);
@@ -699,20 +741,32 @@ int main(int argc, char **argv)
 
 	if (source) {
 		addAddress(source, addresses);
-	} else {
+	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			addAddress(argv[i], addresses);
+			if (isList) {
+				addAddressList(argv[i], addresses, paths);
+			} else {
+				addAddress(argv[i], addresses);
+			}
 		}
+	} else if (isList) {
+		addAddressList(NULL, addresses, paths);
 	}
 
 	if (target) {
 		updateRefsFile(target, addresses, contentOnly);
 	} else if (directory) {
 		updateRefsDirectory(directory, addresses, contentOnly);
-	} else {
+	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			updateRefsFile(argv[i], addresses, contentOnly);
+			if (isList) {
+				updateRefsList(addresses, paths, contentOnly);
+			} else {
+				updateRefsFile(argv[i], addresses, contentOnly);
+			}
 		}
+	} else if (isList) {
+		updateRefsList(addresses, paths, contentOnly);
 	}
 
 	free(source);
@@ -720,6 +774,7 @@ int main(int argc, char **argv)
 	free(directory);
 
 	xmlFreeNode(addresses);
+	xmlFreeNode(paths);
 
 	xmlCleanupParser();
 
