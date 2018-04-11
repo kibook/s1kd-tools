@@ -326,7 +326,7 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 	while (i + termLen <= contentLen) {
 		if (isAcronymTerm(content, contentLen, i, term, termLen)) {
 			xmlChar *s1 = xmlStrndup(content, i);
-			xmlChar *s2 = xmlStrsub(content, i + termLen, contentLen);
+			xmlChar *s2 = xmlStrsub(content, i + termLen, contentLen - (i + termLen));
 			xmlNodePtr acr = acronym;
 
 			if (interactive) {
