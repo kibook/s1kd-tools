@@ -32,7 +32,7 @@
             <xsl:attribute name="id">
               <xsl:value-of select="generate-id()"/>
             </xsl:attribute>
-            <xsl:apply-templates select="acronymDefinition/@*|acronymDefinition/node()"/>
+            <xsl:apply-templates select="acronymDefinition/node()"/>
           </acronymDefinition>
         </acronym>
       </xsl:otherwise>
