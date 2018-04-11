@@ -10,8 +10,8 @@
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
 
-#define PRE_TERM_DELIM " "
-#define POST_TERM_DELIM " .,"
+#define PRE_TERM_DELIM BAD_CAST " "
+#define POST_TERM_DELIM BAD_CAST " .,"
 
 /* Help/usage message */
 void show_help(void)
@@ -47,20 +47,17 @@ xmlChar *last_level(xmlNodePtr flag)
 
 bool is_term(xmlChar *content, int content_len, int i, xmlChar *term, int term_len, bool ignorecase)
 {
-	xmlChar *sub;
 	bool is;
-	char s, e;
+	xmlChar s, e;
 
-	sub = xmlStrsub(content, i, term_len);
+	s = i == 0 ? ' ' : content[i - 1];
+	e = i + term_len >= content_len - 1 ? ' ' : content[i + term_len];
 
-	s = i == 0 ? ' ' : (char) content[i - 1];
-	e = i + term_len == content_len - 1 ? ' ' : (char) content[i + term_len];
-
-	is = strchr(PRE_TERM_DELIM, s) &&
-	     (ignorecase ? xmlStrcasecmp(sub, term) : xmlStrcmp(sub, term)) == 0 &&
-	     strchr(POST_TERM_DELIM, e);
-
-	xmlFree(sub);
+	is = xmlStrchr(PRE_TERM_DELIM, s) &&
+	     (ignorecase ?
+	     	xmlStrncasecmp(content + i, term, term_len) :
+		xmlStrncmp(content + i, term, term_len)) == 0 &&
+	     xmlStrchr(POST_TERM_DELIM, e);
 
 	return is;
 }
@@ -80,7 +77,7 @@ void gen_index_node(xmlNodePtr node, xmlNodePtr flag, bool ignorecase)
 	term_len = xmlStrlen(term);
 
 	i = 0;
-	while (i + term_len < content_len) {
+	while (i + term_len <= content_len) {
 		if (is_term(content, content_len, i, term, term_len, ignorecase)) {
 			xmlChar *s1 = xmlStrndup(content, i + term_len);
 			xmlChar *s2 = xmlStrsub(content, i + term_len, xmlStrlen(content));
