@@ -80,7 +80,7 @@ void gen_index_node(xmlNodePtr node, xmlNodePtr flag, bool ignorecase)
 	while (i + term_len <= content_len) {
 		if (is_term(content, content_len, i, term, term_len, ignorecase)) {
 			xmlChar *s1 = xmlStrndup(content, i + term_len);
-			xmlChar *s2 = xmlStrsub(content, i + term_len, xmlStrlen(content));
+			xmlChar *s2 = xmlStrsub(content, i + term_len, content_len - (i + term_len));
 			xmlNodePtr acr;
 
 			xmlFree(content);
