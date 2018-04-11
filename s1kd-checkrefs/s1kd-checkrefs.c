@@ -490,7 +490,7 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-d <dir>] [-cuFelvh?]");
+	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-d <dir>] [-cuFeLlvh?]");
 	puts("");
 	puts("Options:");
 	puts("  -s <source>    Use only <source> as source.");
@@ -499,6 +499,7 @@ void showHelp(void)
 	puts("  -u             Update address items of references.");
 	puts("  -F             Fail on first invalid reference, returning error code.");
 	puts("  -e             Check externalPubRefs.");
+	puts("  -L             Input is a list of data module filenames.");
 	puts("  -l             List invalid references.");
 	puts("  -d <dir>       Check data modules in directory <dir>.");
 	puts("  -v             Verbose output.");
