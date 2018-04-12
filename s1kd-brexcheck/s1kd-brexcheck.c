@@ -693,14 +693,16 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 	snsError = xmlNewNode(NULL, BAD_CAST "snsError");
 	xmlNewChild(snsError, NULL, BAD_CAST "document", BAD_CAST real_path(dmod_fname, rpath));
 
-	sprintf(xpath, "//snsSystem[snsCode = '%s']", (char *) systemCode);
-	if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
-		xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
-		xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", systemCode);
-		xmlAddChild(brexCheck, snsError);
+	if (should_check(systemCode, "//snsSystem", snsRulesDoc, ctx)) {
+		sprintf(xpath, "//snsSystem[snsCode = '%s']", (char *) systemCode);
+		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
+			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
+			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", systemCode);
+			xmlAddChild(brexCheck, snsError);
 
-		xmlFreeDoc(snsRulesDoc);
-		return false;
+			xmlFreeDoc(snsRulesDoc);
+			return false;
+		}
 	}
 
 	if (should_check(subSystemCode, ".//snsSubSystem", snsRulesDoc, ctx)) {
