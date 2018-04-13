@@ -409,6 +409,66 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 	return comment_ref;
 }
 
+#define DML_FMT "DML-%14[^-]-%5s-%1s-%4s-%5s"
+
+xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
+{
+	char model_ident_code[15]  = "";
+	char sender_ident[6]       = "";
+	char dml_type[2]           = "";
+	char year_of_data_issue[5] = "";
+	char seq_number[6]         = "";
+
+	int n;
+
+	xmlNodePtr dml_ref, dml_ref_ident, dml_code;
+
+	n = sscanf(ref, DML_FMT,
+		model_ident_code,
+		sender_ident,
+		dml_type,
+		year_of_data_issue,
+		seq_number);
+	if (n != 5) {
+		fprintf(stderr, ERR_PREFIX "DML code invalid: %s\n", ref);
+		exit(EXIT_BAD_INPUT);
+	}
+
+	lowercase(dml_type);
+
+	dml_ref = xmlNewNode(NULL, BAD_CAST "dmlRef");
+	dml_ref_ident = xmlNewChild(dml_ref, NULL, BAD_CAST "dmlRefIdent", NULL);
+	dml_code = xmlNewChild(dml_ref_ident, NULL, BAD_CAST "dmlCode", NULL);
+
+	xmlSetProp(dml_code, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+	xmlSetProp(dml_code, BAD_CAST "senderIdent", BAD_CAST sender_ident);
+	xmlSetProp(dml_code, BAD_CAST "dmlType", BAD_CAST dml_type);
+	xmlSetProp(dml_code, BAD_CAST "yearOfDataIssue", BAD_CAST year_of_data_issue);
+	xmlSetProp(dml_code, BAD_CAST "seqNumber", BAD_CAST seq_number);
+
+	if (opts) {
+		xmlDocPtr doc;
+		xmlNodePtr ref_dml_address;
+		xmlNodePtr ref_dml_ident;
+
+		if (!(doc = xmlReadFile(fname, NULL, 0))) {
+			fprintf(stderr, ERR_PREFIX "Could not read DML: %s\n", ref);
+			exit(EXIT_MISSING_FILE);
+		}
+
+		ref_dml_address = first_xpath_node(doc, NULL, "//dmlAddress");
+		ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
+
+		if (hasopt(opts, OPT_ISSUE)) {
+			xmlAddChild(dml_ref_ident, xmlCopyNode(find_child(ref_dml_ident, "issueInfo"), 1));
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	return dml_ref;
+}
+
 xmlNodePtr new_icn_ref(const char *ref, const char *fname, int opts)
 {
 	xmlNodePtr info_entity_ref;
@@ -433,6 +493,11 @@ bool is_dm(const char *ref)
 bool is_com(const char *ref)
 {
 	return strncmp(ref, "COM-", 4) == 0;
+}
+
+bool is_dml(const char *ref)
+{
+	return strncmp(ref, "DML-", 4) == 0;
 }
 
 bool is_icn(const char *ref)
@@ -467,6 +532,8 @@ void print_ref(const char *src, const char *dst, const char *ref, const char *fn
 		f = new_pm_ref;
 	} else if (is_com(ref)) {
 		f = new_com_ref;
+	} else if (is_dml(ref)) {
+		f = new_dml_ref;
 	} else if (is_icn(ref)) {
 		f = new_icn_ref;
 	} else {
