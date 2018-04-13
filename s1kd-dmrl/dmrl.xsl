@@ -54,6 +54,12 @@
           <xsl:text> -f</xsl:text>
         </xsl:if>
       </xsl:when>
+      <xsl:when test="infoEntityRef">
+        <xsl:text>s1kd-newimf</xsl:text>
+        <xsl:if test="$overwrite">
+          <xsl:text> -f</xsl:text>
+        </xsl:if>
+      </xsl:when>
     </xsl:choose>
     <xsl:apply-templates select="*"/>
     <xsl:text>&#10;</xsl:text>
@@ -62,6 +68,11 @@
   <xsl:template match="dmCode|pmCode|commentCode|dmlCode">
     <xsl:text> -# </xsl:text>
     <xsl:apply-templates select="." mode="text"/>
+  </xsl:template>
+
+  <xsl:template match="infoEntityRef">
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="@infoEntityRefIdent"/>
   </xsl:template>
 
   <xsl:template match="dmCode" mode="text">
