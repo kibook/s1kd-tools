@@ -176,6 +176,12 @@
     <xsl:text>"</xsl:text>
   </xsl:template>
 
+  <xsl:template match="shortPmTitle">
+    <xsl:text> -s "</xsl:text>
+    <xsl:value-of select="."/>
+    <xsl:text>"</xsl:text>
+  </xsl:template>
+
   <xsl:template match="responsiblePartnerCompany">
     <xsl:if test="@enterpriseCode">
       <xsl:text> -R </xsl:text>
