@@ -47,6 +47,7 @@ char country_iso_code[4] = "";
 char issue_number[5] = "";
 char in_work[4] = "";
 char pm_title[256] = "";
+char short_pm_title[256] = "";
 char security_classification[4] = "";
 char enterprise_name[256] = "";
 char enterprise_code[7] = "";
@@ -298,9 +299,9 @@ void set_issue_date(xmlNodePtr issueDate)
 		}
 	}
 
-	xmlSetProp(issueDate, (xmlChar *) "year", (xmlChar *) year_s);
-	xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
-	xmlSetProp(issueDate, (xmlChar *) "day", (xmlChar *) day_s);
+	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
+	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
 void show_help(void)
@@ -330,6 +331,7 @@ void show_help(void)
 	puts("  -c    Security classification");
 	puts("  -r    Responsible partner company enterprise name");
 	puts("  -t    Publication module title");
+	puts("  -s    Short PM title");
 	puts("  -b    BREX data module code");
 	puts("  -I    Issue date");
 }
@@ -483,6 +485,10 @@ void set_env_lang(void)
 	free(lang);
 }
 
+void set_short_pm_title(xmlDocPtr doc)
+{
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;
@@ -521,7 +527,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'D': include_date = true; break;
@@ -546,6 +552,7 @@ int main(int argc, char **argv)
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
 			case '%': template_dir = strdup(optarg); break;
+			case 's': strcpy(short_pm_title, optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -624,7 +631,8 @@ int main(int argc, char **argv)
 		prompt("Country ISO code", country_iso_code, 4);
 		prompt("Issue number", issue_number, 5);
 		prompt("In work", in_work, 4);
-		prompt("PM Title", pm_title, 256);
+		prompt("PM title", pm_title, 256);
+		prompt("Short PM title", short_pm_title, 256);
 		prompt("Security classification", security_classification, 4);
 		prompt("Responsible partner company", enterprise_name, 256);
 	}
@@ -672,22 +680,26 @@ int main(int argc, char **argv)
 	responsiblePartnerCompany = find_child(pmStatus, "responsiblePartnerCompany");
 	pmEntry = find_child(find_child(pm, "content"), "pmEntry");
 
-	xmlSetProp(pmCode, (xmlChar *) "modelIdentCode", (xmlChar *) model_ident_code);
-	xmlSetProp(pmCode, (xmlChar *) "pmIssuer",       (xmlChar *) pm_issuer);
-	xmlSetProp(pmCode, (xmlChar *) "pmNumber",       (xmlChar *) pm_number);
-	xmlSetProp(pmCode, (xmlChar *) "pmVolume",       (xmlChar *) pm_volume);
+	xmlSetProp(pmCode, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+	xmlSetProp(pmCode, BAD_CAST "pmIssuer",       BAD_CAST pm_issuer);
+	xmlSetProp(pmCode, BAD_CAST "pmNumber",       BAD_CAST pm_number);
+	xmlSetProp(pmCode, BAD_CAST "pmVolume",       BAD_CAST pm_volume);
 
-	xmlSetProp(language, (xmlChar *) "languageIsoCode", (xmlChar *) language_iso_code);
-	xmlSetProp(language, (xmlChar *) "countryIsoCode",  (xmlChar *) country_iso_code);
+	xmlSetProp(language, BAD_CAST "languageIsoCode", BAD_CAST language_iso_code);
+	xmlSetProp(language, BAD_CAST "countryIsoCode",  BAD_CAST country_iso_code);
 
-	xmlSetProp(issueInfo, (xmlChar *) "issueNumber", (xmlChar *) issue_number);
-	xmlSetProp(issueInfo, (xmlChar *) "inWork",      (xmlChar *) in_work);
+	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue_number);
+	xmlSetProp(issueInfo, BAD_CAST "inWork",      BAD_CAST in_work);
 
 	set_issue_date(issueDate);
 
-	xmlNodeSetContent(pmTitle, (xmlChar *) pm_title);
+	xmlNodeSetContent(pmTitle, BAD_CAST pm_title);
 
-	xmlSetProp(security, (xmlChar *) "securityClassification", (xmlChar *) security_classification);
+	if (strcmp(short_pm_title, "") != 0) {
+		xmlNewChild(pmAddressItems, NULL, BAD_CAST "shortPmTitle", BAD_CAST short_pm_title);
+	}
+
+	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST security_classification);
 
 	if (strcmp(enterprise_name, "") != 0)
 		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST enterprise_name);

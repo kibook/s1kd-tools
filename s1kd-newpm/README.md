@@ -80,6 +80,9 @@ The CAGE code of the responsible partner company.
 -r &lt;RPC&gt;  
 The responsible partner company enterprise name of the new publication module.
 
+-s &lt;title&gt;  
+The short title of the new publication module.
+
 -T  
 Include titles in referenced data modules.
 
