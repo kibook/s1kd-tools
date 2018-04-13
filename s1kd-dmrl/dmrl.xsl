@@ -56,7 +56,7 @@
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
-  <xsl:template match="dmCode">
+  <xsl:template match="dmCode|pmCode">
     <xsl:text> -# </xsl:text>
     <xsl:apply-templates select="." mode="text"/>
   </xsl:template>
@@ -85,6 +85,16 @@
       <xsl:value-of select="@learnCode"/>
       <xsl:value-of select="@learnEventCode"/>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="pmCode" mode="text">
+    <xsl:value-of select="@modelIdentCode"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@pmIssuer"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@pmNumber"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@pmVolume"/>
   </xsl:template>
 
   <xsl:template match="issueInfo">
