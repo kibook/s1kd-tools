@@ -6,6 +6,9 @@
   <xsl:param name="no-issue" select="false()"/>
   <xsl:param name="overwrite" select="false()"/>
 
+  <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+  <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+
   <xsl:output method="text"/>
 
   <xsl:template match="*">
@@ -56,7 +59,7 @@
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
-  <xsl:template match="dmCode|pmCode">
+  <xsl:template match="dmCode|pmCode|commentCode|dmlCode">
     <xsl:text> -# </xsl:text>
     <xsl:apply-templates select="." mode="text"/>
   </xsl:template>
@@ -95,6 +98,30 @@
     <xsl:value-of select="@pmNumber"/>
     <xsl:text>-</xsl:text>
     <xsl:value-of select="@pmVolume"/>
+  </xsl:template>
+
+  <xsl:template match="commentCode" mode="text">
+    <xsl:value-of select="@modelIdentCode"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@senderIdent"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@yearOfDataIssue"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@seqNumber"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="translate(@commentType, $lower, $upper)"/>
+  </xsl:template>
+
+  <xsl:template match="dmlCode" mode="text">
+    <xsl:value-of select="@modelIdentCode"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@senderIdent"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="translate(@dmlType, $lower, $upper)"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@yearOfDataIssue"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@seqNumber"/>
   </xsl:template>
 
   <xsl:template match="issueInfo">
