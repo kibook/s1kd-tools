@@ -172,54 +172,22 @@ All of the s1kd-new\* commands use the same 'defaults' file format, so this file
 Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:
 
     # General
-    modelIdentCode            S1000DTOOLS
-    securityClassification    01
-    responsiblePartnerCompany khzae.net
-    originator                khzae.net
-    languageIsoCode           en
-    countryIsoCode            CA
-    issueNumber               000
-    inWork                    01
-
-    # Data modules
-    systemDiffCode            A
-    systemCode                00
-    subSystemCode             0
-    subSubSystemCode          0
-    assyCode                  00
-    disassyCode               00
-    disassyCodeVariant        A
-    infoCode                  040
-    infoCodeVariant           A
-    itemLocationCode          D
-
-    # Comments/DDN
-    senderIdent               KHZAE
-    yearOfDataIssue           2017
-    seqNumber                 00001
-    city                      Toronto
-    country                   Canada
-
-    # Comments
-    commentType               q
-    commentPriorityCode       cp01
-
-    # DDN
-    authorization             khzae.net
-
-    # Publication modules
-    pmIssuer                  KHZAE
-    pmNumber                  00001
-    pmVolume                  00
+    countryIsoCode               CA
+    languageIsoCode              en
+    originator                   khzae.net
+    responsiblePartnerCompany    khzae.net
+    securityClassification       01
 
 Alternatively, the 'defaults' file can be written using an XML format, containing a root element `defaults` with child elements `default` which each have an attribute `ident` and an attribute `value`.
 
     <?xml version="1.0"?>
     <defaults>
     <!-- General -->
-    <default ident="modelIdentCode" value="S1000DTOOLS"/>
+    <default ident="countryIsoCode" value="CA"/>
+    <default ident="languageIsoCode" value="en"/>
+    <default ident="originator" value="khzae.net"/>
+    <default ident="responsiblePartnerCompany" value="khzae.net"/>
     <default ident="securityClassification" value="01"/>
-    [...]
     </defaults>
 
 'dmtypes' file
@@ -229,11 +197,8 @@ This file sets the default type (schema) for data modules based on their info co
 
 Each line consists of an info code, a schema identifier, and optionally a default info name. Example:
 
-    00E    comrep
-    00W    appliccrossreftable
-    009    frontmatter
-    022    brex
-    024    brdoc
+    000    descript
+    022    brex        Business rules
     040    descript    Description
     520    proced      Remove procedure
 
@@ -241,7 +206,8 @@ Like the 'defaults' file, the 'dmtypes' file may also be written in an XML forma
 
     <?xml version="1.0">
     <dmtypes>
-    <type infoCode="022" schema="brex"/>
+    <type infoCode="000" schema="descript"/>
+    <type infoCode="022" schema="brex" infoName="Business rules"/>
     <type infoCode="040" schema="descript" infoName="Description"/>
     <type infoCode="520" schema="proced" infoName="Remove procedure"/>
     </dmtypes>
