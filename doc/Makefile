@@ -16,11 +16,10 @@ S1KD2DB_FLAGS+=-param include.emphasis.role 1
 PANDOC_MD=pandoc -f docbook -t markdown_github -s
 PANDOC_MAN=pandoc -f docbook -t man -s
 
-MANPAGE=s1kd-tools.1
-
 MAN_PREFIX=/usr/local/share/man/man1
+MAN5_PREFIX=/usr/local/share/man/man5
 
-all: $(MANPAGE)
+all: s1kd-tools.1 s1kd-defaults.5
 
 $(README): $(README_SRC)
 	$(S1KD2DB) $(README_SRC) | $(PANDOC_MD) -o $(README)
@@ -37,11 +36,15 @@ $(INSTALL): $(INSTALL_SRC)
 $(EXAMPLE): $(EXAMPLE_SRC)
 	$(S1KD2DB) $(EXAMPLE_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(EXAMPLE)
 
-$(MANPAGE): $(INTRO_SRC)
-	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $(MANPAGE)
+s1kd-tools.1: $(INTRO_SRC)
+	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
+
+s1kd-defaults.5: $(DEFAULTS_SRC)
+	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
 
 install:
-	cp $(MANPAGE) $(MAN_PREFIX)/
+	cp s1kd-tools.1 $(MAN_PREFIX)/
+	cp s1kd-defaults.5 $(MAN5_PREFIX)/
 
 clean:
-	rm -f $(MANPAGE)
+	rm -f s1kd-tools.1 s1kd-defaults.5

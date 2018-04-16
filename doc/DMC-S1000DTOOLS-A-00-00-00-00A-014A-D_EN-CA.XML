@@ -11,8 +11,7 @@
       <dmAddressItems>
         <issueDate year="2018" month="03" day="09"/>
         <dmTitle>
-          <techName>s1kd-tools</techName>
-          <infoName>'defaults' file identifiers</infoName>
+          <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
