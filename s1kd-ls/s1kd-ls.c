@@ -273,8 +273,7 @@ int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH
 		base1 = basename(name1);
 
 		s = strchr(base1, '_');
-
-		if (s && !strchr(s + 1, '_')) {
+		if (!s || !strchr(s + 1, '_')) {
 			continue;
 		}
 
