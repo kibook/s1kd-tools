@@ -6,17 +6,17 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="720" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="23"/>
+        <issueDate year="2018" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Install procedure</infoName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -39,6 +39,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Use single PREFIX variable for install location.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -78,28 +81,10 @@
           <verbatimText verbatimStyle="vs24">$ make
 # make install</verbatimText>
         </para>
-        <para>To change where these are installed, specify either of the following make variables:</para>
-        <para>
-          <definitionList>
-            <definitionListItem>
-              <listItemTerm>INSTALL_PREFIX</listItemTerm>
-              <listItemDefinition>
-                <para>Prefix where the executables will be installed.</para>
-                <para>Default: /usr/local/bin</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>MAN_PREFIX</listItemTerm>
-              <listItemDefinition>
-                <para>Prefix where the manpages will be installed.</para>
-                <para>Default: /usr/local/share/man/man1</para>
-              </listItemDefinition>
-            </definitionListItem>
-          </definitionList>
-        </para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">To change where these are installed, specify the PREFIX make variable. The default value of this variable is /usr/local.</para>
         <para>For example:</para>
         <para>
-          <verbatimText verbatimStyle="vs24">$ make INSTALL_PREFIX=/usr/local/bin install</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ make PREFIX=/usr install</verbatimText>
         </para>
       </levelledPara>
     </description>

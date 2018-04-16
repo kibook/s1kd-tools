@@ -1,6 +1,7 @@
 SOURCE=DMC-S1000DTOOLS-A-00-0J-00-00A-040A-D_EN-CA.XML
 
-MAN_PREFIX=/usr/local/share/man/man1
+PREFIX=/usr/local
+MAN_PREFIX=$(PREFIX)/share/man/man1
 
 all: s1kd-checkrefs.1
 

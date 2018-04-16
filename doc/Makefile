@@ -16,8 +16,9 @@ S1KD2DB_FLAGS+=-param include.emphasis.role 1
 PANDOC_MD=pandoc -f docbook -t markdown_github -s
 PANDOC_MAN=pandoc -f docbook -t man -s
 
-MAN_PREFIX=/usr/local/share/man/man1
-MAN5_PREFIX=/usr/local/share/man/man5
+PREFIX=/usr/local
+MAN1_PREFIX=$(PREFIX)/share/man/man1
+MAN5_PREFIX=$(PREFIX)/share/man/man5
 
 all: s1kd-tools.1 s1kd-defaults.5
 
@@ -43,7 +44,7 @@ s1kd-defaults.5: $(DEFAULTS_SRC)
 	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
 
 install:
-	cp s1kd-tools.1 $(MAN_PREFIX)/
+	cp s1kd-tools.1 $(MAN1_PREFIX)/
 	cp s1kd-defaults.5 $(MAN5_PREFIX)/
 
 clean:

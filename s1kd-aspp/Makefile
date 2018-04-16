@@ -4,7 +4,8 @@ OUTPUT=s1kd-aspp
 CFLAGS=-Wall -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt libexslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
-INSTALL_PREFIX=/usr/local/bin
+PREFIX=/usr/local
+INSTALL_PREFIX=$(PREFIX)/bin
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
