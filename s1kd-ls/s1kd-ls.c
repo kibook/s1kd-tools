@@ -267,10 +267,14 @@ int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
-		char *name1, *name2, *name3, *base1, *base2, *base3;
+		char *name1, *name2, *name3, *base1, *base2, *base3, *s;
 
 		name1 = strdup(files[i]);
 		base1 = basename(name1);
+
+		if (!strchr(s = strchr(base1, '_') + 1, '_')) {
+			continue;
+		}
 
 		if (i > 0) {
 			name2 = strdup(files[i - 1]);
@@ -286,8 +290,8 @@ int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH
 			name3 = NULL;
 		}
 
-		if ((name3 && strncmp(base1, base3, strchr(base1, '_') - base1) == 0) ||
-		    (name2 && strncmp(base1, base2, strchr(base1, '_') - base1) != 0)) {
+		if ((name3 && strncmp(base1, base3, s - base1) == 0) ||
+		    (name2 && strncmp(base1, base2, s - base1) != 0)) {
 			strcpy(latest[nlatest++], files[i]);
 		}
 
