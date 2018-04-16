@@ -103,13 +103,15 @@ void show_help(void)
 	puts("  -0     Output null-delimited list");
 	puts("  -C     List comments");
 	puts("  -D     List data modules");
+	puts("  -I     Show only inwork issues");
 	puts("  -i     Show only official issues");
 	puts("  -L     List DMLs");
-	puts("  -l     Show only latest issue/inwork version");
+	puts("  -l     Show only latest official/inwork issue");
 	puts("  -M     List ICN metadata files");
+	puts("  -o     Show only old official/inwork issues");
 	puts("  -P     List publication modules");
 	puts("  -r     Recursively search directories");
-	puts("  -w     Show only writable data module files");
+	puts("  -w     Show only writable object files");
 	puts("  -X     List DDNs");
 	puts("  -h -?  Show this help message");
 }
@@ -260,6 +262,42 @@ int extract_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PAT
 	return nlatest;
 }
 
+/* Copy only old issues of CSDB objects. */
+int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
+{
+	int i, nlatest = 0;
+	for (i = 0; i < nfiles; ++i) {
+		char *name1, *name2, *name3, *base1, *base2, *base3;
+
+		name1 = strdup(files[i]);
+		base1 = basename(name1);
+
+		if (i > 0) {
+			name2 = strdup(files[i - 1]);
+			base2 = basename(name2);
+		} else {
+			name2 = NULL;
+		}
+
+		if (i < nfiles - 1) {
+			name3 = strdup(files[i + 1]);
+			base3 = basename(name3);
+		} else {
+			name3 = NULL;
+		}
+
+		if ((name3 && strncmp(base1, base3, strchr(base1, '_') - base1) == 0) ||
+		    (name2 && strncmp(base1, base2, strchr(base1, '_') - base1) != 0)) {
+			strcpy(latest[nlatest++], files[i]);
+		}
+
+		free(name1);
+		free(name2);
+		free(name3);
+	}
+	return nlatest;
+}
+
 /* Copy only official issues of CSDB objects. */
 int extract_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
 {
@@ -269,6 +307,22 @@ int extract_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX]
 		char *base = basename(name);
 
 		if (is_official_issue(base)) {
+			strcpy(official[nofficial++], files[i]);
+		}
+
+		free(name);
+	}
+	return nofficial;
+}
+
+int remove_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
+{
+	int i, nofficial = 0;
+	for (i = 0; i < nfiles; ++i) {
+		char *name = strdup(files[i]);
+		char *base = basename(name);
+
+		if (!is_official_issue(base)) {
 			strcpy(official[nofficial++], files[i]);
 		}
 
@@ -304,12 +358,14 @@ int main(int argc, char **argv)
 	int only_latest = 0;
 	int only_official_issue = 0;
 	int only_writable = 0;
+	int only_old = 0;
+	int only_inwork = 0;
 	int recursive = 0;
 	int show = 0;
 
 	int i;
 
-	while ((i = getopt(argc, argv, "0CDiLlMPrwXh?")) != -1) {
+	while ((i = getopt(argc, argv, "0CDiLlMPrwXoIh?")) != -1) {
 		switch (i) {
 			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;
@@ -322,6 +378,8 @@ int main(int argc, char **argv)
 			case 'r': recursive = 1; break;
 			case 'w': only_writable = 1; break;
 			case 'X': show |= SHOW_DDN; break;
+			case 'o': only_old = 1; break;
+			case 'I': only_inwork = 1; break;
 			case 'h':
 			case '?': show_help();
 				  exit(0);
@@ -332,29 +390,29 @@ int main(int argc, char **argv)
 
 	if (hasopt(show, SHOW_DM)) {
 		dms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest) latest_dms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue) issue_dms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest || only_old) latest_dms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_dms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_PM)) {
 		pms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest) latest_pms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue) issue_pms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest || only_old) latest_pms = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_pms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_COM)) {
 		coms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_IMF)) {
 		imfs = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest) latest_imfs = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue) issue_imfs = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest || only_old) latest_imfs = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_imfs = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DDN)) {
 		ddns = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DML)) {
 		dmls = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest) latest_dmls = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue) issue_dmls = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_latest || only_old) latest_dmls = malloc(OBJECT_MAX * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_dmls = malloc(OBJECT_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
@@ -435,29 +493,64 @@ int main(int argc, char **argv)
 	if (nimfs) qsort(imfs, nimfs, PATH_MAX, compare);
 	if (ndmls) qsort(dmls, ndmls, PATH_MAX, compare);
 
-	if (only_official_issue) {
-		if (ndms) nissue_dms = extract_official(issue_dms, dms, ndms);
-		if (npms) nissue_pms = extract_official(issue_pms, pms, npms);
-		if (nimfs) nissue_imfs = extract_official(issue_imfs, imfs, nimfs);
-		if (ndmls) nissue_dmls = extract_official(issue_dmls, dmls, ndmls);
+	if (only_official_issue || only_inwork) {
+		if (only_old) {
+			int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
+
+			if (ndms) nissue_dms = remove_latest(issue_dms, dms, ndms);
+			if (npms) nissue_pms = remove_latest(issue_pms, pms, npms);
+			if (nimfs) nissue_imfs = remove_latest(issue_imfs, imfs, nimfs);
+			if (ndmls) nissue_dmls = remove_latest(issue_dmls, dmls, ndmls);
+
+			if (only_official_issue) {
+				f = extract_official;
+			} else {
+				f = remove_official;
+			}
+
+			if (nissue_dms) nlatest_dms = f(latest_dms, issue_dms, nissue_dms);
+			if (nissue_pms) nlatest_pms = f(latest_pms, issue_pms, nissue_pms);
+			if (nissue_imfs) nlatest_imfs = f(latest_imfs, issue_imfs, nissue_imfs);
+			if (nissue_dmls) nlatest_dmls = f(latest_dmls, issue_dmls, nissue_dmls);
+		} else {
+			int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
+
+			if (only_official_issue) {
+				f = extract_official;
+			} else {
+				f = remove_official;
+			}
+
+			if (ndms) nissue_dms = f(issue_dms, dms, ndms);
+			if (npms) nissue_pms = f(issue_pms, pms, npms);
+			if (nimfs) nissue_imfs = f(issue_imfs, imfs, nimfs);
+			if (ndmls) nissue_dmls = f(issue_dmls, dmls, ndmls);
+
+			if (only_latest) {
+				if (nissue_dms) nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
+				if (nissue_pms) nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
+				if (nissue_imfs) nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
+				if (nissue_dmls) nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
+			}
+		}
+	} else if (only_latest || only_old) {
+		int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
 
 		if (only_latest) {
-			if (nissue_dms) nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
-			if (nissue_pms) nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
-			if (nissue_imfs) nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
-			if (nissue_dmls) nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
+			f = extract_latest;
+		} else {
+			f = remove_latest;
 		}
-	} else if (only_latest) {
-		if (ndms) nlatest_dms = extract_latest(latest_dms, dms, ndms);
-		if (npms) nlatest_pms = extract_latest(latest_pms, pms, npms);
-		if (nimfs) nlatest_imfs = extract_latest(latest_imfs, imfs, nimfs);
-		if (ndmls) nlatest_dmls = extract_latest(latest_dmls, dmls, ndmls);
+		if (ndms) nlatest_dms = f(latest_dms, dms, ndms);
+		if (npms) nlatest_pms = f(latest_pms, pms, npms);
+		if (nimfs) nlatest_imfs = f(latest_imfs, imfs, nimfs);
+		if (ndmls) nlatest_dmls = f(latest_dmls, dmls, ndmls);
 	}
 
 	if (ndms) {
-		if (only_latest) {
+		if (only_latest || only_old) {
 			printfiles(latest_dms, nlatest_dms);
-		} else if (only_official_issue) {
+		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_dms, nissue_dms);
 		} else {
 			printfiles(dms, ndms);
@@ -465,37 +558,37 @@ int main(int argc, char **argv)
 	}
 
 	if (npms) {
-		if (only_latest) {
+		if (only_latest || only_old) {
 			printfiles(latest_pms, nlatest_pms);
-		} else if (only_official_issue) {
+		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_pms, nissue_pms);
 		} else {
 			printfiles(pms, npms);
 		}
 	}
 
-	if (ncoms) {
+	if (ncoms && !only_old) {
 		printfiles(coms, ncoms);
 	}
 
 	if (nimfs) {
-		if (only_latest) {
+		if (only_latest || only_old) {
 			printfiles(latest_imfs, nlatest_imfs);
-		} else if (only_official_issue) {
+		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_imfs, nissue_imfs);
 		} else {
 			printfiles(imfs, nimfs);
 		}
 	}
 
-	if (nddns) {
+	if (nddns && !only_old) {
 		printfiles(ddns, nddns);
 	}
 
 	if (ndmls) {
-		if (only_latest) {
+		if (only_latest || only_old) {
 			printfiles(latest_dmls, nlatest_dmls);
-		} else if (only_official_issue) {
+		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_dmls, nissue_dmls);
 		} else {
 			printfiles(dmls, ndmls);
