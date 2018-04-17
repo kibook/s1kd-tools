@@ -1184,6 +1184,8 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		} else {
 			xmlSaveFile("-", doc);
 		}
+	} else {
+		putchar('\n');
 	}
 
 	xmlFreeDoc(doc);
@@ -1225,7 +1227,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 {
 	FILE *f;
 	char path[PATH_MAX];
-	int err = 0, i = 0, last_err = 0;
+	int err = 0;
 
 	if (fname) {
 		if (!(f = fopen(fname, "r"))) {
@@ -1238,11 +1240,8 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
-
-		last_err = show_or_edit_metadata(path, metadata_fname, keys,
+		err += show_or_edit_metadata(path, metadata_fname, keys,
 			formatall, overwrite, endl, only_editable, fmtstr, conds);
-		err += last_err;
-		++i;
 	}
 
 	if (fname) {
@@ -1294,23 +1293,19 @@ int main(int argc, char **argv)
 	if (list_keys) {
 		list_metadata_keys(keys, formatall, only_editable);
 	} else if (optind < argc) {
-		int last_err = 0;
-
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				last_err = show_or_edit_metadata_list(argv[i],
+				err += show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr,
 					conds);
 			} else {
-				last_err = show_or_edit_metadata(argv[i],
+				err += show_or_edit_metadata(argv[i],
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr,
 					conds);
 			}
 		}
-
-		err += last_err;
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
 			overwrite, endl, only_editable, fmtstr, conds);
