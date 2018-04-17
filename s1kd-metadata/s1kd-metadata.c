@@ -1239,18 +1239,10 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
 
-		if (i > 0 && last_err != EXIT_CONDITION_UNMET) {
-			putchar('\n');
-		}
-
 		last_err = show_or_edit_metadata(path, metadata_fname, keys,
 			formatall, overwrite, endl, only_editable, fmtstr, conds);
 		err += last_err;
 		++i;
-	}
-
-	if (endl != '\n' && last_err != EXIT_CONDITION_UNMET) {
-		putchar('\n');
 	}
 
 	if (fname) {
@@ -1305,10 +1297,6 @@ int main(int argc, char **argv)
 		int last_err = 0;
 
 		for (i = optind; i < argc; ++i) {
-			if (i > optind && last_err != EXIT_CONDITION_UNMET) {
-				putchar('\n');
-			}
-
 			if (islist) {
 				last_err = show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
@@ -1323,10 +1311,6 @@ int main(int argc, char **argv)
 		}
 
 		err += last_err;
-
-		if (endl != '\n' && last_err != EXIT_CONDITION_UNMET) {
-			putchar('\n');
-		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
 			overwrite, endl, only_editable, fmtstr, conds);
