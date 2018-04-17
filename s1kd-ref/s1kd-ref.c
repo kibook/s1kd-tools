@@ -98,6 +98,45 @@ void dump_node(xmlNodePtr node, const char *dst)
 	xmlBufferFree(buf);
 }
 
+xmlNodePtr new_issue_info(char *s)
+{
+	char *d, *n, *w;
+	xmlNodePtr issue_info;
+
+	d = strchr(s, '-');
+	n = strndup(s + 1, d - s - 1);
+	w = strndup(d + 1, 2);
+
+	issue_info = xmlNewNode(NULL, BAD_CAST "issueInfo");
+	xmlSetProp(issue_info, BAD_CAST "issueNumber", BAD_CAST n);
+	xmlSetProp(issue_info, BAD_CAST "inWork", BAD_CAST w);
+
+	free(n);
+	free(w);
+
+	return issue_info;
+}
+
+xmlNodePtr new_language(char *s)
+{
+	char *d, *l, *c;
+	xmlNodePtr language;
+
+	d = strchr(s, '-');
+	l = strndup(s + 1, d - s -1);
+	c = strndup(d + 1, 2);
+	lowercase(l);
+
+	language = xmlNewNode(NULL, BAD_CAST "language");
+	xmlSetProp(language, BAD_CAST "languageIsoCode", BAD_CAST l);
+	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST c);
+
+	free(l);
+	free(c);
+
+	return language;
+}
+
 #define PME_FMT "PME-%255[^-]-%255[^-]-%14[^-]-%5s-%5s-%2s"
 #define PMC_FMT "PMC-%14[^-]-%5s-%5s-%2s"
 
@@ -165,35 +204,73 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_pm_address_items;
 		xmlNodePtr ref_pm_title;
 		xmlNodePtr ref_pm_issue_date;
+		char *s;
 
-		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read publication module: %s\n", ref);
-			exit(EXIT_MISSING_FILE);
+		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+			ref_pm_address = first_xpath_node(doc, NULL, "//pmAddress");
+			ref_pm_ident = find_child(ref_pm_address, "pmIdent");
+			ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
+			ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
+			ref_pm_issue_date = find_child(ref_pm_address_items, "issueDate");
 		}
 
-		ref_pm_address = first_xpath_node(doc, NULL, "//pmAddress");
-		ref_pm_ident = find_child(ref_pm_address, "pmIdent");
-		ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
-		ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
-		ref_pm_issue_date = find_child(ref_pm_address_items, "issueDate");
+		s = strchr(ref, '_');
 
 		if (hasopt(opts, OPT_ISSUE)) {
-			xmlAddChild(pm_ref_ident, xmlCopyNode(find_child(ref_pm_ident, "issueInfo"), 1));
+			xmlNodePtr issue_info;
+
+			if (doc) {
+				issue_info = xmlCopyNode(find_child(ref_pm_ident, "issueInfo"), 1);
+			} else if (s && isdigit(s[1])) {
+				issue_info = new_issue_info(s);
+			} else {
+				fprintf(stderr, ERR_PREFIX "Could not read issue info from publication module: %s\n", ref);
+				issue_info = NULL;
+			}
+
+			xmlAddChild(pm_ref_ident, issue_info);
 		}
 
 		if (hasopt(opts, OPT_LANG)) {
-			xmlAddChild(pm_ref_ident, xmlCopyNode(find_child(ref_pm_ident, "language"), 1));
+			xmlNodePtr language;
+
+			if (doc) {
+				language = xmlCopyNode(find_child(ref_pm_ident, "language"), 1);
+			} else if (s && (s = strchr(s + 1, '_'))) {
+				language = new_language(s);
+			} else {
+				fprintf(stderr, ERR_PREFIX "Could not read language from publication module: %s\n", ref);
+				language = NULL;
+			}
+
+			xmlAddChild(pm_ref_ident, language);
 		}
 
 		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
-			xmlNodePtr pm_ref_address_items;
-			pm_ref_address_items = xmlNewChild(pm_ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
+			xmlNodePtr pm_ref_address_items, pm_title, issue_date;
+
+			if (doc) {
+				pm_ref_address_items = xmlNewChild(pm_ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
+				pm_title = xmlCopyNode(ref_pm_title, 1);
+				issue_date = xmlCopyNode(ref_pm_issue_date, 1);
+			} else {
+				pm_title = NULL;
+				issue_date = NULL;
+			}
 
 			if (hasopt(opts, OPT_TITLE)) {
-				xmlAddChild(pm_ref_address_items, xmlCopyNode(ref_pm_title, 1));
+				if (pm_title) {
+					xmlAddChild(pm_ref_address_items, pm_title);
+				} else {
+					fprintf(stderr, ERR_PREFIX "Could not read title from publication module: %s\n", ref);
+				}
 			}
 			if (hasopt(opts, OPT_DATE)) {
-				xmlAddChild(pm_ref_address_items, xmlCopyNode(ref_pm_issue_date, 1));
+				if (issue_date) {
+					xmlAddChild(pm_ref_address_items, issue_date);
+				} else {
+					fprintf(stderr, ERR_PREFIX "Could not read date from publication module: %s\n", ref);
+				}
 			}
 		}
 
@@ -311,35 +388,73 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dm_address_items;
 		xmlNodePtr ref_dm_title;
 		xmlNodePtr ref_dm_issue_date;
+		char *s;
 
-		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read data module: %s\n", ref);
-			exit(EXIT_MISSING_FILE);
+		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+			ref_dm_address = first_xpath_node(doc, NULL, "//dmAddress");
+			ref_dm_ident = find_child(ref_dm_address, "dmIdent");
+			ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
+			ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
+			ref_dm_issue_date = find_child(ref_dm_address_items, "issueDate");
 		}
 
-		ref_dm_address = first_xpath_node(doc, NULL, "//dmAddress");
-		ref_dm_ident = find_child(ref_dm_address, "dmIdent");
-		ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
-		ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
-		ref_dm_issue_date = find_child(ref_dm_address_items, "issueDate");
+		s = strchr(ref, '_');
 
 		if (hasopt(opts, OPT_ISSUE)) {
-			xmlAddChild(dm_ref_ident, xmlCopyNode(find_child(ref_dm_ident, "issueInfo"), 1));
+			xmlNodePtr issue_info;
+
+			if (doc) {
+				issue_info = xmlCopyNode(find_child(ref_dm_ident, "issueInfo"), 1);
+			} else if (s && isdigit(s[1])) {
+				issue_info = new_issue_info(s);
+			} else {
+				fprintf(stderr, ERR_PREFIX "Could not read issue info from data module: %s\n", ref);
+				issue_info = NULL;
+			}
+
+			xmlAddChild(dm_ref_ident, issue_info);
 		}
 
 		if (hasopt(opts, OPT_LANG)) {
-			xmlAddChild(dm_ref_ident, xmlCopyNode(find_child(ref_dm_ident, "language"), 1));
+			xmlNodePtr language;
+
+			if (doc) {
+				language = xmlCopyNode(find_child(ref_dm_ident, "language"), 1);
+			} else if (s && (s = strchr(s + 1, '_'))) {
+				language = new_language(s);
+			} else {
+				fprintf(stderr, ERR_PREFIX "Could not read language from data module: %s\n", ref);
+				language = NULL;
+			}
+
+			xmlAddChild(dm_ref_ident, language);
 		}
 
 		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
-			xmlNodePtr dm_ref_address_items;
-			dm_ref_address_items = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
+			xmlNodePtr dm_ref_address_items, dm_title, issue_date;
+
+			if (doc) {
+				dm_ref_address_items = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
+				dm_title = xmlCopyNode(ref_dm_title, 1);
+				issue_date = xmlCopyNode(ref_dm_issue_date, 1);
+			} else {
+				dm_title = NULL;
+				issue_date = NULL;
+			}
 
 			if (hasopt(opts, OPT_TITLE)) {
-				xmlAddChild(dm_ref_address_items, xmlCopyNode(ref_dm_title, 1));
+				if (dm_title) {
+					xmlAddChild(dm_ref_address_items, dm_title);
+				} else {
+					fprintf(stderr, ERR_PREFIX "Could not read title from data module: %s\n", ref);
+				}
 			}
 			if (hasopt(opts, OPT_DATE)) {
-				xmlAddChild(dm_ref_address_items, xmlCopyNode(ref_dm_issue_date, 1));
+				if (issue_date) {
+					xmlAddChild(dm_ref_address_items, issue_date);
+				} else {
+					fprintf(stderr, ERR_PREFIX "Could not read issue date from data module: %s\n", ref);
+				}
 			}
 		}
 
@@ -390,17 +505,28 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		xmlDocPtr doc;
 		xmlNodePtr ref_comment_address;
 		xmlNodePtr ref_comment_ident;
+		char *s;
 
-		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read comment: %s\n", ref);
-			exit(EXIT_MISSING_FILE);
+		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+			ref_comment_address = first_xpath_node(doc, NULL, "//commentAddress");
+			ref_comment_ident = find_child(ref_comment_address, "commentIdent");
 		}
 
-		ref_comment_address = first_xpath_node(doc, NULL, "//commentAddress");
-		ref_comment_ident = find_child(ref_comment_address, "commentIdent");
+		s = strchr(ref, '_');
 
 		if (hasopt(opts, OPT_LANG)) {
-			xmlAddChild(comment_ref_ident, xmlCopyNode(find_child(ref_comment_ident, "language"), 1));
+			xmlNodePtr language;
+
+			if (doc) {
+				language = xmlCopyNode(find_child(ref_comment_ident, "language"), 1);
+			} else if (s && (s = strchr(s + 1, '_'))) {
+				language = new_language(s);
+			} else {
+				fprintf(stderr, ERR_PREFIX "Could not read language from comment: %s\n", ref);
+				language = NULL;
+			}
+
+			xmlAddChild(comment_ref_ident, language);
 		}
 
 		xmlFreeDoc(doc);
@@ -450,17 +576,27 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		xmlDocPtr doc;
 		xmlNodePtr ref_dml_address;
 		xmlNodePtr ref_dml_ident;
+		char *s;
 
-		if (!(doc = xmlReadFile(fname, NULL, 0))) {
-			fprintf(stderr, ERR_PREFIX "Could not read DML: %s\n", ref);
-			exit(EXIT_MISSING_FILE);
+		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+			ref_dml_address = first_xpath_node(doc, NULL, "//dmlAddress");
+			ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
 		}
 
-		ref_dml_address = first_xpath_node(doc, NULL, "//dmlAddress");
-		ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
+		s = strchr(ref, '_');
 
 		if (hasopt(opts, OPT_ISSUE)) {
-			xmlAddChild(dml_ref_ident, xmlCopyNode(find_child(ref_dml_ident, "issueInfo"), 1));
+			xmlNodePtr issue_info;
+
+			if (doc) {
+				issue_info = xmlCopyNode(find_child(ref_dml_ident, "issueInfo"), 1);
+			} else if (s && isdigit(s[1])) {
+				issue_info = new_issue_info(s);
+			} else {
+				fprintf(stderr, ERR_PREFIX "Could not read issue info from DML: %s\n", ref);
+			}
+
+			xmlAddChild(dml_ref_ident, issue_info);
 		}
 
 		xmlFreeDoc(doc);
