@@ -594,6 +594,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 				issue_info = new_issue_info(s);
 			} else {
 				fprintf(stderr, ERR_PREFIX "Could not read issue info from DML: %s\n", ref);
+				issue_info = NULL;
 			}
 
 			xmlAddChild(dml_ref_ident, issue_info);
