@@ -6,20 +6,23 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-Nxp] <PM> [<DM>...]
+    s1kd-flatten [-I <path>] [-Npx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
 
 The *s1kd-flatten* tool combines a publication module and the data modules it references in to a single file for use with a publishing system.
 
-Data modules are searched for in the current directory using the data module code, language and/or issue info provided in each reference.
+Data modules are by default searched for in the current directory using the data module code, language and/or issue info provided in each reference. Additional directories can be searched using the -I option.
 
 OPTIONS
 =======
 
 -h -?  
 Show help/usage message.
+
+-I &lt;path&gt;  
+Add &lt;path&gt; to the list of directories that the tool will search when resolving references.
 
 -N  
 Assume that the files representing the referenced data modules do not include the issue info in their filenames, i.e. they were created using the -N option of the s1kd-new\* tools.

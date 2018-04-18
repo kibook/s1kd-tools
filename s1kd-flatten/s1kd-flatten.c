@@ -15,15 +15,18 @@ int use_pub_fmt = 0;
 xmlDocPtr pub_doc = NULL;
 xmlNodePtr pub;
 
+xmlNodePtr search_paths;
+
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Npxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-I <path>] [-Npxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -N     Assume issue/inwork numbers are omitted.");
-	puts("  -x     Use XInclude references.");
-	puts("  -p     Output a 'publication' XML file.");
-	puts("  -h -?  Show help/usage message.");
+	puts("  -I <path>  Search <path> for referenced objects.");
+	puts("  -N         Assume issue/inwork numbers are omitted.");
+	puts("  -p         Output a 'publication' XML file.");
+	puts("  -x         Use XInclude references.");
+	puts("  -h -?      Show help/usage message.");
 }
 
 xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
@@ -44,47 +47,38 @@ bool is_dm(const char *fname)
 	return strncmp(fname, "DMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
-char *filesystem_dm_fname(char *fs_dm_fname, const char *dm_fname)
-{
-	DIR *dir;
-	struct dirent *cur;
-
-	dir = opendir(".");
-
-	while ((cur = readdir(dir))) {
-		if (is_dm(cur->d_name) && strncmp(cur->d_name, dm_fname, strlen(dm_fname)) == 0) {
-			strcpy(fs_dm_fname, cur->d_name);
-			break;
-		}
-	}
-
-	closedir(dir);
-
-	return fs_dm_fname;
-}
-
 bool is_pm(const char *fname)
 {
 	return strncmp(fname, "PMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
-char *filesystem_pm_fname(char *fs_pm_fname, const char *pm_fname)
+bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool (*is)(const char *))
 {
 	DIR *dir;
 	struct dirent *cur;
+	int fname_len;
+	bool found = false;
 
-	dir = opendir(".");
+	fname_len = strlen(fname);
+	dir = opendir(path);
 
 	while ((cur = readdir(dir))) {
-		if (is_pm(cur->d_name) && strncmp(cur->d_name, pm_fname, strlen(pm_fname)) == 0) {
-			strcpy(fs_pm_fname, cur->d_name);
+		if (is(cur->d_name) && strncmp(cur->d_name, fname, fname_len) == 0) {
+			if (strcmp(path, ".") == 0) {
+				strcpy(fs_fname, cur->d_name);
+			} else {
+				strcpy(fs_fname, path);
+				strcat(fs_fname, "/");
+				strcat(fs_fname, cur->d_name);
+			}
+			found = true;
 			break;
 		}
 	}
 
 	closedir(dir);
 
-	return fs_pm_fname;
+	return found;
 }
 
 void flatten_pm_ref(xmlNodePtr pm_ref)
@@ -111,6 +105,9 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	xmlNodePtr xi;
 	xmlDocPtr doc;
 	xmlNodePtr pm;
+
+	bool found = false;
+	xmlNodePtr cur;
 
 	pm_ref_ident = find_child(pm_ref, "pmRefIdent");
 	pm_code = find_child(pm_ref_ident, "pmCode");
@@ -162,22 +159,32 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		xmlFree(country_iso_code);
 	}
 
-	if (strcmp(filesystem_pm_fname(fs_pm_fname, pm_fname), "") != 0) {
-		if (xinclude ) {
-			xi = xmlNewNode(NULL, BAD_CAST "xi:include");
-			xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
+	for (cur = search_paths->children; cur && !found; cur = cur->next) {
+		char *path;
 
-			if (use_pub_fmt) {
-				xi = xmlAddChild(pub, xi);
+		path = (char *) xmlNodeGetContent(cur);
+
+		if (filesystem_fname(fs_pm_fname, pm_fname, path, is_pm)) {
+			found = true;
+
+			if (xinclude) {
+				xi = xmlNewNode(NULL, BAD_CAST "xi:include");
+				xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
+
+				if (use_pub_fmt) {
+					xi = xmlAddChild(pub, xi);
+				} else {
+					xi = xmlAddPrevSibling(pm_ref, xi);
+				}
 			} else {
-				xi = xmlAddPrevSibling(pm_ref, xi);
+				doc = xmlReadFile(fs_pm_fname, NULL, XML_PARSE_NONET);
+				pm = xmlDocGetRootElement(doc);
+				xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
+				xmlFreeDoc(doc);
 			}
-		} else {
-			doc = xmlReadFile(fs_pm_fname, NULL, XML_PARSE_NONET);
-			pm = xmlDocGetRootElement(doc);
-			xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
-			xmlFreeDoc(doc);
 		}
+
+		xmlFree(path);
 	}
 
 	xmlUnlinkNode(pm_ref);
@@ -215,6 +222,9 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	xmlNodePtr xi;
 	xmlDocPtr doc;
 	xmlNodePtr dmodule;
+
+	bool found = false;
+	xmlNodePtr cur;
 
 	dm_ref_ident = find_child(dm_ref, "dmRefIdent");
 	dm_code = find_child(dm_ref_ident, "dmCode");
@@ -287,22 +297,32 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		xmlFree(country_iso_code);
 	}
 
-	if (strcmp(filesystem_dm_fname(fs_dm_fname, dm_fname), "") != 0) {
-		if (xinclude) {
-			xi = xmlNewNode(NULL, BAD_CAST "xi:include");
-			xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
+	for (cur = search_paths->children; cur && !found; cur = cur->next) {
+		char *path;
 
-			if (use_pub_fmt) {
-				xi = xmlAddChild(pub, xi);
+		path = (char *) xmlNodeGetContent(cur);
+
+		if (filesystem_fname(fs_dm_fname, dm_fname, path, is_dm)) {
+			found = true;
+
+			if (xinclude) {
+				xi = xmlNewNode(NULL, BAD_CAST "xi:include");
+				xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
+
+				if (use_pub_fmt) {
+					xi = xmlAddChild(pub, xi);
+				} else {
+					xi = xmlAddPrevSibling(dm_ref, xi);
+				}
 			} else {
-				xi = xmlAddPrevSibling(dm_ref, xi);
+				doc = xmlReadFile(fs_dm_fname, NULL, XML_PARSE_NONET);
+				dmodule = xmlDocGetRootElement(doc);
+				xmlAddPrevSibling(dm_ref, xmlCopyNode(dmodule, 1));
+				xmlFreeDoc(doc);
 			}
-		} else {
-			doc = xmlReadFile(fs_dm_fname, NULL, XML_PARSE_NONET);
-			dmodule = xmlDocGetRootElement(doc);
-			xmlAddPrevSibling(dm_ref, xmlCopyNode(dmodule, 1));
-			xmlFreeDoc(doc);
 		}
+
+		xmlFree(path);
 	}
 
 	xmlUnlinkNode(dm_ref);
@@ -343,11 +363,15 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	while ((c = getopt(argc, argv, "xNph?")) != -1) {
+	search_paths = xmlNewNode(NULL, BAD_CAST "searchPaths");
+	xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST ".");
+
+	while ((c = getopt(argc, argv, "xNpI:h?")) != -1) {
 		switch (c) {
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; xinclude = 1; break;
+			case 'I': xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
