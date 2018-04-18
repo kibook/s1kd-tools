@@ -46,6 +46,9 @@ The originator enterprise name of the new ICN metadata file.
 -p  
 Prompts the user for any values left unspecified.
 
+-q  
+Do not report an error when the file already exists.
+
 -R &lt;CAGE&gt;  
 The CAGE code of the responsible partner company.
 

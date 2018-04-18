@@ -65,6 +65,9 @@ The issue number of the new data module.
 -p  
 Prompts the user for any values left unspecified.
 
+-q  
+Do not report an error when the file already exists.
+
 -R &lt;NCAGE&gt;  
 Specifies a default responsible partner company enterprise code for entries which do not carry this in their ID STATUS section (ICN, COM, DML).
 

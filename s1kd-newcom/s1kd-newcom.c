@@ -240,6 +240,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -d    Specify the 'defaults' file name.");
 	puts("  -p    Prompt the user for each value.");
+	puts("  -q    Don't report an error if file exists.");
 	puts("  -v    Print file name of comment.");
 	puts("  -f    Overwrite existing file.");
 	puts("  -$    Specify which S1000D issue to use.");
@@ -441,6 +442,7 @@ int main(int argc, char **argv)
 
 	bool verbose = false;
 	bool overwrite = false;
+	bool no_overwrite_error = false;
 
 	char *out = NULL;
 
@@ -448,7 +450,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:h?")) != -1) {
+	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qh?")) != -1) {
 		switch (i) {
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
@@ -501,6 +503,9 @@ int main(int argc, char **argv)
 				break;
 			case '%':
 				template_dir = strdup(optarg);
+				break;
+			case 'q':
+				no_overwrite_error = true;
 				break;
 			case 'h':
 			case '?':
@@ -706,11 +711,12 @@ int main(int argc, char **argv)
 	}
 
 	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
 		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_COMMENT_EXISTS);
 	}
 
-	xmlSaveFormatFile(out, comment_doc, 1);
+	xmlSaveFile(out, comment_doc);
 
 	if (verbose)
 		puts(out);

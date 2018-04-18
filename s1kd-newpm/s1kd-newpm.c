@@ -311,6 +311,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -d    Specify the 'defaults' file name.");
 	puts("  -p    Prompt the user for each value.");
+	puts("  -q    Don't report an error if file exists.");
 	puts("  -N    Omit issue/inwork from file name.");
 	puts("  -v    Print file name of pub module.");
 	puts("  -f    Overwrite existing file.");
@@ -523,11 +524,12 @@ int main(int argc, char **argv)
 	bool include_date = false;
 	bool verbose = false;
 	bool overwrite = false;
+	bool no_overwrite_error = false;
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'D': include_date = true; break;
@@ -553,6 +555,7 @@ int main(int argc, char **argv)
 			case '@': out = strdup(optarg); break;
 			case '%': template_dir = strdup(optarg); break;
 			case 's': strcpy(short_pm_title, optarg); break;
+			case 'q': no_overwrite_error = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -759,6 +762,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
 		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_PM_EXISTS);
 	}

@@ -124,8 +124,9 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
-	puts("  -p          Show prompts.");
 	puts("  -d <path>   Defaults file path.");
+	puts("  -p          Show prompts.");
+	puts("  -q          Don't report an error if file exists.");
 	puts("  -N          Omit issue/inwork numbers from filename.");
 	puts("  -v          Print file name of IMF.");
 	puts("  -f          Overwrite existing file.");
@@ -260,13 +261,14 @@ int main(int argc, char **argv)
 	bool no_issue = false;
 	bool verbose = false;
 	bool overwrite = false;
+	bool no_overwrite_error = false;
 
 	FILE *defaults;
 	char defaults_fname[PATH_MAX] = "defaults";
 
 	xmlDocPtr defaults_xml;
 
-	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:h?")) != -1) {
+	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qh?")) != -1) {
 		switch (i) {
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -284,6 +286,7 @@ int main(int argc, char **argv)
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case '%': template_dir = strdup(optarg); break;
+			case 'q': no_overwrite_error = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -399,6 +402,7 @@ int main(int argc, char **argv)
 		}
 
 		if (!overwrite && access(fname, F_OK) != -1) {
+			if (no_overwrite_error) return 0;
 			fprintf(stderr, ERR_PREFIX "%s already exists.\n", fname);
 			exit(EXIT_IMF_EXISTS);
 		}

@@ -450,7 +450,9 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -h -?    Show usage message.");
+	puts("  -d       Defaults file.");
 	puts("  -p       Prompt the user for each value.");
+	puts("  -q       Don't report an error if file exists.");
 	puts("  -N       Omit issue/inwork from filename.");
 	puts("  -v       Print file name of DML.");
 	puts("  -f       Overwrite existing file.");
@@ -572,6 +574,7 @@ int main(int argc, char **argv)
 	bool noissue = false;
 	bool verbose = false;
 	bool overwrite = false;
+	bool no_overwrite_error = false;
 
 	int c;
 
@@ -579,7 +582,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -597,6 +600,7 @@ int main(int argc, char **argv)
 			case 'r': defaultRpcName = strdup(optarg); break;
 			case 'R': defaultRpcCode = strdup(optarg); break;
 			case '%': template_dir = strdup(optarg); break;
+			case 'q': no_overwrite_error = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -760,6 +764,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
 		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_DML_EXISTS);
 	}

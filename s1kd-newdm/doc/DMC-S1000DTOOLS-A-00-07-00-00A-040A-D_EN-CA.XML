@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="024" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="16"/>
+        <issueDate year="2018" month="04" day="18"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,8 +40,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Simplify defaults and dmtypes files examples.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -q option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -210,6 +210,12 @@
                 <para>Prompts the user for any values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Do not report an error when the file already exists.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
               <listItemDefinition>
@@ -340,7 +346,7 @@
           <para>All of the s1kd-new* commands use the same 'defaults' file format, so this file can contain default values for multiple types of metadata.</para>
           <para>Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[# General
+            <verbatimText verbatimStyle="vs23"><![CDATA[# General
 countryIsoCode               CA
 languageIsoCode              en
 originator                   khzae.net
@@ -349,7 +355,7 @@ securityClassification       01]]></verbatimText>
           </para>
           <para>Alternatively, the 'defaults' file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
 <defaults>
 <!-- General -->
 <default ident="countryIsoCode" value="CA"/>
@@ -365,14 +371,14 @@ securityClassification       01]]></verbatimText>
           <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named 'dmtypes', but any file can be specified by using the -D option.</para>
           <para>Each line consists of an info code, a schema identifier, and optionally a default info name. Example:</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[000    descript
+            <verbatimText verbatimStyle="vs23"><![CDATA[000    descript
 022    brex        Business rules
 040    descript    Description
 520    proced      Remove procedure]]></verbatimText>
           </para>
           <para>Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText>, an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>, and optionally an attribute <verbatimText verbatimStyle="vs13">infoName</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0">
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
 <dmtypes>
 <type infoCode="000" schema="descript"/>
 <type infoCode="022" schema="brex" infoName="Business rules"/>

@@ -201,6 +201,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -d <defaults>    Specify the 'defaults' file name.");
 	puts("  -p               Prompt user for values.");
+	puts("  -q               Don't report an error if file exists.");
 	puts("  -v               Print file name of DDN.");
 	puts("  -f               Overwrite existing file.");
 	puts("  -$               Specify which S1000D issue to use.");
@@ -390,6 +391,7 @@ int main(int argc, char **argv)
 	int skipcode = 0;
 	int verbose = 0;
 	int overwrite = 0;
+	int no_overwrite_error = 0;
 
 	xmlDocPtr ddn;
 	xmlNodePtr ddn_code;
@@ -408,7 +410,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
@@ -427,6 +429,7 @@ int main(int argc, char **argv)
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
 			case '%': template_dir = strdup(optarg); break;
+			case 'q': no_overwrite_error = 1; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -615,6 +618,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
 		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
 		exit(EXIT_DDN_EXISTS);
 	}

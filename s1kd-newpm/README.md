@@ -74,6 +74,9 @@ The issue number of the new publication module.
 -p  
 Prompt the user for any values left unspecified.
 
+-q  
+Do not report an error when the file already exists.
+
 -R &lt;CAGE&gt;  
 The CAGE code of the responsible partner company.
 

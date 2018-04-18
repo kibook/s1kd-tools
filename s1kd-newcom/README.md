@@ -65,6 +65,9 @@ The enterprise name of the originator of the comment.
 -p  
 Prompt the user for values left unspecified.
 
+-q  
+Do not report an error when the file already exists.
+
 -r &lt;type&gt;  
 The response type of the new comment.
 

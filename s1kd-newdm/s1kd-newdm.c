@@ -187,11 +187,12 @@ void show_help(void)
 	puts("Usage: s1kd-newdm [options]");
 	puts("");
 	puts("Options:");
-	puts("  -p      Prompt the user for each value");
+	puts("  -f      Overwrite existing file.");
 	puts("  -N      Omit issue/inwork from filename.");
+	puts("  -p      Prompt the user for each value");
+	puts("  -q      Don't report an error if file exists.");
 	puts("  -S      Get tech name from BREX SNS.");
 	puts("  -v      Print file name of new data module.");
-	puts("  -f      Overwrite existing file.");
 	puts("  -$      Specify which S1000D issue to use.");
 	puts("  -@      Output to specified file.");
 	puts("  -%      Use templates in specified directory.");
@@ -946,10 +947,11 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	char *out = NULL;
 	bool tech_name_flag = false;
+	bool no_overwrite_error = false;
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qh?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -980,6 +982,7 @@ int main(int argc, char **argv)
 			case ',': print_dmtypes(); exit(0);
 			case '.': print_dmtypes_txt(); exit(0);
 			case '%': template_dir = strdup(optarg); break;
+			case 'q': no_overwrite_error = true; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -1291,6 +1294,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
 		fprintf(stderr, ERR_PREFIX "Data module already exists: %s\n", out);
 		exit(EXIT_DM_EXISTS);
 	}

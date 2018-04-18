@@ -68,6 +68,9 @@ The enterprise name of the sender.
 -p &lt;showprompts&gt;  
 Prompt the user for values left unspecified.
 
+-q  
+Do not report an error when the file already exists.
+
 -r &lt;receiver&gt;  
 The enterprise name of the receiver.
 

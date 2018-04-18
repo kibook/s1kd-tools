@@ -579,6 +579,7 @@ void showHelp(void)
 	puts("  -% <dir>    Use templates in specified directory.");
 	puts("  -d <file>   Specify the 'defaults' file name.");
 	puts("  -f          Overwrite existing file.");
+	puts("  -q          Don't report an error if file exists.");
 }
 
 int main(int argc, char **argv)
@@ -591,11 +592,12 @@ int main(int argc, char **argv)
 	char upfname[PATH_MAX];
 	int c;
 	bool overwrite = false;
+	bool no_overwrite_error = false;
 	char *out = NULL;
 	char defaultsFname[PATH_MAX] = "defaults";
 	xmlDocPtr defaultsXml;
 
-	while ((c = getopt(argc, argv, "@:$:%:d:fh?")) != -1) {
+	while ((c = getopt(argc, argv, "@:$:%:d:fqh?")) != -1) {
 		switch (c) {
 			case '@':
 				out = strdup(optarg);
@@ -611,6 +613,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'q':
+				no_overwrite_error = true;
 				break;
 			case 'h':
 			case '?':
@@ -709,6 +714,7 @@ int main(int argc, char **argv)
 		autoName(upfname, updateFileContext);
 
 		if (!overwrite && access(upfname, F_OK) != -1) {
+			if (no_overwrite_error) return 0;
 			fprintf(stderr, ERR_PREFIX "'%s' already exists.\n", upfname);
 			exit(EXIT_UPF_EXISTS);
 		} else {
