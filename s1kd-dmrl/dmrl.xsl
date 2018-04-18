@@ -5,6 +5,7 @@
   
   <xsl:param name="no-issue" select="false()"/>
   <xsl:param name="overwrite" select="false()"/>
+  <xsl:param name="no-overwrite-error" select="false()"/>
 
   <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -26,41 +27,32 @@
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
         </xsl:if>
-        <xsl:if test="$overwrite">
-          <xsl:text> -f</xsl:text>
-        </xsl:if>
       </xsl:when>
       <xsl:when test="pmRef">
         <xsl:text>s1kd-newpm</xsl:text>
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
         </xsl:if>
-        <xsl:if test="$overwrite">
-          <xsl:text> -f</xsl:text>
-        </xsl:if>
       </xsl:when>
       <xsl:when test="commentRef">
         <xsl:text>s1kd-newcom</xsl:text>
-        <xsl:if test="$overwrite">
-          <xsl:text> -f</xsl:text>
-        </xsl:if>
       </xsl:when>
       <xsl:when test="dmlRef">
         <xsl:text>s1kd-newdml</xsl:text>
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
         </xsl:if>
-        <xsl:if test="$overwrite">
-          <xsl:text> -f</xsl:text>
-        </xsl:if>
       </xsl:when>
       <xsl:when test="infoEntityRef">
         <xsl:text>s1kd-newimf</xsl:text>
-        <xsl:if test="$overwrite">
-          <xsl:text> -f</xsl:text>
-        </xsl:if>
       </xsl:when>
     </xsl:choose>
+    <xsl:if test="$overwrite">
+      <xsl:text> -f</xsl:text>
+    </xsl:if>
+    <xsl:if test="$no-overwrite-error">
+      <xsl:text> -q</xsl:text>
+    </xsl:if>
     <xsl:apply-templates select="*"/>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>

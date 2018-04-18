@@ -6,7 +6,7 @@ s1kd-dmrl - Create CSDB objects from a DMRL
 SYNOPSIS
 ========
 
-    s1kd-dmrl [-Nh?] <DML>...
+    s1kd-dmrl [-FfNqsh?] <DML>...
 
 DESCRIPTION
 ===========
@@ -27,6 +27,9 @@ Show help/usage message.
 
 -N  
 Omit issue/in-work numbers from the filenames of created CSDB objects.
+
+-q  
+Do not report errors when any of the CSDB objects already exist.
 
 -s  
 Do not create CSDB objects, only output the s1kd-new\* commands to create them.

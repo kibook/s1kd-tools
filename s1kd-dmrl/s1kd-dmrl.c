@@ -13,16 +13,17 @@
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-dmrl [-Nh?] <DML>...");
+	puts("Usage: s1kd-dmrl [-FfNsh?] <DML>...");
 	puts("");
 	puts("Options:");
-	puts("  -s       Output s1kd-new* commands only.");
-	puts("  -N       Omit issue/inwork numbers.");
-	puts("  -f       Overwrite existing CSDB objects.");
+	puts("  -h -?    Show usage message.");
 	#ifndef _WIN32
 	puts("  -F       Fail on first error from s1kd-new* commands.");
 	#endif
-	puts("  -h -?    Show usage message.");
+	puts("  -f       Overwrite existing CSDB objects.");
+	puts("  -N       Omit issue/inwork numbers.");
+	puts("  -q       Don't report errors if objects exist.");
+	puts("  -s       Output s1kd-new* commands only.");
 }
 
 int main(int argc, char **argv)
@@ -37,11 +38,12 @@ int main(int argc, char **argv)
 	bool failOnFirstErr = false;
 	#endif
 	bool overwrite = false;
+	bool noOverwriteError = false;
 
 	dmrl = xmlReadMemory((const char *) dmrl_xsl, dmrl_xsl_len, NULL, NULL, 0);
 	dmrlStylesheet = xsltParseStylesheetDoc(dmrl);
 
-	while ((i = getopt(argc, argv, "sNfFh?")) != -1) {
+	while ((i = getopt(argc, argv, "sNfFqh?")) != -1) {
 		switch (i) {
 			case 's':
 				execute = false;
@@ -57,6 +59,9 @@ int main(int argc, char **argv)
 				failOnFirstErr = true;
 				break;
 			#endif
+			case 'q':
+				noOverwriteError = true;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -67,7 +72,7 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		xmlDocPtr in, out;
 		xmlChar *content;
-		const char *params[5];
+		const char *params[7];
 
 		in = xmlReadFile(argv[i], NULL, 0);
 
@@ -75,7 +80,9 @@ int main(int argc, char **argv)
 		params[1] = noIssue ? "true()" : "false()";
 		params[2] = "overwrite";
 		params[3] = overwrite ? "true()" : "false()";
-		params[4] = NULL;
+		params[4] = "no-overwrite-error";
+		params[5] = noOverwriteError ? "true()" : "false()";
+		params[6] = NULL;
 
 		out = xsltApplyStylesheet(dmrlStylesheet, in, params);
 
