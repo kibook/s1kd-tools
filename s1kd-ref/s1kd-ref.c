@@ -100,39 +100,34 @@ void dump_node(xmlNodePtr node, const char *dst)
 
 xmlNodePtr new_issue_info(char *s)
 {
-	char *d, *n, *w;
+	char n[4], w[3];
 	xmlNodePtr issue_info;
 
-	d = strchr(s, '-');
-	n = strndup(s + 1, d - s - 1);
-	w = strndup(d + 1, 2);
+	if (sscanf(s, "_%3[^-]-%2s", n, w) != 2) {
+		return NULL;
+	}
 
 	issue_info = xmlNewNode(NULL, BAD_CAST "issueInfo");
 	xmlSetProp(issue_info, BAD_CAST "issueNumber", BAD_CAST n);
 	xmlSetProp(issue_info, BAD_CAST "inWork", BAD_CAST w);
-
-	free(n);
-	free(w);
 
 	return issue_info;
 }
 
 xmlNodePtr new_language(char *s)
 {
-	char *d, *l, *c;
+	char l[4], c[3];
 	xmlNodePtr language;
 
-	d = strchr(s, '-');
-	l = strndup(s + 1, d - s -1);
-	c = strndup(d + 1, 2);
+	if (sscanf(s, "_%3[^-]-%2s", l, c) != 2) {
+		return NULL;
+	}
+
 	lowercase(l);
 
 	language = xmlNewNode(NULL, BAD_CAST "language");
 	xmlSetProp(language, BAD_CAST "languageIsoCode", BAD_CAST l);
 	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST c);
-
-	free(l);
-	free(c);
 
 	return language;
 }
