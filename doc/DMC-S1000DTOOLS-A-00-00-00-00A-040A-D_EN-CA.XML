@@ -8,17 +8,17 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="08" day="14"/>
+        <issueDate year="2018" month="04" day="19"/>
         <dmTitle>
           <techName>S1000D tools</techName>
           <infoName>Description</infoName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,19 +38,62 @@
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
-      <qualityAssurance>
-        <unverified/>
-      </qualityAssurance>
+      <qualityAssurance><unverified/></qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add links to documenation.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <para>A set of small tools for manipulating S1000D data.</para>
-      <para>A more complete example of an S1000D data set produced with these tools is available at <externalPubRef xlink:href="https://github.com/kibook/s1kd-tools-doc">
-        <externalPubRefIdent>
-          <externalPubCode>https://github.com/kibook/s1kd-tools-doc</externalPubCode>
-        </externalPubRefIdent>
-      </externalPubRef></para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <externalPubRef xlink:href="INTRO.md">
+          <externalPubRefIdent>
+            <externalPubTitle>Introduction</externalPubTitle>
+          </externalPubRefIdent>
+        </externalPubRef>
+      </para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <externalPubRef xlink:href="INSTALL.md">
+          <externalPubRefIdent>
+            <externalPubTitle>Installation</externalPubTitle>
+          </externalPubRefIdent>
+        </externalPubRef>
+      </para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <externalPubRef xlink:href="EXAMPLE.md">
+          <externalPubRefIdent>
+            <externalPubTitle>Usage examples</externalPubTitle>
+          </externalPubRefIdent>
+        </externalPubRef>
+      </para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <externalPubRef xlink:href="DEFAULTS.md">
+          <externalPubRefIdent>
+            <externalPubTitle>List of 'defaults' file identifiers</externalPubTitle>
+          </externalPubRefIdent>
+        </externalPubRef>
+      </para>
+      <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Some examples of S1000D data sets produced with these tools are available here:</para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <randomList>
+          <listItem>
+            <para><externalPubRef xlink:href="http://github.com/kibook/s1kd-tools-doc">
+              <externalPubRefIdent>
+                <externalPubTitle>s1kd-tools-doc</externalPubTitle>
+              </externalPubRefIdent>
+            </externalPubRef></para>
+          </listItem>
+          <listItem>
+            <para><externalPubRef xlink:href="http://github.com/kibook/S1000D">
+              <externalPubRefIdent>
+                <externalPubTitle>S1000D</externalPubTitle>
+              </externalPubRefIdent>
+            </externalPubRef></para>
+          </listItem>
+        </randomList>
+      </para>
     </description>
   </content>
 </dmodule>
