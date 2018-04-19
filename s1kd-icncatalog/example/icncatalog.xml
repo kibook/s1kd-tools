@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<icnCatalog>
+  <notation name="jpg" systemId="jpg"/>
+  <notation name="png" systemId="png"/>
+  <notation name="svg" systemId="svg"/>
+  <media name="pdf">
+    <icn infoEntityIdent="ICN-TEST-00001-001-01" uri="graphics/ICN-TEST-00001-001-01.JPG" notation="jpg"/>
+    <icn infoEntityIdent="ICN-TEST-00002-001-01" uri="graphics/ICN-TEST-00002-001-01.JPG" notation="jpg"/>
+  </media>
+  <media name="web">
+    <icn infoEntityIdent="ICN-TEST-00001-001-01" uri="graphics/ICN-TEST-00001-001-01.SVG" notation="svg"/>
+    <icn infoEntityIdent="ICN-TEST-00002-001-01" uri="graphics/ICN-TEST-00002-001-01.SVG" notation="svg"/>
+  </media>
+  <icn infoEntityIdent="ICN-TEST-00001-001-01" uri="graphics/ICN-TEST-00001-001-01.PNG" notation="png"/>
+  <icn infoEntityIdent="ICN-TEST-00002-001-01" uri="graphics/ICN-TEST-00002-001-01.PNG" notation="png"/>
+</icnCatalog>
