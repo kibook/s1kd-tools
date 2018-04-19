@@ -76,3 +76,5 @@ SEE ALSO
 S1000D website: http://www.s1000d.org
 
 s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-ls(1), s1kd-defaults(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-index(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-newupf(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)
+
+s1kd-defaults-file(5)
