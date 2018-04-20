@@ -1026,7 +1026,7 @@ bool auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 		ident.dmlCommentType[0] = toupper(ident.dmlCommentType[0]);
 	}	
 
-	if (!noiss && (ident.type == DM || ident.type == PM || ident.type == DML || ident.type == IMF)) {
+	if (!noiss && (ident.type == DM || ident.type == PM || ident.type == DML || ident.type == IMF || ident.type == UPF)) {
 		sprintf(iss, "_%s-%s", ident.issueNumber, ident.inWork);
 	}
 
