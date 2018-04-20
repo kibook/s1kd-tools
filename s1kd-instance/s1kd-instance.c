@@ -31,11 +31,12 @@
 #define DEFAULT_ORIG_NAME "s1kd-instance tool"
 
 /* Convenient structure for all strings related to uniquely identifying a
- * data module or pub module.
+ * CSDB object.
  */
+enum object_type { DM, PM, DML, COM, DDN, IMF, UPF };
 struct ident {
 	bool extended;
-	bool ispm;
+	enum object_type type;
 	char *extensionProducer;
 	char *extensionCode;
 	char *modelIdentCode;
@@ -51,19 +52,23 @@ struct ident {
 	char *itemLocationCode;
 	char *learnCode;
 	char *learnEventCode;
-	char *pmIssuer;
+	char *senderIdent;
 	char *pmNumber;
 	char *pmVolume;
 	char *issueNumber;
 	char *inWork;
 	char *languageIsoCode;
 	char *countryIsoCode;
+	char *dmlCommentType;
+	char *seqNumber;
+	char *yearOfDataIssue;
+	char *receiverIdent;
+	char *imfIdentIcn;
 };
 
+/* User-defined applicability */
 xmlNodePtr applicability;
-
 int napplics = 0;
-
 void define_applic(char *ident, char *type, char *value)
 {
 	xmlNodePtr assert = NULL;
@@ -113,19 +118,6 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
-/* Same as above but throws a fatal error if the child is not found instead of returning NULL. */
-xmlNodePtr find_req_child(xmlNodePtr parent, const char *name)
-{
-	xmlNodePtr child;
-
-	if (!(child = find_child(parent, name))) {
-		fprintf(stderr, ERR_PREFIX "Element %s missing child element %s.\n", (char *) parent->name, name);
-		exit(EXIT_BAD_XML);
-	}
-
-	return child;
-}
-
 xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 {
 	xmlXPathContextPtr ctx;
@@ -154,24 +146,95 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 	return first;
 }
 
-/* Copy strings related to uniquely identifying a data module. The strings are
+/* Copy strings related to uniquely identifying a CSDB object. The strings are
  * dynamically allocated so they must be freed using free_ident. */
-void init_ident(struct ident *ident, xmlDocPtr doc)
+#define IDENT_XPATH \
+	"//dmIdent|" \
+	"//pmIdent|" \
+	"//dmlIdent|" \
+	"//commentIdent|" \
+	"//ddnIdent|" \
+	"//imfIdent|" \
+	"//updateIdent"
+#define EXTENSION_XPATH \
+	"//dmIdent/identExtension|" \
+	"//pmIdent/identExtension|" \
+	"//updateIdent/identExtension"
+#define CODE_XPATH \
+	"//dmIdent/dmCode|" \
+	"//pmIdent/pmCode|" \
+	"//dmlIdent/dmlCode|" \
+	"//commentIdent/commentCode|" \
+	"//ddnIdent/ddnCode|" \
+	"//imfIdent/imfCode|" \
+	"//updateIdent/updateCode"
+#define LANGUAGE_XPATH \
+	"//dmIdent/language|" \
+	"//pmIdent/language|" \
+	"//commentIdent/language|" \
+	"//updateIdent/language"
+#define ISSUE_INFO_XPATH \
+	"//dmIdent/issueInfo|" \
+	"//pmIdent/issueInfo|" \
+	"//dmlIdent/issueInfo|" \
+	"//imfIdent/issueInfo|" \
+	"//updateIdent/issueInfo"
+bool init_ident(struct ident *ident, xmlDocPtr doc)
 {
 	xmlNodePtr moduleIdent, identExtension, code, language, issueInfo;
 
-	moduleIdent = first_xpath_node(doc, NULL, "//dmIdent|//pmIdent");
+	moduleIdent = first_xpath_node(doc, NULL, IDENT_XPATH);
 
-	ident->ispm = strcmp((char *) moduleIdent->name, "pmIdent") == 0;
+	if (!moduleIdent) {
+		return false;
+	}
 
-	identExtension = first_xpath_node(doc, NULL, "//dmIdent/identExtension|//pmIdent/identExtension");
-	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode");
-	language = first_xpath_node(doc, NULL, "//dmIdent/language|//pmIdent/language");
-	issueInfo = first_xpath_node(doc, NULL, "//dmIdent/issueInfo|//pmIdent/issueInfo");
+	if (xmlStrcmp(moduleIdent->name, BAD_CAST "pmIdent") == 0) {
+		ident->type = PM;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "dmlIdent") == 0) {
+		ident->type = DML;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "commentIdent") == 0) {
+		ident->type = COM;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "dmIdent") == 0) {
+		ident->type = DM;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "ddnIdent") == 0) {
+		ident->type = DDN;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "imfIdent") == 0) {
+		ident->type = IMF;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "updateIdent") == 0) {
+		ident->type = UPF;
+	}
 
-	ident->modelIdentCode     = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+	identExtension = first_xpath_node(doc, NULL, EXTENSION_XPATH);
+	code = first_xpath_node(doc, NULL, CODE_XPATH);
+	language = first_xpath_node(doc, NULL, LANGUAGE_XPATH);
+	issueInfo = first_xpath_node(doc, NULL, ISSUE_INFO_XPATH);
 
-	if (!ident->ispm) {
+	if (!code) {
+		return false;
+	}
+
+	ident->modelIdentCode = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+
+	if (ident->type == PM) {
+		ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
+		ident->pmNumber           = (char *) xmlGetProp(code, BAD_CAST "pmNumber");
+		ident->pmVolume           = (char *) xmlGetProp(code, BAD_CAST "pmVolume");
+	} else if (ident->type == DML || ident->type == COM) {
+		ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "senderIdent");
+		ident->yearOfDataIssue    = (char *) xmlGetProp(code, BAD_CAST "yearOfDataIssue");
+		ident->seqNumber          = (char *) xmlGetProp(code, BAD_CAST "seqNumber");
+		if (ident->type == DML) {
+			ident->dmlCommentType = (char *) xmlGetProp(code, BAD_CAST "dmlType");
+		} else {
+			ident->dmlCommentType = (char *) xmlGetProp(code, BAD_CAST "commentType");
+		}
+	} else if (ident->type == DDN) {
+		ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "senderIdent");
+		ident->receiverIdent      = (char *) xmlGetProp(code, BAD_CAST "receiverIdent");
+		ident->yearOfDataIssue    = (char *) xmlGetProp(code, BAD_CAST "yearOfDataIssue");
+		ident->seqNumber          = (char *) xmlGetProp(code, BAD_CAST "seqNumber");
+	} else if (ident->type == DM || ident->type == UPF) {
 		ident->systemDiffCode     = (char *) xmlGetProp(code, BAD_CAST "systemDiffCode");
 		ident->systemCode         = (char *) xmlGetProp(code, BAD_CAST "systemCode");
 		ident->subSystemCode      = (char *) xmlGetProp(code, BAD_CAST "subSystemCode");
@@ -184,17 +247,21 @@ void init_ident(struct ident *ident, xmlDocPtr doc)
 		ident->itemLocationCode   = (char *) xmlGetProp(code, BAD_CAST "itemLocationCode");
 		ident->learnCode          = (char *) xmlGetProp(code, BAD_CAST "learnCode");
 		ident->learnEventCode     = (char *) xmlGetProp(code, BAD_CAST "learnEventCode");
-	} else {
-		ident->pmIssuer           = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
-		ident->pmNumber           = (char *) xmlGetProp(code, BAD_CAST "pmNumber");
-		ident->pmVolume           = (char *) xmlGetProp(code, BAD_CAST "pmVolume");
+	} else if (ident->type == IMF) {
+		ident->imfIdentIcn = (char *) xmlGetProp(code, BAD_CAST "imfIdentIcn");
 	}
 
-	ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-	ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+	if (ident->type == DM || ident->type == PM || ident->type == DML || ident->type == IMF || ident->type == UPF) {
+		if (!issueInfo) return false;
+		ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
+		ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+	}
 
-	ident->languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-	ident->countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+	if (ident->type == DM || ident->type == PM || ident->type == COM || ident->type == UPF) {
+		if (!language) return false;
+		ident->languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+		ident->countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+	}
 
 	if (identExtension) {
 		ident->extended = true;
@@ -203,6 +270,8 @@ void init_ident(struct ident *ident, xmlDocPtr doc)
 	} else {
 		ident->extended = false;
 	}
+
+	return true;
 }
 
 void free_ident(struct ident *ident)
@@ -214,7 +283,16 @@ void free_ident(struct ident *ident)
 
 	xmlFree(ident->modelIdentCode);
 
-	if (!ident->ispm) {
+	if (ident->type == PM) {
+		xmlFree(ident->senderIdent);
+		xmlFree(ident->pmNumber);
+		xmlFree(ident->pmVolume);
+	} else if (ident->type == DML || ident->type == COM) {
+		xmlFree(ident->senderIdent);
+		xmlFree(ident->yearOfDataIssue);
+		xmlFree(ident->seqNumber);
+		xmlFree(ident->dmlCommentType);
+	} else if (ident->type == DM || ident->type == UPF) {
 		xmlFree(ident->systemDiffCode);
 		xmlFree(ident->systemCode);
 		xmlFree(ident->subSystemCode);
@@ -227,16 +305,22 @@ void free_ident(struct ident *ident)
 		xmlFree(ident->itemLocationCode);
 		xmlFree(ident->learnCode);
 		xmlFree(ident->learnEventCode);
-	} else {
-		xmlFree(ident->pmIssuer);
-		xmlFree(ident->pmNumber);
-		xmlFree(ident->pmVolume);
+	} else if (ident->type == DDN) {
+		xmlFree(ident->senderIdent);
+		xmlFree(ident->receiverIdent);
+		xmlFree(ident->yearOfDataIssue);
+		xmlFree(ident->seqNumber);
 	}
 
-	xmlFree(ident->issueNumber);
-	xmlFree(ident->inWork);
-	xmlFree(ident->languageIsoCode);
-	xmlFree(ident->countryIsoCode);
+	if (ident->type == DM || ident->type == PM || ident->type == DML) {
+		xmlFree(ident->issueNumber);
+		xmlFree(ident->inWork);
+	}
+
+	if (ident->type == DM || ident->type == PM || ident->type == COM) {
+		xmlFree(ident->languageIsoCode);
+		xmlFree(ident->countryIsoCode);
+	}
 }
 
 /* Evaluate an applic statement, returning whether it is valid or invalid given
@@ -661,6 +745,10 @@ void add_source(xmlDocPtr doc)
 	sourceIdent = first_xpath_node(doc, NULL, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
 	node        = first_xpath_node(doc, NULL, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
 
+	if (!node) {
+		return;
+	}
+
 	if (sourceIdent) {
 		xmlUnlinkNode(sourceIdent);
 		xmlFreeNode(sourceIdent);
@@ -918,30 +1006,38 @@ void set_lang(xmlDocPtr doc, char *lang)
 	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST country_iso_code);
 }
 
-void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
+bool auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 {
 	struct ident ident;
-	int i;
 	char iss[8] = "";
 
-	init_ident(&ident, dm);
-
-	for (i = 0; ident.languageIsoCode[i]; ++i) {
-		ident.languageIsoCode[i] = toupper(ident.languageIsoCode[i]);
+	if (!init_ident(&ident, dm)) {
+		return false;
 	}
 
-	if (!noiss) {
+	if (ident.type == DM || ident.type == PM || ident.type == COM || ident.type == UPF) {
+		int i;
+		for (i = 0; ident.languageIsoCode[i]; ++i) {
+			ident.languageIsoCode[i] = toupper(ident.languageIsoCode[i]);
+		}
+	}
+
+	if (ident.type == DML || ident.type == COM) {
+		ident.dmlCommentType[0] = toupper(ident.dmlCommentType[0]);
+	}	
+
+	if (!noiss && (ident.type == DM || ident.type == PM || ident.type == DML || ident.type == IMF)) {
 		sprintf(iss, "_%s-%s", ident.issueNumber, ident.inWork);
 	}
 
-	if (ident.ispm) {
+	if (ident.type == PM) {
 		if (ident.extended) {
 			sprintf(out, "%s/PME-%s-%s-%s-%s-%s-%s%s_%s-%s.XML",
 				dir,
 				ident.extensionProducer,
 				ident.extensionCode,
 				ident.modelIdentCode,
-				ident.pmIssuer,
+				ident.senderIdent,
 				ident.pmNumber,
 				ident.pmVolume,
 				iss,
@@ -951,14 +1047,23 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 			sprintf(out, "%s/PMC-%s-%s-%s-%s%s_%s-%s.XML",
 				dir,
 				ident.modelIdentCode,
-				ident.pmIssuer,
+				ident.senderIdent,
 				ident.pmNumber,
 				ident.pmVolume,
 				iss,
 				ident.languageIsoCode,
 				ident.countryIsoCode);
 		}
-	} else {
+	} else if (ident.type == DML) {
+		sprintf(out, "%s/DML-%s-%s-%s-%s-%s%s.XML",
+			dir,
+			ident.modelIdentCode,
+			ident.senderIdent,
+			ident.dmlCommentType,
+			ident.yearOfDataIssue,
+			ident.seqNumber,
+			iss);
+	} else if (ident.type == DM || ident.type == UPF) {
 		char learn[6] = "";
 
 		if (ident.learnCode && ident.learnEventCode) {
@@ -966,8 +1071,9 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 		}
 
 		if (ident.extended) {
-			sprintf(out, "%s/DME-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+			sprintf(out, "%s/%s-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
 				dir,
+				ident.type == DM ? "DME" : "UPE",
 				ident.extensionProducer,
 				ident.extensionCode,
 				ident.modelIdentCode,
@@ -986,8 +1092,9 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 				ident.languageIsoCode,
 				ident.countryIsoCode);
 		} else {
-			sprintf(out, "%s/DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+			sprintf(out, "%s/%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
 				dir,
+				ident.type == DM ? "DMC" : "UPF",
 				ident.modelIdentCode,
 				ident.systemDiffCode,
 				ident.systemCode,
@@ -1004,9 +1111,36 @@ void auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
 				ident.languageIsoCode,
 				ident.countryIsoCode);
 		}
+	} else if (ident.type == COM) {
+		sprintf(out, "%s/COM-%s-%s-%s-%s-%s_%s-%s.XML",
+			dir,
+			ident.modelIdentCode,
+			ident.senderIdent,
+			ident.yearOfDataIssue,
+			ident.seqNumber,
+			ident.dmlCommentType,
+			ident.languageIsoCode,
+			ident.countryIsoCode);
+	} else if (ident.type == DDN) {
+		sprintf(out, "%s/DDN-%s-%s-%s-%s-%s.XML",
+			dir,
+			ident.modelIdentCode,
+			ident.senderIdent,
+			ident.receiverIdent,
+			ident.yearOfDataIssue,
+			ident.seqNumber);
+	} else if (ident.type == IMF) {
+		sprintf(out, "%s/IMF-%s%s.XML",
+			dir,
+			ident.imfIdentIcn,
+			iss);
+	} else {
+		return false;
 	}
 
 	free_ident(&ident);
+
+	return true;
 }
 
 /* Add an "identity" template to an XSL stylesheet */
@@ -1557,7 +1691,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!use_stdin && access(src, F_OK) == -1) {
-		fprintf(stderr, ERR_PREFIX "Could not find source data module/list \"%s\".\n", src);
+		fprintf(stderr, ERR_PREFIX "Could not find source object or list: \"%s\".\n", src);
 		exit(EXIT_MISSING_FILE);
 	}
 
@@ -1717,7 +1851,10 @@ int main(int argc, char **argv)
 			}
 
 			if (autoname) {
-				auto_name(out, doc, dir, no_issue);
+				if (!auto_name(out, doc, dir, no_issue)) {
+					fprintf(stderr, ERR_PREFIX "Cannot automatically name unsupported object types.\n");
+					exit(EXIT_BAD_XML);
+				}
 
 				if (access(out, F_OK) == 0 && !force_overwrite) {
 					fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
