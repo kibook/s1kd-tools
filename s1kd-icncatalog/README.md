@@ -34,6 +34,9 @@ Resolve ICNs for this intended output media. The catalog may contain alternative
 -n &lt;notation&gt;  
 Specify the notation to reference when adding an ICN with the -a option.
 
+-t  
+Create a new empty catalog.
+
 -u &lt;URI&gt;  
 Specify the URI when adding an ICN with the -a option.
 

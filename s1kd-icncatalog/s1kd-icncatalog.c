@@ -340,13 +340,13 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (createnew) {
+	if (!icns_fname) {
+		icns_fname = strdup(DEFAULT_CATALOG_NAME);
+	}
+
+	if (createnew || access(icns_fname, F_OK) == -1) {
 		icns = xmlReadMemory((const char *) icncatalog_xml, icncatalog_xml_len, NULL, NULL, 0);
 	} else {
-		if (!icns_fname) {
-			icns_fname = strdup(DEFAULT_CATALOG_NAME);
-		}
-
 		icns = xmlReadFile(icns_fname, NULL, 0);
 	}
 

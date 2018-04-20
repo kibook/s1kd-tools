@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="W" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="18"/>
+        <issueDate year="2018" month="04" day="19"/>
         <dmTitle>
           <techName>s1kd-icncatalog(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Document -t option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -94,6 +97,12 @@
               <listItemTerm>-n &lt;notation&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the notation to reference when adding an ICN with the -a option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Create a new empty catalog.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -188,8 +197,13 @@ NDATA svg>]]></verbatimText>
         <para>The following describes the schema of an ICN catalog file.</para>
         <levelledPara>
           <title>Catalog</title>
-          <para><emphasis>Markup element:</emphasis> <verbatimText>&lt;icnCatalog&gt;</verbatimText></para>
-          <para><emphasis>Attributes:</emphasis></para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText>&lt;icnCatalog&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
           <para>
             <randomList>
               <listItem>
@@ -197,7 +211,9 @@ NDATA svg>]]></verbatimText>
               </listItem>
             </randomList>
           </para>
-          <para><emphasis>Child elements:</emphasis></para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
           <para>
             <randomList>
               <listItem>
@@ -221,8 +237,13 @@ NDATA svg>]]></verbatimText>
         <levelledPara>
           <title>Notation</title>
           <para>The element <verbatimText>&lt;notation&gt;</verbatimText> represents a NOTATION declaration.</para>
-          <para><emphasis>Markup element:</emphasis> <verbatimText>&lt;notation&gt;</verbatimText></para>
-          <para><emphasis>Attributes:</emphasis></para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText>&lt;notation&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
           <para>
             <randomList>
               <listItem>
@@ -250,7 +271,10 @@ NDATA svg>]]></verbatimText>
         <levelledPara>
           <title>Media</title>
           <para>The element <verbatimText>&lt;media&gt;</verbatimText> groups a set of alternative ICN formats for a particular output media type.</para>
-          <para><emphasis>Markup element:</emphasis> <verbatimText>&lt;media&gt;</verbatimText></para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText>&lt;media&gt;</verbatimText>
+          </para>
           <para>
             <emphasis>Attributes:</emphasis>
           </para>
@@ -267,7 +291,9 @@ NDATA svg>]]></verbatimText>
           <para>
             <randomList>
               <listItem>
-                <para><verbatimText>&lt;icn&gt;</verbatimText></para>
+                <para>
+                  <verbatimText>&lt;icn&gt;</verbatimText>
+                </para>
               </listItem>
             </randomList>
           </para>
@@ -275,8 +301,13 @@ NDATA svg>]]></verbatimText>
         <levelledPara>
           <title>ICN</title>
           <para>The element <verbatimText>&lt;icn&gt;</verbatimText> maps an ICN to a filename and optionally a notation. When this element occurs as a child of a <verbatimText>&lt;media&gt;</verbatimText> element, it will be used when that output media is specified with the -m option. When it occurs as a child of <verbatimText>&lt;icnCatalog&gt;</verbatimText>, it will be used if no media is specified.</para>
-          <para><emphasis>Markup element:</emphasis> <verbatimText>&lt;icn&gt;</verbatimText></para>
-          <para><emphasis>Attributes:</emphasis></para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText>&lt;icn&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
           <para>
             <randomList>
               <listItem>
@@ -290,7 +321,9 @@ NDATA svg>]]></verbatimText>
               </listItem>
             </randomList>
           </para>
-          <para><emphasis>Child elements:</emphasis></para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
           <para>
             <randomList>
               <listItem>
