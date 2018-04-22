@@ -34,9 +34,11 @@
  * CSDB object.
  */
 enum object_type { DM, PM, DML, COM, DDN, IMF, UPF };
+enum issue { ISS_30, ISS_4X };
 struct ident {
 	bool extended;
 	enum object_type type;
+	enum issue issue;
 	char *extensionProducer;
 	char *extensionCode;
 	char *modelIdentCode;
@@ -149,11 +151,11 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 /* Copy strings related to uniquely identifying a CSDB object. The strings are
  * dynamically allocated so they must be freed using free_ident. */
 #define IDENT_XPATH \
-	"//dmIdent|" \
-	"//pmIdent|" \
-	"//dmlIdent|" \
-	"//commentIdent|" \
-	"//ddnIdent|" \
+	"//dmIdent|//dmaddres|" \
+	"//pmIdent|//pmaddres|" \
+	"//dmlIdent|//dml|" \
+	"//commentIdent|//cstatus|" \
+	"//ddnIdent|//ddn|" \
 	"//imfIdent|" \
 	"//updateIdent"
 #define EXTENSION_XPATH \
@@ -161,22 +163,22 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 	"//pmIdent/identExtension|" \
 	"//updateIdent/identExtension"
 #define CODE_XPATH \
-	"//dmIdent/dmCode|" \
-	"//pmIdent/pmCode|" \
-	"//dmlIdent/dmlCode|" \
-	"//commentIdent/commentCode|" \
-	"//ddnIdent/ddnCode|" \
+	"//dmIdent/dmCode|//dmaddres/dmc/avee|" \
+	"//pmIdent/pmCode|//pmaddres/pmc|" \
+	"//dmlIdent/dmlCode|//dml/dmlc|" \
+	"//commentIdent/commentCode|//cstatus/ccode|" \
+	"//ddnIdent/ddnCode|//ddn/ddnc|" \
 	"//imfIdent/imfCode|" \
 	"//updateIdent/updateCode"
 #define LANGUAGE_XPATH \
-	"//dmIdent/language|" \
-	"//pmIdent/language|" \
-	"//commentIdent/language|" \
+	"//dmIdent/language|//dmaddres/language|" \
+	"//pmIdent/language|//pmaddres/language|" \
+	"//commentIdent/language|//cstatus/language|" \
 	"//updateIdent/language"
 #define ISSUE_INFO_XPATH \
-	"//dmIdent/issueInfo|" \
-	"//pmIdent/issueInfo|" \
-	"//dmlIdent/issueInfo|" \
+	"//dmIdent/issueInfo|//dmaddres/issno|" \
+	"//pmIdent/issueInfo|//pmaddres/issno|" \
+	"//dmlIdent/issueInfo|//dml/issno|" \
 	"//imfIdent/issueInfo|" \
 	"//updateIdent/issueInfo"
 bool init_ident(struct ident *ident, xmlDocPtr doc)
@@ -191,18 +193,40 @@ bool init_ident(struct ident *ident, xmlDocPtr doc)
 
 	if (xmlStrcmp(moduleIdent->name, BAD_CAST "pmIdent") == 0) {
 		ident->type = PM;
+		ident->issue = ISS_4X;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "pmaddres") == 0) {
+		ident->type = PM;
+		ident->issue = ISS_30;
 	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "dmlIdent") == 0) {
 		ident->type = DML;
+		ident->issue = ISS_4X;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "dml") == 0) {
+		ident->type = DML;
+		ident->issue = ISS_30;
 	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "commentIdent") == 0) {
 		ident->type = COM;
+		ident->issue = ISS_4X;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "cstatus") == 0) {
+		ident->type = COM;
+		ident->issue = ISS_30;
 	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "dmIdent") == 0) {
 		ident->type = DM;
+		ident->issue = ISS_4X;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "dmaddres") == 0) {
+		ident->type = DM;
+		ident->issue = ISS_30;
 	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "ddnIdent") == 0) {
 		ident->type = DDN;
+		ident->issue = ISS_4X;
+	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "ddn") == 0) {
+		ident->type = DDN;
+		ident->issue = ISS_30;
 	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "imfIdent") == 0) {
 		ident->type = IMF;
+		ident->issue = ISS_4X;
 	} else if (xmlStrcmp(moduleIdent->name, BAD_CAST "updateIdent") == 0) {
 		ident->type = UPF;
+		ident->issue = ISS_4X;
 	}
 
 	identExtension = first_xpath_node(doc, NULL, EXTENSION_XPATH);
@@ -214,53 +238,112 @@ bool init_ident(struct ident *ident, xmlDocPtr doc)
 		return false;
 	}
 
-	ident->modelIdentCode = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+	if (ident->issue == ISS_30) {
+		ident->modelIdentCode = (char *) xmlNodeGetContent(find_child(code, "modelic"));
+	} else {
+		ident->modelIdentCode = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
+	}
 
 	if (ident->type == PM) {
-		ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
-		ident->pmNumber           = (char *) xmlGetProp(code, BAD_CAST "pmNumber");
-		ident->pmVolume           = (char *) xmlGetProp(code, BAD_CAST "pmVolume");
-	} else if (ident->type == DML || ident->type == COM) {
-		ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "senderIdent");
-		ident->yearOfDataIssue    = (char *) xmlGetProp(code, BAD_CAST "yearOfDataIssue");
-		ident->seqNumber          = (char *) xmlGetProp(code, BAD_CAST "seqNumber");
-		if (ident->type == DML) {
-			ident->dmlCommentType = (char *) xmlGetProp(code, BAD_CAST "dmlType");
+		if (ident->issue == ISS_30) {
+			ident->senderIdent = (char *) xmlNodeGetContent(find_child(code, "pmissuer"));
+			ident->pmNumber    = (char *) xmlNodeGetContent(find_child(code, "pmnumber"));
+			ident->pmVolume    = (char *) xmlNodeGetContent(find_child(code, "pmvolume"));
 		} else {
-			ident->dmlCommentType = (char *) xmlGetProp(code, BAD_CAST "commentType");
+			ident->senderIdent = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
+			ident->pmNumber    = (char *) xmlGetProp(code, BAD_CAST "pmNumber");
+			ident->pmVolume    = (char *) xmlGetProp(code, BAD_CAST "pmVolume");
+		}
+	} else if (ident->type == DML || ident->type == COM) {
+		if (ident->issue == ISS_30) {
+			ident->senderIdent = (char *) xmlNodeGetContent(find_child(code, "sendid"));
+			ident->yearOfDataIssue = (char *) xmlNodeGetContent(find_child(code, "diyear"));
+			ident->seqNumber = (char *) xmlNodeGetContent(find_child(code, "seqnum"));
+		} else {
+			ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "senderIdent");
+			ident->yearOfDataIssue    = (char *) xmlGetProp(code, BAD_CAST "yearOfDataIssue");
+			ident->seqNumber          = (char *) xmlGetProp(code, BAD_CAST "seqNumber");
+		}
+
+		if (ident->type == DML) {
+			if (ident->issue == ISS_30) {
+				ident->dmlCommentType = (char *) xmlGetProp(find_child(code, "dmltype"), BAD_CAST "type");
+			} else {
+				ident->dmlCommentType = (char *) xmlGetProp(code, BAD_CAST "dmlType");
+			}
+		} else {
+			if (ident->issue == ISS_30) {
+				ident->dmlCommentType = (char *) xmlGetProp(find_child(code, "ctype"), BAD_CAST "type");
+			} else {
+				ident->dmlCommentType = (char *) xmlGetProp(code, BAD_CAST "commentType");
+			}
 		}
 	} else if (ident->type == DDN) {
-		ident->senderIdent        = (char *) xmlGetProp(code, BAD_CAST "senderIdent");
-		ident->receiverIdent      = (char *) xmlGetProp(code, BAD_CAST "receiverIdent");
-		ident->yearOfDataIssue    = (char *) xmlGetProp(code, BAD_CAST "yearOfDataIssue");
-		ident->seqNumber          = (char *) xmlGetProp(code, BAD_CAST "seqNumber");
+		if (ident->issue == ISS_30) {
+			ident->senderIdent     = (char *) xmlNodeGetContent(find_child(code, "sendid"));
+			ident->receiverIdent   = (char *) xmlNodeGetContent(find_child(code, "recvid"));
+			ident->yearOfDataIssue = (char *) xmlNodeGetContent(find_child(code, "diyear"));
+			ident->seqNumber       = (char *) xmlNodeGetContent(find_child(code, "seqnum"));
+		} else {
+			ident->senderIdent     = (char *) xmlGetProp(code, BAD_CAST "senderIdent");
+			ident->receiverIdent   = (char *) xmlGetProp(code, BAD_CAST "receiverIdent");
+			ident->yearOfDataIssue = (char *) xmlGetProp(code, BAD_CAST "yearOfDataIssue");
+			ident->seqNumber       = (char *) xmlGetProp(code, BAD_CAST "seqNumber");
+		}
 	} else if (ident->type == DM || ident->type == UPF) {
-		ident->systemDiffCode     = (char *) xmlGetProp(code, BAD_CAST "systemDiffCode");
-		ident->systemCode         = (char *) xmlGetProp(code, BAD_CAST "systemCode");
-		ident->subSystemCode      = (char *) xmlGetProp(code, BAD_CAST "subSystemCode");
-		ident->subSubSystemCode   = (char *) xmlGetProp(code, BAD_CAST "subSubSystemCode");
-		ident->assyCode           = (char *) xmlGetProp(code, BAD_CAST "assyCode");
-		ident->disassyCode        = (char *) xmlGetProp(code, BAD_CAST "disassyCode");
-		ident->disassyCodeVariant = (char *) xmlGetProp(code, BAD_CAST "disassyCodeVariant");
-		ident->infoCode           = (char *) xmlGetProp(code, BAD_CAST "infoCode");
-		ident->infoCodeVariant    = (char *) xmlGetProp(code, BAD_CAST "infoCodeVariant");
-		ident->itemLocationCode   = (char *) xmlGetProp(code, BAD_CAST "itemLocationCode");
-		ident->learnCode          = (char *) xmlGetProp(code, BAD_CAST "learnCode");
-		ident->learnEventCode     = (char *) xmlGetProp(code, BAD_CAST "learnEventCode");
+		if (ident->issue == ISS_30) {
+			ident->systemDiffCode     = (char *) xmlNodeGetContent(find_child(code, "sdc"));
+			ident->systemCode         = (char *) xmlNodeGetContent(find_child(code, "chapnum"));
+			ident->subSystemCode      = (char *) xmlNodeGetContent(find_child(code, "section"));
+			ident->subSubSystemCode   = (char *) xmlNodeGetContent(find_child(code, "subsect"));
+			ident->assyCode           = (char *) xmlNodeGetContent(find_child(code, "subject"));
+			ident->disassyCode        = (char *) xmlNodeGetContent(find_child(code, "discode"));
+			ident->disassyCodeVariant = (char *) xmlNodeGetContent(find_child(code, "discodev"));
+			ident->infoCode           = (char *) xmlNodeGetContent(find_child(code, "incode"));
+			ident->infoCodeVariant    = (char *) xmlNodeGetContent(find_child(code, "incodev"));
+			ident->itemLocationCode   = (char *) xmlNodeGetContent(find_child(code, "itemloc"));
+			ident->learnCode = NULL;
+			ident->learnEventCode = NULL;
+		} else {
+			ident->systemDiffCode     = (char *) xmlGetProp(code, BAD_CAST "systemDiffCode");
+			ident->systemCode         = (char *) xmlGetProp(code, BAD_CAST "systemCode");
+			ident->subSystemCode      = (char *) xmlGetProp(code, BAD_CAST "subSystemCode");
+			ident->subSubSystemCode   = (char *) xmlGetProp(code, BAD_CAST "subSubSystemCode");
+			ident->assyCode           = (char *) xmlGetProp(code, BAD_CAST "assyCode");
+			ident->disassyCode        = (char *) xmlGetProp(code, BAD_CAST "disassyCode");
+			ident->disassyCodeVariant = (char *) xmlGetProp(code, BAD_CAST "disassyCodeVariant");
+			ident->infoCode           = (char *) xmlGetProp(code, BAD_CAST "infoCode");
+			ident->infoCodeVariant    = (char *) xmlGetProp(code, BAD_CAST "infoCodeVariant");
+			ident->itemLocationCode   = (char *) xmlGetProp(code, BAD_CAST "itemLocationCode");
+			ident->learnCode          = (char *) xmlGetProp(code, BAD_CAST "learnCode");
+			ident->learnEventCode     = (char *) xmlGetProp(code, BAD_CAST "learnEventCode");
+		}
 	} else if (ident->type == IMF) {
 		ident->imfIdentIcn = (char *) xmlGetProp(code, BAD_CAST "imfIdentIcn");
 	}
 
 	if (ident->type == DM || ident->type == PM || ident->type == DML || ident->type == IMF || ident->type == UPF) {
+		const char *issueNumberName, *inWorkName;
+
 		if (!issueInfo) return false;
-		ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-		ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+
+		issueNumberName = ident->issue == ISS_30 ? "issno" : "issueNumber";
+		inWorkName      = ident->issue == ISS_30 ? "inwork" : "inWork";
+
+		ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST issueNumberName);
+		ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST inWorkName);
 	}
 
 	if (ident->type == DM || ident->type == PM || ident->type == COM || ident->type == UPF) {
+		const char *languageIsoCodeName, *countryIsoCodeName;
+
 		if (!language) return false;
-		ident->languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-		ident->countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+
+		languageIsoCodeName = ident->issue == ISS_30 ? "language" : "languageIsoCode";
+		countryIsoCodeName  = ident->issue == ISS_30 ? "country" : "countryIsoCode";
+
+		ident->languageIsoCode = (char *) xmlGetProp(language, BAD_CAST languageIsoCodeName);
+		ident->countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST countryIsoCodeName);
 	}
 
 	if (identExtension) {
