@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="18"/>
+        <issueDate year="2018" month="04" day="22"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -q option.</simplePara>
+        <simplePara>Add support for issue 2.2.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -89,6 +89,9 @@
                     </listItem>
                     <listItem>
                       <para>2.3</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>2.2</para>
                     </listItem>
                   </randomList>
                 </para>
@@ -160,7 +163,7 @@
                 <para>Prompts the user for any values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-q</listItemTerm>
               <listItemDefinition>
                 <para>Do not report an error when the file already exists.</para>

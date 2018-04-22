@@ -15,6 +15,7 @@ $(OUTPUT): $(SOURCE) templates.h
 
 templates.h: dml.xml ../common/42to*.xsl
 	xxd -i dml.xml > templates.h
+	xxd -i ../common/42to22.xsl >> templates.h
 	xxd -i ../common/42to23.xsl >> templates.h
 	xxd -i ../common/42to30.xsl >> templates.h
 	xxd -i ../common/42to40.xsl >> templates.h
