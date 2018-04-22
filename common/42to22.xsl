@@ -29,6 +29,7 @@
         <xsl:when test="$schema = 'wrngdata.xsd'">dm/wrngdataSchema.xsd</xsl:when>
         <xsl:when test="$schema = 'wrngflds.xsd'">dm/wrngfldsSchema.xsd</xsl:when>
         <xsl:when test="$schema = 'comment.xsd'">comment/commentSchema.xsd</xsl:when>
+        <xsl:when test="$schema = 'ddn.xsd'">ddn/ddnSchema.xsd</xsl:when>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
