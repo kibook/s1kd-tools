@@ -41,7 +41,8 @@
 #define MAX_TECH_NAME 256
 #define MAX_INFO_NAME 256
 
-#define ERR_PREFIX "s1kd-newdm: ERROR: "
+#define PROG_NAME "s1kd-newdm"
+#define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
@@ -92,10 +93,11 @@ xmlChar *remarks = NULL;
 
 bool no_issue = false;
 
-enum issue { NO_ISS, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+enum issue { NO_ISS, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
+#define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_23_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
@@ -119,6 +121,8 @@ enum issue get_issue(const char *iss)
 		return ISS_30;
 	else if (strcmp(iss, "2.3") == 0)
 		return ISS_23;
+	else if (strcmp(iss, "2.2") == 0)
+		return ISS_22;
 	
 	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
 	exit(EXIT_BAD_ISSUE);
@@ -134,6 +138,7 @@ const char *issue_name(enum issue iss)
 		case ISS_40: return "4.0";
 		case ISS_30: return "3.0";
 		case ISS_23: return "2.3";
+		case ISS_22: return "2.2";
 		default: return "";
 	}
 }
@@ -184,7 +189,7 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-newdm [options]");
+	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
 	puts("  -f      Overwrite existing file.");
@@ -490,6 +495,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		return xmlReadFile(src, NULL, 0);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -503,6 +509,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "proced") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -527,6 +534,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "brex") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -595,6 +603,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "process") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -608,6 +617,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "ipd") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -621,6 +631,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "fault") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -669,6 +680,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "crew") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -692,6 +704,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "schedul") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -705,6 +718,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "wrngdata") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -718,6 +732,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "wrngflds") == 0) {
 		switch (iss) {
+			case ISS_22:
 			case ISS_23:
 			case ISS_30:
 			case ISS_40:
@@ -786,6 +801,10 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 		case ISS_23:
 			xml = ___common_42to23_xsl;
 			len = ___common_42to23_xsl_len;
+			break;
+		case ISS_22:
+			xml = ___common_42to22_xsl;
+			len = ___common_42to22_xsl_len;
 			break;
 		default:
 			return NULL;
@@ -1249,6 +1268,9 @@ int main(int argc, char **argv)
 	if (issue < ISS_42) {
 		if (strcmp(brex_dmcode, "") == 0) {
 			switch (issue) {
+				case ISS_22:
+					set_brex(dm, ISS_22_DEFAULT_BREX);
+					break;
 				case ISS_23:
 					set_brex(dm, ISS_23_DEFAULT_BREX);
 					break;
