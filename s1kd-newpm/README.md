@@ -32,6 +32,8 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   2.3
 
+-   2.2
+
 -@ &lt;filename&gt;  
 Save new publication module as &lt;filename&gt; instead of an automatically named file in the current directory.
 
