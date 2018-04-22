@@ -159,7 +159,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 	"//imfIdent|" \
 	"//updateIdent"
 #define EXTENSION_XPATH \
-	"//dmIdent/identExtension|" \
+	"//dmIdent/identExtension|//dmaddres/dmcextension|" \
 	"//pmIdent/identExtension|" \
 	"//updateIdent/identExtension"
 #define CODE_XPATH \
@@ -348,8 +348,14 @@ bool init_ident(struct ident *ident, xmlDocPtr doc)
 
 	if (identExtension) {
 		ident->extended = true;
-		ident->extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
-		ident->extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
+
+		if (ident->issue == ISS_30) {
+			ident->extensionProducer = (char *) xmlNodeGetContent(find_child(identExtension, "dmeproducer"));
+			ident->extensionCode     = (char *) xmlNodeGetContent(find_child(identExtension, "dmecode"));
+		} else {
+			ident->extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
+			ident->extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
+		}
 	} else {
 		ident->extended = false;
 	}
@@ -861,22 +867,38 @@ void set_extd(xmlDocPtr doc, const char *extension)
 {
 	xmlNodePtr identExtension, code;
 	char *ext, *extensionProducer, *extensionCode;
+	enum issue issue;
 
-	identExtension = first_xpath_node(doc, NULL, "//dmIdent/identExtension|//pmIdent/identExtension");
-	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode");
+	identExtension = first_xpath_node(doc, NULL, "//dmIdent/identExtension|//pmIdent/identExtension|//dmaddres/dmcextension");
+	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode|//dmaddres/dmc");
+
+	if (xmlStrcmp(code->name, BAD_CAST "dmCode") == 0) {
+		issue = ISS_4X;
+	} else if (xmlStrcmp(code->name, BAD_CAST "pmCode") == 0) {
+		issue = ISS_4X;
+	} else if (xmlStrcmp(code->name, BAD_CAST "dmc") == 0) {
+		issue = ISS_30;
+	} else {
+		return;
+	}
 
 	ext = strdup(extension);
 
 	if (!identExtension) {
-		identExtension = xmlNewNode(NULL, BAD_CAST "identExtension");
+		identExtension = xmlNewNode(NULL, BAD_CAST (issue == ISS_30 ? "dmcextension" : "identExtension"));
 		identExtension = xmlAddPrevSibling(code, identExtension);
 	}
 
 	extensionProducer = strtok(ext, "-");
 	extensionCode     = strtok(NULL, "-");
 
-	xmlSetProp(identExtension, BAD_CAST "extensionProducer", BAD_CAST extensionProducer);
-	xmlSetProp(identExtension, BAD_CAST "extensionCode",     BAD_CAST extensionCode);
+	if (issue == ISS_30) {
+		xmlNewChild(identExtension, NULL, BAD_CAST "dmeproducer", BAD_CAST extensionProducer);
+		xmlNewChild(identExtension, NULL, BAD_CAST "dmecode", BAD_CAST extensionCode);
+	} else {
+		xmlSetProp(identExtension, BAD_CAST "extensionProducer", BAD_CAST extensionProducer);
+		xmlSetProp(identExtension, BAD_CAST "extensionCode",     BAD_CAST extensionCode);
+	}
 
 	free(ext);
 }
@@ -902,7 +924,25 @@ void set_code(xmlDocPtr doc, const char *new_code)
 
 	int n;
 
-	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode");
+	enum issue iss;
+
+	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode|//dmaddres/dmc/avee|//pmaddres/pmc");
+
+	if (!code) {
+		return;
+	}
+
+	if (xmlStrcmp(code->name, BAD_CAST "dmCode") == 0) {
+		iss = ISS_4X;
+	} else if (xmlStrcmp(code->name, BAD_CAST "pmCode") == 0) {
+		iss = ISS_4X;
+	} else if (xmlStrcmp(code->name, BAD_CAST "avee") == 0) {
+		iss = ISS_30;
+	} else if (xmlStrcmp(code->name, BAD_CAST "pmc") == 0) {
+		iss = ISS_30;
+	} else {
+		return;
+	}
 
 	n = sscanf(new_code,
 		"%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
@@ -935,13 +975,18 @@ void set_code(xmlDocPtr doc, const char *new_code)
 		if (n != 4) {
 			fprintf(stderr, ERR_PREFIX "Bad data module/pub module code: %s.\n", new_code);
 			exit(EXIT_BAD_ARG);
-		} else {
+		} else if (iss == ISS_4X) {
 			xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
 			xmlSetProp(code, BAD_CAST "pmIssuer", BAD_CAST pmIssuer);
 			xmlSetProp(code, BAD_CAST "pmNumber", BAD_CAST pmNumber);
 			xmlSetProp(code, BAD_CAST "pmVolume", BAD_CAST pmVolume);
+		} else if (iss == ISS_30) {
+			xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST modelIdentCode);
+			xmlNodeSetContent(find_child(code, "pmissuer"), BAD_CAST pmIssuer);
+			xmlNodeSetContent(find_child(code, "pmnumber"), BAD_CAST pmNumber);
+			xmlNodeSetContent(find_child(code, "pmvolume"), BAD_CAST pmVolume);
 		}
-	} else {
+	} else if (iss == ISS_4X) {
 		xmlSetProp(code, BAD_CAST "modelIdentCode",     BAD_CAST modelIdentCode);
 		xmlSetProp(code, BAD_CAST "systemDiffCode",     BAD_CAST systemDiffCode);
 		xmlSetProp(code, BAD_CAST "systemCode",         BAD_CAST systemCode);
@@ -958,6 +1003,18 @@ void set_code(xmlDocPtr doc, const char *new_code)
 			xmlSetProp(code, BAD_CAST "learnCode", BAD_CAST learnCode);
 			xmlSetProp(code, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 		}
+	} else if (iss == ISS_30) {
+		xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST modelIdentCode);
+		xmlNodeSetContent(find_child(code, "sdc"), BAD_CAST systemDiffCode);
+		xmlNodeSetContent(find_child(code, "chapnum"), BAD_CAST systemCode);
+		xmlNodeSetContent(find_child(code, "section"), BAD_CAST subSystemCode);
+		xmlNodeSetContent(find_child(code, "subsect"), BAD_CAST subSubSystemCode);
+		xmlNodeSetContent(find_child(code, "subject"), BAD_CAST assyCode);
+		xmlNodeSetContent(find_child(code, "discode"), BAD_CAST disassyCode);
+		xmlNodeSetContent(find_child(code, "discodev"), BAD_CAST disassyCodeVariant);
+		xmlNodeSetContent(find_child(code, "incode"), BAD_CAST infoCode);
+		xmlNodeSetContent(find_child(code, "incodev"), BAD_CAST infoCodeVariant);
+		xmlNodeSetContent(find_child(code, "ilc"), BAD_CAST itemLocationCode);
 	}
 }
 
@@ -965,10 +1022,23 @@ void set_code(xmlDocPtr doc, const char *new_code)
 void set_title(xmlDocPtr doc, char *tech, char *info)
 {
 	xmlNodePtr dmTitle, techName, infoName;
+	enum issue iss;
 	
-	dmTitle  = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle");
-	techName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/techName|//pmAddressItems/pmTitle");
-	infoName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/infoName");
+	dmTitle  = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle|//dmaddres/dmtitle");
+	techName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/techName|//pmAddressItems/pmTitle|//dmaddres/dmtitle/techname|//pmaddres/pmtitle");
+	infoName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/infoName|//dmaddres/dmtitle/infoname");
+
+	if (!techName) {
+		return;
+	}
+
+	if (xmlStrcmp(techName->name, BAD_CAST "techName") == 0) {
+		iss = ISS_4X;
+	} else if (xmlStrcmp(techName->name, BAD_CAST "pmTitle") == 0) {
+		iss = ISS_4X;
+	} else {
+		iss = ISS_30;
+	}
 
 	if (strcmp(tech, "") != 0) {
 		xmlNodeSetContent(techName, BAD_CAST tech);
@@ -976,37 +1046,37 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 
 	if (strcmp(info, "") != 0) {
 		if (!infoName) {
-			infoName = xmlNewChild(dmTitle, NULL, BAD_CAST "infoName", NULL);
+			infoName = xmlNewChild(dmTitle, NULL, BAD_CAST (iss == ISS_30 ? "infoname" : "infoName"), NULL);
 		}
 		xmlNodeSetContent(infoName, BAD_CAST info);
 	}	
 }
 
-xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values)
+xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values, enum issue iss)
 {
 	xmlNodePtr assert;
 
 	assert = xmlNewNode(NULL, BAD_CAST "assert");
 
-	xmlSetProp(assert, BAD_CAST "applicPropertyIdent", ident);
-	xmlSetProp(assert, BAD_CAST "applicPropertyType", type);
-	xmlSetProp(assert, BAD_CAST "applicPropertyValues", values);
+	xmlSetProp(assert, BAD_CAST (iss == ISS_30 ? "actidref" : "applicPropertyIdent"), ident);
+	xmlSetProp(assert, BAD_CAST (iss == ISS_30 ? "actreftype" : "applicPropertyType"), type);
+	xmlSetProp(assert, BAD_CAST (iss == ISS_30 ? "actvalues" : "applicPropertyValues"), values);
 
 	return assert;
 }
 
-xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values)
+xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values, enum issue iss)
 {
 	xmlNodePtr or, cur;
 
 	or = xmlNewNode(NULL, BAD_CAST "evaluate");
-	xmlSetProp(or, BAD_CAST "andOr", BAD_CAST "or");
+	xmlSetProp(or, BAD_CAST (iss == ISS_30 ? "operator" : "andOr"), BAD_CAST "or");
 
 	for (cur = values->children; cur; cur = cur->next) {
 		xmlChar *value;
 
 		value = xmlNodeGetContent(cur);
-		xmlAddChild(or, create_assert(ident, type, value));
+		xmlAddChild(or, create_assert(ident, type, value, iss));
 		xmlFree(value);
 	}
 
@@ -1016,42 +1086,48 @@ xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values)
 /* Set the applicability for the whole datamodule instance */
 void set_applic(xmlDocPtr doc, char *new_text)
 {
-	xmlNodePtr new_applic;
-	xmlNodePtr new_displayText;
-	xmlNodePtr new_simplePara;
-	xmlNodePtr new_evaluate;
+	xmlNodePtr new_applic, new_displayText, new_simplePara, new_evaluate, cur, applic;
+	enum issue iss;
 
-	xmlNodePtr cur;
+	applic = first_xpath_node(doc, NULL, "//dmStatus/applic|//pmStatus/applic|//status/applic|//pmstatus/applic");
 
-	xmlNodePtr applic;
-
-	applic = first_xpath_node(doc, NULL, "//dmStatus/applic|//pmStatus/applic");
+	if (!applic) {
+		return;
+	} else if (xmlStrcmp(applic->parent->name, BAD_CAST "dmStatus") == 0 || xmlStrcmp(applic->parent->name, BAD_CAST "pmStatus") == 0) {
+		iss = ISS_4X;
+	} else if (xmlStrcmp(applic->parent->name, BAD_CAST "status") == 0 || xmlStrcmp(applic->parent->name, BAD_CAST "pmstatus") == 0) {
+		iss = ISS_30;
+	} else {
+		return;
+	}
 
 	new_applic = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlAddNextSibling(applic, new_applic);
 
 	if (strcmp(new_text, "") != 0) {
-		new_displayText = xmlNewChild(new_applic, NULL, BAD_CAST "displayText", NULL);
-		new_simplePara = xmlNewChild(new_displayText, NULL, BAD_CAST "simplePara", NULL);
+		new_displayText = xmlNewChild(new_applic, NULL, BAD_CAST (iss == ISS_30 ? "displaytext" : "displayText"), NULL);
+		new_simplePara = xmlNewChild(new_displayText, NULL, BAD_CAST (iss == ISS_30 ? "p" : "simplePara"), NULL);
 		xmlNodeSetContent(new_simplePara, BAD_CAST new_text);
 	}
 
 	if (napplics > 1) {
 		new_evaluate = xmlNewChild(new_applic, NULL, BAD_CAST "evaluate", NULL);
-		xmlSetProp(new_evaluate, BAD_CAST "andOr", BAD_CAST "and");
+		xmlSetProp(new_evaluate, BAD_CAST (iss == ISS_30 ? "operator" : "andOr"), BAD_CAST "and");
 	} else {
 		new_evaluate = new_applic;
 	}
 
 	for (cur = applicability->children; cur; cur = cur->next) {
-		xmlChar *cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
-		xmlChar *cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
-		xmlChar *cur_value = xmlGetProp(cur, BAD_CAST "applicPropertyValues");
+		xmlChar *cur_ident, *cur_type, *cur_value;
+
+		cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		cur_value = xmlGetProp(cur, BAD_CAST "applicPropertyValues");
 
 		if (cur_value) {
-			xmlAddChild(new_evaluate, create_assert(cur_ident, cur_type, cur_value));
+			xmlAddChild(new_evaluate, create_assert(cur_ident, cur_type, cur_value, iss));
 		} else {
-			xmlAddChild(new_evaluate, create_or(cur_ident, cur_type, cur));
+			xmlAddChild(new_evaluate, create_or(cur_ident, cur_type, cur, iss));
 		}
 
 		xmlFree(cur_ident);
@@ -1073,7 +1149,21 @@ void set_lang(xmlDocPtr doc, char *lang)
 
 	int i;
 
-	language = first_xpath_node(doc, NULL, "//dmIdent/language|//pmIdent/language");
+	enum issue iss;
+
+	language = first_xpath_node(doc, NULL, LANGUAGE_XPATH);
+
+	if (!language) {
+		return;
+	} else if (xmlStrcmp(language->parent->name, BAD_CAST "dmIdent") == 0 ||
+	           xmlStrcmp(language->parent->name, BAD_CAST "pmIdent") == 0) {
+		iss = ISS_4X;
+	} else if (xmlStrcmp(language->parent->name, BAD_CAST "dmaddres") == 0 ||
+	           xmlStrcmp(language->parent->name, BAD_CAST "pmaddres") == 0) {
+		iss = ISS_30;
+	} else {
+		return;
+	}
 
 	language_iso_code = strtok(lang, "-");
 	country_iso_code = strtok(NULL, "");
@@ -1085,8 +1175,8 @@ void set_lang(xmlDocPtr doc, char *lang)
 		country_iso_code[i] = toupper(country_iso_code[i]);
 	}
 
-	xmlSetProp(language, BAD_CAST "languageIsoCode", BAD_CAST language_iso_code);
-	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST country_iso_code);
+	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "language" : "languageIsoCode"), BAD_CAST language_iso_code);
+	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "country" : "countryIsoCode"), BAD_CAST country_iso_code);
 }
 
 bool auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
@@ -1431,16 +1521,32 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 {
 	char issue[4], inwork[3];
 	xmlNodePtr issueInfo;
+	enum issue iss;
 
 	if (sscanf(issinfo, "%3s-%2s", issue, inwork) != 2) {
 		fprintf(stderr, ERR_PREFIX "Invalid format for issue/in-work number.\n");
 		exit(EXIT_MISSING_ARGS);
 	}
 
-	issueInfo = first_xpath_node(dm, NULL, "//dmIdent/issueInfo|//pmIdent/issueInfo");
+	issueInfo = first_xpath_node(dm, NULL, ISSUE_INFO_XPATH);
 
-	xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
-	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
+	if (!issueInfo) {
+		return;
+	}
+
+	if (xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") == 0) {
+		iss = ISS_4X;
+	} else {
+		iss = ISS_30;
+	}
+
+	if (iss == ISS_30) {
+		xmlSetProp(issueInfo, BAD_CAST "issno", BAD_CAST issue);
+		xmlSetProp(issueInfo, BAD_CAST "inwork", BAD_CAST inwork);
+	} else {
+		xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
+		xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
+	}
 }
 
 /* Set the issue date of the instance. */
@@ -1449,7 +1555,7 @@ void set_issue_date(xmlDocPtr doc, const char *issdate)
 	char year_s[5], month_s[3], day_s[3];
 	xmlNodePtr issueDate;
 
-	issueDate = first_xpath_node(doc, NULL, "//issueDate");
+	issueDate = first_xpath_node(doc, NULL, "//issueDate|//issdate");
 
 	if (sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
 		fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issdate);
@@ -1464,8 +1570,20 @@ void set_issue_date(xmlDocPtr doc, const char *issdate)
 /* Set the securty classification of the instance. */
 void set_security(xmlDocPtr dm, char *sec)
 {
-	xmlNodePtr security = first_xpath_node(dm, NULL, "//dmStatus/security|//pmStatus/security");
-	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST sec);
+	xmlNodePtr security;
+	enum issue iss;
+
+	security = first_xpath_node(dm, NULL, "//security");
+
+	if (!security) {
+		return;
+	} else if (xmlStrcmp(security->parent->name, BAD_CAST "dmStatus") == 0 || xmlStrcmp(security->parent->name, BAD_CAST "pmStatus") == 0) {
+		iss = ISS_4X;
+	} else {
+		iss = ISS_30;
+	}
+
+	xmlSetProp(security, BAD_CAST (iss == ISS_30 ? "class" : "securityClassification"), BAD_CAST sec);
 }
 
 /* Get the originator of the master. If it has no originator
@@ -1475,10 +1593,10 @@ void set_security(xmlDocPtr dm, char *sec)
 xmlNodePtr find_or_create_orig(xmlDocPtr doc)
 {
 	xmlNodePtr orig, rpc;
-	orig = first_xpath_node(doc, NULL, "//originator");
+	orig = first_xpath_node(doc, NULL, "//originator|//orig");
 	if (!orig) {
-		orig = xmlNewNode(NULL, BAD_CAST "originator");
-		rpc = first_xpath_node(doc, NULL, "//responsiblePartnerCompany");
+		rpc = first_xpath_node(doc, NULL, "//responsiblePartnerCompany|//rpc");
+		orig = xmlNewNode(NULL, BAD_CAST (xmlStrcmp(rpc->name, BAD_CAST "rpc") == 0 ? "orig" : "originator"));
 		orig = xmlAddNextSibling(rpc, orig);
 	}
 	return orig;
@@ -1494,8 +1612,9 @@ xmlNodePtr find_or_create_orig(xmlDocPtr doc)
  */
 void set_orig(xmlDocPtr doc, char *origspec)
 {
-	xmlNodePtr originator, enterpriseName;
+	xmlNodePtr originator;
 	const char *code, *name;
+	enum issue iss;
 
 	if (origspec) {
 		code = strtok(origspec, "/");
@@ -1507,16 +1626,31 @@ void set_orig(xmlDocPtr doc, char *origspec)
 
 	originator = find_or_create_orig(doc);
 
+	if (xmlStrcmp(originator->name, BAD_CAST "orig") == 0) {
+		iss = ISS_30;
+	} else {
+		iss = ISS_4X;
+	}
+
 	if (code) {
-		xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST code);
+		if (iss == ISS_30) {
+			xmlNodeSetContent(originator, BAD_CAST code);
+		} else {
+			xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST code);
+		}
 	}
 
 	if (name) {
-		enterpriseName = find_child(originator, "enterpriseName");	
-		if (enterpriseName) {
-			xmlNodeSetContent(enterpriseName, BAD_CAST name);
+		if (iss == ISS_30) {
+			xmlSetProp(originator, BAD_CAST "origname", BAD_CAST name);
 		} else {
-			xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
+			xmlNodePtr enterpriseName;
+			enterpriseName = find_child(originator, "enterpriseName");	
+			if (enterpriseName) {
+				xmlNodeSetContent(enterpriseName, BAD_CAST name);
+			} else {
+				xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
+			}
 		}
 	}
 }
