@@ -12,6 +12,7 @@ all: $(OUTPUT)
 
 template.h: comment.xml ../common/42to*.xsl
 	xxd -i comment.xml > template.h
+	xxd -i ../common/42to22.xsl >> template.h
 	xxd -i ../common/42to23.xsl >> template.h
 	xxd -i ../common/42to30.xsl >> template.h
 	xxd -i ../common/42to40.xsl >> template.h
