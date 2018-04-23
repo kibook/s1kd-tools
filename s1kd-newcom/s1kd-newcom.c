@@ -63,7 +63,7 @@ char issue_date[16] = "";
 #define DEFAULT_LANGUAGE_ISO_CODE "und"
 #define DEFAULT_COUNTRY_ISO_CODE "ZZ"
 
-enum issue { NO_ISS, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 char *template_dir = NULL;
 
@@ -98,6 +98,10 @@ enum issue get_issue(const char *iss)
 		return ISS_23;
 	else if (strcmp(iss, "2.2") == 0)
 		return ISS_22;
+	else if (strcmp(iss, "2.1") == 0)
+		return ISS_21;
+	else if (strcmp(iss, "2.0") == 0)
+		return ISS_20;
 	
 	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
 	exit(EXIT_BAD_ISSUE);
@@ -114,6 +118,8 @@ const char *issue_name(enum issue iss)
 		case ISS_30: return "3.0";
 		case ISS_23: return "2.3";
 		case ISS_22: return "2.2";
+		case ISS_21: return "2.1";
+		case ISS_20: return "2.0";
 		default: return "";
 	}
 }
@@ -145,6 +151,14 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 		case ISS_22:
 			xml = ___common_42to22_xsl;
 			len = ___common_42to22_xsl_len;
+			break;
+		case ISS_21:
+			xml = ___common_42to21_xsl;
+			len = ___common_42to21_xsl_len;
+			break;
+		case ISS_20:
+			xml = ___common_42to20_xsl;
+			len = ___common_42to20_xsl_len;
 			break;
 		default:
 			return NULL;

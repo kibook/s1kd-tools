@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add support for issue 2.2.</simplePara>
+        <simplePara>Add support for issues 2.2, 2.1, and 2.0.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -92,6 +92,12 @@
                     </listItem>
                     <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
                       <para>2.2</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>2.1</para>
+                    </listItem>
+                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>2.0</para>
                     </listItem>
                   </randomList>
                 </para>

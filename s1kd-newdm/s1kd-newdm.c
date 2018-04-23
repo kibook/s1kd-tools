@@ -93,7 +93,7 @@ xmlChar *remarks = NULL;
 
 bool no_issue = false;
 
-enum issue { NO_ISS, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
@@ -123,6 +123,10 @@ enum issue get_issue(const char *iss)
 		return ISS_23;
 	else if (strcmp(iss, "2.2") == 0)
 		return ISS_22;
+	else if (strcmp(iss, "2.1") == 0)
+		return ISS_21;
+	else if (strcmp(iss, "2.0") == 0)
+		return ISS_20;
 	
 	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
 	exit(EXIT_BAD_ISSUE);
@@ -139,6 +143,8 @@ const char *issue_name(enum issue iss)
 		case ISS_30: return "3.0";
 		case ISS_23: return "2.3";
 		case ISS_22: return "2.2";
+		case ISS_21: return "2.1";
+		case ISS_20: return "2.0";
 		default: return "";
 	}
 }
@@ -495,6 +501,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		return xmlReadFile(src, NULL, 0);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -509,6 +517,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "proced") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -603,6 +613,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "process") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -617,6 +629,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "ipd") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -631,6 +645,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "fault") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -680,6 +696,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "crew") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -704,6 +722,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "schedul") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -718,6 +738,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "wrngdata") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -732,6 +754,8 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "wrngflds") == 0) {
 		switch (iss) {
+			case ISS_20:
+			case ISS_21:
 			case ISS_22:
 			case ISS_23:
 			case ISS_30:
@@ -805,6 +829,14 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 		case ISS_22:
 			xml = ___common_42to22_xsl;
 			len = ___common_42to22_xsl_len;
+			break;
+		case ISS_21:
+			xml = ___common_42to21_xsl;
+			len = ___common_42to21_xsl_len;
+			break;
+		case ISS_20:
+			xml = ___common_42to20_xsl;
+			len = ___common_42to20_xsl_len;
 			break;
 		default:
 			return NULL;
