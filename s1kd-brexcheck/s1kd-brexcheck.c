@@ -518,14 +518,14 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 	return node;
 }
 
-int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
+int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr brexCheck)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
 
-	xmlNodePtr objectPath;
-	xmlNodePtr objectUse;
+	xmlNodePtr objectPath, objectUse;
+	xmlChar *defaultBrSeverityLevel;
 
 	int i;
 
@@ -535,6 +535,8 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 
 	context = xmlXPathNewContext(doc);
 	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
+
+	defaultBrSeverityLevel = xmlGetProp(firstXPathNode(brex_doc, NULL, "//brex"), BAD_CAST "defaultBrSeverityLevel");
 
 	for (i = 0; i < rules->nodeNr; ++i) {
 		xmlChar *allowedObjectFlag, *path, *use;
@@ -561,9 +563,7 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 			xmlNodePtr err_path;
 
 			if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
-				xmlNodePtr brex;
-				brex = firstXPathNode(rules->nodeTab[i]->doc, NULL, "//brex");
-				severity = xmlGetProp(brex, BAD_CAST "defaultBrSeverityLevel");
+				severity = defaultBrSeverityLevel;
 			}
 
 			brexError = xmlNewChild(brexCheck, NULL, BAD_CAST "brexError",
@@ -867,7 +867,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
 
 		if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-			status = check_brex_rules(result->nodesetval, dmod_doc, docname,
+			status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
 				brex_fnames[i], brexCheck);
 
 			if (verbose >= MESSAGE) {
