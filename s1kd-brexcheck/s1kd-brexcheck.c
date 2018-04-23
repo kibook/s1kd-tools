@@ -496,6 +496,28 @@ void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 	xmlXPathFreeContext(ctx);
 }
 
+xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	ctx = xmlXPathNewContext(doc);
+	ctx->node = context;
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
+}
+
 int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr brexCheck)
 {
@@ -538,7 +560,11 @@ int check_brex_rules(xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 			xmlChar *severity;
 			xmlNodePtr err_path;
 
-			severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel");
+			if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
+				xmlNodePtr brex;
+				brex = firstXPathNode(rules->nodeTab[i]->doc, NULL, "//brex");
+				severity = xmlGetProp(brex, BAD_CAST "defaultBrSeverityLevel");
+			}
 
 			brexError = xmlNewChild(brexCheck, NULL, BAD_CAST "brexError",
 				NULL);
@@ -608,28 +634,6 @@ void show_help(void)
 	puts("  -f           Output only filenames of invalid modules.");
 	puts("  -L           Input is a list of data module filenames.");
 	puts("  -h -?        Show this help message.");
-}
-
-xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	xmlNodePtr node;
-
-	ctx = xmlXPathNewContext(doc);
-	ctx->node = context;
-
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
-
-	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		node = NULL;
-	else
-		node = obj->nodesetval->nodeTab[0];
-	
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return node;
 }
 
 bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
