@@ -64,7 +64,9 @@
   </xsl:template>
 
   <xsl:template match="dmRefIdent">
-    <xsl:apply-templates select="dmCode"/>
+    <dmc>
+      <xsl:apply-templates select="dmCode"/>
+    </dmc>
     <xsl:apply-templates select="../dmAddressItems/dmTitle"/>
     <xsl:apply-templates select="issueInfo"/>
     <xsl:apply-templates select="../dmAddressItems/issueDate"/>
@@ -734,6 +736,16 @@
     <delivlst>
       <xsl:apply-templates/>
     </delivlst>
+  </xsl:template>
+
+  <xsl:template match="deliveryListItem">
+    <xsl:apply-templates select="node()"/>
+  </xsl:template>
+
+  <xsl:template match="dispatchFileName">
+    <ddnfilen>
+      <xsl:apply-templates/>
+    </ddnfilen>
   </xsl:template>
 
   <xsl:template match="dml/identAndStatusSection">

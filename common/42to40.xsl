@@ -42,4 +42,19 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="pmStatus">
+    <xsl:copy>
+      <xsl:apply-templates select="security"/>
+      <xsl:apply-templates select="responsiblePartnerCompany"/>
+      <xsl:apply-templates select="applic"/>
+      <xsl:apply-templates select="qualityAssurance"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="dmlEntry">
+    <dmEntry>
+      <xsl:apply-templates select="@*|node()"/>
+    </dmEntry>
+  </xsl:template>
+
 </xsl:stylesheet>
