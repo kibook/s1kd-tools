@@ -50,14 +50,17 @@ Do not format columns in output.
 Print a tab-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.
 
 -v &lt;value&gt;  
-The new value for the last piece of metadata specified by -n. Each -n can be followed by a -v to edit multiple pieces of metadata.
+When following a -n option, this specifies the new value for that piece of metadata.
 
--w '&lt;name&gt; &lt;op&gt; &lt;value&gt;'  
-Show or edit metadata only on objects where a certain condition is met. &lt;name&gt; is the identifier for a piece of metadata, &lt;op&gt; is a test operator, and &lt;value&gt; is the value to which the metadata is compared. Supported operators:
+When following a -w or -W option, this specifies the value to compare that piece of metadata to.
 
--   = (The value of &lt;name&gt; is equal to &lt;value&gt;)
+Each -n, -w, or -W can be followed by -v to edit or define conditions on multiple pieces of metadata.
 
--   ~ (The value of &lt;name&gt; is not equal to &lt;value&gt;)
+-W &lt;name&gt;  
+Show or edit metadata only on objects where the value of &lt;name&gt; is not equal to the value specified in the following -v option.
+
+-w &lt;name&gt;  
+Show or edit metadata only on objects where the value of &lt;name&gt; is equal to the value specified in the following -v option.
 
 &lt;object&gt;...  
 The object(s) to show/edit metadata on. The default is to read from stdin.
@@ -101,5 +104,5 @@ EXAMPLE
     New title (2017-08-14) new
     s1kd-aspp(1) | s1kd-tools (2018-03-28) changed
 
-    $ s1kd-metadata -F "%techName%" -w subSubSystemCode=Q DMC-*.XML
+    $ s1kd-metadata -F "%techName%" -w subSubSystemCode -v Q DMC-*.XML
     s1kd-aspp(1) | s1kd-tools

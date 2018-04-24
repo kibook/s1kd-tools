@@ -94,21 +94,27 @@ specified with \-n, or all available metadata if \-n is not specified.
 .RE
 .TP
 .B \-v <value>
-The new value for the last piece of metadata specified by \-n.
-Each \-n can be followed by a \-v to edit multiple pieces of metadata.
+When following a \-n option, this specifies the new value for that piece
+of metadata.
+.RS
+.PP
+When following a \-w or \-W option, this specifies the value to compare
+that piece of metadata to.
+.PP
+Each \-n, \-w, or \-W can be followed by \-v to edit or define
+conditions on multiple pieces of metadata.
+.RE
+.TP
+.B \-W <name>
+Show or edit metadata only on objects where the value of <name> is not
+equal to the value specified in the following \-v option.
 .RS
 .RE
 .TP
-.B \-w \[aq]<name> <op> <value>\[aq]
-Show or edit metadata only on objects where a certain condition is met.
-<name> is the identifier for a piece of metadata, <op> is a test
-operator, and <value> is the value to which the metadata is compared.
-Supported operators:
+.B \-w <name>
+Show or edit metadata only on objects where the value of <name> is equal
+to the value specified in the following \-v option.
 .RS
-.IP \[bu] 2
-= (The value of <name> is equal to <value>)
-.IP \[bu] 2
-~ (The value of <name> is not equal to <value>)
 .RE
 .TP
 .B <object>...
@@ -156,7 +162,7 @@ $\ s1kd\-metadata\ \-F\ "%techName%\ (%issueDate%)\ %issueType%"\ DMC\-*.XML
 New\ title\ (2017\-08\-14)\ new
 s1kd\-aspp(1)\ |\ s1kd\-tools\ (2018\-03\-28)\ changed
 
-$\ s1kd\-metadata\ \-F\ "%techName%"\ \-w\ subSubSystemCode=Q\ DMC\-*.XML
+$\ s1kd\-metadata\ \-F\ "%techName%"\ \-w\ subSubSystemCode\ \-v\ Q\ DMC\-*.XML
 s1kd\-aspp(1)\ |\ s1kd\-tools
 \f[]
 .fi

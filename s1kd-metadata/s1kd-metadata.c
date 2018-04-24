@@ -977,8 +977,9 @@ void show_help(void)
 	puts("  -q           Quiet mode, do not show non-fatal errors.");
 	puts("  -T           Do not format columns in output.");
 	puts("  -t           Use tab-delimited fields.");
-	puts("  -v <value>   Edit the value of the metadata specified.");
-	puts("  -w <cond>    Only list info when object metadata meets <cond>.");
+	puts("  -v <value>   The value to set or match.");
+	puts("  -W <name>    Only list/edit when metadata <name> does not equal a value.");
+	puts("  -w <name>    Only list/edit when metadata <name> equals a value.");
 	puts("  <module>     S1000D module to view/edit metadata on.");
 }
 
@@ -1217,23 +1218,19 @@ void add_val(xmlNodePtr keys, const char *val)
 	xmlSetProp(key, BAD_CAST "value", BAD_CAST val);
 }
 
-void add_cond(xmlNodePtr conds, const char *expr)
+void add_cond(xmlNodePtr conds, const char *k, const char *o)
 {
 	xmlNodePtr cond;
-
-	char *e, *k, *o, *v;
-
-	e = strdup(expr);
-	k = strtok(e, " ");
-	o = strtok(NULL, " ");
-	v = strtok(NULL, "");
-
 	cond = xmlNewChild(conds, NULL, BAD_CAST "cond", NULL);
 	xmlSetProp(cond, BAD_CAST "key", BAD_CAST k);
 	xmlSetProp(cond, BAD_CAST "op", BAD_CAST o);
-	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
+}
 
-	free(e);
+void add_cond_val(xmlNodePtr conds, const char *v)
+{
+	xmlNodePtr cond;
+	cond = conds->last;
+	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
 }
 
 int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
@@ -1268,7 +1265,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 
 int main(int argc, char **argv)
 {
-	xmlNodePtr keys, conds;
+	xmlNodePtr keys, conds, last = NULL;
 	int err = 0;
 
 	int i;
@@ -1284,7 +1281,7 @@ int main(int argc, char **argv)
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 	conds = xmlNewNode(NULL, BAD_CAST "conds");
 
-	while ((i = getopt(argc, argv, "0c:eF:fHln:Ttv:qw:h?")) != -1) {
+	while ((i = getopt(argc, argv, "0c:eF:fHln:Ttv:qW:w:h?")) != -1) {
 		switch (i) {
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
@@ -1293,12 +1290,18 @@ int main(int argc, char **argv)
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
 			case 'l': islist = 1; break;
-			case 'n': add_key(keys, optarg); break;
+			case 'n': add_key(keys, optarg); last = keys; break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;
-			case 'v': add_val(keys, optarg);
+			case 'v':
+				if (last == keys)
+					add_val(keys, optarg);
+				else if (last == conds)
+					add_cond_val(conds, optarg);
+				break;
 			case 'q': verbosity = SILENT; break;
-			case 'w': add_cond(conds, optarg); break;
+			case 'w': add_cond(conds, optarg, "="); last = conds; break;
+			case 'W': add_cond(conds, optarg, "~"); last = conds; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
