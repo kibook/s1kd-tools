@@ -1184,7 +1184,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		} else {
 			xmlSaveFile("-", doc);
 		}
-	} else {
+	} else if (endl != '\n') {
 		putchar('\n');
 	}
 
