@@ -1181,19 +1181,21 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 
 	xmlXPathFreeContext(ctxt);
 
-	if (edit) {
-		if (overwrite) {
-			if (access(fname, W_OK) != -1) {
-				xmlSaveFile(fname, doc);
+	if (!err) {
+		if (edit) {
+			if (overwrite) {
+				if (access(fname, W_OK) != -1) {
+					xmlSaveFile(fname, doc);
+				} else {
+					fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
+					exit(EXIT_NO_WRITE);
+				}
 			} else {
-				fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
-				exit(EXIT_NO_WRITE);
+				xmlSaveFile("-", doc);
 			}
-		} else {
-			xmlSaveFile("-", doc);
+		} else if (endl != '\n') {
+			putchar('\n');
 		}
-	} else if (endl != '\n') {
-		putchar('\n');
 	}
 
 	xmlFreeDoc(doc);
