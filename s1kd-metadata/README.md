@@ -52,8 +52,12 @@ Print a tab-delimited list of values of the pieces of metadata specified with -n
 -v &lt;value&gt;  
 The new value for the last piece of metadata specified by -n. Each -n can be followed by a -v to edit multiple pieces of metadata.
 
--w &lt;name&gt;=&lt;value&gt;  
-Show or edit metadata only on objects where metadata &lt;name&gt; has a value of &lt;value&gt;.
+-w '&lt;name&gt; &lt;op&gt; &lt;value&gt;'  
+Show or edit metadata only on objects where a certain condition is met. &lt;name&gt; is the identifier for a piece of metadata, &lt;op&gt; is a test operator, and &lt;value&gt; is the value to which the metadata is compared. Supported operators:
+
+-   = (The value of &lt;name&gt; is equal to &lt;value&gt;)
+
+-   ~ (The value of &lt;name&gt; is not equal to &lt;value&gt;)
 
 &lt;object&gt;...  
 The object(s) to show/edit metadata on. The default is to read from stdin.

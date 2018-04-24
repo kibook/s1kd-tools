@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="9" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="03"/>
+        <issueDate year="2018" month="04" day="24"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,10 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -w option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Simpify usage example.</simplePara>
+        <simplePara>Change -w syntax, add ~ operator.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -57,7 +54,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-metadata [options] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-metadata [options] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -141,9 +138,19 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-w &lt;name&gt;=&lt;value&gt;</listItemTerm>
+              <listItemTerm>-w '&lt;name&gt; &lt;op&gt; &lt;value&gt;'</listItemTerm>
               <listItemDefinition>
-                <para>Show or edit metadata only on objects where metadata &lt;name&gt; has a value of &lt;value&gt;.</para>
+                <para>Show or edit metadata only on objects where a certain condition is met. &lt;name&gt; is the identifier for a piece of metadata, &lt;op&gt; is a test operator, and &lt;value&gt; is the value to which the metadata is compared. Supported operators:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>= (The value of &lt;name&gt; is equal to &lt;value&gt;)</para>
+                    </listItem>
+                    <listItem>
+                      <para>~ (The value of &lt;name&gt; is not equal to &lt;value&gt;)</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -158,7 +165,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[
+          <verbatimText verbatimStyle="vs24"><![CDATA[
 
 $ ls
 DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML

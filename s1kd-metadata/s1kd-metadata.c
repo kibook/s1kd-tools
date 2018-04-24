@@ -1086,19 +1086,27 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 
 int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 {
-	xmlChar *key, *val;
+	xmlChar *key, *val, *op;
 	int i, cmp = 0;
 
 	key = xmlGetProp(cond, BAD_CAST "key");
 	val = xmlGetProp(cond, BAD_CAST "val");
+	op = xmlGetProp(cond, BAD_CAST "op");
 
 	for (i = 0; metadata[i].key; ++i) {
 		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
 			xmlNodePtr node;
 			xmlChar *content;
+
 			node = first_xpath_node(metadata[i].path, ctx);
 			content = xmlNodeGetContent(node);
-			cmp = xmlStrcmp(content, val) == 0;
+
+			switch (op[0]) {
+				case '=': cmp = xmlStrcmp(content, val) == 0; break;
+				case '~': cmp = xmlStrcmp(content, val) != 0; break;
+				default: break;
+			}
+
 			xmlFree(content);
 			break;
 		}
@@ -1210,15 +1218,20 @@ void add_val(xmlNodePtr keys, const char *val)
 void add_cond(xmlNodePtr conds, const char *expr)
 {
 	xmlNodePtr cond;
-	char *e, *k, *v;
+
+	char *e, *k, *o, *v;
 
 	e = strdup(expr);
-	k = strtok(e, "=");
+	k = strtok(e, " ");
+	o = strtok(NULL, " ");
 	v = strtok(NULL, "");
 
 	cond = xmlNewChild(conds, NULL, BAD_CAST "cond", NULL);
 	xmlSetProp(cond, BAD_CAST "key", BAD_CAST k);
+	xmlSetProp(cond, BAD_CAST "op", BAD_CAST o);
 	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
+
+	free(e);
 }
 
 int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
@@ -1253,8 +1266,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 
 int main(int argc, char **argv)
 {
-	xmlNodePtr keys;
-	xmlNodePtr conds;
+	xmlNodePtr keys, conds;
 	int err = 0;
 
 	int i;
@@ -1282,7 +1294,7 @@ int main(int argc, char **argv)
 			case 'n': add_key(keys, optarg); break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;
-			case 'v': add_val(keys, optarg); break;
+			case 'v': add_val(keys, optarg);
 			case 'q': verbosity = SILENT; break;
 			case 'w': add_cond(conds, optarg); break;
 			case 'h':
