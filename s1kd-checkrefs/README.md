@@ -6,7 +6,7 @@ s1kd-checkrefs - Check and update references in S1000D modules
 SYNOPSIS
 ========
 
-    s1kd-checkrefs [-s <source>] [-t <target>]
+    s1kd-checkrefs [-s <source>] [-t <target>] [-m <object>]
                    [-d <dir>] [-cuFeLlvh?] <modules>...
 
 DESCRIPTION
@@ -37,6 +37,9 @@ Treat input as a list of data module filenames, rather than a data module itself
 
 -l  
 List all invalid references found.
+
+-m &lt;object&gt;  
+Change all references to the source object specified with -s into references that point to &lt;object&gt;.
 
 -s &lt;source&gt;  
 Use only the specified module as the source of address items. Only references to this module will be checked and/or updated in all other modules.

@@ -55,6 +55,8 @@ xmlNodePtr findChild(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
 
+	if (!parent) return NULL;
+
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, name) == 0) {
 			return cur;
@@ -66,13 +68,12 @@ xmlNodePtr findChild(xmlNodePtr parent, const char *name)
 
 void replaceNode(xmlNodePtr a, xmlNodePtr b)
 {
-	xmlChar *name = xmlStrdup(a->name);
-
-	b = xmlAddNextSibling(a, xmlCopyNode(b, 1));
+	xmlNodePtr c;
+	c = xmlCopyNode(b, 1);
+	xmlNodeSetName(c, a->name);
+	xmlAddNextSibling(a, c);
 	xmlUnlinkNode(a);
 	xmlFreeNode(a);
-
-	xmlFree(name);
 }
 
 void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
@@ -413,7 +414,7 @@ void validityError(xmlNodePtr ref, const char *fname)
 		exit(EXIT_VALIDITY_ERR);
 }
 
-void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname)
+void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	xmlNodePtr cur;
 	bool isValid = false;
@@ -423,12 +424,40 @@ void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname)
 			isValid = true;
 
 			if (!validateOnly) {
-				xmlNodePtr dmAddressItems      = findChild(cur, "dmAddressItems");
-				xmlNodePtr issueDate           = findChild(dmAddressItems, "issueDate");
-				xmlNodePtr dmTitle             = findChild(dmAddressItems, "dmTitle");
-				xmlNodePtr dmRefAddressItems   = findChild(ref, "dmRefAddressItems");
-				xmlNodePtr dmRefIssueDate      = dmRefAddressItems ? findChild(dmRefAddressItems, "issueDate") : NULL;
-				xmlNodePtr dmRefTitle          = dmRefAddressItems ? findChild(dmRefAddressItems, "dmTitle") : NULL;
+				xmlNodePtr dmAddressItems, issueDate, dmTitle, dmRefAddressItems, dmRefIssueDate, dmRefTitle;
+
+				if (recode) {
+					xmlNodePtr dmIdent, dmCode, dmRefIdent, dmRefCode, issueInfo, refIssueInfo, language, refLanguage;
+
+					dmIdent = findChild(recode, "dmIdent");
+					dmCode = findChild(dmIdent, "dmCode");
+					issueInfo = findChild(dmIdent, "issueInfo");
+					language = findChild(dmIdent, "language");
+					dmRefIdent = findChild(ref, "dmRefIdent");
+					dmRefCode  = findChild(dmRefIdent, "dmCode");
+					refIssueInfo = findChild(dmRefIdent, "issueInfo");
+					refLanguage = findChild(dmRefIdent, "language");
+
+					if (verbose) {
+						char code[256];
+						getDmCode(code, dmIdent, refIssueInfo, refLanguage);
+						printf("      Recoding to %s...\n", code);
+					}
+
+					replaceNode(dmRefCode, dmCode);
+					if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
+					if (refLanguage) replaceNode(refLanguage, language);
+
+					dmAddressItems = findChild(recode, "dmAddressItems");
+				} else {
+					dmAddressItems = findChild(cur, "dmAddressItems");
+				}
+
+				issueDate           = findChild(dmAddressItems, "issueDate");
+				dmTitle             = findChild(dmAddressItems, "dmTitle");
+				dmRefAddressItems   = findChild(ref, "dmRefAddressItems");
+				dmRefIssueDate      = findChild(dmRefAddressItems, "issueDate");
+				dmRefTitle          = findChild(dmRefAddressItems, "dmTitle");
 
 				if (dmRefIssueDate) replaceNode(dmRefIssueDate, issueDate);
 				if (dmRefTitle)     replaceNode(dmRefTitle, dmTitle);
@@ -437,12 +466,40 @@ void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname)
 			isValid = true;
 
 			if (!validateOnly) {
-				xmlNodePtr pmAddressItems      = findChild(cur, "pmAddressItems");
-				xmlNodePtr issueDate           = findChild(pmAddressItems, "issueDate");
-				xmlNodePtr pmTitle             = findChild(pmAddressItems, "pmTitle");
-				xmlNodePtr pmRefAddressItems   = findChild(ref, "pmRefAddressItems");
-				xmlNodePtr pmRefIssueDate      = pmRefAddressItems ? findChild(pmRefAddressItems, "issueDate") : NULL;
-				xmlNodePtr pmRefTitle          = pmRefAddressItems ? findChild(pmRefAddressItems, "pmTitle") : NULL;
+				xmlNodePtr pmAddressItems, issueDate, pmTitle, pmRefAddressItems, pmRefIssueDate, pmRefTitle;
+
+				if (recode) {
+					xmlNodePtr pmIdent, pmCode, pmRefIdent, pmRefCode, issueInfo, refIssueInfo, language, refLanguage;
+
+					pmIdent = findChild(recode, "pmIdent");
+					pmCode  = findChild(pmIdent, "pmCode");
+					issueInfo = findChild(pmIdent, "issueInfo");
+					language = findChild(pmIdent, "language");
+					pmRefIdent = findChild(ref, "pmRefIdent");
+					pmRefCode  = findChild(pmRefIdent, "pmCode");
+					refIssueInfo = findChild(pmRefIdent, "issueInfo");
+					refLanguage = findChild(pmRefIdent, "language");
+
+					if (verbose) {
+						char code[256];
+						getPmCode(code, pmIdent, refIssueInfo, refLanguage);
+						printf("      Recoding to %s...\n", code);
+					}
+
+					replaceNode(pmRefCode, pmCode);
+					if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
+					if (refLanguage) replaceNode(refLanguage, language);
+
+					pmAddressItems = findChild(recode, "pmAddressItems");
+				} else {
+					pmAddressItems = findChild(cur, "pmAddressItems");
+				}
+
+				issueDate           = findChild(pmAddressItems, "issueDate");
+				pmTitle             = findChild(pmAddressItems, "pmTitle");
+				pmRefAddressItems   = findChild(ref, "pmRefAddressItems");
+				pmRefIssueDate      = findChild(pmRefAddressItems, "issueDate");
+				pmRefTitle          = findChild(pmRefAddressItems, "pmTitle");
 
 				if (pmRefIssueDate) replaceNode(pmRefIssueDate, issueDate);
 				if (pmRefTitle)     replaceNode(pmRefTitle, pmTitle);
@@ -480,21 +537,22 @@ void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname)
 		validityError(ref, fname);
 }
 
-void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname)
+void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	int i;
 
 	for (i = 0; i < refs->nodeNr; ++i)
-		updateRef(refs->nodeTab[i], addresses, fname);
+		updateRef(refs->nodeTab[i], addresses, fname, recode);
 }
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-d <dir>] [-cuFeLlvh?]");
+	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-m <object>] [-d <dir>] [-cuFeLlvh?]");
 	puts("");
 	puts("Options:");
 	puts("  -s <source>    Use only <source> as source.");
 	puts("  -t <target>    Only check references in <target>.");
+	puts("  -m <object>    Change refs to <source> into refs to <object>.");
 	puts("  -c             Only check references in content section of targets.");
 	puts("  -u             Update address items of references.");
 	puts("  -F             Fail on first invalid reference, returning error code.");
@@ -562,16 +620,22 @@ void addAddress(const char *fname, xmlNodePtr addresses)
 	xmlFreeDoc(doc);
 }
 
-void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly)
+void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, const char *recode)
 {
-	xmlDocPtr doc;
+	xmlDocPtr doc, recodeDoc;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+	xmlNodePtr recodeIdent;
 
-	doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
-
-	if (!doc) {
+	if (!(doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR))) {
 		return;
+	}
+
+	if (recode) {
+		recodeDoc = xmlReadFile(recode, NULL, 0);
+		recodeIdent = firstXPathNode("//dmAddress|//pmAddress", recodeDoc, NULL);
+	} else {
+		recodeIdent = NULL;
 	}
 
 	if (verbose) {
@@ -595,7 +659,7 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly)
 	}
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		updateRefs(obj->nodesetval, addresses, fname);
+		updateRefs(obj->nodesetval, addresses, fname, recodeIdent);
 	
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
@@ -629,7 +693,7 @@ void addDirectory(const char *path, xmlNodePtr addresses)
 	closedir(dir);
 }
 
-void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly)
+void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly, const char *recode)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -640,7 +704,7 @@ void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnl
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
 			sprintf(fname, "%s/%s", path, cur->d_name);
-			updateRefsFile(fname, addresses, contentOnly);
+			updateRefsFile(fname, addresses, contentOnly, recode);
 		}
 	}
 
@@ -671,13 +735,13 @@ xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr pa
 	return paths;
 }
 
-void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly)
+void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly, const char *recode)
 {
 	xmlNodePtr cur;
 	for (cur = paths->children; cur; cur = cur->next) {
 		char *path;
 		path = (char *) xmlNodeGetContent(cur);
-		updateRefsFile(path, addresses, contentOnly);
+		updateRefsFile(path, addresses, contentOnly, recode);
 		xmlFree(path);
 	}
 }
@@ -693,14 +757,15 @@ int main(int argc, char **argv)
 	char *target = NULL;
 	char *directory = NULL;
 	bool isList = false;
+	char *recode = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFveld:Lh?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFveld:Lm:h?")) != -1) {
 		switch (i) {
 			case 's':
-				source = strdup(optarg);
+				if (!source) source = strdup(optarg);
 				break;
 			case 't':
-				target = strdup(optarg);
+				if (!target) target = strdup(optarg);
 				break;
 			case 'c':
 				contentOnly = true;
@@ -721,16 +786,25 @@ int main(int argc, char **argv)
 				listInvalid = true;
 				break;
 			case 'd':
-				directory = strdup(optarg);
+				if (!directory) directory = strdup(optarg);
 				break;
 			case 'L':
 				isList = true;
+				break;
+			case 'm':
+				if (!recode) recode = strdup(optarg);
+				validateOnly = false;
 				break;
 			case 'h':
 			case '?':
 				showHelp();
 				exit(0);
 		}
+	}
+
+	if (recode && !source) {
+		fprintf(stderr, ERR_PREFIX "Source object must be specified with -s to be moved with -m.\n");
+		exit(EXIT_NO_FILE);
 	}
 
 	addresses = xmlNewNode(NULL, BAD_CAST "addresses");
@@ -755,24 +829,25 @@ int main(int argc, char **argv)
 	}
 
 	if (target) {
-		updateRefsFile(target, addresses, contentOnly);
+		updateRefsFile(target, addresses, contentOnly, recode);
 	} else if (directory) {
-		updateRefsDirectory(directory, addresses, contentOnly);
+		updateRefsDirectory(directory, addresses, contentOnly, recode);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (isList) {
-				updateRefsList(addresses, paths, contentOnly);
+				updateRefsList(addresses, paths, contentOnly, recode);
 			} else {
-				updateRefsFile(argv[i], addresses, contentOnly);
+				updateRefsFile(argv[i], addresses, contentOnly, recode);
 			}
 		}
 	} else if (isList) {
-		updateRefsList(addresses, paths, contentOnly);
+		updateRefsList(addresses, paths, contentOnly, recode);
 	}
 
 	free(source);
 	free(target);
 	free(directory);
+	free(recode);
 
 	xmlFreeNode(addresses);
 	xmlFreeNode(paths);
