@@ -64,9 +64,7 @@
   </xsl:template>
 
   <xsl:template match="dmRefIdent">
-    <dmc>
-      <xsl:apply-templates select="dmCode"/>
-    </dmc>
+    <xsl:apply-templates select="dmCode"/>
     <xsl:apply-templates select="../dmAddressItems/dmTitle"/>
     <xsl:apply-templates select="issueInfo"/>
     <xsl:apply-templates select="../dmAddressItems/issueDate"/>
@@ -581,6 +579,16 @@
     <title>
       <xsl:apply-templates select="@*|node()"/>
     </title>
+  </xsl:template>
+
+  <xsl:template match="pmEntry/dmRef/dmRefIdent">
+    <dmc>
+      <xsl:apply-templates select="dmCode"/>
+    </dmc>
+    <xsl:apply-templates select="../dmAddressItems/dmTitle"/>
+    <xsl:apply-templates select="issueInfo"/>
+    <xsl:apply-templates select="../dmAddressItems/issueDate"/>
+    <xsl:apply-templates select="language"/>
   </xsl:template>
 
   <xsl:template match="commentCode">
