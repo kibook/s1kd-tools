@@ -39,6 +39,9 @@ struct s1kd_schema_parser schema_parsers[SCHEMA_PARSERS_MAX];
 
 int schema_parser_count = 0;
 
+xmlSchemaValidityErrorFunc schema_efunc = (xmlSchemaValidityErrorFunc) fprintf;
+xmlSchemaValidityWarningFunc schema_wfunc = (xmlSchemaValidityWarningFunc) fprintf;
+
 struct s1kd_schema_parser *get_schema_parser(const char *url)
 {
 	int i;
@@ -50,6 +53,10 @@ struct s1kd_schema_parser *get_schema_parser(const char *url)
 	}
 
 	return NULL;
+}
+
+void suppress_err(void *ctx, const char *msg)
+{
 }
 
 struct s1kd_schema_parser *add_schema_parser(char *url)
@@ -64,14 +71,8 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 	schema = xmlSchemaParse(ctxt);
 	valid_ctxt = xmlSchemaNewValidCtxt(schema);
 
-	xmlSchemaSetParserErrors(ctxt,
-		(xmlSchemaValidityErrorFunc) fprintf,
-		(xmlSchemaValidityWarningFunc) fprintf,
-		stderr);
-	xmlSchemaSetValidErrors(valid_ctxt,
-		(xmlSchemaValidityErrorFunc) fprintf,
-		(xmlSchemaValidityWarningFunc) fprintf,
-		stderr);
+	xmlSchemaSetParserErrors(ctxt, schema_efunc, schema_wfunc, stderr);
+	xmlSchemaSetValidErrors(valid_ctxt, schema_efunc, schema_wfunc, stderr);
 
 	schema_parsers[schema_parser_count].url = url;
 	schema_parsers[schema_parser_count].ctxt = ctxt;
@@ -305,6 +306,11 @@ int main(int argc, char *argv[])
 			case 'h': 
 			case '?': show_help(); exit(0);
 		}
+	}
+
+	if (verbosity == SILENT) {
+		schema_efunc = (xmlSchemaValidityErrorFunc) suppress_err;
+		schema_wfunc = (xmlSchemaValidityWarningFunc) suppress_err;
 	}
 
 	if (optind < argc) {
