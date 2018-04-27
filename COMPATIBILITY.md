@@ -9,7 +9,7 @@ Support is implemented.
 /  
 Support is partially implemented.
 
-\-  
+-  
 Support is not planned. Usually this is because older issues of the specification did not cover the function of the tool.
 
 \[empty\]  
@@ -17,7 +17,7 @@ Support is planned but not yet implemented.
 
 | Tool            | 4.2 | 4.1 | 4.0 | 3.0 | 2.3 | 2.2 | 2.1 | 2.0 |
 |-----------------|-----|-----|-----|-----|-----|-----|-----|-----|
-| s1kd-acronyms   | X   | X   | X   |     |     |     |     |     |
+| s1kd-acronyms   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-aspp       | X   | X   | X   |     |     |     |     |     |
 | s1kd-brexcheck  | X   | X   | X   |     |     |     | -   | -   |
