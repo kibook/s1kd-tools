@@ -57,4 +57,41 @@
     </dmEntry>
   </xsl:template>
 
+  <xsl:template match="catalogSeqNumber/@figureNumber"/>
+
+  <xsl:template match="catalogSeqNumber/@item"/>
+
+  <xsl:template match="itemSeqNumber">
+    <itemSequenceNumber>
+      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates select="quantityPerNextHigherAssy"/>
+      <xsl:apply-templates select="partRef"/>
+      <partIdentSegment>
+        <descrForPart/>
+      </partIdentSegment>
+      <locationRcmdSegment>
+        <locationRcmd>
+          <service/>
+          <sourceMaintRecoverability/>
+        </locationRcmd>
+      </locationRcmdSegment>
+    </itemSequenceNumber>
+  </xsl:template>
+
+  <xsl:template match="partRef">
+    <xsl:apply-templates select="@*"/>
+  </xsl:template>
+
+  <xsl:template match="partRef/@manufacturerCodeValue">
+    <manufacturerCode>
+      <xsl:apply-templates/>
+    </manufacturerCode>
+  </xsl:template>
+
+  <xsl:template match="partRef/@partNumberValue">
+    <partNumber>
+      <xsl:apply-templates/>
+    </partNumber>
+  </xsl:template>
+
 </xsl:stylesheet>
