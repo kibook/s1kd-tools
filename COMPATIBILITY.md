@@ -9,7 +9,7 @@ Support is implemented.
 /  
 Support is partially implemented.
 
--  
+\-  
 Support is not planned. Usually this is because older issues of the specification did not cover the function of the tool.
 
 \[empty\]  
