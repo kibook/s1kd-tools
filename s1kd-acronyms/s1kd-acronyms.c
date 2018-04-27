@@ -435,7 +435,9 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 {
 	xmlDocPtr doc;
 
-	doc = xmlReadFile(path, NULL, 0);
+	if (!(doc = xmlReadFile(path, NULL, 0))) {
+		return;
+	}
 
 	markupAcronyms(doc, acronyms);
 
