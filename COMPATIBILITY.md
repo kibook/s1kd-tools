@@ -9,7 +9,7 @@ Support is implemented.
 /  
 Support is partially implemented.
 
--  
+~  
 Support is not planned. Usually this is because older issues of the specification did not cover the function of the tool.
 
 \[empty\]  
@@ -20,14 +20,14 @@ Support is planned but not yet implemented.
 | s1kd-acronyms   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-aspp       | X   | X   | X   |     |     |     |     |     |
-| s1kd-brexcheck  | X   | X   | X   |     |     |     | -   | -   |
+| s1kd-brexcheck  | X   | X   | X   |     |     |     | ~   | ~   |
 | s1kd-checkrefs  | X   | X   | X   |     |     |     |     |     |
 | s1kd-defaults   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-dmrl       | X   | X   | X   |     |     |     |     |     |
 | s1kd-flatten    | X   | X   | X   |     |     |     |     |     |
 | s1kd-icncatalog | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-index      | X   | X   | X   |     |     |     |     |     |
-| s1kd-instance   | X   | X   | X   | /   | -   | -   | -   | -   |
+| s1kd-instance   | X   | X   | X   | /   | ~   | ~   | ~   | ~   |
 | s1kd-ls         | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-metadata   | X   | X   | X   |     |     |     |     |     |
 | s1kd-neutralize | X   | X   | X   |     |     |     |     |     |
@@ -35,9 +35,9 @@ Support is planned but not yet implemented.
 | s1kd-newddn     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newdm      | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newdml     | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-newimf     | X   | -   | -   | -   | -   | -   | -   | -   |
+| s1kd-newimf     | X   | ~   | ~   | ~   | ~   | ~   | ~   | ~   |
 | s1kd-newpm      | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-newupf     | X   | X   | -   | -   | -   | -   | -   | -   |
+| s1kd-newupf     | X   | X   | ~   | ~   | ~   | ~   | ~   | ~   |
 | s1kd-ref        | X   | X   | X   |     |     |     |     |     |
 | s1kd-refls      | X   | X   | X   |     |     |     |     |     |
 | s1kd-syncrefs   | X   | X   | X   |     |     |     |     |     |

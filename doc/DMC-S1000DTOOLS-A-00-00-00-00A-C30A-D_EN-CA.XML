@@ -57,7 +57,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-</listItemTerm>
+              <listItemTerm>~</listItemTerm>
               <listItemDefinition>
                 <para>Support is not planned. Usually this is because older issues of the specification did not cover the function of the tool.</para>
               </listItemDefinition>
@@ -199,10 +199,10 @@
               <entry/>
               <entry/>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
             </row>
             <row>
@@ -356,16 +356,16 @@
                 <para>/</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
             </row>
             <row>
@@ -559,25 +559,25 @@
                 <para>X</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
             </row>
             <row>
@@ -620,22 +620,22 @@
                 <para>X</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
               <entry>
-                <para>-</para>
+                <para>~</para>
               </entry>
             </row>
             <row>
