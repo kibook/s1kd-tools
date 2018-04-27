@@ -1,7 +1,7 @@
 SOURCE=s1kd-defaults.c
 OUTPUT=s1kd-defaults
 
-CFLAGS=-Wall -pedantic-errors -g `pkg-config --cflags libxml-2.0 libxslt libexslt`
+CFLAGS=-Wall -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt libexslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 PREFIX=/usr/local

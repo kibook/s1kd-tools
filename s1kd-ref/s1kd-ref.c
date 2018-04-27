@@ -34,6 +34,8 @@ xmlNode *find_child(xmlNode *parent, char *name)
 {
 	xmlNode *cur;
 
+	if (!parent) return NULL;
+
 	for (cur = parent->children; cur; cur = cur->next) {
 		if (strcmp((char *) cur->name, name) == 0) {
 			return cur;
@@ -194,11 +196,11 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 	if (opts) {
 		xmlDocPtr doc;
-		xmlNodePtr ref_pm_address;
-		xmlNodePtr ref_pm_ident;
-		xmlNodePtr ref_pm_address_items;
-		xmlNodePtr ref_pm_title;
-		xmlNodePtr ref_pm_issue_date;
+		xmlNodePtr ref_pm_address = NULL;
+		xmlNodePtr ref_pm_ident = NULL;
+		xmlNodePtr ref_pm_address_items = NULL;
+		xmlNodePtr ref_pm_title = NULL;
+		xmlNodePtr ref_pm_issue_date = NULL;
 		char *s;
 
 		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
@@ -242,7 +244,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
-			xmlNodePtr pm_ref_address_items, pm_title, issue_date;
+			xmlNodePtr pm_ref_address_items = NULL, pm_title, issue_date;
 
 			if (doc) {
 				pm_ref_address_items = xmlNewChild(pm_ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
@@ -378,11 +380,11 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 
 	if (opts) {
 		xmlDocPtr doc;
-		xmlNodePtr ref_dm_address;
-		xmlNodePtr ref_dm_ident;
-		xmlNodePtr ref_dm_address_items;
-		xmlNodePtr ref_dm_title;
-		xmlNodePtr ref_dm_issue_date;
+		xmlNodePtr ref_dm_address = NULL;
+		xmlNodePtr ref_dm_ident = NULL;
+		xmlNodePtr ref_dm_address_items = NULL;
+		xmlNodePtr ref_dm_title = NULL;
+		xmlNodePtr ref_dm_issue_date = NULL;
 		char *s;
 
 		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
@@ -426,7 +428,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
-			xmlNodePtr dm_ref_address_items, dm_title, issue_date;
+			xmlNodePtr dm_ref_address_items = NULL, dm_title, issue_date;
 
 			if (doc) {
 				dm_ref_address_items = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefAddressItems", NULL);

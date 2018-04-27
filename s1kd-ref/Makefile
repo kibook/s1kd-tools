@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -pedantic-errors -g `pkg-config --cflags libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
 SOURCE=s1kd-ref.c

@@ -508,10 +508,6 @@ void set_env_lang(void)
 	free(lang);
 }
 
-void set_short_pm_title(xmlDocPtr doc)
-{
-}
-
 int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;

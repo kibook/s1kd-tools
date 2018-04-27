@@ -589,7 +589,6 @@ int main(int argc, char **argv)
 	xmlXPathContextPtr sourceContext, targetContext, updateFileContext;
 	xmlNodePtr update;
 	xmlNodePtr deleteObjectGroup, insertObjectGroup, replaceObjectGroup;
-	char upfname[PATH_MAX];
 	int c;
 	bool overwrite = false;
 	bool no_overwrite_error = false;
@@ -711,6 +710,8 @@ int main(int argc, char **argv)
 	if (out) {
 		xmlSaveFile(out, updateFile);
 	} else {
+		char upfname[PATH_MAX];
+
 		autoName(upfname, updateFileContext);
 
 		if (!overwrite && access(upfname, F_OK) != -1) {

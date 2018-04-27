@@ -11,6 +11,7 @@
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
+#define S_DMTYPES_ERR ERR_PREFIX "Could not create dmtypes file."
 
 #define DEFAULT_DEFAULTS_FNAME "defaults"
 #define DEFAULT_DMTYPES_FNAME "dmtypes"
@@ -244,7 +245,7 @@ void dump_defaults_text(const char *fname, bool overwrite)
 
 xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort)
 {
-	xmlDocPtr doc;
+	xmlDocPtr doc = NULL;
 
 	switch (f) {
 		case NONE:
@@ -269,7 +270,7 @@ xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort)
 /* Convert an XML defaults/dmtypes file to the simple text version. */
 void xml_to_text(const char *path, enum file f, bool overwrite, bool sort)
 {
-	xmlDocPtr doc, res;
+	xmlDocPtr doc, res = NULL;
 
 	if (!(doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
 		doc = simple_text_to_xml(path, f, sort);
@@ -385,10 +386,14 @@ int main(int argc, char **argv)
 	if (initialize) {
 		if (fmt == TEXT) {
 			dump_defaults_text(NULL, true);
-			system("s1kd-newdm -. > dmtypes");
+			if (system("s1kd-newdm -. > dmtypes") != 0) {
+				fprintf(stderr, S_DMTYPES_ERR);
+			}
 		} else {
 			dump_defaults_xml(NULL, true);
-			system("s1kd-newdm -, > dmtypes");
+			if (system("s1kd-newdm -, > dmtypes") != 0) {
+				fprintf(stderr, S_DMTYPES_ERR);
+			}
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {

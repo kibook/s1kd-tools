@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 	bool createnew = false;
 	char *media = NULL;
 	xmlDocPtr icns;
-	xmlNodePtr add, del, cur;
+	xmlNodePtr add, del, cur = NULL;
 
 	add = xmlNewNode(NULL, BAD_CAST "add");
 	del = xmlNewNode(NULL, BAD_CAST "del");
