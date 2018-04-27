@@ -533,7 +533,6 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		}
 	} else if (strcmp(dmtype, "frontmatter") == 0) {
 		switch (iss) {
-			case ISS_40:
 			case ISS_41:
 			case ISS_42:
 				xml = templates_42_frontmatter_xml;
