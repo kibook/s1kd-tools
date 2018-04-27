@@ -454,6 +454,13 @@
   <xsl:template match="itemSeqNumber">
     <isn>
       <xsl:apply-templates select="@*|node()"/>
+      <applics>
+        <applic>
+          <displaytext>
+            <p>All</p>
+          </displaytext>
+        </applic>
+      </applics>
     </isn>
   </xsl:template>
 

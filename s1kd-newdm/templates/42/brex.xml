@@ -41,9 +41,7 @@
   </identAndStatusSection>
   <content>
     <brex>
-      <snsRules/>
       <contextRules/>
-      <nonContextRules/>
     </brex>
   </content>
 </dmodule>
