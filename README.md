@@ -15,3 +15,5 @@ Some examples of S1000D data sets produced with these tools are available here:
 -   [S1000D](http://github.com/kibook/S1000D)
 
 These tools have been primarily developed around Issue 4.2 of the specification, and are generally compatibile with the previous 4.X issues. Support for Issue 3.0 and lower is a work-in-progress. Support for SGML schemas is not planned.
+
+[Compatibility with each issue of the specification](COMPATIBILITY.md)
