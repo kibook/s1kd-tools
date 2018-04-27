@@ -405,6 +405,32 @@ xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 	return orig;
 }
 
+void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+{
+	xmlDocPtr styledoc, src, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	src = xmlCopyDoc(doc, 1);
+
+	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, src, NULL);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+	
+	xmlFreeDoc(src);
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+void convertToIssue30(xmlDocPtr doc)
+{
+	transformDoc(doc, stylesheets_30_xsl, stylesheets_30_xsl_len);
+}
+
 void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out)
 {
 	xmlDocPtr doc;
@@ -414,6 +440,10 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 	markupAcronyms(doc, acronyms);
 
 	doc = matchAcronymTerms(doc);
+
+	if (xmlStrcmp(xmlFirstElementChild(xmlDocGetRootElement(doc))->name, BAD_CAST "idstatus") == 0) {
+		convertToIssue30(doc);
+	}
 
 	xmlSaveFile(out, doc);
 
@@ -475,27 +505,6 @@ void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 	}
 
 	fclose(f);
-}
-
-void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
-{
-	xmlDocPtr styledoc, src, res;
-	xsltStylesheetPtr style;
-	xmlNodePtr old;
-
-	src = xmlCopyDoc(doc, 1);
-
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
-	style = xsltParseStylesheetDoc(styledoc);
-
-	res = xsltApplyStylesheet(style, src, NULL);
-
-	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
-	xmlFreeNode(old);
-	
-	xmlFreeDoc(src);
-	xmlFreeDoc(res);
-	xsltFreeStylesheet(style);
 }
 
 void deleteAcronyms(xmlDocPtr doc)
