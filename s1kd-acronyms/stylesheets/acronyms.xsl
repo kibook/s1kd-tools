@@ -1,44 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
   <xsl:template match="/">
     <acronyms>
-      <xsl:apply-templates/>
+      <xsl:apply-templates select="//acronym"/>
     </acronyms>
-  </xsl:template>
-  
-  <xsl:template match="*">
-    <xsl:apply-templates select="*"/>
   </xsl:template>
 
   <xsl:template match="acronym">
     <xsl:copy>
-      <xsl:apply-templates select="@acronymType|acronymTerm|acronymDefinition"/>
+      <xsl:apply-templates select="@acronymType|@acrotype"/>
+      <xsl:apply-templates select="acronymTerm|acroterm"/>
+      <xsl:apply-templates select="acronymDefinition|acrodef"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="acronym/acronymTerm">
-    <xsl:copy>
+  <xsl:template match="@acrotype">
+    <xsl:attribute name="acronymType">
       <xsl:apply-templates/>
-    </xsl:copy>
+    </xsl:attribute>
   </xsl:template>
 
-  <xsl:template match="acronymDefinition">
-    <xsl:copy>
+  <xsl:template match="acroterm">
+    <acronymTerm>
       <xsl:apply-templates/>
-    </xsl:copy>
+    </acronymTerm>
   </xsl:template>
 
-  <xsl:template match="@acronymType">
-    <xsl:copy>
+  <xsl:template match="acrodef">
+    <acronymDefinition>
       <xsl:apply-templates/>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="acronymTerm/subScript|acronymTerm/superScript|acronymDefinition/subScript|acronymDefinition/superScript">
-    <xsl:copy>
-      <xsl:apply-templates/>
-    </xsl:copy>
+    </acronymDefinition>
   </xsl:template>
 
 </xsl:stylesheet>
