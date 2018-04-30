@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="00"/>
+        <issueInfo issueNumber="027" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="22"/>
+        <issueDate year="2018" month="04" day="30"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add support for issues 2.2, 2.1 and 2.0</simplePara>
+        <simplePara>Add -M option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -92,13 +92,13 @@
                     <listItem>
                       <para>2.3</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.2</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.1</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.0</para>
                     </listItem>
                   </randomList>
@@ -181,6 +181,41 @@
               <listItemTerm>-L &lt;language&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The language ISO code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-M &lt;SNS&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Determine the tech name from on one of the built-in S1000D maintained SNS. Supported SNS:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>Generic</para>
+                    </listItem>
+                    <listItem>
+                      <para>Support and training equipment</para>
+                    </listItem>
+                    <listItem>
+                      <para>Ordnance</para>
+                    </listItem>
+                    <listItem>
+                      <para>General communications</para>
+                    </listItem>
+                    <listItem>
+                      <para>Air vehicle, engines and equipment</para>
+                    </listItem>
+                    <listItem>
+                      <para>Tactical missiles</para>
+                    </listItem>
+                    <listItem>
+                      <para>General surface vehicles</para>
+                    </listItem>
+                    <listItem>
+                      <para>General sea vehicles</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>When creating a BREX data module, this SNS will be included as the SNS rules of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

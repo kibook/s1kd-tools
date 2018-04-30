@@ -1,0 +1,1512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/brex.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000D" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="2" assyCode="0700" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="04" day="29"/>
+        <dmTitle>
+          <techName>Maintained SNS - General surface vehicles</techName>
+          <infoName>Business rules</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany/>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <brex>
+      <snsRules>
+        <snsDescr>
+          <snsSystem>
+            <snsCode>A0</snsCode>
+            <snsTitle>Propulsion, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A1</snsCode>
+            <snsTitle>Power pack - General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Main engine</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Transmission</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Power pack Interfaces</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A2</snsCode>
+            <snsTitle>Power unit, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Engine</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Cooling system</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Fuel systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Air and exhaust systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Lubrication systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Electrical</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Hydraulic</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A3</snsCode>
+            <snsTitle>Engine cooling system, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Fluid</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Air</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A4</snsCode>
+            <snsTitle>Fuel systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Storage</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Priming</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Fuel injection</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Venting and de-fuelling</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A5</snsCode>
+            <snsTitle>Air and exhaust systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Air system</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Collector</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Noise suppression</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Emission control</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A6</snsCode>
+            <snsTitle>Lubrication systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Storage</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A7</snsCode>
+            <snsTitle>Transmission, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Gearbox</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Steering control assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Brake assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Auxiliary drive/power takeoff</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Clutch</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Drive shaft</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Torque converter</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Differential</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A8</snsCode>
+            <snsTitle>Automotive/remote piloting and digital control systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Sensors</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Indicators</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>A9</snsCode>
+            <snsTitle>Controls (drivers), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Foot controls</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Hand controls</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Ancillary controls</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Propulsion control systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Instrumentation</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>B0</snsCode>
+            <snsTitle>Structure, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>B1</snsCode>
+            <snsTitle>Hull/frame, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Internal mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>External mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Doors/hatches</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Seats</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Drinking water tank</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Access cover plates</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Gun crutch/depression rails</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Skirting plates/brackets/splash plates</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>B2</snsCode>
+            <snsTitle>Body/cab, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Internal mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>External mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Doors/hatches</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Seats</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Drinking water tank</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Access panels</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Load bay</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>B3</snsCode>
+            <snsTitle>Suspension/track/wheels, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Suspension unit</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Road wheel hub assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Sprocket wheel assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Track assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Idler wheels</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Roller assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Axle</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>B4</snsCode>
+            <snsTitle>Turret assembly, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Internal mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>External mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Hatches</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Seats</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Ring assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Cupola</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Elevating/traversing gearbox</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Turntable assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C0</snsCode>
+            <snsTitle>Armaments, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C1</snsCode>
+            <snsTitle>Gun control systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Installation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Control panel</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Power supply</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Switch units</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Gun controller</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Power motors</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Gyroscope assembly</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C2</snsCode>
+            <snsTitle>Fire control systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Computer/interface</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Control/monitor</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Filter units</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Sensors</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Firing handles</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Fire control boxes</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C3</snsCode>
+            <snsTitle>Thermal imaging, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Sensor</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Processing</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Display</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Converter units</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Structure and framework</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C4</snsCode>
+            <snsTitle>Thermal imaging cooling systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Compressors</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Storage</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C5</snsCode>
+            <snsTitle>Optical sighting systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Surveillance</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Sighting</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Reticle image projector</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Sighting unit</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C6</snsCode>
+            <snsTitle>Weapon/gun, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Barrel</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Breech, housing and firing mechanism</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Mountings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Recoil mechanism</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Smoke discharger</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Secondary armaments installation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Sights</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>C7</snsCode>
+            <snsTitle>Automatic loading systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Storage (ready round)</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Transfer/lift</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Loading/ramming</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>D0</snsCode>
+            <snsTitle>Electrical systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>D1</snsCode>
+            <snsTitle>Electrical systems (engine/power pack), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Generating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Batteries</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Instrumentation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Lights</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Wiring</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Electrical equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Protection</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>D2</snsCode>
+            <snsTitle>Electrical systems (hull/frame), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Internal electrical systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Batteries</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Internal lights</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>External electrical systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Wiring</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Electrical equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Protection</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>D3</snsCode>
+            <snsTitle>Electrical systems (body/cab), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Generating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Batteries</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Instrumentation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Lights</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Wiring</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Electrical equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Protection</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>D4</snsCode>
+            <snsTitle>Electrical systems (turret), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Generating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Batteries</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Instrumentation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Lights</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Wiring</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Electrical equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Protection</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>E0</snsCode>
+            <snsTitle>Communications, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>E1</snsCode>
+            <snsTitle>Communication systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>UHF/SHF/EHF</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>VHF</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>HF</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>LF</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Audio</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Digital</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Satellite</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Optical</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>E2</snsCode>
+            <snsTitle>Identification friend/foe (iff), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Transmitting</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Receiving</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>F0</snsCode>
+            <snsTitle>Navigation, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>F1</snsCode>
+            <snsTitle>Navigation systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Independent</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Dependent</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Computing</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>G0</snsCode>
+            <snsTitle>Surveillance</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>G1</snsCode>
+            <snsTitle>Surveillance systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Recording</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Optical/infra-red</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Laser</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Radar</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Magnetic</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Sonar</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Acoustic</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>G2</snsCode>
+            <snsTitle>Meteorological/atmospheric research, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Weather</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Air turbulence</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Pollutants</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Magnetic/gravitational</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>H0</snsCode>
+            <snsTitle>Steering, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>H1</snsCode>
+            <snsTitle>Steering systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Rudders</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Trim valves</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Thrusters</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>J0</snsCode>
+            <snsTitle>Ventilation/heating/cooling, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>J1</snsCode>
+            <snsTitle>Ventilation/heating/cooling systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Compression</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Heating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Cooling</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Temperature</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Moisture/air</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Liquid coolant</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>K0</snsCode>
+            <snsTitle>Hydraulic systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>K1</snsCode>
+            <snsTitle>Hydraulics, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Main</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Auxiliary</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>K2</snsCode>
+            <snsTitle>Pneumatic systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Main</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Auxiliary</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>L0</snsCode>
+            <snsTitle>Electronic system, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>L1</snsCode>
+            <snsTitle>Electronics, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>M0</snsCode>
+            <snsTitle>Auxiliary, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>M1</snsCode>
+            <snsTitle>Auxiliary systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>N0</snsCode>
+            <snsTitle>Survivability, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>N1</snsCode>
+            <snsTitle>Fire protection systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Detecting</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Indicating</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Extinguishing</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>N2</snsCode>
+            <snsTitle>Nuclear, biological, chemical, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Pack</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Control</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Pressure relief</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Door assemblies</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>P0</snsCode>
+            <snsTitle>Special equipment/systems, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>P1</snsCode>
+            <snsTitle>Special to type equipment, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Structure</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Electrical systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Hydraulics</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Handling equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Ancillary</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Stowage</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>P2</snsCode>
+            <snsTitle>Special recovery equipment, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>P3</snsCode>
+            <snsTitle>Special fit equipment, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>P4</snsCode>
+            <snsTitle>Special purpose equipment, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>Q0</snsCode>
+            <snsTitle>Outfit, furnishings and stowage, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>Q1</snsCode>
+            <snsTitle>Stowage, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Charge bin</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Shell stowage</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Ammunition</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Body/cab internal</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Body/cab external</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Hull/frame internal</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Hull/frame external</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Turret internal</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Turret external</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>Q2</snsCode>
+            <snsTitle>Complete equipment schedule (CES), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Production ces</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Service ces</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Complex ces</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>R0</snsCode>
+            <snsTitle>Training, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>R1</snsCode>
+            <snsTitle>Training services, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Devices/accessories/aids</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Facilities</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>S0</snsCode>
+            <snsTitle>Repair test and support, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>S1</snsCode>
+            <snsTitle>Power pack repair facility (PPRF), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Mobile</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Fixed</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>S2</snsCode>
+            <snsTitle>Sighting systems repair facility, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Mobile</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Fixed</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>S3</snsCode>
+            <snsTitle>Thermal imaging repair facility, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Mobile</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Fixed</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>S4</snsCode>
+            <snsTitle>General purpose electronic repair facility, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Mobile</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Fixed</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>S5</snsCode>
+            <snsTitle>Common support equipment, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+        </snsDescr>
+      </snsRules>
+    </brex>
+  </content>
+</dmodule>

@@ -77,6 +77,27 @@ The info name of the new data module.
 -L &lt;language&gt;  
 The language ISO code of the new data module.
 
+-M &lt;SNS&gt;  
+Determine the tech name from on one of the built-in S1000D maintained SNS. Supported SNS:
+
+-   Generic
+
+-   Support and training equipment
+
+-   Ordnance
+
+-   General communications
+
+-   Air vehicle, engines and equipment
+
+-   Tactical missiles
+
+-   General surface vehicles
+
+-   General sea vehicles
+
+When creating a BREX data module, this SNS will be included as the SNS rules of the new data module.
+
 -m &lt;remarks&gt;  
 Set remarks for the new data module.
 

@@ -13,6 +13,7 @@
 
 #include "templates.h"
 #include "dmtypes.h"
+#include "sns.h"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -86,7 +87,8 @@ char dmtype[32] = "";
 
 char schema[1024] = "";
 char brex_dmcode[256] = "";
-char sns_fname[PATH_MAX] = "";
+char *sns_fname = NULL;
+char *maint_sns = NULL;
 char issue_date[16] = "";
 
 xmlChar *remarks = NULL;
@@ -203,6 +205,7 @@ void show_help(void)
 	puts("  -p      Prompt the user for each value");
 	puts("  -q      Don't report an error if file exists.");
 	puts("  -S      Get tech name from BREX SNS.");
+	puts("  -M      Use one of the maintained SNS.");
 	puts("  -v      Print file name of new data module.");
 	puts("  -$      Specify which S1000D issue to use.");
 	puts("  -@      Output to specified file.");
@@ -284,8 +287,8 @@ void copy_default_value(const char *key, const char *val)
 		strncpy(schema, val, 1023);
 	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strncpy(brex_dmcode, val, 255);
-	else if (strcmp(key, "sns") == 0 && strcmp(sns_fname, "") == 0)
-		strncpy(sns_fname, val, PATH_MAX - 1);
+	else if (strcmp(key, "sns") == 0 && !sns_fname)
+		sns_fname = strdup(val);
 	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(val);
 	else if (strcmp(key, "omitIssueInfo") == 0)
@@ -294,6 +297,8 @@ void copy_default_value(const char *key, const char *val)
 		remarks = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "templates") == 0 && !template_dir)
 		template_dir = strdup(val);
+	else if (strcmp(key, "maintainedSns") == 0 && !maint_sns)
+		maint_sns = strdup(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -413,42 +418,101 @@ bool find_brex_file(char *dst, const char *code)
 	return found;
 }
 
-void set_tech_from_sns(const char *code)
+struct inmem_xml {
+	unsigned char *xml;
+	unsigned int len;
+};
+
+/* Map maintained SNS title to XML template. */
+struct inmem_xml maint_sns_xml(void)
 {
-	xmlDocPtr brex;
+	struct inmem_xml res;
+
+	if (strcasecmp(maint_sns, "Generic") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0100_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0100_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "Support and training equipment") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0200_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0200_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "Ordnance") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0300_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0300_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "General communications") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0400_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0400_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "Air vehicle, engines and equipment") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0500_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0500_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "Tactical missiles") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0600_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0600_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "General surface vehicles") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0700_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0700_00A_022A_D_EN_CA_XML_len;
+	} else if (strcasecmp(maint_sns, "General sea vehicles") == 0) {
+		res.xml = sns_DMC_S1000D_A_08_02_0800_00A_022A_D_EN_CA_XML;
+		res.len = sns_DMC_S1000D_A_08_02_0800_00A_022A_D_EN_CA_XML_len;
+	} else {
+		fprintf(stderr, ERR_PREFIX "No maintained SNS: %s\n", maint_sns);
+		res.xml = NULL;
+		res.len = 0;
+	}
+
+	return res;
+}
+
+
+xmlDocPtr maint_sns_doc(void)
+{
+	struct inmem_xml xml;
+
+	xml = maint_sns_xml();
+
+	return xmlReadMemory((const char *) xml.xml, xml.len, NULL, NULL, 0);
+}
+
+xmlDocPtr set_tech_from_sns(void)
+{
+	xmlDocPtr brex = NULL;
 	char xpath[256];
 	xmlNodePtr snsTitle;
 	char fname[PATH_MAX];
 
-	if (!find_brex_file(fname, code)) {
-		return;
+	if (sns_fname && find_brex_file(fname, sns_fname)) {
+		brex = xmlReadFile(fname, NULL, 0);
+	} else if (maint_sns) {
+		brex = maint_sns_doc();
 	}
 
-	brex = xmlReadFile(fname, NULL, 0);
+	if (!brex) {
+		return NULL;
+	}
 
 	sprintf(xpath, SNS_XPATH_1, systemCode, subSystemCode, subSubSystemCode, assyCode);
 	if ((snsTitle = firstXPathNode(brex, xpath))) {
 		set_sns_title(snsTitle);
-		return;
+		return brex;
 	}
 
 	sprintf(xpath, SNS_XPATH_2, systemCode, subSystemCode, subSubSystemCode);
 	if ((snsTitle = firstXPathNode(brex, xpath))) {
 		set_sns_title(snsTitle);
-		return;
+		return brex;
 	}
 
 	sprintf(xpath, SNS_XPATH_3, systemCode, subSystemCode);
 	if ((snsTitle = firstXPathNode(brex, xpath))) {
 		set_sns_title(snsTitle);
-		return;
+		return brex;
 	}
 
 	sprintf(xpath, SNS_XPATH_4, systemCode);
 	if ((snsTitle = firstXPathNode(brex, xpath))) {
 		set_sns_title(snsTitle);
-		return;
+		return brex;
 	}
+
+	return brex;
 }
 
 void set_issue_date(xmlNodePtr issueDate)
@@ -549,8 +613,15 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_40:
 			case ISS_41:
 			case ISS_42:
-				xml = templates_42_brex_xml;
-				len = templates_42_brex_xml_len;
+				if (maint_sns) {
+					struct inmem_xml res;
+					res = maint_sns_xml();
+					xml = res.xml;
+					len = res.len;
+				} else {
+					xml = templates_42_brex_xml;
+					len = templates_42_brex_xml_len;
+				}
 				break;
 			default:
 				break;
@@ -805,6 +876,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr styledoc, res, orig;
+	xmlNodePtr old;
 	unsigned char *xml = NULL;
 	unsigned int len;
 
@@ -851,8 +923,9 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	xmlFreeDoc(doc);
 	xsltFreeStylesheet(style);
 
-	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	old = xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
 
+	xmlFreeNode(old);
 	xmlFreeDoc(res);
 
 	return orig;
@@ -1001,7 +1074,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qh?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:h?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -1022,7 +1095,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = true; break;
 			case 's': strcpy(schema, optarg); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
-			case 'S': strcpy(sns_fname, optarg); break;
+			case 'S': sns_fname = strdup(optarg); break;
 			case 'I': strcpy(issue_date, optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
@@ -1033,6 +1106,7 @@ int main(int argc, char **argv)
 			case '.': print_dmtypes_txt(); exit(0);
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
+			case 'M': maint_sns = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
@@ -1194,8 +1268,11 @@ int main(int argc, char **argv)
 		exit(EXIT_BAD_DMC);
 	}
 
-	if (strcmp(sns_fname, "") != 0 && !tech_name_flag)
-		set_tech_from_sns(sns_fname);
+	if (!tech_name_flag && (maint_sns || sns_fname)) {
+		xmlDocPtr brex;
+		brex = set_tech_from_sns();
+		xmlFreeDoc(brex);
+	}
 
 	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issueNumber, "") == 0) strcpy(issueNumber, "000");
@@ -1256,13 +1333,13 @@ int main(int argc, char **argv)
 
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST securityClassification);
 
-	xmlNodeAddContent(techName, BAD_CAST techName_content);
+	xmlNodeSetContent(techName, BAD_CAST techName_content);
 
 	if (strcmp(infoName_content, "") == 0) {
 		xmlUnlinkNode(infoName);
 		xmlFreeNode(infoName);
 	} else {
-		xmlNodeAddContent(infoName, BAD_CAST infoName_content);
+		xmlNodeSetContent(infoName, BAD_CAST infoName_content);
 	}
 
 	responsiblePartnerCompany = find_child(dmStatus, "responsiblePartnerCompany");
@@ -1359,12 +1436,15 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(template_dir);
+	free(sns_fname);
+	free(maint_sns);
 
 	xmlFree(remarks);
 
 	xmlFreeDoc(dm);
 
 	xmlCleanupParser();
+	xsltCleanupGlobals();
 
 	return 0;
 }

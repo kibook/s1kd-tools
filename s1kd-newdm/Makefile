@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=-Wall -Werror -pedantic-errors -g `pkg-config --cflags libxml-2.0 libxslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 SOURCE=s1kd-newdm.c
@@ -25,11 +25,15 @@ dmtypes.h: dmtypes.xml dmtypes.txt
 	xxd -i dmtypes.xml > dmtypes.h
 	xxd -i dmtypes.txt >> dmtypes.h
 
-$(OUTPUT): $(SOURCE) templates.h dmtypes.h
+sns.h: sns/*.XML
+	> sns.h
+	for s in sns/*.XML; do xxd -i $$s >> sns.h; done
+
+$(OUTPUT): $(SOURCE) templates.h dmtypes.h sns.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT) templates.h dmtypes.h
+	rm -f $(OUTPUT) templates.h dmtypes.h sns.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
