@@ -93,7 +93,9 @@ char issue_date[16] = "";
 
 xmlChar *remarks = NULL;
 
+/* Omit the issue information from the object filename. */
 bool no_issue = false;
+bool no_issue_set = false;
 
 enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
@@ -110,6 +112,10 @@ enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS
 #define DEFAULT_COUNTRY_ISO_CODE "ZZ"
 
 char *template_dir = NULL;
+
+/* Include the previous level of SNS title in a tech name. */
+bool sns_prev_title = false;
+bool sns_prev_title_set = false;
 
 enum issue get_issue(const char *iss)
 {
@@ -206,6 +212,7 @@ void show_help(void)
 	puts("  -q      Don't report an error if file exists.");
 	puts("  -S      Get tech name from BREX SNS.");
 	puts("  -M      Use one of the maintained SNS.");
+	puts("  -P      Include previous level of SNS in tech name.");
 	puts("  -v      Print file name of new data module.");
 	puts("  -$      Specify which S1000D issue to use.");
 	puts("  -@      Output to specified file.");
@@ -291,7 +298,7 @@ void copy_default_value(const char *key, const char *val)
 		sns_fname = strdup(val);
 	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(val);
-	else if (strcmp(key, "omitIssueInfo") == 0)
+	else if (strcmp(key, "omitIssueInfo") == 0 && !no_issue_set)
 		no_issue = strcasecmp(val, "true") == 0;
 	else if (strcmp(key, "remarks") == 0 && !remarks)
 		remarks = xmlStrdup(BAD_CAST val);
@@ -299,26 +306,27 @@ void copy_default_value(const char *key, const char *val)
 		template_dir = strdup(val);
 	else if (strcmp(key, "maintainedSns") == 0 && !maint_sns)
 		maint_sns = strdup(val);
+	else if (strcmp(key, "includePrevSnsTitle") == 0 && !sns_prev_title_set)
+		sns_prev_title = strcasecmp(val, "true") == 0;
 }
 
-xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
+xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	xmlNodePtr node;
+	xmlNodePtr first;
 
-	ctx = xmlXPathNewContext(doc);
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
+
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
-	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		node = NULL;
-	else
-		node = obj->nodesetval->nodeTab[0];
+	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 
-	return node;
+	return first;
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -340,7 +348,7 @@ void set_brex(xmlDocPtr doc, const char *code)
 	char learnCode[MAX_LEARN_CODE] = "";
 	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
 
-	dmCode = firstXPathNode(doc, "//brexDmRef/dmRef/dmRefIdent/dmCode");
+	dmCode = firstXPathNode(doc, NULL, "//brexDmRef/dmRef/dmRefIdent/dmCode");
 
 	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
 		modelIdentCode,
@@ -388,7 +396,23 @@ void set_sns_title(xmlNodePtr snsTitle)
 	char *title;
 
 	title = (char *) xmlNodeGetContent(snsTitle);
-	strcpy(techName_content, title);
+
+	strcpy(techName_content, "");
+
+	if (sns_prev_title) {
+		xmlNodePtr prev;
+		if ((prev = firstXPathNode(NULL, snsTitle, "parent::*/parent::*/snsTitle"))) {
+			char *p;
+			if (strcmp((p = (char *) xmlNodeGetContent(prev)), title) != 0) {
+				strcpy(techName_content, p);
+				strcat(techName_content, " - ");
+			}
+			xmlFree(p);
+		}
+	}
+
+	strcat(techName_content, title);
+
 	xmlFree(title);
 }
 
@@ -489,25 +513,25 @@ xmlDocPtr set_tech_from_sns(void)
 	}
 
 	sprintf(xpath, SNS_XPATH_1, systemCode, subSystemCode, subSubSystemCode, assyCode);
-	if ((snsTitle = firstXPathNode(brex, xpath))) {
+	if ((snsTitle = firstXPathNode(brex, NULL, xpath))) {
 		set_sns_title(snsTitle);
 		return brex;
 	}
 
 	sprintf(xpath, SNS_XPATH_2, systemCode, subSystemCode, subSubSystemCode);
-	if ((snsTitle = firstXPathNode(brex, xpath))) {
+	if ((snsTitle = firstXPathNode(brex, NULL, xpath))) {
 		set_sns_title(snsTitle);
 		return brex;
 	}
 
 	sprintf(xpath, SNS_XPATH_3, systemCode, subSystemCode);
-	if ((snsTitle = firstXPathNode(brex, xpath))) {
+	if ((snsTitle = firstXPathNode(brex, NULL, xpath))) {
 		set_sns_title(snsTitle);
 		return brex;
 	}
 
 	sprintf(xpath, SNS_XPATH_4, systemCode);
-	if ((snsTitle = firstXPathNode(brex, xpath))) {
+	if ((snsTitle = firstXPathNode(brex, NULL, xpath))) {
 		set_sns_title(snsTitle);
 		return brex;
 	}
@@ -970,7 +994,7 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 {
 	xmlNodePtr remarks;
 	
-	remarks = firstXPathNode(doc, "//remarks");
+	remarks = firstXPathNode(doc, NULL, "//remarks");
 
 	if (text) {
 		xmlNodePtr simplePara;
@@ -1074,7 +1098,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:h?")) != -1) {
+	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:Ph?")) != -1) {
 		switch (c) {
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -1092,7 +1116,7 @@ int main(int argc, char **argv)
 			case 'i': strcpy(infoName_content, optarg); break;
 			case 'T': strcpy(dmtype, optarg); break;
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
-			case 'N': no_issue = true; break;
+			case 'N': no_issue = true; no_issue_set = true; break;
 			case 's': strcpy(schema, optarg); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'S': sns_fname = strdup(optarg); break;
@@ -1102,13 +1126,14 @@ int main(int argc, char **argv)
 			case '$': issue = get_issue(optarg); break;
 			case '@': out = strdup(optarg); break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
-			case ',': print_dmtypes(); exit(0);
-			case '.': print_dmtypes_txt(); exit(0);
+			case ',': print_dmtypes(); return 0;
+			case '.': print_dmtypes_txt(); return 0;
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
 			case 'M': maint_sns = strdup(optarg); break;
+			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
 			case 'h':
-			case '?': show_help(); exit(0);
+			case '?': show_help(); return 0;
 		}
 	}
 

@@ -113,6 +113,17 @@ The CAGE code of the originator.
 -o &lt;orig&gt;  
 The originator enterprise name of the new data module.
 
+-P  
+When determining tech name from an SNS (-S or -M), include the previous level of SNS in the tech name. This means that:
+
+-   tech names derived from a subsystem will be formatted as "System - Subsystem"
+
+-   tech names derived from a subsubsystem will be formatted as "Subsystem - Subsubsystem"
+
+-   and tech names derived from an assembly will be formatted as "Subsubsystem - Assembly".
+
+If both levels have the same title, then only one will be used.
+
 -p  
 Prompts the user for any values left unspecified.
 

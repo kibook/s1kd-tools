@@ -166,6 +166,24 @@ The originator enterprise name of the new data module.
 .RS
 .RE
 .TP
+.B \-P
+When determining tech name from an SNS (\-S or \-M), include the
+previous level of SNS in the tech name.
+This means that:
+.RS
+.IP \[bu] 2
+tech names derived from a subsystem will be formatted as "System \-
+Subsystem"
+.IP \[bu] 2
+tech names derived from a subsubsystem will be formatted as "Subsystem
+\- Subsubsystem"
+.IP \[bu] 2
+and tech names derived from an assembly will be formatted as
+"Subsubsystem \- Assembly".
+.PP
+If both levels have the same title, then only one will be used.
+.RE
+.TP
 .B \-p
 Prompts the user for any values left unspecified.
 .RS
