@@ -180,6 +180,16 @@
               <row>
                 <entry>
                   <para>
+                    <verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>true or false</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
                     <verbatimText verbatimStyle="vs14">infoCodeVariant</verbatimText>
                   </para>
                 </entry>
@@ -280,11 +290,31 @@
               <row>
                 <entry>
                   <para>
+                    <verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
                     <verbatimText verbatimStyle="vs14">modelIdentCode</verbatimText>
                   </para>
                 </entry>
                 <entry>
                   <para>1 to 14 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>true or false</para>
                 </entry>
               </row>
               <row>
@@ -555,6 +585,7 @@
 <default ident="disassyCodeVariant" value="A"/>
 <default ident="disassyCode" value="00"/>
 <default ident="dmlType" value="C"/>
+<default ident="includePrevSnsTitle" value="true"/>
 <default ident="infoCodeVariant" value="A"/>
 <default ident="infoCode" value="040"/>
 <default ident="infoName" value="Description"/>
@@ -565,7 +596,9 @@
 <default ident="languageIsoCode" value="en"/>
 <default ident="learnCode" value="H10"/>
 <default ident="learnEventCode" value="A"/>
+<default ident="maintainedSns" value="General sea vehicles"/>
 <default ident="modelIdentCode" value="MYPRJ"/>
+<default ident="omitIssueInfo" value="true"/>
 <default ident="originatorCode" value="12345"/>
 <default ident="originator" value="khzae.net"/>
 <default ident="pmIssuer" value="12345"/>
@@ -606,6 +639,7 @@ country                        Canada
 disassyCodeVariant             A
 disassyCode                    00
 dmlType                        C
+includePrevSnsTitle            true
 infoCodeVariant                A
 infoCode                       040
 infoName                       Description
@@ -616,7 +650,9 @@ itemLocationCode               D
 languageIsoCode                en
 learnCode                      H10
 learnEventCode                 A
+maintainedSns                  General sea vehicles
 modelIdentCode                 MYPRJ
+omitIssueInfo                  true
 originatorCode                 12345
 originator                     khzae.net
 pmIssuer                       12345

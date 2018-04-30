@@ -19,6 +19,7 @@ Alphabetic index
 | `disassyCodeVariant`            | 1 to 3 alphanumeric characters           |
 | `disassyCode`                   | 2 alphanumeric characters                |
 | `dmlType`                       | C, P, or S                               |
+| `includePrevSnsTitle`           | true or false                            |
 | `infoCodeVariant`               | 1 alphanumeric character                 |
 | `infoCode`                      | 3 alphanumeric characters                |
 | `infoName`                      | string                                   |
@@ -29,7 +30,9 @@ Alphabetic index
 | `languageIsoCode`               | 2 to 3 character ISO language code       |
 | `learnCode`                     | 3 alphanumeric characters                |
 | `learnEventCode`                | A, B, C, D, or E                         |
+| `maintainedSns`                 | string                                   |
 | `modelIdentCode`                | 1 to 14 alphanumeric characters          |
+| `omitIssueInfo`                 | true or false                            |
 | `originatorCode`                | 5-character NCAGE code                   |
 | `originator`                    | string                                   |
 | `pmIssuer`                      | 5-character NCAGE code                   |
@@ -72,6 +75,7 @@ Example - XML format
     <default ident="disassyCodeVariant" value="A"/>
     <default ident="disassyCode" value="00"/>
     <default ident="dmlType" value="C"/>
+    <default ident="includePrevSnsTitle" value="true"/>
     <default ident="infoCodeVariant" value="A"/>
     <default ident="infoCode" value="040"/>
     <default ident="infoName" value="Description"/>
@@ -82,7 +86,9 @@ Example - XML format
     <default ident="languageIsoCode" value="en"/>
     <default ident="learnCode" value="H10"/>
     <default ident="learnEventCode" value="A"/>
+    <default ident="maintainedSns" value="General sea vehicles"/>
     <default ident="modelIdentCode" value="MYPRJ"/>
+    <default ident="omitIssueInfo" value="true"/>
     <default ident="originatorCode" value="12345"/>
     <default ident="originator" value="khzae.net"/>
     <default ident="pmIssuer" value="12345"/>
@@ -122,6 +128,7 @@ Example - Simple text format
     disassyCodeVariant             A
     disassyCode                    00
     dmlType                        C
+    includePrevSnsTitle            true
     infoCodeVariant                A
     infoCode                       040
     infoName                       Description
@@ -132,7 +139,9 @@ Example - Simple text format
     languageIsoCode                en
     learnCode                      H10
     learnEventCode                 A
+    maintainedSns                  General sea vehicles
     modelIdentCode                 MYPRJ
+    omitIssueInfo                  true
     originatorCode                 12345
     originator                     khzae.net
     pmIssuer                       12345
