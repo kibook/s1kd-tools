@@ -46,6 +46,9 @@
       <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
         <simplePara>Add -P option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
+        <simplePara>Include info on 'defaults' file keys.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -186,7 +189,7 @@
                 <para>The language ISO code of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003">
               <listItemTerm>-M &lt;SNS&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Determine the tech name from on one of the built-in S1000D maintained SNS. Supported SNS:</para>
@@ -218,7 +221,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>When creating a BREX data module, this SNS will be included as the SNS rules of the new data module.</para>
+                <para>When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "<verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>" 'defaults' file key can be used to set one of the above SNS as the default.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -230,7 +233,7 @@
             <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
-                <para>Omit issue/inwork numbers from filename.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0003">Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" 'defaults' file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -251,7 +254,7 @@
                 <para>The originator enterprise name of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0002 rfu-0003">
               <listItemTerm>-P</listItemTerm>
               <listItemDefinition>
                 <para>When determining tech name from an SNS (-S or -M), include the previous level of SNS in the tech name. This means that:</para>
@@ -268,7 +271,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>If both levels have the same title, then only one will be used.</para>
+                <para>If both levels have the same title, then only one will be used. The "<verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>" 'defaults' file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -298,7 +301,7 @@
             <definitionListItem>
               <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.</para>
+                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

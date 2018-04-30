@@ -139,6 +139,8 @@ General sea vehicles
 .PP
 When creating a BREX data module, this SNS will be included as the SNS
 rules of the new data module.
+The "\f[C]maintainedSns\f[]" \[aq]defaults\[aq] file key can be used to
+set one of the above SNS as the default.
 .RE
 .TP
 .B \-m <remarks>
@@ -148,6 +150,8 @@ Set remarks for the new data module.
 .TP
 .B \-N
 Omit issue/inwork numbers from filename.
+The "\f[C]omitIssueInfo\f[]" \[aq]defaults\[aq] file key can also be set
+to control this option.
 .RS
 .RE
 .TP
@@ -182,6 +186,8 @@ and tech names derived from an assembly will be formatted as
 "Subsubsystem \- Assembly".
 .PP
 If both levels have the same title, then only one will be used.
+The "\f[C]includePrevSnsTitle\f[]" \[aq]defaults\[aq] file key can also
+be set to control this option.
 .RE
 .TP
 .B \-p
@@ -208,7 +214,7 @@ The responsible partner company enterprise name of the new data module.
 Determine the tech name from the SNS rules of a specified BREX data
 module.
 This can also be specified in the \[aq]defaults\[aq] file with the key
-\[aq]sns\[aq].
+"\f[C]sns\f[]".
 .RS
 .RE
 .TP

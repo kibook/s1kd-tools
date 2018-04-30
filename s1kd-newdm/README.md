@@ -96,13 +96,13 @@ Determine the tech name from on one of the built-in S1000D maintained SNS. Suppo
 
 -   General sea vehicles
 
-When creating a BREX data module, this SNS will be included as the SNS rules of the new data module.
+When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "`maintainedSns`" 'defaults' file key can be used to set one of the above SNS as the default.
 
 -m &lt;remarks&gt;  
 Set remarks for the new data module.
 
 -N  
-Omit issue/inwork numbers from filename.
+Omit issue/inwork numbers from filename. The "`omitIssueInfo`" 'defaults' file key can also be set to control this option.
 
 -n &lt;issue&gt;  
 The issue number of the new data module.
@@ -122,7 +122,7 @@ When determining tech name from an SNS (-S or -M), include the previous level of
 
 -   and tech names derived from an assembly will be formatted as "Subsubsystem - Assembly".
 
-If both levels have the same title, then only one will be used.
+If both levels have the same title, then only one will be used. The "`includePrevSnsTitle`" 'defaults' file key can also be set to control this option.
 
 -p  
 Prompts the user for any values left unspecified.
@@ -137,7 +137,7 @@ The CAGE code of the responsible partner company.
 The responsible partner company enterprise name of the new data module.
 
 -S &lt;BREX&gt;  
-Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key 'sns'.
+Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key "`sns`".
 
 -s &lt;schema&gt;  
 The schema URL.
