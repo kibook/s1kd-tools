@@ -12,6 +12,7 @@
       <xsl:apply-templates select="default|type">
         <xsl:sort select="@ident|@infoCode"/>
       </xsl:apply-templates>
+      <xsl:apply-templates select="comment()"/>
     </xsl:copy>
   </xsl:template>
 
