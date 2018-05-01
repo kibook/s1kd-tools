@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="23"/>
+        <issueDate year="2018" month="05" day="01"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Update list of tools.</simplePara>
+        <simplePara>Reorganize manpage references.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add info on s1kd-icncatalog.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -88,11 +91,12 @@
                 <para>The <emphasis>s1kd-refls</emphasis> tool lists references in a CSDB object to generate a list of dependencies on other CSDB objects.</para>
                 <para>The <emphasis>s1kd-checkrefs</emphasis> tool validates references between CSDB objects.</para>
               </listItem>
-              <listItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItem>
                 <para><emphasis>Publication:</emphasis> These tools support the production of publications from a CSDB.</para>
                 <para>The <emphasis>s1kd-acronyms</emphasis> tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.</para>
                 <para>The <emphasis>s1kd-aspp</emphasis> tool preprocesses applicability statements in a data module, generating display text and "presentation" applicability statements.</para>
                 <para>The <emphasis>s1kd-flatten</emphasis> tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-icncatalog</emphasis> tool resolves ICN references in objects.</para>
                 <para>The <emphasis>s1kd-index</emphasis> tool flags index keywords in a data module based on a user-defined list.</para>
                 <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).</para>
                 <para>The <emphasis>s1kd-neutralize</emphasis> tool generates IETP neutral metadata for CSDB objects.</para>
@@ -105,7 +109,89 @@
       <levelledPara>
         <title>SEE ALSO</title>
         <para>S1000D website: <externalPubRef><externalPubRefIdent><externalPubTitle>http://www.s1000d.org</externalPubTitle></externalPubRefIdent></externalPubRef></para>
-        <para>s1kd-acronyms(1), s1kd-aspp(1), s1kd-addicn(1), s1kd-brexcheck(1), s1kd-checkrefs(1), s1kd-ls(1), s1kd-defaults(1), s1kd-dmrl(1), s1kd-flatten(1), s1kd-index(1), s1kd-instance(1), s1kd-metadata(1), s1kd-neutralize(1), s1kd-newcom(1), s1kd-newddn(1), s1kd-newdm(1), s1kd-newdml(1), s1kd-newimf(1), s1kd-newpm(1), s1kd-newupf(1), s1kd-ref(1), s1kd-syncrefs(1), s1kd-transform(1), s1kd-upissue(1), s1kd-validate(1)</para>
+        <para>Manpages for each tool:</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+          <randomList>
+            <listItem>
+              <para>s1kd-acronyms(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-aspp(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-addicn(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-brexcheck(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-checkrefs(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-ls(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-defaults(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-dmrl(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-flatten(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-icncatalog(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-index(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-instance(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-metadata(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-neutralize(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newcom(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newddn(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newdm(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newdml(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newimf(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newpm(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-newupf(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-ref(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-syncrefs(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-transform(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-upissue(1)</para>
+            </listItem>
+            <listItem>
+              <para>s1kd-validate(1)</para>
+            </listItem>
+          </randomList>
+        </para>
         <para>s1kd-defaults-file(5)</para>
       </levelledPara>
     </description>
