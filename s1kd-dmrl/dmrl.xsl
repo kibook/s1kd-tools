@@ -6,6 +6,7 @@
   <xsl:param name="no-issue" select="false()"/>
   <xsl:param name="overwrite" select="false()"/>
   <xsl:param name="no-overwrite-error" select="false()"/>
+  <xsl:param name="spec-issue"/>
 
   <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -17,12 +18,12 @@
   </xsl:template>
 
   <xsl:template match="dml">
-    <xsl:apply-templates select="dmlContent"/>
+    <xsl:apply-templates select="dmlContent|dmentry"/>
   </xsl:template>
 
-  <xsl:template match="dmlEntry">
+  <xsl:template match="dmlEntry|dmentry">
     <xsl:choose>
-      <xsl:when test="dmRef">
+      <xsl:when test="dmRef|addresdm">
         <xsl:text>s1kd-newdm</xsl:text>
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
@@ -47,6 +48,8 @@
         <xsl:text>s1kd-newimf</xsl:text>
       </xsl:when>
     </xsl:choose>
+    <xsl:text> -$ </xsl:text>
+    <xsl:value-of select="$spec-issue"/>
     <xsl:if test="$overwrite">
       <xsl:text> -f</xsl:text>
     </xsl:if>
@@ -57,7 +60,7 @@
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
-  <xsl:template match="dmCode|pmCode|commentCode|dmlCode">
+  <xsl:template match="dmCode|dmc|pmCode|commentCode|dmlCode">
     <xsl:text> -# </xsl:text>
     <xsl:apply-templates select="." mode="text"/>
   </xsl:template>
@@ -67,25 +70,29 @@
     <xsl:value-of select="@infoEntityRefIdent"/>
   </xsl:template>
 
-  <xsl:template match="dmCode" mode="text">
-    <xsl:value-of select="@modelIdentCode"/>
+  <xsl:template match="dmc" mode="text">
+    <xsl:apply-templates select="avee" mode="text"/>
+  </xsl:template>
+
+  <xsl:template match="dmCode|avee" mode="text">
+    <xsl:value-of select="@modelIdentCode|modelic"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@systemDiffCode"/>
+    <xsl:value-of select="@systemDiffCode|sdc"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@systemCode"/>
+    <xsl:value-of select="@systemCode|chapnum"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@subSystemCode"/>
-    <xsl:value-of select="@subSubSystemCode"/>
+    <xsl:value-of select="@subSystemCode|section"/>
+    <xsl:value-of select="@subSubSystemCode|subsect"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@assyCode"/>
+    <xsl:value-of select="@assyCode|subject"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@disassyCode"/>
-    <xsl:value-of select="@disassyCodeVariant"/>
+    <xsl:value-of select="@disassyCode|discode"/>
+    <xsl:value-of select="@disassyCodeVariant|discodev"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@infoCode"/>
-    <xsl:value-of select="@infoCodeVariant"/>
+    <xsl:value-of select="@infoCode|incode"/>
+    <xsl:value-of select="@infoCodeVariant|incodev"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@itemLocationCode"/>
+    <xsl:value-of select="@itemLocationCode|itemloc"/>
     <xsl:if test="@learnCode">
       <xsl:text>-</xsl:text>
       <xsl:value-of select="@learnCode"/>
@@ -186,9 +193,21 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="rpc">
+    <xsl:if test="text()">
+      <xsl:text> -R </xsl:text>
+      <xsl:apply-templates/>
+    </xsl:if>
+    <xsl:if test="@rpcname">
+      <xsl:text> -r "</xsl:text>
+      <xsl:value-of select="@rpcname"/>
+      <xsl:text>"</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="security">
     <xsl:text> -c </xsl:text>
-    <xsl:value-of select="@securityClassification"/>
+    <xsl:value-of select="@securityClassification|@class"/>
   </xsl:template>
 
 </xsl:stylesheet>
