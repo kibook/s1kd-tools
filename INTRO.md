@@ -131,4 +131,4 @@ Manpages for each tool:
 
 -   s1kd-validate(1)
 
-s1kd-defaults-file(5)
+s1kd-defaults(5)
