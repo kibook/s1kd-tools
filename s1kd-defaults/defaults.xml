@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <defaults>
+  <default ident="countryIsoCode" value="ZZ"/>
+  <default ident="inWork" value="01"/>
+  <default ident="issue" value="4.2"/>
+  <default ident="issueNumber" value="000"/>
+  <default ident="languageIsoCode" value="und"/>
+  <default ident="securityClassification" value="01"/>
   <!--<default ident="assyCode" value="00"/>-->
   <!--<default ident="authorization" value="khzae.net"/>-->
   <!--<default ident="brex" value="S1000D-F-04-10-0301-00A-022A-D"/>-->
@@ -7,19 +13,14 @@
   <!--<default ident="commentPriorityCode" value="cp01"/>-->
   <!--<default ident="commentType" value="Q"/>-->
   <!--<default ident="country" value="Canada"/>-->
-  <default ident="countryIsoCode" value="ZZ"/>
   <!--<default ident="disassyCode" value="00"/>-->
   <!--<default ident="disassyCodeVariant" value="A"/>-->
   <!--<default ident="dmlType" value="C"/>-->
   <!--<default ident="includePrevSnsTitle" value="false"/>-->
-  <default ident="inWork" value="01"/>
   <!--<default ident="infoCode" value="040"/>-->
   <!--<default ident="infoCodeVariant" value="A"/>-->
   <!--<default ident="infoName" value="Description"/>-->
-  <default ident="issue" value="4.2"/>
-  <default ident="issueNumber" value="000"/>
   <!--<default ident="itemLocationCode" value="D"/>-->
-  <default ident="languageIsoCode" value="und"/>
   <!--<default ident="learnCode" value="H10"/>-->
   <!--<default ident="learnEventCode" value="A"/>-->
   <!--<default ident="maintainedSns" value="Generic"/>-->
@@ -38,7 +39,6 @@
   <!--<default ident="responsiblePartnerCompany" value="khzae.net"/>-->
   <!--<default ident="responsiblePartnerCompanyCode" value="12345"/>-->
   <!--<default ident="schema" value="descript.xsd"/>-->
-  <default ident="securityClassification" value="01"/>
   <!--<default ident="senderIdent" value="12345"/>-->
   <!--<default ident="seqNumber" value="00001"/>-->
   <!--<default ident="sns" value="S1000D-F-04-10-0301-00A-022A-D"/>-->
