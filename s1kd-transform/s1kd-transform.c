@@ -76,7 +76,14 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 {
 	xmlDocPtr doc;
 
-	doc = xmlReadFile(path, NULL, 0);
+	/* Bug in libxml < 20902 where entities in DTD are substituted even when
+	 * XML_PARSE_NOENT is specified (default).
+	 */
+	if (LIBXML_VERSION < 20902) {
+		doc = xmlReadFile(path, NULL, XML_PARSE_NONET);
+	} else {
+		doc = xmlReadFile(path, NULL, 0);
+	}
 
 	doc = transformDoc(doc, stylesheets);
 
