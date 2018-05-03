@@ -1953,7 +1953,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Bug in libxml < 20902 where entities in DTD are substituted even
-	 * when XML_PARSE_NOENT is specified (default). Denying network access
+	 * when XML_PARSE_NOENT is not specified (default). Denying network access
 	 * prevents it from substituting the %ISOEntities; parameter in the DTD
 	 */
 	if (LIBXML_VERSION < 20902) {
