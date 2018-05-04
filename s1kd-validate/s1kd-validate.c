@@ -5,6 +5,7 @@
 #include <libxml/tree.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/debugXML.h>
+#include <libxml/xinclude.h>
 
 #define PROGNAME "s1kd-validate"
 
@@ -88,17 +89,18 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-flvqD] <dms>");
+	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-Dflqvx] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d <dir> Search for schemas in <dir> instead of using the URL.");
-	puts("  -X <URI> Exclude namespace from validation by URI.");
-	puts("  -f       List invalid files.");
-	puts("  -l       Treat input as list of filenames.");
-	puts("  -v       Verbose output.");
-	puts("  -q       Silent (not output).");
-	puts("  -D       Debug output.");
-	puts("  <dms>    Any number of data modules to validate.");
+	puts("  -D        Debug output.");
+	puts("  -d <dir>  Search for schemas in <dir> instead of using the URL.");
+	puts("  -f        List invalid files.");
+	puts("  -l        Treat input as list of filenames.");
+	puts("  -q        Silent (not output).");
+	puts("  -v        Verbose output.");
+	puts("  -X <URI>  Exclude namespace from validation by URI.");
+	puts("  -x        Do XInclude processing before validation.");
+	puts("  <object>  Any number of CSDB objects to validate.");
 }
 
 void add_ignore_ns(xmlNodePtr ignore_ns, const char *arg)
@@ -164,7 +166,7 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 	return err;
 }
 
-int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list)
+int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list, int xinclude)
 {
 	xmlDocPtr doc;
 	xmlNodePtr dmodule;
@@ -173,6 +175,10 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	int err = 0;
 
 	doc = xmlReadFile(fname, NULL, 0);
+
+	if (xinclude) {
+		xmlXIncludeProcess(doc);
+	}
 
 	if (ignore_ns->children) {
 		xmlNodePtr cur;
@@ -256,7 +262,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	return err;
 }
 
-int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns, int list_invalid)
+int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns, int list_invalid, int xinclude)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -272,7 +278,7 @@ int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\n");
-		err += validate_file(path, schema_dir, ignore_ns, list_invalid);
+		err += validate_file(path, schema_dir, ignore_ns, list_invalid, xinclude);
 	}
 
 	if (fname) {
@@ -289,18 +295,20 @@ int main(int argc, char *argv[])
 	int err = 0;
 	int list_invalid = 0;
 	int is_list = 0;
+	int xinclude = 0;
 
 	xmlNodePtr ignore_ns;
 
 	ignore_ns = xmlNewNode(NULL, BAD_CAST "ignorens");
 
-	while ((c = getopt(argc, argv, "vqDd:X:flh?")) != -1) {
+	while ((c = getopt(argc, argv, "vqDd:X:xflh?")) != -1) {
 		switch (c) {
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 'D': verbosity = DEBUG; break;
 			case 'd': strcpy(schema_dir, optarg); break;
 			case 'X': add_ignore_ns(ignore_ns, optarg); break;
+			case 'x': xinclude = 1; break;
 			case 'f': list_invalid = 1; break;
 			case 'l': is_list = 1; break;
 			case 'h': 
@@ -316,15 +324,15 @@ int main(int argc, char *argv[])
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (is_list) {
-				err += validate_file_list(argv[i], schema_dir, ignore_ns, list_invalid);
+				err += validate_file_list(argv[i], schema_dir, ignore_ns, list_invalid, xinclude);
 			} else {
-				err += validate_file(argv[i], schema_dir, ignore_ns, list_invalid);
+				err += validate_file(argv[i], schema_dir, ignore_ns, list_invalid, xinclude);
 			}
 		}
 	} else if (is_list) {
-		err = validate_file_list(NULL, schema_dir, ignore_ns, list_invalid);
+		err = validate_file_list(NULL, schema_dir, ignore_ns, list_invalid, xinclude);
 	} else {
-		err = validate_file("-", schema_dir, ignore_ns, list_invalid);
+		err = validate_file("-", schema_dir, ignore_ns, list_invalid, xinclude);
 	}
 
 	for (i = 0; i < schema_parser_count; ++i) {

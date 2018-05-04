@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="2" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="06"/>
+        <issueDate year="2018" month="05" day="04"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,10 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -l option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Use generic term "CSDB object" instead of "data module".</simplePara>
+        <simplePara>Add -x option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,17 +49,17 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-validate - Validate S1000D CSDB objects against their schemas</para>
+        <para>s1kd-validate - Validate S1000D CSDB objects against their schemas</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-lvqD] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-Dflqvx] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-validate</emphasis> tool validates S1000D CSDB objects, checking whether they are valid XML files and if they are valid against their own S1000D schemas.</para>
+        <para>The <emphasis>s1kd-validate</emphasis> tool validates S1000D CSDB objects, checking whether they are valid XML files and if they are valid against their own S1000D schemas.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -99,7 +96,13 @@
                 <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
+              <listItemTerm>-x</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing before validation.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;object&gt;...</listItemTerm>
               <listItemDefinition>
                 <para>Any number of CSDB objects to validate. If none are specified, input is read from stdin.</para>
