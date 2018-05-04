@@ -17,10 +17,25 @@
 #define EXIT_MISSING_SCHEMA 2
 #define EXIT_BAD_IDREF 3
 
+#define S_BAD_IDREF ERR_PREFIX "No matching ID for '%s' (%s line %u).\n"
+
 #define INVALID_ID_XPATH BAD_CAST \
-	"//@internalRefId[not(//@id = .)]|" \
-        "//@applicRefId[not(//@id = .)]|" \
-	"//@nextActionRefId[not(//@id = .)]"
+	"//@applicMapRefId[not(//@id=.)]|" \
+        "//@applicRefId[not(//@id=.)]|" \
+	"//@condRefId[not(//@id=.)]|" \
+	"//@condTypeRefId[not(//@id=.)]|" \
+	"//@conditionidref[not(//@id=.)]|" \
+	"//@condtyperef[not(//@id=.)]|" \
+	"//@dependencyTest[not(//@id=.)]|" \
+	"//@derivativeClassificationRefId[not(//@id = .)]|" \
+	"//@internalRefId[not(//@id=.)]|" \
+	"//@nextActionRefId[not(//@id=.)]|" \
+	"//@refapplic[not(//@id=.)]|" \
+	"//@refid[not(//@id=.)]|" \
+	"//@xrefid[not(//id=.)]"
+
+#define INVALID_IDS_XPATH BAD_CAST \
+	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs"
 
 enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
 
@@ -137,6 +152,9 @@ void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
 	xmlXPathFreeContext(ctxt);
 }
 
+/* Check that certain attributes of type xs:IDREF and xs:IDREFS have a matching
+ * xs:ID attribute.
+ */
 int check_idrefs(xmlDocPtr doc, const char *fname)
 {
 	xmlXPathContextPtr ctx;
@@ -145,6 +163,7 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 
 	ctx = xmlXPathNewContext(doc);
 
+	/* Check xs:IDREF */
 	obj = xmlXPathEvalExpression(INVALID_ID_XPATH, ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
@@ -152,7 +171,11 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 			int i;
 			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 				xmlChar *id = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
-				fprintf(stderr, ERR_PREFIX "No matching ID for '%s' (%s line %u).\n", (char *) id, fname, obj->nodesetval->nodeTab[i]->parent->line);
+				fprintf(stderr,
+					S_BAD_IDREF,
+					(char *) id,
+					fname,
+					obj->nodesetval->nodeTab[i]->parent->line);
 				xmlFree(id);
 			}
 		}
@@ -161,6 +184,43 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 	}
 
 	xmlXPathFreeObject(obj);
+
+	/* Check xs:IDREFS */
+	obj = xmlXPathEvalExpression(INVALID_IDS_XPATH, ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char *ids, *id = NULL;
+
+			ids = (char *) xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+
+			while ((id = strtok(id ? NULL : ids, " "))) {
+				xmlChar xpath[256];
+				xmlXPathObjectPtr res;
+
+				xmlStrPrintf(xpath, 256, "//*[@id='%s']", id);
+
+				res = xmlXPathEvalExpression(xpath, ctx);
+
+				if (xmlXPathNodeSetIsEmpty(res->nodesetval)) {
+					if (verbosity > SILENT) {
+						fprintf(stderr,
+							S_BAD_IDREF,
+							id,
+							fname,
+							obj->nodesetval->nodeTab[i]->parent->line);
+					}
+					err = EXIT_BAD_IDREF;
+				}
+			}
+
+			xmlFree(ids);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+
 	xmlXPathFreeContext(ctx);
 
 	return err;
@@ -188,6 +248,10 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		}
 	}
 
+	/* This shouldn't be needed because the xs:ID, xs:IDREF and xs:IDREFS
+	 * are defined in the schema, but at this time libxml2 does not check
+	 * these when validating.
+	 */
 	err += check_idrefs(doc, fname);
 
 	dmodule = xmlDocGetRootElement(doc);
