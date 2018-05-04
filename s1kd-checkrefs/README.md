@@ -74,3 +74,22 @@ Example:
     </externalPubAddressItems>
     </externalPubAddress>
     </externalPubs>
+
+EXAMPLES
+========
+
+Validate all references in all data modules:
+
+    $ s1kd-checkrefs DMC-*.XML
+
+Validate references in a single data module:
+
+    $ s1kd-checkrefs -t <DM> DMC-*.XML
+
+Update all references in all data modules:
+
+    $ s1kd-checkrefs -u DMC-*.XML
+
+Change references from one data module to another in all data modules:
+
+    $ s1kd-checkrefs -s <old DM> -m <new DM> DMC-*.XML
