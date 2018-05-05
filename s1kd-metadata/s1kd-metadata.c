@@ -74,6 +74,13 @@ xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
 	return first;
 }
 
+char *first_xpath_string(xmlNodePtr node, const char *expr)
+{
+	xmlNodePtr first;
+	first = first_xpath_node_local(node, expr);
+	return (char *) xmlNodeGetContent(first);
+}
+
 void show_issue_date(xmlNodePtr issue_date, int endl)
 {
 	char *year, *month, *day;
@@ -121,8 +128,16 @@ int edit_simple_node(xmlNodePtr node, const char *val)
 
 int create_info_name(xmlXPathContextPtr ctxt, const char *val)
 {
-	xmlNodePtr tech_name = first_xpath_node("//dmAddressItems/dmTitle/techName", ctxt);
-	xmlNodePtr info_name = xmlNewNode(NULL, BAD_CAST "infoName");
+	xmlNodePtr tech_name, info_name;
+
+	tech_name = first_xpath_node("//techName|//techname", ctxt);
+
+	if (xmlStrcmp(tech_name->name, BAD_CAST "techName") == 0) {
+		info_name = xmlNewNode(NULL, BAD_CAST "infoName");
+	} else {
+		info_name = xmlNewNode(NULL, BAD_CAST "infoname");
+	}
+
 	info_name = xmlAddNextSibling(tech_name, info_name);
 	xmlNodeSetContent(info_name, BAD_CAST val);
 
@@ -143,53 +158,66 @@ int edit_simple_attr(xmlNodePtr node, const char *attr, const char *val)
 	return 0;
 }
 
-int create_simple_attr(xmlXPathContextPtr ctxt, const char *nodepath, const char *attr, const char *val)
-{
-	xmlXPathObjectPtr results;
-	xmlNodePtr node;
-
-	results = xmlXPathEvalExpression(BAD_CAST nodepath, ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
-		node = results->nodesetval->nodeTab[0];
-		xmlSetProp(node, BAD_CAST attr, BAD_CAST val);
-	}
-
-	xmlXPathFreeObject(results);
-
-	return 0;
-}
-
 void show_ent_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "enterpriseCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0 || xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "enterpriseCode", endl);
+	}
 }
 
 int edit_ent_code(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "enterpriseCode", val);
+	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0 || xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "enterpriseCode", val);
+	}
 }
 
 int create_rpc_ent_code(xmlXPathContextPtr ctxt, const char *val)
 {
-	create_simple_attr(ctxt, "//dmStatus/responsiblePartnerCompany", "enterpriseCode", val);
+	xmlNodePtr node;
+	node = first_xpath_node("//rpc|//responsiblePartnerCompany", ctxt);
+
+	if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
+		edit_simple_node(node, val);
+	} else {
+		edit_simple_attr(node, "enterpriseCode", val);
+	}
 	return 0;
 }
 
 int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
 {
-	create_simple_attr(ctxt, "//dmStatus/originator", "enterpriseCode", val);
+	xmlNodePtr node;
+	node = first_xpath_node("//orig|//originator", ctxt);
+
+	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
+		edit_simple_node(node, val);
+	} else {
+		edit_simple_attr(node, "enterpriseCode", val);
+	}
 	return 0;
 }
 
 void show_sec_class(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "securityClassification", endl);
+	if (xmlHasProp(node, BAD_CAST "securityClassification")) {
+		show_simple_attr(node, "securityClassification", endl);
+	} else {
+		show_simple_attr(node, "class", endl);
+	}
 }
 
 int edit_sec_class(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "securityClassification", val);
+	if (xmlHasProp(node, BAD_CAST "securityClassification")) {
+		return edit_simple_attr(node, "securityClassification", val);
+	} else {
+		return edit_simple_attr(node, "class", val);
+	}
 }
 
 void show_schema(xmlNodePtr node, int endl)
@@ -221,23 +249,52 @@ void show_type(xmlNodePtr node, int endl)
 
 void show_dmcode(xmlNodePtr node, int endl)
 {
-	char *model_ident_code      = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
-	char *system_diff_code      = (char *) xmlGetProp(node, BAD_CAST "systemDiffCode");
-	char *system_code           = (char *) xmlGetProp(node, BAD_CAST "systemCode");
-	char *sub_system_code       = (char *) xmlGetProp(node, BAD_CAST "subSystemCode");
-	char *sub_sub_system_code   = (char *) xmlGetProp(node, BAD_CAST "subSubSystemCode");
-	char *assy_code             = (char *) xmlGetProp(node, BAD_CAST "assyCode");
-	char *disassy_code          = (char *) xmlGetProp(node, BAD_CAST "disassyCode");
-	char *disassy_code_variant  = (char *) xmlGetProp(node, BAD_CAST "disassyCodeVariant");
-	char *info_code             = (char *) xmlGetProp(node, BAD_CAST "infoCode");
-	char *info_code_variant     = (char *) xmlGetProp(node, BAD_CAST "infoCodeVariant");
-	char *item_location_code    = (char *) xmlGetProp(node, BAD_CAST "itemLocationCode");
-	char *learn_code            = (char *) xmlGetProp(node, BAD_CAST "learnCode");
-	char *learn_event_code      = (char *) xmlGetProp(node, BAD_CAST "learnEventCode");
-
+	char *model_ident_code;
+	char *system_diff_code;
+	char *system_code;
+	char *sub_system_code;
+	char *sub_sub_system_code;
+	char *assy_code;
+	char *disassy_code;
+	char *disassy_code_variant;
+	char *info_code;
+	char *info_code_variant;
+	char *item_location_code;
+	char *learn_code;
+	char *learn_event_code;
 	char learn[6] = "";
 
-	if (learn_code && learn_event_code) sprintf(learn, "-%s%s", learn_code, learn_event_code);
+	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0) {
+		model_ident_code      = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
+		system_diff_code      = (char *) xmlGetProp(node, BAD_CAST "systemDiffCode");
+		system_code           = (char *) xmlGetProp(node, BAD_CAST "systemCode");
+		sub_system_code       = (char *) xmlGetProp(node, BAD_CAST "subSystemCode");
+		sub_sub_system_code   = (char *) xmlGetProp(node, BAD_CAST "subSubSystemCode");
+		assy_code             = (char *) xmlGetProp(node, BAD_CAST "assyCode");
+		disassy_code          = (char *) xmlGetProp(node, BAD_CAST "disassyCode");
+		disassy_code_variant  = (char *) xmlGetProp(node, BAD_CAST "disassyCodeVariant");
+		info_code             = (char *) xmlGetProp(node, BAD_CAST "infoCode");
+		info_code_variant     = (char *) xmlGetProp(node, BAD_CAST "infoCodeVariant");
+		item_location_code    = (char *) xmlGetProp(node, BAD_CAST "itemLocationCode");
+		learn_code            = (char *) xmlGetProp(node, BAD_CAST "learnCode");
+		learn_event_code      = (char *) xmlGetProp(node, BAD_CAST "learnEventCode");
+
+		if (learn_code && learn_event_code) sprintf(learn, "-%s%s", learn_code, learn_event_code);
+	} else {
+		model_ident_code     = first_xpath_string(node, "modelic");
+		system_diff_code     = first_xpath_string(node, "sdc");
+		system_code          = first_xpath_string(node, "chapnum");
+		sub_system_code      = first_xpath_string(node, "section");
+		sub_sub_system_code  = first_xpath_string(node, "subsect");
+		assy_code            = first_xpath_string(node, "subject");
+		disassy_code         = first_xpath_string(node, "discode");
+		disassy_code_variant = first_xpath_string(node, "discodev");
+		info_code            = first_xpath_string(node, "incode");
+		info_code_variant    = first_xpath_string(node, "incodev");
+		item_location_code   = first_xpath_string(node, "itemloc");
+		learn_code = NULL;
+		learn_event_code = NULL;
+	}
 
 	printf("%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
 		model_ident_code,
@@ -305,21 +362,35 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 		return EXIT_INVALID_VALUE;
 	}
 
-	edit_simple_attr(node, "modelIdentCode", model_ident_code);
-	edit_simple_attr(node, "systemDiffCode", system_diff_code);
-	edit_simple_attr(node, "systemCode", system_code);
-	edit_simple_attr(node, "subSystemCode", sub_system_code);
-	edit_simple_attr(node, "subSubSystemCode", sub_sub_system_code);
-	edit_simple_attr(node, "assyCode", assy_code);
-	edit_simple_attr(node, "disassyCode", disassy_code);
-	edit_simple_attr(node, "disassyCodeVariant", disassy_code_variant);
-	edit_simple_attr(node, "infoCode", info_code);
-	edit_simple_attr(node, "infoCodeVariant", info_code_variant);
-	edit_simple_attr(node, "itemLocationCode", item_location_code);
+	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0) {
+		edit_simple_attr(node, "modelIdentCode", model_ident_code);
+		edit_simple_attr(node, "systemDiffCode", system_diff_code);
+		edit_simple_attr(node, "systemCode", system_code);
+		edit_simple_attr(node, "subSystemCode", sub_system_code);
+		edit_simple_attr(node, "subSubSystemCode", sub_sub_system_code);
+		edit_simple_attr(node, "assyCode", assy_code);
+		edit_simple_attr(node, "disassyCode", disassy_code);
+		edit_simple_attr(node, "disassyCodeVariant", disassy_code_variant);
+		edit_simple_attr(node, "infoCode", info_code);
+		edit_simple_attr(node, "infoCodeVariant", info_code_variant);
+		edit_simple_attr(node, "itemLocationCode", item_location_code);
 
-	if (n == 13) {
-		edit_simple_attr(node, "learnCode", learn_code);
-		edit_simple_attr(node, "learnEventCode", learn_event_code);
+		if (n == 13) {
+			edit_simple_attr(node, "learnCode", learn_code);
+			edit_simple_attr(node, "learnEventCode", learn_event_code);
+		}
+	} else {
+		edit_simple_node(first_xpath_node_local(node, "modelic"), model_ident_code);
+		edit_simple_node(first_xpath_node_local(node, "sdc"), system_diff_code);
+		edit_simple_node(first_xpath_node_local(node, "chapnum"), system_code);
+		edit_simple_node(first_xpath_node_local(node, "section"), sub_system_code);
+		edit_simple_node(first_xpath_node_local(node, "subsect"), sub_sub_system_code);
+		edit_simple_node(first_xpath_node_local(node, "subject"), assy_code);
+		edit_simple_node(first_xpath_node_local(node, "discode"), disassy_code);
+		edit_simple_node(first_xpath_node_local(node, "discodev"), disassy_code_variant);
+		edit_simple_node(first_xpath_node_local(node, "incode"), info_code);
+		edit_simple_node(first_xpath_node_local(node, "incodev"), info_code_variant);
+		edit_simple_node(first_xpath_node_local(node, "itemloc"), item_location_code);
 	}
 
 	return 0;
@@ -327,37 +398,65 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 
 void show_issue_type(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "issueType", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
+		show_simple_attr(node, "type", endl);
+	} else {
+		show_simple_attr(node, "issueType", endl);
+	}
 }
 
 int edit_issue_type(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "issueType", val);
+	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
+		return edit_simple_attr(node, "type", val);
+	} else {
+		return edit_simple_attr(node, "issueType", val);
+	}
 }
 
 void show_language_iso_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "languageIsoCode", endl);
+	if (xmlHasProp(node, BAD_CAST "languageIsoCode")) {
+		show_simple_attr(node, "languageIsoCode", endl);
+	} else {
+		show_simple_attr(node, "language", endl);
+	}
 }
 
 int edit_language_iso_code(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "languageIsoCode", val);
+	if (xmlHasProp(node, BAD_CAST "languageIsoCode")) {
+		return edit_simple_attr(node, "languageIsoCode", val);
+	} else {
+		return edit_simple_attr(node, "language", val);
+	}
 }
 
 void show_country_iso_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "countryIsoCode", endl);
+	if (xmlHasProp(node, BAD_CAST "countryIsoCode")) {
+		show_simple_attr(node, "countryIsoCode", endl);
+	} else {
+		show_simple_attr(node, "country", endl);
+	}
 }
 
 int edit_country_iso_code(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "countryIsoCode", val);
+	if (xmlHasProp(node, BAD_CAST "countryIsoCode")) {
+		return edit_simple_attr(node, "countryIsoCode", val);
+	} else {
+		return edit_simple_attr(node, "country", val);
+	}
 }
 
 void show_issue_number(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "issueNumber", endl);
+	if (xmlHasProp(node, BAD_CAST "issueNumber")) {
+		show_simple_attr(node, "issueNumber", endl);
+	} else {
+		show_simple_attr(node, "issno", endl);
+	}
 }
 
 int edit_issue_number(xmlNodePtr node, const char *val)
@@ -367,7 +466,11 @@ int edit_issue_number(xmlNodePtr node, const char *val)
 
 void show_in_work(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "inWork", endl);
+	if (xmlHasProp(node, BAD_CAST "inWork")) {
+		show_simple_attr(node, "inWork", endl);
+	} else {
+		show_simple_attr(node, "inwork", endl);
+	}
 }
 
 int edit_in_work(xmlNodePtr node, const char *val)
@@ -410,11 +513,19 @@ void show_comment_code(xmlNodePtr node, int endl)
 	char *seq_number;
 	char *comment_type;
 
-	model_ident_code   = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
-	sender_ident       = (char *) xmlGetProp(node, BAD_CAST "senderIdent");
-	year_of_data_issue = (char *) xmlGetProp(node, BAD_CAST "yearOfDataIssue");
-	seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
-	comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
+	if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0) {
+		model_ident_code   = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
+		sender_ident       = (char *) xmlGetProp(node, BAD_CAST "senderIdent");
+		year_of_data_issue = (char *) xmlGetProp(node, BAD_CAST "yearOfDataIssue");
+		seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
+		comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
+	} else {
+		model_ident_code   = first_xpath_string(node, "modelic");
+		sender_ident       = first_xpath_string(node, "sendid");
+		year_of_data_issue = first_xpath_string(node, "diyear");
+		seq_number         = first_xpath_string(node, "seqnum");
+		comment_type       = first_xpath_string(node, "ctype/@type");
+	}
 
 	printf("%s-%s-%s-%s-%s",
 		model_ident_code,
@@ -433,22 +544,38 @@ void show_comment_code(xmlNodePtr node, int endl)
 
 void show_comment_priority(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "commentPriorityCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "priority") == 0) {
+		show_simple_attr(node, "cprio", endl);
+	} else {
+		show_simple_attr(node, "commentPriorityCode", endl);
+	}
 }
 
 int edit_comment_priority(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "commentPriorityCode", val);
+	if (xmlStrcmp(node->name, BAD_CAST "priority") == 0) {
+		return edit_simple_attr(node, "cprio", val);
+	} else {
+		return edit_simple_attr(node, "commentPriorityCode", val);
+	}
 }
 
 void show_comment_response(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "responseType", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "response") == 0) {
+		show_simple_attr(node, "rsptype", endl);
+	} else {
+		show_simple_attr(node, "responseType", endl);
+	}
 }
 
 int edit_comment_response(xmlNodePtr node, const char *val)
 {
-	return edit_simple_attr(node, "responseType", val);
+	if (xmlStrcmp(node->name, BAD_CAST "response") == 0) {
+		return edit_simple_attr(node, "rsptype", val);
+	} else {
+		return edit_simple_attr(node, "responseType", val);
+	}
 }
 
 int create_ent_name(xmlNodePtr node, const char *val)
@@ -459,17 +586,27 @@ int create_ent_name(xmlNodePtr node, const char *val)
 int create_rpc_name(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
-	node = first_xpath_node("//responsiblePartnerCompany", ctxt);
-	if (!node) return EXIT_INVALID_CREATE;
-	return create_ent_name(node, val);
+	node = first_xpath_node("//responsiblePartnerCompany|//rpc", ctxt);
+	if (!node) {
+		return EXIT_INVALID_CREATE;
+	} else if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
+		return edit_simple_attr(node, "rpcname", val);
+	} else {
+		return create_ent_name(node, val);
+	}
 }
 
 int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
-	node = first_xpath_node("//originator", ctxt);
-	if (!node) return EXIT_INVALID_CREATE;
-	return create_ent_name(node, val);
+	node = first_xpath_node("//originator|//orig", ctxt);
+	if (!node) {
+		return EXIT_INVALID_CREATE;
+	} else if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
+		return edit_simple_attr(node, "origname", val);
+	} else {
+		return create_ent_name(node, val);
+	}
 }
 
 void show_url(xmlNodePtr node, int endl)
@@ -480,11 +617,11 @@ void show_url(xmlNodePtr node, int endl)
 
 void show_title(xmlNodePtr node, int endl)
 {
-	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0) {
+	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0 || xmlStrcmp(node->name, BAD_CAST "dmtitle") == 0) {
 		xmlNodePtr tech, info;
 		xmlChar *tech_content;
-		tech = first_xpath_node_local(node, "techName");
-		info = first_xpath_node_local(node, "infoName");
+		tech = first_xpath_node_local(node, "techName|techname");
+		info = first_xpath_node_local(node, "infoName|infoname");
 		tech_content = xmlNodeGetContent(tech);
 		printf("%s", (char *) tech_content);
 		xmlFree(tech_content);
@@ -502,57 +639,101 @@ void show_title(xmlNodePtr node, int endl)
 
 void show_model_ident_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "modelIdentCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "modelic") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "modelIdentCode", endl);
+	}
 }
 
 void show_system_diff_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "systemDiffCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "sdc") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "systemDiffCode", endl);
+	}
 }
 
 void show_system_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "systemCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "chapnum") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "systemCode", endl);
+	}
 }
 
 void show_sub_system_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "subSystemCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "section") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "subSystemCode", endl);
+	}
 }
 
 void show_sub_sub_system_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "subSubSystemCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "subsect") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "subSubSystemCode", endl);
+	}
 }
 
 void show_assy_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "assyCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "subject") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "assyCode", endl);
+	}
 }
 
 void show_disassy_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "disassyCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "discode") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "disassyCode", endl);
+	}
 }
 
 void show_disassy_code_variant(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "disassyCodeVariant", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "discodev") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "disassyCodeVariant", endl);
+	}
 }
 
 void show_info_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "infoCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "incode") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "infoCode", endl);
+	}
 }
 
 void show_info_code_variant(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "infoCodeVariant", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "incodev") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "infoCodeVariant", endl);
+	}
 }
 
 void show_item_location_code(xmlNodePtr node, int endl)
 {
-	show_simple_attr(node, "itemLocationCode", endl);
+	if (xmlStrcmp(node->name, BAD_CAST "itemloc") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "itemLocationCode", endl);
+	}
 }
 
 void show_learn_code(xmlNodePtr node, int endl)
@@ -573,73 +754,73 @@ struct metadata metadata[] = {
 		create_act_ref,
 		"ACT data module code"},
 	{"applic",
-		"//applic/displayText/simplePara",
+		"//applic/displayText/simplePara|//applic/displaytext/p",
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Whole data module applicability"},
 	{"assyCode",
-		"//@assyCode",
+		"//@assyCode|//avee/subject",
 		show_assy_code,
 		NULL,
 		NULL,
 		"Assembly code"},
 	{"authorization",
-		"//ddnStatus/authorization",
+		"//authorization|//authrtn",
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Authorization for a DDN"},
 	{"brex",
-		"//brexDmRef/dmRef/dmRefIdent/dmCode",
+		"//brexDmRef/dmRef/dmRefIdent/dmCode|//brexref/refdm/avee",
 		show_dmcode,
 		edit_dmcode,
 		NULL,
 		"BREX data module code"},
 	{"commentCode",
-		"//commentIdent/commentCode",
+		"//commentCode|//ccode",
 		show_comment_code,
 		NULL,
 		NULL,
 		"Comment code"},
 	{"commentPriority",
-		"//commentStatus/commentPriority/@commentPriorityCode",
+		"//commentPriority/@commentPriorityCode|//priority/@cprio",
 		show_comment_priority,
 		edit_comment_priority,
 		NULL,
 		"Priority code of a comment"},
 	{"commentResponse",
-		"//commentStatus/commentResponse/@responseType",
+		"//commentResponse/@responseType|//response/@rsptype",
 		show_comment_response,
 		edit_comment_response,
 		NULL,
 		"Response type of a comment"},
 	{"commentTitle",
-		"//commentAddressItems/commentTitle",
+		"//commentTitle|//ctitle",
 		show_simple_node,
 		edit_simple_node,
 		create_comment_title,
 		"Title of a comment"},
 	{"countryIsoCode",
-		"//language/@countryIsoCode",
+		"//language/@countryIsoCode|//language/@country",
 		show_country_iso_code,
 		edit_country_iso_code,
 		NULL,
 		"Country ISO code (CA, US, GB...)"},
 	{"disassyCode",
-		"//@disassyCode",
+		"//@disassyCode|//discode",
 		show_disassy_code,
 		NULL,
 		NULL,
 		"Disassembly code"},
 	{"disassyCodeVariant",
-		"//@disassyCodeVariant",
+		"//@disassyCodeVariant|//discodev",
 		show_disassy_code_variant,
 		NULL,
 		NULL,
 		"Disassembly code variant"},
 	{"dmCode",
-		"//dmIdent/dmCode",
+		"//dmIdent/dmCode|//avee",
 		show_dmcode,
 		NULL,
 		NULL,
@@ -657,55 +838,55 @@ struct metadata metadata[] = {
 		NULL,
 		"Title of an IMF"},
 	{"infoCode",
-		"//@infoCode",
+		"//@infoCode|//incode",
 		show_info_code,
 		NULL,
 		NULL,
 		"Information code"},
 	{"infoCodeVariant",
-		"//@infoCodeVariant",
+		"//@infoCodeVariant|//incodev",
 		show_info_code_variant,
 		NULL,
 		NULL,
 		"Information code variant"},
 	{"infoName",
-		"//dmAddressItems/dmTitle/infoName",
+		"//infoName|//infoname",
 		show_simple_node,
 		edit_info_name,
 		create_info_name,
 		"Information name of a data module"},
 	{"inWork",
-		"//issueInfo/@inWork",
+		"//issueInfo/@inWork|//issno/@inwork",
 		show_in_work,
 		edit_in_work,
 		NULL,
 		"Inwork issue number (NN)"},
 	{"issueDate",
-	 	"//issueDate",
+	 	"//issueDate|//issdate",
 		show_issue_date,
 		edit_issue_date,
 		NULL,
 		"Issue date in ISO 8601 format (YYYY-MM-DD)"},
 	{"issueNumber",
-		"//issueInfo/@issueNumber",
+		"//issueInfo/@issueNumber|//issno/@issno",
 		show_issue_number,
 		edit_issue_number,
 		NULL,
 		"Issue number (NNN)"},
 	{"issueType",
-		"//dmStatus/@issueType|//pmStatus/@issueType",
+		"//dmStatus/@issueType|//pmStatus/@issueType|//issno/@type",
 		show_issue_type,
 		edit_issue_type,
 		NULL,
 		"Issue type (new, changed, deleted...)"},
 	{"itemLocationCode",
-		"//@itemLocationCode",
+		"//@itemLocationCode|//itemloc",
 		show_item_location_code,
 		NULL,
 		NULL,
 		"Item location code"},
 	{"languageIsoCode",
-		"//language/@languageIsoCode",
+		"//language/@languageIsoCode|//language/@language",
 		show_language_iso_code,
 		edit_language_iso_code,
 		NULL,
@@ -723,19 +904,19 @@ struct metadata metadata[] = {
 		NULL,
 		"Learn event code"},
 	{"modelIdentCode",
-		"//@modelIdentCode",
+		"//@modelIdentCode|//modelic",
 		show_model_ident_code,
 		NULL,
 		NULL,
 		"Model identification code"},
 	{"originator",
-		"//originator/enterpriseName",
+		"//originator/enterpriseName|//orig/@origname",
 		show_simple_node,
 		edit_simple_node,
 		create_orig_name,
 		"Name of the originator"},
 	{"originatorCode",
-		"//originator/@enterpriseCode",
+		"//originator/@enterpriseCode|//orig[. != '']",
 		show_ent_code,
 		edit_ent_code,
 		create_orig_ent_code,
@@ -747,19 +928,19 @@ struct metadata metadata[] = {
 		NULL,
 		"Filesystem path of object"},
 	{"pmTitle",
-		"//pmAddressItems/pmTitle",
+		"//pmTitle|//pmtitle",
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Title of a publication module"},
 	{"responsiblePartnerCompany",
-		"//responsiblePartnerCompany/enterpriseName",
+		"//responsiblePartnerCompany/enterpriseName|//rpc/@rpcname",
 		show_simple_node,
 		edit_simple_node,
 		create_rpc_name,
 		"Name of the RPC"},
 	{"responsiblePartnerCompanyCode",
-		"//responsiblePartnerCompany/@enterpriseCode",
+		"//responsiblePartnerCompany/@enterpriseCode|//rpc[. != '']",
 		show_ent_code,
 		edit_ent_code,
 		create_rpc_ent_code,
@@ -771,50 +952,49 @@ struct metadata metadata[] = {
 		NULL,
 		"XML schema URI"},
 	{"securityClassification",
-		"//security",
+		"//security/@securityClassification|//security/@class",
 		show_sec_class,
 		edit_sec_class,
 		NULL,
 		"Security classification (01, 02...)"},
 	{"shortPmTitle",
-		"//pmAddressItems/shortPmTitle",
+		"//shortPmTitle",
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Short title of a publication module"},
 	{"subSubSystemCode",
-		"//@subSubSystemCode",
+		"//@subSubSystemCode|//subsect",
 		show_sub_sub_system_code,
 		NULL,
 		NULL,
 		"Subsubsystem code"},
 	{"subSystemCode",
-		"//@subSystemCode",
+		"//@subSystemCode|//section",
 		show_sub_system_code,
 		NULL,
 		NULL,
 		"Subsystem code"},
 	{"systemCode",
-		"//@systemCode",
+		"//@systemCode|//chapnum",
 		show_system_code,
 		NULL,
 		NULL,
 		"System code"},
 	{"systemDiffCode",
-		"//@systemDiffCode",
+		"//@systemDiffCode|//sdc",
 		show_system_diff_code,
 		NULL,
 		NULL,
 		"System difference code"},
 	{"techName",
-		"//dmAddressItems/dmTitle/techName",
+		"//techName|//techname",
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Technical name of a data module"},
 	{"title",
-		"//dmAddressItems/dmTitle|//pmAddressItems/pmTitle|"
-		"//commentAddressItems/commentTitle|//imfAddressItems/icnTitle",
+		"//dmTitle|//dmtitle|//pmTitle|//pmtitle|//commentTitle|//ctitle|//icnTitle",
 		show_title,
 		NULL,
 		NULL,
