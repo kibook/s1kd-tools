@@ -1,23 +1,23 @@
 NAME
 ====
 
-s1kd-transform - Apply XSL transformations to data modules
+s1kd-transform - Apply XSL transformations to CSDB objects
 
 SYNOPSIS
 ========
 
-    s1kd-transform [-s <stylesheet> ...] [-o <file>] [-ifh?] [<data module> ...]
+    s1kd-transform [-s <stylesheet> ...] [-o <file>] [-ifh?] [<object> ...]
 
 DESCRIPTION
 ===========
 
-Applies an XSLT stylesheet to S1000D data modules. The DTD of any specified data modules is preserved in the resulting output.
+Applies an XSLT stylesheet to S1000D CSDB objects. The DTD of any specified objects is preserved in the resulting output, which leaves external entities such as ICN references intact.
 
 OPTIONS
 =======
 
 -f  
-Overwrite the specified data module(s) instead of writing to stdout.
+Overwrite the specified CSDB object(s) instead of writing to stdout.
 
 -h -?  
 Show usage message.
@@ -26,13 +26,13 @@ Show usage message.
 Includes an "identity" template in to each specified stylesheet.
 
 -o &lt;file&gt;  
-Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single data module.
+Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single CSDB object.
 
 -s &lt;stylesheet&gt;  
-An XSLT stylesheet file to apply to each data module. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.
+An XSLT stylesheet file to apply to each CSDB object. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.
 
-&lt;data module&gt; ...  
-Any number of data modules to apply all specified stylesheets to.
+&lt;object&gt; ...  
+Any number of CSDB objects to apply all specified stylesheets to.
 
 Identity template
 -----------------

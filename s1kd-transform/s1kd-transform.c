@@ -98,14 +98,15 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-transform [-h?] [-s <stylesheet> ...] [-i] [-o <file>] <datamodules>");
+	puts("Usage: s1kd-transform [-fih?] [-s <stylesheet> ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?    Show usage message.");
-	puts("  -s <stylesheet>  Apply XSLT stylesheet to data modules.");
-	puts("  -i               Include identity template.");
-	puts("  -o <file>        Output to <path> instead of overwriting (- for stdout).");
-	puts("  <datamodules>    Data modules to apply transformations to.");
+	puts("  -h -?            Show usage message.");
+	puts("  -f               Overwrite input CSDB objects.");
+	puts("  -i               Include identity template in stylesheets.");
+	puts("  -o <file>        Output result of transformation to <path>.");
+	puts("  -s <stylesheet>  Apply XSLT stylesheet to CSDB objects.");
+	puts("  <object>         CSDB objects to apply transformations to.");
 }
 
 int main(int argc, char **argv)

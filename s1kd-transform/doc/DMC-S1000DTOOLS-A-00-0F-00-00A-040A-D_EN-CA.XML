@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="F" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="23"/>
+        <issueDate year="2018" month="05" day="06"/>
         <dmTitle>
           <techName>s1kd-transform(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+        <simplePara>Use "CSDB object" instead of "data module".</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -47,26 +47,26 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-transform - Apply XSL transformations to data modules</para>
+        <para>s1kd-transform - Apply XSL transformations to CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
-          <verbatimText verbatimStyle="vs24">s1kd-transform [-s &lt;stylesheet&gt; ...] [-o &lt;file&gt;] [-ifh?] [&lt;data module&gt; ...]</verbatimText>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-transform [-s &lt;stylesheet&gt; ...] [-o &lt;file&gt;] [-ifh?] [&lt;object&gt; ...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>Applies an XSLT stylesheet to S1000D data modules. The DTD of any specified data modules is preserved in the resulting output.</para>
+        <para>Applies an XSLT stylesheet to S1000D CSDB objects. The DTD of any specified objects is preserved in the resulting output, which leaves external entities such as ICN references intact.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>Overwrite the specified data module(s) instead of writing to stdout.</para>
+                <para>Overwrite the specified CSDB object(s) instead of writing to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -84,19 +84,19 @@
             <definitionListItem>
               <listItemTerm>-o &lt;file&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single data module.</para>
+                <para>Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single CSDB object.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-s &lt;stylesheet&gt;</listItemTerm>
               <listItemDefinition>
-                <para>An XSLT stylesheet file to apply to each data module. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.</para>
+                <para>An XSLT stylesheet file to apply to each CSDB object. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>&lt;data module&gt; ...</listItemTerm>
+              <listItemTerm>&lt;object&gt; ...</listItemTerm>
               <listItemDefinition>
-                <para>Any number of data modules to apply all specified stylesheets to.</para>
+                <para>Any number of CSDB objects to apply all specified stylesheets to.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
