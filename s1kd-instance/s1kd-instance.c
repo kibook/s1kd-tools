@@ -1956,9 +1956,9 @@ int main(int argc, char **argv)
 	 * when XML_PARSE_NOENT is not specified (default). Denying network access
 	 * prevents it from substituting the %ISOEntities; parameter in the DTD
 	 */
-	if (LIBXML_VERSION < 20902) {
+	#if LIBXML_VERSION < 20902
 		parseopts |= XML_PARSE_NONET;
-	}
+	#endif
 
 	while (1) {
 		bool ispm;
