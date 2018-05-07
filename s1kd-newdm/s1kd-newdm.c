@@ -117,6 +117,15 @@ char *template_dir = NULL;
 bool sns_prev_title = false;
 bool sns_prev_title_set = false;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
@@ -503,7 +512,7 @@ xmlDocPtr set_tech_from_sns(void)
 	char fname[PATH_MAX];
 
 	if (sns_fname && find_brex_file(fname, sns_fname)) {
-		brex = xmlReadFile(fname, NULL, 0);
+		brex = xmlReadFile(fname, NULL, PARSE_OPTS);
 	} else if (maint_sns) {
 		brex = maint_sns_doc();
 	}
@@ -586,7 +595,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			exit(EXIT_UNKNOWN_DMTYPE);
 		}
 
-		return xmlReadFile(src, NULL, 0);
+		return xmlReadFile(src, NULL, PARSE_OPTS);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
 			case ISS_20:
@@ -1137,7 +1146,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
@@ -1197,7 +1206,7 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(dmtype, "") == 0 || strcmp(infoName_content, "") == 0) {
-		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			process_dmtypes_xml(defaults_xml);
 			xmlFreeDoc(defaults_xml);
 		} else if ((defaults = fopen(dmtypes_fname, "r"))) {

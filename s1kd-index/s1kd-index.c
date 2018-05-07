@@ -13,6 +13,15 @@
 #define PRE_TERM_DELIM BAD_CAST " "
 #define POST_TERM_DELIM BAD_CAST " .,"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 /* Help/usage message */
 void show_help(void)
 {
@@ -141,7 +150,7 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	index_obj = xmlXPathEvalExpression(BAD_CAST "//indexFlag", index_ctx);
 	flags = index_obj->nodesetval;
 
-	doc = xmlReadFile(path, NULL, 0);
+	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 	doc_ctx = xmlXPathNewContext(doc);
 
 	if (!xmlXPathNodeSetIsEmpty(flags)) {
@@ -177,7 +186,7 @@ int main(int argc, char **argv)
 				break;
 			case 'I':
 				if (!index_doc) {
-					index_doc = xmlReadFile(optarg, NULL, 0);
+					index_doc = xmlReadFile(optarg, NULL, PARSE_OPTS);
 				}
 				break;
 			case 'i':

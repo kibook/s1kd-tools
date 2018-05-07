@@ -6,6 +6,15 @@
 #include <libxml/tree.h>
 #include <libxml/valid.h>
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 void showHelp(void)
 {
 	puts("Usage: s1kd-addicn [-s <src>] [-o <out>] [-fh?] <ICN>...");
@@ -87,7 +96,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	doc = xmlReadFile(src, NULL, 0);
+	doc = xmlReadFile(src, NULL, PARSE_OPTS);
 
 	for (i = optind; i < argc; ++i) {
 		addIcn(doc, argv[i], fullpath);

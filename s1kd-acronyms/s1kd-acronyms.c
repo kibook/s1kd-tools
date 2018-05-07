@@ -21,6 +21,15 @@
 #define PRE_ACRONYM_DELIM BAD_CAST " "
 #define POST_ACRONYM_DELIM BAD_CAST " .,"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 bool prettyPrint = false;
 int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
@@ -45,7 +54,7 @@ void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 	xmlDocPtr doc, styleDoc, result;
 	xsltStylesheetPtr style;
 
-	if (!(doc = xmlReadFile(path, NULL, 0))) {
+	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
 		return;
 	}
 
@@ -435,7 +444,7 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 {
 	xmlDocPtr doc;
 
-	if (!(doc = xmlReadFile(path, NULL, 0))) {
+	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
 		return;
 	}
 
@@ -518,7 +527,7 @@ void deleteAcronymsInFile(const char *fname, const char *out)
 {
 	xmlDocPtr doc;
 
-	doc = xmlReadFile(fname, NULL, 0);
+	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
 	
 	deleteAcronyms(doc);
 
@@ -662,7 +671,7 @@ int main(int argc, char **argv)
 	} else if (markup) {
 		xmlDocPtr termStylesheetDoc, idStylesheetDoc;
 
-		doc = xmlReadFile(markup, NULL, 0);
+		doc = xmlReadFile(markup, NULL, PARSE_OPTS);
 		doc = sortAcronyms(doc);
 		acronyms = xmlDocGetRootElement(doc);
 

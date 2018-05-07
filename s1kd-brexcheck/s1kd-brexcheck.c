@@ -57,6 +57,15 @@
 
 #define PROGRESS_BAR_WIDTH 60
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
 
 enum verbosity verbose = NORMAL;
@@ -680,7 +689,7 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 	for (i = 0; i < nbrex_fnames; ++i) {
 		xmlDocPtr brex;
 
-		brex = xmlReadFile(brex_fnames[i], NULL, 0);
+		brex = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
 
 		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
 
@@ -804,7 +813,7 @@ int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames,
 	for (i = 0; i < nbrex_fnames; ++i) {
 		xmlDocPtr brex;
 
-		brex = xmlReadFile(brex_fnames[i], NULL, 0);
+		brex = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
 
 		xmlAddChild(notationRuleGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//notationRuleList"), 1));
 
@@ -853,7 +862,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlXPathContextPtr context;
 		xmlXPathObjectPtr result;
 
-		brex_doc = xmlReadFile(brex_fnames[i], NULL, 0);
+		brex_doc = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
 
 		if (!brex_doc) {
 			if (verbose > SILENT) {
@@ -1003,7 +1012,7 @@ int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[B
 		char fname[PATH_MAX];
 		bool found;
 
-		doc = xmlReadFile(fnames[i], NULL, 0);
+		doc = xmlReadFile(fnames[i], NULL, PARSE_OPTS);
 
 		found = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
 
@@ -1165,7 +1174,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (brsl_fname) {
-		brsl = xmlReadFile(brsl_fname, NULL, 0);
+		brsl = xmlReadFile(brsl_fname, NULL, PARSE_OPTS);
 	}
 
 	outdoc = xmlNewDoc(BAD_CAST "1.0");
@@ -1182,7 +1191,7 @@ int main(int argc, char *argv[])
 		 * module which referenced it. */
 		bool ref_brex = false;
 
-		dmod_doc = xmlReadFile(dmod_fnames[i], NULL, 0);
+		dmod_doc = xmlReadFile(dmod_fnames[i], NULL, PARSE_OPTS);
 
 		if (!dmod_doc) {
 			if (use_stdin) {

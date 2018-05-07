@@ -12,13 +12,22 @@
 
 #define PROG_NAME "s1kd-neutralize"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 void neutralizeFile(const char *fname, const char *outfile, bool overwrite)
 {
 	xmlDocPtr doc, res, styledoc, orig;
 	xsltStylesheetPtr style;
 	xmlNodePtr oldroot;
 
-	orig = xmlReadFile(fname, NULL, 0);
+	orig = xmlReadFile(fname, NULL, PARSE_OPTS);
 
 	doc = xmlCopyDoc(orig, 1);
 

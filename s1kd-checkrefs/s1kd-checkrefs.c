@@ -21,6 +21,15 @@
 #define REFS_PATH BAD_CAST "//dmRef|//pmRef"
 #define REFS_PATH_EXT BAD_CAST "//dmRef|//pmRef|//externalPubRef"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 bool verbose = false;
 bool validateOnly = true;
 bool failOnInvalid = false;
@@ -585,7 +594,7 @@ void addAddress(const char *fname, xmlNodePtr addresses)
 	xmlDocPtr doc;
 	xmlNodePtr root;
 
-	doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
+	doc = xmlReadFile(fname, NULL, PARSE_OPTS|XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
 
 	if (!doc)
 		return;
@@ -627,12 +636,12 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	xmlXPathObjectPtr obj;
 	xmlNodePtr recodeIdent;
 
-	if (!(doc = xmlReadFile(fname, NULL, XML_PARSE_NOWARNING|XML_PARSE_NOERROR))) {
+	if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS|XML_PARSE_NOWARNING|XML_PARSE_NOERROR))) {
 		return;
 	}
 
 	if (recode) {
-		recodeDoc = xmlReadFile(recode, NULL, 0);
+		recodeDoc = xmlReadFile(recode, NULL, PARSE_OPTS);
 		recodeIdent = firstXPathNode("//dmAddress|//pmAddress", recodeDoc, NULL);
 	} else {
 		recodeIdent = NULL;

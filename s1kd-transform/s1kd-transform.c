@@ -11,6 +11,15 @@
 
 bool includeIdentity = false;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 void addIdentity(xmlDocPtr style)
 {
 	xmlDocPtr identity;
@@ -46,7 +55,7 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 
 		path = xmlNodeGetContent(cur);
 
-		styledoc = xmlReadFile((char *) path, NULL, 0);
+		styledoc = xmlReadFile((char *) path, NULL, PARSE_OPTS);
 
 		if (includeIdentity) {
 			addIdentity(styledoc);
@@ -76,14 +85,7 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 {
 	xmlDocPtr doc;
 
-	/* Bug in libxml < 20902 where entities in DTD are substituted even when
-	 * XML_PARSE_NOENT is not specified (default).
-	 */
-	#if LIBXML_VERSION < 20902
-		doc = xmlReadFile(path, NULL, XML_PARSE_NONET);
-	#else
-		doc = xmlReadFile(path, NULL, 0);
-	#endif
+	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 
 	doc = transformDoc(doc, stylesheets);
 

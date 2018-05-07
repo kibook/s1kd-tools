@@ -70,6 +70,15 @@ enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS
 
 char *template_dir = NULL;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
@@ -81,7 +90,7 @@ xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return xmlReadFile(src, NULL, 0);
+		return xmlReadFile(src, NULL, PARSE_OPTS);
 	} else {
 		return xmlReadMemory((const char *) pm_xml, pm_xml_len, NULL, NULL, 0);
 	}
@@ -258,7 +267,7 @@ void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool in
 		return;
 	}
 
-	dmodule = xmlReadFile(path, NULL, 0);
+	dmodule = xmlReadFile(path, NULL, PARSE_OPTS);
 	ctx = xmlXPathNewContext(dmodule);
 
 	ident_extension = first_xpath_node("//dmIdent/identExtension", ctx);
@@ -581,7 +590,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+	defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
 
 	if (defaults_xml) {
 		xmlNodePtr cur;

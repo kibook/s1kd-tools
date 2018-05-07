@@ -28,6 +28,15 @@ xmlChar *dmApplicId;
  * Read from elements_list.h*/
 xmlChar *applicElemsXPath;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 char *customGenDispTextXsl = NULL;
 
 /* Return the first node matching an XPath expression. */
@@ -217,7 +226,7 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 		xmlDocPtr act;
 		xmlChar *path;
 		path = xmlNodeGetContent(cur);
-		act = xmlReadFile((char *) path, NULL, 0);
+		act = xmlReadFile((char *) path, NULL, PARSE_OPTS);
 		xmlAddChild(muxacts, xmlCopyNode(xmlDocGetRootElement(act), 1));
 		xmlFreeDoc(act);
 		xmlFree(path);
@@ -226,14 +235,14 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 		xmlDocPtr cct;
 		xmlChar *path;
 		path = xmlNodeGetContent(cur);
-		cct = xmlReadFile((char *) path, NULL, 0);
+		cct = xmlReadFile((char *) path, NULL, PARSE_OPTS);
 		xmlAddChild(muxccts, xmlCopyNode(xmlDocGetRootElement(cct), 1));
 		xmlFreeDoc(cct);
 		xmlFree(path);
 	}
 
 	if (customGenDispTextXsl) {
-		styledoc = xmlReadFile(customGenDispTextXsl, NULL, 0);
+		styledoc = xmlReadFile(customGenDispTextXsl, NULL, PARSE_OPTS);
 	} else {
 		styledoc = xmlReadMemory((const char *) generateDisplayText_xsl,
 			generateDisplayText_xsl_len, NULL, NULL, 0);
@@ -287,7 +296,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
-	doc = xmlReadFile(in, NULL, 0);
+	doc = xmlReadFile(in, NULL, PARSE_OPTS);
 
 	if (xincl) {
 		xmlXIncludeProcess(doc);

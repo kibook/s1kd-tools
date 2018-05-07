@@ -14,6 +14,15 @@
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 void showHelp(void)
 {
 	puts("Usage: s1kd-dmrl [-FfNsh?] <DML>...");
@@ -83,7 +92,7 @@ int main(int argc, char **argv)
 		const char *params[9];
 		char iss[8];
 
-		in = xmlReadFile(argv[i], NULL, 0);
+		in = xmlReadFile(argv[i], NULL, PARSE_OPTS);
 
 		params[0] = "no-issue";
 		params[1] = noIssue ? "true()" : "false()";

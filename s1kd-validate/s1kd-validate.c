@@ -37,6 +37,15 @@
 #define INVALID_IDS_XPATH BAD_CAST \
 	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
 
 /* Cache schemas to prevent parsing them twice (mainly needed when accessing
@@ -234,7 +243,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	struct s1kd_schema_parser *parser;
 	int err = 0;
 
-	doc = xmlReadFile(fname, NULL, 0);
+	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
 
 	if (xinclude) {
 		xmlXIncludeProcess(doc);

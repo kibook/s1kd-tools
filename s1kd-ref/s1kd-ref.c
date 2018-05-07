@@ -19,6 +19,15 @@
 #define OPT_LANG  (int) 0x04
 #define OPT_DATE  (int) 0x08
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 bool hasopt(int opts, int opt)
 {
 	return (opts & opt) == opt;
@@ -203,7 +212,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_pm_issue_date = NULL;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			ref_pm_address = first_xpath_node(doc, NULL, "//pmAddress");
 			ref_pm_ident = find_child(ref_pm_address, "pmIdent");
 			ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
@@ -387,7 +396,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dm_issue_date = NULL;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			ref_dm_address = first_xpath_node(doc, NULL, "//dmAddress");
 			ref_dm_ident = find_child(ref_dm_address, "dmIdent");
 			ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
@@ -504,7 +513,7 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_comment_ident;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			ref_comment_address = first_xpath_node(doc, NULL, "//commentAddress");
 			ref_comment_ident = find_child(ref_comment_address, "commentIdent");
 		}
@@ -575,7 +584,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dml_ident;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			ref_dml_address = first_xpath_node(doc, NULL, "//dmlAddress");
 			ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
 		}
@@ -644,7 +653,7 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 	xmlDocPtr doc;
 	xmlNodePtr refs;
 
-	if (!(doc = xmlReadFile(src, NULL, 0))) {
+	if (!(doc = xmlReadFile(src, NULL, PARSE_OPTS))) {
 		fprintf(stderr, ERR_PREFIX "Could not read source data module: %s\n", src);
 		exit(EXIT_MISSING_FILE);
 	}

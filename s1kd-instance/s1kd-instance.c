@@ -30,6 +30,15 @@
 #define DEFAULT_ORIG_CODE "S1KDI"
 #define DEFAULT_ORIG_NAME "s1kd-instance tool"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 /* Convenient structure for all strings related to uniquely identifying a
  * CSDB object.
  */
@@ -1433,7 +1442,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 
 	xmlDocPtr styledoc = NULL;
 
-	cir = xmlReadFile(cirdocfname, NULL, 0);
+	cir = xmlReadFile(cirdocfname, NULL, PARSE_OPTS);
 
 	if (!cir) {
 		fprintf(stderr, ERR_PREFIX "%s is not a valid CIR data module.\n", cirdocfname);
@@ -1468,7 +1477,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 	cirtype = (char *) cirnode->name;
 
 	if (cir_xsl) {
-		styledoc = xmlReadFile(cir_xsl, NULL, 0);
+		styledoc = xmlReadFile(cir_xsl, NULL, PARSE_OPTS);
 	} else {
 		unsigned char *xsl = NULL;
 		unsigned int len = 0;
@@ -1675,7 +1684,7 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	xmlXPathObjectPtr obj;
 	char xpath[256];
 
-	pct = xmlReadFile(pctfname, NULL, 0);
+	pct = xmlReadFile(pctfname, NULL, PARSE_OPTS);
 
 	ctx = xmlXPathNewContext(pct);
 
@@ -1847,10 +1856,7 @@ int main(int argc, char **argv)
 	char *origspec = NULL;
 	bool flat_alts = false;
 
-	int parseopts = 0;
-
 	xmlNodePtr cirs, cir;
-
 
 	exsltRegisterAll();
 
@@ -1952,14 +1958,6 @@ int main(int argc, char **argv)
 		++napplics;
 	}
 
-	/* Bug in libxml < 20902 where entities in DTD are substituted even
-	 * when XML_PARSE_NOENT is not specified (default). Denying network access
-	 * prevents it from substituting the %ISOEntities; parameter in the DTD
-	 */
-	#if LIBXML_VERSION < 20902
-		parseopts |= XML_PARSE_NONET;
-	#endif
-
 	while (1) {
 		bool ispm;
 
@@ -1968,7 +1966,7 @@ int main(int argc, char **argv)
 			strtok(src, "\t\n");
 		}
 
-		doc = xmlReadFile(src, NULL, parseopts);
+		doc = xmlReadFile(src, NULL, PARSE_OPTS);
 
 		if (!doc) {
 			fprintf(stderr, ERR_PREFIX "%s does not contain valid XML.\n",

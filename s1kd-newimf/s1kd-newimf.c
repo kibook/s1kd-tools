@@ -46,6 +46,15 @@ char issue_date[16] = "";
 
 char *template_dir = NULL;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
@@ -57,7 +66,7 @@ xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return xmlReadFile(src, NULL, 0);
+		return xmlReadFile(src, NULL, PARSE_OPTS);
 	} else {
 		return xmlReadMemory((const char *) icnmetadata_xml, icnmetadata_xml_len, NULL, NULL, 0);
 	}
@@ -292,7 +301,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {

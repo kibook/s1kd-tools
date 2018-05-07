@@ -14,6 +14,15 @@
 #define EXIT_NO_OVERWRITE 2
 #define EXIT_BAD_FILENAME 3
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-dviNrRqI] [-s <status>] [-1 <type>] [-2 <type>] <datamodules>");
@@ -328,7 +337,7 @@ int main(int argc, char **argv)
 			exit(EXIT_NO_FILE);
 		}
 
-		dmdoc = xmlReadFile(dmfile, NULL, XML_PARSE_NONET | XML_PARSE_NOERROR);
+		dmdoc = xmlReadFile(dmfile, NULL, PARSE_OPTS | XML_PARSE_NONET | XML_PARSE_NOERROR);
 
 		if (dmdoc) {
 			issueInfo = firstXPathNode("//issueInfo|//issno", dmdoc);

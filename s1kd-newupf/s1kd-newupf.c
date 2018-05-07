@@ -53,6 +53,15 @@ typedef enum {
 
 char *templateDir = NULL;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 enum issue getIssue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0) {
@@ -553,7 +562,7 @@ xmlDocPtr xmlSkeleton(const char *templateDir)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return xmlReadFile(src, NULL, 0);
+		return xmlReadFile(src, NULL, PARSE_OPTS);
 	} else {
 		return xmlReadMemory((const char *) update_xml, update_xml_len, NULL, NULL, 0);
 	}
@@ -630,10 +639,10 @@ int main(int argc, char **argv)
 	source = argv[optind];
 	target = argv[optind + 1];
 
-	sourceDoc = xmlReadFile(source, NULL, 0);
-	targetDoc = xmlReadFile(target, NULL, 0);
+	sourceDoc = xmlReadFile(source, NULL, PARSE_OPTS);
+	targetDoc = xmlReadFile(target, NULL, PARSE_OPTS);
 
-	if ((defaultsXml = xmlReadFile(defaultsFname, NULL, XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if ((defaultsXml = xmlReadFile(defaultsFname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaultsXml)->children; cur; cur = cur->next) {

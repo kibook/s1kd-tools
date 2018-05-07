@@ -8,6 +8,15 @@
 
 #define PROG_NAME "s1kd-flatten"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 int xinclude = 0;
 int no_issue = 0;
 
@@ -177,7 +186,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 					xi = xmlAddPrevSibling(pm_ref, xi);
 				}
 			} else {
-				doc = xmlReadFile(fs_pm_fname, NULL, XML_PARSE_NONET);
+				doc = xmlReadFile(fs_pm_fname, NULL, PARSE_OPTS);
 				pm = xmlDocGetRootElement(doc);
 				xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
 				xmlFreeDoc(doc);
@@ -315,7 +324,7 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 					xi = xmlAddPrevSibling(dm_ref, xi);
 				}
 			} else {
-				doc = xmlReadFile(fs_dm_fname, NULL, XML_PARSE_NONET);
+				doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
 				dmodule = xmlDocGetRootElement(doc);
 				xmlAddPrevSibling(dm_ref, xmlCopyNode(dmodule, 1));
 				xmlFreeDoc(doc);
@@ -383,7 +392,7 @@ int main(int argc, char **argv)
 		pm_fname = "-";
 	}
 
-	pm_doc = xmlReadFile(pm_fname, NULL, 0);
+	pm_doc = xmlReadFile(pm_fname, NULL, PARSE_OPTS);
 
 	pm = xmlDocGetRootElement(pm_doc);
 

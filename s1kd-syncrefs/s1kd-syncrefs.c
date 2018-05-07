@@ -23,6 +23,15 @@ struct ref {
 
 bool only_delete = false;
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 bool contains_code(struct ref refs[256], int n, const char *code)
 {
 	int i;
@@ -286,7 +295,7 @@ int main(int argc, char *argv[])
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			dm = xmlReadFile(argv[i], NULL, XML_PARSE_NONET);
+			dm = xmlReadFile(argv[i], NULL, PARSE_OPTS);
 
 			dmodule = xmlDocGetRootElement(dm);
 
@@ -301,7 +310,7 @@ int main(int argc, char *argv[])
 			xmlFreeDoc(dm);
 		}
 	} else {
-		dm = xmlReadFile("-", NULL, XML_PARSE_NONET);
+		dm = xmlReadFile("-", NULL, PARSE_OPTS);
 		dmodule = xmlDocGetRootElement(dm);
 		sync_refs(dmodule);
 		xmlSaveFile(out, dm);

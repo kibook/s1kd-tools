@@ -16,6 +16,15 @@
 #define DEFAULT_DEFAULTS_FNAME "defaults"
 #define DEFAULT_DMTYPES_FNAME "dmtypes"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 enum format {TEXT, XML};
 enum file {NONE, DEFAULTS, DMTYPES};
 
@@ -79,7 +88,7 @@ xmlDocPtr text_defaults_to_xml(const char *path)
 		return NULL;
 	}
 
-	if ((doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if ((doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
 		return doc;
 	}
 
@@ -118,7 +127,7 @@ xmlDocPtr text_dmtypes_to_xml(const char *path)
 	xmlDocPtr doc;
 	xmlNodePtr dmtypes;
 
-	if ((doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if ((doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
 		return doc;
 	}
 
@@ -272,7 +281,7 @@ void xml_to_text(const char *path, enum file f, bool overwrite, bool sort)
 {
 	xmlDocPtr doc, res = NULL;
 
-	if (!(doc = xmlReadFile(path, NULL, XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
 		doc = simple_text_to_xml(path, f, sort);
 	}
 

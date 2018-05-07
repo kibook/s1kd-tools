@@ -12,6 +12,15 @@
 #define PROG_NAME "s1kd-icncatalog"
 #define DEFAULT_CATALOG_NAME "icncatalog.xml"
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 /* Not exposed by the libxml API */
 static void xmlFreeEntity(xmlEntityPtr entity)
 {
@@ -155,7 +164,7 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 	xmlXPathObjectPtr obj;
 	xmlChar xpath[256];
 
-	doc = xmlReadFile(fname, NULL, 0);
+	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
 
 	if (xinclude) {
 		xmlXIncludeProcess(doc);
@@ -347,7 +356,7 @@ int main(int argc, char **argv)
 	if (createnew || access(icns_fname, F_OK) == -1) {
 		icns = xmlReadMemory((const char *) icncatalog_xml, icncatalog_xml_len, NULL, NULL, 0);
 	} else {
-		icns = xmlReadFile(icns_fname, NULL, 0);
+		icns = xmlReadFile(icns_fname, NULL, PARSE_OPTS);
 	}
 
 	if (add->children || del->children) {
