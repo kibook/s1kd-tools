@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="P" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="02" day="23"/>
+        <issueDate year="2018" month="05" day="08"/>
         <dmTitle>
           <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Improve organization and formatting.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -f option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -51,8 +51,8 @@
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
-          <verbatimText verbatimStyle="vs24">s1kd-refls [-qcaNh?] &lt;objects&gt;...</verbatimText>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-refls [-acfNqh?] &lt;objects&gt;...</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -62,7 +62,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
@@ -73,6 +73,12 @@
               <listItemTerm>-c</listItemTerm>
               <listItemDefinition>
                 <para>List references in the <verbatimText verbatimStyle="vs12">content</verbatimText> section of a CSDB object only.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Include the filename of the source object where each reference was found in the output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

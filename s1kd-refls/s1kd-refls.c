@@ -14,6 +14,7 @@ bool contentOnly = false;
 bool quiet = false;
 bool noIssue = false;
 bool showUnmatched = false;
+bool inclSrcFname = false;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -358,7 +359,25 @@ bool getFileName(char *dst, char *code, char *path)
 	return found;
 }
 
-void printReference(xmlNodePtr ref)
+void printMatched(const char *src, const char *ref)
+{
+	if (inclSrcFname) {
+		printf("%s: %s\n", src, ref);
+	} else {
+		puts(ref);
+	}
+}
+
+void printUnmatched(const char *src, const char *ref)
+{
+	if (inclSrcFname) {
+		fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
+	} else {
+		fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", ref);
+	}
+}
+
+void printReference(xmlNodePtr ref, const char *src)
 {
 	char code[256];
 	char fname[PATH_MAX];
@@ -373,11 +392,11 @@ void printReference(xmlNodePtr ref)
 		getComCode(code, ref);
 
 	if (showUnmatched)
-		puts(code);
+		printMatched(src, code);
 	else if (getFileName(fname, code, "."))
-		puts(fname);
+		printMatched(src, fname);
 	else if (!quiet)
-		fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", code);
+		printUnmatched(src, code);
 }
 
 void listReferences(const char *path)
@@ -401,7 +420,7 @@ void listReferences(const char *path)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			printReference(obj->nodesetval->nodeTab[i]);
+			printReference(obj->nodesetval->nodeTab[i], path);
 		}
 	}
 
@@ -412,13 +431,14 @@ void listReferences(const char *path)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-qcNah?] <objects>...");
+	puts("Usage: s1kd-refls [-acfNqh?] <objects>...");
 	puts("");
 	puts("Options:");
-	puts("  -q       Quiet mode");
-	puts("  -c       Only show references in content section");
-	puts("  -N       Assume filenames omit issue info");
 	puts("  -a       Print unmatched codes");
+	puts("  -c       Only show references in content section");
+	puts("  -f       Print the source filename for each reference");
+	puts("  -N       Assume filenames omit issue info");
+	puts("  -q       Quiet mode");
 	puts("  -h -?    Show help/usage message");
 }
 
@@ -426,7 +446,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	while ((i = getopt(argc, argv, "qcNah?")) != -1) {
+	while ((i = getopt(argc, argv, "qcNafh?")) != -1) {
 		switch (i) {
 			case 'q':
 				quiet = true;
@@ -439,6 +459,9 @@ int main(int argc, char **argv)
 				break;
 			case 'a':
 				showUnmatched = true;
+				break;
+			case 'f':
+				inclSrcFname = true;
 				break;
 			case 'h':
 			case '?':

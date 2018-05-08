@@ -6,7 +6,7 @@ s1kd-refls - List references in a CSDB object
 SYNOPSIS
 ========
 
-    s1kd-refls [-qcaNh?] <objects>...
+    s1kd-refls [-acfNqh?] <objects>...
 
 DESCRIPTION
 ===========
@@ -21,6 +21,9 @@ List all references, not attempting to match them to an actual filename.
 
 -c  
 List references in the `content` section of a CSDB object only.
+
+-f  
+Include the filename of the source object where each reference was found in the output.
 
 -h -?  
 Show help/usage message.
