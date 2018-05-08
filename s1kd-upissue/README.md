@@ -43,7 +43,7 @@ Keep quality assurance information from old issue. Normally, when upissuing an o
 Delete only change markup on elements associated with an RFU (by use of the attribute `reasonForUpdateRefIds`. Change markup on other elements is ignored.
 
 -r  
-Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements. This option prevents their deletion.
+Keep old RFUs. Normally, when upissuing an offical data module to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements (when change type is "add" or "modify") or the elements themselves (when change type is "delete"). This option prevents their deletion.
 
 -s &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.

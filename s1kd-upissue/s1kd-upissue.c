@@ -111,29 +111,43 @@ void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx, bool iss30)
 void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
 {
 	xmlXPathObjectPtr obj;
+	const xmlChar *change, *mark, *rfc;
 
 	if (iss30) {
+		change = BAD_CAST "change";
+		mark = BAD_CAST "mark";
+		rfc = BAD_CAST "rfc";
 		obj = xmlXPathEvalExpression(BAD_CAST "//*[@change or @mark or @rfc or @level]", ctx);
 	} else {
+		change = BAD_CAST "changeType";
+		mark = BAD_CAST "changeMark";
+		rfc = BAD_CAST "reasonForUpdateRefIds";
 		obj = xmlXPathEvalExpression(BAD_CAST "//*[@changeType or @changeMark or @reasonForUpdateRefIds]", ctx);
 	}
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 
-		if (iss30) {
-			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "change");
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "mark");
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "rfc");
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "level");
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *type;
+
+			type = xmlGetProp(obj->nodesetval->nodeTab[i], change);
+
+			if (xmlStrcmp(type, BAD_CAST "delete") == 0) {
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
+			} else {
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], change);
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], mark);
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], rfc);
+
+				if (iss30) {
+					xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "level");
+				}
 			}
-		} else {
-			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeType");
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeMark");
-				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "reasonForUpdateRefIds");
-			}
+
+			xmlFree(type);
 		}
 	}
 
@@ -161,11 +175,13 @@ void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 				del_assoc_rfu_attrs(obj->nodesetval->nodeTab[i], ctx, iss30);
 				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
 			}
 		} else {
 			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
 			}
 
 			del_rfu_attrs(ctx, iss30);
