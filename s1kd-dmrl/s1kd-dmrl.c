@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 	#endif
 	bool overwrite = false;
 	bool noOverwriteError = false;
-	char *specIssue = DEFAULT_S1000D_ISSUE;
+	char *specIssue = strdup(DEFAULT_S1000D_ISSUE);
 
 	dmrl = xmlReadMemory((const char *) dmrl_xsl, dmrl_xsl_len, NULL, NULL, 0);
 	dmrlStylesheet = xsltParseStylesheetDoc(dmrl);
@@ -77,6 +77,7 @@ int main(int argc, char **argv)
 				noOverwriteError = true;
 				break;
 			case '$':
+				free(specIssue);
 				specIssue = strdup(optarg);
 				break;
 			case 'h':
@@ -146,6 +147,8 @@ int main(int argc, char **argv)
 	}
 
 	xsltFreeStylesheet(dmrlStylesheet);
+
+	free(specIssue);
 
 	return err;
 }
