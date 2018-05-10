@@ -326,7 +326,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		}
 	}
 
-	if (list && verbosity > SILENT && err) {
+	if (list && err) {
 		printf("%s\n", fname);
 	}
 
