@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-checkrefs [-s <source>] [-t <target>] [-m <object>]
-                   [-d <dir>] [-cuFeLlvh?] <modules>...
+                   [-d <dir>] [-cuFfeLlvh?] <modules>...
 
 DESCRIPTION
 ===========
@@ -28,6 +28,9 @@ Check/update external publication references against a pre-defined list of publi
 
 -F  
 Fail on first invalid reference and return an error code.
+
+-f  
+List files which contain invalid references.
 
 -h -?  
 Show help/usage message

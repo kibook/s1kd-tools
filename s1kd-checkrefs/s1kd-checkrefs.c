@@ -34,7 +34,7 @@ bool verbose = false;
 bool validateOnly = true;
 bool failOnInvalid = false;
 bool checkExtPubRefs = false;
-bool listInvalid = false;
+enum list {OFF, REFS, DMS} listInvalid = OFF;
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -413,8 +413,10 @@ void validityError(xmlNodePtr ref, const char *fname)
 		getExtPubCode(code, firstXPathNode("externalPubRefIdent", ref->doc, ref), false, false);
 	}
 
-	if (listInvalid) {
+	if (listInvalid == REFS) {
 		printf("%s\n", code);
+	} else if (listInvalid == DMS) {
+		printf("%s\n", fname);
 	} else {
 		fprintf(stderr, ERR_PREFIX "%s (Line %d): invalid reference to %s %s.\n", fname, ref->line, prefix, code);
 	}
@@ -423,7 +425,7 @@ void validityError(xmlNodePtr ref, const char *fname)
 		exit(EXIT_VALIDITY_ERR);
 }
 
-void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
+bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	xmlNodePtr cur;
 	bool isValid = false;
@@ -544,14 +546,19 @@ void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 
 	if (!isValid)
 		validityError(ref, fname);
+
+	return isValid;
 }
 
 void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	int i;
 
-	for (i = 0; i < refs->nodeNr; ++i)
-		updateRef(refs->nodeTab[i], addresses, fname, recode);
+	for (i = 0; i < refs->nodeNr; ++i) {
+		if (!updateRef(refs->nodeTab[i], addresses, fname, recode) && listInvalid == DMS) {
+			break;
+		}
+	}
 }
 
 void showHelp(void)
@@ -768,7 +775,7 @@ int main(int argc, char **argv)
 	bool isList = false;
 	char *recode = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFveld:Lm:h?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFfveld:Lm:h?")) != -1) {
 		switch (i) {
 			case 's':
 				if (!source) source = strdup(optarg);
@@ -785,6 +792,9 @@ int main(int argc, char **argv)
 			case 'F':
 				failOnInvalid = true;
 				break;
+			case 'f':
+				listInvalid = DMS;
+				break;
 			case 'v':
 				verbose = true;
 				break;
@@ -792,7 +802,7 @@ int main(int argc, char **argv)
 				checkExtPubRefs = true;
 				break;
 			case 'l':
-				listInvalid = true;
+				listInvalid = REFS;
 				break;
 			case 'd':
 				if (!directory) directory = strdup(optarg);
