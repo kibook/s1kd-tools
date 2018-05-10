@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="19"/>
+        <issueDate year="2018" month="05" day="10"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -39,8 +39,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add usage example of the s1kd-defaults tool.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add examples of the -N option for use with VCS such as git or SVN.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -58,11 +58,11 @@
           <verbatimText verbatimStyle="vs23">$ mkdir myproject
 $ cd myproject</verbatimText>
         </para>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">After that, you should create two files: <verbatimText verbatimStyle="vs02">defaults</verbatimText> and <verbatimText verbatimStyle="vs02">dmtypes</verbatimText>. These files can be created automatically using the <emphasis>s1kd-defaults</emphasis> tool to initialize the new CSDB:</para>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <para>After that, you should create two files: <verbatimText verbatimStyle="vs02">defaults</verbatimText> and <verbatimText verbatimStyle="vs02">dmtypes</verbatimText>. These files can be created automatically using the <emphasis>s1kd-defaults</emphasis> tool to initialize the new CSDB:</para>
+        <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-defaults -i</verbatimText>
         </para>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0001">Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
+        <para>Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
         <levelledPara id="par-0001">
           <title><verbatimText verbatimStyle="vs02">defaults</verbatimText> file</title>
           <para>The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
@@ -273,6 +273,39 @@ S1000D and s1kd-tools.</para>
           </para>
           <para>The data module is once again upissued to the next official issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-..."</verbatimText> types.</para>
         </levelledPara>
+      </levelledPara>
+      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <title>Use with other version control systems</title>
+        <para>The issue/inwork numbers and S1000D file naming conventions as seen above provide a basic form of version control. In this case, each file represents a single issue of a CSDB object, and multiple files together represent the whole logical object. For example, all of the following files represent different versions of the same object:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>
+                <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
+              </para>
+            </listItem>
+            <listItem>
+              <para>
+                <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML</verbatimText>
+              </para>
+            </listItem>
+            <listItem>
+              <para>
+                <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
+              </para>
+            </listItem>
+          </randomList>
+        </para>
+        <para>However, if you prefer to use an existing version control system such as git or SVN, it is often more useful for each file to represent a whole object, since these systems typically track changes based on filenames.</para>
+        <para>The s1kd-tools support an alternate naming convention for this case. Specifying the -N option to certain tools will omit the issue and inwork numbers from filenames of CSDB objects. Taking the s1kd-newdm tool example from above, but adding the -N option as follows:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-newdm -N# MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
+        </para>
+        <para>would create the file <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText> in your CSDB folder. The s1kd-upissue tool works similarly:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-upissue -Ni DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+        </para>
+        <para>The issue and inwork numbers are updated in the XML metadata, but instead of creating a new file, the original is overwritten. The previous inwork issues are therefore stored as part of the external version control's history, rather than as individual files.</para>
       </levelledPara>
     </description>
   </content>

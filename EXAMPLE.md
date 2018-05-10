@@ -229,3 +229,26 @@ Deleted data modules may be reinstated later in a similar way:
     $ s1kd-upissue -is rinstate-status ...
 
 The data module is once again upissued to the next official issue, and the issue type is set to one of the "`rinstate-..."` types.
+
+Use with other version control systems
+======================================
+
+The issue/inwork numbers and S1000D file naming conventions as seen above provide a basic form of version control. In this case, each file represents a single issue of a CSDB object, and multiple files together represent the whole logical object. For example, all of the following files represent different versions of the same object:
+
+-   `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML`
+
+-   `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML`
+
+-   `DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML`
+
+However, if you prefer to use an existing version control system such as git or SVN, it is often more useful for each file to represent a whole object, since these systems typically track changes based on filenames.
+
+The s1kd-tools support an alternate naming convention for this case. Specifying the -N option to certain tools will omit the issue and inwork numbers from filenames of CSDB objects. Taking the s1kd-newdm tool example from above, but adding the -N option as follows:
+
+    $ s1kd-newdm -N# MYPRJ-A-00-00-00-00A-040A-D
+
+would create the file `DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML` in your CSDB folder. The s1kd-upissue tool works similarly:
+
+    $ s1kd-upissue -Ni DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML
+
+The issue and inwork numbers are updated in the XML metadata, but instead of creating a new file, the original is overwritten. The previous inwork issues are therefore stored as part of the external version control's history, rather than as individual files.
