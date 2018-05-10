@@ -1,16 +1,3 @@
--   General
--   Initial setup
-    -   `defaults` file
-    -   `dmtypes` file
--   Creating the DMRL and populating the CSDB
-    -   Creating CSDB objects on-the-fly
--   Data module workflow
-    -   Inwork data modules
-    -   Making data modules official
-    -   Changes to official data modules
-    -   Deleting data modules
--   Use with other version control systems
-
 General
 =======
 
