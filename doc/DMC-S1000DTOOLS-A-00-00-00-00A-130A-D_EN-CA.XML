@@ -63,7 +63,7 @@ $ cd myproject</verbatimText>
           <verbatimText verbatimStyle="vs23">$ s1kd-defaults -i</verbatimText>
         </para>
         <para>Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
-        <levelledPara id="par-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">defaults</verbatimText> file</title>
           <para>The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
           <para>
@@ -127,7 +127,7 @@ schema="proced"/>
           <para>The generated <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file can then be customized to fit your project.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara id="par-0002">
+      <levelledPara>
         <title>Creating the DMRL and populating the CSDB</title>
         <para>The next step is to prepare the DMRL for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.</para>
         <para>If you do not already have a DMRL, the <emphasis>s1kd-newdml</emphasis> tool can be used to create a new one:</para>
