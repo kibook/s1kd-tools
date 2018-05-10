@@ -572,6 +572,7 @@ void showHelp(void)
 	puts("  -c             Only check references in content section of targets.");
 	puts("  -u             Update address items of references.");
 	puts("  -F             Fail on first invalid reference, returning error code.");
+	puts("  -f             List files containing invalid references.");
 	puts("  -e             Check externalPubRefs.");
 	puts("  -L             Input is a list of data module filenames.");
 	puts("  -l             List invalid references.");
