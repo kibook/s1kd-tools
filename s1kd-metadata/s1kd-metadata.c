@@ -1440,7 +1440,7 @@ int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	}
 
 	while (fgets(path, PATH_MAX, f)) {
-		strtok(path, "\t\n");
+		strtok(path, "\t\r\n");
 		err += show_or_edit_metadata(path, metadata_fname, keys,
 			formatall, overwrite, endl, only_editable, fmtstr, conds);
 	}

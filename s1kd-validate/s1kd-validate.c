@@ -350,7 +350,7 @@ int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns
 	err = 0;
 
 	while (fgets(path, PATH_MAX, f)) {
-		strtok(path, "\t\n");
+		strtok(path, "\t\r\n");
 		err += validate_file(path, schema_dir, ignore_ns, list_invalid, xinclude);
 	}
 

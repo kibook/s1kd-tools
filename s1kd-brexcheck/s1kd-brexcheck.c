@@ -1063,7 +1063,7 @@ void add_dmod_list(const char *fname, char dmod_fnames[DMOD_MAX][PATH_MAX], int 
 	}
 
 	while (fgets(path, PATH_MAX, f)) {
-		strtok(path, "\t\n");
+		strtok(path, "\t\r\n");
 
 		if (*num_dmod_fnames == DMOD_MAX) {
 			if (verbose > SILENT) fprintf(stderr, E_MAXDMOD);

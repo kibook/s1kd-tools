@@ -1963,7 +1963,7 @@ int main(int argc, char **argv)
 
 		if (dmlist) {
 			if (!fgets(src, PATH_MAX - 1, list)) break;
-			strtok(src, "\t\n");
+			strtok(src, "\t\r\n");
 		}
 
 		doc = xmlReadFile(src, NULL, PARSE_OPTS);

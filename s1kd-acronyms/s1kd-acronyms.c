@@ -487,7 +487,7 @@ void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *ou
 	}
 
 	while (fgets(line, PATH_MAX, f)) {
-		strtok(line, "\t\n");
+		strtok(line, "\t\r\n");
 
 		if (overwrite) {
 			markupAcronymsInFile(line, acronyms, line);
@@ -511,7 +511,7 @@ void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 	}
 
 	while (fgets(line, PATH_MAX, f)) {
-		strtok(line, "\t\n");
+		strtok(line, "\t\r\n");
 		findAcronymsInFile(acronyms, line);
 	}
 
@@ -548,7 +548,7 @@ void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 	}
 
 	while (fgets(line, PATH_MAX, f)) {
-		strtok(line, "\t\n");
+		strtok(line, "\t\r\n");
 		
 		if (overwrite) {
 			deleteAcronymsInFile(line, line);

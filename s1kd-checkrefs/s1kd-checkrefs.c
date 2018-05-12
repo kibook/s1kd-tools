@@ -740,7 +740,7 @@ xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr pa
 	}
 
 	while (fgets(path, PATH_MAX, f)) {
-		strtok(path, "\t\n");
+		strtok(path, "\t\r\n");
 		addAddress(path, addresses);
 		xmlNewChild(paths, NULL, BAD_CAST "path", BAD_CAST path);
 	}
