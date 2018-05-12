@@ -6,20 +6,18 @@ s1kd-instance - Create S1000D data/pub module instances
 SYNOPSIS
 ========
 
-    s1kd-instance [-s <src>] [-e <ext>|-E] [-c <dmc>]
-                  [-l <lang>] [-n <iss>] [-I <date>]
-                  [-u <sec>] [-o <file>|-O <dir>] [-f]
-                  [-t <techName>] [-i <infoName>] [-a|-A]
-                  [-y|-Y <text>] [-C <comment>] [-X <path>]
-                  [-g|-G <CODE>/<NAME>] [-F]
-                  [-R <CIR> ...] [-r <XSL>] [-x <CIR>]
-                  [-S] [-N] [-P <PCT> -p <id>] [-L]
-                  [<applic>...]
+    s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
+                  [-g|-G <CODE>/<NAME>] [-I <date>] [-i <infoName>]
+                  [-l <lang>] [-n <iss>] [-o <file>|-O <dir>]
+                  [-P <PCT> -p <id>] [-R <CIR> ...] [-r <XSL>]
+                  [-s <applic> ...] [-t <techName>] [-u <sec>]
+                  [-x <CIR>] [-X <path>] [-y|-Y <text>] [-FfLNS]
+                  [<object>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-instance* tool produces an "instance" of an S1000D data module or publication module, derived from a "master" (or "source") module. The tool supports multiple methods of instantiating a module:
+The *s1kd-instance* tool produces an "instance" of an S1000D CSDB object, derived from a "master" (or "source") object. The tool supports multiple methods of instantiating an object:
 
 -   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
 
@@ -39,13 +37,13 @@ Remove unused applicability annotations and simplify/remove unused applicability
 Remove unused applicability annotations but not statements.
 
 -C &lt;comment&gt;  
-Add an XML comment to an instance. Useful as another way of identifying a module as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
+Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
 
 -c &lt;dmc&gt;  
 Specify a new data module code (DMC) or publication module code (PMC) for the instance.
 
 -E  
-Remove the extension from an instance produced from an already extended module.
+Remove the extension from an instance produced from an already extended object.
 
 -e &lt;ext&gt;  
 Specify an extension on the data module code (DME) or publication module code (PME) for the instance.
@@ -69,7 +67,7 @@ Set the issue date of the instance. By default, the issue date is taken from the
 Give the data module instance a different infoName.
 
 -L  
-Source (-s or stdin) is a list of module filenames to create instances of, rather than a single module.
+Source is a list of object filenames to create instances of, rather than an object itself.
 
 -l &lt;lang&gt;  
 Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".
@@ -91,7 +89,7 @@ Output instance(s) in dir, automatically naming them based on:
 
 -   the language and country specified with -L
 
-If any of the above are not specified, the information is copied from the source module.
+If any of the above are not specified, the information is copied from the source object.
 
 -o &lt;file&gt;  
 Output instance to file instead of stdout.
@@ -103,7 +101,7 @@ PCT file to read product definitions from (-p).
 Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).
 
 -R &lt;CIR&gt; ...  
-Use a CIR to resolve external dependencies in the master data module, making the instance data module standalone. Additional CIRs can be used by specifying the -R option multiple times.
+Use a CIR to resolve external dependencies in the master object, making the instance object standalone. Additional CIRs can be used by specifying the -R option multiple times.
 
 The following CIRs have some built-in support:
 
@@ -139,8 +137,12 @@ Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.
 -S  
 Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.
 
--s &lt;src&gt;  
-The source module (default is to read from stdin).
+-s &lt;applic&gt;  
+An applicability definition in the form of:
+
+    <ident>:<type>=<value>
+
+Any number of values can be defined by specifying this option multiple times.
 
 -t &lt;techName&gt;  
 Give the instance a different techName/pmTitle.
@@ -152,7 +154,7 @@ Set the security classification of the instance. An instance may have a lower se
 When -O is used, print the automatically generated file name of the instance.
 
 -w  
-Check the applicability of the whole module against the user-defined applicability. If the whole module is not applicable, then no instance is created.
+Check the applicability of the whole object against the user-defined applicability. If the whole object is not applicable, then no instance is created.
 
 -X &lt;path&gt;  
 The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.
@@ -187,13 +189,13 @@ The following types currently have built-in XSLT and can therefore be used as va
 -   zoneRepository
 
 -Y &lt;text&gt;  
-Set the applicability for the whole module using the user-defined applicability values, using text as the new display text.
+Set the applicability for the whole object using the user-defined applicability values, using text as the new display text.
 
 -y  
-Set the applicability for the whole data module using the user-defined applicability values, with no display text.
+Set the applicability for the whole data object using the user-defined applicability values, with no display text.
 
-&lt;applic&gt;...  
-Any number of applicability definitions in the form of: &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;
+&lt;object&gt;...  
+Source CSDB objects to instantiate.
 
 -a vs -A
 --------
@@ -206,17 +208,17 @@ The -A option will do the above, but will also attempt to simplify unused parts 
 >
 > The -A option may change the *meaning* of certain applicability statements without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect.
 
-Identifying source module of an instance
-----------------------------------------
+Identifying the source of an instance
+-------------------------------------
 
-The resulting data module instance will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the data module specified with the -s option. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.
+The resulting data module instances will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.
 
 Additionally, the data module instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.
 
 If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.
 
-Instance data module/publication module code (-c) vs extension (-e)
--------------------------------------------------------------------
+Instance module code (-c) vs extension (-e)
+-------------------------------------------
 
 When creating a data module or publication module instance, the instance should have the same data module/publication module code as the master, with an added extension code, the DME/PME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules/publication modules, it may be desirable to change the data module/publication module code instead. These two options can be used together as well to give an instance a new DMC/PMC as well an extension.
 
@@ -249,7 +251,7 @@ Though not usually the case, it is possible to create an instance which is filte
 
 filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property multiple times in the applicability definition arguments. For example:
 
-    $ s1kd-instance -A -Y "A or C" ... attr:prodattr=A attr:prodattr=C
+    $ s1kd-instance -A -Y "A or C" -s attr:prodattr=A -s attr:prodattr=C ...
 
 This would produce the following in the instance:
 
@@ -332,7 +334,7 @@ The source data module would contain a reference:
 
 The command would resemble:
 
-    $ s1kd-instance -s <src> -R <CIR> -r <custom XSLT>
+    $ s1kd-instance -R <CIR> -r <custom XSLT> <src>
 
 And the resulting XML would be:
 

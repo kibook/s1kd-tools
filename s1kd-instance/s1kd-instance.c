@@ -12,8 +12,10 @@
 #include "strings.h"
 #include "xsl.h"
 
+#define PROG_NAME "s1kd-instance"
+
 /* Prefix before errors printed to console */
-#define ERR_PREFIX "s1kd-instance: ERROR: "
+#define ERR_PREFIX PROG_NAME ": ERROR: "
 
 /* Error codes */
 #define EXIT_MISSING_ARGS 1 /* Option or parameter missing */
@@ -23,6 +25,25 @@
 #define EXIT_BAD_XML 6 /* Invalid XML/S1000D */
 #define EXIT_BAD_ARG 7 /* Malformed argument */
 #define EXIT_BAD_DATE 8 /* Malformed issue date */
+
+/* Error messages */
+#define S_MISSING_OBJECT ERR_PREFIX "Could not read source object: %s\n"
+#define S_MISSING_LIST ERR_PREFIX "Could not read list file: %s\n"
+#define S_BAD_TYPE ERR_PREFIX "Cannot automatically name unsupported object types.\n"
+#define S_FILE_EXISTS ERR_PREFIX "%s already exists. Use -f to overwrite.\n"
+#define S_BAD_XML "%s does not contain valid XML.\n"
+#define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
+#define S_BAD_CODE ERR_PREFIX "Bad data module/pub module code: %s.\n"
+#define S_NO_XSLT ERR_PREFIX "No built-in XSLT for CIR type: %s\n"
+#define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
+#define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
+#define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
+#define S_NO_PRODUCT ERR_PREFIX "No product '%s' in PCT '%s'.\n"
+#define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s.\n"
+#define S_NO_DIR ERR_PREFIX "No directory specified with -O.\n"
+#define S_NO_PCT ERR_PREFIX "No PCT specified (-P).\n"
+#define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
+#define S_MISSING_CIR ERR_PREFIX "Could not find CIR %s."
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -586,7 +607,7 @@ bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 	op = (char *) xmlGetProp(evaluate, BAD_CAST "andOr");
 
 	if (!op) {
-		fprintf(stderr, ERR_PREFIX "Element evaluate missing required attribute andOr.");
+		fprintf(stderr, S_MISSING_ANDOR);
 		exit(EXIT_BAD_XML);
 	}
 
@@ -982,7 +1003,7 @@ void set_code(xmlDocPtr doc, const char *new_code)
 			pmVolume);
 		
 		if (n != 4) {
-			fprintf(stderr, ERR_PREFIX "Bad data module/pub module code: %s.\n", new_code);
+			fprintf(stderr, S_BAD_CODE, new_code);
 			exit(EXIT_BAD_ARG);
 		} else if (iss == ISS_4X) {
 			xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
@@ -1387,7 +1408,7 @@ bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 		*xsl = cirxsl_zoneRepository_xsl;
 		*len = cirxsl_zoneRepository_xsl_len;
 	} else {
-		fprintf(stderr, ERR_PREFIX "No built-in XSLT for CIR type: %s\n", cirtype);
+		fprintf(stderr, S_NO_XSLT, cirtype);
 		return false;
 	}
 
@@ -1445,7 +1466,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 	cir = xmlReadFile(cirdocfname, NULL, PARSE_OPTS);
 
 	if (!cir) {
-		fprintf(stderr, ERR_PREFIX "%s is not a valid CIR data module.\n", cirdocfname);
+		fprintf(stderr, S_INVALID_CIR, cirdocfname);
 		exit(EXIT_BAD_XML);
 	}
 
@@ -1467,7 +1488,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 	results = xmlXPathEvalExpression(BAD_CAST "//content/commonRepository/*[position()=last()]", ctxt);
 
 	if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
-		fprintf(stderr, ERR_PREFIX "%s is not a valid CIR data module.\n", cirdocfname);
+		fprintf(stderr, S_INVALID_CIR, cirdocfname);
 		exit(EXIT_BAD_XML);
 	}
 
@@ -1533,7 +1554,7 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 	enum issue iss;
 
 	if (sscanf(issinfo, "%3s-%2s", issue, inwork) != 2) {
-		fprintf(stderr, ERR_PREFIX "Invalid format for issue/in-work number.\n");
+		fprintf(stderr, ERR_PREFIX S_INVALID_ISSFMT);
 		exit(EXIT_MISSING_ARGS);
 	}
 
@@ -1567,7 +1588,7 @@ void set_issue_date(xmlDocPtr doc, const char *issdate)
 	issueDate = first_xpath_node(doc, NULL, "//issueDate|//issdate");
 
 	if (sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
-		fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issdate);
+		fprintf(stderr, S_BAD_DATE, issdate);
 		exit(EXIT_BAD_DATE);
 	}
 
@@ -1693,7 +1714,7 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		fprintf(stderr, ERR_PREFIX "No product '%s' in PCT '%s'.\n", product, pctfname);
+		fprintf(stderr, S_NO_PRODUCT, product, pctfname);
 		exit(EXIT_BAD_APPLIC);
 	} else {
 		int i;
@@ -1785,6 +1806,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 	xsltFreeStylesheet(style);
 }
 
+/* Flatten alts elements. */
 void flatten_alts(xmlDocPtr doc)
 {
 	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len);
@@ -1808,6 +1830,26 @@ void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 	}
 }
 
+/* Read an applicability assign in the form of ident:type=value */
+void read_applic(char *s)
+{
+
+	char *ident, *type, *value;
+
+	if (!strchr(s, ':') || !strchr(s, '=')) {
+		fprintf(stderr, S_BAD_ASSIGN, s);
+		exit(EXIT_BAD_APPLIC);
+	}
+
+	ident = strtok(s, ":");
+	type  = strtok(NULL, "=");
+	value = strtok(NULL, "");
+
+	define_applic(ident, type, value);
+
+	++napplics;
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -1823,7 +1865,6 @@ int main(int argc, char **argv)
 	int i;
 	int c;
 
-	char src[PATH_MAX] = "";
 	char code[256] = "";
 	char out[PATH_MAX] = "-";
 	bool clean = false;
@@ -1848,7 +1889,7 @@ int main(int argc, char **argv)
 	char pctfname[PATH_MAX] = "";
 	char product[64] = "";
 	bool dmlist = false;
-	FILE *list = stdin;
+	FILE *list = NULL;
 	char issdate[16] = "";
 	bool stripext = false;
 	bool verbose = false;
@@ -1864,9 +1905,11 @@ int main(int argc, char **argv)
 
 	cirs = xmlNewNode(NULL, BAD_CAST "cirs");
 
+	applicability = xmlNewNode(NULL, BAD_CAST "applic");
+
 	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:h?")) != -1) {
 		switch (c) {
-			case 's': strncpy(src, optarg, PATH_MAX - 1); break;
+			case 's': read_applic(optarg); break;
 			case 'S': add_source_ident = false; break;
 			case 'e': strncpy(extension, optarg, 255); break;
 			case 'E': stripext = true; break;
@@ -1905,33 +1948,23 @@ int main(int argc, char **argv)
 		}
 	}
 
-
-	if (strcmp(src, "") == 0) {
-		strcpy(src, "-");
+	if (optind >= argc) {
 		use_stdin = true;
-	} else if (dmlist) {
-		list = fopen(src, "r");
-	}
-
-	if (!use_stdin && access(src, F_OK) == -1) {
-		fprintf(stderr, ERR_PREFIX "Could not find source object or list: \"%s\".\n", src);
-		exit(EXIT_MISSING_FILE);
+		list = stdin;
 	}
 
 	if (autoname && strcmp(dir, "") == 0) {
-		fprintf(stderr, ERR_PREFIX "No directory specified with -O.\n");
+		fprintf(stderr, S_NO_DIR);
 		exit(EXIT_MISSING_ARGS);
 	}
 
-	applicability = xmlNewNode(NULL, BAD_CAST "applic");
-
 	if (strcmp(product, "") != 0) {
 		if (strcmp(pctfname, "") == 0) {
-			fprintf(stderr, ERR_PREFIX "No PCT specified (-P).\n");
+			fprintf(stderr, S_NO_PCT);
 			exit(EXIT_MISSING_ARGS);
 		} else {
 			if (access(pctfname, F_OK) == -1) {
-				fprintf(stderr, ERR_PREFIX "PCT '%s' not found.\n", pctfname);
+				fprintf(stderr, S_MISSING_PCT, pctfname);
 				exit(EXIT_MISSING_FILE);
 			} else {
 				load_applic_from_pct(pctfname, product);
@@ -1939,38 +1972,45 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* All remaining arguments are treated as applic defs and copied to the
-	 * global applicability list. */
-	for (i = optind; i < argc; ++i) {
-		char *ident, *type, *value;
-
-		if (!strchr(argv[i], ':') || !strchr(argv[i], '=')) {
-			fprintf(stderr, ERR_PREFIX "Malformed applicability definition: %s.\n", argv[i]);
-			exit(EXIT_BAD_APPLIC);
-		}
-
-		ident = strtok(argv[i], ":");
-		type  = strtok(NULL, "=");
-		value = strtok(NULL, "");
-
-		define_applic(ident, type, value);
-
-		++napplics;
-	}
+	i = optind;
 
 	while (1) {
 		bool ispm;
+		char src[PATH_MAX] = "";
 
 		if (dmlist) {
-			if (!fgets(src, PATH_MAX - 1, list)) break;
+			if (!list && !(list = fopen(argv[i++], "r"))) {
+				fprintf(stderr, S_MISSING_LIST, argv[i - 1]);
+				exit(EXIT_MISSING_FILE);
+			}
+
+			if (!fgets(src, PATH_MAX - 1, list)) {
+				fclose(list);
+				list = NULL;
+
+				if (i < argc) {
+					continue;
+				} else {
+					break;
+				}
+			}
+
 			strtok(src, "\t\r\n");
+		} else if (i < argc) {
+			strcpy(src, argv[i++]);
+		} else if (use_stdin) {
+			strcpy(src, "-");
+		}
+
+		if (!use_stdin && access(src, F_OK) == -1) {
+			fprintf(stderr, S_MISSING_OBJECT, src);
+			exit(EXIT_MISSING_FILE);
 		}
 
 		doc = xmlReadFile(src, NULL, PARSE_OPTS);
 
 		if (!doc) {
-			fprintf(stderr, ERR_PREFIX "%s does not contain valid XML.\n",
-				use_stdin ? "stdin" : src);
+			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
 			exit(EXIT_BAD_XML);
 		}
 
@@ -1987,7 +2027,7 @@ int main(int argc, char **argv)
 				char *cirxsl = (char *) xmlGetProp(cir, BAD_CAST "xsl");
 
 				if (access(cirdocfname, F_OK) == -1) {
-					fprintf(stderr, ERR_PREFIX "Could not find CIR %s.", cirdocfname);
+					fprintf(stderr, S_MISSING_CIR, cirdocfname);
 					continue;
 				}
 
@@ -2067,12 +2107,12 @@ int main(int argc, char **argv)
 
 			if (autoname) {
 				if (!auto_name(out, doc, dir, no_issue)) {
-					fprintf(stderr, ERR_PREFIX "Cannot automatically name unsupported object types.\n");
+					fprintf(stderr, S_BAD_TYPE);
 					exit(EXIT_BAD_XML);
 				}
 
 				if (access(out, F_OK) == 0 && !force_overwrite) {
-					fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
+					fprintf(stderr, S_FILE_EXISTS, out);
 					exit(EXIT_NO_OVERWRITE);
 				}
 
@@ -2086,10 +2126,10 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(doc);
 
-		if (!dmlist) break;
+		if (!use_stdin && !list && i >= argc) {
+			break;
+		}
 	}
-
-	if (list != stdin) fclose(list);
 
 	free(origspec);
 	xmlFreeNode(cirs);
