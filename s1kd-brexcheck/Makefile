@@ -10,11 +10,15 @@ INSTALL_PREFIX=$(PREFIX)/bin
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-$(OUTPUT): $(SOURCE)
+$(OUTPUT): $(SOURCE) brex.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
+brex.h: brex/DMC-*.XML
+	> brex.h
+	for f in brex/DMC-*.XML; do xxd -i "$$f" >> brex.h; done
+
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(OUTPUT) brex.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

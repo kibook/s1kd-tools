@@ -15,8 +15,10 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/debugXML.h>
 
-#define STRUCT_OBJ_RULE_PATH "/dmodule/content/brex/contextRules[not(@rulesContext) or @rulesContext='%s']/structureObjectRuleGroup/structureObjectRule"
-#define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef/dmRef/dmRefIdent/dmCode"
+#include "brex.h"
+
+#define STRUCT_OBJ_RULE_PATH "//contextRules[not(@rulesContext) or @rulesContext='%s']//structureObjectRule|//contextrules[not(@context) or @context='%s']//objrule"
+#define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
@@ -82,17 +84,31 @@ bool check_notation = false;
 
 bool check_values = false;
 
-xmlNodePtr find_child(xmlNodePtr parent, const char *name)
+xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 {
-	xmlNodePtr cur;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
 
-	for (cur = parent->children; cur; cur = cur->next) {
-		if (strcmp((char *) cur->name, name) == 0) {
-			return cur;
-		}
-	}
+	ctx = xmlXPathNewContext(doc ? doc : context->doc);
+	ctx->node = context;
 
-	return NULL;
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
+		node = NULL;
+	else
+		node = obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
+}
+
+xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
+{
+	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
 }
 
 void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError)
@@ -174,6 +190,17 @@ bool search_brex_fname_from_dmods(char *fname,
 	return found;
 }
 
+/* Search for the BREX in the built-in default BREX data modules. */
+bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
+{
+	return
+		(strcmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0 ||
+		 strcmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0 ||
+		 strcmp(dmcode, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0 ||
+		 strcmp(dmcode, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) &&
+		strcpy(fname, dmcode);
+}
+
 /* Find the filename of a BREX data module referenced by a CSDB object. */
 bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_MAX][PATH_MAX],
 	int nspaths, char dmod_fnames[DMOD_MAX][PATH_MAX], int num_dmod_fnames)
@@ -212,17 +239,31 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	xmlXPathFreeObject(object);
 	xmlXPathFreeContext(context);
 
-	modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-	systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-	systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
-	subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-	subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-	assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
-	disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
-	disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
-	infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
-	infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
-	itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
+	if (xmlStrcmp(dmCode->name, BAD_CAST "dmCode") == 0) {
+		modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
+		systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
+		systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
+		subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
+		subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
+		assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
+		disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
+		disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
+		infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
+		infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
+		itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
+	} else {
+		modelIdentCode     = (char *) firstXPathValue(dmCode, "modelic");
+		systemDiffCode     = (char *) firstXPathValue(dmCode, "sdc");
+		systemCode         = (char *) firstXPathValue(dmCode, "chapnum");
+		subSystemCode      = (char *) firstXPathValue(dmCode, "section");
+		subSubSystemCode   = (char *) firstXPathValue(dmCode, "subsect");
+		assyCode           = (char *) firstXPathValue(dmCode, "subject");
+		disassyCode        = (char *) firstXPathValue(dmCode, "discode");
+		disassyCodeVariant = (char *) firstXPathValue(dmCode, "discodev");
+		infoCode           = (char *) firstXPathValue(dmCode, "incode");
+		infoCodeVariant    = (char *) firstXPathValue(dmCode, "incodev");
+		itemLocationCode   = (char *) firstXPathValue(dmCode, "itemloc");
+	}
 
 	snprintf(dmcode, 256, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		modelIdentCode,
@@ -266,6 +307,11 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	/* Look for the BREX in the list of objects to check. */
 	if (!found) {
 		found = search_brex_fname_from_dmods(fname, dmod_fnames, num_dmod_fnames, dmcode, len);
+	}
+
+	/* Look for the BREX in the built-in default BREX. */
+	if (!found) {
+		found = search_brex_fname_from_default_brex(fname, dmcode, len);
 	}
 
 	if (verbose >= INFO && found) {
@@ -339,9 +385,9 @@ bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 	for (i = 0; i < values->nodeNr; ++i) {
 		char *allowed, *value, *form;
 
-		allowed = (char *) xmlGetProp(values->nodeTab[i], BAD_CAST "valueAllowed");
-		form = (char *) xmlGetProp(values->nodeTab[i], BAD_CAST "valueForm");
-		value = (char *) xmlNodeGetContent(node);
+		allowed = (char *) firstXPathValue(values->nodeTab[i], "@valueAllowed|@val1");
+		form    = (char *) firstXPathValue(values->nodeTab[i], "@valueForm|@valtype");
+		value   = (char *) xmlNodeGetContent(node);
 
 		if (form && strcmp(form, "range") == 0) {
 			ret = ret || is_in_set(value, allowed);
@@ -369,7 +415,7 @@ bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
 	ctx = xmlXPathNewContext(rule->doc);
 	ctx->node = rule;
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//objectValue", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST "objectValue|objval", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -392,17 +438,19 @@ bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
 {
 	bool invalid = false;
 
-	if (strcmp(allowedObjectFlag, "0") == 0) {
-		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			invalid = obj->boolval;
-		} else {
-			invalid = true;
-		}
-	} else if (strcmp(allowedObjectFlag, "1") == 0) {
-		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			invalid = !obj->boolval;
-		} else {
-			invalid = false;
+	if (allowedObjectFlag) {
+		if (strcmp(allowedObjectFlag, "0") == 0) {
+			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				invalid = obj->boolval;
+			} else {
+				invalid = true;
+			}
+		} else if (strcmp(allowedObjectFlag, "1") == 0) {
+			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				invalid = !obj->boolval;
+			} else {
+				invalid = false;
+			}
 		}
 	}
 
@@ -492,7 +540,7 @@ void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 	ctx = xmlXPathNewContext(rule->doc);
 	ctx->node = rule;
 
-	obj = xmlXPathEvalExpression(BAD_CAST "objectValue", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST "objectValue|objval", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -503,28 +551,6 @@ void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
-}
-
-xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	xmlNodePtr node;
-
-	ctx = xmlXPathNewContext(doc);
-	ctx->node = context;
-
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
-
-	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		node = NULL;
-	else
-		node = obj->nodesetval->nodeTab[0];
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return node;
 }
 
 int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
@@ -550,10 +576,10 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 	for (i = 0; i < rules->nodeNr; ++i) {
 		xmlChar *allowedObjectFlag, *path, *use;
 
-		objectPath = find_child(rules->nodeTab[i], "objectPath");
-		objectUse = find_child(rules->nodeTab[i], "objectUse");
+		objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
+		objectUse  = firstXPathNode(brex_doc, rules->nodeTab[i], "objectUse|objuse");
 
-		allowedObjectFlag = xmlGetProp(objectPath, BAD_CAST "allowedObjectFlag");
+		allowedObjectFlag = firstXPathValue(objectPath, "@allowedObjectFlag|@objappl");
 		path = xmlNodeGetContent(objectPath);
 		use  = xmlNodeGetContent(objectUse);
 
@@ -847,7 +873,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char xpath[512];
 
 	schema = (char *) xmlGetProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation");
-	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema);
+	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema, schema);
 	xmlFree(schema);
 
 	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck)))
@@ -862,7 +888,28 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlXPathContextPtr context;
 		xmlXPathObjectPtr result;
 
-		brex_doc = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
+		if (access(brex_fnames[i], F_OK) != -1) {
+			brex_doc = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
+		} else {
+			unsigned char *xml = NULL;
+			unsigned int len = NULL;
+
+			if (strcmp(brex_fnames[i], "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
+				xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
+				len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
+			} else if (strcmp(brex_fnames[i], "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
+				xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML;
+				len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML_len;
+			} else if (strcmp(brex_fnames[i], "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0) {
+				xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML;
+				len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML_len;
+			} else if (strcmp(brex_fnames[i], "DMC-AE-A-04-10-0301-00A-022A-D") == 0) {
+				xml = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML;
+				len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
+			}
+
+			brex_doc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+		}
 
 		if (!brex_doc) {
 			if (verbose > SILENT) {
@@ -911,7 +958,9 @@ void print_node(xmlNodePtr node)
 		xmlFree(type);
 	} else if (strcmp((char *) node->name, "brex") == 0 && !shortmsg) {
 		char *brex = (char *) xmlNodeGetContent(node);
-		printf("  BREX: %s\n", brex);
+		if (strcmp(brex, "") != 0) {
+			printf("  BREX: %s\n", brex);
+		}
 		xmlFree(brex);
 	} else if (strcmp((char *) node->name, "document") == 0) {
 		char *doc = (char *) xmlNodeGetContent(node);
@@ -930,6 +979,17 @@ void print_node(xmlNodePtr node)
 		xmlFree(use);
 	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
 		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
+		char *content = (char *) xmlNodeGetContent(node);
+		printf("  VALUE ALLOWED:");
+		if (allowed)
+			printf(" %s", allowed);
+		if (content && strcmp(content, "") != 0)
+			printf(" (%s)", content);
+		putchar('\n');
+		xmlFree(content);
+		xmlFree(allowed);
+	} else if (strcmp((char *) node->name, "objval") == 0 && !shortmsg) {
+		char *allowed = (char *) xmlGetProp(node, BAD_CAST "val1");
 		char *content = (char *) xmlNodeGetContent(node);
 		printf("  VALUE ALLOWED:");
 		if (allowed)
@@ -1203,6 +1263,8 @@ int main(int argc, char *argv[])
 		}
 
 		if (num_brex_fnames == 0) {
+			strcpy(brex_fnames[0], "");
+
 			if (!find_brex_fname_from_doc(brex_fnames[0], dmod_doc,
 				brex_search_paths, num_brex_search_paths, dmod_fnames, num_dmod_fnames)) {
 				if (use_stdin) {
