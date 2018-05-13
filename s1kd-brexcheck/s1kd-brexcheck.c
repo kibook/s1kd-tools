@@ -655,20 +655,21 @@ void show_help(void)
 	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStupfcLh?] <datamodules>");
 	puts("");
 	puts("Options:");
-	puts("  -b <brex>    Use <brex> as the BREX data module");
-	puts("  -I <path>    Add <path> to search path for BREX data module.");
-	puts("  -v -V -q -D  Message verbosity.");
-	puts("  -s           Short messages.");
-	puts("  -x           XML output.");
-	puts("  -l           Check BREX referenced by other BREX.");
-	puts("  -w <sev>     List of severity levels.");
-	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict)");
-	puts("  -n           Check notation rules.");
-	puts("  -c           Check object values.");
-	puts("  -p           Display progress bar.");
-	puts("  -f           Output only filenames of invalid modules.");
-	puts("  -L           Input is a list of data module filenames.");
 	puts("  -h -?        Show this help message.");
+	puts("  -B           Use the default BREX.");
+	puts("  -b <brex>    Use <brex> as the BREX data module.");
+	puts("  -c           Check object values.");
+	puts("  -f           Output only filenames of invalid modules.");
+	puts("  -I <path>    Add <path> to search path for BREX data module.");
+	puts("  -L           Input is a list of data module filenames.");
+	puts("  -l           Check BREX referenced by other BREX.");
+	puts("  -n           Check notation rules.");
+	puts("  -p           Display progress bar.");
+	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict).");
+	puts("  -s           Short messages.");
+	puts("  -v -V -q -D  Message verbosity.");
+	puts("  -w <sev>     List of severity levels.");
+	puts("  -x           XML output.");
 }
 
 bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
@@ -1138,6 +1139,28 @@ void add_dmod_list(const char *fname, char dmod_fnames[DMOD_MAX][PATH_MAX], int 
 	}
 }
 
+const char *default_brex_dmc(xmlDocPtr doc)
+{
+	char *schema;
+	const char *code;
+
+	schema = (char *) xmlGetProp(xmlDocGetRootElement(doc), BAD_CAST "noNamespaceSchemaLocation");
+
+	if (strstr(schema, "S1000D_4-2")) {
+		code = "DMC-S1000D-F-04-10-0301-00A-022A-D";
+	} else if (strstr(schema, "S1000D_4-1")) {
+		code = "DMC-S1000D-E-04-10-0301-00A-022A-D";
+	} else if (strstr(schema, "S1000D_4-0")) {
+		code = "DMC-S1000D-A-04-10-0301-00A-022A-D";
+	} else {
+		code = "DMC-AE-A-04-10-0301-00A-022A-D";
+	}
+
+	xmlFree(schema);
+
+	return code;
+}
+
 int main(int argc, char *argv[])
 {
 	int c;
@@ -1162,12 +1185,16 @@ int main(int argc, char *argv[])
 	bool progress = false;
 	bool only_fnames = false;
 	bool is_list = false;
+	bool use_default_brex = false;
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	while ((c = getopt(argc, argv, "b:I:xvVDqslw:StupfncLh?")) != -1) {
+	while ((c = getopt(argc, argv, "Bb:I:xvVDqslw:StupfncLh?")) != -1) {
 		switch (c) {
+			case 'B':
+				use_default_brex = true;
+				break;
 			case 'b':
 				if (num_brex_fnames == BREX_MAX) {
 					if (verbose > SILENT) {
@@ -1265,7 +1292,13 @@ int main(int argc, char *argv[])
 		if (num_brex_fnames == 0) {
 			strcpy(brex_fnames[0], "");
 
-			if (!find_brex_fname_from_doc(brex_fnames[0], dmod_doc,
+			/* Override the referenced BREX with a default BREX
+			 * based on which issue of the specification a data
+			 * module is written to.
+			 */
+			if (use_default_brex) {
+				strcpy(brex_fnames[0], default_brex_dmc(dmod_doc));
+			} else if (!find_brex_fname_from_doc(brex_fnames[0], dmod_doc,
 				brex_search_paths, num_brex_search_paths, dmod_fnames, num_dmod_fnames)) {
 				if (use_stdin) {
 					if (verbose > SILENT) fprintf(stderr, E_NOBREX_STDIN);

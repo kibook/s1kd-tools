@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="06"/>
+        <issueDate year="2018" month="05" day="13"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -L option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Use generic term "CSDB object" instead of "data module".</simplePara>
+        <simplePara>Add -B option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -50,13 +47,13 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-brexcheck - Validate S1000D CSDB objects against BREX data modules</para>
+        <para>s1kd-brexcheck - Validate S1000D CSDB objects against BREX data modules</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-               [-vVqDsxlStupfcLh?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+               [-BcDfLlpqSstuVvxh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -67,6 +64,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-B</listItemTerm>
+              <listItemDefinition>
+                <para>Check each input object against the appropriate built-in S1000D default BREX only. The actual BREX reference of each object is ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-b &lt;brex&gt;</listItemTerm>
               <listItemDefinition>

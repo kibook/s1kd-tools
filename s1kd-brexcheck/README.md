@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-                   [-vVqDsxlStupfcLh?] [<object>...]
+                   [-BcDfLlpqSstuVvxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -16,6 +16,9 @@ The *s1kd-brexcheck* tool validates S1000D CSDB objects using the context, SNS, 
 
 OPTIONS
 =======
+
+-B  
+Check each input object against the appropriate built-in S1000D default BREX only. The actual BREX reference of each object is ignored.
 
 -b &lt;brex&gt;  
 Check the CSDB objects against this BREX. Multiple BREX data modules can be specified by adding this option multiple times. When no BREX data modules are specified, the BREX data module referenced in &lt;brexDmRef&gt; in the CSDB object is attempted to be used instead.
