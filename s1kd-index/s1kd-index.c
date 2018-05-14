@@ -4,6 +4,8 @@
 #include <string.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/transform.h>
+#include "xslt.h"
 
 #define PROG_NAME "s1kd-index"
 
@@ -126,6 +128,8 @@ void gen_index_flag(xmlNodePtr flag, xmlXPathContextPtr ctx, bool ignorecase)
 			gen_index_node(obj->nodesetval->nodeTab[i], flag, ignorecase);
 		}
 	}
+
+	xmlXPathFreeObject(obj);
 }
 
 /* Insert indexFlags for each term included in the specified index file. */
@@ -136,6 +140,34 @@ void gen_index_flags(xmlNodeSetPtr flags, xmlXPathContextPtr ctx, bool ignorecas
 	for (i = 0; i < flags->nodeNr; ++i) {
 		gen_index_flag(flags->nodeTab[i], ctx, ignorecase);
 	}
+}
+
+/* Apply a built-in XSLT transform to a doc in place. */
+void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+{
+	xmlDocPtr styledoc, src, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	src = xmlCopyDoc(doc, 1);
+
+	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, src, NULL);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(src);
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+/* Convert index flags for older issues. */
+void convert_to_iss_30(xmlDocPtr doc)
+{
+	transform_doc(doc, iss30_xsl, iss30_xsl_len);
 }
 
 /* Insert indexFlag elements after matched terms in a document. */
@@ -160,6 +192,10 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	xmlXPathFreeContext(doc_ctx);
 	xmlXPathFreeObject(index_obj);
 	xmlXPathFreeContext(index_ctx);
+
+	if (xmlStrcmp(xmlFirstElementChild(xmlDocGetRootElement(doc))->name, BAD_CAST "idstatus") == 0) {
+		convert_to_iss_30(doc);
+	}
 
 	if (overwrite) {
 		xmlSaveFile(path, doc);
@@ -208,6 +244,9 @@ int main(int argc, char **argv)
 	}
 
 	xmlFreeDoc(index_doc);
+
+	xsltCleanupGlobals();
+	xmlCleanupParser();
 
 	return 0;
 }
