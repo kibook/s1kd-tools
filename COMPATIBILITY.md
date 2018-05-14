@@ -19,7 +19,7 @@ Support is planned but not yet implemented.
 |-----------------|-----|-----|-----|-----|-----|-----|-----|-----|
 | s1kd-acronyms   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-aspp       | X   | X   | X   |     |     |     |     |     |
+| s1kd-aspp       | X   | X   | X   |     | ~   | ~   | ~   | ~   |
 | s1kd-brexcheck  | X   | X   | X   | X   | X   | X   | ~   | ~   |
 | s1kd-checkrefs  | X   | X   | X   |     |     |     |     |     |
 | s1kd-defaults   | X   | X   | X   | X   | X   | X   | X   | X   |
