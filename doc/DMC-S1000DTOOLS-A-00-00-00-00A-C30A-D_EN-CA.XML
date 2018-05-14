@@ -36,7 +36,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Update compatbility for s1kd-brexcheck and s1kd-aspp.</simplePara>
+        <simplePara>Update compatbility for s1kd-brexcheck, s1kd-aspp, and s1kd-index.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -349,7 +349,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row>
+            <row changeType="modify" reasonForUpdateRefIds="rfu-0001">
               <entry>
                 <para>s1kd-index</para>
               </entry>
@@ -362,11 +362,21 @@
               <entry>
                 <para>X</para>
               </entry>
-              <entry/>
-              <entry/>
-              <entry/>
-              <entry/>
-              <entry/>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
