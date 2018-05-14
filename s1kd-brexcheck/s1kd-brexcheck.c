@@ -897,7 +897,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 			brex_doc = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
 		} else {
 			unsigned char *xml = NULL;
-			unsigned int len = NULL;
+			unsigned int len = 0;
 
 			if (strcmp(brex_fnames[i], "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
 				xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
