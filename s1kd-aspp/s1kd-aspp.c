@@ -110,26 +110,29 @@ xmlNodePtr lastXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
  * the applicability of the whole data module. */
 void processNode(xmlNodePtr node)
 {
-	xmlChar *applicRefId = xmlGetProp(node, BAD_CAST "applicRefId");
+	xmlNodePtr attr;
 
-	if (!applicRefId) {
+	attr = firstXPathNode(NULL, node, "@applicRefId|@refapplic");
+
+	if (!attr) {
 		/* Inherit applicability from
 		 * - an ancestor, or
 		 * - the whole data module level */
 		xmlNodePtr ancestor;
+		xmlChar *name;
 
-		ancestor = lastXPathNode(NULL, node, "ancestor::*[@applicRefId]");
+		ancestor = lastXPathNode(NULL, node, "ancestor::*[@applicRefId]|ancestor::*[@refapplic]");
+
+		name = BAD_CAST (firstXPathNode(NULL, node, "//idstatus") ? "refapplic" : "applicRefId");
 
 		if (!ancestor) {
-			xmlSetProp(node, BAD_CAST "applicRefId", dmApplicId);
+			xmlSetProp(node, name, dmApplicId);
 		} else {
-			xmlChar *ancestorApplic = xmlGetProp(ancestor, BAD_CAST "applicRefId");
-			xmlSetProp(node, BAD_CAST "applicRefId", ancestorApplic);
+			xmlChar *ancestorApplic = xmlGetProp(ancestor, name);
+			xmlSetProp(node, name, ancestorApplic);
 			xmlFree(ancestorApplic);
 		}
 	}
-
-	xmlFree(applicRefId);
 }
 
 /* Set explicit applicability on all nodes in a nodeset. */
@@ -151,10 +154,14 @@ void removeDuplicates(xmlNodeSetPtr nodes)
 	xmlChar *applic = xmlStrdup(dmApplicId);
 
 	for (i = 0; i < nodes->nodeNr; ++i) {
-		xmlChar *applicRefId = xmlGetProp(nodes->nodeTab[i], BAD_CAST "applicRefId");
+		xmlNodePtr attr;
+		xmlChar *applicRefId;
+
+		attr = firstXPathNode(NULL, nodes->nodeTab[i], "@applicRefId|@refapplic");
+		applicRefId = xmlNodeGetContent(attr);
 
 		if (xmlStrcmp(applicRefId, applic) == 0) {
-			xmlUnsetProp(nodes->nodeTab[i], BAD_CAST "applicRefId");
+			xmlUnsetProp(nodes->nodeTab[i], attr->name);
 		} else {
 			xmlFree(applic);
 			applic = xmlStrdup(applicRefId);
@@ -172,11 +179,11 @@ void addDmApplic(xmlNodePtr dmodule)
 {
 	xmlNodePtr referencedApplicGroup;
 
-	if ((referencedApplicGroup = firstXPathNode(NULL, dmodule, ".//referencedApplicGroup"))) {
+	if ((referencedApplicGroup = firstXPathNode(NULL, dmodule, ".//referencedApplicGroup|.//inlineapplics"))) {
 		xmlNodePtr applic;
 		xmlNodePtr wholeDmApplic;
 
-		wholeDmApplic = firstXPathNode(NULL, dmodule, ".//dmStatus/applic");
+		wholeDmApplic = firstXPathNode(NULL, dmodule, ".//dmStatus/applic|.//status/applic");
 		applic = xmlAddChild(referencedApplicGroup, xmlCopyNode(wholeDmApplic, 1));
 
 		xmlSetProp(applic, BAD_CAST "id", dmApplicId);

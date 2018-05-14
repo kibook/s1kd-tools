@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="Q" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="05"/>
+        <issueDate year="2018" month="05" day="14"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Tool renamed to s1kd-aspp.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Change "s1kd-flatpm" to "s1kd-flatten".</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -47,18 +47,18 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-aspp - Applicability statement preprocessor</para>
+        <para>s1kd-aspp - Applicability statement preprocessor</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-aspp [-g [-A &lt;ACT&gt;]... [-C &lt;CCT&gt;]... [-G &lt;XSL&gt;]]
+          <verbatimText verbatimStyle="vs24">s1kd-aspp [-g [-A &lt;ACT&gt;]... [-C &lt;CCT&gt;]... [-G &lt;XSL&gt;]]
           [-p [-a &lt;ID&gt;]] [-dfxh?] [&lt;modules&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-aspp</emphasis> tool has two main functions:</para>
+        <para>The <emphasis>s1kd-aspp</emphasis> tool has two main functions:</para>
         <para>
           <randomList>
             <listItem>
@@ -133,7 +133,7 @@
             <definitionListItem>
               <listItemTerm>&lt;modules&gt;...</listItemTerm>
               <listItemDefinition>
-                <para>The module(s) to preprocess. This can include both individual modules and combined files such as those produced by s1kd-flatpm(1).</para>
+                <para>The module(s) to preprocess. This can include both individual modules and combined files such as those produced by s1kd-flatten(1).</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -171,7 +171,7 @@ applicPropertyValues="A"/>
           </para>
           <para>When supplied with the -A option:</para>
           <para>
-            <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-aspp -g -A &lt;ACT&gt; &lt;DM&gt;</verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-aspp -g -A &lt;ACT&gt; &lt;DM&gt;</verbatimText>
           </para>
           <para>The resulting XML would instead contain:</para>
           <para>
@@ -273,7 +273,7 @@ applicPropertyValues="A"/>
               </listItem>
             </randomList>
           </para>
-          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Using the s1kd-aspp tool, the above XML would produce the following output:</para>
+          <para>Using the s1kd-aspp tool, the above XML would produce the following output:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
 <identAndStatusSection>

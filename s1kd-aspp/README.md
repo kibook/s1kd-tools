@@ -53,7 +53,7 @@ Preprocess applicability statements to produce "presentation" applicability stat
 Process the modules using the XInclude specification.
 
 &lt;modules&gt;...  
-The module(s) to preprocess. This can include both individual modules and combined files such as those produced by s1kd-flatpm(1).
+The module(s) to preprocess. This can include both individual modules and combined files such as those produced by s1kd-flatten(1).
 
 EXAMPLES
 ========
