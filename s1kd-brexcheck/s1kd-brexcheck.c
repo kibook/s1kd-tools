@@ -524,12 +524,16 @@ xmlChar *brsl_type(xmlChar *severity)
 
 char *real_path(const char *path, char *real)
 {
+	char *r;
 	#ifdef _WIN32
-	GetFullPathName(path, PATH_MAX, real, NULL);
-	return real;
+	r = GetFullPathName(path, PATH_MAX, real, NULL);
 	#else
-	return realpath(path, real);
+	r = realpath(path, real);
 	#endif
+	if (!r) {
+		r = strcpy(real, path);
+	}
+	return r;
 }
 
 void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
