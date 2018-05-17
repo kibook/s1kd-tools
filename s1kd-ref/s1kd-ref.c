@@ -6,6 +6,8 @@
 #include <libgen.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/transform.h>
+#include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
 
@@ -13,6 +15,7 @@
 
 #define EXIT_MISSING_FILE 1
 #define EXIT_BAD_INPUT 2
+#define EXIT_BAD_ISSUE 3
 
 #define OPT_TITLE (int) 0x01
 #define OPT_ISSUE (int) 0x02
@@ -27,6 +30,10 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
+
+#define DEFAULT_S1000D_ISSUE ISS_42
 
 bool hasopt(int opts, int opt)
 {
@@ -664,7 +671,31 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 	xmlSaveFile(dst, doc);
 }
 
-void print_ref(const char *src, const char *dst, const char *ref, const char *fname, int opts, bool insert_refs, bool overwrite)
+/* Apply a built-in XSLT transform to a doc in place. */
+void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+{
+	xmlDocPtr styledoc, src, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	src = xmlCopyDoc(doc, 1);
+
+	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, src, NULL);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(src);
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+void print_ref(const char *src, const char *dst, const char *ref,
+	const char *fname, int opts, bool insert_refs, bool overwrite,
+	enum issue iss)
 {
 	xmlNodePtr node;
 	xmlNodePtr (*f)(const char *, const char *, int);
@@ -685,6 +716,56 @@ void print_ref(const char *src, const char *dst, const char *ref, const char *fn
 	}
 
 	node = f(ref, fname, opts);
+
+	if (iss < DEFAULT_S1000D_ISSUE) {
+		unsigned char *xsl;
+		unsigned int len;
+		xmlDocPtr doc;
+
+		switch (iss) {
+			case ISS_20:
+				xsl = ___common_42to20_xsl;
+				len = ___common_42to20_xsl_len;
+				break;
+			case ISS_21:
+				xsl = ___common_42to21_xsl;
+				len = ___common_42to21_xsl_len;
+				break;
+			case ISS_22:
+				xsl = ___common_42to22_xsl;
+				len = ___common_42to22_xsl_len;
+				break;
+			case ISS_23:
+				xsl = ___common_42to23_xsl;
+				len = ___common_42to23_xsl_len;
+				break;
+			case ISS_30:
+				xsl = ___common_42to30_xsl;
+				len = ___common_42to30_xsl_len;
+				break;
+			case ISS_40:
+				xsl = ___common_42to40_xsl;
+				len = ___common_42to40_xsl_len;
+				break;
+			case ISS_41:
+				xsl = ___common_42to41_xsl;
+				len = ___common_42to41_xsl_len;
+				break;
+			default:
+				xsl = NULL;
+				len = 0;
+				break;
+		}
+
+		doc = xmlNewDoc(BAD_CAST "1.0");
+		xmlDocSetRootElement(doc, node);
+
+		transform_doc(doc, xsl, len);
+
+		node = xmlCopyNode(xmlDocGetRootElement(doc), 1);
+
+		xmlFreeDoc(doc);
+	}
 
 	if (insert_refs) {
 		if (overwrite) {
@@ -715,6 +796,30 @@ char *trim(char *str)
 	return str;
 }
 
+enum issue spec_issue(const char *s)
+{
+	if (strcmp(s, "2.0") == 0) {
+		return ISS_20;
+	} else if (strcmp(s, "2.1") == 0) {
+		return ISS_21;
+	} else if (strcmp(s, "2.2") == 0) {
+		return ISS_22;
+	} else if (strcmp(s, "2.3") == 0) {
+		return ISS_23;
+	} else if (strcmp(s, "3.0") == 0) {
+		return ISS_30;
+	} else if (strcmp(s, "4.0") == 0) {
+		return ISS_40;
+	} else if (strcmp(s, "4.1") == 0) {
+		return ISS_41;
+	} else if (strcmp(s, "4.2") == 0) {
+		return ISS_42;
+	}
+
+	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", s);
+	exit(EXIT_BAD_ISSUE);
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-filrth?] [-s <src>] [-o <dst>] [<code>|<file>]");
@@ -743,8 +848,9 @@ int main(int argc, char **argv)
 	char src[PATH_MAX] = "-";
 	char dst[PATH_MAX] = "-";
 	bool overwrite = false;
+	enum issue iss = DEFAULT_S1000D_ISSUE;
 
-	while ((i = getopt(argc, argv, "filo:rs:tdh?")) != -1) {
+	while ((i = getopt(argc, argv, "filo:rs:td$:h?")) != -1) {
 		switch (i) {
 			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;
@@ -754,6 +860,7 @@ int main(int argc, char **argv)
 			case 's': strcpy(src, optarg); break;
 			case 't': opts |= OPT_TITLE; break;
 			case 'd': opts |= OPT_DATE; break;
+			case '$': iss = spec_issue(optarg); break;
 			case '?':
 			case 'h': show_help(); exit(EXIT_SUCCESS);
 		}
@@ -768,11 +875,11 @@ int main(int argc, char **argv)
 			strcpy(scratch, fname);
 			base = basename(scratch);
 
-			print_ref(src, dst, base, fname, opts, insert_refs, overwrite);
+			print_ref(src, dst, base, fname, opts, insert_refs, overwrite, iss);
 		}
 	} else {
 		while (fgets(scratch, PATH_MAX, stdin)) {
-			print_ref(src, dst, trim(scratch), NULL, opts, insert_refs, overwrite);
+			print_ref(src, dst, trim(scratch), NULL, opts, insert_refs, overwrite, iss);
 		}
 	}
 

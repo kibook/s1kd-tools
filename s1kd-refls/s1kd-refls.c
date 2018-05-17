@@ -57,6 +57,11 @@ xmlNodePtr firstXPathNode(const char *path, xmlDocPtr doc, xmlNodePtr root)
 	return node;
 }
 
+char *firstXPathValue(const char *path, xmlDocPtr doc, xmlNodePtr root)
+{
+	return (char *) xmlNodeGetContent(firstXPathNode(path, doc, root));
+}
+
 void getDmCode(char *dst, xmlNodePtr dmRef)
 {
 	char *modelIdentCode;
@@ -75,18 +80,18 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 
 	xmlNodePtr identExtension, dmCode, issueInfo, language;
 
-	identExtension = firstXPathNode("dmRefIdent/identExtension", NULL, dmRef);
-	dmCode = firstXPathNode("dmRefIdent/dmCode", NULL, dmRef);
-	issueInfo = firstXPathNode("dmRefIdent/issueInfo", NULL, dmRef);
-	language = firstXPathNode("dmRefIdent/language", NULL, dmRef);
+	identExtension = firstXPathNode("dmRefIdent/identExtension|dmcextension", NULL, dmRef);
+	dmCode = firstXPathNode("dmRefIdent/dmCode|dmc/avee|avee", NULL, dmRef);
+	issueInfo = firstXPathNode("dmRefIdent/issueInfo|issno", NULL, dmRef);
+	language = firstXPathNode("dmRefIdent/language|language", NULL, dmRef);
 
 	strcpy(dst, "");
 
 	if (identExtension) {
 		char *extensionProducer, *extensionCode;
 
-		extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
-		extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
+		extensionProducer = firstXPathValue("@extensionProducer|dmeproducer", NULL, identExtension);
+		extensionCode     = firstXPathValue("@extensionCode|dmecode", NULL, identExtension);
 
 		strcat(dst, "DME-");
 
@@ -101,19 +106,19 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 		strcat(dst, "DMC-");
 	}
 
-	modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-	systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-	systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
-	subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-	subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-	assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
-	disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
-	disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
-	infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
-	infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
-	itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
-	learnCode          = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
-	learnEventCode     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
+	modelIdentCode     = firstXPathValue("@modelIdentCode|modelic", NULL, dmCode);
+	systemDiffCode     = firstXPathValue("@systemDiffCode|sdc", NULL, dmCode);
+	systemCode         = firstXPathValue("@systemCode|chapnum", NULL, dmCode);
+	subSystemCode      = firstXPathValue("@subSystemCode|section", NULL, dmCode);
+	subSubSystemCode   = firstXPathValue("@subSubSystemCode|subsect", NULL, dmCode);
+	assyCode           = firstXPathValue("@assyCode|subject", NULL, dmCode);
+	disassyCode        = firstXPathValue("@disassyCode|discode", NULL, dmCode);
+	disassyCodeVariant = firstXPathValue("@disassyCodeVariant|discodev", NULL, dmCode);
+	infoCode           = firstXPathValue("@infoCode|incode", NULL, dmCode);
+	infoCodeVariant    = firstXPathValue("@infoCodeVariant|incodev", NULL, dmCode);
+	itemLocationCode   = firstXPathValue("@itemLocationCode|itemloc", NULL, dmCode);
+	learnCode          = firstXPathValue("@learnCode", NULL, dmCode);
+	learnEventCode     = firstXPathValue("@learnEventCode", NULL, dmCode);
 
 	strcat(dst, modelIdentCode);
 	strcat(dst, "-");
@@ -157,8 +162,8 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 	if (issueInfo && !noIssue) {
 		char *issueNumber, *inWork;
 
-		issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-		inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+		issueNumber = firstXPathValue("@issueNumber|@issno", NULL, issueInfo);
+		inWork      = firstXPathValue("@inWork|@inwork", NULL, issueInfo);
 
 		strcat(dst, "_");
 		strcat(dst, issueNumber);
@@ -172,8 +177,8 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 	if (language) {
 		char *languageIsoCode, *countryIsoCode;
 
-		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		languageIsoCode = firstXPathValue("@languageIsoCode|@language", NULL, language);
+		countryIsoCode  = firstXPathValue("@countryIsoCode|@country", NULL, language);
 
 		strcat(dst, "_");
 		strcat(dst, languageIsoCode);
@@ -195,9 +200,9 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 	char *pmVolume;
 
 	identExtension = firstXPathNode("pmRefIdent/identExtension", NULL, pmRef);
-	pmCode         = firstXPathNode("pmRefIdent/pmCode", NULL, pmRef);
-	issueInfo      = firstXPathNode("pmRefIdent/issueInfo", NULL, pmRef);
-	language       = firstXPathNode("pmRefIdent/language", NULL, pmRef);
+	pmCode         = firstXPathNode("pmRefIdent/pmCode|pmc", NULL, pmRef);
+	issueInfo      = firstXPathNode("pmRefIdent/issueInfo|issno", NULL, pmRef);
+	language       = firstXPathNode("pmRefIdent/language|language", NULL, pmRef);
 
 	strcpy(dst, "");
 
@@ -220,10 +225,10 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 		strcat(dst, "PMC-");
 	}
 
-	modelIdentCode = (char *) xmlGetProp(pmCode, BAD_CAST "modelIdentCode");
-	pmIssuer       = (char *) xmlGetProp(pmCode, BAD_CAST "pmIssuer");
-	pmNumber       = (char *) xmlGetProp(pmCode, BAD_CAST "pmNumber");
-	pmVolume       = (char *) xmlGetProp(pmCode, BAD_CAST "pmVolume");
+	modelIdentCode = firstXPathValue("@modelIdentCode|modelic", NULL, pmCode);
+	pmIssuer       = firstXPathValue("@pmIssuer|pmissuer", NULL, pmCode);
+	pmNumber       = firstXPathValue("@pmNumber|pmnumber", NULL, pmCode);
+	pmVolume       = firstXPathValue("@pmVolume|pmvolume", NULL, pmCode);
 
 	strcat(dst, modelIdentCode);
 	strcat(dst, "-");
@@ -241,8 +246,8 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 	if (issueInfo && !noIssue) {
 		char *issueNumber, *inWork;
 
-		issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-		inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+		issueNumber = firstXPathValue("@issueNumber|@issno", NULL, issueInfo);
+		inWork      = firstXPathValue("@inWork|@inwork", NULL, issueInfo);
 
 		strcat(dst, "_");
 		strcat(dst, issueNumber);
@@ -256,8 +261,8 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 	if (language) {
 		char *languageIsoCode, *countryIsoCode;
 
-		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		languageIsoCode = firstXPathValue("@languageIsoCode|@language", NULL, language);
+		countryIsoCode  = firstXPathValue("@countryIsoCode|@country", NULL, language);
 
 		strcat(dst, "_");
 		strcat(dst, languageIsoCode);
@@ -345,9 +350,6 @@ bool getFileName(char *dst, char *code, char *path)
 
 	while ((cur = readdir(dir))) {
 		if (strncasecmp(code, cur->d_name, n) == 0) {
-			/*strcpy(dst, path);
-			strcat(dst, "/");
-			strcat(dst, cur->d_name);*/
 			strcpy(dst, cur->d_name);
 			found = true;
 			break;
@@ -382,14 +384,19 @@ void printReference(xmlNodePtr ref, const char *src)
 	char code[256];
 	char fname[PATH_MAX];
 
-	if (strcmp((char *) ref->name, "dmRef") == 0)
+	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
+	    xmlStrcmp(ref->name, BAD_CAST "refdm") == 0 ||
+	    xmlStrcmp(ref->name, BAD_CAST "addresdm") == 0)
 		getDmCode(code, ref);
-	else if (strcmp((char *) ref->name, "pmRef") == 0)
+	else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 ||
+	         xmlStrcmp(ref->name, BAD_CAST "refpm") == 0)
 		getPmCode(code, ref);
 	else if (strcmp((char *) ref->name, "infoEntityRef") == 0)
 		getICN(code, ref);
 	else if (strcmp((char *) ref->name, "commentRef") == 0)
 		getComCode(code, ref);
+	else
+		return;
 
 	if (showUnmatched)
 		printMatched(src, code);
@@ -410,11 +417,11 @@ void listReferences(const char *path)
 	ctx = xmlXPathNewContext(doc);
 
 	if (contentOnly)
-		ctx->node = firstXPathNode("//content|//dmlContent", doc, NULL);
+		ctx->node = firstXPathNode("//content|//dmlContent|//dml", doc, NULL);
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//pmRef|.//infoEntityRef|.//commentRef", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|.//commentRef", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
