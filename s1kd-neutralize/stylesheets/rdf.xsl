@@ -3,6 +3,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:dc="http://www.purl.org/dc/elements/1.1/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   version="1.0">
   
   <xsl:template match="node()|@*">
@@ -14,39 +15,78 @@
   <xsl:template match="dmodule">
     <xsl:variable name="dmtitle" select="(//dmTitle|//dmtitle)[1]"/>
     <xsl:variable name="orig" select="(//originator|//orig)[1]"/>
+    <xsl:variable name="schema" select="@xsi:noNamespaceSchemaLocation"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <rdf:Description>
-        <dc:title>
-          <xsl:apply-templates select="$dmtitle" mode="dc"/>
-        </dc:title>
-        <dc:creator>
-          <xsl:apply-templates select="$orig" mode="dc"/>
-        </dc:creator>
-        <dc:subject>
-          <xsl:apply-templates select="$dmtitle" mode="dc"/>
-        </dc:subject>
-        <dc:publisher>
-          <xsl:apply-templates select="(//responsiblePartnerCompany|//rpc)[1]" mode="dc"/>
-        </dc:publisher>
-        <dc:contributor>
-          <xsl:apply-templates select="$orig" mode="dc"/>
-        </dc:contributor>
-        <dc:date>
-          <xsl:apply-templates select="(//issueDate|//issdate)[1]" mode="dc"/>
-        </dc:date>
-        <dc:type>text</dc:type>
-        <dc:format>text/xml</dc:format>
-        <dc:identifier>
-          <xsl:apply-templates select="(//dmIdent|//dmaddres)[1]" mode="dc"/>
-        </dc:identifier>
-        <dc:language>
-          <xsl:apply-templates select="(//language)[1]" mode="dc"/>
-        </dc:language>
-        <xsl:apply-templates select="//derivativeSource" mode="dc"/>
-        <dc:rights>
-          <xsl:value-of select="(//@securityClassification|//@class)[1]"/>
-        </dc:rights>
+        <xsl:choose>
+          <xsl:when test="contains($schema, 'S1000D_2-0') or
+                          contains($schema, 'S1000D_2-1') or
+                          contains($schema, 'S1000D_2-2')">
+            <dc:Title>
+              <xsl:apply-templates select="$dmtitle" mode="dc"/>
+            </dc:Title>
+            <dc:Creator>
+              <xsl:apply-templates select="$orig" mode="dc"/>
+            </dc:Creator>
+            <dc:Subject>
+              <xsl:apply-templates select="$dmtitle" mode="dc"/>
+            </dc:Subject>
+            <dc:Publisher>
+              <xsl:apply-templates select="(//responsiblePartnerCompany|//rpc)[1]" mode="dc"/>
+            </dc:Publisher>
+            <dc:Contributor>
+              <xsl:apply-templates select="$orig" mode="dc"/>
+            </dc:Contributor>
+            <dc:Date>
+              <xsl:apply-templates select="(//issueDate|//issdate)[1]" mode="dc"/>
+            </dc:Date>
+            <dc:Type>text</dc:Type>
+            <dc:Format>text/xml</dc:Format>
+            <dc:Identifier>
+              <xsl:apply-templates select="(//dmIdent|//dmaddres)[1]" mode="dc"/>
+            </dc:Identifier>
+            <dc:Language>
+              <xsl:apply-templates select="(//language)[1]" mode="dc"/>
+            </dc:Language>
+            <xsl:apply-templates select="//derivativeSource" mode="dc"/>
+            <dc:Rights>
+              <xsl:value-of select="(//@securityClassification|//@class)[1]"/>
+            </dc:Rights>
+          </xsl:when>
+          <xsl:otherwise>
+            <dc:title>
+              <xsl:apply-templates select="$dmtitle" mode="dc"/>
+            </dc:title>
+            <dc:creator>
+              <xsl:apply-templates select="$orig" mode="dc"/>
+            </dc:creator>
+            <dc:subject>
+              <xsl:apply-templates select="$dmtitle" mode="dc"/>
+            </dc:subject>
+            <dc:publisher>
+              <xsl:apply-templates select="(//responsiblePartnerCompany|//rpc)[1]" mode="dc"/>
+            </dc:publisher>
+            <dc:contributor>
+              <xsl:apply-templates select="$orig" mode="dc"/>
+            </dc:contributor>
+            <dc:date>
+              <xsl:apply-templates select="(//issueDate|//issdate)[1]" mode="dc"/>
+            </dc:date>
+            <dc:type>text</dc:type>
+            <dc:format>text/xml</dc:format>
+            <dc:identifier>
+              <xsl:apply-templates select="(//dmIdent|//dmaddres)[1]" mode="dc"/>
+            </dc:identifier>
+            <dc:language>
+              <xsl:apply-templates select="(//language)[1]" mode="dc"/>
+            </dc:language>
+            <xsl:apply-templates select="//derivativeSource" mode="dc"/>
+            <dc:rights>
+              <xsl:value-of select="(//@securityClassification|//@class)[1]"/>
+            </dc:rights>
+          </xsl:otherwise>
+        </xsl:choose>
       </rdf:Description>
       <xsl:apply-templates select="node()[not(self::rdf:Description)]"/>
     </xsl:copy>

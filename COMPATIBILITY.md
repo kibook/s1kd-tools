@@ -30,7 +30,7 @@ Support is planned but not yet implemented.
 | s1kd-instance   | X   | X   | X   | /   | ~   | ~   | ~   | ~   |
 | s1kd-ls         | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-metadata   | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-neutralize | X   | X   | X   |     |     |     |     |     |
+| s1kd-neutralize | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newcom     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newddn     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newdm      | X   | X   | X   | X   | X   | X   | X   | X   |
