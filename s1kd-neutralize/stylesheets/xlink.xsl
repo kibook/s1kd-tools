@@ -18,13 +18,42 @@
       <xsl:attribute name="xlink:title">
         <xsl:apply-templates select="dmRefAddressItems/dmTitle" mode="xlink"/>
       </xsl:attribute>
-      <xsl:if test="behavior">
-        <xsl:attribute name="xlink:show">
-          <xsl:apply-templates select="behavior" mode="xlink"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:apply-templates select="node()|@*"/>
+      <xsl:attribute name="xlink:show">
+        <xsl:choose>
+          <xsl:when test="behavior">
+            <xsl:apply-templates select="behavior" mode="xlink"/>
+          </xsl:when>
+          <xsl:otherwise>replace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="refdm">
+    <xsl:copy>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:choose>
+          <xsl:when test="dmcextension">DME-</xsl:when>
+          <xsl:otherwise>DMC-</xsl:otherwise>
+        </xsl:choose>
+        <xsl:if test="dmcextension">
+          <xsl:apply-templates select="dmcextension" mode="xlink"/>
+          <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:apply-templates select="avee" mode="xlink"/>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:title">
+        <xsl:apply-templates select="dmtitle" mode="xlink"/>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:show">replace</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="*" mode="xlink">
+    <xsl:apply-templates mode="xlink"/>
   </xsl:template>
 
   <xsl:template match="dmRefIdent" mode="xlink">
@@ -76,11 +105,40 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="avee" mode="xlink">
+    <xsl:value-of select="modelic"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="sdc"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="chapnum"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="section"/>
+    <xsl:value-of select="subsect"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="subject"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="discode"/>
+    <xsl:value-of select="discodev"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="incode"/>
+    <xsl:value-of select="incodev"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="itemloc"/>
+  </xsl:template>
+
   <xsl:template match="dmTitle" mode="xlink">
-    <xsl:value-of select="techName/text()"/>
+    <xsl:apply-templates select="techName" mode="xlink"/>
     <xsl:if test="infoName">
       <xsl:text> - </xsl:text>
-      <xsl:value-of select="infoName/text()"/>
+      <xsl:apply-templates select="infoName" mode="xlink"/>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="dmtitle" mode="xlink">
+    <xsl:apply-templates select="techname" mode="xlink"/>
+    <xsl:if test="infoname">
+      <xsl:text> - </xsl:text>
+      <xsl:apply-templates select="infoname" mode="xlink"/>
     </xsl:if>
   </xsl:template>
 
@@ -103,12 +161,29 @@
       <xsl:attribute name="xlink:title">
         <xsl:apply-templates select="pmRefAddressItems/pmTitle" mode="xlink"/>
       </xsl:attribute>
-      <xsl:if test="behavior">
-        <xsl:attribute name="xlink:show">
-          <xsl:apply-templates select="behavior" mode="xlink"/>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:attribute name="xlink:show">
+        <xsl:choose>
+          <xsl:when test="behavior">
+            <xsl:apply-templates select="behavior" mode="xlink"/>
+          </xsl:when>
+          <xsl:otherwise>replace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:apply-templates select="node()|@*"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="refpm">
+    <xsl:copy>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:text>URN:S1000D:PMC-</xsl:text>
+        <xsl:apply-templates select="pmc" mode="xlink"/>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:title">
+        <xsl:apply-templates select="pmtitle" mode="xlink"/>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:show">replace</xsl:attribute>
     </xsl:copy>
   </xsl:template>
 
@@ -120,6 +195,16 @@
     <xsl:value-of select="@pmNumber"/>
     <xsl:text>-</xsl:text>
     <xsl:value-of select="@pmVolume"/>
+  </xsl:template>
+
+  <xsl:template match="pmc" mode="xlink">
+    <xsl:value-of select="modelic"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="pmissuer"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="pmnumber"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="pmvolume"/>
   </xsl:template>
 
   <xsl:template match="pmRefIdent" mode="xlink">
@@ -144,10 +229,10 @@
       <xsl:attribute name="xlink:type">simple</xsl:attribute>
       <xsl:attribute name="xlink:href">
         <xsl:text>URN:S1000D:</xsl:text>
-        <xsl:value-of select="@infoEntityIdent"/>
+        <xsl:value-of select="@infoEntityIdent|@boardno"/>
       </xsl:attribute>
       <xsl:attribute name="xlink:title">
-        <xsl:apply-templates select="parent::figure/title"/>
+        <xsl:apply-templates select="parent::figure/title" mode="xlink"/>
       </xsl:attribute>
       <xsl:apply-templates select="node()|@*"/>
     </xsl:copy>
