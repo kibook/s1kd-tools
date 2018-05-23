@@ -1381,7 +1381,12 @@ int main(int argc, char **argv)
 		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST responsiblePartnerCompany_enterpriseCode);
 	}
 	if (strcmp(responsiblePartnerCompany_enterpriseName, "") != 0) {
-		xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST responsiblePartnerCompany_enterpriseName);
+		xmlNodePtr node;
+		if ((node = firstXPathNode(dm, NULL, "//responsiblePartnerCompany/enterpriseName"))) {
+			xmlNodeSetContent(node, BAD_CAST responsiblePartnerCompany_enterpriseName);
+		} else {
+			xmlNewChild(responsiblePartnerCompany, NULL, BAD_CAST "enterpriseName", BAD_CAST responsiblePartnerCompany_enterpriseName);
+		}
 	}
 
 	originator = find_child(dmStatus, "originator");
@@ -1389,7 +1394,12 @@ int main(int argc, char **argv)
 		xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST originator_enterpriseCode);
 	}
 	if (strcmp(originator_enterpriseName, "") != 0) {
-		xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST originator_enterpriseName);
+		xmlNodePtr node;
+		if ((node = firstXPathNode(dm, NULL, "//originator/enterpriseName"))) {
+			xmlNodeSetContent(node, BAD_CAST originator_enterpriseName);
+		} else {
+			xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST originator_enterpriseName);
+		}
 	}
 
 	set_remarks(dm, remarks);
