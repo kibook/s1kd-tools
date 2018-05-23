@@ -93,3 +93,8 @@ Print the file name of the newly created DDN.
 ---------------
 
 Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
+
+EXAMPLE
+=======
+
+    $ s1kd-newddn -# EX-12345-54321-2018-00001

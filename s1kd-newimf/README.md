@@ -63,3 +63,8 @@ Print the file name of the newly created IMF.
 
 -w &lt;inwork&gt;  
 The inwork issue of the new ICN metadata file.
+
+EXAMPLE
+=======
+
+    $ s1kd-newimf ICN-EX-00001-001-01.PNG

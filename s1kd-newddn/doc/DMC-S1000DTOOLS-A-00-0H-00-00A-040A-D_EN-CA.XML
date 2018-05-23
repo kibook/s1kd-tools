@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="H" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="22"/>
+        <issueDate year="2018" month="05" day="23"/>
         <dmTitle>
           <techName>s1kd-newddn(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add support for issues 2.2, 2.1 and 2.0.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -90,13 +90,13 @@
                     <listItem>
                       <para>2.3</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.2</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.1</para>
                     </listItem>
-                    <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>2.0</para>
                     </listItem>
                   </randomList>
@@ -211,6 +211,12 @@
           <title>'defaults' file</title>
           <para>Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new* commands.</para>
         </levelledPara>
+      </levelledPara>
+      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-newddn -# EX-12345-54321-2018-00001</verbatimText>
+        </para>
       </levelledPara>
     </description>
   </content>

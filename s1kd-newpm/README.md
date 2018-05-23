@@ -108,3 +108,8 @@ The inwork number of the new publication module.
 ---------------
 
 Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
+
+EXAMPLE
+=======
+
+    $ s1kd-newpm -# EX-12345-00001-00

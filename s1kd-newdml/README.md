@@ -93,3 +93,8 @@ Any number of data module file names to automatically add to the list.
 ---------------
 
 Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
+
+EXAMPLE
+=======
+
+    $ s1kd-newdml -# EX-12345-C-2018-00001

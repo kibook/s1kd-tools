@@ -43,3 +43,10 @@ The source (original) issue of the CIR data module.
 
 &lt;TARGET&gt;  
 The target (updated) issue of the CIR data module.
+
+EXAMPLE
+=======
+
+    $ s1kd-newupf \
+        DMC-EX-A-00-00-00-00A-00GA-D_001-00_EN-CA.XML \
+        DMC-EX-A-00-00-00-00A-00GA-D_002-00_EN-CA.XML
