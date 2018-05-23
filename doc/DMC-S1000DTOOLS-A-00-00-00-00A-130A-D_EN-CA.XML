@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="05" day="10"/>
+        <issueDate year="2018" month="05" day="23"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -32,26 +32,26 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="TEST1" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add examples of the -N option for use with VCS such as git or SVN.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt03">
+        <simplePara>Change BREX reference and add ids to all levelled paragraphs.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
-      <levelledPara>
+      <levelledPara id="par-0001">
         <title>General</title>
         <para>This document provides examples of the usage of the <emphasis>s1kd-tools</emphasis>.</para>
         <para>The sample commands have been written as they would be used on a Linux or other Unix-like system, but should work more-or-less the same on most operating systems. OS-specific commands used in examples (e.g., <verbatimText>mkdir</verbatimText>) may need to be adapted.</para>
       </levelledPara>
-      <levelledPara>
+      <levelledPara id="par-0002">
         <title>Initial setup</title>
         <para>This first step is to create a folder for the new S1000D project. Example:</para>
         <para>
@@ -63,7 +63,7 @@ $ cd myproject</verbatimText>
           <verbatimText verbatimStyle="vs23">$ s1kd-defaults -i</verbatimText>
         </para>
         <para>Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
-        <levelledPara>
+        <levelledPara id="par-0003">
           <title><verbatimText verbatimStyle="vs02">defaults</verbatimText> file</title>
           <para>The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
           <para>
@@ -81,18 +81,18 @@ techName                   My project</verbatimText>
             <emphasis emphasisType="em01">Example of XML format:</emphasis>
           </para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
-<defaults>
-<default ident="languageIsoCode" value="en"/>
-<default ident="countryIsoCode" value="CA"/>
-<default ident="responsiblePartnerCompany" value="khzae.net"/>
-<default ident="originator" value="khzae.net"/>
-<default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/>
-<default ident="techName" value="My project"/>
-</defaults>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+&lt;defaults&gt;
+&lt;default ident="languageIsoCode" value="en"/&gt;
+&lt;default ident="countryIsoCode" value="CA"/&gt;
+&lt;default ident="responsiblePartnerCompany" value="khzae.net"/&gt;
+&lt;default ident="originator" value="khzae.net"/&gt;
+&lt;default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/&gt;
+&lt;default ident="techName" value="My project"/&gt;
+&lt;/defaults&gt;</verbatimText>
           </para>
         </levelledPara>
-        <levelledPara>
+        <levelledPara id="par-0004">
           <title><verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file</title>
           <para>The <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file is used by the <emphasis>s1kd-newdm</emphasis> tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the <verbatimText verbatimStyle="vs02">defaults</verbatimText> file, it can be written using either the simple text format or XML format.</para>
           <para>
@@ -108,17 +108,17 @@ techName                   My project</verbatimText>
             <emphasis emphasisType="em01">Example of XML format:</emphasis>
           </para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
-<dmtypes>
-<type infoCode="009" infoName="Table of contents"
-schema="frontmatter"/>
-<type infoCode="022" infoName="Business rules exchange"
-schema="brex"/>
-<type infoCode="040" infoName="Description"
-schema="descript"/>
-<type infoCode="130" infoName="Normal operation"
-schema="proced"/>
-</dmtypes>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+&lt;dmtypes&gt;
+&lt;type infoCode="009" infoName="Table of contents"
+schema="frontmatter"/&gt;
+&lt;type infoCode="022" infoName="Business rules exchange"
+schema="brex"/&gt;
+&lt;type infoCode="040" infoName="Description"
+schema="descript"/&gt;
+&lt;type infoCode="130" infoName="Normal operation"
+schema="proced"/&gt;
+&lt;/dmtypes&gt;</verbatimText>
           </para>
           <para>The s1kd-newdm tool contains a default set of information code definitions. This can be used to create a default <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file by use of the <verbatimText>-.</verbatimText> (simple text format) or <verbatimText>-,</verbatimText> (XML) options:</para>
           <para>
@@ -127,7 +127,7 @@ schema="proced"/>
           <para>The generated <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file can then be customized to fit your project.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara>
+      <levelledPara id="par-0005">
         <title>Creating the DMRL and populating the CSDB</title>
         <para>The next step is to prepare the DMRL for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.</para>
         <para>If you do not already have a DMRL, the <emphasis>s1kd-newdml</emphasis> tool can be used to create a new one:</para>
@@ -140,7 +140,7 @@ schema="proced"/>
           <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
         </para>
         <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file for data modules).</para>
-        <levelledPara>
+        <levelledPara id="par-0006">
           <title>Creating CSDB objects on-the-fly</title>
           <para>Data modules and other CSDB objects can also be created in an "on-the-fly" manner, without the use of a DMRL, by invoking the s1kd-new* set of tools directly, as with s1kd-newdml above. For example, to create a new data module:</para>
           <para>
@@ -150,10 +150,10 @@ schema="proced"/>
           <para>Each of the s1kd-new* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the <verbatimText verbatimStyle="vs02">defaults</verbatimText> and <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> files.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara>
+      <levelledPara id="par-0007">
         <title>Data module workflow</title>
         <para>Data modules are put through the general S1000D workflow with the <emphasis>s1kd-upissue</emphasis> tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.</para>
-        <levelledPara>
+        <levelledPara id="par-0008">
           <title>Inwork data modules</title>
           <para>When a data module is in the inwork state, the s1kd-upissue tool is called without any additional arguments:</para>
           <para>
@@ -162,29 +162,29 @@ schema="proced"/>
           <para>Assuming this data module was just created, it would be incremented from initial inwork issue 000-01 to initial inwork issue 000-02. After upissuing, make the changes. For example:</para>
           <para>
             <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>:</emphasis>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<content>
-<description>
-<levelledPara>
-<title>General</title>
-<para>This is my project.</para>
-</levelledPara>
-</description>
-</content>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
           </para>
           <para>
             <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML</verbatimText>:</emphasis>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<content>
-<description>
-<levelledPara>
-<title>General</title>
-<para>This is my project.</para>
-<para>My project is maintained using S1000D.</para>
-</levelledPara>
-</description>
-</content>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;para&gt;My project is maintained using S1000D.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
           </para>
         </levelledPara>
-        <levelledPara>
+        <levelledPara id="par-0009">
           <title>Making data modules official</title>
           <para>Before a data module can be made official, it must be validated. This means:</para>
           <para>
@@ -218,7 +218,7 @@ schema="proced"/>
             <verbatimText verbatimStyle="vs23">$ s1kd-upissue -i DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
           </para>
         </levelledPara>
-        <levelledPara>
+        <levelledPara id="par-0010">
           <title>Changes to official data modules</title>
           <para>When a change must be made to an official data module (for example, as a result of feedback), the s1kd-upissue tool is used again to bring the data module back to the inwork state:</para>
           <para>
@@ -227,40 +227,40 @@ schema="proced"/>
           <para>Changes between official issues of a data module are indicated with reasons for update and change marking. For example:</para>
           <para>
             <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>:</emphasis>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<content>
-<description>
-<levelledPara>
-<title>General</title>
-<para>This is my project.</para>
-<para>My project is maintained using S1000D.</para>
-</levelledPara>
-</description>
-</content>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;para&gt;My project is maintained using S1000D.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
           </para>
           <para>
             <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_001-01_EN-CA.XML</verbatimText>:</emphasis>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus issueType="changed">
-<!-- ...... -->
-<reasonForUpdate id="rfu-0001">
-<simplePara>Added reference to tools used.</simplePara>
-</reasonForUpdate>
-</dmStatus>
-<!-- ...... -->
-<content>
-<description>
-<levelledPara>
-<title>General</title>
-<para>This is my project.</para>
-<para changeType="modify" changeMark="1"
-reasonForUpdateRefIds="rfu-0001">My project is maintained using
-S1000D and s1kd-tools.</para>
-</levelledPara>
-</description>
-</content>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus issueType="changed"&gt;
+&lt;!-- ...... --&gt;
+&lt;reasonForUpdate id="rfu-0001"&gt;
+&lt;simplePara&gt;Added reference to tools used.&lt;/simplePara&gt;
+&lt;/reasonForUpdate&gt;
+&lt;/dmStatus&gt;
+&lt;!-- ...... --&gt;
+&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;para changeType="modify" changeMark="1"
+reasonForUpdateRefIds="rfu-0001"&gt;My project is maintained using
+S1000D and s1kd-tools.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
           </para>
           <para>Reasons for update from the previous official issue are automatically removed when upissuing to the first inwork issue.</para>
         </levelledPara>
-        <levelledPara>
+        <levelledPara id="par-0011">
           <title>Deleting data modules</title>
           <para>The basic cycle continues until a data module is deleted. "Deleting" a data module is a special case of upissuing:</para>
           <para>
@@ -274,7 +274,7 @@ S1000D and s1kd-tools.</para>
           <para>The data module is once again upissued to the next official issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-..."</verbatimText> types.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara id="par-0012">
         <title>Use with other version control systems</title>
         <para>The issue/inwork numbers and S1000D file naming conventions as seen above provide a basic form of version control. In this case, each file represents a single issue of a CSDB object, and multiple files together represent the whole logical object. For example, all of the following files represent different versions of the same object:</para>
         <para>
