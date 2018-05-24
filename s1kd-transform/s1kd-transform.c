@@ -141,7 +141,7 @@ void addParam(xmlNodePtr stylesheet, char *s)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-transform [-fih?] [-s <stylesheet> ... [-p <name>=<value> ...]] [-o <file>] [<object>...]");
+	puts("Usage: s1kd-transform [-fih?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?              Show usage message.");

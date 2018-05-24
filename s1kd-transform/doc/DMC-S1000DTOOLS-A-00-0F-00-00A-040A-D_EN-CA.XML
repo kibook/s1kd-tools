@@ -52,7 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-transform [-s &lt;stylesheet&gt; ...] [-o &lt;file&gt;] [-ifh?] [&lt;object&gt; ...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
+               [-o <file>] [-ifh?] [<object> ...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>

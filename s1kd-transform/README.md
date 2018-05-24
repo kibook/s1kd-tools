@@ -6,7 +6,8 @@ s1kd-transform - Apply XSL transformations to CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-transform [-s <stylesheet> ...] [-o <file>] [-ifh?] [<object> ...]
+    s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
+                   [-o <file>] [-ifh?] [<object> ...]
 
 DESCRIPTION
 ===========
