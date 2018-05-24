@@ -28,6 +28,9 @@ Includes an "identity" template in to each specified stylesheet.
 -o &lt;file&gt;  
 Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single CSDB object.
 
+-p &lt;name&gt;=&lt;value&gt;  
+Pass a parameter to the last specified stylesheet.
+
 -s &lt;stylesheet&gt;  
 An XSLT stylesheet file to apply to each CSDB object. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.
 

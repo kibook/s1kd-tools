@@ -52,8 +52,30 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 		xmlDocPtr res, styledoc;
 		xmlChar *path;
 		xsltStylesheetPtr style;
+		const char **params = NULL;
+		unsigned long nparams;
+		int i;
 
-		path = xmlNodeGetContent(cur);
+		path = xmlGetProp(cur, BAD_CAST "path");
+
+		if ((nparams = xmlChildElementCount(cur)) > 0) {
+			xmlNodePtr param;
+			int n = 0;
+
+			params = malloc((nparams * 2 + 1) * sizeof(char *));
+
+			for (param = cur->children; param; param = param->next) {
+				char *name, *value;
+
+				name  = (char *) xmlGetProp(param, BAD_CAST "name");
+				value = (char *) xmlGetProp(param, BAD_CAST "value");
+
+				params[n++] = name;
+				params[n++] = value;
+			}
+
+			params[n] = NULL;
+		}
 
 		styledoc = xmlReadFile((char *) path, NULL, PARSE_OPTS);
 
@@ -65,7 +87,13 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 
 		xmlFree(path);
 
-		res = xsltApplyStylesheet(style, doc, NULL);
+		res = xsltApplyStylesheet(style, doc, params);
+
+		for (i = 0; i < nparams; ++i) {
+			xmlFree((char *) params[i]);
+			xmlFree((char *) params[i + 1]);
+		}
+		free(params);
 
 		xsltFreeStylesheet(style);
 		xmlFreeDoc(doc);
@@ -98,24 +126,38 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 	xmlFreeDoc(doc);
 }
 
+void addParam(xmlNodePtr stylesheet, char *s)
+{
+	char *n, *v;
+	xmlNodePtr p;
+
+	n = strtok(s, "=");
+	v = strtok(NULL, "");
+
+	p = xmlNewChild(stylesheet, NULL, BAD_CAST "param", NULL);
+	xmlSetProp(p, BAD_CAST "name", BAD_CAST n);
+	xmlSetProp(p, BAD_CAST "value", BAD_CAST v);
+}
+
 void showHelp(void)
 {
-	puts("Usage: s1kd-transform [-fih?] [-s <stylesheet> ...] [-o <file>] [<object>...]");
+	puts("Usage: s1kd-transform [-fih?] [-s <stylesheet> ... [-p <name>=<value> ...]] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?            Show usage message.");
-	puts("  -f               Overwrite input CSDB objects.");
-	puts("  -i               Include identity template in stylesheets.");
-	puts("  -o <file>        Output result of transformation to <path>.");
-	puts("  -s <stylesheet>  Apply XSLT stylesheet to CSDB objects.");
-	puts("  <object>         CSDB objects to apply transformations to.");
+	puts("  -h -?              Show usage message.");
+	puts("  -f                 Overwrite input CSDB objects.");
+	puts("  -i                 Include identity template in stylesheets.");
+	puts("  -o <file>          Output result of transformation to <path>.");
+	puts("  -p <name>=<value>  Pass parameters to stylesheets.");
+	puts("  -s <stylesheet>    Apply XSLT stylesheet to CSDB objects.");
+	puts("  <object>           CSDB objects to apply transformations to.");
 }
 
 int main(int argc, char **argv)
 {
 	int i;
 
-	xmlNodePtr stylesheets;
+	xmlNodePtr stylesheets, lastStyle = NULL;
 
 	char *out = strdup("-");
 	bool overwrite = false;
@@ -124,10 +166,11 @@ int main(int argc, char **argv)
 
 	stylesheets = xmlNewNode(NULL, BAD_CAST "stylesheets");
 
-	while ((i = getopt(argc, argv, "s:io:fh?")) != -1) {
+	while ((i = getopt(argc, argv, "s:io:p:fh?")) != -1) {
 		switch (i) {
 			case 's':
-				xmlNewChild(stylesheets, NULL, BAD_CAST "stylesheet", BAD_CAST optarg);
+				lastStyle = xmlNewChild(stylesheets, NULL, BAD_CAST "stylesheet", NULL);
+				xmlSetProp(lastStyle, BAD_CAST "path", BAD_CAST optarg);
 				break;
 			case 'i':
 				includeIdentity = true;
@@ -135,6 +178,9 @@ int main(int argc, char **argv)
 			case 'o':
 				free(out);
 				out = strdup(optarg);
+				break;
+			case 'p':
+				addParam(lastStyle, optarg);
 				break;
 			case 'f':
 				overwrite = true;
