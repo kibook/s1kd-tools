@@ -183,7 +183,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 #define IDENT_XPATH \
 	"//dmIdent|//dmaddres|" \
 	"//pmIdent|//pmaddres|" \
-	"//dmlIdent|//dml|" \
+	"//dmlIdent|//dml[dmlc]|" \
 	"//commentIdent|//cstatus|" \
 	"//ddnIdent|//ddn|" \
 	"//imfIdent|" \
