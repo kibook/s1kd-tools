@@ -35,6 +35,7 @@ bool validateOnly = true;
 bool failOnInvalid = false;
 bool checkExtPubRefs = false;
 enum list {OFF, REFS, DMS} listInvalid = OFF;
+bool inclFname = false;
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -414,7 +415,11 @@ void validityError(xmlNodePtr ref, const char *fname)
 	}
 
 	if (listInvalid == REFS) {
-		printf("%s\n", code);
+		if (inclFname) {
+			printf("%s: %s\n", fname, code);
+		} else {
+			printf("%s\n", code);
+		}
 	} else if (listInvalid == DMS) {
 		printf("%s\n", fname);
 	} else {
@@ -563,22 +568,23 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xml
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-s <source>] [-t <target>] [-m <object>] [-d <dir>] [-cuFeLlvh?]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-m <object>] [-s <source>] [-t <target>] [-ceFLlnuvh?]");
 	puts("");
 	puts("Options:");
-	puts("  -s <source>    Use only <source> as source.");
-	puts("  -t <target>    Only check references in <target>.");
-	puts("  -m <object>    Change refs to <source> into refs to <object>.");
+	puts("  -h -?          Show help/usage message.");
 	puts("  -c             Only check references in content section of targets.");
-	puts("  -u             Update address items of references.");
+	puts("  -d <dir>       Check data modules in directory <dir>.");
+	puts("  -e             Check externalPubRefs.");
 	puts("  -F             Fail on first invalid reference, returning error code.");
 	puts("  -f             List files containing invalid references.");
-	puts("  -e             Check externalPubRefs.");
 	puts("  -L             Input is a list of data module filenames.");
 	puts("  -l             List invalid references.");
-	puts("  -d <dir>       Check data modules in directory <dir>.");
+	puts("  -m <object>    Change refs to <source> into refs to <object>.");
+	puts("  -n             Include filename in list of invalid references.");
+	puts("  -s <source>    Use only <source> as source.");
+	puts("  -t <target>    Only check references in <target>.");
+	puts("  -u             Update address items of references.");
 	puts("  -v             Verbose output.");
-	puts("  -h -?          Show help/usage message.");
 }
 
 bool isS1000D(const char *fname)
@@ -776,7 +782,7 @@ int main(int argc, char **argv)
 	bool isList = false;
 	char *recode = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFfveld:Lm:h?")) != -1) {
+	while ((i = getopt(argc, argv, "s:t:cuFfveld:Lm:nh?")) != -1) {
 		switch (i) {
 			case 's':
 				if (!source) source = strdup(optarg);
@@ -814,6 +820,9 @@ int main(int argc, char **argv)
 			case 'm':
 				if (!recode) recode = strdup(optarg);
 				validateOnly = false;
+				break;
+			case 'n':
+				inclFname = true;
 				break;
 			case 'h':
 			case '?':
