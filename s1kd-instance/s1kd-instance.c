@@ -2126,7 +2126,7 @@ int main(int argc, char **argv)
 
 		xmlFreeDoc(doc);
 
-		if (!use_stdin && !list && i >= argc) {
+		if (!dmlist && (use_stdin || i >= argc)) {
 			break;
 		}
 	}
