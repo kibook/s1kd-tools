@@ -8,10 +8,10 @@
   </xsl:template>
 
   <xsl:template match="acronym">
-    <xsl:apply-templates select="acronymTerm"/>
+    <xsl:apply-templates select="acronymTerm|acroterm"/>
   </xsl:template>
 
-  <xsl:template match="acronymTerm">
+  <xsl:template match="acronymTerm|acroterm">
     <xsl:apply-templates/>
   </xsl:template>
 
