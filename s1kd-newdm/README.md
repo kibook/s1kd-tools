@@ -198,6 +198,9 @@ Print the file name of the newly created data module.
 -w &lt;inwork&gt;  
 The inwork number of the new data module.
 
+--version  
+Show version information.
+
 Prompt (-p) option
 ------------------
 

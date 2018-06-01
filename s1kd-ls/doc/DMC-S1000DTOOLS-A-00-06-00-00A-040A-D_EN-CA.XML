@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="6" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="16"/>
+        <issueDate year="2018" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,10 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -I and -o options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Use correct terminology.</simplePara>
+        <simplePara>Add --version option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -57,7 +54,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDIiLlMoPrwX]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-ls [-0CDIiLlMoPrwX]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -86,7 +83,7 @@
                 <para>Show the usage message.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-I</listItemTerm>
               <listItemDefinition>
                 <para>Show only inwork issues of objects (inwork != 00).</para>
@@ -95,16 +92,16 @@
             <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Show only official issues of objects (inwork = 00).</para>
+                <para>Show only official issues of objects (inwork = 00).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Show only the latest official/inwork issue of objects.</para>
+                <para>Show only the latest official/inwork issue of objects.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-o</listItemTerm>
               <listItemDefinition>
                 <para>Show only old official/inwork issues of objects.</para>
@@ -119,7 +116,13 @@
             <definitionListItem>
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Show only writable object files.</para>
+                <para>Show only writable object files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -128,7 +131,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ s1kd-ls
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-ls
 DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
 DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML

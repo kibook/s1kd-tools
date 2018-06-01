@@ -43,6 +43,9 @@ Specify the URI when adding an ICN with the -a option.
 -x  
 Process input CSDB objects using the XInclude specification.
 
+--version  
+Show version information.
+
 EXAMPLES
 ========
 

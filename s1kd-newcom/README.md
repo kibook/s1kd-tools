@@ -83,6 +83,9 @@ The title of the new comment.
 -v  
 Print the file name of the newly created comment.
 
+--version  
+Show version information.
+
 'defaults' file
 ---------------
 

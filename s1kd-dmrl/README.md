@@ -37,5 +37,8 @@ Do not report errors when any of the CSDB objects already exist.
 -s  
 Do not create CSDB objects, only output the s1kd-new\* commands to create them.
 
+--version  
+Show version information.
+
 &lt;DML&gt;...  
 One or more S1000D data management lists.

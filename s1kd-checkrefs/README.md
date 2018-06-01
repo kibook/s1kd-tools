@@ -59,6 +59,9 @@ Update the address items of all valid references found within the specified modu
 -v  
 Verbose output.
 
+--version  
+Show version information.
+
 External publication list (-e)
 ------------------------------
 

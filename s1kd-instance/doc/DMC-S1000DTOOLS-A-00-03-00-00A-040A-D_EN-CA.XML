@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="05" day="12"/>
+        <issueDate year="2018" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change behaviour of -s and additional arguments to allow multiple objects to be specified as sources and better match the behaviour of the other tools.</simplePara>
+        <simplePara>Add --version option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
               [-g|-G <CODE>/<NAME>] [-I <date>] [-i <infoName>]
               [-l <lang>] [-n <iss>] [-o <file>|-O <dir>]
               [-P <PCT> -p <id>] [-R <CIR> ...] [-r <XSL>]
@@ -158,7 +158,7 @@
             <definitionListItem>
               <listItemTerm>-L</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Source is a list of object filenames to create instances of, rather than an object itself.</para>
+                <para>Source is a list of object filenames to create instances of, rather than an object itself.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -280,7 +280,7 @@
                 <para>Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-s &lt;applic&gt;</listItemTerm>
               <listItemDefinition>
                 <para>An applicability definition in the form of:</para>
@@ -380,6 +380,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;object&gt;...</listItemTerm>
               <listItemDefinition>
                 <para>Source CSDB objects to instantiate.</para>
@@ -397,7 +403,7 @@
         </levelledPara>
         <levelledPara>
           <title>Identifying the source of an instance</title>
-          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The resulting data module instances will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.</para>
+          <para>The resulting data module instances will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.</para>
           <para>Additionally, the data module instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.</para>
           <para>If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
         </levelledPara>
@@ -433,7 +439,7 @@ applicPropertyValues="C"/>
           </para>
           <para>filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property multiple times in the applicability definition arguments. For example:</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-instance -A -Y "A or C" -s attr:prodattr=A -s attr:prodattr=C ...</verbatimText>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -A -Y "A or C" -s attr:prodattr=A -s attr:prodattr=C ...</verbatimText>
           </para>
           <para>This would produce the following in the instance:</para>
           <para>

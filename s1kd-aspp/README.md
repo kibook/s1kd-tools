@@ -52,6 +52,9 @@ Preprocess applicability statements to produce "presentation" applicability stat
 -x  
 Process the modules using the XInclude specification.
 
+--version  
+Show version information.
+
 &lt;modules&gt;...  
 The module(s) to preprocess. This can include both individual modules and combined files such as those produced by s1kd-flatten(1).
 

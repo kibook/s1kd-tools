@@ -25,5 +25,8 @@ Overwrite the data modules automatically.
 -o &lt;out&gt;  
 The resulting XML is written to &lt;out&gt; instead of stdout.
 
+--version  
+Show version information.
+
 &lt;data module&gt;...  
 The data module(s) to synchronize references in. Default is to read from stdin.

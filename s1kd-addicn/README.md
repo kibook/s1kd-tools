@@ -31,5 +31,8 @@ The filename to output to. Default is to write to stdout.
 -s &lt;src&gt;  
 The source module to add the ICN(s) to. Default is to read from stdin.
 
+--version  
+Show version information.
+
 &lt;ICN&gt;..  
 Any number of ICN files to add.

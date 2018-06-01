@@ -36,6 +36,9 @@ Exclude an XML namespace from the validation. Elements in the namespace specifie
 -x  
 Do XInclude processing before validation.
 
+--version  
+Show version information.
+
 &lt;object&gt;...  
 Any number of CSDB objects to validate. If none are specified, input is read from stdin.
 

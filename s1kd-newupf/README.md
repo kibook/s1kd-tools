@@ -38,6 +38,9 @@ Overwrite existing file.
 -q  
 Do not report an error when the file already exists.
 
+--version  
+Show version information.
+
 &lt;SOURCE&gt;  
 The source (original) issue of the CIR data module.
 

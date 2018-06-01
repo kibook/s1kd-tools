@@ -43,6 +43,9 @@ Recursively descend in to directories.
 -w  
 Show only writable object files.
 
+--version  
+Show version information.
+
 EXAMPLE
 =======
 

@@ -89,6 +89,9 @@ The sender's city.
 -v  
 Print the file name of the newly created DDN.
 
+--version  
+Show version information.
+
 'defaults' file
 ---------------
 

@@ -70,6 +70,9 @@ Format XML output as an S1000D `<table>`.
 -x  
 Use XML output instead of plain text.
 
+--version  
+Show version information.
+
 &lt;dmodule&gt;...  
 Data modules to find acronyms in. If none are specified, input is taken from stdin.
 

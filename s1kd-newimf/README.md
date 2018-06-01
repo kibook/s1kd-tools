@@ -64,6 +64,9 @@ Print the file name of the newly created IMF.
 -w &lt;inwork&gt;  
 The inwork issue of the new ICN metadata file.
 
+--version  
+Show version information.
+
 EXAMPLE
 =======
 

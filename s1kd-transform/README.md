@@ -35,6 +35,9 @@ Pass a parameter to the last specified stylesheet.
 -s &lt;stylesheet&gt;  
 An XSLT stylesheet file to apply to each CSDB object. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.
 
+--version  
+Show version information.
+
 &lt;object&gt; ...  
 Any number of CSDB objects to apply all specified stylesheets to.
 

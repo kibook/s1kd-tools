@@ -194,6 +194,9 @@ Set the applicability for the whole object using the user-defined applicability 
 -y  
 Set the applicability for the whole data object using the user-defined applicability values, with no display text.
 
+--version  
+Show version information.
+
 &lt;object&gt;...  
 Source CSDB objects to instantiate.
 

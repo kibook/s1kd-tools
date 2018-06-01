@@ -29,6 +29,9 @@ Show usage message.
 -o &lt;file&gt;  
 Output neutralized data module XML to &lt;file&gt; instead of stdout.
 
+--version  
+Show version information.
+
 EXAMPLE
 =======
 

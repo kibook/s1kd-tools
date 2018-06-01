@@ -51,6 +51,9 @@ Set the status of the new issue. Default is 'changed'.
 -v  
 Print the file name of the upissued data module.
 
+--version  
+Show version information.
+
 EXAMPLES
 ========
 

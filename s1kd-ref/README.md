@@ -47,6 +47,9 @@ Specify a source data module &lt;src&gt; to add references to when using the -r 
 -t  
 Include the title in the reference (target must be a file).
 
+--version  
+Show version information.
+
 &lt;code&gt;|&lt;filename&gt;  
 Either a code, including the prefix (DMC, PMC, etc.), or the filename of a CSDB object.
 

@@ -62,6 +62,9 @@ Show or edit metadata only on objects where the value of &lt;name&gt; is not equ
 -w &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is equal to the value specified in the following -v option.
 
+--version  
+Show version information.
+
 &lt;object&gt;...  
 The object(s) to show/edit metadata on. The default is to read from stdin.
 

@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="00"/>
+        <issueInfo issueNumber="028" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="30"/>
+        <issueDate year="2018" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,13 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -M option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Add -P option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Include info on 'defaults' file keys.</simplePara>
+        <simplePara>Add --version option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -189,7 +183,7 @@
                 <para>The language ISO code of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003">
+            <definitionListItem>
               <listItemTerm>-M &lt;SNS&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Determine the tech name from on one of the built-in S1000D maintained SNS. Supported SNS:</para>
@@ -233,7 +227,7 @@
             <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0003">Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" 'defaults' file key can also be set to control this option.</para>
+                <para>Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" 'defaults' file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -254,7 +248,7 @@
                 <para>The originator enterprise name of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0002 rfu-0003">
+            <definitionListItem>
               <listItemTerm>-P</listItemTerm>
               <listItemDefinition>
                 <para>When determining tech name from an SNS (-S or -M), include the previous level of SNS in the tech name. This means that:</para>
@@ -402,6 +396,12 @@
               <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The inwork number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

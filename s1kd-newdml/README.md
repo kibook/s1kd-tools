@@ -86,6 +86,9 @@ Print the file name of the newly created DML.
 -w &lt;inwork&gt;  
 The inwork number of the new data module.
 
+--version  
+Show version information.
+
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 

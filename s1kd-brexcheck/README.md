@@ -64,6 +64,9 @@ Specify a list of severity levels for business rules.
 -x  
 Output an XML report instead of a plain-text one.
 
+--version  
+Show version information.
+
 Business rule severity levels (-w)
 ----------------------------------
 

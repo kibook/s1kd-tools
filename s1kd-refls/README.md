@@ -33,3 +33,6 @@ Assume filenames of referenced CSDB objects omit the issue info, i.e. they were 
 
 -q  
 Quiet mode. Errors are not printed.
+
+--version  
+Show version information.

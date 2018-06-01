@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
         <simplePara>Add examples.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
+        <simplePara>Add --version option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -159,6 +162,12 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
               <listItemTerm>-x</listItemTerm>
               <listItemDefinition>
                 <para>Use XML output instead of plain text.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

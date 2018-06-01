@@ -37,6 +37,9 @@ Output using the simple text format. Otherwise, the XML format is used by defaul
 -h -?  
 Show help/usage message.
 
+--version  
+Show version information.
+
 &lt;file&gt;...  
 Names of files to convert. If none are specified, the default names of '`defaults`' (for the -d option) or '`dmtypes`' (for the -D option) in the current directory are used.
 

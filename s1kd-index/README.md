@@ -28,6 +28,9 @@ Ignore case when flagging terms.
 -h -?  
 Show help/usage message.
 
+--version  
+Show version information.
+
 EXAMPLE
 =======
 
