@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="K" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="25"/>
+        <issueDate year="2018" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,14 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -D option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Give a more general description of purpose.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Clarify usage of trailing arguments.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add examples.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +47,7 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-acronyms - Manage acronyms in S1000D data modules</para>
+        <para>s1kd-acronyms - Manage acronyms in S1000D data modules</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
@@ -68,8 +62,8 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-acronyms</emphasis> tool is used to manage acronyms in S1000D data modules in one of three ways:</para>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0002">
+        <para>The <emphasis>s1kd-acronyms</emphasis> tool is used to manage acronyms in S1000D data modules in one of three ways:</para>
+        <para>
           <randomList>
             <listItem>
               <para>Generate a list of unique acronyms used in all specified data modules.</para>
@@ -87,7 +81,7 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-D</listItemTerm>
               <listItemDefinition>
                 <para>Remove acronym markup, flattening it to the acronym term.</para>
@@ -167,13 +161,28 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
                 <para>Use XML output instead of plain text.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>&lt;dmodule&gt;...</listItemTerm>
               <listItemDefinition>
                 <para>Data modules to find acronyms in. If none are specified, input is taken from stdin.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <title>EXAMPLES</title>
+        <para>List all acronyms used in all data modules:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms DMC-*.XML</verbatimText>
+        </para>
+        <para>Markup predefined acronyms in a data module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms -m acr.xml -f DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+        </para>
+        <para>Unmarkup acronyms in a data module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms -D -f DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
         </para>
       </levelledPara>
     </description>

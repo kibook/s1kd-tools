@@ -72,3 +72,18 @@ Use XML output instead of plain text.
 
 &lt;dmodule&gt;...  
 Data modules to find acronyms in. If none are specified, input is taken from stdin.
+
+EXAMPLES
+========
+
+List all acronyms used in all data modules:
+
+    $ s1kd-acronyms DMC-*.XML
+
+Markup predefined acronyms in a data module:
+
+    $ s1kd-acronyms -m acr.xml -f DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
+
+Unmarkup acronyms in a data module:
+
+    $ s1kd-acronyms -D -f DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
