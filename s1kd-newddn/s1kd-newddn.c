@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <time.h>
 #include <dirent.h>
@@ -13,6 +14,7 @@
 #include "templates.h"
 
 #define PROG_NAME "s1kd-newddn"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -238,6 +240,7 @@ void show_help(void)
 	puts("  -$               Specify which S1000D issue to use.");
 	puts("  -@               Output to specified file.");
 	puts("  -%               Use templates in specified directory.");
+	puts("  --version        Show version information.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
@@ -250,6 +253,11 @@ void show_help(void)
 	puts("  -a <auth>        Authorization");
 	puts("  -b <BREX>        BREX data module code");
 	puts("  -I <date>        Issue date");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int matches_key_and_not_set(const char *key, const char *match, const char *var)
@@ -441,8 +449,21 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qh?")) != -1) {
+	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'p': showprompts = 1; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
 			case '#': strncpy(ddncode, optarg, 255); skipcode = 1; break;
@@ -462,7 +483,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = 1; break;
 			case 'h':
-			case '?': show_help(); exit(0);
+			case '?': show_help(); return 0;
 		}
 	}
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <time.h>
 #include <string.h>
 #include <stdbool.h>
@@ -13,6 +14,7 @@
 #include "templates.h"
 
 #define PROG_NAME "s1kd-newdml"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -480,26 +482,32 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <datamodules>");
 	puts("");
 	puts("Options:");
-	puts("  -h -?    Show usage message.");
-	puts("  -d       Defaults file.");
-	puts("  -p       Prompt the user for each value.");
-	puts("  -q       Don't report an error if file exists.");
-	puts("  -N       Omit issue/inwork from filename.");
-	puts("  -v       Print file name of DML.");
-	puts("  -f       Overwrite existing file.");
-	puts("  -$       Specify which S1000d issue to use.");
-	puts("  -@       Output to specified file.");
-	puts("  -%       Use template in specified directory.");
+	puts("  -h -?      Show usage message.");
+	puts("  -d         Defaults file.");
+	puts("  -p         Prompt the user for each value.");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -N         Omit issue/inwork from filename.");
+	puts("  -v         Print file name of DML.");
+	puts("  -f         Overwrite existing file.");
+	puts("  -$         Specify which S1000d issue to use.");
+	puts("  -@         Output to specified file.");
+	puts("  -%         Use template in specified directory.");
+	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
-	puts("  -#       DML code");
-	puts("  -n       Issue number");
-	puts("  -w       Inwork issue");
-	puts("  -c       Security classification");
-	puts("  -b       BREX data module code");
-	puts("  -I       Issue date");
-	puts("  -r       Default RPC name");
-	puts("  -R       Default RPC code");
+	puts("  -#         DML code");
+	puts("  -n         Issue number");
+	puts("  -w         Inwork issue");
+	puts("  -c         Security classification");
+	puts("  -b         BREX data module code");
+	puts("  -I         Issue date");
+	puts("  -r         Default RPC name");
+	puts("  -R         Default RPC code");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -613,8 +621,21 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qh?")) != -1) {
+	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
 			case '#': strcpy(code, optarg); skipcode = true; break;
@@ -633,7 +654,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
 			case 'h':
-			case '?': show_help(); exit(0);
+			case '?': show_help(); return 0;
 		}
 	}
 

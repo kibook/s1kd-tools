@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <libgen.h>
 #include <stdbool.h>
 #include <libxml/tree.h>
 #include <libxml/valid.h>
+
+#define PROG_NAME "s1kd-addicn"
+#define VERSION "1.0.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -17,15 +21,21 @@
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-addicn [-s <src>] [-o <out>] [-fh?] <ICN>...");
+	puts("Usage: " PROG_NAME " [-s <src>] [-o <out>] [-fh?] <ICN>...");
 	puts("");
 	puts("Options:");
-	puts("  -s <src>  Source filename.");
-	puts("  -o <out>  Output filename.");
-	puts("  -f        Overwrite source file.");
-	puts("  -F        Include full ICN file path.");
-	puts("  -h -?     Show help/usage message.");
-	puts("  <ICN>...  ICNs to add.");
+	puts("  -s <src>   Source filename.");
+	puts("  -o <out>   Output filename.");
+	puts("  -f         Overwrite source file.");
+	puts("  -F         Include full ICN file path.");
+	puts("  -h -?      Show help/usage message.");
+	puts("  <ICN>...   ICNs to add.");
+	puts("  --version  Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 void addNotation(xmlDocPtr doc, const char *name, const char *sysId)
@@ -70,11 +80,24 @@ int main(int argc, char **argv)
 	bool fullpath = false;
 	bool overwrite = false;
 
+	const char *sopts = "s:o:fFh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	src = strdup("-");
 	out = strdup("-");
 
-	while ((i = getopt(argc, argv, "s:o:fFh?")) != -1) {
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 's':
 				free(src);
 				src = strdup(optarg);
@@ -92,7 +115,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				showHelp();
-				exit(0);
+				return 0;
 		}
 	}
 

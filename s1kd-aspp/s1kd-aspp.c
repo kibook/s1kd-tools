@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
 #include <libxml/tree.h>
@@ -17,6 +18,9 @@
 #include "elements_list.h"
 #include "generateDisplayText.h"
 #include "identity.h"
+
+#define PROG_NAME "s1kd-aspp"
+#define VERSION "1.0.0"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -330,18 +334,24 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-aspp [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-dfxh?] [<modules>]");
+	puts("Usage: " PROG_NAME " [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-dfxh?] [<modules>]");
 	puts("");
 	puts("Options:");
-	puts("  -A <ACT>  Use <ACT> when generating display text.");
-	puts("  -a <ID>   Use <ID> for DM-level applic.");
-	puts("  -C <CCT>  Use <CCT> when generating display text.");
-	puts("  -d        Dump built-in XSLT for generating display text.");
-	puts("  -f        Overwrite input file(s).");
-	puts("  -G <XSL>  Use custom XSLT script to generate display text.");
-	puts("  -g        Generate display text for applicability statements.");
-	puts("  -p        Convert semantic applicability to presentation applicability.");
-	puts("  -h -?     Show help/usage message.");
+	puts("  -A <ACT>   Use <ACT> when generating display text.");
+	puts("  -a <ID>    Use <ID> for DM-level applic.");
+	puts("  -C <CCT>   Use <CCT> when generating display text.");
+	puts("  -d         Dump built-in XSLT for generating display text.");
+	puts("  -f         Overwrite input file(s).");
+	puts("  -G <XSL>   Use custom XSLT script to generate display text.");
+	puts("  -g         Generate display text for applicability statements.");
+	puts("  -p         Convert semantic applicability to presentation applicability.");
+	puts("  -h -?      Show help/usage message.");
+	puts("  --version  Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -354,6 +364,13 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
+	const char *sopts = "A:a:C:dfG:gpxh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	exsltRegisterAll();
 
 	dmApplicId = xmlStrdup(DEFAULT_DM_APPLIC_ID);
@@ -363,8 +380,14 @@ int main(int argc, char **argv)
 	acts = xmlNewNode(NULL, BAD_CAST "acts");
 	ccts = xmlNewNode(NULL, BAD_CAST "ccts");
 
-	while ((i = getopt(argc, argv, "A:a:C:dfG:gpxh?")) != -1) {
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'A':
 				xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST optarg);
 				break;

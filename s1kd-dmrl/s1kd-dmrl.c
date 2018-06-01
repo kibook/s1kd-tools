@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
 #ifdef _WIN32
@@ -11,6 +12,9 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 #include "dmrl.h"
+
+#define PROG_NAME "s1kd-dmrl"
+#define VERSION "1.0.0"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
@@ -25,18 +29,24 @@
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-dmrl [-FfNsh?] <DML>...");
+	puts("Usage: " PROG_NAME " [-FfNsh?] <DML>...");
 	puts("");
 	puts("Options:");
-	puts("  -h -?     Show usage message.");
-	puts("  -$ <iss>  Which issue of the spec to use.");
+	puts("  -h -?      Show usage message.");
+	puts("  -$ <iss>   Which issue of the spec to use.");
 	#ifndef _WIN32
-	puts("  -F        Fail on first error from s1kd-new* commands.");
+	puts("  -F         Fail on first error from s1kd-new* commands.");
 	#endif
-	puts("  -f        Overwrite existing CSDB objects.");
-	puts("  -N        Omit issue/inwork numbers.");
-	puts("  -q        Don't report errors if objects exist.");
-	puts("  -s        Output s1kd-new* commands only.");
+	puts("  -f         Overwrite existing CSDB objects.");
+	puts("  -N         Omit issue/inwork numbers.");
+	puts("  -q         Don't report errors if objects exist.");
+	puts("  -s         Output s1kd-new* commands only.");
+	puts("  --version  Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -54,11 +64,24 @@ int main(int argc, char **argv)
 	bool noOverwriteError = false;
 	char *specIssue = strdup(DEFAULT_S1000D_ISSUE);
 
+	const char *sopts = "sNfFq$:h?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	dmrl = xmlReadMemory((const char *) dmrl_xsl, dmrl_xsl_len, NULL, NULL, 0);
 	dmrlStylesheet = xsltParseStylesheetDoc(dmrl);
 
-	while ((i = getopt(argc, argv, "sNfFq$:h?")) != -1) {
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 's':
 				execute = false;
 				break;
@@ -83,7 +106,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				showHelp();
-				exit(0);
+				return 0;
 		}
 	}
 

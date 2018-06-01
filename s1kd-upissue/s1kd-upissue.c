@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <time.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-upissue"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -39,6 +41,12 @@ void show_help(void)
 	puts("  -I           Do not change issue date");
 	puts("  -1 <type>    Set first verification type");
 	puts("  -2 <type>    Set second verification type");
+	puts("  --version    Show version information");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
@@ -295,8 +303,21 @@ int main(int argc, char **argv)
 	char *firstver = NULL;
 	char *secondver = NULL;
 
-	while ((c = getopt(argc, argv, "ivs:NfrRIq1:2:dh?")) != -1) {
+	const char *sopts = "ivs:NfrRIq1:2:dh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'i':
 				newissue = true;
 				break;
@@ -338,7 +359,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				show_help();
-				exit(0);
+				return 0;
 		}
 	}
 

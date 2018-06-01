@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
 #include <libgen.h>
@@ -10,6 +11,8 @@
 #include "templates.h"
 
 #define PROG_NAME "s1kd-icncatalog"
+#define VERSION "1.0.0"
+
 #define DEFAULT_CATALOG_NAME "icncatalog.xml"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
@@ -287,6 +290,12 @@ void show_help(void)
 	puts("  -t             Create new ICN catalog.");
 	puts("  -u <uri>       Set the URI of the new ICN.");
 	puts("  -x             Process XInclude elements.");
+	puts("  --version      Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -300,11 +309,24 @@ int main(int argc, char **argv)
 	xmlDocPtr icns;
 	xmlNodePtr add, del, cur = NULL;
 
+	const char *sopts = "a:c:d:fm:n:tu:xh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	add = xmlNewNode(NULL, BAD_CAST "add");
 	del = xmlNewNode(NULL, BAD_CAST "del");
 
-	while ((i = getopt(argc, argv, "a:c:d:fm:n:tu:xh?")) != -1) {
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'a':
 				cur = xmlNewChild(add, NULL, BAD_CAST "icn", NULL);
 				xmlSetProp(cur, BAD_CAST "infoEntityIdent", BAD_CAST optarg);

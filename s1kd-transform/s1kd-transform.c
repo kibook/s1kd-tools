@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
 #include <libxml/tree.h>
@@ -10,6 +11,9 @@
 #include "identity.h"
 
 bool includeIdentity = false;
+
+#define PROG_NAME "s1kd-transform"
+#define VERSION "1.0.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -141,7 +145,7 @@ void addParam(xmlNodePtr stylesheet, char *s)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-transform [-fih?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-fih?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?              Show usage message.");
@@ -150,7 +154,13 @@ void showHelp(void)
 	puts("  -o <file>          Output result of transformation to <path>.");
 	puts("  -p <name>=<value>  Pass parameters to stylesheets.");
 	puts("  -s <stylesheet>    Apply XSLT stylesheet to CSDB objects.");
+	puts("  --version          Show version information.");
 	puts("  <object>           CSDB objects to apply transformations to.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -162,12 +172,25 @@ int main(int argc, char **argv)
 	char *out = strdup("-");
 	bool overwrite = false;
 
+	const char *sopts = "s:io:p:fh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	exsltRegisterAll();
 
 	stylesheets = xmlNewNode(NULL, BAD_CAST "stylesheets");
 
-	while ((i = getopt(argc, argv, "s:io:p:fh?")) != -1) {
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 's':
 				lastStyle = xmlNewChild(stylesheets, NULL, BAD_CAST "stylesheet", NULL);
 				xmlSetProp(lastStyle, BAD_CAST "path", BAD_CAST optarg);
@@ -188,7 +211,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				showHelp();
-				exit(0);
+				return 0;
 		}
 	}
 

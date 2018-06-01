@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/debugXML.h>
@@ -10,6 +11,7 @@
 #include "templates.h"
 
 #define PROG_NAME "s1kd-newupf"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -589,6 +591,12 @@ void showHelp(void)
 	puts("  -d <file>   Specify the 'defaults' file name.");
 	puts("  -f          Overwrite existing file.");
 	puts("  -q          Don't report an error if file exists.");
+	puts("  --version   Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -605,8 +613,21 @@ int main(int argc, char **argv)
 	char defaultsFname[PATH_MAX] = "defaults";
 	xmlDocPtr defaultsXml;
 
-	while ((c = getopt(argc, argv, "@:$:%:d:fqh?")) != -1) {
+	const char *sopts = "@:$:%:d:fqh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case '@':
 				out = strdup(optarg);
 				break;
@@ -628,7 +649,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				showHelp();
-				exit(0);
+				return 0;
 		}
 	}
 

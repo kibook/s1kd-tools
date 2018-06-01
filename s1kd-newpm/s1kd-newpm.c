@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <libgen.h>
 #include <string.h>
 #include <time.h>
@@ -14,6 +15,9 @@
 #include <libxslt/transform.h>
 
 #include "template.h"
+
+#define PROG_NAME "s1kd-newpm"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
 
@@ -337,35 +341,41 @@ void set_issue_date(xmlNodePtr issueDate)
 
 void show_help(void)
 {
-	puts("Usage: s1kd-newpm [options] [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [options] [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d    Specify the 'defaults' file name.");
-	puts("  -p    Prompt the user for each value.");
-	puts("  -q    Don't report an error if file exists.");
-	puts("  -N    Omit issue/inwork from file name.");
-	puts("  -v    Print file name of pub module.");
-	puts("  -f    Overwrite existing file.");
-	puts("  -$    Specify which S1000D issue to use.");
-	puts("  -@    Output to specified file.");
-	puts("  -%    Use template in specified directory.");
-	puts("  -D    Include issue date in referenced data modules.");
-	puts("  -i    Include issue info in referenced data modules.");
-	puts("  -l    Include language info in referenced data modules.");
-	puts("  -T    Include titles in referenced data modules.");
+	puts("  -d         Specify the 'defaults' file name.");
+	puts("  -p         Prompt the user for each value.");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -N         Omit issue/inwork from file name.");
+	puts("  -v         Print file name of pub module.");
+	puts("  -f         Overwrite existing file.");
+	puts("  -$         Specify which S1000D issue to use.");
+	puts("  -@         Output to specified file.");
+	puts("  -%         Use template in specified directory.");
+	puts("  -D         Include issue date in referenced data modules.");
+	puts("  -i         Include issue info in referenced data modules.");
+	puts("  -l         Include language info in referenced data modules.");
+	puts("  -T         Include titles in referenced data modules.");
+	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -#    Publication module code");
-	puts("  -L    Language ISO code");
-	puts("  -C    Country ISO code");
-	puts("  -n    Issue number");
-	puts("  -w    Inwork issue");
-	puts("  -c    Security classification");
-	puts("  -r    Responsible partner company enterprise name");
-	puts("  -t    Publication module title");
-	puts("  -s    Short PM title");
-	puts("  -b    BREX data module code");
-	puts("  -I    Issue date");
+	puts("  -#         Publication module code");
+	puts("  -L         Language ISO code");
+	puts("  -C         Country ISO code");
+	puts("  -n         Issue number");
+	puts("  -w         Inwork issue");
+	puts("  -c         Security classification");
+	puts("  -r         Responsible partner company enterprise name");
+	puts("  -t         Publication module title");
+	puts("  -s         Short PM title");
+	puts("  -b         BREX data module code");
+	puts("  -I         Issue date");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -556,8 +566,21 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	while ((c = getopt(argc, argv, "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qh?")) != -1) {
+	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'p': showprompts = true; break;
 			case 'D': include_date = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
@@ -586,7 +609,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				show_help();
-				exit(0);
+				return 0;
 		}
 	}
 

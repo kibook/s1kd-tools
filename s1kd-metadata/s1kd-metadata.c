@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1280,7 +1282,13 @@ void show_help(void)
 	puts("  -v <value>   The value to set or match.");
 	puts("  -W <name>    Only list/edit when metadata <name> does not equal a value.");
 	puts("  -w <name>    Only list/edit when metadata <name> equals a value.");
+	puts("  --version    Show version information.");
 	puts("  <module>     S1000D module to view/edit metadata on.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int show_err(int err, const char *key, const char *val, const char *fname)
@@ -1576,11 +1584,24 @@ int main(int argc, char **argv)
 	int only_editable = 0;
 	char *fmtstr = NULL;
 
+	const char *sopts = "0c:eF:fHln:Ttv:qW:w:h?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 	conds = xmlNewNode(NULL, BAD_CAST "conds");
 
-	while ((i = getopt(argc, argv, "0c:eF:fHln:Ttv:qW:w:h?")) != -1) {
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
 			case 'e': only_editable = 1; break;
@@ -1601,7 +1622,7 @@ int main(int argc, char **argv)
 			case 'w': add_cond(conds, optarg, "="); last = conds; break;
 			case 'W': add_cond(conds, optarg, "~"); last = conds; break;
 			case 'h':
-			case '?': show_help(); exit(0);
+			case '?': show_help(); return 0;
 		}
 	}
 

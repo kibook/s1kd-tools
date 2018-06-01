@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -11,6 +12,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
+#define VERSION "1.0.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -69,6 +71,12 @@ void show_help(void)
 	puts("  -o <file>  Output to <file> instead of stdout.");
 	puts("  -f         Overwrite data modules automatically.");
 	puts("  -h -?      Show usage message.");
+	puts("  --version  Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -77,8 +85,21 @@ int main(int argc, char **argv)
 	char *outfile = strdup("-");
 	bool overwrite = false;
 
-	while ((i = getopt(argc, argv, "o:fh?")) != -1) {
+	const char *sopts = "o:fh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'o':
 				free(outfile);
 				outfile = strdup(optarg);

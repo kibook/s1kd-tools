@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
@@ -11,6 +12,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -260,7 +262,13 @@ void show_help(void)
 	puts("  -o <out>	Output to <out> instead of stdout");
 	puts("  -f              Overwrite the data modules automatically");
 	puts("  -d              Delete the references table");
+	puts("  --version       Show version information");
 	puts("  <dms>		Any number of data modules");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char *argv[])
@@ -275,8 +283,21 @@ int main(int argc, char *argv[])
 
 	bool overwrite = false;
 
-	while ((i = getopt(argc, argv, "o:dfh?")) != -1) {
+	const char *sopts = "o:dfh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'o':
 				strcpy(out, optarg);
 				break;
@@ -289,7 +310,7 @@ int main(int argc, char *argv[])
 			case 'h':
 			case '?':
 				show_help();
-				exit(0);
+				return 0;
 		}
 	}
 

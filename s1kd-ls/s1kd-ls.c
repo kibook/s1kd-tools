@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <libgen.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -11,6 +12,7 @@
 #define OBJECT_MAX 10240
 
 #define PROG_NAME "s1kd-ls"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -100,20 +102,26 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-CDiLlMPrwX]");
 	puts("");
 	puts("Options:");
-	puts("  -0     Output null-delimited list");
-	puts("  -C     List comments");
-	puts("  -D     List data modules");
-	puts("  -I     Show only inwork issues");
-	puts("  -i     Show only official issues");
-	puts("  -L     List DMLs");
-	puts("  -l     Show only latest official/inwork issue");
-	puts("  -M     List ICN metadata files");
-	puts("  -o     Show only old official/inwork issues");
-	puts("  -P     List publication modules");
-	puts("  -r     Recursively search directories");
-	puts("  -w     Show only writable object files");
-	puts("  -X     List DDNs");
-	puts("  -h -?  Show this help message");
+	puts("  -0         Output null-delimited list");
+	puts("  -C         List comments");
+	puts("  -D         List data modules");
+	puts("  -I         Show only inwork issues");
+	puts("  -i         Show only official issues");
+	puts("  -L         List DMLs");
+	puts("  -l         Show only latest official/inwork issue");
+	puts("  -M         List ICN metadata files");
+	puts("  -o         Show only old official/inwork issues");
+	puts("  -P         List publication modules");
+	puts("  -r         Recursively search directories");
+	puts("  -w         Show only writable object files");
+	puts("  -X         List DDNs");
+	puts("  -h -?      Show this help message");
+	puts("  --version  Show version information");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int is_directory(const char *path, int recursive)
@@ -361,8 +369,21 @@ int main(int argc, char **argv)
 
 	int i;
 
-	while ((i = getopt(argc, argv, "0CDiLlMPrwXoIh?")) != -1) {
+	const char *sopts = "0CDiLlMPrwXoIh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;
 			case 'D': show |= SHOW_DM; break;
@@ -378,7 +399,7 @@ int main(int argc, char **argv)
 			case 'I': only_inwork = 1; break;
 			case 'h':
 			case '?': show_help();
-				  exit(0);
+				  return 0;
 		}
 	}
 

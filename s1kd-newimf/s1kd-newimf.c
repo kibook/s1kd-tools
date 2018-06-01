@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <time.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -9,6 +10,7 @@
 #include "template.h"
 
 #define PROG_NAME "s1kd-newimf"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -140,6 +142,7 @@ void show_help(void)
 	puts("  -v          Print file name of IMF.");
 	puts("  -f          Overwrite existing file.");
 	puts("  -% <dir>    Use template in specified directory.");
+	puts("  --version   Show version information.");
 	puts("  <icns>      1 or more ICNs to generate a metadata file for.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
@@ -153,6 +156,11 @@ void show_help(void)
 	puts("  -t          ICN title");
 	puts("  -b          BREX data module code");
 	puts("  -I          Issue date");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 void copy_default_value(const char *def_key, const char *def_val)
@@ -277,8 +285,21 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((i = getopt(argc, argv, "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qh?")) != -1) {
+	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
 			case 'n': strncpy(issue_number, optarg, 3); break;
@@ -297,7 +318,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
 			case 'h':
-			case '?': show_help(); exit(0);
+			case '?': show_help(); return 0;
 		}
 	}
 

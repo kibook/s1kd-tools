@@ -3,6 +3,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -11,6 +12,7 @@
 #include "template.h"
 
 #define PROG_NAME "s1kd-newcom"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -264,32 +266,6 @@ void set_issue_date(xmlNodePtr issueDate)
 
 }
 
-void show_help(void)
-{
-	puts("Usage: " PROG_NAME " [options]");
-	puts("");
-	puts("Options:");
-	puts("  -d    Specify the 'defaults' file name.");
-	puts("  -p    Prompt the user for each value.");
-	puts("  -q    Don't report an error if file exists.");
-	puts("  -v    Print file name of comment.");
-	puts("  -f    Overwrite existing file.");
-	puts("  -$    Specify which S1000D issue to use.");
-	puts("  -@    Output to specified file.");
-	puts("  -%    Use templates in specified directory.");
-	puts("");
-	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -#    Comment code");
-	puts("  -L    Language ISO code");
-	puts("  -C    Country ISO code");
-	puts("  -c    Security classification");
-	puts("  -o    Originator");
-	puts("  -t    Title");
-	puts("  -r    Response type");
-	puts("  -b    BREX data module code");
-	puts("  -I    Issue date");
-}
-
 void copy_default_value(const char *def_key, const char *def_val)
 {
 	if (strcmp(def_key, "modelIdentCode") == 0 && strcmp(modelIdentCode, "") == 0)
@@ -439,6 +415,38 @@ void set_env_lang(void)
 	free(lang);
 }
 
+void show_help(void)
+{
+	puts("Usage: " PROG_NAME " [options]");
+	puts("");
+	puts("Options:");
+	puts("  -d         Specify the 'defaults' file name.");
+	puts("  -p         Prompt the user for each value.");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -v         Print file name of comment.");
+	puts("  -f         Overwrite existing file.");
+	puts("  -$         Specify which S1000D issue to use.");
+	puts("  -@         Output to specified file.");
+	puts("  -%         Use templates in specified directory.");
+	puts("  --version  Show version information.");
+	puts("");
+	puts("In addition, the following pieces of meta data can be set:");
+	puts("  -#         Comment code");
+	puts("  -L         Language ISO code");
+	puts("  -C         Country ISO code");
+	puts("  -c         Security classification");
+	puts("  -o         Originator");
+	puts("  -t         Title");
+	puts("  -r         Response type");
+	puts("  -b         BREX data module code");
+	puts("  -I         Issue date");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr comment_doc;
@@ -481,8 +489,21 @@ int main(int argc, char **argv)
 
 	int i;
 
-	while ((i = getopt(argc, argv, "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qh?")) != -1) {
+	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);
 				break;

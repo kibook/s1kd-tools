@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
-
 #include <libxml/tree.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/debugXML.h>
 #include <libxml/xinclude.h>
 
-#define PROGNAME "s1kd-validate"
+#define PROG_NAME "s1kd-validate"
+#define VERSION "1.0.0"
 
-#define ERR_PREFIX PROGNAME ": ERROR: "
-#define SUCCESS_PREFIX PROGNAME ": SUCCESS: "
-#define FAILED_PREFIX PROGNAME ": FAILED: "
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+#define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
+#define FAILED_PREFIX PROG_NAME ": FAILED: "
 
 #define EXIT_MAX_SCHEMAS 1
 #define EXIT_MISSING_SCHEMA 2
@@ -113,18 +114,24 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROGNAME " [-d <dir>] [-X <URI>] [-Dflqvx] [<object>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-X <URI>] [-Dflqvx] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -D        Debug output.");
-	puts("  -d <dir>  Search for schemas in <dir> instead of using the URL.");
-	puts("  -f        List invalid files.");
-	puts("  -l        Treat input as list of filenames.");
-	puts("  -q        Silent (not output).");
-	puts("  -v        Verbose output.");
-	puts("  -X <URI>  Exclude namespace from validation by URI.");
-	puts("  -x        Do XInclude processing before validation.");
-	puts("  <object>  Any number of CSDB objects to validate.");
+	puts("  -D         Debug output.");
+	puts("  -d <dir>   Search for schemas in <dir> instead of using the URL.");
+	puts("  -f         List invalid files.");
+	puts("  -l         Treat input as list of filenames.");
+	puts("  -q         Silent (not output).");
+	puts("  -v         Verbose output.");
+	puts("  -X <URI>   Exclude namespace from validation by URI.");
+	puts("  -x         Do XInclude processing before validation.");
+	puts("  --version  Show version information.");
+	puts("  <object>   Any number of CSDB objects to validate.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 void add_ignore_ns(xmlNodePtr ignore_ns, const char *arg)
@@ -372,10 +379,23 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
+	const char *sopts = "vqDd:X:xflh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	ignore_ns = xmlNewNode(NULL, BAD_CAST "ignorens");
 
-	while ((c = getopt(argc, argv, "vqDd:X:xflh?")) != -1) {
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 'D': verbosity = DEBUG; break;
@@ -385,7 +405,7 @@ int main(int argc, char *argv[])
 			case 'f': list_invalid = 1; break;
 			case 'l': is_list = 1; break;
 			case 'h': 
-			case '?': show_help(); exit(0);
+			case '?': show_help(); return 0;
 		}
 	}
 

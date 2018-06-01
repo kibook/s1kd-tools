@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
@@ -10,6 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -825,18 +827,24 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-filrth?] [-s <src>] [-o <dst>] [<code>|<file>]");
 	puts("");
 	puts("Options:");
-	puts("  -f        Overwrite source data module instead of writing to stdout.");
-	puts("  -i        Include issue info (target must be file)");
-	puts("  -l        Include language (target must be file)");
-	puts("  -o <dst>  Output to <dst> instead of stdout.");
-	puts("  -r        Add reference to data module's <refs> table.");
-	puts("  -s <src>  Source data module to add references to.");
-	puts("  -t        Include title (target must be file)");
-	puts("  -d        Include issue date (target must be file)");
-	puts("  -h -?     Show this help message.");
-	puts("  <code>    The code of the reference (must include prefix DMC/PMC/etc.).");
-	puts("  <file>    A file to reference.");
-	puts("            -t/-i/-l can then be used to include the title, issue, and language.");
+	puts("  -f         Overwrite source data module instead of writing to stdout.");
+	puts("  -i         Include issue info (target must be file)");
+	puts("  -l         Include language (target must be file)");
+	puts("  -o <dst>   Output to <dst> instead of stdout.");
+	puts("  -r         Add reference to data module's <refs> table.");
+	puts("  -s <src>   Source data module to add references to.");
+	puts("  -t         Include title (target must be file)");
+	puts("  -d         Include issue date (target must be file)");
+	puts("  -h -?      Show this help message.");
+	puts("  --version  Show version information.");
+	puts("  <code>     The code of the reference (must include prefix DMC/PMC/etc.).");
+	puts("  <file>     A file to reference.");
+	puts("             -t/-i/-l can then be used to include the title, issue, and language.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -850,8 +858,21 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	enum issue iss = DEFAULT_S1000D_ISSUE;
 
-	while ((i = getopt(argc, argv, "filo:rs:td$:h?")) != -1) {
+	const char *sopts = "filo:rs:td$:h?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return EXIT_SUCCESS;
+				}
+				break;
 			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;
 			case 'l': opts |= OPT_LANG; break;
@@ -862,7 +883,7 @@ int main(int argc, char **argv)
 			case 'd': opts |= OPT_DATE; break;
 			case '$': iss = spec_issue(optarg); break;
 			case '?':
-			case 'h': show_help(); exit(EXIT_SUCCESS);
+			case 'h': show_help(); return EXIT_SUCCESS;
 		}
 	}
 

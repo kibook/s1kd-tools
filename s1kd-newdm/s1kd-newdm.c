@@ -2,6 +2,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <dirent.h>
@@ -43,6 +44,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
+#define VERSION "1.0.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1
@@ -215,38 +217,44 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -f      Overwrite existing file.");
-	puts("  -N      Omit issue/inwork from filename.");
-	puts("  -p      Prompt the user for each value");
-	puts("  -q      Don't report an error if file exists.");
-	puts("  -S      Get tech name from BREX SNS.");
-	puts("  -M      Use one of the maintained SNS.");
-	puts("  -P      Include previous level of SNS in tech name.");
-	puts("  -v      Print file name of new data module.");
-	puts("  -$      Specify which S1000D issue to use.");
-	puts("  -@      Output to specified file.");
-	puts("  -%      Use templates in specified directory.");
-	puts("  -,      Dump default dmtypes XML.");
-	puts("  -.      Dump default dmtypes text file.");
+	puts("  -f         Overwrite existing file.");
+	puts("  -N         Omit issue/inwork from filename.");
+	puts("  -p         Prompt the user for each value");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -S         Get tech name from BREX SNS.");
+	puts("  -M         Use one of the maintained SNS.");
+	puts("  -P         Include previous level of SNS in tech name.");
+	puts("  -v         Print file name of new data module.");
+	puts("  -$         Specify which S1000D issue to use.");
+	puts("  -@         Output to specified file.");
+	puts("  -%         Use templates in specified directory.");
+	puts("  -,         Dump default dmtypes XML.");
+	puts("  -.         Dump default dmtypes text file.");
+	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -#      Data module code");
-	puts("  -L      Language ISO code");
-	puts("  -C      Country ISO code");
-	puts("  -n      Issue number");
-	puts("  -w      Inwork issue");
-	puts("  -c      Security classification");
-	puts("  -r      Responsible partner company enterprise name");
-	puts("  -R      Responsible partner company CAGE code.");
-	puts("  -o      Originator enterprise name");
-	puts("  -O      Originator CAGE code.");
-	puts("  -t      Tech name");
-	puts("  -i      Info name");
-	puts("  -T      DM type (descript, proced, frontmatter, etc.)");
-	puts("  -b      BREX data module code");
-	puts("  -s      Schema");
-	puts("  -I      Issue date");
-	puts("  -m      Remarks");
+	puts("  -#         Data module code");
+	puts("  -L         Language ISO code");
+	puts("  -C         Country ISO code");
+	puts("  -n         Issue number");
+	puts("  -w         Inwork issue");
+	puts("  -c         Security classification");
+	puts("  -r         Responsible partner company enterprise name");
+	puts("  -R         Responsible partner company CAGE code.");
+	puts("  -o         Originator enterprise name");
+	puts("  -O         Originator CAGE code.");
+	puts("  -t         Tech name");
+	puts("  -i         Info name");
+	puts("  -T         DM type (descript, proced, frontmatter, etc.)");
+	puts("  -b         BREX data module code");
+	puts("  -s         Schema");
+	puts("  -I         Issue date");
+	puts("  -m         Remarks");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 void copy_default_value(const char *key, const char *val)
@@ -1107,8 +1115,21 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	while ((c = getopt(argc, argv, "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:Ph?")) != -1) {
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:Ph?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); break;
 			case 'D': strcpy(dmtypes_fname, optarg); break;

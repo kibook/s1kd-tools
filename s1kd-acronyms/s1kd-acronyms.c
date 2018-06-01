@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
 #include <libxml/tree.h>
@@ -12,6 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-acronyms"
+#define VERSION "1.0.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -581,7 +583,13 @@ void showHelp(void)
 	puts("  -T <types>  Only search for acronyms of these types");
 	puts("  -t          Format XML output as table");
 	puts("  -x          Output XML instead of text");
-	puts("  -h -?  Show usage message");
+	puts("  -h -?       Show usage message");
+	puts("  --version   Show version information");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 int main(int argc, char **argv)
@@ -599,8 +607,21 @@ int main(int argc, char **argv)
 	bool list = false;
 	bool delete = false;
 
-	while ((i = getopt(argc, argv, "pn:xDdtT:o:m:iIfLh?")) != -1) {
+	const char *sopts = "pn:xDdtT:o:m:iIfLh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'p':
 				prettyPrint = true;
 				break;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
 #include <dirent.h>
@@ -7,6 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-checkrefs"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -585,6 +587,12 @@ void showHelp(void)
 	puts("  -t <target>    Only check references in <target>.");
 	puts("  -u             Update address items of references.");
 	puts("  -v             Verbose output.");
+	puts("  --version      Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 bool isS1000D(const char *fname)
@@ -782,8 +790,21 @@ int main(int argc, char **argv)
 	bool isList = false;
 	char *recode = NULL;
 
-	while ((i = getopt(argc, argv, "s:t:cuFfveld:Lm:nh?")) != -1) {
+	const char *sopts = "s:t:cuFfveld:Lm:nh?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 's':
 				if (!source) source = strdup(optarg);
 				break;

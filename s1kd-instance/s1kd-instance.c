@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <ctype.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -13,6 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
+#define VERSION "1.0.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1856,6 +1858,12 @@ void show_help(void)
 	printf("%.*s", help_msg_len, help_msg);
 }
 
+/* Print version information */
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr doc;
@@ -1899,6 +1907,13 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
+	const char *sopts = "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:h?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	exsltRegisterAll();
 
 	opterr = 1;
@@ -1907,8 +1922,14 @@ int main(int argc, char **argv)
 
 	applicability = xmlNewNode(NULL, BAD_CAST "applic");
 
-	while ((c = getopt(argc, argv, "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:h?")) != -1) {
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return EXIT_SUCCESS;
+				}
+				break;
 			case 's': read_applic(optarg); break;
 			case 'S': add_source_ident = false; break;
 			case 'e': strncpy(extension, optarg, 255); break;

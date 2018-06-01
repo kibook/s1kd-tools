@@ -39,4 +39,5 @@ Options:
   -x <CIR>      Dump default XSLT for resolving CIR references.
   -Y <text>     Set applic for DM with text as the display text.
   -y            Set applic for DM based on the user-defined defs.
+  --version     Show version information.
   object...     Source CSDB object(s)

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdbool.h>
@@ -7,6 +8,7 @@
 #include <libxml/tree.h>
 
 #define PROG_NAME "s1kd-flatten"
+#define VERSION "1.0.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -36,6 +38,12 @@ void show_help(void)
 	puts("  -p         Output a 'publication' XML file.");
 	puts("  -x         Use XInclude references.");
 	puts("  -h -?      Show help/usage message.");
+	puts("  --version  Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
@@ -372,11 +380,24 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
+	const char *sopts = "xNpI:h?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
 	search_paths = xmlNewNode(NULL, BAD_CAST "searchPaths");
 	xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST ".");
 
-	while ((c = getopt(argc, argv, "xNpI:h?")) != -1) {
+	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; xinclude = 1; break;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
 #include <libxml/tree.h>
@@ -8,6 +9,7 @@
 #include "defaults.h"
 
 #define PROG_NAME "s1kd-defaults"
+#define VERSION "1.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -41,6 +43,12 @@ void show_help(void)
 	puts("  -i         Initialize a new CSDB.");
 	puts("  -s         Sort entries.");
 	puts("  -t         Output in the simple text format.");
+	puts("  --version  Show version information.");
+}
+
+void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
 /* Apply a built-in XSLT stylesheet to an XML document. */
@@ -363,8 +371,21 @@ int main(int argc, char **argv)
 	bool initialize = false;
 	bool sort = false;
 
-	while ((i = getopt(argc, argv, "Ddfisth?")) != -1) {
+	const char *sopts = "Ddfisth?";
+	struct option lopts[] = {
+		{"version", no_argument, 0, 0},
+		{0, 0, 0, 0}
+	};
+	int loptind = 0;
+
+	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
+			case 0:
+				if (strcmp(lopts[loptind].name, "version") == 0) {
+					show_version();
+					return 0;
+				}
+				break;
 			case 'D':
 				f = DMTYPES;
 				if (!fname) fname = strdup(DEFAULT_DMTYPES_FNAME);
