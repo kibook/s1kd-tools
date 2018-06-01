@@ -405,6 +405,130 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
+void show_ddncode(xmlNodePtr node, int endl)
+{
+	char *modelic, *sendid, *recvid, *diyear, *seqnum;
+
+	modelic = first_xpath_string(node, "@modelIdentCode|modelic");
+	sendid  = first_xpath_string(node, "@senderIdent|sendid");
+	recvid  = first_xpath_string(node, "@receiverIdent|recvid");
+	diyear  = first_xpath_string(node, "@yearOfDataIssue|diyear");
+	seqnum  = first_xpath_string(node, "@seqNumber|seqnum");
+
+	printf("%s-%s-%s-%s-%s",
+		modelic,
+		sendid,
+		recvid,
+		diyear,
+		seqnum);
+	if (endl > -1) putchar(endl);
+
+	xmlFree(modelic);
+	xmlFree(sendid);
+	xmlFree(recvid);
+	xmlFree(diyear);
+	xmlFree(seqnum);
+}
+
+void show_dmlcode(xmlNodePtr node, int endl)
+{
+	char *modelic, *sendid, *dmltype, *diyear, *seqnum;
+
+	modelic = first_xpath_string(node, "@modelIdentCode|modelic");
+	sendid  = first_xpath_string(node, "@senderIdent|sendid");
+	dmltype = first_xpath_string(node, "@dmlType|dmltype/@type");
+	diyear  = first_xpath_string(node, "@yearOfDataIssue|diyear");
+	seqnum  = first_xpath_string(node, "@seqNumber|seqnum");
+
+	printf("%s-%s-%s-%s-%s",
+		modelic,
+		sendid,
+		dmltype,
+		diyear,
+		seqnum);
+	if (endl > -1) putchar(endl);
+
+	xmlFree(modelic);
+	xmlFree(sendid);
+	xmlFree(dmltype);
+	xmlFree(diyear);
+	xmlFree(seqnum);
+}
+
+void show_pmcode(xmlNodePtr node, int endl)
+{
+	char *modelic, *pmissuer, *pmnumber, *pmvolume;
+
+	modelic  = first_xpath_string(node, "@modelIdentCode|modelic");
+	pmissuer = first_xpath_string(node, "@pmIssuer|pmissuer");
+	pmnumber = first_xpath_string(node, "@pmNumber|pmnumber");
+	pmvolume = first_xpath_string(node, "@pmVolume|pmvolume");
+
+	printf("%s-%s-%s-%s",
+		modelic,
+		pmissuer,
+		pmnumber,
+		pmvolume);
+	if (endl > -1) putchar(endl);
+
+	xmlFree(modelic);
+	xmlFree(pmissuer);
+	xmlFree(pmnumber);
+	xmlFree(pmvolume);
+}
+
+void show_comment_code(xmlNodePtr node, int endl)
+{
+	char *model_ident_code;
+	char *sender_ident;
+	char *year_of_data_issue;
+	char *seq_number;
+	char *comment_type;
+
+	if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0) {
+		model_ident_code   = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
+		sender_ident       = (char *) xmlGetProp(node, BAD_CAST "senderIdent");
+		year_of_data_issue = (char *) xmlGetProp(node, BAD_CAST "yearOfDataIssue");
+		seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
+		comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
+	} else {
+		model_ident_code   = first_xpath_string(node, "modelic");
+		sender_ident       = first_xpath_string(node, "sendid");
+		year_of_data_issue = first_xpath_string(node, "diyear");
+		seq_number         = first_xpath_string(node, "seqnum");
+		comment_type       = first_xpath_string(node, "ctype/@type");
+	}
+
+	printf("%s-%s-%s-%s-%s",
+		model_ident_code,
+		sender_ident,
+		year_of_data_issue,
+		seq_number,
+		comment_type);
+	if (endl > -1) putchar(endl);
+
+	xmlFree(model_ident_code);
+	xmlFree(sender_ident);
+	xmlFree(year_of_data_issue);
+	xmlFree(seq_number);
+	xmlFree(comment_type);
+}
+
+void show_code(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
+		show_dmcode(node, endl);
+	} else if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "pmc") == 0) {
+		show_pmcode(node, endl);
+	} else if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ccode") == 0) {
+		show_comment_code(node, endl);
+	} else if (xmlStrcmp(node->name, BAD_CAST "ddnCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ddnc") == 0) {
+		show_ddncode(node, endl);
+	} else if (xmlStrcmp(node->name, BAD_CAST "dmlCode") == 0 || xmlStrcmp(node->name, BAD_CAST "dmlc") == 0) {
+		show_dmlcode(node, endl);
+	}
+}
+
 void show_issue_type(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
@@ -512,43 +636,6 @@ int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
 	node = xmlAddNextSibling(node, xmlNewNode(NULL, BAD_CAST "commentTitle"));
 
 	return edit_simple_node(node, val);
-}
-
-void show_comment_code(xmlNodePtr node, int endl)
-{
-	char *model_ident_code;
-	char *sender_ident;
-	char *year_of_data_issue;
-	char *seq_number;
-	char *comment_type;
-
-	if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0) {
-		model_ident_code   = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
-		sender_ident       = (char *) xmlGetProp(node, BAD_CAST "senderIdent");
-		year_of_data_issue = (char *) xmlGetProp(node, BAD_CAST "yearOfDataIssue");
-		seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
-		comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
-	} else {
-		model_ident_code   = first_xpath_string(node, "modelic");
-		sender_ident       = first_xpath_string(node, "sendid");
-		year_of_data_issue = first_xpath_string(node, "diyear");
-		seq_number         = first_xpath_string(node, "seqnum");
-		comment_type       = first_xpath_string(node, "ctype/@type");
-	}
-
-	printf("%s-%s-%s-%s-%s",
-		model_ident_code,
-		sender_ident,
-		year_of_data_issue,
-		seq_number,
-		comment_type);
-	if (endl > -1) putchar(endl);
-	
-	xmlFree(model_ident_code);
-	xmlFree(sender_ident);
-	xmlFree(year_of_data_issue);
-	xmlFree(seq_number);
-	xmlFree(comment_type);
 }
 
 void show_comment_priority(xmlNodePtr node, int endl)
@@ -786,6 +873,12 @@ struct metadata metadata[] = {
 		edit_dmcode,
 		NULL,
 		"BREX data module code"},
+	{"code",
+		"//dmCode|//avee|//pmCode|//pmc|//commentCode|//ccode|//ddnCode|//ddnc|//dmlCode|//dmlc",
+		show_code,
+		NULL,
+		NULL,
+		"CSDB object code"},
 	{"commentCode",
 		"//commentCode|//ccode",
 		show_comment_code,
@@ -816,6 +909,12 @@ struct metadata metadata[] = {
 		edit_country_iso_code,
 		NULL,
 		"Country ISO code (CA, US, GB...)"},
+	{"ddnCode",
+		"//ddnCode|//ddnc",
+		show_ddncode,
+		NULL,
+		NULL,
+		"Data dispatch note code"},
 	{"disassyCode",
 		"//@disassyCode|//discode",
 		show_disassy_code,
@@ -829,11 +928,17 @@ struct metadata metadata[] = {
 		NULL,
 		"Disassembly code variant"},
 	{"dmCode",
-		"//dmIdent/dmCode|//avee",
+		"//dmCode|//avee",
 		show_dmcode,
 		NULL,
 		NULL,
 		"Data module code"},
+	{"dmlCode",
+		"//dmlCode|//dmlc",
+		show_dmlcode,
+		NULL,
+		NULL,
+		"Data management list code"},
 	{"url",
 		"/",
 		show_url,
@@ -936,6 +1041,12 @@ struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Filesystem path of object"},
+	{"pmCode",
+		"//pmCode|//pmc",
+		show_pmcode,
+		NULL,
+		NULL,
+		"Publication module code"},
 	{"pmTitle",
 		"//pmTitle|//pmtitle",
 		show_simple_node,
