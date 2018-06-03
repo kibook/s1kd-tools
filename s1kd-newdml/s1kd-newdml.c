@@ -14,7 +14,7 @@
 #include "templates.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -133,10 +133,30 @@ const char *issue_name(enum issue iss)
 	}
 }
 
+void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
+{
+	xmlDocPtr styledoc, src, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	src = xmlCopyDoc(doc, 1);
+
+	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, src, params);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(src);
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
 xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
-	xsltStylesheetPtr style;
-	xmlDocPtr styledoc, res, orig;
+	xmlDocPtr orig;
 	unsigned char *xml = NULL;
 	unsigned int len;
 
@@ -174,18 +194,8 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	}
 
 	orig = xmlCopyDoc(doc, 1);
-			
-	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
-	style = xsltParseStylesheetDoc(styledoc);
-
-	res = xsltApplyStylesheet(style, doc, NULL);
-
+	transform_doc(orig, xml, len, NULL);
 	xmlFreeDoc(doc);
-	xsltFreeStylesheet(style);
-
-	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
-
-	xmlFreeDoc(res);
 
 	return orig;
 }
@@ -477,6 +487,45 @@ void copy_default_value(const char *def_key, const char *def_val)
 		template_dir = strdup(def_val);
 }
 
+void add_sns(xmlNodePtr content, const char *path, const char *incode)
+{
+	xmlDocPtr doc;
+	xmlNodePtr new_content, cur;
+	const char *params[3];
+	char *s;
+
+	params[0] = "infoCode";
+
+	s = malloc(strlen(incode) + 3);
+	sprintf(s, "\"%s\"", incode);
+	params[1] = s;
+
+	params[2] = NULL;
+
+	doc = xmlReadFile(path, NULL, PARSE_OPTS);
+
+	transform_doc(doc, sns2dmrl_xsl, sns2dmrl_xsl_len, params);
+
+	free(s);
+
+	new_content = xmlDocGetRootElement(doc);
+
+	for (cur = new_content->children; cur; cur = cur->next) {
+		if (cur->type != XML_ELEMENT_NODE) {
+			continue;
+		}
+
+		xmlAddChild(content, xmlCopyNode(cur, 1));
+	}
+
+	xmlFreeDoc(doc);
+}
+
+void sort_entries(xmlDocPtr doc)
+{
+	transform_doc(doc, sort_xsl, sort_xsl_len, NULL);
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] <datamodules>");
@@ -492,6 +541,8 @@ void show_help(void)
 	puts("  -$         Specify which S1000d issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use template in specified directory.");
+	puts("  -S         Create a DMRL from SNS rules.");
+	puts("  -i         Specify info codes for SNS-generated DMRL.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
@@ -600,7 +651,7 @@ int main(int argc, char **argv)
 {
 	xmlDocPtr dml_doc;
 
-	xmlNodePtr dmlCode, issueInfo, security, issueDate, dmlContent;
+	xmlNodePtr dmlCode, issueInfo, security, issueDate, dmlContent, sns_incodes;
 	
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
@@ -614,6 +665,7 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	bool overwrite = false;
 	bool no_overwrite_error = false;
+	char *sns = NULL;
 
 	int c;
 
@@ -621,12 +673,14 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qh?";
+	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	sns_incodes = xmlNewNode(NULL, BAD_CAST "incodes");
 
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
@@ -653,9 +707,15 @@ int main(int argc, char **argv)
 			case 'R': defaultRpcCode = strdup(optarg); break;
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
+			case 'S': sns = strdup(optarg); break;
+			case 'i': xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
+	}
+
+	if (!sns_incodes->children) {
+		xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST "000");
 	}
 
 	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
@@ -823,6 +883,16 @@ int main(int argc, char **argv)
 
 	dmlContent = firstXPathNode("//dmlContent", dml_doc);
 
+	if (sns) {
+		xmlNodePtr incode;
+		for (incode = sns_incodes->children; incode; incode = incode->next) {
+			char *inc;
+			inc = (char *) xmlNodeGetContent(incode);
+			add_sns(dmlContent, sns, inc);
+			xmlFree(inc);
+		}
+	}
+
 	for (c = optind; c < argc; ++c) {
 		xmlDocPtr doc = xmlReadFile(argv[c], NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
 
@@ -848,6 +918,8 @@ int main(int argc, char **argv)
 			}
 		}
 	}
+
+	sort_entries(dml_doc);
 
 	if (issue < ISS_42) {
 		if (strcmp(brex_dmcode, "") == 0) {
