@@ -157,6 +157,18 @@
     <xsl:value-of select="@day"/>
   </xsl:template>
 
+  <xsl:template match="dmTitle">
+    <xsl:apply-templates select="techName"/>
+    <xsl:choose>
+      <xsl:when test="infoName">
+        <xsl:apply-templates select="infoName"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text> -!</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="techName">
     <xsl:text> -t "</xsl:text>
     <xsl:value-of select="."/>
