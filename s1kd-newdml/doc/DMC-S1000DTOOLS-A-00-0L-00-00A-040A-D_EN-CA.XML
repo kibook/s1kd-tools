@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="06" day="03"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add --version option.</simplePara>
+        <simplePara>Add -S and -i options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -151,6 +151,12 @@
                 <para>The issue date of the new DML in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-i &lt;info code&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>When creating a DMRL from SNS rules (-S), use the specified info code for each entry. Specify this option multiple times to create multiple data modules for each part of the SNS.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
@@ -187,6 +193,12 @@
                 <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-S &lt;SNS&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Create a DMRL using the specified SNS rules.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
@@ -199,7 +211,7 @@
                 <para>The inwork number of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>

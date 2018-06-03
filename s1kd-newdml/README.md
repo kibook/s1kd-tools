@@ -62,6 +62,9 @@ Show usage message.
 -I &lt;date&gt;  
 The issue date of the new DML in the form of YYYY-MM-DD.
 
+-i &lt;info code&gt;  
+When creating a DMRL from SNS rules (-S), use the specified info code for each entry. Specify this option multiple times to create multiple data modules for each part of the SNS.
+
 -N  
 Omit the issue/inwork numbers from filename.
 
@@ -79,6 +82,9 @@ Specifies a default responsible partner company enterprise code for entries whic
 
 -r &lt;name&gt;  
 Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).
+
+-S &lt;SNS&gt;  
+Create a DMRL using the specified SNS rules.
 
 -v  
 Print the file name of the newly created DML.
