@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="06" day="02"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add --version option.</simplePara>
+        <simplePara>Add -! option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -127,6 +127,12 @@
               <listItemTerm>-.</listItemTerm>
               <listItemDefinition>
                 <para>Dumps the simple text form of the built-in default 'dmtypes'.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-!</listItemTerm>
+              <listItemDefinition>
+                <para>Do not include an info name for the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -398,7 +404,7 @@
                 <para>The inwork number of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>

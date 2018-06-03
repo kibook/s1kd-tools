@@ -44,7 +44,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1
@@ -118,6 +118,8 @@ char *template_dir = NULL;
 /* Include the previous level of SNS title in a tech name. */
 bool sns_prev_title = false;
 bool sns_prev_title_set = false;
+
+bool no_info_name = false;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -230,6 +232,7 @@ void show_help(void)
 	puts("  -%         Use templates in specified directory.");
 	puts("  -,         Dump default dmtypes XML.");
 	puts("  -.         Dump default dmtypes text file.");
+	puts("  -!         Do not include an info name.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
@@ -305,7 +308,7 @@ void copy_default_value(const char *key, const char *val)
 		strncpy(originator_enterpriseCode, val, MAX_ENTERPRISE_CODE - 2);
 	else if (strcmp(key, "techName") == 0 && strcmp(techName_content, "") == 0)
 		strncpy(techName_content, val, MAX_TECH_NAME - 2);
-	else if (strcmp(key, "infoName") == 0 && strcmp(infoName_content, "") == 0)
+	else if (strcmp(key, "infoName") == 0 && strcmp(infoName_content, "") == 0 && !no_info_name)
 		strncpy(infoName_content, val, MAX_INFO_CODE - 2);
 	else if (strcmp(key, "schema") == 0 && strcmp(schema, "") == 0)
 		strncpy(schema, val, 1023);
@@ -998,7 +1001,7 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml)
 
 		if (infname && strcmp(code, infoCode) == 0 &&
 		    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
-		    strcmp(infoName_content, "") == 0)
+		    strcmp(infoName_content, "") == 0 && !no_info_name)
 			strcpy(infoName_content, infname);
 
 		xmlFree(def_key);
@@ -1115,7 +1118,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:Ph?";
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:P!h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1162,6 +1165,7 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = true; break;
 			case 'M': maint_sns = strdup(optarg); break;
 			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
+			case '!': no_info_name = true; break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -1226,7 +1230,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (strcmp(dmtype, "") == 0 || strcmp(infoName_content, "") == 0) {
+	if (strcmp(dmtype, "") == 0 || (strcmp(infoName_content, "") == 0 && !no_info_name)) {
 		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 			process_dmtypes_xml(defaults_xml);
 			xmlFreeDoc(defaults_xml);
@@ -1253,7 +1257,7 @@ int main(int argc, char **argv)
 
 				if (n == 3 && strcmp(code, infoCode) == 0 &&
 				    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
-				    strcmp(infoName_content, "") == 0)
+				    strcmp(infoName_content, "") == 0 && !no_info_name)
 					strcpy(infoName_content, infname);
 			}
 

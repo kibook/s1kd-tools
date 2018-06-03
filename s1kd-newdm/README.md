@@ -50,6 +50,9 @@ Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a s
 -.  
 Dumps the simple text form of the built-in default 'dmtypes'.
 
+-!  
+Do not include an info name for the new data module.
+
 -b &lt;BREX&gt;  
 BREX data module code.
 
