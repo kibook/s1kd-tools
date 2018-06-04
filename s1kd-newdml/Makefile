@@ -13,7 +13,7 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-templates.h: dml.xml ../common/42to*.xsl
+templates.h: dml.xml ../common/42to*.xsl sns2dmrl.xsl sort.xsl
 	xxd -i dml.xml > templates.h
 	xxd -i sns2dmrl.xsl >> templates.h
 	xxd -i sort.xsl >> templates.h
