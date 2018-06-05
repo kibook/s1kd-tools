@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="05" day="14"/>
+        <issueDate year="2018" month="06" day="04"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -35,8 +35,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Update compatbility for s1kd-brexcheck, s1kd-aspp, and s1kd-index.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add support for older issues to s1kd-syncrefs.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -166,7 +166,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-aspp</para>
               </entry>
@@ -195,7 +195,7 @@
                 <para>~</para>
               </entry>
             </row>
-            <row changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-brexcheck</para>
               </entry>
@@ -349,7 +349,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-index</para>
               </entry>
@@ -768,11 +768,21 @@
               <entry>
                 <para>X</para>
               </entry>
-              <entry/>
-              <entry/>
-              <entry/>
-              <entry/>
-              <entry/>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>

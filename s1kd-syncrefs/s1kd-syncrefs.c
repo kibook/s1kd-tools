@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 /* Order of references */
 #define DM "0" /* dmRef */
@@ -12,7 +13,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -60,21 +61,47 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 	return NULL;
 }
 
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
+
+	obj = xmlXPathEvalExpression(BAD_CAST expr, ctx);
+
+	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
+}
+
+char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+{
+	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
+}
+
 bool is_ref(xmlNodePtr node)
 {
 	return node->type == XML_ELEMENT_NODE && (
-		strcmp((char *) node->name, "dmRef") == 0 ||
-		strcmp((char *) node->name, "pmRef") == 0 ||
-		strcmp((char *) node->name, "externalPubRef") == 0);
+		xmlStrcmp(node->name, BAD_CAST "dmRef") == 0 ||
+		xmlStrcmp(node->name, BAD_CAST "refdm") == 0 ||
+		xmlStrcmp(node->name, BAD_CAST "pmRef") == 0 ||
+		xmlStrcmp(node->name, BAD_CAST "reftp") == 0 ||
+		xmlStrcmp(node->name, BAD_CAST "externalPubRef") == 0);
 }
 
 void copy_code(char *dst, xmlNodePtr ref)
 {
-	xmlNodePtr ref_ident, code;
+	xmlNodePtr code;
 
 	char *model_ident_code;
 
-	if (strcmp((char *) ref->name, "dmRef") == 0) {
+	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "refdm") == 0) {
 		char *system_diff_code;
 		char *system_code;
 		char *sub_system_code;
@@ -90,22 +117,21 @@ void copy_code(char *dst, xmlNodePtr ref)
 
 		char learn[6] = "";
 
-		ref_ident = find_child(ref, "dmRefIdent");
-		code = find_child(ref_ident, "dmCode");
+		code = first_xpath_node(NULL, ref, ".//dmCode|.//avee");
 
-		model_ident_code     = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
-		system_diff_code     = (char *) xmlGetProp(code, BAD_CAST "systemDiffCode");
-		system_code          = (char *) xmlGetProp(code, BAD_CAST "systemCode");
-		sub_system_code      = (char *) xmlGetProp(code, BAD_CAST "subSystemCode");
-		sub_sub_system_code  = (char *) xmlGetProp(code, BAD_CAST "subSubSystemCode");
-		assy_code            = (char *) xmlGetProp(code, BAD_CAST "assyCode");
-		disassy_code         = (char *) xmlGetProp(code, BAD_CAST "disassyCode");
-		disassy_code_variant = (char *) xmlGetProp(code, BAD_CAST "disassyCodeVariant");
-		info_code            = (char *) xmlGetProp(code, BAD_CAST "infoCode");
-		info_code_variant    = (char *) xmlGetProp(code, BAD_CAST "infoCodeVariant");
-		item_location_code   = (char *) xmlGetProp(code, BAD_CAST "itemLocationCode");
-		learn_code           = (char *) xmlGetProp(code, BAD_CAST "learnCode");
-		learn_event_code     = (char *) xmlGetProp(code, BAD_CAST "learnEventCode");
+		model_ident_code     = first_xpath_string(NULL, code, "@modelIdentCode|modelic");
+		system_diff_code     = first_xpath_string(NULL, code, "@systemDiffCode|sdc");
+		system_code          = first_xpath_string(NULL, code, "@systemCode|chapnum");
+		sub_system_code      = first_xpath_string(NULL, code, "@subSystemCode|section");
+		sub_sub_system_code  = first_xpath_string(NULL, code, "@subSubSystemCode|subsect");
+		assy_code            = first_xpath_string(NULL, code, "@assyCode|subject");
+		disassy_code         = first_xpath_string(NULL, code, "@disassyCode|discode");
+		disassy_code_variant = first_xpath_string(NULL, code, "@disassyCodeVariant|discodev");
+		info_code            = first_xpath_string(NULL, code, "@infoCode|incode");
+		info_code_variant    = first_xpath_string(NULL, code, "@infoCodeVariant|incodev");
+		item_location_code   = first_xpath_string(NULL, code, "@itemLocationCode|itemloc");
+		learn_code           = first_xpath_string(NULL, code, "@learnCode");
+		learn_event_code     = first_xpath_string(NULL, code, "@learnEventCode");
 
 		if (learn_code && learn_event_code)
 			sprintf(learn, "-%s%s", learn_code, learn_event_code);
@@ -137,13 +163,12 @@ void copy_code(char *dst, xmlNodePtr ref)
 		xmlFree(item_location_code);
 		xmlFree(learn_code);
 		xmlFree(learn_event_code);
-	} else if (strcmp((char *) ref->name, "pmRef") == 0) {
+	} else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "reftp") == 0) {
 		char *pm_issuer;
 		char *pm_number;
 		char *pm_volume;
 
-		ref_ident = find_child(ref, "pmRefIdent");
-		code = find_child(ref_ident, "pmCode");
+		code = first_xpath_node(NULL, ref, ".//pmCode|.//pmc");
 
 		model_ident_code = (char *) xmlGetProp(code, BAD_CAST "modelIdentCode");
 		pm_issuer = (char *) xmlGetProp(code, BAD_CAST "pmIssuer");
@@ -160,12 +185,11 @@ void copy_code(char *dst, xmlNodePtr ref)
 		xmlFree(pm_issuer);
 		xmlFree(pm_number);
 		xmlFree(pm_volume);
-	} else if (strcmp((char *) ref->name, "externalPubRef") == 0) {
+	} else if (xmlStrcmp(ref->name, BAD_CAST "externalPubRef") == 0) {
 		xmlNodePtr title;
 
-		ref_ident = find_child(ref, "externalPubRefIdent");
-		code = find_child(ref_ident, "externalPubCode");
-		title = find_child(ref_ident, "externalPubTitle");
+		code  = first_xpath_node(NULL, ref, ".//externalPubCode");
+		title = first_xpath_node(NULL, ref, ".//externalPubTitle");
 
 		if (code) {
 			char *code_content;
@@ -219,19 +243,20 @@ void sync_refs(xmlNodePtr dmodule)
 	struct ref refs[256];
 	int n = 0, i;
 
-	xmlNodePtr content, old_refs, new_refs, searchable, new_node;
+	xmlNodePtr content, old_refs, new_refs, searchable, new_node, refgrp, refdms, reftp, rdandrt;
 
 	content = find_child(dmodule, "content");
 
 	old_refs = find_child(content, "refs");
+
 	if (old_refs) {
+		refgrp = first_xpath_node(NULL, old_refs, "norefs|refdms|reftp|rdandrt");
+
 		xmlUnlinkNode(old_refs);
 		xmlFreeNode(old_refs);
 	}
 
 	if (only_delete) return;
-
-	new_refs = xmlNewNode(NULL, BAD_CAST "refs");
 
 	searchable = xmlLastElementChild(content);
 
@@ -242,15 +267,54 @@ void sync_refs(xmlNodePtr dmodule)
 
 	find_refs(refs, &n, searchable);
 
-	qsort(refs, n, sizeof(struct ref), compare_refs);
-
-	for (i = 0; i < n; ++i) {
-		new_node = xmlAddChild(new_refs, xmlCopyNode(refs[i].ref, 1));
-		xmlUnsetProp(new_node, BAD_CAST "id");
-	}
+	new_refs = xmlNewNode(NULL, BAD_CAST "refs");
 
 	if (n > 0) {
 		xmlAddPrevSibling(content->children, new_refs);
+	}
+
+	if (refgrp) {
+		refdms  = xmlNewChild(new_refs, NULL, BAD_CAST "refdms", NULL);
+		reftp   = xmlNewChild(new_refs, NULL, BAD_CAST "reftp", NULL);
+		rdandrt = xmlNewChild(new_refs, NULL, BAD_CAST "rdandrt", NULL);
+	}
+
+	qsort(refs, n, sizeof(struct ref), compare_refs);
+
+	for (i = 0; i < n; ++i) {
+		if (refgrp) {
+			if (xmlStrcmp(refs[i].ref->name, BAD_CAST "refdm") == 0) {
+				new_node = xmlAddChild(refdms, xmlCopyNode(refs[i].ref, 1));
+				xmlUnsetProp(new_node, BAD_CAST "id");
+				new_node = xmlAddChild(rdandrt, xmlCopyNode(refs[i].ref, 1));
+				xmlUnsetProp(new_node, BAD_CAST "id");
+			} else if (xmlStrcmp(refs[i].ref->name, BAD_CAST "reftp") == 0) {
+				new_node = xmlAddChild(reftp, xmlCopyNode(refs[i].ref, 1));
+				xmlUnsetProp(new_node, BAD_CAST "id");
+				new_node = xmlAddChild(reftp, xmlCopyNode(refs[i].ref, 1));
+				xmlUnsetProp(new_node, BAD_CAST "id");
+			}
+		} else {
+			new_node = xmlAddChild(new_refs, xmlCopyNode(refs[i].ref, 1));
+			xmlUnsetProp(new_node, BAD_CAST "id");
+		}
+	}
+
+	if (refgrp) {
+		if (!refdms->children) {
+			xmlUnlinkNode(refdms);
+			xmlFreeNode(refdms);
+			xmlUnlinkNode(rdandrt);
+			xmlFreeNode(rdandrt);
+		} else if (!reftp->children) {
+			xmlUnlinkNode(reftp);
+			xmlFreeNode(reftp);
+			xmlUnlinkNode(rdandrt);
+			xmlFreeNode(rdandrt);
+		} else {
+			xmlUnlinkNode(rdandrt);
+			xmlFreeNode(rdandrt);
+		}
 	}
 }
 
