@@ -42,6 +42,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
         <simplePara>Update compatibility for s1kd-flatten.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
+        <simplePara>Update compatibility for s1kd-checkrefs.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -228,7 +231,7 @@
                 <para>~</para>
               </entry>
             </row>
-            <row>
+            <row changeType="modify" reasonForUpdateRefIds="rfu-0002">
               <entry>
                 <para>s1kd-checkrefs</para>
               </entry>
@@ -241,11 +244,21 @@
               <entry>
                 <para>X</para>
               </entry>
-              <entry/>
-              <entry/>
-              <entry/>
-              <entry/>
-              <entry/>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
