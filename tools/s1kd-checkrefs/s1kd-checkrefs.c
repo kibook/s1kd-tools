@@ -15,13 +15,13 @@
 #define EXIT_VALIDITY_ERR 1
 #define EXIT_NO_FILE 2
 
-#define ADDR_PATH     "//dmAddress|//pmAddress"
-#define ADDR_PATH_EXT "//dmAddress|//pmAddress|//externalPubAddress"
+#define ADDR_PATH     "//dmAddress|//dmaddres|//pmAddress|//pmaddres"
+#define ADDR_PATH_EXT "//dmAddress|//dmaddres|//pmAddress|//pmaddres|//externalPubAddress"
 
-#define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//pmRef"
-#define REFS_PATH_CONTENT_EXT BAD_CAST "//content//dmRef|//content//pmRef|//content//externalPubRef"
-#define REFS_PATH BAD_CAST "//dmRef|//pmRef"
-#define REFS_PATH_EXT BAD_CAST "//dmRef|//pmRef|//externalPubRef"
+#define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content/refpm"
+#define REFS_PATH_CONTENT_EXT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content//refpm|//content//externalPubRef"
+#define REFS_PATH BAD_CAST "//dmRef|//pmRef|//refdm[*]|//refpm"
+#define REFS_PATH_EXT BAD_CAST "//dmRef|//refdm[*]|//pmRef|//refpm|//externalPubRef"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -45,10 +45,8 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 	xmlXPathObjectPtr obj;
 	xmlNodePtr first;
 
-	ctx = xmlXPathNewContext(doc);
-
-	if (node)
-		ctx->node = node;
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
 	
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
@@ -61,6 +59,11 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 	xmlXPathFreeContext(ctx);
 
 	return first;
+}
+
+char *firstXPathString(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
+{
+	return (char *) xmlNodeGetContent(firstXPathNode(xpath, doc, node));
 }
 
 xmlNodePtr findChild(xmlNodePtr parent, const char *name)
@@ -97,8 +100,8 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	char cat[256];
 
 	identExtension = findChild(ident, "identExtension");
-	pmCode         = findChild(ident, "pmCode");
-	issueInfo      = findChild(ident, "issueInfo");
+	pmCode         = firstXPathNode("pmCode|pmc", NULL, ident);
+	issueInfo      = firstXPathNode("issueInfo|issno", NULL, ident);
 	language       = findChild(ident, "language");
 
 	strcpy(dst, "");
@@ -117,10 +120,10 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		strcat(dst, cat);
 	}
 
-	modelIdentCode = (char *) xmlGetProp(pmCode, BAD_CAST "modelIdentCode");
-	pmIssuer       = (char *) xmlGetProp(pmCode, BAD_CAST "pmIssuer");
-	pmNumber       = (char *) xmlGetProp(pmCode, BAD_CAST "pmNumber");
-	pmVolume       = (char *) xmlGetProp(pmCode, BAD_CAST "pmVolume");
+	modelIdentCode = firstXPathString("@modelIdentCode|modelic", NULL, pmCode);
+	pmIssuer       = firstXPathString("@pmIssuer|pmissuer", NULL, pmCode);
+	pmNumber       = firstXPathString("@pmNumber|pmnumber", NULL, pmCode);
+	pmVolume       = firstXPathString("@pmVolume|pmvolume", NULL, pmCode);
 
 	sprintf(cat, "%s-%s-%s-%s", modelIdentCode, pmIssuer, pmNumber, pmVolume);
 
@@ -134,8 +137,8 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	if (withIssue && issueInfo) {
 		char *issueNumber, *inWork;
 
-		issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-		inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+		issueNumber = firstXPathString("@issueNumber|@issno", NULL, issueInfo);
+		inWork      = firstXPathString("@inWork|@inwork", NULL, issueInfo);
 
 		sprintf(cat, "_%s-%s", issueNumber, inWork);
 
@@ -148,8 +151,8 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	if (withLang && language) {
 		char *languageIsoCode, *countryIsoCode;
 
-		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		languageIsoCode = firstXPathString("@languageIsoCode|@language", NULL, language);
+		countryIsoCode  = firstXPathString("@countryIsoCode|@country", NULL, language);
 
 		sprintf(cat, "_%s-%s", languageIsoCode, countryIsoCode);
 
@@ -179,18 +182,18 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	
 	char cat[256];
 
-	identExtension = findChild(ident, "identExtension");
-	dmCode = findChild(ident, "dmCode");
-	issueInfo = findChild(ident, "issueInfo");
-	language = findChild(ident, "language");
+	identExtension = firstXPathNode("identExtension|dmcextension", NULL, ident);
+	dmCode         = firstXPathNode("dmCode|.//avee", NULL, ident);
+	issueInfo      = firstXPathNode("issueInfo|issno", NULL, ident);
+	language       = findChild(ident, "language");
 
 	strcpy(dst, "");
 
 	if (identExtension) {
 		char *extensionProducer, *extensionCode;
 
-		extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
-		extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
+		extensionProducer = firstXPathString("@extensionProducer|dmeproducer", NULL, identExtension);
+		extensionCode     = firstXPathString("@extensionCode|dmecode", NULL, identExtension);
 
 		sprintf(cat, "%s-%s-", extensionProducer, extensionCode);
 
@@ -200,19 +203,19 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		strcat(dst, cat);
 	}
 
-	modelIdentCode     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-	systemDiffCode     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-	systemCode         = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
-	subSystemCode      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-	subSubSystemCode   = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-	assyCode           = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
-	disassyCode        = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
-	disassyCodeVariant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
-	infoCode           = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
-	infoCodeVariant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
-	itemLocationCode   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
-	learnCode          = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
-	learnEventCode     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
+	modelIdentCode     = firstXPathString("@modelIdentCode|modelic", NULL, dmCode);
+	systemDiffCode     = firstXPathString("@systemDiffCode|sdc", NULL, dmCode);
+	systemCode         = firstXPathString("@systemCode|chapnum", NULL, dmCode);
+	subSystemCode      = firstXPathString("@subSystemCode|section", NULL, dmCode);
+	subSubSystemCode   = firstXPathString("@subSubSystemCode|subsect", NULL, dmCode);
+	assyCode           = firstXPathString("@assyCode|subject", NULL, dmCode);
+	disassyCode        = firstXPathString("@disassyCode|discode", NULL, dmCode);
+	disassyCodeVariant = firstXPathString("@disassyCodeVariant|discodev", NULL, dmCode);
+	infoCode           = firstXPathString("@infoCode|incode", NULL, dmCode);
+	infoCodeVariant    = firstXPathString("@infoCodeVariant|incodev", NULL, dmCode);
+	itemLocationCode   = firstXPathString("@itemLocationCode|itemloc", NULL, dmCode);
+	learnCode          = firstXPathString("@learnCode", NULL, dmCode);
+	learnEventCode     = firstXPathString("@learnEventCode", NULL, dmCode);
 
 	sprintf(cat, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		modelIdentCode,
@@ -252,8 +255,8 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	if (withIssue && issueInfo) {
 		char *issueNumber, *inWork;
 
-		issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-		inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+		issueNumber = firstXPathString("@issueNumber|@issno", NULL, issueInfo);
+		inWork      = firstXPathString("@inWork|@inwork", NULL, issueInfo);
 
 		sprintf(cat, "_%s-%s", issueNumber, inWork);
 
@@ -266,8 +269,8 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	if (withLang && language) {
 		char *languageIsoCode, *countryIsoCode;
 
-		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		languageIsoCode = firstXPathString("@languageIsoCode|@language", NULL, language);
+		countryIsoCode  = firstXPathString("@countryIsoCode|@country", NULL, language);
 
 		sprintf(cat, "_%s-%s", languageIsoCode, countryIsoCode);
 
@@ -307,7 +310,12 @@ void getExtPubCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 
 bool isDmRef(xmlNodePtr ref)
 {
-	return strcmp((char *) ref->name, "dmRef") == 0;
+	return xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "refdm") == 0;
+}
+
+bool isDmAddress(xmlNodePtr address)
+{
+	return xmlStrcmp(address->name, BAD_CAST "dmAddress") == 0 || xmlStrcmp(address->name, BAD_CAST "dmaddres") == 0;
 }
 
 bool sameDm(xmlNodePtr ref, xmlNodePtr address)
@@ -318,14 +326,14 @@ bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 	xmlNodePtr ref_dmIdent;
 	xmlNodePtr add_dmIdent;
 
-	if (!isDmRef(ref) || strcmp((char *) address->name, "dmAddress") != 0)
+	if (!isDmRef(ref) || !isDmAddress(address))
 		return false;
 
-	ref_dmIdent = findChild(ref, "dmRefIdent");
-	add_dmIdent = findChild(address, "dmIdent");
+	ref_dmIdent = firstXPathNode("dmRefIdent|self::refdm", NULL, ref);
+	add_dmIdent = firstXPathNode("dmIdent|self::dmaddres", NULL, address);
 
-	withIssue = findChild(ref_dmIdent, "issueInfo");
-	withLang  = findChild(ref_dmIdent, "language");
+	withIssue = firstXPathNode(".//issueInfo|.//issno", NULL, ref);
+	withLang  = firstXPathNode(".//language", NULL, ref);
 
 	getDmCode(refcode, ref_dmIdent, withIssue, withLang);
 	getDmCode(addcode, add_dmIdent, withIssue, withLang);
@@ -339,7 +347,12 @@ bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 
 bool isPmRef(xmlNodePtr ref)
 {
-	return strcmp((char *) ref->name, "pmRef") == 0;
+	return xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "refpm") == 0;
+}
+
+bool isPmAddress(xmlNodePtr address)
+{
+	return xmlStrcmp(address->name, BAD_CAST "pmAddress") == 0 || xmlStrcmp(address->name, BAD_CAST "pmaddres") == 0;
 }
 
 bool samePm(xmlNodePtr ref, xmlNodePtr address)
@@ -350,13 +363,13 @@ bool samePm(xmlNodePtr ref, xmlNodePtr address)
 	xmlNodePtr ref_pmIdent;
 	xmlNodePtr add_pmIdent;
 
-	if (!isPmRef(ref) || strcmp((char *) address->name, "pmAddress") != 0)
+	if (!isPmRef(ref) || !isPmAddress(address))
 		return false;
 
-	ref_pmIdent = findChild(ref, "pmRefIdent");
-	add_pmIdent = findChild(address, "pmIdent");
+	ref_pmIdent = firstXPathNode("pmRefIdent|self::refpm", NULL, ref);
+	add_pmIdent = firstXPathNode("pmIdent|self::pmaddres", NULL, address);
 
-	withIssue = findChild(ref_pmIdent, "issueInfo");
+	withIssue = firstXPathNode("issueInfo|issno", NULL, ref_pmIdent);
 	withLang  = findChild(ref_pmIdent, "language");
 
 	getPmCode(refcode, ref_pmIdent, withIssue, withLang);
@@ -407,10 +420,10 @@ void validityError(xmlNodePtr ref, const char *fname)
 
 	if (isDmRef(ref)) {
 		prefix = "data module";
-		getDmCode(code, firstXPathNode("dmRefIdent", ref->doc, ref), false, false);
+		getDmCode(code, firstXPathNode("dmRefIdent|self::refdm", ref->doc, ref), false, false);
 	} else if (isPmRef(ref)) {
 		prefix = "pub module";
-		getPmCode(code, firstXPathNode("pmRefIdent", ref->doc, ref), false, false);
+		getPmCode(code, firstXPathNode("pmRefIdent|self::refpm", ref->doc, ref), false, false);
 	} else if (isExtPubRef(ref)) {
 		prefix = "external pub";
 		getExtPubCode(code, firstXPathNode("externalPubRefIdent", ref->doc, ref), false, false);
@@ -447,13 +460,14 @@ bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 				if (recode) {
 					xmlNodePtr dmIdent, dmCode, dmRefIdent, dmRefCode, issueInfo, refIssueInfo, language, refLanguage;
 
-					dmIdent = findChild(recode, "dmIdent");
-					dmCode = findChild(dmIdent, "dmCode");
-					issueInfo = findChild(dmIdent, "issueInfo");
+					dmIdent = firstXPathNode("dmIdent|self::dmaddres", NULL, recode);
+					dmCode = firstXPathNode("dmCode|.//avee", NULL, dmIdent);
+					issueInfo = firstXPathNode("issueInfo|issno", NULL, dmIdent);
 					language = findChild(dmIdent, "language");
-					dmRefIdent = findChild(ref, "dmRefIdent");
-					dmRefCode  = findChild(dmRefIdent, "dmCode");
-					refIssueInfo = findChild(dmRefIdent, "issueInfo");
+
+					dmRefIdent = firstXPathNode("dmRefIdent|self::refdm", NULL, ref);
+					dmRefCode  = firstXPathNode("dmCode|.//avee", NULL, dmRefIdent);
+					refIssueInfo = firstXPathNode("issueInfo|issno", NULL, dmRefIdent);
 					refLanguage = findChild(dmRefIdent, "language");
 
 					if (verbose) {
@@ -466,16 +480,17 @@ bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 					if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
 					if (refLanguage) replaceNode(refLanguage, language);
 
-					dmAddressItems = findChild(recode, "dmAddressItems");
+					dmAddressItems = firstXPathNode("dmAddressItems|self::dmaddres", NULL, recode);
 				} else {
-					dmAddressItems = findChild(cur, "dmAddressItems");
+					dmAddressItems = firstXPathNode("dmAddressItems|self::dmaddres", NULL, cur);
 				}
 
 				issueDate           = findChild(dmAddressItems, "issueDate");
-				dmTitle             = findChild(dmAddressItems, "dmTitle");
-				dmRefAddressItems   = findChild(ref, "dmRefAddressItems");
+				dmTitle             = firstXPathNode("dmTitle|dmtitle", NULL, dmAddressItems);
+
+				dmRefAddressItems   = firstXPathNode("dmRefAddressItems|self::refdm", NULL, ref);
 				dmRefIssueDate      = findChild(dmRefAddressItems, "issueDate");
-				dmRefTitle          = findChild(dmRefAddressItems, "dmTitle");
+				dmRefTitle          = firstXPathNode("dmTitle|dmtitle", NULL, dmRefAddressItems);
 
 				if (dmRefIssueDate) replaceNode(dmRefIssueDate, issueDate);
 				if (dmRefTitle)     replaceNode(dmRefTitle, dmTitle);
@@ -489,13 +504,14 @@ bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 				if (recode) {
 					xmlNodePtr pmIdent, pmCode, pmRefIdent, pmRefCode, issueInfo, refIssueInfo, language, refLanguage;
 
-					pmIdent = findChild(recode, "pmIdent");
-					pmCode  = findChild(pmIdent, "pmCode");
-					issueInfo = findChild(pmIdent, "issueInfo");
+					pmIdent = firstXPathNode("pmIdent|self::pmaddres", NULL, recode);
+					pmCode  = firstXPathNode("pmCode|pmc", NULL, pmIdent);
+					issueInfo = firstXPathNode("issueInfo|issno", NULL, pmIdent);
 					language = findChild(pmIdent, "language");
-					pmRefIdent = findChild(ref, "pmRefIdent");
-					pmRefCode  = findChild(pmRefIdent, "pmCode");
-					refIssueInfo = findChild(pmRefIdent, "issueInfo");
+
+					pmRefIdent = firstXPathNode("pmRefIdent|self::refpm", NULL, ref);
+					pmRefCode  = firstXPathNode("pmCode|pmc", NULL, pmRefIdent);
+					refIssueInfo = firstXPathNode("issueInfo|issno", NULL, pmRefIdent);
 					refLanguage = findChild(pmRefIdent, "language");
 
 					if (verbose) {
@@ -508,16 +524,17 @@ bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 					if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
 					if (refLanguage) replaceNode(refLanguage, language);
 
-					pmAddressItems = findChild(recode, "pmAddressItems");
+					pmAddressItems = firstXPathNode("pmAddressItems|self::pmaddres", NULL, recode);
 				} else {
-					pmAddressItems = findChild(cur, "pmAddressItems");
+					pmAddressItems = firstXPathNode("pmAddressItems|self::pmaddres", NULL, recode);
 				}
 
-				issueDate           = findChild(pmAddressItems, "issueDate");
-				pmTitle             = findChild(pmAddressItems, "pmTitle");
-				pmRefAddressItems   = findChild(ref, "pmRefAddressItems");
-				pmRefIssueDate      = findChild(pmRefAddressItems, "issueDate");
-				pmRefTitle          = findChild(pmRefAddressItems, "pmTitle");
+				issueDate           = firstXPathNode("issueDate|issdate", NULL, pmAddressItems);
+				pmTitle             = firstXPathNode("pmTitle|pmtitle", NULL, pmAddressItems);
+
+				pmRefAddressItems   = firstXPathNode("pmRefAddressItems|self::refpm", NULL, ref);
+				pmRefIssueDate      = firstXPathNode("issueDate|issdate", NULL, pmRefAddressItems);
+				pmRefTitle          = firstXPathNode("pmTitle|pmtitle", NULL, pmRefAddressItems);
 
 				if (pmRefIssueDate) replaceNode(pmRefIssueDate, issueDate);
 				if (pmRefTitle)     replaceNode(pmRefTitle, pmTitle);
@@ -664,7 +681,7 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 
 	if (recode) {
 		recodeDoc = xmlReadFile(recode, NULL, PARSE_OPTS);
-		recodeIdent = firstXPathNode("//dmAddress|//pmAddress", recodeDoc, NULL);
+		recodeIdent = firstXPathNode(ADDR_PATH, recodeDoc, NULL);
 	} else {
 		recodeIdent = NULL;
 	}
