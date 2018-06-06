@@ -6,9 +6,10 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -59,6 +60,30 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 	return NULL;
 }
 
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
+
+	obj = xmlXPathEvalExpression(BAD_CAST expr, ctx);
+
+	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
+}
+
+char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+{
+	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
+}
+
 bool is_dm(const char *fname)
 {
 	return strncmp(fname, "DMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
@@ -100,7 +125,6 @@ bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool 
 
 void flatten_pm_ref(xmlNodePtr pm_ref)
 {
-	xmlNodePtr pm_ref_ident;
 	xmlNodePtr pm_code;
 	xmlNodePtr issue_info;
 	xmlNodePtr language;
@@ -126,15 +150,14 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	bool found = false;
 	xmlNodePtr cur;
 
-	pm_ref_ident = find_child(pm_ref, "pmRefIdent");
-	pm_code = find_child(pm_ref_ident, "pmCode");
-	issue_info = find_child(pm_ref_ident, "issueInfo");
-	language = find_child(pm_ref_ident, "language");
+	pm_code = first_xpath_node(NULL, pm_ref, ".//pmCode|.//pmc");
+	issue_info = first_xpath_node(NULL, pm_ref, ".//issueInfo|.//issno");
+	language = first_xpath_node(NULL, pm_ref, ".//language");
 
-	model_ident_code = (char *) xmlGetProp(pm_code, BAD_CAST "modelIdentCode");
-	pm_issuer        = (char *) xmlGetProp(pm_code, BAD_CAST "pmIssuer");
-	pm_number        = (char *) xmlGetProp(pm_code, BAD_CAST "pmNumber");
-	pm_volume        = (char *) xmlGetProp(pm_code, BAD_CAST "pmVolume");
+	model_ident_code = first_xpath_string(NULL, pm_code, "@modelIdentCode|modelic");
+	pm_issuer        = first_xpath_string(NULL, pm_code, "@pmIssuer|pmissuer");
+	pm_number        = first_xpath_string(NULL, pm_code, "@pmNumber|pmnumber");
+	pm_volume        = first_xpath_string(NULL, pm_code, "@pmVolume|pmvolume");
 
 	snprintf(pmc, 256, "%s-%s-%s-%s",
 		model_ident_code,
@@ -145,8 +168,8 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	snprintf(pm_fname, 256, "PMC-%s", pmc);
 
 	if (issue_info && !no_issue) {
-		issue_number = (char *) xmlGetProp(issue_info, BAD_CAST "issueNumber");
-		in_work = (char *) xmlGetProp(issue_info, BAD_CAST "inWork");
+		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
+		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 		strcpy(pm_fname_temp, pm_fname);
 		snprintf(pm_fname, 256, "%s_%s-%s", pm_fname_temp, issue_number, in_work);
 	}
@@ -154,9 +177,9 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	if (language) {
 		int i;
 
-		language_iso_code = (char *)  xmlGetProp(language, BAD_CAST "languageIsoCode");
-		country_iso_code = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
-	
+		language_iso_code = first_xpath_string(NULL, language, "@languageIsoCode|@language");
+		country_iso_code  = first_xpath_string(NULL, language, "@countryIsoCode|@country");
+
 		for (i = 0; language_iso_code[i]; ++i)
 			language_iso_code[i] = toupper(language_iso_code[i]);
 		strcpy(pm_fname_temp, pm_fname);
@@ -210,7 +233,6 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 
 void flatten_dm_ref(xmlNodePtr dm_ref)
 {
-	xmlNodePtr dm_ref_ident;
 	xmlNodePtr dm_code;
 	xmlNodePtr issue_info;
 	xmlNodePtr language;
@@ -243,22 +265,21 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	bool found = false;
 	xmlNodePtr cur;
 
-	dm_ref_ident = find_child(dm_ref, "dmRefIdent");
-	dm_code = find_child(dm_ref_ident, "dmCode");
-	issue_info = find_child(dm_ref_ident, "issueInfo");
-	language = find_child(dm_ref_ident, "language");
+	dm_code    = first_xpath_node(NULL, dm_ref, ".//dmCode|.//avee");
+	issue_info = first_xpath_node(NULL, dm_ref, ".//issueInfo|.//issno");
+	language   = first_xpath_node(NULL, dm_ref, ".//language");
 
-	model_ident_code     = (char *) xmlGetProp(dm_code, BAD_CAST "modelIdentCode");
-	system_diff_code     = (char *) xmlGetProp(dm_code, BAD_CAST "systemDiffCode");
-	system_code          = (char *) xmlGetProp(dm_code, BAD_CAST "systemCode");
-	sub_system_code      = (char *) xmlGetProp(dm_code, BAD_CAST "subSystemCode");
-	sub_sub_system_code  = (char *) xmlGetProp(dm_code, BAD_CAST "subSubSystemCode");
-	assy_code            = (char *) xmlGetProp(dm_code, BAD_CAST "assyCode");
-	disassy_code         = (char *) xmlGetProp(dm_code, BAD_CAST "disassyCode");
-	disassy_code_variant = (char *) xmlGetProp(dm_code, BAD_CAST "disassyCodeVariant");
-	info_code            = (char *) xmlGetProp(dm_code, BAD_CAST "infoCode");
-	info_code_variant    = (char *) xmlGetProp(dm_code, BAD_CAST "infoCodeVariant");
-	item_location_code   = (char *) xmlGetProp(dm_code, BAD_CAST "itemLocationCode");
+	model_ident_code     = first_xpath_string(NULL, dm_code, "@modelIdentCode|modelic");
+	system_diff_code     = first_xpath_string(NULL, dm_code, "@systemDiffCode|sdc");
+	system_code          = first_xpath_string(NULL, dm_code, "@systemCode|chapnum");
+	sub_system_code      = first_xpath_string(NULL, dm_code, "@subSystemCode|section");
+	sub_sub_system_code  = first_xpath_string(NULL, dm_code, "@subSubSystemCode|subsect");
+	assy_code            = first_xpath_string(NULL, dm_code, "@assyCode|subject");
+	disassy_code         = first_xpath_string(NULL, dm_code, "@disassyCode|discode");
+	disassy_code_variant = first_xpath_string(NULL, dm_code, "@disassyCodeVariant|discodev");
+	info_code            = first_xpath_string(NULL, dm_code, "@infoCode|incode");
+	info_code_variant    = first_xpath_string(NULL, dm_code, "@infoCodeVariant|incodev");
+	item_location_code   = first_xpath_string(NULL, dm_code, "@itemLocationCode|itemloc");
 
 	snprintf(dmc, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		model_ident_code,
@@ -276,8 +297,8 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	snprintf(dm_fname, 256, "DMC-%s", dmc);
 
 	if (issue_info && !no_issue) {
-		issue_number = (char *) xmlGetProp(issue_info, BAD_CAST "issueNumber");
-		in_work = (char *) xmlGetProp(issue_info, BAD_CAST "inWork");
+		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
+		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 		strcpy(dm_fname_temp, dm_fname);
 		snprintf(dm_fname, 256, "%s_%s-%s", dm_fname_temp, issue_number, in_work);
 	}
@@ -285,8 +306,8 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	if (language) {
 		int i;
 
-		language_iso_code = (char *)  xmlGetProp(language, BAD_CAST "languageIsoCode");
-		country_iso_code = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		language_iso_code = first_xpath_string(NULL, language, "@languageIsoCode|@language");
+		country_iso_code  = first_xpath_string(NULL, language, "@countryIsoCode|@country");
 	
 		for (i = 0; language_iso_code[i]; ++i)
 			language_iso_code[i] = toupper(language_iso_code[i]);
@@ -355,11 +376,11 @@ void flatten_pm_entry(xmlNodePtr pm_entry)
 	while (cur) {
 		next = cur->next;
 
-		if (strcmp((char *) cur->name, "dmRef") == 0) {
+		if (xmlStrcmp(cur->name, BAD_CAST "dmRef") == 0 || xmlStrcmp(cur->name, BAD_CAST "refdm") == 0) {
 			flatten_dm_ref(cur);
-		} else if (strcmp((char *) cur->name, "pmRef") == 0) {
+		} else if (xmlStrcmp(cur->name, BAD_CAST "pmRef") == 0 || xmlStrcmp(cur->name, BAD_CAST "refpm") == 0) {
 			flatten_pm_ref(cur);
-		} else if (strcmp((char *) cur->name, "pmEntry") == 0) {
+		} else if (xmlStrcmp(cur->name, BAD_CAST "pmEntry") == 0 || xmlStrcmp(cur->name, BAD_CAST "pmentry") == 0) {
 			flatten_pm_entry(cur);
 		}
 
@@ -436,7 +457,7 @@ int main(int argc, char **argv)
 
 	if (optind == argc - 1 || !use_pub_fmt) {
 		for (cur = content->children; cur; cur = cur->next) {
-			if (strcmp((char *) cur->name, "pmEntry") == 0) {
+			if (xmlStrcmp(cur->name, BAD_CAST "pmEntry") == 0 || xmlStrcmp(cur->name, BAD_CAST "pmentry") == 0) {
 				flatten_pm_entry(cur);
 			}
 		}
