@@ -10,11 +10,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
-#define S_DMTYPES_ERR ERR_PREFIX "Could not create dmtypes file."
+#define EXIT_NO_FILE 2
+#define S_DMTYPES_ERR ERR_PREFIX "Could not create dmtypes file.\n"
+#define S_NO_FILE_ERR ERR_PREFIX "Could not open file: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -224,7 +226,6 @@ void dump_defaults_xml(const char *fname, bool overwrite)
 	doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
 	set_defaults(doc);
 	if (overwrite) {
-		if (!fname) fname = DEFAULT_DEFAULTS_FNAME;
 		xmlSaveFile(fname, doc);
 	} else {
 		xmlSaveFile("-", doc);
@@ -242,13 +243,12 @@ void dump_defaults_text(const char *fname, bool overwrite)
 	res = transform_doc(doc, xsl_xml_defaults_to_text_xsl, xsl_xml_defaults_to_text_xsl_len);
 
 	if (overwrite) {
-		if (!fname) fname = DEFAULT_DEFAULTS_FNAME;
 		f = fopen(fname, "w");
 	} else {
 		f = stdout;
 	}
 
-	fprintf(f, "%s", (char *) res->children->content);
+	fprintf(f, "%s", res->children->content);
 
 	if (overwrite) {
 		fclose(f);
@@ -344,6 +344,11 @@ void text_to_xml(const char *path, enum file f, bool overwrite, bool sort)
 
 void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort)
 {
+	if (f != NONE && access(fname, F_OK) == -1) {
+		fprintf(stderr, S_NO_FILE_ERR, fname);
+		exit(EXIT_NO_FILE);
+	}
+
 	if (fmt == TEXT) {
 		if (f == NONE) {
 			dump_defaults_text(fname, overwrite);
@@ -411,17 +416,29 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (!fname) {
+		fname = strdup(DEFAULT_DEFAULTS_FNAME);
+	}
+
 	if (initialize) {
+		char sys[256];
+		const char *opt;
+		void (*fn)(const char *, bool);
+
 		if (fmt == TEXT) {
-			dump_defaults_text(NULL, true);
-			if (system("s1kd-newdm -. > dmtypes") != 0) {
-				fprintf(stderr, S_DMTYPES_ERR);
-			}
+			opt = "-.";
+			fn = dump_defaults_text;
 		} else {
-			dump_defaults_xml(NULL, true);
-			if (system("s1kd-newdm -, > dmtypes") != 0) {
-				fprintf(stderr, S_DMTYPES_ERR);
-			}
+			opt = "-,";
+			fn = dump_defaults_xml;
+		}
+
+		snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
+
+		fn(DEFAULT_DEFAULTS_FNAME, true);
+
+		if (system(sys) != 0) {
+			fprintf(stderr, S_DMTYPES_ERR);
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {

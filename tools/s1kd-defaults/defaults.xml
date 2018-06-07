@@ -6,46 +6,4 @@
   <default ident="issueNumber" value="000"/>
   <default ident="languageIsoCode" value="und"/>
   <default ident="securityClassification" value="01"/>
-  <!--<default ident="assyCode" value="00"/>-->
-  <!--<default ident="authorization" value="khzae.net"/>-->
-  <!--<default ident="brex" value="S1000D-F-04-10-0301-00A-022A-D"/>-->
-  <!--<default ident="city" value="Toronto"/>-->
-  <!--<default ident="commentPriorityCode" value="cp01"/>-->
-  <!--<default ident="commentType" value="Q"/>-->
-  <!--<default ident="country" value="Canada"/>-->
-  <!--<default ident="disassyCode" value="00"/>-->
-  <!--<default ident="disassyCodeVariant" value="A"/>-->
-  <!--<default ident="dmlType" value="C"/>-->
-  <!--<default ident="includePrevSnsTitle" value="false"/>-->
-  <!--<default ident="infoCode" value="040"/>-->
-  <!--<default ident="infoCodeVariant" value="A"/>-->
-  <!--<default ident="infoName" value="Description"/>-->
-  <!--<default ident="itemLocationCode" value="D"/>-->
-  <!--<default ident="learnCode" value="H10"/>-->
-  <!--<default ident="learnEventCode" value="A"/>-->
-  <!--<default ident="maintainedSns" value="Generic"/>-->
-  <!--<default ident="modelIdentCode" value="MYPRJ"/>-->
-  <!--<default ident="omitIssueInfo" value="false"/>-->
-  <!--<default ident="originator" value="khzae.net"/>-->
-  <!--<default ident="originatorCode" value="12345"/>-->
-  <!--<default ident="pmIssuer" value="12345"/>-->
-  <!--<default ident="pmNumber" value="00000"/>-->
-  <!--<default ident="pmVolume" value="00"/>-->
-  <!--<default ident="receiver" value="khzae.net"/>-->
-  <!--<default ident="receiverCity" value="Toronto"/>-->
-  <!--<default ident="receiverCountry" value="Canada"/>-->
-  <!--<default ident="receiverIdent" value="12345"/>-->
-  <!--<default ident="remarks" value="Remarks"/>-->
-  <!--<default ident="responsiblePartnerCompany" value="khzae.net"/>-->
-  <!--<default ident="responsiblePartnerCompanyCode" value="12345"/>-->
-  <!--<default ident="schema" value="descript.xsd"/>-->
-  <!--<default ident="senderIdent" value="12345"/>-->
-  <!--<default ident="seqNumber" value="00001"/>-->
-  <!--<default ident="sns" value="S1000D-F-04-10-0301-00A-022A-D"/>-->
-  <!--<default ident="subSubSystem" value="0"/>-->
-  <!--<default ident="subSystem" value="0"/>-->
-  <!--<default ident="systemCode" value="00"/>-->
-  <!--<default ident="techName" value="My project"/>-->
-  <!--<default ident="templates" value="/usr/share/s1kd-tools/templ"/>-->
-  <!--<default ident="yearOfDataIssue" value="2018"/>-->
 </defaults>
