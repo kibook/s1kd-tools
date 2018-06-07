@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="01"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="05" day="23"/>
+        <issueDate year="2018" month="06" day="07"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -39,8 +39,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt03">
-        <simplePara>Change BREX reference and add ids to all levelled paragraphs.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Change 'defaults' and 'dmtypes' to '.defaults' and '.dmtypes'</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -58,14 +58,14 @@
           <verbatimText verbatimStyle="vs23">$ mkdir myproject
 $ cd myproject</verbatimText>
         </para>
-        <para>After that, you should create two files: <verbatimText verbatimStyle="vs02">defaults</verbatimText> and <verbatimText verbatimStyle="vs02">dmtypes</verbatimText>. These files can be created automatically using the <emphasis>s1kd-defaults</emphasis> tool to initialize the new CSDB:</para>
+        <para>After that, you should create two files: <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>. These files can be created automatically using the <emphasis>s1kd-defaults</emphasis> tool to initialize the new CSDB:</para>
         <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-defaults -i</verbatimText>
         </para>
         <para>Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
         <levelledPara id="par-0003">
-          <title><verbatimText verbatimStyle="vs02">defaults</verbatimText> file</title>
-          <para>The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>The <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
           <para>
             <emphasis emphasisType="em01">Example of simple text format:</emphasis>
           </para>
@@ -93,8 +93,8 @@ techName                   My project</verbatimText>
           </para>
         </levelledPara>
         <levelledPara id="par-0004">
-          <title><verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file</title>
-          <para>The <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file is used by the <emphasis>s1kd-newdm</emphasis> tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the <verbatimText verbatimStyle="vs02">defaults</verbatimText> file, it can be written using either the simple text format or XML format.</para>
+          <title><verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file</title>
+          <para>The <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file is used by the <emphasis>s1kd-newdm</emphasis> tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file, it can be written using either the simple text format or XML format.</para>
           <para>
             <emphasis emphasisType="em01">Example of simple text format:</emphasis>
           </para>
@@ -120,11 +120,11 @@ schema="descript"/&gt;
 schema="proced"/&gt;
 &lt;/dmtypes&gt;</verbatimText>
           </para>
-          <para>The s1kd-newdm tool contains a default set of information code definitions. This can be used to create a default <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file by use of the <verbatimText>-.</verbatimText> (simple text format) or <verbatimText>-,</verbatimText> (XML) options:</para>
+          <para>The s1kd-newdm tool contains a default set of information code definitions. This can be used to create a default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file by use of the <verbatimText>-.</verbatimText> (simple text format) or <verbatimText>-,</verbatimText> (XML) options:</para>
           <para>
-            <verbatimText>$ s1kd-newdm -, &gt; dmtypes</verbatimText>
+            <verbatimText>$ s1kd-newdm -, &gt; .dmtypes</verbatimText>
           </para>
-          <para>The generated <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file can then be customized to fit your project.</para>
+          <para>The generated <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file can then be customized to fit your project.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara id="par-0005">
@@ -139,7 +139,7 @@ schema="proced"/&gt;
         <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
         </para>
-        <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> file for data modules).</para>
+        <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
         <levelledPara id="par-0006">
           <title>Creating CSDB objects on-the-fly</title>
           <para>Data modules and other CSDB objects can also be created in an "on-the-fly" manner, without the use of a DMRL, by invoking the s1kd-new* set of tools directly, as with s1kd-newdml above. For example, to create a new data module:</para>
@@ -147,7 +147,7 @@ schema="proced"/&gt;
             <verbatimText verbatimStyle="vs23">$ s1kd-newdm -# MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
           </para>
           <para>This would create the file <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText> in your CSDB folder.</para>
-          <para>Each of the s1kd-new* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the <verbatimText verbatimStyle="vs02">defaults</verbatimText> and <verbatimText verbatimStyle="vs02">dmtypes</verbatimText> files.</para>
+          <para>Each of the s1kd-new* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara id="par-0007">

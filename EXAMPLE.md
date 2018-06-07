@@ -1,7 +1,7 @@
 -   [General](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0001)
 -   [Initial setup](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0002)
-    -   [`defaults` file](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0003)
-    -   [`dmtypes` file](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0004)
+    -   [`.defaults` file](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0003)
+    -   [`.dmtypes` file](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0004)
 -   [Creating the DMRL and populating the CSDB](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0005)
     -   [Creating CSDB objects on-the-fly](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0006)
 -   [Data module workflow](#ID_S1000DTOOLS-A-00-00-00-00A-130A-D_par-0007)
@@ -26,16 +26,16 @@ This first step is to create a folder for the new S1000D project. Example:
     $ mkdir myproject
     $ cd myproject
 
-After that, you should create two files: `defaults` and `dmtypes`. These files can be created automatically using the **s1kd-defaults** tool to initialize the new CSDB:
+After that, you should create two files: `.defaults` and `.dmtypes`. These files can be created automatically using the **s1kd-defaults** tool to initialize the new CSDB:
 
     $ s1kd-defaults -i
 
 Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.
 
-`defaults` file
----------------
+`.defaults` file
+----------------
 
-The `defaults` file is used by all of the s1kd-new\* tools. It provides default values for various S1000D metadata. The `defaults` file can be written in either a simple text format or an XML format.
+The `.defaults` file is used by all of the s1kd-new\* tools. It provides default values for various S1000D metadata. The `.defaults` file can be written in either a simple text format or an XML format.
 
 **Example of simple text format:**
 
@@ -58,10 +58,10 @@ The `defaults` file is used by all of the s1kd-new\* tools. It provides default 
     <default ident="techName" value="My project"/>
     </defaults>
 
-`dmtypes` file
---------------
+`.dmtypes` file
+---------------
 
-The `dmtypes` file is used by the **s1kd-newdm** tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the `defaults` file, it can be written using either the simple text format or XML format.
+The `.dmtypes` file is used by the **s1kd-newdm** tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the `.defaults` file, it can be written using either the simple text format or XML format.
 
 **Example of simple text format:**
 
@@ -84,11 +84,11 @@ The `dmtypes` file is used by the **s1kd-newdm** tool. It contains a list of inf
     schema="proced"/>
     </dmtypes>
 
-The s1kd-newdm tool contains a default set of information code definitions. This can be used to create a default `dmtypes` file by use of the `-.` (simple text format) or `-,` (XML) options:
+The s1kd-newdm tool contains a default set of information code definitions. This can be used to create a default `.dmtypes` file by use of the `-.` (simple text format) or `-,` (XML) options:
 
-`$ s1kd-newdm -, > dmtypes`
+`$ s1kd-newdm -, > .dmtypes`
 
-The generated `dmtypes` file can then be customized to fit your project.
+The generated `.dmtypes` file can then be customized to fit your project.
 
 Creating the DMRL and populating the CSDB
 =========================================
@@ -105,7 +105,7 @@ Once the DMRL is prepared, the **s1kd-dmrl** tool can be used to automatically p
 
     $ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML
 
-Information not included in the DMRL entry for a CSDB object is pulled from the `defaults` file (and the `dmtypes` file for data modules).
+Information not included in the DMRL entry for a CSDB object is pulled from the `.defaults` file (and the `.dmtypes` file for data modules).
 
 Creating CSDB objects on-the-fly
 --------------------------------
@@ -116,7 +116,7 @@ Data modules and other CSDB objects can also be created in an "on-the-fly" manne
 
 This would create the file `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML` in your CSDB folder.
 
-Each of the s1kd-new\* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the `defaults` and `dmtypes` files.
+Each of the s1kd-new\* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the `.defaults` and `.dmtypes` files.
 
 Data module workflow
 ====================
