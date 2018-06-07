@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="04" day="27"/>
+        <issueDate year="2018" month="06" day="07"/>
         <dmTitle>
           <techName>S1000D tools</techName>
           <infoName>Description</infoName>
@@ -41,8 +41,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add link to compatability table document.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Change 'defaults' to '.defaults'</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -70,10 +70,10 @@
           </externalPubRefIdent>
         </externalPubRef>
       </para>
-      <para>
+      <para changeType="modify" reasonForUpdateRefIds="rfu-0001">
         <externalPubRef xlink:href="DEFAULTS.md">
           <externalPubRefIdent>
-            <externalPubTitle>List of 'defaults' file identifiers</externalPubTitle>
+            <externalPubTitle>List of .defaults file identifiers</externalPubTitle>
           </externalPubRefIdent>
         </externalPubRef>
       </para>

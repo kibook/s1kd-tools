@@ -6,7 +6,7 @@ A set of small tools for manipulating S1000D data.
 
 [Usage examples](EXAMPLE.md)
 
-[List of 'defaults' file identifiers](DEFAULTS.md)
+[List of .defaults file identifiers](DEFAULTS.md)
 
 Some examples of S1000D data sets produced with these tools are available here:
 
