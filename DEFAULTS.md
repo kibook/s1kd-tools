@@ -1,7 +1,7 @@
 General
 =======
 
-This document contains an alphabetic index of all valid `defaults` file identifiers, and a description of the values they may be assigned. It also contains examples of a `defaults` file using all identifiers in both the XML format and simple text format.
+This document contains an alphabetic index of all valid `.defaults` file identifiers, and a description of the values they may be assigned. It also contains examples of a `.defaults` file using all identifiers in both the XML format and simple text format.
 
 Alphabetic index
 ================

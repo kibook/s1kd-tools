@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="03" day="09"/>
+        <issueDate year="2018" month="06" day="07"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add missing receiver and sender identifiers.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Change 'defaults' to '.defaults'</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -47,12 +47,12 @@
     <description>
       <levelledPara>
         <title>General</title>
-        <para>This document contains an alphabetic index of all valid <verbatimText verbatimStyle="vs02">defaults</verbatimText> file identifiers, and a description of the values they may be assigned. It also contains examples of a <verbatimText verbatimStyle="vs02">defaults</verbatimText> file using all identifiers in both the XML format and simple text format.</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">This document contains an alphabetic index of all valid <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file identifiers, and a description of the values they may be assigned. It also contains examples of a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file using all identifiers in both the XML format and simple text format.</para>
       </levelledPara>
       <levelledPara>
         <title>Alphabetic index</title>
         <table pgwide="1">
-          <title><verbatimText verbatimStyle="vs02">defaults</verbatimText> file - Identifier value descriptions</title>
+          <title changeType="modify" reasonForUpdateRefIds="rfu-0001"><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file - Identifier value descriptions</title>
           <tgroup cols="2">
             <colspec colname="c1"/>
             <colspec colname="c2"/>
@@ -367,7 +367,7 @@
                   <para>2 digits</para>
                 </entry>
               </row>
-              <row changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <row>
                 <entry>
                   <para>
                     <verbatimText verbatimStyle="vs14">receiver</verbatimText>
@@ -457,9 +457,11 @@
                   <para>2 digits</para>
                 </entry>
               </row>
-              <row changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <row>
                 <entry>
-                  <para><verbatimText verbatimStyle="vs14">sender</verbatimText></para>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">sender</verbatimText>
+                  </para>
                 </entry>
                 <entry>
                   <para>string</para>
