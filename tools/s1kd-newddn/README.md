@@ -51,7 +51,7 @@ Specify the authorization.
 BREX data module code.
 
 -d &lt;defaults&gt;  
-Specify the 'defaults' file name.
+Specify the `.defaults` file name.
 
 -f  
 Overwrite existing file.
@@ -92,10 +92,10 @@ Print the file name of the newly created DDN.
 --version  
 Show version information.
 
-'defaults' file
----------------
+`.defaults` file
+----------------
 
-Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="00"/>
+        <issueInfo issueNumber="030" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="02"/>
+        <issueDate year="2018" month="06" day="07"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -! option.</simplePara>
+        <simplePara>Change 'defaults' to '.defaults' and 'dmtypes' to '.dmtypes'</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -120,16 +120,16 @@
             <definitionListItem>
               <listItemTerm>-,</listItemTerm>
               <listItemDefinition>
-                <para>Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Dumps the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-.</listItemTerm>
               <listItemDefinition>
-                <para>Dumps the simple text form of the built-in default 'dmtypes'.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Dumps the simple text form of the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-!</listItemTerm>
               <listItemDefinition>
                 <para>Do not include an info name for the new data module.</para>
@@ -156,13 +156,13 @@
             <definitionListItem>
               <listItemTerm>-D &lt;dmtypes&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify the 'dmtypes' file name.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify the 'defaults' file name.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -221,7 +221,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "<verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>" 'defaults' file key can be used to set one of the above SNS as the default.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "<verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can be used to set one of the above SNS as the default.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -233,7 +233,7 @@
             <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
-                <para>Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" 'defaults' file key can also be set to control this option.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -271,7 +271,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>If both levels have the same title, then only one will be used. The "<verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>" 'defaults' file key can also be set to control this option.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">If both levels have the same title, then only one will be used. The "<verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -301,7 +301,7 @@
             <definitionListItem>
               <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -414,12 +414,12 @@
         </para>
         <levelledPara>
           <title>Prompt (-p) option</title>
-          <para>If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the 'defaults' and 'dmtypes' files), it will be displayed in square brackets [] in the prompt, and pressing Enter without typing any value will select this default value.</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files), it will be displayed in square brackets [] in the prompt, and pressing Enter without typing any value will select this default value.</para>
         </levelledPara>
-        <levelledPara>
-          <title>'defaults' file</title>
-          <para>This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named 'defaults', but any file can be specified by using the -d option.</para>
-          <para>All of the s1kd-new* commands use the same 'defaults' file format, so this file can contain default values for multiple types of metadata.</para>
+        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, but any file can be specified by using the -d option.</para>
+          <para>All of the s1kd-new* commands use the same <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file format, so this file can contain default values for multiple types of metadata.</para>
           <para>Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:</para>
           <para>
             <verbatimText verbatimStyle="vs23"><![CDATA[# General
@@ -429,7 +429,7 @@ originator                   khzae.net
 responsiblePartnerCompany    khzae.net
 securityClassification       01]]></verbatimText>
           </para>
-          <para>Alternatively, the 'defaults' file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
+          <para>Alternatively, the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
           <para>
             <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
 <defaults>
@@ -442,9 +442,9 @@ securityClassification       01]]></verbatimText>
 </defaults>]]></verbatimText>
           </para>
         </levelledPara>
-        <levelledPara>
-          <title>'dmtypes' file</title>
-          <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named 'dmtypes', but any file can be specified by using the -D option.</para>
+        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <title><verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file</title>
+          <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>, but any file can be specified by using the -D option.</para>
           <para>Each line consists of an info code, a schema identifier, and optionally a default info name. Example:</para>
           <para>
             <verbatimText verbatimStyle="vs23"><![CDATA[000    descript
@@ -452,7 +452,7 @@ securityClassification       01]]></verbatimText>
 040    descript    Description
 520    proced      Remove procedure]]></verbatimText>
           </para>
-          <para>Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText>, an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>, and optionally an attribute <verbatimText verbatimStyle="vs13">infoName</verbatimText>.</para>
+          <para>Like the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file, the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText>, an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>, and optionally an attribute <verbatimText verbatimStyle="vs13">infoName</verbatimText>.</para>
           <para>
             <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
 <dmtypes>
@@ -468,13 +468,13 @@ securityClassification       01]]></verbatimText>
 258B  proced  Other procedure to clean, Clean with air
 258C  proced  Other procedure to clean, Clean with water</verbatimText>
           </para>
-          <para>The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the 'dmtypes' file. An info code with no variant matches all possible variants.</para>
+          <para>The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file. An info code with no variant matches all possible variants.</para>
         </levelledPara>
         <levelledPara>
           <title>Custom XML templates (-%)</title>
-          <para>A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named <verbatimText verbatimStyle="vs02">&lt;schema&gt;.xml</verbatimText>, where <verbatimText verbatimStyle="vs02">&lt;schema&gt;</verbatimText> is the name of the schema, matching one of the schema names in the 'dmtypes' file or the schema specified with the -T option.</para>
+          <para>A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named <verbatimText verbatimStyle="vs02">&lt;schema&gt;.xml</verbatimText>, where <verbatimText verbatimStyle="vs02">&lt;schema&gt;</verbatimText> is the name of the schema, matching one of the schema names in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file or the schema specified with the -T option.</para>
           <para>The templates must be written to conform to the default S1000D issue of this tool (currently 4.2). They will be automatically transformed when another issue is specified with the -$ option.</para>
-          <para>The 'templates' default can also be specified in the 'defaults' file to use these custom templates by default.</para>
+          <para>The <verbatimText>templates</verbatimText> default can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file to use these custom templates by default.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

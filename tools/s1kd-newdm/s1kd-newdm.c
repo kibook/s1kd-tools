@@ -15,6 +15,7 @@
 #include "templates.h"
 #include "dmtypes.h"
 #include "sns.h"
+#include "s1kd_tools.h"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -44,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1
@@ -219,6 +220,8 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
+	puts("  -d         Specify .defaults file name.");
+	puts("  -D         Specify .dmtypes file name.");
 	puts("  -f         Overwrite existing file.");
 	puts("  -N         Omit issue/inwork from filename.");
 	puts("  -p         Prompt the user for each value");
@@ -1101,8 +1104,8 @@ int main(int argc, char **argv)
 
 	FILE *defaults;
 
-	char defaults_fname[256] = "defaults";
-	char dmtypes_fname[256] = "dmtypes";
+	char defaults_fname[256] = DEFAULT_DEFAULTS_FNAME;
+	char dmtypes_fname[256] = DEFAULT_DMTYPES_FNAME;
 
 	int i;
 	int c;

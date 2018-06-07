@@ -8,9 +8,10 @@
 #include <libxml/xpath.h>
 
 #include "template.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -135,7 +136,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
-	puts("  -d <path>   Defaults file path.");
+	puts("  -d <path>   Specify .defaults file path.");
 	puts("  -p          Show prompts.");
 	puts("  -q          Don't report an error if file exists.");
 	puts("  -N          Omit issue/inwork numbers from filename.");
@@ -281,7 +282,7 @@ int main(int argc, char **argv)
 	bool no_overwrite_error = false;
 
 	FILE *defaults;
-	char defaults_fname[PATH_MAX] = "defaults";
+	char defaults_fname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
 
 	xmlDocPtr defaults_xml;
 

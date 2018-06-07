@@ -15,9 +15,10 @@
 #include <libxslt/transform.h>
 
 #include "template.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
 
@@ -344,7 +345,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d         Specify the 'defaults' file name.");
+	puts("  -d         Specify the .defaults file name.");
 	puts("  -p         Prompt the user for each value.");
 	puts("  -q         Don't report an error if file exists.");
 	puts("  -N         Omit issue/inwork from file name.");
@@ -552,7 +553,7 @@ int main(int argc, char **argv)
 	char pmcode[256] = "";
 	bool showprompts = false;
 	bool skippmc = false;
-	char defaults_fname[256] = "defaults";
+	char defaults_fname[256] = DEFAULT_DEFAULTS_FNAME;
 	bool no_issue = false;
 	char iss[8] = "";
 	bool include_issue_info = false;

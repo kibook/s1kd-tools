@@ -57,7 +57,7 @@ The security classification of the new publication module.
 Include issue date in referenced data modules.
 
 -d &lt;defaults&gt;  
-Specify the 'defaults' file name.
+Specify the `.defaults` file name.
 
 -f  
 Overwrite existing file.
@@ -107,10 +107,10 @@ The inwork number of the new publication module.
 --version  
 Show version information.
 
-'defaults' file
----------------
+`.defaults` file
+----------------
 
-Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

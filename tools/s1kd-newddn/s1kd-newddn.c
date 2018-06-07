@@ -5,16 +5,15 @@
 #include <time.h>
 #include <dirent.h>
 #include <libgen.h>
-
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
-
 #include "templates.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -232,7 +231,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <files>...");
 	puts("");
 	puts("Options:");
-	puts("  -d <defaults>    Specify the 'defaults' file name.");
+	puts("  -d <defaults>    Specify the .defaults file name.");
 	puts("  -p               Prompt user for values.");
 	puts("  -q               Don't report an error if file exists.");
 	puts("  -v               Print file name of DDN.");
@@ -422,7 +421,7 @@ int main(int argc, char **argv)
 {
 	int c;
 
-	char defaults_fname[PATH_MAX] = "defaults";
+	char defaults_fname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
 
 	char ddncode[256] = "";
 

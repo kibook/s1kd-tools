@@ -51,7 +51,7 @@ BREX data module code.
 The security classification of the new data module.
 
 -d &lt;defaults&gt;  
-Specify the 'defaults' file name.
+Specify the `.defaults` file name.
 
 -f  
 Overwrite existing file.
@@ -98,10 +98,10 @@ Show version information.
 &lt;datamodules&gt;  
 Any number of data module file names to automatically add to the list.
 
-'defaults' file
----------------
+`.defaults` file
+----------------
 
-Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

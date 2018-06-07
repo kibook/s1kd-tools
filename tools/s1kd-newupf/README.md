@@ -30,7 +30,7 @@ Specify which issue of S1000D to use. Currently supported issues are:
 Use XML template in the specified directory instead of the built-in template. The template must be named `update.xml` in the directory &lt;dir&gt;, and must conform to the default S1000D issue of this tool (4.2).
 
 -d &lt;defaults&gt;  
-Specify the 'defaults' file name.
+Specify the `.defaults` file name.
 
 -f  
 Overwrite existing file.
@@ -46,6 +46,11 @@ The source (original) issue of the CIR data module.
 
 &lt;TARGET&gt;  
 The target (updated) issue of the CIR data module.
+
+`.defaults` file
+----------------
+
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* tools.
 
 EXAMPLE
 =======

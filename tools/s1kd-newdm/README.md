@@ -45,10 +45,10 @@ Save the new data module as &lt;filename&gt; instead of an automatically named f
 Use XML templates in the specified directory instead of the built-in templates.
 
 -,  
-Dumps the built-in default 'dmtypes' XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.
+Dumps the built-in default `.dmtypes` XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.
 
 -.  
-Dumps the simple text form of the built-in default 'dmtypes'.
+Dumps the simple text form of the built-in default `.dmtypes`.
 
 -!  
 Do not include an info name for the new data module.
@@ -63,10 +63,10 @@ The country ISO code of the new data module.
 The security classification of the new data module.
 
 -D &lt;dmtypes&gt;  
-Specify the 'dmtypes' file name.
+Specify the `.dmtypes` file name.
 
 -d &lt;defaults&gt;  
-Specify the 'defaults' file name.
+Specify the `.defaults` file name.
 
 -f  
 Overwrite existing file.
@@ -99,13 +99,13 @@ Determine the tech name from on one of the built-in S1000D maintained SNS. Suppo
 
 -   General sea vehicles
 
-When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "`maintainedSns`" 'defaults' file key can be used to set one of the above SNS as the default.
+When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "`maintainedSns`" `.defaults` file key can be used to set one of the above SNS as the default.
 
 -m &lt;remarks&gt;  
 Set remarks for the new data module.
 
 -N  
-Omit issue/inwork numbers from filename. The "`omitIssueInfo`" 'defaults' file key can also be set to control this option.
+Omit issue/inwork numbers from filename. The "`omitIssueInfo`" `.defaults` file key can also be set to control this option.
 
 -n &lt;issue&gt;  
 The issue number of the new data module.
@@ -125,7 +125,7 @@ When determining tech name from an SNS (-S or -M), include the previous level of
 
 -   and tech names derived from an assembly will be formatted as "Subsubsystem - Assembly".
 
-If both levels have the same title, then only one will be used. The "`includePrevSnsTitle`" 'defaults' file key can also be set to control this option.
+If both levels have the same title, then only one will be used. The "`includePrevSnsTitle`" `.defaults` file key can also be set to control this option.
 
 -p  
 Prompts the user for any values left unspecified.
@@ -140,7 +140,7 @@ The CAGE code of the responsible partner company.
 The responsible partner company enterprise name of the new data module.
 
 -S &lt;BREX&gt;  
-Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the 'defaults' file with the key "`sns`".
+Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the `.defaults` file with the key "`sns`".
 
 -s &lt;schema&gt;  
 The schema URL.
@@ -207,14 +207,14 @@ Show version information.
 Prompt (-p) option
 ------------------
 
-If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the 'defaults' and 'dmtypes' files), it will be displayed in square brackets \[\] in the prompt, and pressing Enter without typing any value will select this default value.
+If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the `.defaults` and `.dmtypes` files), it will be displayed in square brackets \[\] in the prompt, and pressing Enter without typing any value will select this default value.
 
-'defaults' file
----------------
+`.defaults` file
+----------------
 
-This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named 'defaults', but any file can be specified by using the -d option.
+This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named `.defaults`, but any file can be specified by using the -d option.
 
-All of the s1kd-new\* commands use the same 'defaults' file format, so this file can contain default values for multiple types of metadata.
+All of the s1kd-new\* commands use the same `.defaults` file format, so this file can contain default values for multiple types of metadata.
 
 Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:
 
@@ -225,7 +225,7 @@ Each line consists of the identifier of a piece of metadata and its default valu
     responsiblePartnerCompany    khzae.net
     securityClassification       01
 
-Alternatively, the 'defaults' file can be written using an XML format, containing a root element `defaults` with child elements `default` which each have an attribute `ident` and an attribute `value`.
+Alternatively, the `.defaults` file can be written using an XML format, containing a root element `defaults` with child elements `default` which each have an attribute `ident` and an attribute `value`.
 
     <?xml version="1.0"?>
     <defaults>
@@ -237,10 +237,10 @@ Alternatively, the 'defaults' file can be written using an XML format, containin
     <default ident="securityClassification" value="01"/>
     </defaults>
 
-'dmtypes' file
---------------
+`.dmtypes` file
+---------------
 
-This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named 'dmtypes', but any file can be specified by using the -D option.
+This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named `.dmtypes`, but any file can be specified by using the -D option.
 
 Each line consists of an info code, a schema identifier, and optionally a default info name. Example:
 
@@ -249,7 +249,7 @@ Each line consists of an info code, a schema identifier, and optionally a defaul
     040    descript    Description
     520    proced      Remove procedure
 
-Like the 'defaults' file, the 'dmtypes' file may also be written in an XML format, where each child has an attribute `infoCode`, an attribute `schema`, and optionally an attribute `infoName`.
+Like the `.defaults` file, the `.dmtypes` file may also be written in an XML format, where each child has an attribute `infoCode`, an attribute `schema`, and optionally an attribute `infoName`.
 
     <?xml version="1.0">
     <dmtypes>
@@ -265,16 +265,16 @@ Info code variants can also be given specific default schema and info names. To 
     258B  proced  Other procedure to clean, Clean with air
     258C  proced  Other procedure to clean, Clean with water
 
-The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the 'dmtypes' file. An info code with no variant matches all possible variants.
+The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the `.dmtypes` file. An info code with no variant matches all possible variants.
 
 Custom XML templates (-%)
 -------------------------
 
-A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named `<schema>.xml`, where `<schema>` is the name of the schema, matching one of the schema names in the 'dmtypes' file or the schema specified with the -T option.
+A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named `<schema>.xml`, where `<schema>` is the name of the schema, matching one of the schema names in the `.dmtypes` file or the schema specified with the -T option.
 
 The templates must be written to conform to the default S1000D issue of this tool (currently 4.2). They will be automatically transformed when another issue is specified with the -$ option.
 
-The 'templates' default can also be specified in the 'defaults' file to use these custom templates by default.
+The `templates` default can also be specified in the `.defaults` file to use these custom templates by default.
 
 EXAMPLE
 =======

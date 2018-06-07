@@ -7,16 +7,14 @@
 #include <libxslt/transform.h>
 #include "xsl.h"
 #include "defaults.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
 #define S_DMTYPES_ERR ERR_PREFIX "Could not create dmtypes file."
-
-#define DEFAULT_DEFAULTS_FNAME "defaults"
-#define DEFAULT_DMTYPES_FNAME "dmtypes"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -37,8 +35,8 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
-	puts("  -D         Convert a dmtypes file.");
-	puts("  -d         Convert a defaults file.");
+	puts("  -D         Convert a .dmtypes file.");
+	puts("  -d         Convert a .defaults file.");
 	puts("  -f         Overwrite an existing file.");
 	puts("  -i         Initialize a new CSDB.");
 	puts("  -s         Sort entries.");

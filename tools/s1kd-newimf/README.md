@@ -26,7 +26,7 @@ BREX data module code.
 The security classification of the new ICN metadata file.
 
 -d &lt;defaults&gt;  
-Specify the 'defaults' file name.
+Specify the `.defaults` file name.
 
 -f  
 Overwrite existing file.
@@ -66,6 +66,11 @@ The inwork issue of the new ICN metadata file.
 
 --version  
 Show version information.
+
+`.defaults` file
+----------------
+
+Refer to s1kd-newdm(1) for information on the `.defaults` file used by all the s1kd-new\* tools.
 
 EXAMPLE
 =======

@@ -9,9 +9,10 @@
 #include <libxml/debugXML.h>
 #include <libxslt/transform.h>
 #include "templates.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -588,7 +589,7 @@ void showHelp(void)
 	puts("  -@ <file>   Output to <file>.");
 	puts("  -$ <issue>  Specify which S1000D issue to use.");
 	puts("  -% <dir>    Use templates in specified directory.");
-	puts("  -d <file>   Specify the 'defaults' file name.");
+	puts("  -d <file>   Specify the .defaults file name.");
 	puts("  -f          Overwrite existing file.");
 	puts("  -q          Don't report an error if file exists.");
 	puts("  --version   Show version information.");
@@ -610,7 +611,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool no_overwrite_error = false;
 	char *out = NULL;
-	char defaultsFname[PATH_MAX] = "defaults";
+	char defaultsFname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
 	xmlDocPtr defaultsXml;
 
 	const char *sopts = "@:$:%:d:fqh?";

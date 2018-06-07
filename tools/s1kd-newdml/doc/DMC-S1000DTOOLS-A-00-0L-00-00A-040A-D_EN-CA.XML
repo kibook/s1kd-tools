@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="03"/>
+        <issueDate year="2018" month="06" day="07"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add -S and -i options.</simplePara>
+        <simplePara>Change 'defaults' to '.defaults'</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -130,7 +130,7 @@
             <definitionListItem>
               <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify the 'defaults' file name.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -151,7 +151,7 @@
                 <para>The issue date of the new DML in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-i &lt;info code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>When creating a DMRL from SNS rules (-S), use the specified info code for each entry. Specify this option multiple times to create multiple data modules for each part of the SNS.</para>
@@ -193,7 +193,7 @@
                 <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-S &lt;SNS&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Create a DMRL using the specified SNS rules.</para>
@@ -225,9 +225,9 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara>
-          <title>'defaults' file</title>
-          <para>Refer to s1kd-newdm(1) for information on the 'defaults' file which is used by all the s1kd-new* commands.</para>
+        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>Refer to s1kd-newdm(1) for information on the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file which is used by all the s1kd-new* commands.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

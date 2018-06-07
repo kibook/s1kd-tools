@@ -12,9 +12,10 @@
 #include <libxslt/transform.h>
 
 #include "templates.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -532,7 +533,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
-	puts("  -d         Defaults file.");
+	puts("  -d         Specify .defaults file name.");
 	puts("  -p         Prompt the user for each value.");
 	puts("  -q         Don't report an error if file exists.");
 	puts("  -N         Omit issue/inwork from filename.");
@@ -656,7 +657,7 @@ int main(int argc, char **argv)
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
 
-	char defaults_fname[PATH_MAX] = "defaults";
+	char defaults_fname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
 
 	bool showprompts = false;
 	char code[256];
