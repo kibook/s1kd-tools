@@ -37,7 +37,7 @@ $(INSTALL): $(INSTALL_SRC)
 	$(S1KD2DB) $(INSTALL_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INSTALL)
 
 $(EXAMPLE): $(EXAMPLE_SRC)
-	$(S1KD2DB) $(EXAMPLE_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(EXAMPLE) --toc
+	$(S1KD2DB) $(EXAMPLE_SRC) $(S1KD2DB_FLAGS) | pandoc -f docbook -t markdown | pandoc -f markdown -t markdown_github -s --toc -o $(EXAMPLE)
 
 $(COMPAT): $(COMPAT_SRC)
 	$(S1KD2DB) $(COMPAT_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(COMPAT)
