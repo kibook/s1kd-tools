@@ -431,7 +431,7 @@ int main(int argc, char **argv)
 	bool initialize = false;
 	bool sort = false;
 
-	const char *sopts = "Ddfisth?";
+	const char *sopts = "DdFfisth?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
