@@ -62,6 +62,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
     The **s1kd-flatten** tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.
 
+    The **s1kd-fmgen** tool generates front matter data module content from a publication module.
+
     The **s1kd-icncatalog** tool resolves ICN references in objects.
 
     The **s1kd-index** tool flags index keywords in a data module based on a user-defined list.
@@ -96,6 +98,8 @@ Manpages for each tool:
 -   s1kd-dmrl(1)
 
 -   s1kd-flatten(1)
+
+-   s1kd-fmgen(1)
 
 -   s1kd-icncatalog(1)
 

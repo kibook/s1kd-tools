@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="05" day="01"/>
+        <issueDate year="2018" month="06" day="09"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Reorganize manpage references.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add info on s1kd-icncatalog.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add s1kd-fmgen tool.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -96,7 +93,8 @@
                 <para>The <emphasis>s1kd-acronyms</emphasis> tool can automatically mark up acronyms within data modules, and can also generate lists of acronyms marked up within data modules.</para>
                 <para>The <emphasis>s1kd-aspp</emphasis> tool preprocesses applicability statements in a data module, generating display text and "presentation" applicability statements.</para>
                 <para>The <emphasis>s1kd-flatten</emphasis> tool flattens a publication module and referenced data modules in to a single "deliverable" file for a publishing system.</para>
-                <para changeType="add" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-icncatalog</emphasis> tool resolves ICN references in objects.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-fmgen</emphasis> tool generates front matter data module content from a publication module.</para>
+                <para>The <emphasis>s1kd-icncatalog</emphasis> tool resolves ICN references in objects.</para>
                 <para>The <emphasis>s1kd-index</emphasis> tool flags index keywords in a data module based on a user-defined list.</para>
                 <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).</para>
                 <para>The <emphasis>s1kd-neutralize</emphasis> tool generates IETP neutral metadata for CSDB objects.</para>
@@ -110,7 +108,7 @@
         <title>SEE ALSO</title>
         <para>S1000D website: <externalPubRef><externalPubRefIdent><externalPubTitle>http://www.s1000d.org</externalPubTitle></externalPubRefIdent></externalPubRef></para>
         <para>Manpages for each tool:</para>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+        <para>
           <randomList>
             <listItem>
               <para>s1kd-acronyms(1)</para>
@@ -138,6 +136,9 @@
             </listItem>
             <listItem>
               <para>s1kd-flatten(1)</para>
+            </listItem>
+            <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <para>s1kd-fmgen(1)</para>
             </listItem>
             <listItem>
               <para>s1kd-icncatalog(1)</para>
