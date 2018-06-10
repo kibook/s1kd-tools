@@ -47,17 +47,17 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-defaults - <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files management tool</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-defaults - <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files management tool</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-defaults [-DdFfisth?] [&lt;file&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-defaults [-DdFfisth?] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-defaults</emphasis> tool generates a basic <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files.</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-defaults</emphasis> tool generates a basic <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -75,7 +75,7 @@
                 <para>Convert a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-F</listItemTerm>
               <listItemDefinition>
                 <para>Convert a <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
@@ -90,7 +90,7 @@
             <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
-                <para>Initialize a new CSDB by generating both the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files in the current directory.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0001">Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -120,7 +120,7 @@
             <definitionListItem>
               <listItemTerm>&lt;file&gt;...</listItemTerm>
               <listItemDefinition>
-                <para>Names of files to convert. If none are specified, the default names of <verbatimText verbatimStyle="vs02">.defaults</verbatimText> (for the -d option) or <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> (for the -D option) in the current directory are used.</para>
+                <para>Names of files to convert. If none are specified, the default names of <verbatimText verbatimStyle="vs02">.defaults</verbatimText> (for the -d option), <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> (for the -D option) or <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> (for the -F option) in the current directory are used.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

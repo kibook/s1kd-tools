@@ -29,7 +29,7 @@ Convert a `.fmtypes` file.
 Overwrite the existing file after conversion.
 
 -i  
-Initialize a new CSDB by generating both the `.defaults` and `.dmtypes` files in the current directory.
+Initialize a new CSDB by generating the `.defaults`, `.dmtypes` and `.fmtypes` files in the current directory.
 
 -s  
 Sort the entries alphabetically for either file/output format.
@@ -44,7 +44,7 @@ Show help/usage message.
 Show version information.
 
 &lt;file&gt;...  
-Names of files to convert. If none are specified, the default names of `.defaults` (for the -d option) or `.dmtypes` (for the -D option) in the current directory are used.
+Names of files to convert. If none are specified, the default names of `.defaults` (for the -d option), `.dmtypes` (for the -D option) or `.fmtypes` (for the -F option) in the current directory are used.
 
 EXAMPLES
 ========
