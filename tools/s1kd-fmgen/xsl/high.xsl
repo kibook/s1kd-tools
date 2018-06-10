@@ -45,12 +45,8 @@
   </xsl:template>
 
   <xsl:template match="content">
-    <xsl:apply-templates select="pmEntry"/>
-  </xsl:template>
-
-  <xsl:template match="pmEntry">
     <frontMatterSubList>
-      <xsl:apply-templates select="@*|node()"/>
+      <xsl:apply-templates select="pmEntry//dmRef|pmEntry//dmodule"/>
     </frontMatterSubList>
   </xsl:template>
 
