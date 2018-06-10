@@ -8,7 +8,7 @@ SYNOPSIS
 
     s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-,.fh?] (-t <TYPE>|<DM>...)
 
-DESCRIPTIOM
+DESCRIPTION
 ===========
 
 The *s1kd-fmgen* tool generates the content section for front matter data modules from either a standard publication module, or the combined format of the s1kd-flatten(1) tool. Some front matter types require the use of the combined format, particularly those that list information not directly found in the publication module, such as the highlights (HIGH) type.
