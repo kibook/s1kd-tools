@@ -9,6 +9,7 @@ all:
 	$(MAKE) -C tools/s1kd-ls
 	$(MAKE) -C tools/s1kd-dmrl
 	$(MAKE) -C tools/s1kd-flatten
+	$(MAKE) -C tools/s1kd-fmgen
 	$(MAKE) -C tools/s1kd-icncatalog
 	$(MAKE) -C tools/s1kd-index
 	$(MAKE) -C tools/s1kd-instance
@@ -39,6 +40,7 @@ clean:
 	$(MAKE) -C tools/s1kd-ls clean
 	$(MAKE) -C tools/s1kd-dmrl clean
 	$(MAKE) -C tools/s1kd-flatten clean
+	$(MAKE) -C tools/s1kd-fmgen clean
 	$(MAKE) -C tools/s1kd-icncatalog clean
 	$(MAKE) -C tools/s1kd-index clean
 	$(MAKE) -C tools/s1kd-instance clean
@@ -69,6 +71,7 @@ install:
 	$(MAKE) -C tools/s1kd-ls install
 	$(MAKE) -C tools/s1kd-dmrl install
 	$(MAKE) -C tools/s1kd-flatten install
+	$(MAKE) -C tools/s1kd-fmgen install
 	$(MAKE) -C tools/s1kd-icncatalog install
 	$(MAKE) -C tools/s1kd-index install
 	$(MAKE) -C tools/s1kd-instance install
