@@ -1,17 +1,17 @@
 NAME
 ====
 
-s1kd-defaults - `.defaults` and `.dmtypes` files management tool
+s1kd-defaults - `.defaults`, `.dmtypes` and `.fmtypes` files management tool
 
 SYNOPSIS
 ========
 
-    s1kd-defaults [-Ddfisth?] [<file>...]
+    s1kd-defaults [-DdFfisth?] [<file>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-defaults* tool generates a basic `.defaults` file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the `.defaults` and `.dmtypes` files.
+The *s1kd-defaults* tool generates a basic `.defaults` file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the `.defaults`, `.dmtypes` and `.fmtypes` files.
 
 OPTIONS
 =======
@@ -21,6 +21,9 @@ Convert a `.dmtypes` file.
 
 -d  
 Convert a `.defaults` file.
+
+-F  
+Convert a `.fmtypes` file.
 
 -f  
 Overwrite the existing file after conversion.

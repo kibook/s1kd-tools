@@ -10,12 +10,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
 #define EXIT_NO_FILE 2
-#define S_DMTYPES_ERR ERR_PREFIX "Could not create dmtypes file.\n"
+#define S_DMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_DMTYPES_FNAME " file.\n"
+#define S_FMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_FMTYPES_FNAME " file.\n"
 #define S_NO_FILE_ERR ERR_PREFIX "Could not open file: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
@@ -28,7 +29,7 @@
 #endif
 
 enum format {TEXT, XML};
-enum file {NONE, DEFAULTS, DMTYPES};
+enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
 
 /* Show the help/usage message. */
 void show_help(void)
@@ -39,6 +40,7 @@ void show_help(void)
 	puts("  -h -?      Show usage message.");
 	puts("  -D         Convert a .dmtypes file.");
 	puts("  -d         Convert a .defaults file.");
+	puts("  -F         Convert a .fmtypes file.");
 	puts("  -f         Overwrite an existing file.");
 	puts("  -i         Initialize a new CSDB.");
 	puts("  -s         Sort entries.");
@@ -82,6 +84,12 @@ xmlDocPtr xml_defaults_to_text(xmlDocPtr doc)
 xmlDocPtr xml_dmtypes_to_text(xmlDocPtr doc)
 {
 	return transform_doc(doc, xsl_xml_dmtypes_to_text_xsl, xsl_xml_dmtypes_to_text_xsl_len);
+}
+
+/* Convert XML fmtypes to the simple text version. */
+xmlDocPtr xml_fmtypes_to_text(xmlDocPtr doc)
+{
+	return transform_doc(doc, xsl_xml_fmtypes_to_text_xsl, xsl_xml_fmtypes_to_text_xsl_len);
 }
 
 /* Convert simple text defaults to the XML version. */
@@ -166,6 +174,49 @@ xmlDocPtr text_dmtypes_to_xml(const char *path)
 		if (n > 2) {
 			xmlSetProp(type, BAD_CAST "infoName", BAD_CAST infname);
 		}
+	}
+
+	fclose(f);
+
+	return doc;
+}
+
+/* Convert simple text fmtypes to the XML version. */
+xmlDocPtr text_fmtypes_to_xml(const char *path)
+{
+	FILE *f;
+	char line[1024];
+	xmlDocPtr doc;
+	xmlNodePtr fmtypes;
+
+	if ((doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+		return doc;
+	}
+
+	if (strcmp(path, "-") == 0) {
+		f = stdin;
+	} else if (!(f = fopen(path, "r"))) {
+		return NULL;
+	}
+
+	doc = xmlNewDoc(BAD_CAST "1.0");
+	fmtypes = xmlNewNode(NULL, BAD_CAST "fmtypes");
+	xmlDocSetRootElement(doc, fmtypes);
+
+	while (fgets(line, 1024, f)) {
+		char code[6], type[64];
+		int n;
+		xmlNodePtr fm;
+
+		n = sscanf(line, "%5s %63[^\n]", code, type);
+
+		if (n < 2) {
+			continue;
+		}
+
+		fm = xmlNewChild(fmtypes, NULL, BAD_CAST "fm", NULL);
+		xmlSetProp(fm, BAD_CAST "infoCode", BAD_CAST code);
+		xmlSetProp(fm, BAD_CAST "type", BAD_CAST type);
 	}
 
 	fclose(f);
@@ -270,6 +321,9 @@ xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort)
 		case DMTYPES:
 			doc = text_dmtypes_to_xml(path);
 			break;
+		case FMTYPES:
+			doc = text_fmtypes_to_xml(path);
+			break;
 	}
 
 	if (sort) {
@@ -298,6 +352,9 @@ void xml_to_text(const char *path, enum file f, bool overwrite, bool sort)
 			break;
 		case DMTYPES:
 			res = xml_dmtypes_to_text(doc);
+			break;
+		case FMTYPES:
+			res = xml_fmtypes_to_text(doc);
 			break;
 	}
 
@@ -397,6 +454,10 @@ int main(int argc, char **argv)
 				f = DEFAULTS;
 				if (!fname) fname = strdup(DEFAULT_DEFAULTS_FNAME);
 				break;
+			case 'F':
+				f = FMTYPES;
+				if (!fname) fname = strdup(DEFAULT_FMTYPES_FNAME);
+				break;
 			case 'f':
 				overwrite = true;
 				break;
@@ -433,12 +494,18 @@ int main(int argc, char **argv)
 			fn = dump_defaults_xml;
 		}
 
-		snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
-
 		fn(DEFAULT_DEFAULTS_FNAME, true);
+
+		snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
 
 		if (system(sys) != 0) {
 			fprintf(stderr, S_DMTYPES_ERR);
+		}
+
+		snprintf(sys, 256, "s1kd-fmgen %s > %s", opt, DEFAULT_FMTYPES_FNAME);
+
+		if (system(sys) != 0) {
+			fprintf(stderr, S_FMTYPES_ERR);
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {

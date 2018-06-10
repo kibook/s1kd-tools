@@ -7,9 +7,9 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="defaults|dmtypes">
+  <xsl:template match="defaults|dmtypes|fmtypes">
     <xsl:copy>
-      <xsl:apply-templates select="default|type">
+      <xsl:apply-templates select="default|type|fm">
         <xsl:sort select="@ident|@infoCode"/>
       </xsl:apply-templates>
       <xsl:apply-templates select="comment()"/>
