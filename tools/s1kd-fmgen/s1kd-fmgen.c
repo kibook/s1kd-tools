@@ -10,17 +10,19 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_NO_PM 1
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
+#define EXIT_NO_INFOCODE 4
 
 #define S_NO_PM_ERR ERR_PREFIX "No publication module.\n"
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
+#define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -130,6 +132,11 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 
 	type = fmtype(fmtypes, incode);
 
+	if (!type) {
+		fprintf(stderr, S_NO_INFOCODE_ERR, incode);
+		exit(EXIT_NO_INFOCODE);
+	}
+
 	res = generate_fm_content_for_type(pm, type);
 
 	xmlFree(type);
@@ -150,7 +157,7 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 	xmlFreeDoc(res);
 }
 
-void dump_fmtypes(void)
+void dump_fmtypes_xml(void)
 {
 	xmlDocPtr doc;
 	doc = xmlReadMemory((const char *) fmtypes_xml, fmtypes_xml_len, NULL, NULL, PARSE_OPTS);
@@ -158,12 +165,49 @@ void dump_fmtypes(void)
 	xmlFreeDoc(doc);
 }
 
+void dump_fmtypes_txt(void)
+{
+	printf("%.*s", fmtypes_txt_len, fmtypes_txt);
+}
+
+xmlDocPtr read_fmtypes(const char *path)
+{
+	xmlDocPtr doc;
+
+	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR))) {
+		FILE *f;
+		char line[256];
+		xmlNodePtr root;
+
+		doc = xmlNewDoc(BAD_CAST "1.0");
+		root = xmlNewNode(NULL, BAD_CAST "fmtypes");
+		xmlDocSetRootElement(doc, root);
+
+		f = fopen(path, "r");
+
+		while (fgets(line, 256, f)) {
+			char *incode, *type;
+			xmlNodePtr fm;
+
+			incode = strtok(line, " \t");
+			type   = strtok(NULL, "\r\n");
+
+			fm = xmlNewChild(root, NULL, BAD_CAST "fm", NULL);
+			xmlSetProp(fm, BAD_CAST "infoCode", BAD_CAST incode);
+			xmlSetProp(fm, BAD_CAST "type", BAD_CAST type);
+		}
+	}
+
+	return doc;
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-F <FMTYPES>] -p <PM> [-,fh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
-	puts("  -,            Dump the built-in .fmtypes file.");
+	puts("  -,            Dump the built-in .fmtypes file in XML format.");
+	puts("  -.            Dump the built-in .fmtypes file in simple text format.");
 	puts("  -h -?         Show usage message.");
 	puts("  -F <FMTYPES>  Specify .fmtypes file.");
 	puts("  -f            Overwrite input data modules.");
@@ -181,7 +225,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",F:fp:t:h?";
+	const char *sopts = ",.F:fp:t:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -204,11 +248,14 @@ int main(int argc, char **argv)
 				}
 				break;
 			case ',':
-				dump_fmtypes();
+				dump_fmtypes_xml();
+				return 0;
+			case '.':
+				dump_fmtypes_txt();
 				return 0;
 			case 'F':
 				if (!fmtypes) {
-					fmtypes = xmlReadFile(optarg, NULL, PARSE_OPTS);
+					fmtypes = read_fmtypes(optarg);
 				}
 				break;
 			case 'f':
@@ -229,7 +276,7 @@ int main(int argc, char **argv)
 
 	if (!fmtypes) {
 		if (access(DEFAULT_FMTYPES_FNAME, F_OK) != -1) {
-			fmtypes = xmlReadFile(DEFAULT_FMTYPES_FNAME, NULL, PARSE_OPTS);
+			fmtypes = read_fmtypes(DEFAULT_FMTYPES_FNAME);
 		} else {
 			fmtypes = xmlReadMemory((const char *) fmtypes_xml, fmtypes_xml_len, NULL, NULL, 0);
 		}

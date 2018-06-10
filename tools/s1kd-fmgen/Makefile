@@ -13,8 +13,9 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-xsl.h: fmtypes.xml xsl/*
+xsl.h: fmtypes.xml fmtypes.txt xsl/*
 	xxd -i fmtypes.xml > xsl.h
+	xxd -i fmtypes.txt >> xsl.h
 	for f in xsl/*; do xxd -i "$$f" >> xsl.h; done
 
 clean:
