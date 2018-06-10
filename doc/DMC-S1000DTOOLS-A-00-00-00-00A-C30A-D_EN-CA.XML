@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="06"/>
+        <issueDate year="2018" month="06" day="09"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -40,10 +40,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Update compatibility for s1kd-flatten.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Update compatibility for s1kd-checkrefs.</simplePara>
+        <simplePara>Add s1kd-fmgen tool.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -231,7 +228,7 @@
                 <para>~</para>
               </entry>
             </row>
-            <row changeType="modify" reasonForUpdateRefIds="rfu-0002">
+            <row>
               <entry>
                 <para>s1kd-checkrefs</para>
               </entry>
@@ -318,7 +315,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-flatten</para>
               </entry>
@@ -345,6 +342,35 @@
               </entry>
               <entry>
                 <para>X</para>
+              </entry>
+            </row>
+            <row changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <entry>
+                <para>s1kd-fmgen</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>~</para>
+              </entry>
+              <entry>
+                <para>~</para>
+              </entry>
+              <entry>
+                <para>~</para>
+              </entry>
+              <entry>
+                <para>~</para>
+              </entry>
+              <entry>
+                <para>~</para>
+              </entry>
+              <entry>
+                <para>~</para>
               </entry>
             </row>
             <row>

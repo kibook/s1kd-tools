@@ -25,6 +25,7 @@ Support is planned but not yet implemented.
 | s1kd-defaults   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-dmrl       | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-flatten    | X   | X   | X   | X   | X   | X   | X   | X   |
+| s1kd-fmgen      | X   | X   | ~   | ~   | ~   | ~   | ~   | ~   |
 | s1kd-icncatalog | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-index      | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-instance   | X   | X   | X   | /   | ~   | ~   | ~   | ~   |
