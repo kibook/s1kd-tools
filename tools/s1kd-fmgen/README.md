@@ -6,7 +6,7 @@ s1kd-fmgen - Generate front matter data module contents
 SYNOPSIS
 ========
 
-    s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-,fh?] (-t <TYPE>|<DM>...)
+    s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-,.fh?] (-t <TYPE>|<DM>...)
 
 DESCRIPTIOM
 ===========
@@ -17,7 +17,10 @@ OPTIONS
 =======
 
 -,  
-Dump the built-in `.fmtypes` XML.
+Dump the built-in `.fmtypes` XML format.
+
+-.  
+Dump the built-in `.fmtypes` simple text format.
 
 -h -?  
 Show usage message.
@@ -50,7 +53,14 @@ Front matter data modules to generate content for.
 
 This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named `.fmtypes` in the current directory, but any file can be specified using the -F option.
 
-Example:
+Example of simple text format:
+
+    001    TP
+    009    TOC
+    00S    LOEDM
+    00U    HIGH
+
+Example of XML format
 
     <fmtypes>
     <fm infoCode="001" type="TP"/>

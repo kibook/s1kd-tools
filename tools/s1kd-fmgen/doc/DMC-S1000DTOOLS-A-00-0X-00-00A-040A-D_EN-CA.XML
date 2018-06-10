@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="X" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="001" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="09"/>
+        <issueDate year="2018" month="06" day="10"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -49,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-,fh?] (-t <TYPE>|<DM>...)]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-,.fh?] (-t <TYPE>|<DM>...)]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -63,7 +63,13 @@
             <definitionListItem>
               <listItemTerm>-,</listItemTerm>
               <listItemDefinition>
-                <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> XML.</para>
+                <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> XML format.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-.</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> simple text format.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -123,7 +129,14 @@
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file</title>
           <para>This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory, but any file can be specified using the -F option.</para>
-          <para>Example:</para>
+          <para>Example of simple text format:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[001    TP
+009    TOC
+00S    LOEDM
+00U    HIGH]]></verbatimText>
+          </para>
+          <para>Example of XML format</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<fmtypes>
 <fm infoCode="001" type="TP"/>
