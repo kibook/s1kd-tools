@@ -10,7 +10,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

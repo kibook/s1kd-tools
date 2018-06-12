@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+  <!-- Identifier for the annotation capturing the whole PM's applicability. -->
+  <xsl:param name="pm-applic">app-0000</xsl:param>
   
   <xsl:template match="@*|node()">
     <xsl:copy>
@@ -11,6 +14,12 @@
     <xsl:variable name="issueInfo" select="identAndStatusSection/pmAddress/pmIdent/issueInfo"/>
     <xsl:variable name="issueDate" select="identAndStatusSection/pmAddress/pmAddressItems/issueDate"/>
     <content>
+      <referencedApplicGroup>
+        <applic id="{$pm-applic}">
+          <xsl:apply-templates select="identAndStatusSection/pmStatus/applic/*"/>
+        </applic>
+        <xsl:apply-templates select="content/referencedApplicGroup/applic"/>
+      </referencedApplicGroup>
       <frontMatter>
         <frontMatterList frontMatterType="fm03">
           <xsl:apply-templates select="$issueInfo"/>
@@ -46,7 +55,7 @@
 
   <xsl:template match="content">
     <frontMatterSubList>
-      <xsl:apply-templates select="pmEntry//dmRef|pmEntry//dmodule"/>
+      <xsl:apply-templates select="//pmEntry/dmRef|//pmEntry/dmodule"/>
     </frontMatterSubList>
   </xsl:template>
 
@@ -56,7 +65,18 @@
     <xsl:variable name="dmodule" select="."/>
     <xsl:for-each select=".//reasonForUpdate[@updateHighlight = 1]">
       <frontMatterDmEntry>
+        <xsl:apply-templates select="$dmodule/identAndStatusSection/dmStatus/@issueType"/>
         <dmRef>
+          <xsl:choose>
+            <xsl:when test="$dmodule/@applicRefId">
+              <xsl:apply-templates select="$dmodule/@applicRefId"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="applicRefId">
+                <xsl:value-of select="$pm-applic"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
           <dmRefIdent>
             <xsl:apply-templates select="$dmodule/identAndStatusSection/dmAddress/dmIdent/dmCode"/>
             <xsl:apply-templates select="$dmodule/identAndStatusSection/dmAddress/dmIdent/issueInfo"/>

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- Identifier for the annotation capturing the whole DM's applicablility. -->
-  <xsl:param name="dm-applic">app-0000</xsl:param>
+  <!-- Identifier for the annotation capturing the whole PM's applicablility. -->
+  <xsl:param name="pm-applic">app-0000</xsl:param>
 
   <xsl:template match="@*|node()">
     <xsl:copy>
@@ -14,7 +14,12 @@
     <xsl:variable name="issueInfo" select="identAndStatusSection/pmAddress/pmIdent/issueInfo"/>
     <xsl:variable name="issueDate" select="identAndStatusSection/pmAddress/pmAddressItems/issueDate"/>
     <content>
-      <xsl:call-template name="referenced.applic.group"/>
+      <referencedApplicGroup>
+        <applic id="{$pm-applic}">
+          <xsl:apply-templates select="identAndStatusSection/pmStatus/applic/*"/>
+        </applic>
+        <xsl:apply-templates select="content/referencedApplicGroup/applic"/>
+      </referencedApplicGroup>
       <frontMatter>
         <frontMatterTableOfContent>
           <xsl:apply-templates select="$issueInfo"/>
@@ -48,15 +53,6 @@
     <xsl:value-of select="@day"/>
   </xsl:template>
 
-  <xsl:template name="referenced.applic.group">
-    <referencedApplicGroup>
-      <applic id="{$dm-applic}">
-        <xsl:apply-templates select="identAndStatusSection/pmStatus/applic/*"/>
-      </applic>
-      <xsl:apply-templates select="content/referencedApplicGroup/applic"/>
-    </referencedApplicGroup>
-  </xsl:template>
-
   <xsl:template match="pmTitle">
     <title>
       <xsl:apply-templates select="@*|node()"/>
@@ -83,12 +79,16 @@
 
   <xsl:template match="dmRef">
     <xsl:copy>
-      <xsl:apply-templates select="@*"/>
-      <xsl:if test="not(@applicRefId)">
-        <xsl:attribute name="applicRefId">
-          <xsl:value-of select="$dm-applic"/>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="@applicRefId">
+          <xsl:apply-templates select="@applicRefId"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="applicRefId">
+            <xsl:value-of select="$pm-applic"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:apply-templates select="node()"/>
     </xsl:copy>
   </xsl:template>
@@ -101,7 +101,7 @@
             <xsl:value-of select="@applicRefId"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$dm-applic"/>
+            <xsl:value-of select="$pm-applic"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
