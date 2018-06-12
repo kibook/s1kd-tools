@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -353,8 +353,13 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 					xi = xmlAddPrevSibling(dm_ref, xi);
 				}
 			} else {
+				xmlChar *app;
 				doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
 				dmodule = xmlDocGetRootElement(doc);
+				if ((app = xmlGetProp(dm_ref, BAD_CAST "applicRefId"))) {
+					xmlSetProp(dmodule, BAD_CAST "applicRefId", app);
+				}
+				xmlFree(app);
 				xmlAddPrevSibling(dm_ref, xmlCopyNode(dmodule, 1));
 				xmlFreeDoc(doc);
 			}
