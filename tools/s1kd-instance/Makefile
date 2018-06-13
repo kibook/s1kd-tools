@@ -13,7 +13,7 @@ all: $(OUTPUT)
 strings.h: help.msg
 	xxd -i help.msg > strings.h
 
-xsl.h: xsl/*.xsl
+xsl.h: xsl/*.xsl cirxsl/*.xsl
 	> xsl.h
 	for f in xsl/*.xsl cirxsl/*.xsl ../common/identity.xsl; do xxd -i "$$f" >> xsl.h; done
 
