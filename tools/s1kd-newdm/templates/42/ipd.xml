@@ -41,8 +41,8 @@
   <content>
     <illustratedPartsCatalog>
       <catalogSeqNumber figureNumber="01" item="000" indenture="1">
-        <itemSeqNumber itemSeqNumberValue="00">
-          <quantityPerNextHigherAssy/>
+        <itemSeqNumber itemSeqNumberValue="00A">
+          <quantityPerNextHigherAssy>REF</quantityPerNextHigherAssy>
           <partRef manufacturerCodeValue="" partNumberValue=""/>
         </itemSeqNumber>
       </catalogSeqNumber>
