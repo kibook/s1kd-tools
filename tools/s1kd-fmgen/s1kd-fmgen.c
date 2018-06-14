@@ -11,7 +11,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -149,28 +149,31 @@ char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath)
 {
 	xmlDocPtr doc, res = NULL;
-	char *incode, *type;
+	char *type;
 	xmlNodePtr content;
 
 	doc = xmlReadFile(dmpath, NULL, PARSE_OPTS);
 
-	incode = first_xpath_string(doc, NULL, "//@infoCode|//incode");
-
 	if (fmtype) {
 		type = strdup(fmtype);
 	} else {
-		type = find_fmtype(fmtypes, incode);
-	}
+		char *incode;
 
-	if (!type) {
-		fprintf(stderr, S_NO_INFOCODE_ERR, incode);
-		exit(EXIT_NO_INFOCODE);
+		incode = first_xpath_string(doc, NULL, "//@infoCode|//incode");
+
+		type = find_fmtype(fmtypes, incode);
+
+		if (!type) {
+			fprintf(stderr, S_NO_INFOCODE_ERR, incode);
+			exit(EXIT_NO_INFOCODE);
+		}
+
+		xmlFree(incode);
 	}
 
 	res = generate_fm_content_for_type(pm, type, xslpath);
 
 	xmlFree(type);
-	xmlFree(incode);
 
 	content = first_xpath_node(doc, NULL, "//content");
 	xmlAddNextSibling(content, xmlCopyNode(xmlDocGetRootElement(res), 1));
@@ -226,6 +229,8 @@ xmlDocPtr read_fmtypes(const char *path)
 			xmlSetProp(fm, BAD_CAST "infoCode", BAD_CAST incode);
 			xmlSetProp(fm, BAD_CAST "type", BAD_CAST type);
 		}
+
+		fclose(f);
 	}
 
 	return doc;
