@@ -7,10 +7,9 @@ SYNOPSIS
 ========
 
     s1kd-acronyms -h?
-    s1kd-acronyms [-dLptx] [-n <#>] [-o <file>]
-                  [-T <types>] [<dmodule>...]
-    s1kd-acronyms [-fiIL] [-m <list>] [-o <file>]
+    s1kd-acronyms [-dLptx] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
+    s1kd-acronyms [-fL] [-i|-I|-!] [-m <acr>] [-o <file>] [<dmodule>...]
     s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
@@ -39,12 +38,14 @@ When marking up acronyms with the -m option, overwrite the input data modules in
 -h -?  
 Show help/usage message.
 
--i -I  
+-i -I -!  
 Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.
 
 When not in interactive mode, the first definition found will be used.
 
 The -I option prompts for all acronyms, not just those with multiple definitions. This can be useful if some occurrences of the acronym term should be ignored.
+
+The -! option will not prompt for acronyms, instead it will markup where acronyms are found using a &lt;`chooseAcronym`&gt; element, whose child elements are all possible acronyms matching the term. Another program can then use this as input to actually prompt the user.
 
 -L  
 Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.

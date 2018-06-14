@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="K" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="06" day="14"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add examples.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Add --version option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -! option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,12 +52,11 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-acronyms -h?
-s1kd-acronyms [-dLptx] [-n &lt;#&gt;] [-o &lt;file&gt;]
-              [-T &lt;types&gt;] [&lt;dmodule&gt;...]
-s1kd-acronyms [-fiIL] [-m &lt;list&gt;] [-o &lt;file&gt;]
-              [&lt;dmodule&gt;...]
-s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-acronyms -h?
+s1kd-acronyms [-dLptx] [-n <#>] [-o <file>] [-T <types>]
+              [<dmodule>...]
+s1kd-acronyms [-fL] [-i|-I|-!] [-m <acr>] [-o <file>] [<dmodule>...]
+s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -109,11 +105,12 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-i -I</listItemTerm>
+              <listItemTerm>-i -I -!</listItemTerm>
               <listItemDefinition>
                 <para>Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.</para>
                 <para>When not in interactive mode, the first definition found will be used.</para>
                 <para>The -I option prompts for all acronyms, not just those with multiple definitions. This can be useful if some occurrences of the acronym term should be ignored.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0001">The -! option will not prompt for acronyms, instead it will markup where acronyms are found using a &lt;<verbatimText verbatimStyle="vs12">chooseAcronym</verbatimText>&gt; element, whose child elements are all possible acronyms matching the term. Another program can then use this as input to actually prompt the user.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -164,7 +161,7 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
                 <para>Use XML output instead of plain text.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>
@@ -179,7 +176,7 @@ s1kd-acronyms -D [-fL] [-o &lt;file&gt;] [&lt;dmodule&gt;...]</verbatimText>
           </definitionList>
         </para>
       </levelledPara>
-      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>EXAMPLES</title>
         <para>List all acronyms used in all data modules:</para>
         <para>

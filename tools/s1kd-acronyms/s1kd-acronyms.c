@@ -13,7 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -37,6 +37,7 @@ int minimumSpaces = 2;
 enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
 bool interactive = false;
 bool alwaysAsk = false;
+bool deferChoice = false;
 
 xsltStylesheetPtr termStylesheet, idStylesheet;
 
@@ -265,7 +266,15 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 
 	obj = xmlXPathEvalExpression(xpath, ctx);
 
-	if (alwaysAsk || obj->nodesetval->nodeNr > 1) {
+	if (deferChoice) {
+		int i;
+
+		acronym = xmlNewNode(NULL, BAD_CAST "chooseAcronym");
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlAddChild(acronym, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
+		}
+	} else if (alwaysAsk || obj->nodesetval->nodeNr > 1) {
 		int i;
 
 		printf("Found acronym term %s in the following context:\n\n", (char *) term);
@@ -574,7 +583,7 @@ void showHelp(void)
 	puts("  -D          Remove acronym markup");
 	puts("  -d          Format XML output as definitionList");
 	puts("  -f          Overwrite data modules when marking up acronyms");
-	puts("  -i -I       Markup acronyms in interactive modes");
+	puts("  -i -I -!    Markup acronyms in interactive modes");
 	puts("  -L          Input is a list of file names");
 	puts("  -m <list>   Add markup for acronyms");
 	puts("  -n <#>      Minimum spaces after term in pretty printed output");
@@ -607,7 +616,7 @@ int main(int argc, char **argv)
 	bool list = false;
 	bool delete = false;
 
-	const char *sopts = "pn:xDdtT:o:m:iIfLh?";
+	const char *sopts = "pn:xDdtT:o:m:iIfL!h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -662,6 +671,10 @@ int main(int argc, char **argv)
 				break;
 			case 'L':
 				list = true;
+				break;
+			case '!':
+				interactive = true;
+				deferChoice = true;
 				break;
 			case 'h':
 			case '?':
