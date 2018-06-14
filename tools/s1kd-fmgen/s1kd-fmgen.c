@@ -5,12 +5,13 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <libxml/tree.h>
+#include <libxml/xinclude.h>
 #include <libxslt/transform.h>
 #include "s1kd_tools.h"
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -57,12 +58,28 @@ char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
-xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath)
 {
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
 
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	styledoc = xmlReadFile(xslpath, NULL, PARSE_OPTS);
+
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	xsltFreeStylesheet(style);
+
+	return res;
+}
+
+xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+{
+	xmlDocPtr styledoc, res;
+	xsltStylesheetPtr style;
+
+	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, PARSE_OPTS);
 
 	style = xsltParseStylesheetDoc(styledoc);
 
@@ -75,25 +92,25 @@ xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 
 xmlDocPtr generate_tp(xmlDocPtr doc)
 {
-	return transform_doc(doc, xsl_tp_xsl, xsl_tp_xsl_len);
+	return transform_doc_builtin(doc, xsl_tp_xsl, xsl_tp_xsl_len);
 }
 
 xmlDocPtr generate_toc(xmlDocPtr doc)
 {
-	return transform_doc(doc, xsl_toc_xsl, xsl_toc_xsl_len);
+	return transform_doc_builtin(doc, xsl_toc_xsl, xsl_toc_xsl_len);
 }
 
 xmlDocPtr generate_high(xmlDocPtr doc)
 {
-	return transform_doc(doc, xsl_high_xsl, xsl_high_xsl_len);
+	return transform_doc_builtin(doc, xsl_high_xsl, xsl_high_xsl_len);
 }
 
 xmlDocPtr generate_loedm(xmlDocPtr doc)
 {
-	return transform_doc(doc, xsl_loedm_xsl, xsl_loedm_xsl_len);
+	return transform_doc_builtin(doc, xsl_loedm_xsl, xsl_loedm_xsl_len);
 }
 
-xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type)
+xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *xslpath)
 {
 	xmlDocPtr res = NULL;
 
@@ -110,17 +127,26 @@ xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type)
 		exit(EXIT_BAD_TYPE);
 	}
 
+	if (xslpath) {
+		xmlDocPtr old;
+
+		old = res;
+		res = transform_doc(old, xslpath);
+
+		xmlFreeDoc(old);
+	}
+
 	return res;
 }
 
-char *fmtype(xmlDocPtr fmtypes, char *incode)
+char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 {
 	char xpath[256];
 	snprintf(xpath, 256, "//fm[@infoCode='%s']/@type", incode);
 	return first_xpath_string(fmtypes, NULL, xpath);
 }
 
-void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, bool overwrite)
+void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath)
 {
 	xmlDocPtr doc, res = NULL;
 	char *incode, *type;
@@ -128,16 +154,20 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 
 	doc = xmlReadFile(dmpath, NULL, PARSE_OPTS);
 
-	incode = first_xpath_string(doc, NULL, "//@infoCode");
+	incode = first_xpath_string(doc, NULL, "//@infoCode|//incode");
 
-	type = fmtype(fmtypes, incode);
+	if (fmtype) {
+		type = strdup(fmtype);
+	} else {
+		type = find_fmtype(fmtypes, incode);
+	}
 
 	if (!type) {
 		fprintf(stderr, S_NO_INFOCODE_ERR, incode);
 		exit(EXIT_NO_INFOCODE);
 	}
 
-	res = generate_fm_content_for_type(pm, type);
+	res = generate_fm_content_for_type(pm, type, xslpath);
 
 	xmlFree(type);
 	xmlFree(incode);
@@ -203,7 +233,7 @@ xmlDocPtr read_fmtypes(const char *path)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <FMTYPES>] -p <PM> [-,fh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-p <PM>] [-X <XSL>] [-,fxh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
 	puts("  -,            Dump the built-in .fmtypes file in XML format.");
@@ -213,6 +243,8 @@ void show_help(void)
 	puts("  -f            Overwrite input data modules.");
 	puts("  -p <PM>       Generate front matter from the specified PM.");
 	puts("  -t <TYPE>     Generate the specified type of front matter.");
+	puts("  -X <XSL>      Transform generated contents.");
+	puts("  -x            Do XInclude processing.");
 	puts("  <DM>          Generate front matter content based on the specified data modules.");
 }
 
@@ -225,7 +257,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.F:fp:t:h?";
+	const char *sopts = ",.F:fp:t:X:xh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -238,6 +270,8 @@ int main(int argc, char **argv)
 	xmlDocPtr pm, fmtypes = NULL;
 
 	bool overwrite = false;
+	bool xincl = false;
+	char *xslpath = NULL;
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -267,6 +301,12 @@ int main(int argc, char **argv)
 			case 't':
 				fmtype = strdup(optarg);
 				break;
+			case 'X':
+				xslpath = strdup(optarg);
+				break;
+			case 'x':
+				xincl = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -288,13 +328,17 @@ int main(int argc, char **argv)
 
 	pm = xmlReadFile(pmpath, NULL, PARSE_OPTS);
 
+	if (xincl) {
+		xmlXIncludeProcess(pm);
+	}
+
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			generate_fm_content_for_dm(pm, argv[i], fmtypes, overwrite);
+			generate_fm_content_for_dm(pm, argv[i], fmtypes, fmtype, overwrite, xslpath);
 		}
 	} else if (fmtype) {
 		xmlDocPtr res;
-		res = generate_fm_content_for_type(pm, fmtype);
+		res = generate_fm_content_for_type(pm, fmtype, xslpath);
 		xmlSaveFile("-", res);
 		xmlFreeDoc(res);
 	} else {
@@ -307,6 +351,7 @@ int main(int argc, char **argv)
 
 	free(pmpath);
 	free(fmtype);
+	free(xslpath);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

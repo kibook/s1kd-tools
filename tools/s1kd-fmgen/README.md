@@ -6,7 +6,8 @@ s1kd-fmgen - Generate front matter data module contents
 SYNOPSIS
 ========
 
-    s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-,.fh?] (-t <TYPE>|<DM>...)
+    s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-X <XSL>] [-,.fhx?]
+               (-t <TYPE>|<DM>...)
 
 DESCRIPTION
 ===========
@@ -44,6 +45,12 @@ Generate content for this type of front matter when no data modules are specifie
 -   TOC - Table of contents
 
 -   TP - Title page
+
+-X &lt;XSL&gt;  
+Transform the front matter contents after generating them using the specified XSLT. This can be used, for example, to generate content for a descriptive schema data module instead, to support older issues of the specification, or for types of generated front matter not covered by the frontmatter schema.
+
+-x  
+Do XInclude processing.
 
 &lt;DM&gt;...  
 Front matter data modules to generate content for.
