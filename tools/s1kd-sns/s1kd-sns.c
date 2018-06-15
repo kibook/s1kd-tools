@@ -28,8 +28,26 @@
 
 #define DEFAULT_SNS_DNAME "SNS"
 
+int hlink(const char *path, const char *fname)
+{
+	#ifdef _WIN32
+		return CreateHardLink(fname, path, 0);
+	#else
+		return link(path, fname);
+	#endif
+}
+
+int slink(const char *path, const char *fname)
+{
+	#ifdef _WIN32
+		return CreateSymbolicLink(fname, path, 0);
+	#else
+		return symlink(path, fname);
+	#endif
+}
+
 /* The type of link to use, hard or soft (symbolic). */
-enum link {HARD, SYMB} link_type = HARD;
+int (*linkfn)(const char *path, const char *fname) = hlink;
 
 /* Title SNS directories using only the SNS code, not including the SNS title. */
 bool only_numb = false;
@@ -70,7 +88,18 @@ void cleanstr(char *s)
 	int i;
 	for (i = 0; s[i]; ++i) {
 		switch(s[i]) {
-			case '/': s[i] = ' ';
+			case '/':
+			#ifdef _WIN32
+			case '<':
+			case '>':
+			case ':':
+			case '"':
+			case '\\':
+			case '|':
+			case '?':
+			case '*':
+			#endif
+				s[i] = ' ';
 		}
 	}
 }
@@ -205,24 +234,6 @@ int sns_exists(const char *code, char *dname)
 	return exists;
 }
 
-int hlink(const char *path, const char *fname)
-{
-	#ifdef _WIN32
-		return CreateHardLink(fname, path, 0);
-	#else
-		return link(path, fname);
-	#endif
-}
-
-int slink(const char *path, const char *fname)
-{
-	#ifdef _WIN32
-		return CreateSymbolicLink(fname, path, 0);
-	#else
-		return symlink(path, fname);
-	#endif
-}
-
 /* Place a link to a DM file in to the proper place in the SNS directory hierarchy. */
 void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 {
@@ -258,10 +269,7 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 		unlink(fname);
 	}
 
-	switch (link_type) {
-		case HARD: if (hlink(path, fname) != 0) exit(1); break;
-		case SYMB: if (slink(path, fname) != 0) exit(1); break;
-	}		
+	if (linkfn(path, fname) != 0) exit(1);
 
 	if (chdir(orig) != 0) exit(1);
 }
@@ -363,7 +371,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'd': snsdname = strdup(optarg); break;
-			case 's': link_type = SYMB; break;
+			case 's': linkfn = slink; break;
 			case 'n': only_numb = true; break;
 			case 'p': printsns = true; break;
 			case 'h':
