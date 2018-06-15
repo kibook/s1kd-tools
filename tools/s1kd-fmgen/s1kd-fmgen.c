@@ -11,7 +11,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -264,6 +264,7 @@ void show_help(void)
 	puts("  -t <TYPE>          Generate the specified type of front matter.");
 	puts("  -X <XSL>           Transform generated contents.");
 	puts("  -x                 Do XInclude processing.");
+	puts("  --version          Show version information.");
 	puts("  <DM>               Generate front matter content based on the specified data modules.");
 }
 

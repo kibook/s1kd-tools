@@ -55,6 +55,9 @@ Transform the front matter contents after generating them using the specified XS
 -x  
 Do XInclude processing.
 
+--version  
+Show version information.
+
 &lt;DM&gt;...  
 Front matter data modules to generate content for.
 
