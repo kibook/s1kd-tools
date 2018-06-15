@@ -8,9 +8,12 @@
 #include <stdbool.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -76,7 +79,11 @@ void cleanstr(char *s)
 void makedir(const char *path)
 {
 	if (access(path, F_OK) == -1) {
-		mkdir(path, S_IRWXU);
+		#ifdef _WIN32
+			mkdir(path);
+		#else
+			mkdir(path, S_IRWXU);
+		#endif
 	}
 }
 
@@ -198,6 +205,24 @@ int sns_exists(const char *code, char *dname)
 	return exists;
 }
 
+int hlink(const char *path, const char *fname)
+{
+	#ifdef _WIN32
+		return CreateHardLink(fname, path, 0);
+	#else
+		return link(path, fname);
+	#endif
+}
+
+int slink(const char *path, const char *fname)
+{
+	#ifdef _WIN32
+		return CreateSymbolicLink(fname, path, 0);
+	#else
+		return symlink(path, fname);
+	#endif
+}
+
 /* Place a link to a DM file in to the proper place in the SNS directory hierarchy. */
 void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 {
@@ -234,8 +259,8 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 	}
 
 	switch (link_type) {
-		case HARD: if (link(path, fname) != 0) exit(1); break;
-		case SYMB: if (symlink(path, fname) != 0) exit(1); break;
+		case HARD: if (hlink(path, fname) != 0) exit(1); break;
+		case SYMB: if (slink(path, fname) != 0) exit(1); break;
 	}		
 
 	if (chdir(orig) != 0) exit(1);
