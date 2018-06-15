@@ -71,7 +71,6 @@
               <listItem>
                 <para><emphasis>Generation:</emphasis> The generation of new CSDB objects is supported by the <emphasis>s1kd-dmrl</emphasis> tool and the <emphasis>s1kd-new*</emphasis> set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new* tools directly.</para>
                 <para>The <emphasis>s1kd-defaults</emphasis> tool is used to manage the files which contain default metadata for new CSDB objects.</para>
-                <para changeType="add" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-sns</emphasis> tool can be used to organize the CSDB using a given SNS structure.</para>
               </listItem>
               <listItem>
                 <para><emphasis>Authoring:</emphasis> These tools support the authoring process.</para>
@@ -79,6 +78,7 @@
                 <para>The <emphasis>s1kd-ls</emphasis> tool lists data modules within a directory.</para>
                 <para>The <emphasis>s1kd-metadata</emphasis> tool lists and edits S1000D metadata on CSDB objects.</para>
                 <para>The <emphasis>s1kd-ref</emphasis> tool can be used to quickly insert references to other CSDB objects.</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-sns</emphasis> tool can be used to organize the CSDB using a given SNS structure.</para>
                 <para>The <emphasis>s1kd-transform</emphasis> tool applies XSLT transformations to CSDB objects.</para>
                 <para>The <emphasis>s1kd-upissue</emphasis> tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.</para>
               </listItem>

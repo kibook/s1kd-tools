@@ -30,8 +30,6 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
     The **s1kd-defaults** tool is used to manage the files which contain default metadata for new CSDB objects.
 
-    The **s1kd-sns** tool can be used to organize the CSDB using a given SNS structure.
-
 2.  **Authoring:** These tools support the authoring process.
 
     The **s1kd-addicn** tool creates the notation and entity elements to reference an ICN in a data module.
@@ -41,6 +39,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     The **s1kd-metadata** tool lists and edits S1000D metadata on CSDB objects.
 
     The **s1kd-ref** tool can be used to quickly insert references to other CSDB objects.
+
+    The **s1kd-sns** tool can be used to organize the CSDB using a given SNS structure.
 
     The **s1kd-transform** tool applies XSLT transformations to CSDB objects.
 
