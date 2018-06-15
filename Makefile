@@ -24,6 +24,7 @@ all:
 	$(MAKE) -C tools/s1kd-newupf
 	$(MAKE) -C tools/s1kd-ref
 	$(MAKE) -C tools/s1kd-refls
+	$(MAKE) -C tools/s1kd-sns
 	$(MAKE) -C tools/s1kd-syncrefs
 	$(MAKE) -C tools/s1kd-transform
 	$(MAKE) -C tools/s1kd-upissue
@@ -55,6 +56,7 @@ clean:
 	$(MAKE) -C tools/s1kd-newupf clean
 	$(MAKE) -C tools/s1kd-ref clean
 	$(MAKE) -C tools/s1kd-refls clean
+	$(MAKE) -C tools/s1kd-sns clean
 	$(MAKE) -C tools/s1kd-syncrefs clean
 	$(MAKE) -C tools/s1kd-transform clean
 	$(MAKE) -C tools/s1kd-upissue clean
@@ -86,6 +88,7 @@ install:
 	$(MAKE) -C tools/s1kd-newupf install
 	$(MAKE) -C tools/s1kd-ref install
 	$(MAKE) -C tools/s1kd-refls install
+	$(MAKE) -C tools/s1kd-sns install
 	$(MAKE) -C tools/s1kd-syncrefs install
 	$(MAKE) -C tools/s1kd-transform install
 	$(MAKE) -C tools/s1kd-upissue install
