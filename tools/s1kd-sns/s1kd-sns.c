@@ -13,7 +13,7 @@
 #endif
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
