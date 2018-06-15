@@ -302,11 +302,13 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-d <dir>] [-npsh?] [<BREX> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?     Show usage message.");
-	puts("  -d <dir>  Directory to organize DMs in to. Default is '" DEFAULT_SNS_DNAME "'.");
-	puts("  -n        Only use the SNS code to name directories.");
-	puts("  -p        Print SNS instead of organizing.");
-	puts("  -s        Use symbolic links.");
+	puts("  -h -?      Show usage message.");
+	puts("  -d <dir>   Directory to organize DMs in to. Default is '" DEFAULT_SNS_DNAME "'.");
+	puts("  -n         Only use the SNS code to name directories.");
+	puts("  -p         Print SNS instead of organizing.");
+	puts("  -s         Use symbolic links.");
+	puts("  --version  Show version information.");
+	puts("  <BREX>     BREX data module to read SNS structure from.");
 }
 
 void show_version(void)

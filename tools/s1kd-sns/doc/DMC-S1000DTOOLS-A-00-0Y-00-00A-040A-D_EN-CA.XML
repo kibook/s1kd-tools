@@ -96,6 +96,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>&lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Read the SNS structure from the specified BREX data module. If none is specified, the tool will read from stdin.</para>
