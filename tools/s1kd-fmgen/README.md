@@ -6,8 +6,8 @@ s1kd-fmgen - Generate front matter data module contents
 SYNOPSIS
 ========
 
-    s1kd-fmgen [-F <FMTYPES>] [-p <PM>] [-X <XSL>] [-,.fhx?]
-               (-t <TYPE>|<DM>...)
+    s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]]
+               [-,.fhx?] (-t <TYPE>|<DM>...)
 
 DESCRIPTION
 ===========
@@ -32,8 +32,11 @@ Specify a custom `.fmtypes` file.
 -f  
 Overwrite the specified front matter data module files after generating their content.
 
--p &lt;PM&gt;  
+-P &lt;PM&gt;  
 Publication module or s1kd-flatten(1) PM format file to generate contents from. If none is specified, the tool will read from stdin.
+
+-p &lt;name&gt;=&lt;value&gt;  
+Pass a parameter to the XSLT specified with the -X option.
 
 -t &lt;TYPE&gt;  
 Generate content for this type of front matter when no data modules are specified. Supported types are:

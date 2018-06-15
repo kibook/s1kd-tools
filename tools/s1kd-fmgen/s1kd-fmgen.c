@@ -11,7 +11,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -58,7 +58,7 @@ char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
-xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath)
+xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
 {
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
@@ -67,7 +67,7 @@ xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath)
 
 	style = xsltParseStylesheetDoc(styledoc);
 
-	res = xsltApplyStylesheet(style, doc, NULL);
+	res = xsltApplyStylesheet(style, doc, params);
 
 	xsltFreeStylesheet(style);
 
@@ -110,7 +110,7 @@ xmlDocPtr generate_loedm(xmlDocPtr doc)
 	return transform_doc_builtin(doc, xsl_loedm_xsl, xsl_loedm_xsl_len);
 }
 
-xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *xslpath)
+xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *xslpath, const char **params)
 {
 	xmlDocPtr res = NULL;
 
@@ -131,7 +131,7 @@ xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const ch
 		xmlDocPtr old;
 
 		old = res;
-		res = transform_doc(old, xslpath);
+		res = transform_doc(old, xslpath, params);
 
 		xmlFreeDoc(old);
 	}
@@ -146,7 +146,7 @@ char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 	return first_xpath_string(fmtypes, NULL, xpath);
 }
 
-void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath)
+void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
 {
 	xmlDocPtr doc, res = NULL;
 	char *type;
@@ -171,7 +171,7 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 		xmlFree(incode);
 	}
 
-	res = generate_fm_content_for_type(pm, type, xslpath);
+	res = generate_fm_content_for_type(pm, type, xslpath, params);
 
 	xmlFree(type);
 
@@ -236,21 +236,35 @@ xmlDocPtr read_fmtypes(const char *path)
 	return doc;
 }
 
+void add_param(xmlNodePtr params, char *s)
+{
+	char *n, *v;
+	xmlNodePtr p;
+
+	n = strtok(s, "=");
+	v = strtok(NULL, "");
+
+	p = xmlNewChild(params, NULL, BAD_CAST "param", NULL);
+	xmlSetProp(p, BAD_CAST "name", BAD_CAST n);
+	xmlSetProp(p, BAD_CAST "value", BAD_CAST v);
+}
+
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-p <PM>] [-X <XSL>] [-,fxh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,fxh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
-	puts("  -,            Dump the built-in .fmtypes file in XML format.");
-	puts("  -.            Dump the built-in .fmtypes file in simple text format.");
-	puts("  -h -?         Show usage message.");
-	puts("  -F <FMTYPES>  Specify .fmtypes file.");
-	puts("  -f            Overwrite input data modules.");
-	puts("  -p <PM>       Generate front matter from the specified PM.");
-	puts("  -t <TYPE>     Generate the specified type of front matter.");
-	puts("  -X <XSL>      Transform generated contents.");
-	puts("  -x            Do XInclude processing.");
-	puts("  <DM>          Generate front matter content based on the specified data modules.");
+	puts("  -,                 Dump the built-in .fmtypes file in XML format.");
+	puts("  -.                 Dump the built-in .fmtypes file in simple text format.");
+	puts("  -h -?              Show usage message.");
+	puts("  -F <FMTYPES>       Specify .fmtypes file.");
+	puts("  -f                 Overwrite input data modules.");
+	puts("  -P <PM>            Generate front matter from the specified PM.");
+	puts("  -p <name>=<value>  Pass parameters to the XSLT specified with -X.");
+	puts("  -t <TYPE>          Generate the specified type of front matter.");
+	puts("  -X <XSL>           Transform generated contents.");
+	puts("  -x                 Do XInclude processing.");
+	puts("  <DM>               Generate front matter content based on the specified data modules.");
 }
 
 void show_version(void)
@@ -262,7 +276,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.F:fp:t:X:xh?";
+	const char *sopts = ",.F:fP:p:t:X:xh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -277,6 +291,11 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool xincl = false;
 	char *xslpath = NULL;
+	xmlNodePtr params_node;
+	int nparams = 0;
+	const char **params = NULL;
+
+	params_node = xmlNewNode(NULL, BAD_CAST "params");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -300,8 +319,12 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
-			case 'p':
+			case 'P':
 				pmpath = strdup(optarg);
+				break;
+			case 'p':
+				add_param(params_node, optarg);
+				++nparams;
 				break;
 			case 't':
 				fmtype = strdup(optarg);
@@ -318,6 +341,26 @@ int main(int argc, char **argv)
 				return 0;
 		}
 	}
+
+	if (nparams > 0) {
+		xmlNodePtr p;
+		int n = 0;
+
+		params = malloc((nparams * 2 + 1) * sizeof(char *));
+
+		for (p = params_node->children; p; p = p->next) {
+			char *name, *value;
+
+			name  = (char *) xmlGetProp(p, BAD_CAST "name");
+			value = (char *) xmlGetProp(p, BAD_CAST "value");
+
+			params[n++] = name;
+			params[n++] = value;
+		}
+
+		params[n] = NULL;
+	}
+	xmlFreeNode(params_node);
 
 	if (!fmtypes) {
 		if (access(DEFAULT_FMTYPES_FNAME, F_OK) != -1) {
@@ -339,17 +382,23 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			generate_fm_content_for_dm(pm, argv[i], fmtypes, fmtype, overwrite, xslpath);
+			generate_fm_content_for_dm(pm, argv[i], fmtypes, fmtype, overwrite, xslpath, params);
 		}
 	} else if (fmtype) {
 		xmlDocPtr res;
-		res = generate_fm_content_for_type(pm, fmtype, xslpath);
+		res = generate_fm_content_for_type(pm, fmtype, xslpath, params);
 		xmlSaveFile("-", res);
 		xmlFreeDoc(res);
 	} else {
 		fprintf(stderr, S_NO_TYPE_ERR);
 		exit(EXIT_NO_TYPE);
 	}
+
+	for (i = 0; i < nparams; ++i) {
+		xmlFree((char *) params[i]);
+		xmlFree((char *) params[i + 1]);
+	}
+	free(params);
 
 	xmlFreeDoc(pm);
 	xmlFreeDoc(fmtypes);
