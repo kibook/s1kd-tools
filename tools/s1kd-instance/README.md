@@ -119,6 +119,8 @@ The following CIRs have some built-in support:
 
 -   Functional items
 
+-   Illustrated parts data
+
 -   Parts
 
 -   Supplies
@@ -177,6 +179,8 @@ The following types currently have built-in XSLT and can therefore be used as va
 -   enterpriseRepository
 
 -   functionalItemRepository
+
+-   illustratedPartsCatalog
 
 -   partRepository
 

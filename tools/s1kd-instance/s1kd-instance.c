@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1397,6 +1397,9 @@ bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 	} else if (strcmp(cirtype, "partRepository") == 0) {
 		*xsl = cirxsl_partRepository_xsl;
 		*len = cirxsl_partRepository_xsl_len;
+	} else if (strcmp(cirtype, "illustratedPartsCatalog") == 0) {
+		*xsl = cirxsl_illustratedPartsCatalog_xsl;
+		*len = cirxsl_illustratedPartsCatalog_xsl_len;
 	} else if (strcmp(cirtype, "supplyRepository") == 0) {
 		*xsl = cirxsl_supplyRepository_xsl;
 		*len = cirxsl_supplyRepository_xsl_len;
@@ -1487,7 +1490,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 
 	xmlXPathFreeObject(results);
 
-	results = xmlXPathEvalExpression(BAD_CAST "//content/commonRepository/*[position()=last()]", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST "//content/commonRepository/*[position()=last()]|//content/illustratedPartsCatalog", ctxt);
 
 	if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
 		fprintf(stderr, S_INVALID_CIR, cirdocfname);
