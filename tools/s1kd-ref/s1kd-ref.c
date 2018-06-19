@@ -11,7 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -632,6 +632,58 @@ xmlNodePtr new_icn_ref(const char *ref, const char *fname, int opts)
 	return info_entity_ref;
 }
 
+#define CSN_FMT "CSN-%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s"
+
+xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
+{
+	char model_ident_code[15]    = "";
+	char system_diff_code[5]     = "";
+	char system_code[4]          = "";
+	char assy_code[5]            = "";
+	char item_location_code[2]   = "";
+	char sub_system_code[2]      = "";
+	char sub_sub_system_code[2]  = "";
+	char figure_number[3]         = "";
+	char figure_number_variant[4] = "";
+	char item[4]            = "";
+	char item_variant[2]    = "";
+	xmlNode *csn_ref;
+	int n;
+
+	n = sscanf(ref, CSN_FMT,
+		model_ident_code,
+		system_diff_code,
+		system_code,
+		sub_system_code,
+		sub_sub_system_code,
+		assy_code,
+		figure_number,
+		figure_number_variant,
+		item,
+		item_variant,
+		item_location_code);
+	if (n != 11) {
+		fprintf(stderr, ERR_PREFIX "CSN invalid: %s\n", ref);
+		exit(EXIT_BAD_INPUT);
+	}
+
+	csn_ref = xmlNewNode(NULL, BAD_CAST "catalogSeqNumberRef");
+
+	xmlSetProp(csn_ref, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+	xmlSetProp(csn_ref, BAD_CAST "systemDiffCode", BAD_CAST system_diff_code);
+	xmlSetProp(csn_ref, BAD_CAST "systemCode", BAD_CAST system_code);
+	xmlSetProp(csn_ref, BAD_CAST "subSystemCode", BAD_CAST sub_system_code);
+	xmlSetProp(csn_ref, BAD_CAST "subSubSystemCode", BAD_CAST sub_sub_system_code);
+	xmlSetProp(csn_ref, BAD_CAST "assyCode", BAD_CAST assy_code);
+	xmlSetProp(csn_ref, BAD_CAST "figureNumber", BAD_CAST figure_number);
+	xmlSetProp(csn_ref, BAD_CAST "figureNumberVariant", BAD_CAST figure_number_variant);
+	xmlSetProp(csn_ref, BAD_CAST "item", BAD_CAST item);
+	xmlSetProp(csn_ref, BAD_CAST "itemVariant", BAD_CAST item_variant);
+	xmlSetProp(csn_ref, BAD_CAST "itemLocationCode", BAD_CAST item_location_code);
+
+	return csn_ref;
+}
+
 bool is_pm(const char *ref)
 {
 	return strncmp(ref, "PMC-", 4) == 0 || strncmp(ref, "PME-", 4) == 0;
@@ -655,6 +707,11 @@ bool is_dml(const char *ref)
 bool is_icn(const char *ref)
 {
 	return strncmp(ref, "ICN-", 4) == 0;
+}
+
+bool is_csn(const char *ref)
+{
+	return strncmp(ref, "CSN-", 4) == 0;
 }
 
 void add_ref(const char *src, const char *dst, xmlNodePtr ref)
@@ -712,6 +769,8 @@ void print_ref(const char *src, const char *dst, const char *ref,
 		f = new_dml_ref;
 	} else if (is_icn(ref)) {
 		f = new_icn_ref;
+	} else if (is_csn(ref)) {
+		f = new_csn_ref;
 	} else {
 		fprintf(stderr, ERR_PREFIX "Unknown reference type: %s\n", ref);
 		exit(EXIT_BAD_INPUT);
