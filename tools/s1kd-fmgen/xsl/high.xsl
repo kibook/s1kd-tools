@@ -62,21 +62,22 @@
   <xsl:template match="dmRef"/>
 
   <xsl:template match="dmodule">
+    <xsl:variable name="last-app" select="ancestor-or-self::*[@applicRefId][position() = last()]"/>
     <xsl:variable name="dmodule" select="."/>
     <xsl:for-each select=".//reasonForUpdate[@updateHighlight = 1]">
       <frontMatterDmEntry>
         <xsl:apply-templates select="$dmodule/identAndStatusSection/dmStatus/@issueType"/>
         <dmRef>
-          <xsl:choose>
-            <xsl:when test="$dmodule/@applicRefId">
-              <xsl:apply-templates select="$dmodule/@applicRefId"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:attribute name="applicRefId">
+          <xsl:attribute name="applicRefId">
+            <xsl:choose>
+              <xsl:when test="$last-app">
+                <xsl:value-of select="$last-app/@applicRefId"/>
+              </xsl:when>
+              <xsl:otherwise>
                 <xsl:value-of select="$pm-applic"/>
-              </xsl:attribute>
-            </xsl:otherwise>
-          </xsl:choose>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
           <dmRefIdent>
             <xsl:apply-templates select="$dmodule/identAndStatusSection/dmAddress/dmIdent/dmCode"/>
             <xsl:apply-templates select="$dmodule/identAndStatusSection/dmAddress/dmIdent/issueInfo"/>

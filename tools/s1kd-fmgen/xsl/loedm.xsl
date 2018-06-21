@@ -62,33 +62,39 @@
   </xsl:template>
 
   <xsl:template match="dmRef">
+    <xsl:variable name="last-app" select="ancestor-or-self::*[@applicRefId][position() = last()]"/>
     <frontMatterDmEntry>
       <xsl:copy>
-        <xsl:apply-templates select="@*"/>
-        <xsl:if test="not(@applicRefId)">
-          <xsl:attribute name="applicRefId">
-            <xsl:value-of select="$pm-applic"/>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:attribute name="applicRefId">
+          <xsl:choose>
+            <xsl:when test="$last-app">
+              <xsl:value-of select="$last-app/@applicRefId"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$pm-applic"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <xsl:apply-templates select="node()"/>
       </xsl:copy>
     </frontMatterDmEntry>
   </xsl:template>
 
   <xsl:template match="dmodule">
+    <xsl:variable name="last-app" select="ancestor-or-self::*[@applicRefId][position() = last()]"/>
     <frontMatterDmEntry>
       <xsl:apply-templates select="identAndStatusSection/dmStatus/@issueType"/>
       <dmRef>
-        <xsl:choose>
-          <xsl:when test="@applicRefId">
-            <xsl:apply-templates select="@applicRefId"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="applicRefId">
+        <xsl:attribute name="applicRefId">
+          <xsl:choose>
+            <xsl:when test="$last-app">
+              <xsl:value-of select="$last-app/@applicRefId"/>
+            </xsl:when>
+            <xsl:otherwise>
               <xsl:value-of select="$pm-applic"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <dmRefIdent>
           <xsl:apply-templates select="identAndStatusSection/dmAddress/dmIdent/dmCode"/>
           <xsl:apply-templates select="identAndStatusSection/dmAddress/dmIdent/issueInfo"/>

@@ -78,27 +78,29 @@
   </xsl:template>
 
   <xsl:template match="dmRef">
+    <xsl:variable name="last-app" select="ancestor-or-self::*[@applicRefId][position() = last()]"/>
     <xsl:copy>
-      <xsl:choose>
-        <xsl:when test="@applicRefId">
-          <xsl:apply-templates select="@applicRefId"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="applicRefId">
+      <xsl:attribute name="applicRefId">
+        <xsl:choose>
+          <xsl:when test="$last-app">
+            <xsl:value-of select="$last-app/@applicRefId"/>
+          </xsl:when>
+          <xsl:otherwise>
             <xsl:value-of select="$pm-applic"/>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:apply-templates select="node()"/>
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="dmodule">
+    <xsl:variable name="last-app" select="ancestor-or-self::*[@applicRefId][position() = last()]"/>
     <dmRef>
       <xsl:attribute name="applicRefId">
         <xsl:choose>
-          <xsl:when test="@applicRefId">
-            <xsl:value-of select="@applicRefId"/>
+          <xsl:when test="$last-app">
+            <xsl:value-of select="$last-app/@applicRefId"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$pm-applic"/>
