@@ -11,7 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -106,7 +106,7 @@ void dump_node(xmlNodePtr node, const char *dst)
 {
 	xmlBufferPtr buf;
 	buf = xmlBufferCreate();
-	xmlNodeDump(buf, NULL, node, 0, 1);
+	xmlNodeDump(buf, NULL, node, 0, 0);
 	if (strcmp(dst, "-") == 0) {
 		puts((char *) buf->content);
 	} else {
