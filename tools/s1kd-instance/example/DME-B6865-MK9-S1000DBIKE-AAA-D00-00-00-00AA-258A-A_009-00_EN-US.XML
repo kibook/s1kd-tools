@@ -23,7 +23,11 @@
 			      </dmAddressItems>
 		    </dmAddress>
 		    <dmStatus issueType="changed">
-			      <sourceDmIdent><dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="258" infoCodeVariant="A" itemLocationCode="A"/><language languageIsoCode="en" countryIsoCode="US"/><issueInfo issueNumber="009" inWork="00"/></sourceDmIdent><security securityClassification="01" commercialClassification="cc51" caveat="cv51"/>
+			      <sourceDmIdent>
+				        <dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="258" infoCodeVariant="A" itemLocationCode="A"/>
+				        <language countryIsoCode="US" languageIsoCode="en"/>
+				        <issueInfo issueNumber="009" inWork="00"/>
+			      </sourceDmIdent><security securityClassification="01" commercialClassification="cc51" caveat="cv51"/>
 			      <dataRestrictions>
             <restrictionInstructions>
                <dataDistribution>To be made available to all S1000D users.</dataDistribution>
