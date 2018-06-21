@@ -360,3 +360,22 @@ An "identity" template is automatically inserted in to the custom XSLT script, e
 This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.
 
 The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.
+
+EXAMPLES
+========
+
+Filtering a data module on specified applicability and writing to stdout:
+
+    $ s1kd-instance -s version:prodattr=A <DM>
+
+Filtering a data module on a specified product instance and writing to stdout:
+
+    $ s1kd-instance -P <PCT> -p versionA <DM>
+
+Filtering data modules for a particular customer and outputting with extended identification:
+
+    $ s1kd-instance -s version:prodattr=A -e 12345-54321 -O . <DMs>
+
+Writing out a data module from stdin to a directory with automatic naming:
+
+    $ s1kd-transform -s <xsl> <DM> | s1kd-instance -O <dir>
