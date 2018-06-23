@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1394,6 +1394,9 @@ bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 	} else if (strcmp(cirtype, "functionalItemRepository") == 0) {
 		*xsl = cirxsl_functionalItemRepository_xsl;
 		*len = cirxsl_functionalItemRepository_xsl_len;
+	} else if (strcmp(cirtype, "einlist") == 0) {
+		*xsl = cirxsl_einlist_xsl;
+		*len = cirxsl_einlist_xsl_len;
 	} else if (strcmp(cirtype, "partRepository") == 0) {
 		*xsl = cirxsl_partRepository_xsl;
 		*len = cirxsl_partRepository_xsl_len;
@@ -1493,6 +1496,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 	results = xmlXPathEvalExpression(BAD_CAST
 		"//content/commonRepository/*[position()=last()]|"
 		"//content/techRepository/*[position()=last()]|"
+		"//content/techrep/*[position()=last()]|"
 		"//content/illustratedPartsCatalog",
 		ctxt);
 
@@ -1529,11 +1533,15 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 
 	xmlXPathFreeContext(ctxt);
 
+	if (first_xpath_node(dm, NULL, "//idstatus")) {
+		add_src = false;
+	}
+
 	if (add_src) {
 		xmlNodePtr security, dmIdent, repositorySourceDmIdent, cur;
 
 		ctxt = xmlXPathNewContext(dm);
-		results = xmlXPathEvalExpression(BAD_CAST "//dmStatus/security", ctxt);
+		results = xmlXPathEvalExpression(BAD_CAST "//security", ctxt);
 		security = results->nodesetval->nodeTab[0];
 		xmlXPathFreeObject(results);
 		xmlXPathFreeContext(ctxt);
