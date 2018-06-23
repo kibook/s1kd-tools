@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1490,7 +1490,11 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 
 	xmlXPathFreeObject(results);
 
-	results = xmlXPathEvalExpression(BAD_CAST "//content/commonRepository/*[position()=last()]|//content/illustratedPartsCatalog", ctxt);
+	results = xmlXPathEvalExpression(BAD_CAST
+		"//content/commonRepository/*[position()=last()]|"
+		"//content/techRepository/*[position()=last()]|"
+		"//content/illustratedPartsCatalog",
+		ctxt);
 
 	if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
 		fprintf(stderr, S_INVALID_CIR, cirdocfname);
