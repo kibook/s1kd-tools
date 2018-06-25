@@ -6,6 +6,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
+INSTALL=install -s
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
@@ -16,11 +17,16 @@ $(OUTPUT): $(SOURCE) dmrl.h
 dmrl.h: dmrl.xsl
 	xxd -i dmrl.xsl > dmrl.h
 
+.PHONY: clean install uninstall
+
 clean:
 	rm -f $(OUTPUT)
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	cp $(OUTPUT) $(INSTALL_PREFIX)/
+	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)
 	$(MAKE) -C doc install
 
+uninstall:
+	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(MAKE) -C doc uninstall

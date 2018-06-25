@@ -6,6 +6,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
+INSTALL=install -s
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
@@ -18,11 +19,16 @@ xsl.h: fmtypes.xml fmtypes.txt xsl/*
 	xxd -i fmtypes.txt >> xsl.h
 	for f in xsl/*; do xxd -i "$$f" >> xsl.h; done
 
+.PHONY: clean install uninstall
+
 clean:
 	rm -f $(OUTPUT) xsl.h
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	cp $(OUTPUT) $(INSTALL_PREFIX)/
+	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)
 	$(MAKE) -C doc install
 
+uninstall:
+	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(MAKE) -C doc uninstall

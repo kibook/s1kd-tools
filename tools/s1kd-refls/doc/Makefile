@@ -1,18 +1,26 @@
 SOURCE=DMC-S1000DTOOLS-A-00-0P-00-00A-040A-D_EN-CA.XML
+OUTPUT=s1kd-refls.1
+README=../README.md
 
 PREFIX=/usr/local
 MAN_PREFIX=$(PREFIX)/share/man/man1
+INSTALL=install
 
-all: s1kd-refls.1
+all: $(OUTPUT) $(README)
 
-../README.md: $(SOURCE)
-	s1kd2db $(SOURCE) | pandoc -f docbook -t markdown_github -s -o ../README.md
+$(README): $(SOURCE)
+	s1kd2db $(SOURCE) | pandoc -f docbook -t markdown_github -s -o $(README)
 
-s1kd-refls.1: $(SOURCE)
-	s1kd2db $(SOURCE) | pandoc -f docbook -t man -s -o s1kd-refls.1
+$(OUTPUT): $(SOURCE)
+	s1kd2db $(SOURCE) | pandoc -f docbook -t man -s -o $(OUTPUT)
 
-install: s1kd-refls.1
-	cp s1kd-refls.1 $(MAN_PREFIX)/
+.PHONY: clean install uninstall
 
 clean:
-	rm -f s1kd-refls.1
+	rm -f $(OUTPUT) $(README)
+
+install: $(OUTPUT)
+	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)
+
+uninstall:
+	rm -f $(MAN_PREFIX)/$(OUTPUT)

@@ -6,6 +6,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
+INSTALL=install -s
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
@@ -16,12 +17,17 @@ identity.h: ../common/identity.xsl
 $(OUTPUT): $(SOURCE) identity.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
+.PHONY: clean install uninstall
+
 clean:
 	rm -f identity.h
 	rm -f $(OUTPUT)
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	cp $(OUTPUT) $(INSTALL_PREFIX)/
+	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)
 	$(MAKE) -C doc install
 
+uninstall:
+	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(MAKE) -C doc uninstall

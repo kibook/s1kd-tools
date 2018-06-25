@@ -6,6 +6,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
+INSTALL=install -s
 
 all: $(OUTPUT)
 	$(MAKE) -C doc
@@ -22,9 +23,7 @@ generateDisplayText.h: generateDisplayText.xsl
 identity.h: ../common/identity.xsl
 	xxd -i ../common/identity.xsl > identity.h
 
-install: $(OUTPUT)
-	cp $(OUTPUT) $(INSTALL_PREFIX)/
-	$(MAKE) -C doc install
+.PHONY: clean install uninstall
 
 clean:
 	rm -f $(OUTPUT)
@@ -32,3 +31,11 @@ clean:
 	rm -f generateDisplayText.h
 	rm -f identity.h
 	$(MAKE) -C doc clean
+
+install: $(OUTPUT)
+	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)
+	$(MAKE) -C doc install
+
+uninstall:
+	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(MAKE) -C doc uninstall

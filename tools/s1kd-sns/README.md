@@ -31,6 +31,9 @@ Print the SNS structure only.
 -s  
 Use symbolic links to organize the SNS instead of the default hard links.
 
+--version  
+Show version information.
+
 &lt;BREX&gt;  
 Read the SNS structure from the specified BREX data module. If none is specified, the tool will read from stdin.
 

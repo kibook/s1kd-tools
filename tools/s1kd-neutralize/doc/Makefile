@@ -1,18 +1,26 @@
 SOURCE=DMC-S1000DTOOLS-A-00-0E-00-00A-040A-D_EN-CA.XML
+OUTPUT=s1kd-neutralize.1
+README=../README.md
 
 PREFIX=/usr/local
 MAN_PREFIX=$(PREFIX)/share/man/man1
+INSTALL=install
 
-all: s1kd-neutralize.1
+all: $(OUTPUT) $(README)
 
-../README.md: $(SOURCE)
-	s1kd2db $(SOURCE) | pandoc -f docbook -t markdown_github -o ../README.md
+$(README): $(SOURCE)
+	s1kd2db $(SOURCE) | pandoc -f docbook -t markdown_github -o $(README)
 
-s1kd-neutralize.1: $(SOURCE)
-	s1kd2db $(SOURCE) | pandoc -f docbook -t man -s -o s1kd-neutralize.1
+$(OUTPUT): $(SOURCE)
+	s1kd2db $(SOURCE) | pandoc -f docbook -t man -s -o $(OUTPUT)
+
+.PHONY: clean install uninstall
 
 clean:
-	rm -f s1kd-neutralize.1
+	rm -f $(OUTPUT) $(README)
 
-install:
-	cp s1kd-neutralize.1 $(MAN_PREFIX)/
+install: $(OUTPUT)
+	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)
+
+uninstall:
+	rm -f $(MAN_PREFIX)/$(OUTPUT)

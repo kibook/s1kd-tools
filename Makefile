@@ -1,6 +1,6 @@
 TARGETS=doc tools/s1kd-*
 
-all install clean: $(TARGETS)
+all clean install uninstall: $(TARGETS)
 
 $(TARGETS)::
 	$(MAKE) -C $@ $(MAKECMDGOALS)

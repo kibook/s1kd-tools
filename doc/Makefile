@@ -8,7 +8,7 @@ COMPAT_SRC=DMC-S1000DTOOLS-A-00-00-00-00A-C30A-D_EN-CA.XML
 README=../README.md
 INTRO=../INTRO.md
 DEFAULTS=../DEFAULTS.md
-INSTALL=../INSTALL.md
+INSTALL_DOC=../INSTALL.md
 EXAMPLE=../EXAMPLE.md
 COMPAT=../COMPATIBILITY.md
 
@@ -21,6 +21,7 @@ PANDOC_MAN=pandoc -f docbook -t man -s
 PREFIX=/usr/local
 MAN1_PREFIX=$(PREFIX)/share/man/man1
 MAN5_PREFIX=$(PREFIX)/share/man/man5
+INSTALL=install
 
 all: s1kd-tools.1 s1kd-defaults.5
 
@@ -33,8 +34,8 @@ $(INTRO): $(INTRO_SRC)
 $(DEFAULTS): $(DEFAULTS_SRC)
 	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(DEFAULTS)
 
-$(INSTALL): $(INSTALL_SRC)
-	$(S1KD2DB) $(INSTALL_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INSTALL)
+$(INSTALL_DOC): $(INSTALL_SRC)
+	$(S1KD2DB) $(INSTALL_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INSTALL_DOC)
 
 $(EXAMPLE): $(EXAMPLE_SRC)
 	$(S1KD2DB) $(EXAMPLE_SRC) $(S1KD2DB_FLAGS) | pandoc -f docbook -t markdown | pandoc -f markdown -t markdown_github -s --toc -o $(EXAMPLE)
@@ -48,9 +49,15 @@ s1kd-tools.1: $(INTRO_SRC)
 s1kd-defaults.5: $(DEFAULTS_SRC)
 	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
 
-install:
-	cp s1kd-tools.1 $(MAN1_PREFIX)/
-	cp s1kd-defaults.5 $(MAN5_PREFIX)/
+.PHONY: clean install uninstall
 
 clean:
 	rm -f s1kd-tools.1 s1kd-defaults.5
+
+install: s1kd-tools.1 s1kd-defaults.5
+	$(INSTALL) s1kd-tools.1 $(MAN1_PREFIX)
+	$(INSTALL) s1kd-defaults.5 $(MAN5_PREFIX)
+
+uninstall:
+	rm -f $(MAN1_PREFIX)/s1kd-tools.1
+	rm -f $(MAN5_PREFIX)/s1kd-defaults.5
