@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-dmrl [-FfNqsh?] &lt;DML&gt;...</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-dmrl [-FfNqsvh?] &lt;DML&gt;...</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>

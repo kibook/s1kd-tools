@@ -6,7 +6,7 @@ s1kd-dmrl - Create CSDB objects from a DMRL
 SYNOPSIS
 ========
 
-    s1kd-dmrl [-FfNqsh?] <DML>...
+    s1kd-dmrl [-FfNqsvh?] <DML>...
 
 DESCRIPTION
 ===========
