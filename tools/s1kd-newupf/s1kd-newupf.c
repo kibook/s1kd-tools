@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -592,6 +592,7 @@ void showHelp(void)
 	puts("  -d <file>   Specify the .defaults file name.");
 	puts("  -f          Overwrite existing file.");
 	puts("  -q          Don't report an error if file exists.");
+	puts("  -v          Print file name of new update file.");
 	puts("  --version   Show version information.");
 }
 
@@ -610,11 +611,12 @@ int main(int argc, char **argv)
 	int c;
 	bool overwrite = false;
 	bool no_overwrite_error = false;
+	bool verbose = false;
 	char *out = NULL;
 	char defaultsFname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
 	xmlDocPtr defaultsXml;
 
-	const char *sopts = "@:$:%:d:fqh?";
+	const char *sopts = "@:$:%:d:fqvh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -646,6 +648,9 @@ int main(int argc, char **argv)
 				break;
 			case 'q':
 				no_overwrite_error = true;
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':
@@ -740,6 +745,10 @@ int main(int argc, char **argv)
 
 	if (out) {
 		xmlSaveFile(out, updateFile);
+
+		if (verbose) {
+			puts(out);
+		}
 	} else {
 		char upfname[PATH_MAX];
 
@@ -751,6 +760,10 @@ int main(int argc, char **argv)
 			exit(EXIT_UPF_EXISTS);
 		} else {
 			xmlSaveFile(upfname, updateFile);
+
+			if (verbose) {
+				puts(upfname);
+			}
 		}
 	}
 

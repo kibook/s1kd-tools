@@ -38,6 +38,9 @@ Overwrite existing file.
 -q  
 Do not report an error when the file already exists.
 
+-v  
+Print the file name of the newly created data update file.
+
 --version  
 Show version information.
 
