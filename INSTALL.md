@@ -28,3 +28,12 @@ To change where these are installed, specify the PREFIX make variable. The defau
 For example:
 
     $ make PREFIX=/usr install
+
+Uninstalling
+============
+
+To uninstall the executables and documentation:
+
+    # make uninstall
+
+Remember to specify the PREFIX make variable if a different prefix was used during installation.
