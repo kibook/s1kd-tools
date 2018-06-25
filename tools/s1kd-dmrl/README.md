@@ -37,6 +37,9 @@ Do not report errors when any of the CSDB objects already exist.
 -s  
 Do not create CSDB objects, only output the s1kd-new\* commands to create them.
 
+-v  
+Print the filenames of newly created CSDB objects.
+
 --version  
 Show version information.
 

@@ -14,7 +14,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
@@ -41,6 +41,7 @@ void showHelp(void)
 	puts("  -N         Omit issue/inwork numbers.");
 	puts("  -q         Don't report errors if objects exist.");
 	puts("  -s         Output s1kd-new* commands only.");
+	puts("  -v         Print the names of newly created objects.");
 	puts("  --version  Show version information.");
 }
 
@@ -62,9 +63,10 @@ int main(int argc, char **argv)
 	#endif
 	bool overwrite = false;
 	bool noOverwriteError = false;
+	bool verbose = false;
 	char *specIssue = strdup(DEFAULT_S1000D_ISSUE);
 
-	const char *sopts = "sNfFq$:h?";
+	const char *sopts = "sNfFq$:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -103,6 +105,9 @@ int main(int argc, char **argv)
 				free(specIssue);
 				specIssue = strdup(optarg);
 				break;
+			case 'v':
+				verbose = true;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -113,7 +118,7 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		xmlDocPtr in, out;
 		xmlChar *content;
-		const char *params[9];
+		const char *params[11];
 		char iss[8];
 
 		in = xmlReadFile(argv[i], NULL, PARSE_OPTS);
@@ -131,7 +136,10 @@ int main(int argc, char **argv)
 		params[6] = "spec-issue";
 		params[7] = iss;
 
-		params[8] = NULL;
+		params[8] = "verbose";
+		params[9] = verbose ? "true()" : "false()";
+
+		params[10] = NULL;
 
 		out = xsltApplyStylesheet(dmrlStylesheet, in, params);
 
