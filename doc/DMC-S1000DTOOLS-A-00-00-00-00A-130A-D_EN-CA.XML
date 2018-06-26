@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="07"/>
+        <issueDate year="2018" month="06" day="25"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -39,8 +39,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change 'defaults' and 'dmtypes' to '.defaults' and '.dmtypes'</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add more details on creating a DMRL.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -129,17 +129,50 @@ schema="proced"/&gt;
       </levelledPara>
       <levelledPara>
         <title>Creating the DMRL and populating the CSDB</title>
-        <para>The next step is to prepare the DMRL for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.</para>
+        <para>The next step is to prepare the Data Management Requirements List (DMRL) for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.</para>
         <para>If you do not already have a DMRL, the <emphasis>s1kd-newdml</emphasis> tool can be used to create a new one:</para>
         <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-newdml -# MYPRJ-NCAGE-C-2017-00001</verbatimText>
         </para>
         <para>This would create the file <verbatimText verbatimStyle="vs02">DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText> in your CSDB folder.</para>
-        <para>Once the DMRL is prepared, the <emphasis>s1kd-dmrl</emphasis> tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:</para>
-        <para>
-          <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
-        </para>
-        <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Adding DMRL entries</title>
+          <para>Each entry in the DMRL describes a data module that is planned to be created, giving the data module code, title, security classification and responsible entity:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmlContent>
+<dmlEntry>
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" 
+disassyCode="00" disassyCodeVariant="A" infoCode="040"
+infoCodeVariant="A" itemLocationCode="D"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>My project</techName>
+<infoName>Description</infoName>
+</dmTitle>
+</dmRefAddressItems>
+</dmRef>
+<security securityClassification="01"/>
+<responsiblePartnerCompany>
+<enterpriseName>khzae.net</enterpriseName>
+</responsiblePartnerCompany>
+</dmlEntry>
+...
+</dmlContent>]]></verbatimText>
+          </para>
+          <para>The DMRL is updated throughout the lifecycle of a project.</para>
+        </levelledPara>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Populating the CSDB from the DMRL</title>
+          <para>Once the DMRL is prepared, the <emphasis>s1kd-dmrl</emphasis> tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
+          </para>
+          <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
+        </levelledPara>
         <levelledPara>
           <title>Creating CSDB objects on-the-fly</title>
           <para>Data modules and other CSDB objects can also be created in an "on-the-fly" manner, without the use of a DMRL, by invoking the s1kd-new* set of tools directly, as with s1kd-newdml above. For example, to create a new data module:</para>

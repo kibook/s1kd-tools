@@ -3,6 +3,8 @@
     -   [`.defaults` file](#defaults-file)
     -   [`.dmtypes` file](#dmtypes-file)
 -   [Creating the DMRL and populating the CSDB](#creating-the-dmrl-and-populating-the-csdb)
+    -   [Adding DMRL entries](#adding-dmrl-entries)
+    -   [Populating the CSDB from the DMRL](#populating-the-csdb-from-the-dmrl)
     -   [Creating CSDB objects on-the-fly](#creating-csdb-objects-on-the-fly)
 -   [Data module workflow](#data-module-workflow)
     -   [Inwork data modules](#inwork-data-modules)
@@ -93,13 +95,47 @@ The generated `.dmtypes` file can then be customized to fit your project.
 Creating the DMRL and populating the CSDB
 =========================================
 
-The next step is to prepare the DMRL for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.
+The next step is to prepare the Data Management Requirements List (DMRL) for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.
 
 If you do not already have a DMRL, the **s1kd-newdml** tool can be used to create a new one:
 
     $ s1kd-newdml -# MYPRJ-NCAGE-C-2017-00001
 
 This would create the file `DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML` in your CSDB folder.
+
+Adding DMRL entries
+-------------------
+
+Each entry in the DMRL describes a data module that is planned to be created, giving the data module code, title, security classification and responsible entity:
+
+    <dmlContent>
+    <dmlEntry>
+    <dmRef>
+    <dmRefIdent>
+    <dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+    subSystemCode="0" subSubSystemCode="0" assyCode="00" 
+    disassyCode="00" disassyCodeVariant="A" infoCode="040"
+    infoCodeVariant="A" itemLocationCode="D"/>
+    </dmRefIdent>
+    <dmRefAddressItems>
+    <dmTitle>
+    <techName>My project</techName>
+    <infoName>Description</infoName>
+    </dmTitle>
+    </dmRefAddressItems>
+    </dmRef>
+    <security securityClassification="01"/>
+    <responsiblePartnerCompany>
+    <enterpriseName>khzae.net</enterpriseName>
+    </responsiblePartnerCompany>
+    </dmlEntry>
+    ...
+    </dmlContent>
+
+The DMRL is updated throughout the lifecycle of a project.
+
+Populating the CSDB from the DMRL
+---------------------------------
 
 Once the DMRL is prepared, the **s1kd-dmrl** tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:
 
