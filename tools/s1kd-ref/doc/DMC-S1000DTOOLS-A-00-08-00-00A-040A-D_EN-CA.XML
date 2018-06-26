@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="06" day="26"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add --version option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add more examples.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -124,7 +124,7 @@
                 <para>Include the title in the reference (target must be a file).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>
@@ -139,18 +139,98 @@
           </definitionList>
         </para>
       </levelledPara>
-      <levelledPara>
-        <title>EXAMPLE</title>
+      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <title>EXAMPLES</title>
+        <para>Reference to data module with data module code:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref DMC-S1000DTOOLS-A-00-08-00-00A-040A-D
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref DMC-EX-A-00-00-00-00A-040A-D
 <dmRef>
 <dmRefIdent>
-<dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A"
-systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00"
-disassyCode="00" disassyCodeVariant="A" infoCode="040"
-infoCodeVariant="A" itemLocationCode="D"/>
+<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/>
 </dmRefIdent>
 </dmRef>]]></verbatimText>
+        </para>
+        <para>Reference to data module with data module code and issue/language:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[
+$ s1kd-ref -il DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/>
+<issueInfo issueNumber="001" inWork="03"/>
+<language languageIsoCode="en" countryIsoCode="CA"/>
+</dmRefIdent>
+</dmRef>]]></verbatimText>
+        </para>
+        <para>Reference to data module with all information, from a file:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -dilt DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA.XML
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/>
+<issueInfo issueNumber="001" inWork="03"/>
+<language languageIsoCode="en" countryIsoCode="CA"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>Example</techName>
+<infoName>Description</infoName>
+</dmTitle>
+<issueDate year="2018" month="06" day="25"/>
+</dmRefAddressItems>
+</dmRef>]]></verbatimText>
+        </para>
+        <para>Reference to a catalog sequence number:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref CSN-EX-A-00-00-00-01A-004A-D
+<catalogSeqNumberRef modelIdentCode="EX" systemDiffCode="A"
+systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00"
+figureNumber="01" figureNumberVariant="A" item="004" itemVariant="A"
+itemLocationCode="D"/>]]></verbatimText>
+        </para>
+        <para>Reference to a comment:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref COM-EX-12345-2018-00001-Q
+<commentRef>
+<commentRefIdent>
+<commentCode modelIdentCode="EX" senderIdent="12345"
+yearOfDataIssue="2018" seqNumber="00001" commentType="q"/>
+</commentRefIdent>
+</commentRef>]]></verbatimText>
+        </para>
+        <para>Reference to a data management list:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref DML-EX-12345-C-2018-00001
+<dmlRef>
+<dmlRefIdent>
+<dmlCode modelIdentCode="EX" senderIdent="12345" dmlType="c"
+yearOfDataIssue="2018" seqNumber="00001"/>
+</dmlRefIdent>
+</dmlRef>]]></verbatimText>
+        </para>
+        <para>Reference to an information control number:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref ICN-EX-A-000000-A-00001-A-001-01
+<infoEntityRef infoEntityRefIdent="ICN-EX-A-000000-A-00001-A-001-01"/>]]></verbatimText>
+        </para>
+        <para>Reference to a publication module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref PMC-EX-12345-00001-00
+<pmRef>
+<pmRefIdent>
+<pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
+pmVolume="00"/>
+</pmRefIdent>
+</pmRef>]]></verbatimText>
         </para>
       </levelledPara>
     </description>
