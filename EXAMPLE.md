@@ -9,6 +9,9 @@
 -   [Data module workflow](#data-module-workflow)
     -   [Inwork data modules](#inwork-data-modules)
     -   [Making data modules official](#making-data-modules-official)
+        -   [Validating against the schema](#validating-against-the-schema)
+        -   [Validating against a BREX data module](#validating-against-a-brex-data-module)
+        -   [Quality assurance verification](#quality-assurance-verification)
     -   [Changes to official data modules](#changes-to-official-data-modules)
     -   [Deleting data modules](#deleting-data-modules)
 -   [Use with other version control systems](#use-with-other-version-control-systems)
@@ -202,17 +205,34 @@ Before a data module can be made official, it must be validated. This means:
 
 -   It is valid according to the relevant business rules
 
--   Its references to other CSDB objects are valid
-
 -   The actual narrative (content) is correct
 
-The first two points can be verified with the **s1kd-validate** tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema.
+### Validating against the schema
 
-The third point can be verified using the **s1kd-brexcheck** tool. This tool will indicate any places where a data module violates computable business rules.
+The first two points can be verified with the **s1kd-validate** tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:
 
-The fourth point can be checked using the **s1kd-checkrefs** tool. This tool checks the references within a data module and highlights any references which cannot be resolved.
+    $ s1kd-validate DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
 
-In contrast to the first four points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:
+### Validating against a BREX data module
+
+The third point can be verified using the **s1kd-brexcheck** tool. This tool will indicate any places where a data module violates computable business rules as specified in a Business Rules Exchange (BREX) data module.
+
+    $ s1kd-brexcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
+
+The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attribute values:
+
+    <structureObjectRule>
+    <objectPath allowedObjectFlag="0">//emphasis</objectPath>
+    <objectUse>The emphasis element is not allowed.</objectUse>
+    </structureObjectRule>
+
+Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.
+
+Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.
+
+### Quality assurance verification
+
+In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:
 
     $ s1kd-upissue -1 tabtop -2 ttandoo ...
 

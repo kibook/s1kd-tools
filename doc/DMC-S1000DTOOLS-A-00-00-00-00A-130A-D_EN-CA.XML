@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="25"/>
+        <issueDate year="2018" month="06" day="26"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -40,7 +40,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add more details on creating a DMRL.</simplePara>
+        <simplePara>Add examples for each validation step.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -135,7 +135,7 @@ schema="proced"/&gt;
           <verbatimText verbatimStyle="vs23">$ s1kd-newdml -# MYPRJ-NCAGE-C-2017-00001</verbatimText>
         </para>
         <para>This would create the file <verbatimText verbatimStyle="vs02">DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText> in your CSDB folder.</para>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Adding DMRL entries</title>
           <para>Each entry in the DMRL describes a data module that is planned to be created, giving the data module code, title, security classification and responsible entity:</para>
           <para>
@@ -165,7 +165,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
           </para>
           <para>The DMRL is updated throughout the lifecycle of a project.</para>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Populating the CSDB from the DMRL</title>
           <para>Once the DMRL is prepared, the <emphasis>s1kd-dmrl</emphasis> tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:</para>
           <para>
@@ -221,7 +221,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
           <title>Making data modules official</title>
           <para>Before a data module can be made official, it must be validated. This means:</para>
           <para>
-            <randomList>
+            <randomList changeType="modify" reasonForUpdateRefIds="rfu-0001">
               <listItem>
                 <para>It is a valid XML file</para>
               </listItem>
@@ -232,24 +232,44 @@ infoCodeVariant="A" itemLocationCode="D"/>
                 <para>It is valid according to the relevant business rules</para>
               </listItem>
               <listItem>
-                <para>Its references to other CSDB objects are valid</para>
-              </listItem>
-              <listItem>
                 <para>The actual narrative (content) is correct</para>
               </listItem>
             </randomList>
           </para>
-          <para>The first two points can be verified with the <emphasis>s1kd-validate</emphasis> tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema.</para>
-          <para>The third point can be verified using the <emphasis>s1kd-brexcheck</emphasis> tool. This tool will indicate any places where a data module violates computable business rules.</para>
-          <para>The fourth point can be checked using the <emphasis>s1kd-checkrefs</emphasis> tool. This tool checks the references within a data module and highlights any references which cannot be resolved.</para>
-          <para>In contrast to the first four points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:</para>
-          <para>
-            <verbatimText verbatimStyle="vs23">$ s1kd-upissue -1 tabtop -2 ttandoo ...</verbatimText>
-          </para>
-          <para>Once the data module is validated, the s1kd-upissue tool is used to make it official with the <verbatimText>-i</verbatimText> option:</para>
-          <para>
-            <verbatimText verbatimStyle="vs23">$ s1kd-upissue -i DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
-          </para>
+          <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <title>Validating against the schema</title>
+            <para>The first two points can be verified with the <emphasis>s1kd-validate</emphasis> tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-validate DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+          </levelledPara>
+          <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <title>Validating against a BREX data module</title>
+            <para>The third point can be verified using the <emphasis>s1kd-brexcheck</emphasis> tool. This tool will indicate any places where a data module violates computable business rules as specified in a Business Rules Exchange (BREX) data module.</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-brexcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+            <para>The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attribute values:</para>
+            <para>
+              <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
+<objectPath allowedObjectFlag="0">//emphasis</objectPath>
+<objectUse>The emphasis element is not allowed.</objectUse>
+</structureObjectRule>]]></verbatimText>
+            </para>
+            <para>Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.</para>
+            <para>Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.</para>
+          </levelledPara>
+          <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <title>Quality assurance verification</title>
+            <para>In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-upissue -1 tabtop -2 ttandoo ...</verbatimText>
+            </para>
+            <para>Once the data module is validated, the s1kd-upissue tool is used to make it official with the <verbatimText>-i</verbatimText> option:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-upissue -i DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+          </levelledPara>
         </levelledPara>
         <levelledPara>
           <title>Changes to official data modules</title>
