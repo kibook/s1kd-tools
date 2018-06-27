@@ -13,7 +13,7 @@
 #endif
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -392,6 +392,8 @@ int main(int argc, char **argv)
 	}
 
 	free(snsdname);
+
+	xmlCleanupParser();
 
 	return 0;
 }
