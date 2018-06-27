@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -233,8 +233,11 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 
 	object = xmlXPathEvalExpression(BREX_REF_DMCODE_PATH, context);
 
-	if (xmlXPathNodeSetIsEmpty(object->nodesetval))
+	if (xmlXPathNodeSetIsEmpty(object->nodesetval)) {
+		xmlXPathFreeObject(object);
+		xmlXPathFreeContext(context);
 		return false;
+	}
 
 	dmCode = object->nodesetval->nodeTab[0];
 
@@ -869,6 +872,32 @@ int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames,
 	return invalid;
 }
 
+xmlDocPtr load_brex(const char *name)
+{
+	if (access(name, F_OK) != -1) {
+		return xmlReadFile(name, NULL, PARSE_OPTS);
+	} else {
+		unsigned char *xml = NULL;
+		unsigned int len = 0;
+
+		if (strcmp(name, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
+			len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML;
+			len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML;
+			len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML;
+			len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
+		}
+
+		return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	}
+}
+
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char brex_fnames[BREX_MAX][PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
 {
@@ -899,28 +928,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlXPathContextPtr context;
 		xmlXPathObjectPtr result;
 
-		if (access(brex_fnames[i], F_OK) != -1) {
-			brex_doc = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
-		} else {
-			unsigned char *xml = NULL;
-			unsigned int len = 0;
-
-			if (strcmp(brex_fnames[i], "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
-				xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
-				len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
-			} else if (strcmp(brex_fnames[i], "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
-				xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML;
-				len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML_len;
-			} else if (strcmp(brex_fnames[i], "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0) {
-				xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML;
-				len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML_len;
-			} else if (strcmp(brex_fnames[i], "DMC-AE-A-04-10-0301-00A-022A-D") == 0) {
-				xml = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML;
-				len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
-			}
-
-			brex_doc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
-		}
+		brex_doc = load_brex(brex_fnames[i]);
 
 		if (!brex_doc) {
 			if (verbose > SILENT) {
@@ -1083,7 +1091,7 @@ int add_layered_brex(char fnames[BREX_MAX][PATH_MAX], int nfnames, char spaths[B
 		char fname[PATH_MAX];
 		bool found;
 
-		doc = xmlReadFile(fnames[i], NULL, PARSE_OPTS);
+		doc = load_brex(fnames[i]);
 
 		found = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
 
