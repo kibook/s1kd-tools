@@ -8,7 +8,7 @@
 #include <libxml/valid.h>
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
