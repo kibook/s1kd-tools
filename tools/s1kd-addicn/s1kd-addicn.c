@@ -133,6 +133,9 @@ int main(int argc, char **argv)
 
 	xmlFreeDoc(doc);
 	free(src);
+	free(out);
+
+	xmlCleanupParser();
 
 	return 0;
 }
