@@ -590,7 +590,7 @@
   <type infoCode="930" schema="descript" infoName="Service bulletin"/>
   <type infoCode="931" schema="descript" infoName="Service bulletin data"/>
   <type infoCode="932" schema="descript" infoName="Planning information"/>
-  <type infoCode="933" schema="procedure" infoName="Accomplishment procedure - Task set"/>
+  <type infoCode="933" schema="proced" infoName="Accomplishment procedure - Task set"/>
   <type infoCode="934" schema="descript" infoName="Material information"/>
   <!-- 935 thru 939 not available for projects -->
   <type infoCode="940" schema="descript" infoName="Provisioning data"/>

@@ -45,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1

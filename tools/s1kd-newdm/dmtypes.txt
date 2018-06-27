@@ -511,7 +511,7 @@
 930  descript             Service bulletin
 931  descript             Service bulletin data
 932  descript             Planning information
-933  procedure            Accomplishment procedure - Task set
+933  proced               Accomplishment procedure - Task set
 934  descript             Material information
 940  descript             Provisioning data
 941  ipd                  Illustrated parts data
