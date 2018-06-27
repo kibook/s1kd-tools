@@ -135,7 +135,9 @@ Each entry in the DMRL describes a data module that is planned to be created, gi
     ...
     </dmlContent>
 
-The DMRL is updated throughout the lifecycle of a project.
+The XML for the `dmRef` of each entry can be quickly generated using the **s1kd-ref** tool:
+
+    $ s1kd-ref DMC-MYPRJ-A-00-00-00-00A-040A-D
 
 Populating the CSDB from the DMRL
 ---------------------------------
@@ -145,6 +147,10 @@ Once the DMRL is prepared, the **s1kd-dmrl** tool can be used to automatically p
     $ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML
 
 Information not included in the DMRL entry for a CSDB object is pulled from the `.defaults` file (and the `.dmtypes` file for data modules).
+
+The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the **s1kd-dmrl** tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:
+
+    $ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML
 
 Creating CSDB objects on-the-fly
 --------------------------------

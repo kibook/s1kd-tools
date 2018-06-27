@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="26"/>
+        <issueDate year="2018" month="06" day="27"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -40,7 +40,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add examples for each validation step.</simplePara>
+        <simplePara>Add example of s1kd-ref and details on updating the DMRL.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -163,7 +163,10 @@ infoCodeVariant="A" itemLocationCode="D"/>
 ...
 </dmlContent>]]></verbatimText>
           </para>
-          <para>The DMRL is updated throughout the lifecycle of a project.</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">The XML for the <verbatimText verbatimStyle="vs12">dmRef</verbatimText> of each entry can be quickly generated using the <emphasis>s1kd-ref</emphasis> tool:</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs23">$ s1kd-ref DMC-MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
+          </para>
         </levelledPara>
         <levelledPara>
           <title>Populating the CSDB from the DMRL</title>
@@ -172,6 +175,10 @@ infoCodeVariant="A" itemLocationCode="D"/>
             <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
           </para>
           <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the <emphasis>s1kd-dmrl</emphasis> tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:</para>
+          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs23">$ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML</verbatimText>
+          </para>
         </levelledPara>
         <levelledPara>
           <title>Creating CSDB objects on-the-fly</title>
@@ -221,7 +228,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
           <title>Making data modules official</title>
           <para>Before a data module can be made official, it must be validated. This means:</para>
           <para>
-            <randomList changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <randomList>
               <listItem>
                 <para>It is a valid XML file</para>
               </listItem>
@@ -236,14 +243,14 @@ infoCodeVariant="A" itemLocationCode="D"/>
               </listItem>
             </randomList>
           </para>
-          <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <levelledPara>
             <title>Validating against the schema</title>
             <para>The first two points can be verified with the <emphasis>s1kd-validate</emphasis> tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:</para>
             <para>
               <verbatimText verbatimStyle="vs23">$ s1kd-validate DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
             </para>
           </levelledPara>
-          <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <levelledPara>
             <title>Validating against a BREX data module</title>
             <para>The third point can be verified using the <emphasis>s1kd-brexcheck</emphasis> tool. This tool will indicate any places where a data module violates computable business rules as specified in a Business Rules Exchange (BREX) data module.</para>
             <para>
@@ -259,7 +266,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
             <para>Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.</para>
             <para>Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.</para>
           </levelledPara>
-          <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <levelledPara>
             <title>Quality assurance verification</title>
             <para>In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:</para>
             <para>
