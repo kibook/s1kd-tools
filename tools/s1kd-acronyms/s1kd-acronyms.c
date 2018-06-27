@@ -408,8 +408,8 @@ void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 
 xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 {
-	xmlDocPtr res;
-	xmlDocPtr orig;
+	xmlDocPtr res, orig;
+	xmlNodePtr old;
 
 	orig = xmlCopyDoc(doc, 1);
 
@@ -419,7 +419,8 @@ xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 	res = xsltApplyStylesheet(idStylesheet, doc, NULL);
 	xmlFreeDoc(doc);
 
-	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	old = xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
 	xmlFreeDoc(res);
 
 	return orig;
