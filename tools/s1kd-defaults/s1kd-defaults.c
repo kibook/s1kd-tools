@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -516,6 +516,9 @@ int main(int argc, char **argv)
 	}
 
 	free(fname);
+
+	xsltCleanupGlobals();
+	xmlCleanupParser();
 
 	return 0;
 }
