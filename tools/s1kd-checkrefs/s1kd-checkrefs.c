@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-checkrefs"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -45,7 +45,14 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 	xmlXPathObjectPtr obj;
 	xmlNodePtr first;
 
-	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	if (doc) {
+		ctx = xmlXPathNewContext(doc);
+	} else if (node) {
+		ctx = xmlXPathNewContext(node->doc);
+	} else {
+		return NULL;
+	}
+
 	ctx->node = node;
 	
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
