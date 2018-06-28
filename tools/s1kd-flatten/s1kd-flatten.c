@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -480,6 +480,9 @@ int main(int argc, char **argv)
 	xmlSaveFormatFile("-", use_pub_fmt ? pub_doc : pm_doc, 1);
 
 	xmlFreeDoc(pm_doc);
+	xmlFreeNode(search_paths);
+
+	xmlCleanupParser();
 
 	return 0;
 }
