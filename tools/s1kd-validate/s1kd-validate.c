@@ -8,7 +8,7 @@
 #include <libxml/xinclude.h>
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -229,6 +229,8 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 					}
 					err = EXIT_BAD_IDREF;
 				}
+
+				xmlXPathFreeObject(res);
 			}
 
 			xmlFree(ids);
