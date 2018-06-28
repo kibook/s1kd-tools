@@ -14,7 +14,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
@@ -180,6 +180,9 @@ int main(int argc, char **argv)
 	xsltFreeStylesheet(dmrlStylesheet);
 
 	free(specIssue);
+
+	xsltCleanupGlobals();
+	xmlCleanupParser();
 
 	return err;
 }
