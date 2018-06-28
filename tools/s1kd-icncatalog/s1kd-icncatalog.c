@@ -408,6 +408,7 @@ int main(int argc, char **argv)
 	}
 
 	free(icns_fname);
+	free(media);
 	xmlFreeNode(add);
 	xmlFreeNode(del);
 	xmlFreeDoc(icns);
