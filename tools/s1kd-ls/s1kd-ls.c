@@ -12,7 +12,7 @@
 #define OBJECT_MAX 10240
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -282,6 +282,7 @@ int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH
 
 		s = strchr(base1, '_');
 		if (!s || !strchr(s + 1, '_')) {
+			free(name1);
 			continue;
 		}
 
