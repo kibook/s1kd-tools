@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1651,6 +1651,7 @@ int main(int argc, char **argv)
 	}
 
 	free(metadata_fname);
+	free(fmtstr);
 	xmlFreeNode(keys);
 	xmlFreeNode(conds);
 
