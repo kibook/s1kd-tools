@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -501,6 +501,8 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		listReferences(argv[i]);
 	}
+
+	xmlCleanupParser();
 
 	return 0;
 }
