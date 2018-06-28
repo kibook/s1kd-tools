@@ -11,7 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -728,6 +728,8 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 	xmlAddChild(refs, xmlCopyNode(ref, 1));
 
 	xmlSaveFile(dst, doc);
+
+	xmlFreeDoc(doc);
 }
 
 /* Apply a built-in XSLT transform to a doc in place. */
