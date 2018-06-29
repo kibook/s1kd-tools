@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -440,7 +440,7 @@ void listReferences(const char *path)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-acfNqh?] <objects>...");
+	puts("Usage: s1kd-refls [-acfNqh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes");
@@ -450,6 +450,7 @@ void showHelp(void)
 	puts("  -q         Quiet mode");
 	puts("  -h -?      Show help/usage message");
 	puts("  --version  Show version information");
+	puts("  <object>   CSDB object to list references in");
 }
 
 void show_version(void)
@@ -498,8 +499,12 @@ int main(int argc, char **argv)
 		}
 	}
 
-	for (i = optind; i < argc; ++i) {
-		listReferences(argv[i]);
+	if (optind < argc) {
+		for (i = optind; i < argc; ++i) {
+			listReferences(argv[i]);
+		}
+	} else {
+		listReferences("-");
 	}
 
 	xmlCleanupParser();

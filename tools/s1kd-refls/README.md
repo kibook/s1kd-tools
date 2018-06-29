@@ -6,7 +6,7 @@ s1kd-refls - List references in a CSDB object
 SYNOPSIS
 ========
 
-    s1kd-refls [-acfNqh?] <objects>...
+    s1kd-refls [-acfNqh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -36,3 +36,6 @@ Quiet mode. Errors are not printed.
 
 --version  
 Show version information.
+
+&lt;object&gt;...  
+CSDB object(s) to list references in. If none are specified, the tool will read from stdin.
