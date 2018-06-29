@@ -15,4 +15,8 @@
     <xsl:apply-templates/>
   </xsl:template>
 
+  <xsl:template match="chooseAcronym">
+    <xsl:apply-templates select="acronym[1]"/>
+  </xsl:template>
+
 </xsl:stylesheet>

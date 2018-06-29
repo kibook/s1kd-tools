@@ -9,7 +9,8 @@ SYNOPSIS
     s1kd-acronyms -h?
     s1kd-acronyms [-dLptx] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
-    s1kd-acronyms [-fL] [-i|-I|-!] [-m <acr>] [-o <file>] [<dmodule>...]
+    s1kd-acronyms [-fL] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
+                  [<dmodule>...]
     s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
@@ -50,8 +51,11 @@ The -! option will not prompt for acronyms, instead it will markup where acronym
 -L  
 Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.
 
--m &lt;acronyms&gt;  
-Instead of listing acronyms, automatically markup acronyms given in the &lt;acronyms&gt; XML file in the specified data modules. Occurrences of the acronym term will be replaced in text with the `acronym` element in the list.
+-M &lt;list&gt;  
+Like the -m option, but use a custom list of acronyms instead of the default `.acronyms` file.
+
+-m  
+Instead of listing acronyms in the specified data modules, automatically markup acronyms in the data module using the `.acronyms` file.
 
 -n &lt;\#&gt;  
 Minimum number of spaces after the term in pretty-printed text output.
@@ -77,6 +81,24 @@ Show version information.
 &lt;dmodule&gt;...  
 Data modules to find acronyms in. If none are specified, input is taken from stdin.
 
+`.acronyms` file
+----------------
+
+This file specifies a list of acronyms for a project. By default, the program will search for a file named `.acronyms` in the current directory, but any file can be specified using the -M option.
+
+Example of .acronyms file format:
+
+    <acronyms>
+    <acronym acronymType="at01">
+    <acronymTerm>BREX</acronymTerm>
+    <acronymDefinition>Business Rules Exchange</acronymDefinition>
+    </acronym>
+    <acronym acronymType="at01">
+    <acronymTerm>SNS</acronymTerm>
+    <acronymDefinition>Standard Numbering System</acronymDefinition>
+    </acronym>
+    </acronyms>
+
 EXAMPLES
 ========
 
@@ -86,8 +108,8 @@ List all acronyms used in all data modules:
 
 Markup predefined acronyms in a data module:
 
-    $ s1kd-acronyms -m acr.xml -f DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
+    $ s1kd-acronyms -mf DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
 
 Unmarkup acronyms in a data module:
 
-    $ s1kd-acronyms -D -f DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
+    $ s1kd-acronyms -Df DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML

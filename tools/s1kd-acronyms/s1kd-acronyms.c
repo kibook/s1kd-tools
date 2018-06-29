@@ -11,9 +11,10 @@
 #include <libxslt/xsltutils.h>
 #include <libxml/debugXML.h>
 #include "stylesheets.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -577,7 +578,7 @@ void showHelp(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " [-dLptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
-	puts("  " PROG_NAME " [-m <list>] [-fiIL] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " [-m|-M <list>] [-fiIL] [-o <file>] [<dmodules>]");
 	puts("  " PROG_NAME " -D [-fL] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
@@ -586,7 +587,8 @@ void showHelp(void)
 	puts("  -f          Overwrite data modules when marking up acronyms");
 	puts("  -i -I -!    Markup acronyms in interactive modes");
 	puts("  -L          Input is a list of file names");
-	puts("  -m <list>   Add markup for acronyms");
+	puts("  -M <list>   Markup acronyms from specified list.");
+	puts("  -m          Markup acronyms from .acronyms file.");
 	puts("  -n <#>      Minimum spaces after term in pretty printed output");
 	puts("  -o <file>   Output to <file> instead of stdout");
 	puts("  -p          Pretty print text/XML output");
@@ -617,7 +619,7 @@ int main(int argc, char **argv)
 	bool list = false;
 	bool delete = false;
 
-	const char *sopts = "pn:xDdtT:o:m:iIfL!h?";
+	const char *sopts = "pn:xDdtT:o:M:miIfL!h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -658,6 +660,9 @@ int main(int argc, char **argv)
 				out = strdup(optarg);
 				break;
 			case 'm':
+				markup = strdup(DEFAULT_ACRONYMS_FNAME);
+				break;
+			case 'M':
 				markup = strdup(optarg);
 				break;
 			case 'i':
