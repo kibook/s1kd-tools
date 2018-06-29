@@ -26,7 +26,7 @@ INSTALL=install
 all: s1kd-tools.1 s1kd-defaults.5
 
 $(README): $(README_SRC)
-	s1kd-icncatalog -m github $(README_SRC) | $(S1KD2DB) - | $(PANDOC_MD) -o $(README)
+	$(S1KD2DB) $(README_SRC) | $(PANDOC_MD) -o $(README)
 
 $(INTRO): $(INTRO_SRC)
 	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INTRO)

@@ -1,5 +1,3 @@
-![s1kd-tools logo](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-SLOGO-A-001-01.PNG)
-
 A set of small tools for manipulating S1000D data.
 
 [Introduction](INTRO.md)
