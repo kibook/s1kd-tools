@@ -4,5 +4,6 @@
 #define DEFAULT_DEFAULTS_FNAME ".defaults"
 #define DEFAULT_DMTYPES_FNAME ".dmtypes"
 #define DEFAULT_FMTYPES_FNAME ".fmtypes"
+#define DEFAULT_ICNCATALOG_FNAME ".icncatalog"
 
 #endif

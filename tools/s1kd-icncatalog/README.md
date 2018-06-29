@@ -20,7 +20,7 @@ OPTIONS
 Add an ICN to the catalog. Follow with the -u and -n options to specify the URI and notation to use for this ICN. The -m option specifies a media group to add the ICN to.
 
 -c &lt;catalog&gt;  
-Specify the catalog file to manage or resolve against. By default, the file "icncatalog.xml" in the current directory is used.
+Specify the catalog file to manage or resolve against. By default, the file `.icncatalog` in the current directory is used.
 
 -d &lt;ICN&gt;  
 Delete an ICN from the catalog. The -m option specifies a media group to delete the ICN from.

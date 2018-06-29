@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="W" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="06" day="29"/>
         <dmTitle>
           <techName>s1kd-icncatalog(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add --version option.</simplePara>
+        <simplePara>Change default ICN catalog filename from "icncatalog.xml" to ".icncatalog" to fit with the other configuration files.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -72,7 +72,7 @@
             <definitionListItem>
               <listItemTerm>-c &lt;catalog&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify the catalog file to manage or resolve against. By default, the file "icncatalog.xml" in the current directory is used.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the catalog file to manage or resolve against. By default, the file <verbatimText verbatimStyle="vs02">.icncatalog</verbatimText> in the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -117,7 +117,7 @@
                 <para>Process input CSDB objects using the XInclude specification.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>

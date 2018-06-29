@@ -9,11 +9,10 @@
 #include <libxml/valid.h>
 #include <libxml/xpath.h>
 #include "templates.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.0.0"
-
-#define DEFAULT_CATALOG_NAME "icncatalog.xml"
+#define VERSION "1.1.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -372,7 +371,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!icns_fname) {
-		icns_fname = strdup(DEFAULT_CATALOG_NAME);
+		icns_fname = strdup(DEFAULT_ICNCATALOG_FNAME);
 	}
 
 	if (createnew || access(icns_fname, F_OK) == -1) {
