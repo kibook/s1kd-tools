@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -32,6 +32,10 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+#define E_NO_LIST ERR_PREFIX "Could not read acronyms list: %s\n"
+#define EXIT_NO_LIST 1
 
 bool prettyPrint = false;
 int minimumSpaces = 2;
@@ -711,7 +715,11 @@ int main(int argc, char **argv)
 	} else if (markup) {
 		xmlDocPtr termStylesheetDoc, idStylesheetDoc;
 
-		doc = xmlReadFile(markup, NULL, PARSE_OPTS);
+		if (!(doc = xmlReadFile(markup, NULL, PARSE_OPTS))) {
+			fprintf(stderr, E_NO_LIST, markup);
+			exit(EXIT_NO_LIST);
+		}
+
 		doc = sortAcronyms(doc);
 		acronyms = xmlDocGetRootElement(doc);
 
