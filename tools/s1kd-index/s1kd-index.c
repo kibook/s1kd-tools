@@ -7,9 +7,10 @@
 #include <libxml/xpath.h>
 #include <libxslt/transform.h>
 #include "xslt.h"
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -33,7 +34,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -f          Overwrite input module(s).");
-	puts("  -I <index>  XML file containing index flags.");
+	puts("  -I <index>  Specify a custom .indexflags file");
 	puts("  -i          Ignore case when flagging terms.");
 	puts("  -h -?       Show help/usage message.");
 	puts("  --version   Show version information.");
@@ -254,6 +255,10 @@ int main(int argc, char **argv)
 				show_help();
 				return 0;
 		}
+	}
+
+	if (!index_doc) {
+		index_doc = xmlReadFile(DEFAULT_INDEXFLAGS_FNAME, NULL, PARSE_OPTS);
 	}
 
 	if (optind < argc) {

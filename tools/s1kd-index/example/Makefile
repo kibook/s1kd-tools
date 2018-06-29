@@ -6,6 +6,6 @@ DM2=DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
 
 $(DM2): $(DM1)
 	$(UPISSUE) $(DM1)
-	$(INDEX) -I index.xml -fi $(DM2)
+	$(INDEX) -fi $(DM2)
 clean:
 	rm -f $(DM2)

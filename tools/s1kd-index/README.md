@@ -20,7 +20,7 @@ OPTIONS
 Overwrite input module(s).
 
 -I &lt;index&gt;  
-Flag the terms in the specified &lt;index&gt; XML file.
+Flag the terms in the specified &lt;index&gt; XML file instead of the default `.indexflags` file.
 
 -i  
 Ignore case when flagging terms.
@@ -30,6 +30,18 @@ Show help/usage message.
 
 --version  
 Show version information.
+
+`.indexflags` file
+------------------
+
+This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named `.indexflags` in the current directory, but any file can be specified using the -I option.
+
+Exmaple of `.indexflags` file format:
+
+    <indexFlags>
+    <indexFlag indexLevelOne="bicycle"/>
+    <indexFlag indexLevelOne="bicycle" indexLevelTwo="brake system"/>
+    </indexFlags>
 
 EXAMPLE
 =======
@@ -44,18 +56,18 @@ Given the following in a data module:
     </para>
     </levelledPara>
 
-And the following index file:
+And the following `.indexflags` file:
 
-    <index>
+    <indexFlags>
     <indexFlag indexLevelOne="S1000D"/>
     <indexFlag indexLevelTwo="S10000D" indexLevelTwo="s1kd-tools"/>
     <indexFlag indexLevelOne="data"/>
     <indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
-    </index>
+    </indexFlags>
 
 Then the s1kd-index command:
 
-    $ s1kd-index -I <INDEX>.XML <DM>.XML
+    $ s1kd-index <DM>.XML
 
 Would result in the following:
 

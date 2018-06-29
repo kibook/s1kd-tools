@@ -6,5 +6,6 @@
 #define DEFAULT_FMTYPES_FNAME ".fmtypes"
 #define DEFAULT_ICNCATALOG_FNAME ".icncatalog"
 #define DEFAULT_ACRONYMS_FNAME ".acronyms"
+#define DEFAULT_INDEXFLAGS_FNAME ".indexflags"
 
 #endif
