@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
+<!NOTATION PNG SYSTEM "PNG" >
 <!ENTITY % ISOEntities PUBLIC "ISO 8879-1986//ENTITIES ISO Character Entities 20030531//EN//XML" "http://www.s1000d.org/S1000D_4-2/ent/ISOEntities">
+<!ENTITY ICN-S1000DTOOLS-A-000000-A-KHZAE-SLOGO-A-001-01 SYSTEM "ICN-S1000DTOOLS-A-000000-A-KHZAE-SLOGO-A-001-01.PNG" NDATA PNG>
 ]>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
@@ -48,6 +50,10 @@
   </identAndStatusSection>
   <content>
     <description>
+      <figure>
+        <title>s1kd-tools logo</title>
+        <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-SLOGO-A-001-01"/>
+      </figure>
       <para>A set of small tools for manipulating S1000D data.</para>
       <para>
         <externalPubRef xlink:href="INTRO.md">
