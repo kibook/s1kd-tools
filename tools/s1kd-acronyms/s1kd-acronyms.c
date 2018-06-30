@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -726,7 +726,7 @@ int main(int argc, char **argv)
 
 		if (!(doc = xmlReadFile(markup, NULL, PARSE_OPTS))) {
 			fprintf(stderr, E_NO_LIST, markup);
-			doc = xmlReadMemory((const char *) acronyms_xml, acronyms_xml_len, NULL, NULL, PARSE_OPTS);
+			exit(EXIT_NO_LIST);
 		}
 
 		doc = sortAcronyms(doc);

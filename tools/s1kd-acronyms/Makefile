@@ -11,7 +11,7 @@ INSTALL=install -s
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-stylesheets.h: stylesheets/*.xsl acronyms.xml
+stylesheets.h: stylesheets/*.xsl
 	xxd -i stylesheets/acronyms.xsl >  stylesheets.h
 	xxd -i stylesheets/unique.xsl   >> stylesheets.h
 	xxd -i stylesheets/list.xsl     >> stylesheets.h
@@ -22,7 +22,6 @@ stylesheets.h: stylesheets/*.xsl acronyms.xml
 	xxd -i stylesheets/id.xsl       >> stylesheets.h
 	xxd -i stylesheets/delete.xsl   >> stylesheets.h
 	xxd -i stylesheets/30.xsl       >> stylesheets.h
-	xxd -i acronyms.xml             >> stylesheets.h
 
 $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
