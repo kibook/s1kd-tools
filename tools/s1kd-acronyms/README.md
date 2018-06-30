@@ -7,11 +7,11 @@ SYNOPSIS
 ========
 
     s1kd-acronyms -h?
-    s1kd-acronyms [-dLptx] [-n <#>] [-o <file>] [-T <types>]
+    s1kd-acronyms [-dlptx] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
-    s1kd-acronyms [-fL] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
+    s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
                   [<dmodule>...]
-    s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]
+    s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
 ===========
@@ -48,7 +48,7 @@ The -I option prompts for all acronyms, not just those with multiple definitions
 
 The -! option will not prompt for acronyms, instead it will markup where acronyms are found using a &lt;`chooseAcronym`&gt; element, whose child elements are all possible acronyms matching the term. Another program can then use this as input to actually prompt the user.
 
--L  
+-l  
 Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.
 
 -M &lt;list&gt;  

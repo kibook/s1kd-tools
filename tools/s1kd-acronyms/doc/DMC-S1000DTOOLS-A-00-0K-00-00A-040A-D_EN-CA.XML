@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="K" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="29"/>
+        <issueDate year="2018" month="06" day="30"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change -m option to -M, and add a new -m option which uses a default .acronyms file.</simplePara>
+        <simplePara>Change -L option to -l.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,11 +53,11 @@
         <title>SYNOPSIS</title>
         <para>
           <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-acronyms -h?
-s1kd-acronyms [-dLptx] [-n <#>] [-o <file>] [-T <types>]
+s1kd-acronyms [-dlptx] [-n <#>] [-o <file>] [-T <types>]
               [<dmodule>...]
-s1kd-acronyms [-fL] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
+s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
               [<dmodule>...]
-s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]]]></verbatimText>
+s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -115,18 +115,18 @@ s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]]]></verbatimText>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-L</listItemTerm>
+              <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-M &lt;list&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Like the -m option, but use a custom list of acronyms instead of the default <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-m</listItemTerm>
               <listItemDefinition>
                 <para>Instead of listing acronyms in the specified data modules, automatically markup acronyms in the data module using the <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file.</para>
@@ -182,7 +182,7 @@ s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]]]></verbatimText>
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file</title>
           <para>This file specifies a list of acronyms for a project. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> in the current directory, but any file can be specified using the -M option.</para>
           <para>Example of .acronyms file format:</para>
@@ -208,11 +208,11 @@ s1kd-acronyms -D [-fL] [-o <file>] [<dmodule>...]]]></verbatimText>
         </para>
         <para>Markup predefined acronyms in a data module:</para>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-acronyms -mf DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms -mf DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
         </para>
         <para>Unmarkup acronyms in a data module:</para>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-acronyms -Df DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms -Df DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
         </para>
       </levelledPara>
     </description>

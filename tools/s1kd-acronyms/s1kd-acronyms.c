@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -35,6 +35,8 @@
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_NO_LIST ERR_PREFIX "Could not read acronyms list: %s\n"
+#define E_NO_FILE ERR_PREFIX "Could not read file: %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define EXIT_NO_LIST 1
 
 bool prettyPrint = false;
@@ -63,6 +65,7 @@ void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 	xsltStylesheetPtr style;
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
+		fprintf(stderr, E_NO_FILE, path);
 		return;
 	}
 
@@ -462,6 +465,7 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 	xmlDocPtr doc;
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
+		fprintf(stderr, E_NO_FILE, path);
 		return;
 	}
 
@@ -564,6 +568,11 @@ void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 		f = stdin;
 	}
 
+	if (!f) {
+		fprintf(stderr, E_BAD_LIST, fname);
+		return;
+	}
+
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
 		
@@ -623,7 +632,7 @@ int main(int argc, char **argv)
 	bool list = false;
 	bool delete = false;
 
-	const char *sopts = "pn:xDdtT:o:M:miIfL!h?";
+	const char *sopts = "pn:xDdtT:o:M:miIfl!h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -679,7 +688,7 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
-			case 'L':
+			case 'l':
 				list = true;
 				break;
 			case '!':
@@ -717,7 +726,7 @@ int main(int argc, char **argv)
 
 		if (!(doc = xmlReadFile(markup, NULL, PARSE_OPTS))) {
 			fprintf(stderr, E_NO_LIST, markup);
-			exit(EXIT_NO_LIST);
+			doc = xmlReadMemory((const char *) acronyms_xml, acronyms_xml_len, NULL, NULL, PARSE_OPTS);
 		}
 
 		doc = sortAcronyms(doc);
