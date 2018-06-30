@@ -10,8 +10,8 @@ s1kd\-index \- Flag index keywords in a data module
 .nf
 \f[C]
 s1kd\-index\ \-h?
-s1kd\-index\ [\-I\ <index>]\ [\-fi]\ [<module>...]
-s1kd\-index\ \-D\ [\-fi]\ [<module>...]
+s1kd\-index\ [\-I\ <index>]\ [\-fil]\ [<module>...]
+s1kd\-index\ \-D\ [\-fil]\ [<module>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -38,6 +38,12 @@ Flag the terms in the specified <index> XML file instead of the default
 .TP
 .B \-i
 Ignore case when flagging terms.
+.RS
+.RE
+.TP
+.B \-l
+Treat input (stdin or arguments) as lists of filenames of data modules
+to add index flags to, rather than data modules themselves.
 .RS
 .RE
 .TP

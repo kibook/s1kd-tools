@@ -7,8 +7,8 @@ SYNOPSIS
 ========
 
     s1kd-index -h?
-    s1kd-index [-I <index>] [-fi] [<module>...]
-    s1kd-index -D [-fi] [<module>...]
+    s1kd-index [-I <index>] [-fil] [<module>...]
+    s1kd-index -D [-fil] [<module>...]
 
 DESCRIPTION
 ===========
@@ -29,6 +29,9 @@ Flag the terms in the specified &lt;index&gt; XML file instead of the default `.
 
 -i  
 Ignore case when flagging terms.
+
+-l  
+Treat input (stdin or arguments) as lists of filenames of data modules to add index flags to, rather than data modules themselves.
 
 -h -?  
 Show help/usage message.

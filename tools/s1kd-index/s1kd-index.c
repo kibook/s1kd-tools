@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -29,6 +29,8 @@
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_NO_LIST ERR_PREFIX "Could not read index flags from %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_NO_FILE ERR_PREFIX "Could not read file: %s\n"
 #define EXIT_NO_LIST 1
 
 /* Help/usage message */
@@ -210,11 +212,15 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	xmlXPathObjectPtr index_obj;
 	xmlNodeSetPtr flags;
 
+	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
+		fprintf(stderr, E_NO_FILE, path);
+		return;
+	}
+
 	index_ctx = xmlXPathNewContext(index_doc);
 	index_obj = xmlXPathEvalExpression(BAD_CAST "//indexFlag", index_ctx);
 	flags = index_obj->nodesetval;
 
-	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 	doc_ctx = xmlXPathNewContext(doc);
 
 	if (!xmlXPathNodeSetIsEmpty(flags)) {
@@ -250,16 +256,46 @@ xmlDocPtr read_index_flags(const char *fname)
 	return index_doc;
 }
 
+void handle_list(const char *path, bool delflags, xmlDocPtr index_doc, bool overwrite, bool ignorecase)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		f = fopen(path, "r");
+	} else {
+		f = stdin;
+	}
+
+	if (!f) {
+		fprintf(stderr, E_BAD_LIST, path);
+		return;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+
+		if (delflags) {
+			delete_index_flags(line, overwrite);
+		} else {
+			gen_index(line, index_doc, overwrite, ignorecase);
+		}
+	}
+
+	fclose(f);
+}
+
 int main(int argc, char **argv)
 {
 	int i;
 	bool overwrite = false;
 	bool ignorecase = false;
 	bool delflags = false;
+	bool list = false;
 
 	xmlDocPtr index_doc = NULL;
 
-	const char *sopts = "DfI:ih?";
+	const char *sopts = "DfI:lih?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -288,6 +324,9 @@ int main(int argc, char **argv)
 			case 'i':
 				ignorecase = true;
 				break;
+			case 'l':
+				list = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -301,12 +340,16 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			if (delflags) {
+			if (list) {
+				handle_list(argv[i], delflags, index_doc, overwrite, ignorecase);
+			} else if (delflags) {
 				delete_index_flags(argv[i], overwrite);
 			} else {
 				gen_index(argv[i], index_doc, overwrite, ignorecase);
 			}
 		}
+	} else if (list) {
+		handle_list(NULL, delflags, index_doc, overwrite, ignorecase);
 	} else if (delflags) {
 		delete_index_flags("-", false);
 	} else {

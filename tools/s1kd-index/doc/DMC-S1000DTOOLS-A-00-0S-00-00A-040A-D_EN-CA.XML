@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
         <simplePara>Add -D option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
+        <simplePara>Add -l option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,9 +55,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-index -h?
-s1kd-index [-I <index>] [-fi] [<module>...]
-s1kd-index -D [-fi] [<module>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-index -h?
+s1kd-index [-I <index>] [-fil] [<module>...]
+s1kd-index -D [-fil] [<module>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -65,7 +68,7 @@ s1kd-index -D [-fi] [<module>...]]]></verbatimText>
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-D</listItemTerm>
               <listItemDefinition>
                 <para>Remove the current index flags from a data module.</para>
@@ -87,6 +90,12 @@ s1kd-index -D [-fi] [<module>...]]]></verbatimText>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
                 <para>Ignore case when flagging terms.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of filenames of data modules to add index flags to, rather than data modules themselves.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
