@@ -14,8 +14,9 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) xslt.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-xslt.h: iss30.xsl
+xslt.h: iss30.xsl delete.xsl
 	xxd -i iss30.xsl > xslt.h
+	xxd -i delete.xsl >> xslt.h
 
 .PHONY: clean install uninstall
 

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="S" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="29"/>
+        <issueDate year="2018" month="06" day="30"/>
         <dmTitle>
           <techName>s1kd-index(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add usage of the default .indexflags file.</simplePara>
+        <simplePara>Add -D option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-index [-fih?] [-I &lt;index&gt;] [&lt;module&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-index -h?
+s1kd-index [-I <index>] [-fi] [<module>...]
+s1kd-index -D [-fi] [<module>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -63,13 +65,19 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-D</listItemTerm>
+              <listItemDefinition>
+                <para>Remove the current index flags from a data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite input module(s).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-I &lt;index&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Flag the terms in the specified &lt;index&gt; XML file instead of the default <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> file.</para>
@@ -95,7 +103,7 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.indexflags</verbatimText> file</title>
           <para>This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> in the current directory, but any file can be specified using the -I option.</para>
           <para>Exmaple of <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> file format:</para>
@@ -107,7 +115,7 @@
           </para>
         </levelledPara>
       </levelledPara>
-      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>EXAMPLE</title>
         <para>Given the following in a data module:</para>
         <para>

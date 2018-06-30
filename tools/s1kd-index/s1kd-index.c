@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -27,12 +27,20 @@
 #define PARSE_OPTS 0
 #endif
 
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+#define E_NO_LIST ERR_PREFIX "Could not read index flags from %s\n"
+#define EXIT_NO_LIST 1
+
 /* Help/usage message */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-I <index>] [-fih?] [<module>...]");
+	puts("Usage:");
+	puts("  " PROG_NAME " -h?");
+	puts("  " PROG_NAME " [-I <index>] [-fi] [<module>...]");
+	puts("  " PROG_NAME " -D [-fi] [<module>...]");
 	puts("");
 	puts("Options:");
+	puts("  -D          Delete current index flags.");
 	puts("  -f          Overwrite input module(s).");
 	puts("  -I <index>  Specify a custom .indexflags file");
 	puts("  -i          Ignore case when flagging terms.");
@@ -179,6 +187,21 @@ void convert_to_iss_30(xmlDocPtr doc)
 	transform_doc(doc, iss30_xsl, iss30_xsl_len);
 }
 
+void delete_index_flags(const char *path, bool overwrite)
+{
+	xmlDocPtr doc;
+
+	doc = xmlReadFile(path, NULL, PARSE_OPTS);
+
+	transform_doc(doc, delete_xsl, delete_xsl_len);
+
+	if (overwrite) {
+		xmlSaveFile(path, doc);
+	} else {
+		xmlSaveFile("-", doc);
+	}
+}
+
 /* Insert indexFlag elements after matched terms in a document. */
 void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignorecase)
 {
@@ -215,16 +238,28 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	xmlFreeDoc(doc);
 }
 
+xmlDocPtr read_index_flags(const char *fname)
+{
+	xmlDocPtr index_doc;
+
+	if (!(index_doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+		fprintf(stderr, E_NO_LIST, fname);
+		exit(EXIT_NO_LIST);
+	}
+
+	return index_doc;
+}
 
 int main(int argc, char **argv)
 {
 	int i;
 	bool overwrite = false;
 	bool ignorecase = false;
+	bool delflags = false;
 
 	xmlDocPtr index_doc = NULL;
 
-	const char *sopts = "fI:ih?";
+	const char *sopts = "DfI:ih?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -239,12 +274,15 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				break;
+			case 'D':
+				delflags = true;
+				break;
 			case 'f':
 				overwrite = true;
 				break;
 			case 'I':
 				if (!index_doc) {
-					index_doc = xmlReadFile(optarg, NULL, PARSE_OPTS);
+					index_doc = read_index_flags(optarg);
 				}
 				break;
 			case 'i':
@@ -258,13 +296,19 @@ int main(int argc, char **argv)
 	}
 
 	if (!index_doc) {
-		index_doc = xmlReadFile(DEFAULT_INDEXFLAGS_FNAME, NULL, PARSE_OPTS);
+		index_doc = read_index_flags(DEFAULT_INDEXFLAGS_FNAME);
 	}
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			gen_index(argv[i], index_doc, overwrite, ignorecase);
+			if (delflags) {
+				delete_index_flags(argv[i], overwrite);
+			} else {
+				gen_index(argv[i], index_doc, overwrite, ignorecase);
+			}
 		}
+	} else if (delflags) {
+		delete_index_flags("-", false);
 	} else {
 		gen_index("-", index_doc, false, ignorecase);
 	}

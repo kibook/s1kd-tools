@@ -6,7 +6,9 @@ s1kd-index - Flag index keywords in a data module
 SYNOPSIS
 ========
 
-    s1kd-index [-fih?] [-I <index>] [<module>...]
+    s1kd-index -h?
+    s1kd-index [-I <index>] [-fi] [<module>...]
+    s1kd-index -D [-fi] [<module>...]
 
 DESCRIPTION
 ===========
@@ -15,6 +17,9 @@ The *s1kd-index* tool adds index flags to a data module based on a user-defined 
 
 OPTIONS
 =======
+
+-D  
+Remove the current index flags from a data module.
 
 -f  
 Overwrite input module(s).
