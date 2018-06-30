@@ -8,9 +8,11 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 bool contentOnly = false;
 bool quiet = false;
@@ -438,6 +440,30 @@ void listReferences(const char *path)
 	xmlFreeDoc(doc);
 }
 
+void listReferencesInList(const char *path)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		listReferences(line);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 void showHelp(void)
 {
 	puts("Usage: s1kd-refls [-acfNqh?] [<object>...]");
@@ -462,7 +488,9 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "qcNafh?";
+	bool isList = false;
+
+	const char *sopts = "qcNaflh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -492,6 +520,9 @@ int main(int argc, char **argv)
 			case 'f':
 				inclSrcFname = true;
 				break;
+			case 'l':
+				isList = true;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -501,8 +532,14 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			listReferences(argv[i]);
+			if (isList) {
+				listReferencesInList(argv[i]);
+			} else {
+				listReferences(argv[i]);
+			}
 		}
+	} else if (isList) {
+		listReferencesInList(NULL);
 	} else {
 		listReferences("-");
 	}

@@ -6,7 +6,7 @@ s1kd-refls - List references in a CSDB object
 SYNOPSIS
 ========
 
-    s1kd-refls [-acfNqh?] [<object>...]
+    s1kd-refls [-acflNqh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -27,6 +27,9 @@ Include the filename of the source object where each reference was found in the 
 
 -h -?  
 Show help/usage message.
+
+-l  
+Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.
 
 -N  
 Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new\* tools.
