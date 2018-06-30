@@ -590,16 +590,16 @@ void showHelp(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-dLptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
-	puts("  " PROG_NAME " [-m|-M <list>] [-fiIL] [-o <file>] [<dmodules>]");
-	puts("  " PROG_NAME " -D [-fL] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " [-dlptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
+	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-fl] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " -D [-fl] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
 	puts("  -D          Remove acronym markup");
 	puts("  -d          Format XML output as definitionList");
 	puts("  -f          Overwrite data modules when marking up acronyms");
 	puts("  -i -I -!    Markup acronyms in interactive modes");
-	puts("  -L          Input is a list of file names");
+	puts("  -l          Input is a list of file names");
 	puts("  -M <list>   Markup acronyms from specified list.");
 	puts("  -m          Markup acronyms from .acronyms file.");
 	puts("  -n <#>      Minimum spaces after term in pretty printed output");

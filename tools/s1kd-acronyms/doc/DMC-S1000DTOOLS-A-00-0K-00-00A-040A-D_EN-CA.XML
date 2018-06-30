@@ -114,7 +114,7 @@ s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]]]></verbatimText>
                 <para>The -! option will not prompt for acronyms, instead it will markup where acronyms are found using a &lt;<verbatimText verbatimStyle="vs12">chooseAcronym</verbatimText>&gt; element, whose child elements are all possible acronyms matching the term. Another program can then use this as input to actually prompt the user.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.</para>
