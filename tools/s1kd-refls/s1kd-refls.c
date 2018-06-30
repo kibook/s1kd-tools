@@ -466,12 +466,13 @@ void listReferencesInList(const char *path)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-acfNqh?] [<object>...]");
+	puts("Usage: s1kd-refls [-acflNqh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes");
 	puts("  -c         Only show references in content section");
 	puts("  -f         Print the source filename for each reference");
+	puts("  -l         Treat input as list of CSDB objects");
 	puts("  -N         Assume filenames omit issue info");
 	puts("  -q         Quiet mode");
 	puts("  -h -?      Show help/usage message");
