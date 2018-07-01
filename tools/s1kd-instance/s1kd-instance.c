@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -35,7 +35,7 @@
 #define S_FILE_EXISTS ERR_PREFIX "%s already exists. Use -f to overwrite.\n"
 #define S_BAD_XML "%s does not contain valid XML.\n"
 #define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
-#define S_BAD_CODE ERR_PREFIX "Bad data module/pub module code: %s.\n"
+#define S_BAD_CODE ERR_PREFIX "Bad %s code: %s.\n"
 #define S_NO_XSLT ERR_PREFIX "No built-in XSLT for CIR type: %s\n"
 #define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
@@ -178,6 +178,22 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 	xmlXPathFreeContext(ctx);
 
 	return first;
+}
+
+void lowercase(char *s)
+{
+	int i;
+	for (i = 0; s[i]; ++i) {
+		s[i] = tolower(s[i]);
+	}
+}
+
+void uppercase(char *s)
+{
+	int i;
+	for (i = 0; s[i]; ++i) {
+		s[i] = toupper(s[i]);
+	}
 }
 
 /* Copy strings related to uniquely identifying a CSDB object. The strings are
@@ -935,118 +951,220 @@ void set_extd(xmlDocPtr doc, const char *extension)
 	free(ext);
 }
 
-/* Set the DMC of the produced data module of the instance */
+void set_dm_code(xmlNodePtr code, enum issue iss, const char *s)
+{
+	char model_ident_code[15];
+	char system_diff_code[5];
+	char system_code[4];
+	char sub_system_code[2];
+	char sub_sub_system_code[2];
+	char assy_code[5];
+	char disassy_code[3];
+	char disassy_code_variant[4];
+	char info_code[4];
+	char info_code_variant[2];
+	char item_location_code[2];
+	char learn_code[4];
+	char learn_event_code[2];
+	int n;
+
+	n = sscanf(s,
+		"%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
+		model_ident_code,
+		system_diff_code,
+		system_code,
+		sub_system_code,
+		sub_sub_system_code,
+		assy_code,
+		disassy_code,
+		disassy_code_variant,
+		info_code,
+		info_code_variant,
+		item_location_code,
+		learn_code,
+		learn_event_code);
+
+	if (n != 11 && n != 13) {
+		fprintf(stderr, S_BAD_CODE, "data module", s);
+		exit(EXIT_BAD_ARG);
+	}
+
+	if (iss == ISS_4X) {
+		xmlSetProp(code, BAD_CAST "modelIdentCode",     BAD_CAST model_ident_code);
+		xmlSetProp(code, BAD_CAST "systemDiffCode",     BAD_CAST system_diff_code);
+		xmlSetProp(code, BAD_CAST "systemCode",         BAD_CAST system_code);
+		xmlSetProp(code, BAD_CAST "subSystemCode",      BAD_CAST sub_system_code);
+		xmlSetProp(code, BAD_CAST "subSubSystemCode",   BAD_CAST sub_sub_system_code);
+		xmlSetProp(code, BAD_CAST "assyCode",           BAD_CAST assy_code);
+		xmlSetProp(code, BAD_CAST "disassyCode",        BAD_CAST disassy_code);
+		xmlSetProp(code, BAD_CAST "disassyCodeVariant", BAD_CAST disassy_code_variant);
+		xmlSetProp(code, BAD_CAST "infoCode",           BAD_CAST info_code);
+		xmlSetProp(code, BAD_CAST "infoCodeVariant",    BAD_CAST info_code_variant);
+		xmlSetProp(code, BAD_CAST "itemLocationCode",   BAD_CAST item_location_code);
+
+		if (n == 13) {
+			xmlSetProp(code, BAD_CAST "learnCode", BAD_CAST learn_code);
+			xmlSetProp(code, BAD_CAST "learnEventCode", BAD_CAST learn_event_code);
+		}
+	} else if (iss == ISS_30) {
+		xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST model_ident_code);
+		xmlNodeSetContent(find_child(code, "sdc"), BAD_CAST system_diff_code);
+		xmlNodeSetContent(find_child(code, "chapnum"), BAD_CAST system_code);
+		xmlNodeSetContent(find_child(code, "section"), BAD_CAST sub_system_code);
+		xmlNodeSetContent(find_child(code, "subsect"), BAD_CAST sub_sub_system_code);
+		xmlNodeSetContent(find_child(code, "subject"), BAD_CAST assy_code);
+		xmlNodeSetContent(find_child(code, "discode"), BAD_CAST disassy_code);
+		xmlNodeSetContent(find_child(code, "discodev"), BAD_CAST disassy_code_variant);
+		xmlNodeSetContent(find_child(code, "incode"), BAD_CAST info_code);
+		xmlNodeSetContent(find_child(code, "incodev"), BAD_CAST info_code_variant);
+		xmlNodeSetContent(find_child(code, "ilc"), BAD_CAST item_location_code);
+	}
+}
+
+void set_pm_code(xmlNodePtr code, enum issue iss, const char *s)
+{
+	char model_ident_code[15];
+	char pm_issuer[6];
+	char pm_number[6];
+	char pm_volume[3];
+	int n;
+
+	n = sscanf(s,
+		"%14[^-]-%5[^-]-%5[^-]-%2s",
+		model_ident_code,
+		pm_issuer,
+		pm_number,
+		pm_volume);
+
+	if (n != 4) {
+		fprintf(stderr, S_BAD_CODE, "publication module", s);
+		exit(EXIT_BAD_ARG);
+	}
+
+	if (iss == ISS_4X) {
+		xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+		xmlSetProp(code, BAD_CAST "pmIssuer", BAD_CAST pm_issuer);
+		xmlSetProp(code, BAD_CAST "pmNumber", BAD_CAST pm_number);
+		xmlSetProp(code, BAD_CAST "pmVolume", BAD_CAST pm_volume);
+	} else if (iss == ISS_30) {
+		xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST model_ident_code);
+		xmlNodeSetContent(find_child(code, "pmissuer"), BAD_CAST pm_issuer);
+		xmlNodeSetContent(find_child(code, "pmnumber"), BAD_CAST pm_number);
+		xmlNodeSetContent(find_child(code, "pmvolume"), BAD_CAST pm_volume);
+	}
+}
+
+void set_com_code(xmlNodePtr code, enum issue iss, const char *s)
+{
+	char model_ident_code[15];
+	char sender_ident[6];
+	char year_of_data_issue[5];
+	char seq_number[6];
+	char comment_type[2];
+	int n;
+
+	n = sscanf(s,
+		"%14[^-]-%5s-%4s-%5s-%1s",
+		model_ident_code,
+		sender_ident,
+		year_of_data_issue,
+		seq_number,
+		comment_type);
+
+	if (n != 5) {
+		fprintf(stderr, S_BAD_CODE, "comment", s);
+		exit(EXIT_BAD_ARG);
+	}
+
+	lowercase(comment_type);
+
+	if (iss == ISS_4X) {
+		xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+		xmlSetProp(code, BAD_CAST "senderIdent", BAD_CAST sender_ident);
+		xmlSetProp(code, BAD_CAST "yearOfDataIssue", BAD_CAST year_of_data_issue);
+		xmlSetProp(code, BAD_CAST "seqNumber", BAD_CAST seq_number);
+		xmlSetProp(code, BAD_CAST "commentType", BAD_CAST comment_type);
+	} else if (iss == ISS_30) {
+		xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST model_ident_code);
+		xmlNodeSetContent(find_child(code, "sendid"), BAD_CAST sender_ident);
+		xmlNodeSetContent(find_child(code, "diyear"), BAD_CAST year_of_data_issue);
+		xmlNodeSetContent(find_child(code, "seqnum"), BAD_CAST seq_number);
+	}
+}
+
+void set_dml_code(xmlNodePtr code, enum issue iss, const char *s)
+{
+	char model_ident_code[15];
+	char sender_ident[6];
+	char dml_type[2];
+	char year_of_data_issue[5];
+	char seq_number[6];
+	int n;
+
+	n = sscanf(s,
+		"%14[^-]-%5s-%1s-%4s-%5s",
+		model_ident_code,
+		sender_ident,
+		dml_type,
+		year_of_data_issue,
+		seq_number);
+
+	if (n != 5) {
+		fprintf(stderr, S_BAD_CODE, "data management list", s);
+		exit(EXIT_BAD_ARG);
+	}
+
+	lowercase(dml_type);
+
+	if (iss == ISS_4X) {
+		xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+		xmlSetProp(code, BAD_CAST "senderIdent", BAD_CAST sender_ident);
+		xmlSetProp(code, BAD_CAST "dmlType", BAD_CAST dml_type);
+		xmlSetProp(code, BAD_CAST "yearOfDataIssue", BAD_CAST year_of_data_issue);
+		xmlSetProp(code, BAD_CAST "seqNumber", BAD_CAST seq_number);
+	} else if (iss == ISS_30) {
+		xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST model_ident_code);
+		xmlNodeSetContent(find_child(code, "sendid"), BAD_CAST sender_ident);
+		xmlSetProp(find_child(code, "dmltype"), BAD_CAST "type", BAD_CAST dml_type);
+		xmlNodeSetContent(find_child(code, "diyear"), BAD_CAST year_of_data_issue);
+		xmlNodeSetContent(find_child(code, "seqnum"), BAD_CAST seq_number);
+	}
+}
+
 void set_code(xmlDocPtr doc, const char *new_code)
 {
 	xmlNodePtr code;
 
-	char modelIdentCode[15];
-	char systemDiffCode[5];
-	char systemCode[4];
-	char subSystemCode[2];
-	char subSubSystemCode[2];
-	char assyCode[5];
-	char disassyCode[3];
-	char disassyCodeVariant[4];
-	char infoCode[4];
-	char infoCodeVariant[2];
-	char itemLocationCode[2];
-	char learnCode[4];
-	char learnEventCode[2];
-
-	int n;
-
-	enum issue iss;
-
-	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode|//dmaddres/dmc/avee|//pmaddres/pmc");
+	code = first_xpath_node(doc, NULL,
+		"//dmIdent/dmCode|"
+		"//pmIdent/pmCode|"
+		"//commentIdent/commentCode|"
+		"//dmlIdent/dmlCode|"
+		"//dmaddres/dmc/avee|"
+		"//pmaddres/pmc|"
+		"//cstatus/ccode|"
+		"//dml/dmlc");
 
 	if (!code) {
 		return;
 	}
 
 	if (xmlStrcmp(code->name, BAD_CAST "dmCode") == 0) {
-		iss = ISS_4X;
-	} else if (xmlStrcmp(code->name, BAD_CAST "pmCode") == 0) {
-		iss = ISS_4X;
+		set_dm_code(code, ISS_4X, new_code);
 	} else if (xmlStrcmp(code->name, BAD_CAST "avee") == 0) {
-		iss = ISS_30;
+		set_dm_code(code, ISS_30, new_code);
+	} else if (xmlStrcmp(code->name, BAD_CAST "pmCode") == 0) {
+		set_pm_code(code, ISS_4X, new_code);
 	} else if (xmlStrcmp(code->name, BAD_CAST "pmc") == 0) {
-		iss = ISS_30;
-	} else {
-		return;
-	}
-
-	n = sscanf(new_code,
-		"%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
-		modelIdentCode,
-		systemDiffCode,
-		systemCode,
-		subSystemCode,
-		subSubSystemCode,
-		assyCode,
-		disassyCode,
-		disassyCodeVariant,
-		infoCode,
-		infoCodeVariant,
-		itemLocationCode,
-		learnCode,
-		learnEventCode);
-
-	if (n != 11 && n != 13) {
-		char pmIssuer[6];
-		char pmNumber[6];
-		char pmVolume[3];
-
-		n = sscanf(new_code,
-			"%14[^-]-%5[^-]-%5[^-]-%2s",
-			modelIdentCode,
-			pmIssuer,
-			pmNumber,
-			pmVolume);
-		
-		if (n != 4) {
-			fprintf(stderr, S_BAD_CODE, new_code);
-			exit(EXIT_BAD_ARG);
-		} else if (iss == ISS_4X) {
-			xmlSetProp(code, BAD_CAST "modelIdentCode", BAD_CAST modelIdentCode);
-			xmlSetProp(code, BAD_CAST "pmIssuer", BAD_CAST pmIssuer);
-			xmlSetProp(code, BAD_CAST "pmNumber", BAD_CAST pmNumber);
-			xmlSetProp(code, BAD_CAST "pmVolume", BAD_CAST pmVolume);
-		} else if (iss == ISS_30) {
-			xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST modelIdentCode);
-			xmlNodeSetContent(find_child(code, "pmissuer"), BAD_CAST pmIssuer);
-			xmlNodeSetContent(find_child(code, "pmnumber"), BAD_CAST pmNumber);
-			xmlNodeSetContent(find_child(code, "pmvolume"), BAD_CAST pmVolume);
-		}
-	} else if (iss == ISS_4X) {
-		xmlSetProp(code, BAD_CAST "modelIdentCode",     BAD_CAST modelIdentCode);
-		xmlSetProp(code, BAD_CAST "systemDiffCode",     BAD_CAST systemDiffCode);
-		xmlSetProp(code, BAD_CAST "systemCode",         BAD_CAST systemCode);
-		xmlSetProp(code, BAD_CAST "subSystemCode",      BAD_CAST subSystemCode);
-		xmlSetProp(code, BAD_CAST "subSubSystemCode",   BAD_CAST subSubSystemCode);
-		xmlSetProp(code, BAD_CAST "assyCode",           BAD_CAST assyCode);
-		xmlSetProp(code, BAD_CAST "disassyCode",        BAD_CAST disassyCode);
-		xmlSetProp(code, BAD_CAST "disassyCodeVariant", BAD_CAST disassyCodeVariant);
-		xmlSetProp(code, BAD_CAST "infoCode",           BAD_CAST infoCode);
-		xmlSetProp(code, BAD_CAST "infoCodeVariant",    BAD_CAST infoCodeVariant);
-		xmlSetProp(code, BAD_CAST "itemLocationCode",   BAD_CAST itemLocationCode);
-
-		if (n == 13) {
-			xmlSetProp(code, BAD_CAST "learnCode", BAD_CAST learnCode);
-			xmlSetProp(code, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
-		}
-	} else if (iss == ISS_30) {
-		xmlNodeSetContent(find_child(code, "modelic"), BAD_CAST modelIdentCode);
-		xmlNodeSetContent(find_child(code, "sdc"), BAD_CAST systemDiffCode);
-		xmlNodeSetContent(find_child(code, "chapnum"), BAD_CAST systemCode);
-		xmlNodeSetContent(find_child(code, "section"), BAD_CAST subSystemCode);
-		xmlNodeSetContent(find_child(code, "subsect"), BAD_CAST subSubSystemCode);
-		xmlNodeSetContent(find_child(code, "subject"), BAD_CAST assyCode);
-		xmlNodeSetContent(find_child(code, "discode"), BAD_CAST disassyCode);
-		xmlNodeSetContent(find_child(code, "discodev"), BAD_CAST disassyCodeVariant);
-		xmlNodeSetContent(find_child(code, "incode"), BAD_CAST infoCode);
-		xmlNodeSetContent(find_child(code, "incodev"), BAD_CAST infoCodeVariant);
-		xmlNodeSetContent(find_child(code, "ilc"), BAD_CAST itemLocationCode);
+		set_pm_code(code, ISS_30, new_code);
+	} else if (xmlStrcmp(code->name, BAD_CAST "commentCode") == 0) {
+		set_com_code(code, ISS_4X, new_code);
+	} else if (xmlStrcmp(code->name, BAD_CAST "ccode") == 0) {
+		set_com_code(code, ISS_30, new_code);
+	} else if (xmlStrcmp(code->name, BAD_CAST "dmlCode") == 0) {
+		set_dml_code(code, ISS_4X, new_code);
+	} else if (xmlStrcmp(code->name, BAD_CAST "dmlc") == 0) {
+		set_dml_code(code, ISS_30, new_code);
 	}
 }
 
@@ -1056,9 +1174,19 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 	xmlNodePtr dmTitle, techName, infoName;
 	enum issue iss;
 	
-	dmTitle  = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle|//dmaddres/dmtitle");
-	techName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/techName|//pmAddressItems/pmTitle|//dmaddres/dmtitle/techname|//pmaddres/pmtitle");
-	infoName = first_xpath_node(doc, NULL, "//dmAddressItems/dmTitle/infoName|//dmaddres/dmtitle/infoname");
+	dmTitle  = first_xpath_node(doc, NULL,
+		"//dmAddressItems/dmTitle|"
+		"//dmaddres/dmtitle");
+	techName = first_xpath_node(doc, NULL,
+		"//dmAddressItems/dmTitle/techName|"
+		"//pmAddressItems/pmTitle|"
+		"//commentAddressItems/commentTitle|"
+		"//dmaddres/dmtitle/techname|"
+		"//pmaddres/pmtitle|"
+		"//cstatus/ctitle");
+	infoName = first_xpath_node(doc, NULL,
+		"//dmAddressItems/dmTitle/infoName|"
+		"//dmaddres/dmtitle/infoname");
 
 	if (!techName) {
 		return;
@@ -1067,6 +1195,8 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 	if (xmlStrcmp(techName->name, BAD_CAST "techName") == 0) {
 		iss = ISS_4X;
 	} else if (xmlStrcmp(techName->name, BAD_CAST "pmTitle") == 0) {
+		iss = ISS_4X;
+	} else if (xmlStrcmp(techName->name, BAD_CAST "commentTitle") == 0) {
 		iss = ISS_4X;
 	} else {
 		iss = ISS_30;
@@ -1175,12 +1305,8 @@ void set_applic(xmlDocPtr doc, char *new_text)
 void set_lang(xmlDocPtr doc, char *lang)
 {
 	xmlNodePtr language;
-
 	char *language_iso_code;
 	char *country_iso_code;
-
-	int i;
-
 	enum issue iss;
 
 	language = first_xpath_node(doc, NULL, LANGUAGE_XPATH);
@@ -1200,12 +1326,8 @@ void set_lang(xmlDocPtr doc, char *lang)
 	language_iso_code = strtok(lang, "-");
 	country_iso_code = strtok(NULL, "");
 
-	for (i = 0; language_iso_code[i]; ++i) {
-		language_iso_code[i] = tolower(language_iso_code[i]);
-	}
-	for (i = 0; country_iso_code[i]; ++i) {
-		country_iso_code[i] = toupper(country_iso_code[i]);
-	}
+	lowercase(language_iso_code);
+	uppercase(country_iso_code);
 
 	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "language" : "languageIsoCode"), BAD_CAST language_iso_code);
 	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "country" : "countryIsoCode"), BAD_CAST country_iso_code);
