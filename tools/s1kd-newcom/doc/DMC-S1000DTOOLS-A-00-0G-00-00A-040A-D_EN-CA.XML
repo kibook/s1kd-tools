@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="G" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="07"/>
+        <issueDate year="2018" month="07" day="02"/>
         <dmTitle>
           <techName>s1kd-newcom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change 'defaults' to '.defaults'</simplePara>
+        <simplePara>Add -m option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -136,7 +136,7 @@
             <definitionListItem>
               <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -155,6 +155,12 @@
               <listItemTerm>-L &lt;lang&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The language ISO code of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the remarks for the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -201,7 +207,7 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
           <para>Refer to s1kd-newdm(1) for information on the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file which is used by all the s1kd-new* commands.</para>
         </levelledPara>

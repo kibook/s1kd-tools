@@ -65,6 +65,9 @@ The issue date of the new comment in the form of YYYY-MM-DD.
 -L &lt;lang&gt;  
 The language ISO code of the new comment.
 
+-m &lt;remarks&gt;  
+Set the remarks for the new comment.
+
 -o &lt;orig&gt;  
 The enterprise name of the originator of the comment.
 

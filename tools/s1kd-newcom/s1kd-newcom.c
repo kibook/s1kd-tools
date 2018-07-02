@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -55,6 +55,8 @@ char responseType[6] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+
+xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -297,6 +299,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		strcpy(brex_dmcode, def_val);
 	else if (strcmp(def_key, "templates") == 0 && !template_dir)
 		template_dir = strdup(def_val);
+	else if (strcmp(def_key, "remarks") == 0 && !remarks)
+		remarks = xmlStrdup(BAD_CAST def_val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -416,6 +420,20 @@ void set_env_lang(void)
 	free(lang);
 }
 
+void set_remarks(xmlDocPtr doc, xmlChar *text)
+{
+	xmlNodePtr remarks;
+
+	remarks = firstXPathNode(doc, "//remarks");
+
+	if (text) {
+		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", text);
+	} else {
+		xmlUnlinkNode(remarks);
+		xmlFreeNode(remarks);
+	}
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options]");
@@ -441,6 +459,7 @@ void show_help(void)
 	puts("  -r         Response type");
 	puts("  -b         BREX data module code");
 	puts("  -I         Issue date");
+	puts("  -m         Remarks");
 }
 
 void show_version(void)
@@ -490,7 +509,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qh?";
+	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -559,6 +578,9 @@ int main(int argc, char **argv)
 				break;
 			case 'q':
 				no_overwrite_error = true;
+				break;
+			case 'm':
+				remarks = xmlStrdup(BAD_CAST optarg);
 				break;
 			case 'h':
 			case '?':
@@ -717,6 +739,8 @@ int main(int argc, char **argv)
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(comment_doc, brex_dmcode);
+
+	set_remarks(comment_doc, remarks);
 
 	for (i = 0; languageIsoCode[i]; ++i) {
 		language_fname[i] = toupper(languageIsoCode[i]);
