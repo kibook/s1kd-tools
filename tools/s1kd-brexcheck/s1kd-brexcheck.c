@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -41,9 +41,9 @@
 #define E_INVOBJPATH E_PREFIX "Invalid object path.\n"
 #define E_MISSBREX E_PREFIX "Could not find BREX file \"%s\".\n"
 #define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
-
 #define E_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
 #define E_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
+#define E_BAD_LIST "Could not read list: %s\n"
 
 #define I_FILE_FOUND I_PREFIX "Found file for BREX %s: %s\n"
 
@@ -1136,7 +1136,10 @@ void add_dmod_list(const char *fname, char dmod_fnames[DMOD_MAX][PATH_MAX], int 
 	char path[PATH_MAX];
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return;
+		}
 	} else {
 		f = stdin;
 	}
