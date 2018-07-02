@@ -12,7 +12,7 @@
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
-#define E_BAD_LIST "Could not read list: %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 #define EXIT_VALIDITY_ERR 1
 #define EXIT_NO_FILE 2
