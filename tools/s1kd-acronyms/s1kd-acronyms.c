@@ -36,7 +36,7 @@
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_NO_LIST ERR_PREFIX "Could not read acronyms list: %s\n"
 #define E_NO_FILE ERR_PREFIX "Could not read file: %s\n"
-#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define EXIT_NO_LIST 1
 
 bool prettyPrint = false;
