@@ -43,7 +43,7 @@
 #define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
 #define E_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
 #define E_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
-#define E_BAD_LIST "Could not read list: %s\n"
+#define E_BAD_LIST E_PREFIX "Could not read list: %s\n"
 
 #define I_FILE_FOUND I_PREFIX "Found file for BREX %s: %s\n"
 
