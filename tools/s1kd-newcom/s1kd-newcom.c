@@ -803,6 +803,7 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(template_dir);
+	free(remarks);
 	xmlFreeDoc(comment_doc);
 
 	xmlCleanupParser();
