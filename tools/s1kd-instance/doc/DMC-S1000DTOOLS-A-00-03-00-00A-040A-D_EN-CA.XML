@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="21"/>
+        <issueDate year="2018" month="07" day="02"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add examples.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add -m option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,11 +52,11 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
               [-g|-G <CODE>/<NAME>] [-I <date>] [-i <infoName>]
-              [-l <lang>] [-n <iss>] [-o <file>|-O <dir>]
-              [-P <PCT> -p <id>] [-R <CIR> ...] [-r <XSL>]
-              [-s <applic> ...] [-t <techName>] [-u <sec>]
+              [-l <lang>] [-m <remarks>] [-n <iss>]
+              [-o <file>|-O <dir>] [-P <PCT> -p <id>] [-R <CIR> ...]
+              [-r <XSL>] [-s <applic> ...] [-t <techName>] [-u <sec>]
               [-x <CIR>] [-X <path>] [-y|-Y <text>] [-FfLNS]
               [<object>...]]]></verbatimText>
         </para>
@@ -165,6 +165,12 @@
               <listItemTerm>-l &lt;lang&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the remarks for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -551,7 +557,7 @@ is an item in the system.
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>EXAMPLES</title>
         <para>Filtering a data module on specified applicability and writing to stdout:</para>
         <para>

@@ -8,9 +8,9 @@ SYNOPSIS
 
     s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
                   [-g|-G <CODE>/<NAME>] [-I <date>] [-i <infoName>]
-                  [-l <lang>] [-n <iss>] [-o <file>|-O <dir>]
-                  [-P <PCT> -p <id>] [-R <CIR> ...] [-r <XSL>]
-                  [-s <applic> ...] [-t <techName>] [-u <sec>]
+                  [-l <lang>] [-m <remarks>] [-n <iss>]
+                  [-o <file>|-O <dir>] [-P <PCT> -p <id>] [-R <CIR> ...]
+                  [-r <XSL>] [-s <applic> ...] [-t <techName>] [-u <sec>]
                   [-x <CIR>] [-X <path>] [-y|-Y <text>] [-FfLNS]
                   [<object>...]
 
@@ -71,6 +71,9 @@ Source is a list of object filenames to create instances of, rather than an obje
 
 -l &lt;lang&gt;  
 Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".
+
+-m &lt;remarks&gt;  
+Set the remarks for the instance.
 
 -N  
 Omit issue/inwork numbers from automatically generated filenames.

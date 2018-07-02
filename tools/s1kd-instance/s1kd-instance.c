@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1989,6 +1989,47 @@ void read_applic(char *s)
 	++napplics;
 }
 
+/* Set the remarks for the object */
+void set_remarks(xmlDocPtr doc, const char *s)
+{
+	xmlNodePtr status, remarks;
+
+	status = first_xpath_node(doc, NULL,
+		"//dmStatus|"
+		"//pmStatus|"
+		"//commentStatus|"
+		"//dmlStatus|"
+		"//status|"
+		"//pmstatus|"
+		"//cstatus|"
+		"//dml[dmlc]");
+
+	if (!status) {
+		return;
+	}
+
+	remarks = first_xpath_node(doc, status, "//remarks");
+
+	if (remarks) {
+		xmlNodePtr cur, next;
+		cur = remarks->children;
+		while (cur) {
+			next = cur->next;
+			xmlUnlinkNode(cur);
+			xmlFreeNode(cur);
+			cur = next;
+		}
+	} else {
+		remarks = xmlNewChild(status, NULL, BAD_CAST "remarks", NULL);
+	}
+
+	if (xmlStrcmp(status->parent->name, BAD_CAST "identAndStatusSection") == 0) {
+		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", BAD_CAST s);
+	} else {
+		xmlNewChild(remarks, NULL, BAD_CAST "p", BAD_CAST s);
+	}
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -2041,10 +2082,11 @@ int main(int argc, char **argv)
 	bool setorig = false;
 	char *origspec = NULL;
 	bool flat_alts = false;
+	char *remarks = NULL;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:h?";
+	const char *sopts = "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:m:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2099,6 +2141,7 @@ int main(int argc, char **argv)
 			case 'g': setorig = true; break;
 			case 'G': setorig = true; origspec = strdup(optarg); break;
 			case 'F': flat_alts = true; break;
+			case 'm': remarks = strdup(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2251,6 +2294,10 @@ int main(int argc, char **argv)
 				set_orig(doc, origspec);
 			}
 
+			if (remarks) {
+				set_remarks(doc, remarks);
+			}
+
 			if (strcmp(comment_text, "") != 0) {
 				insert_comment(doc, comment_text, comment_path);
 			}
@@ -2290,6 +2337,7 @@ int main(int argc, char **argv)
 	}
 
 	free(origspec);
+	free(remarks);
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();

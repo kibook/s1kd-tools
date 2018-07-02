@@ -1,9 +1,10 @@
 Usage: s1kd-instance [-e <ext>|-E] [-c <dmc>] [-l <lang>]
-                     [-n <iss>] [-I <date>] [-o <file>|-O <dir>]
-                     [-t <techName>] [-i <infoName>] [-a|-A] [-Y <text>]
-                     [-C <comment>] [-X <path>] [-g [-G <CODE>/<NAME>]]
-                     [-R <CIR> ...] [-S] [-v] [-s <applic> ...]
-		     [<object>...]
+                     [-m <remarks>] [-n <iss>] [-I <date>]
+                     [-o <file>|-O <dir>] [-t <techName>]
+                     [-i <infoName>] [-a|-A] [-Y <text>]
+                     [-C <comment>] [-X <path>]
+                     [-g [-G <CODE>/<NAME>]] [-R <CIR> ...] [-S] [-v]
+		     [-s <applic> ...] [<object>...]
 
 Options:
   -A            Simplify and remove unused applicability annotations.
@@ -21,6 +22,7 @@ Options:
   -i <infoName> Give the data module instance a different infoName.
   -L            Source (-s/stdin) is a list of files instead of a DM.
   -l <lang>     Specify the language of the instance.
+  -m <remarks>  Set the remarks for the instance.
   -N            Omit issue/inwork numbers from automatic filename.
   -n <iss>      Set the issue and inwork numbers of the instance.
   -O <dir>      Output instance in dir, automatically named.
