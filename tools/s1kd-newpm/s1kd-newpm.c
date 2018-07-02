@@ -855,6 +855,7 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(template_dir);
+	xmlFree(remarks);
 	xmlFreeDoc(pm_doc);
 
 	xmlCleanupParser();
