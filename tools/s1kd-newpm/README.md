@@ -6,7 +6,7 @@ s1kd-newpm - Create new S1000D publication module.
 SYNOPSIS
 ========
 
-    s1kd-newpm [options]
+    s1kd-newpm [options] [<DM>...]
 
 DESCRIPTION
 ===========
@@ -74,6 +74,9 @@ The language ISO code of the new publication module.
 -l  
 Include language information in referenced data modules.
 
+-m &lt;remarks&gt;  
+Set remarks for the new publication module.
+
 -n &lt;issue&gt;  
 The issue number of the new publication module.
 
@@ -106,6 +109,9 @@ The inwork number of the new publication module.
 
 --version  
 Show version information.
+
+&lt;DM&gt;...  
+Any number of data modules to automatically reference in the new publication module's content.
 
 `.defaults` file
 ----------------

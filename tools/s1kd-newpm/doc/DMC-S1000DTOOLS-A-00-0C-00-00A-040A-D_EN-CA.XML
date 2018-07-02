@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="C" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="00"/>
+        <issueInfo issueNumber="017" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="07"/>
+        <issueDate year="2018" month="07" day="02"/>
         <dmTitle>
           <techName>s1kd-newpm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change 'defaults' to '.defaults'</simplePara>
+        <simplePara>Add -m option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Fix synopsis/options to include optional DM arguments.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -54,7 +57,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-newpm [options]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-newpm [options] [&lt;DM&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -144,7 +147,7 @@
             <definitionListItem>
               <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -175,6 +178,12 @@
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Include language information in referenced data modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set remarks for the new publication module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -243,9 +252,15 @@
                 <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>&lt;DM&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Any number of data modules to automatically reference in the new publication module's content.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
           <para>Refer to s1kd-newdm(1) for information on the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file which is used by all the s1kd-new* commands.</para>
         </levelledPara>

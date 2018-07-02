@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
 
@@ -60,6 +60,8 @@ char enterprise_code[7] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+
+xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -372,6 +374,7 @@ void show_help(void)
 	puts("  -s         Short PM title");
 	puts("  -b         BREX data module code");
 	puts("  -I         Issue date");
+	puts("  -m         Remarks");
 }
 
 void show_version(void)
@@ -409,6 +412,8 @@ void copy_default_value(const char *key, const char *val)
 		issue = get_issue(val);
 	else if (strcmp(key, "templates") == 0 && !template_dir)
 		template_dir = strdup(val);
+	else if (strcmp(key, "remarks") == 0 && !remarks)
+		remarks = xmlStrdup(BAD_CAST val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -528,6 +533,25 @@ void set_env_lang(void)
 	free(lang);
 }
 
+void set_remarks(xmlDocPtr doc, xmlChar *text)
+{
+	xmlXPathContextPtr ctx;
+	xmlNodePtr remarks;
+
+	ctx = xmlXPathNewContext(doc);
+
+	remarks = first_xpath_node("//remarks", ctx);
+
+	xmlXPathFreeContext(ctx);
+
+	if (text) {
+		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", text);
+	} else {
+		xmlUnlinkNode(remarks);
+		xmlFreeNode(remarks);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;
@@ -567,7 +591,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qh?";
+	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -607,6 +631,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 's': strcpy(short_pm_title, optarg); break;
 			case 'q': no_overwrite_error = true; break;
+			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -763,6 +788,8 @@ int main(int argc, char **argv)
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(pm_doc, brex_dmcode);
+
+	set_remarks(pm_doc, remarks);
 
 	for (i = optind; i < argc; ++i) {
 		add_dm_ref(pmEntry, argv[i], include_issue_info, include_language, include_title, include_date);
