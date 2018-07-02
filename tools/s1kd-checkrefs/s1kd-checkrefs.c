@@ -8,9 +8,11 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-checkrefs"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST "Could not read list: %s\n"
 
 #define EXIT_VALIDITY_ERR 1
 #define EXIT_NO_FILE 2
@@ -772,7 +774,10 @@ xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr pa
 	char path[PATH_MAX];
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return paths;
+		}
 	} else {
 		f = stdin;
 	}
