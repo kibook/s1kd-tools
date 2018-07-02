@@ -62,6 +62,9 @@ Show help/usage message.
 -I &lt;date&gt;  
 The issue date of the new DDN in the form of YYYY-MM-DD.
 
+-m &lt;remarks&gt;  
+Set the remarks for the new data dispatch note.
+
 -N &lt;country&gt;  
 The receiver's country.
 

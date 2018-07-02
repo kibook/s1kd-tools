@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -60,6 +60,8 @@ char authorization[256] = "";
 char brex_dmcode[256] = "";
 
 char ddn_issue_date[16] = "";
+
+xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -252,6 +254,7 @@ void show_help(void)
 	puts("  -a <auth>        Authorization");
 	puts("  -b <BREX>        BREX data module code");
 	puts("  -I <date>        Issue date");
+	puts("  -m <remarks>     Remarks");
 }
 
 void show_version(void)
@@ -324,6 +327,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		issue = get_issue(def_val);
 	if (strcmp(def_key, "templates") == 0 && !template_dir)
 		template_dir = strdup(def_val);
+	if (strcmp(def_key, "remarks") == 0 && !remarks)
+		remarks = xmlStrdup(BAD_CAST def_val);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)
@@ -417,6 +422,22 @@ void set_issue_date(xmlNodePtr issue_date)
 	xmlSetProp(issue_date, BAD_CAST "day", BAD_CAST day_s);
 }
 
+void set_remarks(xmlDocPtr doc, xmlChar *text)
+{
+	xmlXPathContextPtr ctx;
+	xmlNodePtr remarks;
+
+	ctx = xmlXPathNewContext(doc);
+	remarks = first_xpath_node("//remarks", ctx);
+
+	if (text) {
+		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", text);
+	} else {
+		xmlUnlinkNode(remarks);
+		xmlFreeNode(remarks);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int c;
@@ -448,7 +469,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qh?";
+	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -481,6 +502,7 @@ int main(int argc, char **argv)
 			case '@': out = strdup(optarg); break;
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = 1; break;
+			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -620,6 +642,8 @@ int main(int argc, char **argv)
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(ddn, brex_dmcode);
+
+	set_remarks(ddn, remarks);
 
 	delivery_list = first_xpath_node("//ddnContent/deliveryList", ctxt);
 
