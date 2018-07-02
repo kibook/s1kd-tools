@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -53,6 +53,8 @@ char in_work[4] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+
+xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -486,6 +488,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		defaultRpcCode = strdup(def_val);
 	else if (strcmp(def_key, "templates") == 0 && !template_dir)
 		template_dir = strdup(def_val);
+	else if (strcmp(def_key, "remarks") == 0 && !remarks)
+		remarks = xmlStrdup(BAD_CAST def_val);
 }
 
 void add_sns(xmlNodePtr content, const char *path, const char *incode)
@@ -555,6 +559,7 @@ void show_help(void)
 	puts("  -I         Issue date");
 	puts("  -r         Default RPC name");
 	puts("  -R         Default RPC code");
+	puts("  -m         Remarks");
 }
 
 void show_version(void)
@@ -648,6 +653,20 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
 }
 
+void set_remarks(xmlDocPtr doc, xmlChar *text)
+{
+	xmlNodePtr remarks;
+
+	remarks = firstXPathNode("//remarks", doc);
+
+	if (text) {
+		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", text);
+	} else {
+		xmlUnlinkNode(remarks);
+		xmlFreeNode(remarks);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr dml_doc;
@@ -674,7 +693,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:h?";
+	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -710,6 +729,7 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = true; break;
 			case 'S': sns = strdup(optarg); break;
 			case 'i': xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST optarg); break;
+			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -848,6 +868,8 @@ int main(int argc, char **argv)
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(dml_doc, brex_dmcode);
 
+	set_remarks(dml_doc, remarks);
+
 	dml_type[0] = toupper(dml_type[0]);
 
 	if (!out) {
@@ -957,6 +979,7 @@ int main(int argc, char **argv)
 	free(defaultRpcName);
 	free(defaultRpcCode);
 	free(template_dir);
+	free(remarks);
 	xmlFreeDoc(dml_doc);
 
 	xmlCleanupParser();
