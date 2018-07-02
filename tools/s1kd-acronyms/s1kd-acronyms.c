@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -502,7 +502,10 @@ void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *ou
 	char line[PATH_MAX];
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return;
+		}
 	} else {
 		f = stdin;
 	}
@@ -526,7 +529,10 @@ void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 	char line[PATH_MAX];
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return;
+		}
 	} else {
 		f = stdin;
 	}
@@ -563,14 +569,12 @@ void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 	char line[PATH_MAX];
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return;
+		}
 	} else {
 		f = stdin;
-	}
-
-	if (!f) {
-		fprintf(stderr, E_BAD_LIST, fname);
-		return;
 	}
 
 	while (fgets(line, PATH_MAX, f)) {

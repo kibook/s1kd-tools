@@ -8,11 +8,13 @@
 #include <libxml/xinclude.h>
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
 #define FAILED_PREFIX PROG_NAME ": FAILED: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
 
 #define EXIT_MAX_SCHEMAS 1
 #define EXIT_MISSING_SCHEMA 2
@@ -351,7 +353,10 @@ int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns
 	int err;
 
 	if (fname) {
-		f = fopen(fname, "r");
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return 0;
+		}
 	} else {
 		f = stdin;
 	}
