@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -551,9 +551,11 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(ddncode, "") != 0) {
-		int n;
+		int n, offset;
 
-		n = sscanf(ddncode, "%14[^-]-%5[^-]-%5[^-]-%4[^-]-%5[^-]",
+		offset = strncmp(ddncode, "DDN-", 4) == 0 ? 4 : 0;
+
+		n = sscanf(ddncode + offset, "%14[^-]-%5[^-]-%5[^-]-%4[^-]-%5[^-]",
 			model_ident_code,
 			sender_ident,
 			receiver_ident,

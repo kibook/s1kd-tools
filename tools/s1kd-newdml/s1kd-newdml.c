@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -781,9 +781,11 @@ int main(int argc, char **argv)
 	}
 	
 	if (strcmp(code, "") != 0) {
-		int n;
+		int n, offset;
 
-		n = sscanf(code, "%14[^-]-%5[^-]-%c-%4[^-]-%5[^-]",
+		offset = strncmp(code, "DML-", 4) == 0 ? 4 : 0;
+
+		n = sscanf(code + offset, "%14[^-]-%5[^-]-%c-%4[^-]-%5[^-]",
 			model_ident_code,
 			sender_ident,
 			dml_type,

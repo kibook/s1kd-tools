@@ -45,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1
@@ -1210,9 +1210,11 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(dmcode, "") != 0) {
-		int n;
+		int n, offset;
 
-		n = sscanf(dmcode, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+		offset = strncmp(dmcode, "DMC-", 4) == 0 ? 4 : 0;
+
+		n = sscanf(dmcode + offset, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
 			modelIdentCode,
 			systemDiffCode,
 			systemCode,

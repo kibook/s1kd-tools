@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -633,9 +633,11 @@ int main(int argc, char **argv)
 	comment_doc = xml_skeleton();
 
 	if (strcmp(code, "") != 0) {
-		int n;
+		int n, offset;
 
-		n = sscanf(code, "%14[^-]-%5s-%4s-%5s-%1s",
+		offset = strncmp(code, "COM-", 4) == 0 ? 4 : 0;
+
+		n = sscanf(code + offset, "%14[^-]-%5s-%4s-%5s-%1s",
 			modelIdentCode,
 			senderIdent,
 			yearOfDataIssue,

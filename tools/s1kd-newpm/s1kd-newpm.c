@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
 
@@ -685,9 +685,11 @@ int main(int argc, char **argv)
 	pm_doc = xml_skeleton();
 
 	if (strcmp(pmcode, "") != 0) {
-		int n;
+		int n, offset;
 
-		n = sscanf(pmcode, "%14[^-]-%5s-%5s-%2s",
+		offset = strncmp(pmcode, "PMC-", 4) == 0 ? 4 : 0;
+
+		n = sscanf(pmcode + offset, "%14[^-]-%5s-%5s-%2s",
 			model_ident_code,
 			pm_issuer,
 			pm_number,
