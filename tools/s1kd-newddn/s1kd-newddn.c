@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -429,6 +429,8 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 
 	ctx = xmlXPathNewContext(doc);
 	remarks = first_xpath_node("//remarks", ctx);
+
+	xmlXPathFreeContext(ctx);
 
 	if (text) {
 		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", text);
