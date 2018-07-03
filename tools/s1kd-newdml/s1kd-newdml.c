@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -981,8 +981,10 @@ int main(int argc, char **argv)
 	free(template_dir);
 	free(remarks);
 	xmlFreeDoc(dml_doc);
+	xmlFreeNode(sns_incodes);
 
 	xmlCleanupParser();
+	xsltCleanupGlobals();
 
 	return 0;
 }
