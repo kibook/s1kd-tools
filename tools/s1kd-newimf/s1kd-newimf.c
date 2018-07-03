@@ -11,7 +11,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -48,6 +48,8 @@ char brex_dmcode[256] = "";
 char issue_date[16] = "";
 
 char *template_dir = NULL;
+
+xmlChar *remarks = NULL;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -157,6 +159,7 @@ void show_help(void)
 	puts("  -t          ICN title");
 	puts("  -b          BREX data module code");
 	puts("  -I          Issue date");
+	puts("  -m          Remarks");
 }
 
 void show_version(void)
@@ -177,6 +180,9 @@ void copy_default_value(const char *def_key, const char *def_val)
 	
 	if (strcmp(def_key, "templates") == 0 && !template_dir) {
 		template_dir = strdup(def_val);
+	}
+	if (strcmp(def_key, "remarks") == 0 && !remarks) {
+		remarks = xmlStrdup(BAD_CAST def_val);
 	}
 }
 
@@ -271,6 +277,24 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
 }
 
+void set_remarks(xmlDocPtr doc, xmlChar *text)
+{
+	xmlXPathContextPtr ctx;
+	xmlNodePtr remarks;
+
+	ctx = xmlXPathNewContext(doc);
+	remarks = first_xpath_node("//remarks", ctx);
+
+	xmlXPathFreeContext(ctx);
+
+	if (text) {
+		xmlNewChild(remarks, NULL, BAD_CAST "simplePara", text);
+	} else {
+		xmlUnlinkNode(remarks);
+		xmlFreeNode(remarks);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int i;
@@ -286,7 +310,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qh?";
+	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -318,6 +342,7 @@ int main(int argc, char **argv)
 			case 'f': overwrite = true; break;
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
+			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -426,6 +451,8 @@ int main(int argc, char **argv)
 		if (strcmp(brex_dmcode, "") != 0)
 			set_brex(template, brex_dmcode);
 
+		set_remarks(template, remarks);
+
 		if (no_issue) {
 			snprintf(fname, 256, "IMF-%s.XML", icn);
 		} else {
@@ -443,10 +470,15 @@ int main(int argc, char **argv)
 		if (verbose)
 			puts(fname);
 
+		xmlXPathFreeContext(ctx);
+
 		xmlFreeDoc(template);
 	}
 
 	free(template_dir);
+	xmlFree(remarks);
+
+	xmlCleanupParser();
 
 	return 0;
 }

@@ -34,6 +34,9 @@ Overwrite existing file.
 -I &lt;date&gt;  
 The issue date of the new ICN metadata file in the form of YYYY-MM-DD.
 
+-m &lt;remarks&gt;  
+Set the remarks for the new ICN metadata file.
+
 -n &lt;issue&gt;  
 The issue number of the new ICN metadata file.
 
