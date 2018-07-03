@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.0.2"
+#define VERSION "1.1.0"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -991,10 +991,11 @@ void print_node(xmlNodePtr node)
 		xmlFree(doc);
 	} else if (strcmp((char *) node->name, "objectUse") == 0) {
 		char *use = (char *) xmlNodeGetContent(node);
-		if (!shortmsg) {
-			printf("  ");
+		if (shortmsg) {
+			printf("%s", use);
+		} else {
+			printf("  %s\n", use);
 		}
-		printf("%s\n", use);
 		xmlFree(use);
 	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
 		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
@@ -1018,11 +1019,15 @@ void print_node(xmlNodePtr node)
 		putchar('\n');
 		xmlFree(content);
 		xmlFree(allowed);
-	} else if (strcmp((char *) node->name, "object") == 0 && !shortmsg) {
+	} else if (strcmp((char *) node->name, "object") == 0) {
 		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
-		printf("  line %s:\n", line);
+		if (shortmsg) {
+			printf(" (line %s)\n", line);
+		} else {
+			printf("  line %s:\n", line);
+			xmlDebugDumpOneNode(stdout, node->children, 2);
+		}
 		xmlFree(line);
-		xmlDebugDumpOneNode(stdout, node->children, 2);
 	} else if (strcmp((char *) node->name, "snsError") == 0) {
 		printf("SNS ERROR: ");
 	} else if (strcmp((char *) node->name, "code") == 0) {
