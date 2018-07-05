@@ -225,16 +225,31 @@ The third point can be verified using the **s1kd-brexcheck** tool. This tool wil
 
     $ s1kd-brexcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
 
-The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attribute values:
+The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attributes:
 
     <structureObjectRule>
     <objectPath allowedObjectFlag="0">//emphasis</objectPath>
     <objectUse>The emphasis element is not allowed.</objectUse>
     </structureObjectRule>
 
+Or by tailoring the allowed values of certain elements or attributes:
+
+    <structureObjectRule>
+    <objectPath allowedObjectFlag="2">//@securityClassification</objectPath>
+    <objectUse>The security classification must be 01 (Unclassified) or 02 (Classified).</objectUse>
+    <objectValue valueAllowed="01">Unclassified</objectValue>
+    <objectValue valueAllowed="02">Classified</objectValue>
+    </structureObjectRule>
+
 Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.
 
 Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.
+
+To get started with your project's own business rules, you can create a simple BREX data module based on the current defaults of your CSDB using the -B option of the s1kd-newdm tool:
+
+    $ s1kd-newdm -B# MYPRJ-A-00-00-00-00A-022A-D
+
+This will use the customized `.defaults` and `.dmtypes` files to generate a basic set of business rules.
 
 ### Quality assurance verification
 

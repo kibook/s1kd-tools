@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="27"/>
+        <issueDate year="2018" month="07" day="05"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -40,7 +40,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add example of s1kd-ref and details on updating the DMRL.</simplePara>
+        <simplePara>Add example of creating a basic BREX from defaults files.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Add example of BREX attribute value tailoring.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -163,8 +166,8 @@ infoCodeVariant="A" itemLocationCode="D"/>
 ...
 </dmlContent>]]></verbatimText>
           </para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">The XML for the <verbatimText verbatimStyle="vs12">dmRef</verbatimText> of each entry can be quickly generated using the <emphasis>s1kd-ref</emphasis> tool:</para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>The XML for the <verbatimText verbatimStyle="vs12">dmRef</verbatimText> of each entry can be quickly generated using the <emphasis>s1kd-ref</emphasis> tool:</para>
+          <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-ref DMC-MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
           </para>
         </levelledPara>
@@ -175,8 +178,8 @@ infoCodeVariant="A" itemLocationCode="D"/>
             <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
           </para>
           <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the <emphasis>s1kd-dmrl</emphasis> tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:</para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the <emphasis>s1kd-dmrl</emphasis> tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:</para>
+          <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML</verbatimText>
           </para>
         </levelledPara>
@@ -256,15 +259,29 @@ infoCodeVariant="A" itemLocationCode="D"/>
             <para>
               <verbatimText verbatimStyle="vs23">$ s1kd-brexcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
             </para>
-            <para>The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attribute values:</para>
+            <para>The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attributes:</para>
             <para>
               <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
 <objectPath allowedObjectFlag="0">//emphasis</objectPath>
 <objectUse>The emphasis element is not allowed.</objectUse>
 </structureObjectRule>]]></verbatimText>
             </para>
+            <para changeType="add" reasonForUpdateRefIds="rfu-0002">Or by tailoring the allowed values of certain elements or attributes:</para>
+            <para changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
+<objectPath allowedObjectFlag="2">//@securityClassification</objectPath>
+<objectUse>The security classification must be 01 (Unclassified) or 02 (Classified).</objectUse>
+<objectValue valueAllowed="01">Unclassified</objectValue>
+<objectValue valueAllowed="02">Classified</objectValue>
+</structureObjectRule>]]></verbatimText>
+            </para>
             <para>Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.</para>
             <para>Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.</para>
+            <para changeType="add" reasonForUpdateRefIds="rfu-0001">To get started with your project's own business rules, you can create a simple BREX data module based on the current defaults of your CSDB using the -B option of the s1kd-newdm tool:</para>
+            <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <verbatimText verbatimStyle="vs23">$ s1kd-newdm -B# MYPRJ-A-00-00-00-00A-022A-D</verbatimText>
+            </para>
+            <para>This will use the customized <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to generate a basic set of business rules.</para>
           </levelledPara>
           <levelledPara>
             <title>Quality assurance verification</title>
