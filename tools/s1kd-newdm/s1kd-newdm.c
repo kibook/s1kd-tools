@@ -238,6 +238,7 @@ void show_help(void)
 	puts("  -,         Dump default dmtypes XML.");
 	puts("  -.         Dump default dmtypes text file.");
 	puts("  -!         Do not include an info name.");
+	puts("  -B         Generate BREX rules.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
