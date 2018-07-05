@@ -790,6 +790,7 @@
           <!-- 19 Available for projects -->
         </snsDescr>
       </snsRules>
+      <contextRules/>
     </brex>
   </content>
 </dmodule>

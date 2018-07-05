@@ -45,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_DM_EXISTS 1
@@ -130,6 +130,8 @@ bool no_info_name = false;
 #else
 #define PARSE_OPTS 0
 #endif
+
+#define BREX_INFOCODE_USE BAD_CAST "The information code used is not in the allowed set."
 
 enum issue get_issue(const char *iss)
 {
@@ -978,7 +980,15 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	return orig;
 }
 
-void process_dmtypes_xml(xmlDocPtr defaults_xml)
+void add_dmtypes_brex_val(xmlNodePtr rules, const char *key, const char *val)
+{
+	xmlNodePtr objval;
+	objval = xmlNewChild(rules->children, NULL, BAD_CAST "objectValue", NULL);
+	xmlSetProp(objval, BAD_CAST "valueAllowed", BAD_CAST key);
+	xmlNodeSetContent(objval, xmlEncodeEntitiesReentrant(NULL, BAD_CAST val));
+}
+
+void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 {
 	xmlNodePtr cur;
 
@@ -1006,6 +1016,10 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml)
 		    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
 		    strcmp(infoName_content, "") == 0 && !no_info_name)
 			strcpy(infoName_content, infname);
+
+		if (brex_rules) {
+			add_dmtypes_brex_val(brex_rules, def_key, infname);
+		}
 
 		xmlFree(def_key);
 		xmlFree(def_val);
@@ -1079,6 +1093,43 @@ void set_env_lang(void)
 	free(lang);
 }
 
+void add_brex_rule(xmlNodePtr rules, const char *key, const char *val)
+{
+	xmlNodePtr rule, objpath, objval;
+	char *path;
+	xmlChar use[256];
+
+	if (strcmp(key, "countryIsoCode") == 0) {
+		path = "//@countryIsoCode";
+	} else if (strcmp(key, "languageIsoCode") == 0) {
+		path = "//@languageIsoCode";
+	} else if (strcmp(key, "modelIdentCode") == 0) {
+		path = "//@modelIdentCode";
+	} else if (strcmp(key, "originator") == 0) {
+		path = "//originator/enterpriseName";
+	} else if (strcmp(key, "originatorCode") == 0) {
+		path = "//originator/@enterpriseCode";
+	} else if (strcmp(key, "responsiblePartnerCompany") == 0) {
+		path = "//responsiblePartnerCompany/enterpriseName";
+	} else if (strcmp(key, "responsiblePartnerCompanyCode") == 0) {
+		path = "//responsiblePartnerCompany/@enterpriseCode";
+	} else if (strcmp(key, "securityClassification") == 0) {
+		path = "//@securityClassification";
+	} else {
+		return;
+	}
+
+	xmlStrPrintf(use, 256, "%s must be %s", key, val);
+
+	rule = xmlNewChild(rules, NULL, BAD_CAST "structureObjectRule", NULL);
+	objpath = xmlNewChild(rule, NULL, BAD_CAST "objectPath", BAD_CAST path);
+	xmlNewChild(rule, NULL, BAD_CAST "objectUse", use);
+	objval = xmlNewChild(rule, NULL, BAD_CAST "objectValue", NULL);
+
+	xmlSetProp(objpath, BAD_CAST "allowedObjectFlag", BAD_CAST "2");
+	xmlSetProp(objval, BAD_CAST "valueAllowed", BAD_CAST val);
+}
+
 int main(int argc, char **argv)
 {
 	char learn[6] = "";
@@ -1120,8 +1171,9 @@ int main(int argc, char **argv)
 	bool no_overwrite_error = false;
 
 	xmlDocPtr defaults_xml;
+	xmlNodePtr brex_rules = NULL;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:b:S:I:v$:@:fm:,.%:qM:P!h?";
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1154,6 +1206,7 @@ int main(int argc, char **argv)
 			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
 			case 'N': no_issue = true; no_issue_set = true; break;
 			case 's': strcpy(schema, optarg); break;
+			case 'B': if (!brex_rules) brex_rules = xmlNewNode(NULL, BAD_CAST "structureObjectRuleGroup"); break;
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'S': sns_fname = strdup(optarg); break;
 			case 'I': strcpy(issue_date, optarg); break;
@@ -1174,6 +1227,14 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (brex_rules) {
+		xmlNodePtr dmtypes_brex_rule;
+		dmtypes_brex_rule = xmlNewChild(brex_rules, NULL, BAD_CAST "structureObjectRule", NULL);
+		xmlSetProp(xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectPath", BAD_CAST "//@infoCode"),
+			BAD_CAST "allowedObjectFlag", BAD_CAST "2");
+		xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectUse", BREX_INFOCODE_USE);
+	}
+
 	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
 
@@ -1188,6 +1249,10 @@ int main(int argc, char **argv)
 			def_val = (char *) xmlGetProp(cur, BAD_CAST "value");
 
 			copy_default_value(def_key, def_val);
+
+			if (brex_rules) {
+				add_brex_rule(brex_rules, def_key, def_val);
+			}
 
 			xmlFree(def_key);
 			xmlFree(def_val);
@@ -1204,6 +1269,10 @@ int main(int argc, char **argv)
 				continue;
 
 			copy_default_value(def_key, def_val);
+
+			if (brex_rules) {
+				add_brex_rule(brex_rules, def_key, def_val);
+			}
 		}
 
 		fclose(defaults);
@@ -1237,7 +1306,7 @@ int main(int argc, char **argv)
 
 	if (strcmp(dmtype, "") == 0 || (strcmp(infoName_content, "") == 0 && !no_info_name)) {
 		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
-			process_dmtypes_xml(defaults_xml);
+			process_dmtypes_xml(defaults_xml, brex_rules);
 			xmlFreeDoc(defaults_xml);
 		} else if ((defaults = fopen(dmtypes_fname, "r"))) {
 			char default_line[1024];
@@ -1264,12 +1333,16 @@ int main(int argc, char **argv)
 				    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
 				    strcmp(infoName_content, "") == 0 && !no_info_name)
 					strcpy(infoName_content, infname);
+
+				if (brex_rules) {
+					add_dmtypes_brex_val(brex_rules, def_key, n == 3 ? infname : NULL);
+				}
 			}
 
 			fclose(defaults);
 		} else {
 			defaults_xml = xmlReadMemory((const char *) dmtypes_xml, dmtypes_xml_len, NULL, NULL, 0);
-			process_dmtypes_xml(defaults_xml);
+			process_dmtypes_xml(defaults_xml, brex_rules);
 			xmlFreeDoc(defaults_xml);
 		}
 	}
@@ -1436,6 +1509,15 @@ int main(int argc, char **argv)
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(dm, brex_dmcode);
+
+	if (brex_rules) {
+		xmlNodePtr context_rules;
+		if ((context_rules = firstXPathNode(dm, NULL, "//contextRules"))) {
+			xmlAddChild(context_rules, brex_rules);
+		} else {
+			xmlFreeNode(brex_rules);
+		}
+	}
 
 	for (i = 0; languageIsoCode[i]; ++i) languageIsoCode[i] = toupper(languageIsoCode[i]);
 

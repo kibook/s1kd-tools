@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="030" inWork="00"/>
+        <issueInfo issueNumber="031" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="07"/>
+        <issueDate year="2018" month="07" day="05"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change 'defaults' to '.defaults' and 'dmtypes' to '.dmtypes'</simplePara>
+        <simplePara>Add -B option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -120,19 +120,25 @@
             <definitionListItem>
               <listItemTerm>-,</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Dumps the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
+                <para>Dumps the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-.</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Dumps the simple text form of the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>.</para>
+                <para>Dumps the simple text form of the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-!</listItemTerm>
               <listItemDefinition>
                 <para>Do not include an info name for the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-B</listItemTerm>
+              <listItemDefinition>
+                <para>When creating a new BREX data module, use the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to add a basic set of context rules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -156,13 +162,13 @@
             <definitionListItem>
               <listItemTerm>-D &lt;dmtypes&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file name.</para>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -221,7 +227,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "<verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can be used to set one of the above SNS as the default.</para>
+                <para>When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "<verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can be used to set one of the above SNS as the default.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -233,7 +239,7 @@
             <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
+                <para>Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -271,7 +277,7 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">If both levels have the same title, then only one will be used. The "<verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
+                <para>If both levels have the same title, then only one will be used. The "<verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -301,7 +307,7 @@
             <definitionListItem>
               <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
+                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -414,9 +420,9 @@
         </para>
         <levelledPara>
           <title>Prompt (-p) option</title>
-          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files), it will be displayed in square brackets [] in the prompt, and pressing Enter without typing any value will select this default value.</para>
+          <para>If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files), it will be displayed in square brackets [] in the prompt, and pressing Enter without typing any value will select this default value.</para>
         </levelledPara>
-        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
           <para>This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, but any file can be specified by using the -d option.</para>
           <para>All of the s1kd-new* commands use the same <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file format, so this file can contain default values for multiple types of metadata.</para>
@@ -442,7 +448,7 @@ securityClassification       01]]></verbatimText>
 </defaults>]]></verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file</title>
           <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>, but any file can be specified by using the -D option.</para>
           <para>Each line consists of an info code, a schema identifier, and optionally a default info name. Example:</para>
