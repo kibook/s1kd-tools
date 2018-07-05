@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="U" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="10"/>
+        <issueDate year="2018" month="07" day="05"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add support for the .fmtypes file.</simplePara>
+        <simplePara>Add -b option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -47,22 +47,28 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-defaults - <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files management tool</para>
+        <para>s1kd-defaults - <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files management tool</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-defaults [-DdFfisth?] [&lt;file&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-defaults [-DdFfisth?] [-b &lt;BREX&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-defaults</emphasis> tool generates a basic <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files.</para>
+        <para>The <emphasis>s1kd-defaults</emphasis> tool generates a basic <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>When initializing a new CSDB (-i), use the specified BREX data module to build the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-D</listItemTerm>
               <listItemDefinition>
@@ -75,7 +81,7 @@
                 <para>Convert a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-F</listItemTerm>
               <listItemDefinition>
                 <para>Convert a <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
@@ -90,7 +96,7 @@
             <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
-                <para changeType="add" reasonForUpdateRefIds="rfu-0001">Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
+                <para>Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

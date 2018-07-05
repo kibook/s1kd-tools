@@ -6,7 +6,7 @@ s1kd-defaults - `.defaults`, `.dmtypes` and `.fmtypes` files management tool
 SYNOPSIS
 ========
 
-    s1kd-defaults [-DdFfisth?] [<file>...]
+    s1kd-defaults [-DdFfisth?] [-b <BREX>] [<file>...]
 
 DESCRIPTION
 ===========
@@ -15,6 +15,9 @@ The *s1kd-defaults* tool generates a basic `.defaults` file for a new CSDB, whic
 
 OPTIONS
 =======
+
+-b &lt;BREX&gt;  
+When initializing a new CSDB (-i), use the specified BREX data module to build the `.defaults` and `.dmtypes` files.
 
 -D  
 Convert a `.dmtypes` file.

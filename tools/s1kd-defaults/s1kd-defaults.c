@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -38,6 +38,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
+	puts("  -b <BREX>  Initialize CSDB using a BREX DM.");
 	puts("  -D         Convert a .dmtypes file.");
 	puts("  -d         Convert a .defaults file.");
 	puts("  -F         Convert a .fmtypes file.");
@@ -270,12 +271,40 @@ void set_defaults(xmlDocPtr doc)
 	}
 }
 
+/* Create a .defaults file from a BREX DM. */
+xmlDocPtr new_defaults_from_brex(xmlDocPtr brex)
+{
+	xmlDocPtr res, sorted;
+
+	res = transform_doc(brex, brex2defaults_xsl, brex2defaults_xsl_len);
+	sorted = sort_entries(res);
+	xmlFreeDoc(res);
+	return sorted;
+}
+
+/* Create a .dmtypes file from a BREX DM. */
+xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex)
+{
+	xmlDocPtr res, sorted;
+
+	res = transform_doc(brex, brex2dmtypes_xsl, brex2dmtypes_xsl_len);
+	sorted = sort_entries(res);
+	xmlFreeDoc(res);
+	return sorted;
+}
+
 /* Dump the built-in defaults in the XML format. */
-void dump_defaults_xml(const char *fname, bool overwrite)
+void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex)
 {
 	xmlDocPtr doc;
-	doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
-	set_defaults(doc);
+
+	if (brex) {
+		doc = new_defaults_from_brex(brex);
+	} else {
+		doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
+		set_defaults(doc);
+	}
+
 	if (overwrite) {
 		xmlSaveFile(fname, doc);
 	} else {
@@ -285,12 +314,18 @@ void dump_defaults_xml(const char *fname, bool overwrite)
 }
 
 /* Dump the built-in defaults in the simple text format. */
-void dump_defaults_text(const char *fname, bool overwrite)
+void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex)
 {
 	xmlDocPtr doc, res;
 	FILE *f;
-	doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
-	set_defaults(doc);
+
+	if (brex) {
+		doc = new_defaults_from_brex(brex);
+	} else {
+		doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
+		set_defaults(doc);
+	}
+
 	res = transform_doc(doc, xsl_xml_defaults_to_text_xsl, xsl_xml_defaults_to_text_xsl_len);
 
 	if (overwrite) {
@@ -408,13 +443,13 @@ void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overw
 
 	if (fmt == TEXT) {
 		if (f == NONE) {
-			dump_defaults_text(fname, overwrite);
+			dump_defaults_text(fname, overwrite, NULL);
 		} else {
 			xml_to_text(fname, f, overwrite, sort);
 		}
 	} else if (fmt == XML) {
 		if (f == NONE) {
-			dump_defaults_xml(fname, overwrite);
+			dump_defaults_xml(fname, overwrite, NULL);
 		} else {
 			text_to_xml(fname, f, overwrite, sort);
 		}
@@ -430,8 +465,9 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool initialize = false;
 	bool sort = false;
+	xmlDocPtr brex = NULL;
 
-	const char *sopts = "DdFfisth?";
+	const char *sopts = "b:DdFfisth?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -445,6 +481,9 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				break;
+			case 'b':
+				if (!brex) brex = xmlReadFile(optarg, NULL, PARSE_OPTS);
 				break;
 			case 'D':
 				f = DMTYPES;
@@ -484,7 +523,7 @@ int main(int argc, char **argv)
 	if (initialize) {
 		char sys[256];
 		const char *opt;
-		void (*fn)(const char *, bool);
+		void (*fn)(const char *, bool, xmlDocPtr);
 
 		if (fmt == TEXT) {
 			opt = "-.";
@@ -494,12 +533,32 @@ int main(int argc, char **argv)
 			fn = dump_defaults_xml;
 		}
 
-		fn(DEFAULT_DEFAULTS_FNAME, true);
+		fn(DEFAULT_DEFAULTS_FNAME, true, brex);
 
-		snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
+		if (brex) {
+			xmlDocPtr dmtypes;
 
-		if (system(sys) != 0) {
-			fprintf(stderr, S_DMTYPES_ERR);
+			dmtypes = new_dmtypes_from_brex(brex);
+
+			if (fmt == TEXT) {
+				xmlDocPtr res;
+				FILE *f;
+				res = xml_dmtypes_to_text(dmtypes);
+				f = fopen(DEFAULT_DMTYPES_FNAME, "w");
+				fprintf(f, "%s", (char *) res->children->content);
+				fclose(f);
+				xmlFreeDoc(res);
+			} else {
+				xmlSaveFile(DEFAULT_DMTYPES_FNAME, dmtypes);
+			}
+
+			xmlFreeDoc(dmtypes);
+		} else {
+			snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
+
+			if (system(sys) != 0) {
+				fprintf(stderr, S_DMTYPES_ERR);
+			}
 		}
 
 		snprintf(sys, 256, "s1kd-fmgen %s > %s", opt, DEFAULT_FMTYPES_FNAME);
@@ -516,6 +575,7 @@ int main(int argc, char **argv)
 	}
 
 	free(fname);
+	xmlFreeDoc(brex);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();
