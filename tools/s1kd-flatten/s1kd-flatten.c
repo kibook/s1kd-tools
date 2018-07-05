@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -19,6 +19,10 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+#define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
+#define EXIT_BAD_PM 1
 
 int xinclude = 0;
 int no_issue = 0;
@@ -458,6 +462,9 @@ int main(int argc, char **argv)
 		xmlSetProp(pub, BAD_CAST "xmlns:xi", BAD_CAST "http://www.w3.org/2001/XInclude");
 		xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
 		xmlSetProp(xi, BAD_CAST "href", BAD_CAST pm_fname);
+	} else if (!content) {
+		fprintf(stderr, E_BAD_PM, pm_fname);
+		exit(EXIT_BAD_PM);
 	}
 
 	if (optind == argc - 1 || !use_pub_fmt) {
