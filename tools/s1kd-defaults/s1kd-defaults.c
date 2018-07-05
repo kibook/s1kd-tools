@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -38,7 +38,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
-	puts("  -b <BREX>  Initialize CSDB using a BREX DM.");
+	puts("  -b <BREX>  Create from a BREX DM.");
 	puts("  -D         Convert a .dmtypes file.");
 	puts("  -d         Convert a .defaults file.");
 	puts("  -F         Convert a .fmtypes file.");
@@ -344,17 +344,17 @@ void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex)
 	xmlFreeDoc(doc);
 }
 
-xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort)
+xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr brex)
 {
 	xmlDocPtr doc = NULL;
 
 	switch (f) {
 		case NONE:
 		case DEFAULTS:
-			doc = text_defaults_to_xml(path);
+			doc = brex ? new_defaults_from_brex(brex) : text_defaults_to_xml(path);
 			break;
 		case DMTYPES:
-			doc = text_dmtypes_to_xml(path);
+			doc = brex ? new_dmtypes_from_brex(brex) : text_dmtypes_to_xml(path);
 			break;
 		case FMTYPES:
 			doc = text_fmtypes_to_xml(path);
@@ -372,12 +372,12 @@ xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort)
 }
 
 /* Convert an XML defaults/dmtypes file to the simple text version. */
-void xml_to_text(const char *path, enum file f, bool overwrite, bool sort)
+void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex)
 {
 	xmlDocPtr doc, res = NULL;
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
-		doc = simple_text_to_xml(path, f, sort);
+		doc = simple_text_to_xml(path, f, sort, brex);
 	}
 
 	switch (f) {
@@ -412,11 +412,11 @@ void xml_to_text(const char *path, enum file f, bool overwrite, bool sort)
 }
 
 /* Convert a simple text defaults/dmtypes file to the XML version. */
-void text_to_xml(const char *path, enum file f, bool overwrite, bool sort)
+void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex)
 {
 	xmlDocPtr doc;
 
-	doc = simple_text_to_xml(path, f, sort);
+	doc = simple_text_to_xml(path, f, sort, brex);
 
 	if (sort) {
 		xmlDocPtr res;
@@ -434,24 +434,24 @@ void text_to_xml(const char *path, enum file f, bool overwrite, bool sort)
 	xmlFreeDoc(doc);
 }
 
-void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort)
+void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex)
 {
-	if (f != NONE && access(fname, F_OK) == -1) {
+	if (f != NONE && (!brex || f == FMTYPES) && access(fname, F_OK) == -1) {
 		fprintf(stderr, S_NO_FILE_ERR, fname);
 		exit(EXIT_NO_FILE);
 	}
 
 	if (fmt == TEXT) {
 		if (f == NONE) {
-			dump_defaults_text(fname, overwrite, NULL);
+			dump_defaults_text(fname, overwrite, brex);
 		} else {
-			xml_to_text(fname, f, overwrite, sort);
+			xml_to_text(fname, f, overwrite, sort, brex);
 		}
 	} else if (fmt == XML) {
 		if (f == NONE) {
-			dump_defaults_xml(fname, overwrite, NULL);
+			dump_defaults_xml(fname, overwrite, brex);
 		} else {
-			text_to_xml(fname, f, overwrite, sort);
+			text_to_xml(fname, f, overwrite, sort, brex);
 		}
 	}
 }
@@ -568,10 +568,10 @@ int main(int argc, char **argv)
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			convert_or_dump(fmt, f, argv[i], overwrite, sort);
+			convert_or_dump(fmt, f, argv[i], overwrite, sort, brex);
 		}
 	} else {
-		convert_or_dump(fmt, f, fname, overwrite, sort);
+		convert_or_dump(fmt, f, fname, overwrite, sort, brex);
 	}
 
 	free(fname);

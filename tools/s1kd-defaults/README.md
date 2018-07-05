@@ -17,7 +17,7 @@ OPTIONS
 =======
 
 -b &lt;BREX&gt;  
-When initializing a new CSDB (-i), use the specified BREX data module to build the `.defaults` and `.dmtypes` files.
+Use the specified BREX data module to build the `.defaults` and `.dmtypes` files. This can be used both when initializing a new CSDB (-i) or either file can be generated from a BREX data module separately.
 
 -D  
 Convert a `.dmtypes` file.
