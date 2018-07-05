@@ -983,9 +983,12 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 void add_dmtypes_brex_val(xmlNodePtr rules, const char *key, const char *val)
 {
 	xmlNodePtr objval;
+	xmlChar *name;
 	objval = xmlNewChild(rules->children, NULL, BAD_CAST "objectValue", NULL);
 	xmlSetProp(objval, BAD_CAST "valueAllowed", BAD_CAST key);
-	xmlNodeSetContent(objval, xmlEncodeEntitiesReentrant(NULL, BAD_CAST val));
+	name = xmlEncodeEntitiesReentrant(NULL, BAD_CAST val);
+	xmlNodeSetContent(objval, name);
+	xmlFree(name);
 }
 
 void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
