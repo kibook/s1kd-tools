@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -277,7 +277,7 @@ bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
 	return invalid;
 }
 
-void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule, xmlChar *flag)
+void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule)
 {
 	int i;
 
@@ -661,7 +661,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 
 			if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 				dump_nodes_xml(object->nodesetval, fname,
-					brexError, rules->nodeTab[i], allowedObjectFlag);
+					brexError, rules->nodeTab[i]);
 			}
 			
 			if (severity) {
