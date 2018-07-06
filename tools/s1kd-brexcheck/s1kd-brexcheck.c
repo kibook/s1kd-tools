@@ -18,13 +18,15 @@
 
 #include "brex.h"
 
-#define STRUCT_OBJ_RULE_PATH "//contextRules[not(@rulesContext) or @rulesContext='%s']//structureObjectRule|//contextrules[not(@context) or @context='%s']//objrule"
+#define STRUCT_OBJ_RULE_PATH \
+	"//contextRules[not(@rulesContext) or @rulesContext='%s']//structureObjectRule|" \
+	"//contextrules[not(@context) or @context='%s']//objrule"
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -113,7 +115,169 @@ xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
 	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
 }
 
-void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError)
+/* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
+bool is_in_range(const char *value, const char *range)
+{
+	char *ran;
+	char *first;
+	char *last;
+	bool ret;
+
+	if (!strchr(range, '~')) {
+		return strcmp(value, range) == 0;
+	}
+
+	ran = malloc(strlen(range) + 1);
+
+	strcpy(ran, range);
+
+	first = strtok(ran, "~");
+	last = strtok(NULL, "~");
+
+	ret = strcmp(value, first) >= 0 && strcmp(value, last) <= 0;
+
+	free(ran);
+
+	return ret;
+}
+
+/* Tests whether a value is in an S1000D set (a|b|c) */
+bool is_in_set(const char *value, const char *set)
+{
+	char *s;
+	char *val = NULL;
+	bool ret = false;
+
+	if (!strchr(set, '|')) {
+		return is_in_range(value, set);
+	}
+
+	s = malloc(strlen(set) + 1);
+
+	strcpy(s, set);
+
+	while ((val = strtok(val ? NULL : s, "|"))) {
+		if (is_in_range(value, val)) {
+			ret = true;
+			break;
+		}
+	}
+
+	free(s);
+
+	return ret;
+}
+
+bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
+{
+	int i;
+	bool ret = false;
+
+	if (xmlXPathNodeSetIsEmpty(values))
+		return true;
+
+	for (i = 0; i < values->nodeNr; ++i) {
+		char *allowed, *value, *form;
+
+		allowed = (char *) firstXPathValue(values->nodeTab[i], "@valueAllowed|@val1");
+		form    = (char *) firstXPathValue(values->nodeTab[i], "@valueForm|@valtype");
+		value   = (char *) xmlNodeGetContent(node);
+
+		if (form && strcmp(form, "range") == 0) {
+			ret = ret || is_in_set(value, allowed);
+		} else {
+			ret = ret || strcmp(value, allowed) == 0;
+		}
+
+		xmlFree(allowed);
+		xmlFree(form);
+		xmlFree(value);
+	}
+
+	return ret;
+}
+
+bool check_single_object_values(xmlNodePtr rule, xmlNodePtr node)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	bool ret;
+
+	ctx = xmlXPathNewContext(rule->doc);
+	ctx->node = rule;
+
+	obj = xmlXPathEvalExpression(BAD_CAST "objectValue|objval", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		ret = check_node_values(node, obj->nodesetval);
+	} else {
+		ret = true;
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return ret;
+}
+
+bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	bool ret = true;
+
+	if (xmlXPathNodeSetIsEmpty(nodes))
+		return true;
+
+	ctx = xmlXPathNewContext(rule->doc);
+	ctx->node = rule;
+
+	obj = xmlXPathEvalExpression(BAD_CAST "objectValue|objval", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < nodes->nodeNr; ++i) {
+			if (!check_node_values(nodes->nodeTab[i], obj->nodesetval)) {
+				ret = false;
+				break;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return ret;
+}
+
+bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
+{
+	bool invalid = false;
+
+	if (allowedObjectFlag) {
+		if (strcmp(allowedObjectFlag, "0") == 0) {
+			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				invalid = obj->boolval;
+			} else {
+				invalid = true;
+			}
+		} else if (strcmp(allowedObjectFlag, "1") == 0) {
+			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				invalid = !obj->boolval;
+			} else {
+				invalid = false;
+			}
+		}
+	}
+
+	if (!invalid && check_values)
+		invalid = !check_objects_values(rule, obj->nodesetval);
+
+	return invalid;
+}
+
+void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule, xmlChar *flag)
 {
 	int i;
 
@@ -121,6 +285,10 @@ void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError
 		xmlNodePtr node = nodes->nodeTab[i];
 		xmlNodePtr object;
 		char line_s[256];
+
+		if (check_values && check_single_object_values(rule, node)) {
+			continue;
+		}
 
 		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
@@ -326,145 +494,6 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 	return found;
 }
 
-/* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
-bool is_in_range(const char *value, const char *range)
-{
-	char *ran;
-	char *first;
-	char *last;
-	bool ret;
-
-	if (!strchr(range, '~')) {
-		return strcmp(value, range) == 0;
-	}
-
-	ran = malloc(strlen(range) + 1);
-
-	strcpy(ran, range);
-
-	first = strtok(ran, "~");
-	last = strtok(NULL, "~");
-
-	ret = strcmp(value, first) >= 0 && strcmp(value, last) <= 0;
-
-	free(ran);
-
-	return ret;
-}
-
-/* Tests whether a value is in an S1000D set (a|b|c) */
-bool is_in_set(const char *value, const char *set)
-{
-	char *s;
-	char *val = NULL;
-	bool ret = false;
-
-	if (!strchr(set, '|')) {
-		return is_in_range(value, set);
-	}
-
-	s = malloc(strlen(set) + 1);
-
-	strcpy(s, set);
-
-	while ((val = strtok(val ? NULL : s, "|"))) {
-		if (is_in_range(value, val)) {
-			ret = true;
-			break;
-		}
-	}
-
-	free(s);
-
-	return ret;
-}
-
-bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
-{
-	int i;
-	bool ret = false;
-
-	if (xmlXPathNodeSetIsEmpty(values))
-		return true;
-
-	for (i = 0; i < values->nodeNr; ++i) {
-		char *allowed, *value, *form;
-
-		allowed = (char *) firstXPathValue(values->nodeTab[i], "@valueAllowed|@val1");
-		form    = (char *) firstXPathValue(values->nodeTab[i], "@valueForm|@valtype");
-		value   = (char *) xmlNodeGetContent(node);
-
-		if (form && strcmp(form, "range") == 0) {
-			ret = ret || is_in_set(value, allowed);
-		} else {
-			ret = ret || strcmp(value, allowed) == 0;
-		}
-				
-		xmlFree(allowed);
-		xmlFree(form);
-		xmlFree(value);
-	}
-
-	return ret;
-}
-
-bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	bool ret = true;
-
-	if (xmlXPathNodeSetIsEmpty(nodes))
-		return true;
-
-	ctx = xmlXPathNewContext(rule->doc);
-	ctx->node = rule;
-
-	obj = xmlXPathEvalExpression(BAD_CAST "objectValue|objval", ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < nodes->nodeNr; ++i) {
-			if (!check_node_values(nodes->nodeTab[i], obj->nodesetval)) {
-				ret = false;
-				break;
-			}
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return ret;
-}
-
-bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
-{
-	bool invalid = false;
-
-	if (allowedObjectFlag) {
-		if (strcmp(allowedObjectFlag, "0") == 0) {
-			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-				invalid = obj->boolval;
-			} else {
-				invalid = true;
-			}
-		} else if (strcmp(allowedObjectFlag, "1") == 0) {
-			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-				invalid = !obj->boolval;
-			} else {
-				invalid = false;
-			}
-		}
-	}
-
-	if (!invalid && check_values)
-		invalid = !check_objects_values(rule, obj->nodesetval);
-
-	return invalid;
-}
-
 bool is_failure(xmlChar *severity)
 {
 	xmlXPathContextPtr ctx;
@@ -632,7 +661,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 
 			if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 				dump_nodes_xml(object->nodesetval, fname,
-					brexError);
+					brexError, rules->nodeTab[i], allowedObjectFlag);
 			}
 			
 			if (severity) {
