@@ -124,6 +124,38 @@ Using strict checking will disable this shorthand, and missing optional elements
 
 ...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.
 
+Object value checking (-c)
+--------------------------
+
+There are two ways to restrict the allowable values of an object in a BREX rule. One is to use the XPath expression itself. For example, this expression will match any `securityClassification` attribute whose value is neither `"01"` nor `"02"`, and because the `allowedObjectFlag` is `"0"`, will generate a BREX error if any match is found:
+
+    <objectPath allowedObjectFlag="0">
+    //@securityClassification[
+    . != '01' and
+    . != '02'
+    ]
+    </objectPath>
+
+However, this method can lead to fairly complex expressions and requires a reversal of logic. The BREX schema provides an alternative method using the element `objectValue`:
+
+    <structureObjectRule>
+    <objectPath allowedObjectFlag="2">
+    //@securityClassification
+    </objectPath>
+    <objectValue valueAllowed="01">Unclassified</objectValue>
+    <objectValue valueAllowed="02">Classified</objectValue>
+    </structureObjectRule>
+
+Specifying the -c option will enable checking of these types of rules, and if the value is not within the allowed set a BREX error will be reported. The `valueForm` attribute can be used to specify what kind of notation the `valueAllowed` attribute will contain:
+
+-   `"single"` - A single, exact value.
+
+-   `"range"` - Values given in the S1000D range/set notation, e.g. `"a~c"` or `"a|b|c"`.
+
+-   `"pattern"` - A regular expression.
+
+The s1kd-brexcheck tool supports all three types. If the `valueForm` attribute is omitted, it will assume the value is in the `"single"` notation.
+
 RETURN VALUE
 ============
 

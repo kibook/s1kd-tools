@@ -15,6 +15,7 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/debugXML.h>
+#include <libxml/xmlregexp.h>
 
 #include "brex.h"
 
@@ -26,7 +27,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.1.2"
+#define VERSION "1.2.0"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -168,6 +169,16 @@ bool is_in_set(const char *value, const char *set)
 	return ret;
 }
 
+bool match_pattern(const char *value, const char *pattern)
+{
+	xmlRegexpPtr regex;
+	bool match;
+	regex = xmlRegexpCompile(BAD_CAST pattern);
+	match = xmlRegexpExec(regex, BAD_CAST value);
+	xmlRegFreeRegexp(regex);
+	return match;
+}
+
 bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 {
 	int i;
@@ -185,6 +196,8 @@ bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 
 		if (form && strcmp(form, "range") == 0) {
 			ret = ret || is_in_set(value, allowed);
+		} else if (form && strcmp(form, "pattern") == 0) {
+			ret = ret || match_pattern(value, allowed);
 		} else {
 			ret = ret || strcmp(value, allowed) == 0;
 		}

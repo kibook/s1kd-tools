@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="00"/>
+        <issueInfo issueNumber="018" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="07" day="06"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add --version option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add details on object value checking (-c).</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -155,7 +155,7 @@
                 <para>Output an XML report instead of a plain-text one.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>
@@ -214,6 +214,43 @@
 </snsSystem>]]></verbatimText>
           </para>
           <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
+        </levelledPara>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Object value checking (-c)</title>
+          <para>There are two ways to restrict the allowable values of an object in a BREX rule. One is to use the XPath expression itself. For example, this expression will match any <verbatimText verbatimStyle="vs13">securityClassification</verbatimText> attribute whose value is neither <verbatimText verbatimStyle="vs14">"01"</verbatimText> nor <verbatimText verbatimStyle="vs14">"02"</verbatimText>, and because the <verbatimText verbatimStyle="vs13">allowedObjectFlag</verbatimText> is <verbatimText verbatimStyle="vs14">"0"</verbatimText>, will generate a BREX error if any match is found:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<objectPath allowedObjectFlag="0">
+//@securityClassification[
+. != '01' and
+. != '02'
+]
+</objectPath>]]></verbatimText>
+          </para>
+          <para>However, this method can lead to fairly complex expressions and requires a reversal of logic. The BREX schema provides an alternative method using the element <verbatimText verbatimStyle="vs12">objectValue</verbatimText>:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
+<objectPath allowedObjectFlag="2">
+//@securityClassification
+</objectPath>
+<objectValue valueAllowed="01">Unclassified</objectValue>
+<objectValue valueAllowed="02">Classified</objectValue>
+</structureObjectRule>]]></verbatimText>
+          </para>
+          <para>Specifying the -c option will enable checking of these types of rules, and if the value is not within the allowed set a BREX error will be reported. The <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute can be used to specify what kind of notation the <verbatimText verbatimStyle="vs13">valueAllowed</verbatimText> attribute will contain:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs14">"single"</verbatimText> - A single, exact value.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs14">"range"</verbatimText> - Values given in the S1000D range/set notation, e.g. <verbatimText verbatimStyle="vs14">"a~c"</verbatimText> or <verbatimText verbatimStyle="vs14">"a|b|c"</verbatimText>.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs14">"pattern"</verbatimText> - A regular expression.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The s1kd-brexcheck tool supports all three types. If the <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute is omitted, it will assume the value is in the <verbatimText verbatimStyle="vs14">"single"</verbatimText> notation.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
