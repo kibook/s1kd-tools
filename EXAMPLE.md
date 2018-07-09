@@ -235,8 +235,13 @@ The BREX allows a project to customize S1000D, for example, by disallowing certa
 Or by tailoring the allowed values of certain elements or attributes:
 
     <structureObjectRule>
-    <objectPath allowedObjectFlag="2">//@securityClassification</objectPath>
-    <objectUse>The security classification must be 01 (Unclassified) or 02 (Classified).</objectUse>
+    <objectPath allowedObjectFlag="2">
+    //@securityClassification
+    </objectPath>
+    <objectUse>
+    The security classification must be 01 (Unclassified)
+    or 02 (Classified).
+    </objectUse>
     <objectValue valueAllowed="01">Unclassified</objectValue>
     <objectValue valueAllowed="02">Classified</objectValue>
     </structureObjectRule>

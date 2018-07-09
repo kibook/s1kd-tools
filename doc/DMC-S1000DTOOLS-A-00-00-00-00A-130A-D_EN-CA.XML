@@ -269,8 +269,13 @@ infoCodeVariant="A" itemLocationCode="D"/>
             <para changeType="add" reasonForUpdateRefIds="rfu-0002">Or by tailoring the allowed values of certain elements or attributes:</para>
             <para changeType="add" reasonForUpdateRefIds="rfu-0002">
               <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
-<objectPath allowedObjectFlag="2">//@securityClassification</objectPath>
-<objectUse>The security classification must be 01 (Unclassified) or 02 (Classified).</objectUse>
+<objectPath allowedObjectFlag="2">
+//@securityClassification
+</objectPath>
+<objectUse>
+The security classification must be 01 (Unclassified)
+or 02 (Classified).
+</objectUse>
 <objectValue valueAllowed="01">Unclassified</objectValue>
 <objectValue valueAllowed="02">Classified</objectValue>
 </structureObjectRule>]]></verbatimText>
