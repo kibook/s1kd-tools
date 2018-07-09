@@ -727,6 +727,32 @@ void show_version(void)
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
+xmlDocPtr load_brex(const char *name)
+{
+	if (access(name, F_OK) != -1) {
+		return xmlReadFile(name, NULL, PARSE_OPTS);
+	} else {
+		unsigned char *xml = NULL;
+		unsigned int len = 0;
+
+		if (strcmp(name, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
+			len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML;
+			len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML;
+			len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML;
+			len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
+		}
+
+		return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	}
+}
+
 bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
 {
 	bool ret;
@@ -758,10 +784,11 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 	int i;
 	xmlDocPtr snsRulesDoc;
 	xmlNodePtr snsRulesGroup;
+	bool correct = true;
 
 	/* Only check SNS in data modules. */
 	if (xmlStrcmp(xmlDocGetRootElement(dmod_doc)->name, BAD_CAST "dmodule") != 0)
-		return true;
+		return correct;
 
 	/* The valid SNS is taken as a combination of the snsRules from all specified BREX data modules. */
 	snsRulesDoc = xmlNewDoc(BAD_CAST "1.0");
@@ -771,7 +798,7 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 	for (i = 0; i < nbrex_fnames; ++i) {
 		xmlDocPtr brex;
 
-		brex = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
+		brex = load_brex(brex_fnames[i]);
 
 		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
 
@@ -788,67 +815,66 @@ bool check_brex_sns(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames, xmlD
 	snsError = xmlNewNode(NULL, BAD_CAST "snsError");
 	xmlNewChild(snsError, NULL, BAD_CAST "document", BAD_CAST real_path(dmod_fname, rpath));
 
+	/* Check the SNS of the data module against the SNS rules in descending order. */
+
+	/* System code. */
 	if (should_check(systemCode, "//snsSystem", snsRulesDoc, ctx)) {
 		sprintf(xpath, "//snsSystem[snsCode = '%s']", (char *) systemCode);
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", systemCode);
 			xmlAddChild(brexCheck, snsError);
-
-			xmlFreeDoc(snsRulesDoc);
-			return false;
+			correct = false;
 		}
 	}
 
-	if (should_check(subSystemCode, ".//snsSubSystem", snsRulesDoc, ctx)) {
+	/* Subsystem code. */
+	if (correct && should_check(subSystemCode, ".//snsSubSystem", snsRulesDoc, ctx)) {
 		sprintf(xpath, ".//snsSubSystem[snsCode = '%s']", (char *) subSystemCode);
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSystemCode");
-
 			sprintf(value, "%s-%s", systemCode, subSystemCode);
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
-
 			xmlAddChild(brexCheck, snsError);
-
-			xmlFreeDoc(snsRulesDoc);
-			return false;
+			correct = false;
 		}
 	}
 
-	if (should_check(subSubSystemCode, ".//snsSubSubSystem", snsRulesDoc, ctx)) {
+	/* Subsubsystem code. */
+	if (correct && should_check(subSubSystemCode, ".//snsSubSubSystem", snsRulesDoc, ctx)) {
 		sprintf(xpath, ".//snsSubSubSystem[snsCode = '%s']", (char *) subSubSystemCode);
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSubSystemCode");
-
 			sprintf(value, "%s-%s%s", systemCode, subSystemCode, subSubSystemCode);
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
-
 			xmlAddChild(brexCheck, snsError);
-
-			xmlFree(snsRulesDoc);
-			return false;
+			correct = false;
 		}
 	}
 
-	if (should_check(assyCode, ".//snsAssy", snsRulesDoc, ctx)) {
+	/* Assembly code. */
+	if (correct && should_check(assyCode, ".//snsAssy", snsRulesDoc, ctx)) {
 		sprintf(xpath, ".//snsAssy[snsCode = '%s']", (char *) assyCode);
 		if (!firstXPathNode(snsRulesDoc, ctx, xpath)) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "assyCode");
-
 			sprintf(value, "%s-%s%s-%s", systemCode, subSystemCode, subSubSystemCode, assyCode);
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
-
 			xmlAddChild(brexCheck, snsError);
-
-			xmlFreeDoc(snsRulesDoc);
-			return false;
+			correct = false;
 		}
 	}
 
-	xmlFreeNode(snsError);
+	if (correct) {
+		xmlFreeNode(snsError);
+	}
 
+	xmlFree(systemCode);
+	xmlFree(subSystemCode);
+	xmlFree(subSubSystemCode);
+	xmlFree(assyCode);
 	xmlFreeDoc(snsRulesDoc);
-	return true;
+
+	return correct;
 }
 
 int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
@@ -912,32 +938,6 @@ int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames,
 	xmlFreeDoc(notationRuleDoc);
 
 	return invalid;
-}
-
-xmlDocPtr load_brex(const char *name)
-{
-	if (access(name, F_OK) != -1) {
-		return xmlReadFile(name, NULL, PARSE_OPTS);
-	} else {
-		unsigned char *xml = NULL;
-		unsigned int len = 0;
-
-		if (strcmp(name, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
-			xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
-			len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
-		} else if (strcmp(name, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
-			xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML;
-			len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML_len;
-		} else if (strcmp(name, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0) {
-			xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML;
-			len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML_len;
-		} else if (strcmp(name, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) {
-			xml = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML;
-			len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
-		}
-
-		return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
-	}
 }
 
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
