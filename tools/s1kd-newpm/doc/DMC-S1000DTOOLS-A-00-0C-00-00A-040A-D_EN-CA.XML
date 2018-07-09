@@ -40,10 +40,10 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add -m option.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
         <simplePara>Fix synopsis/options to include optional DM arguments.</simplePara>
       </reasonForUpdate>
     </dmStatus>

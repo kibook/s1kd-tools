@@ -38,7 +38,7 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add -m option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
