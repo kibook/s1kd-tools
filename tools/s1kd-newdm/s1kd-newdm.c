@@ -45,8 +45,10 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
 
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
@@ -465,6 +467,11 @@ bool find_brex_file(char *dst, const char *code)
 
 	closedir(dir);
 
+	if (!found) {
+		fprintf(stderr, E_BREX_NOT_FOUND, code);
+		exit(EXIT_BAD_BREX_DMC);
+	}
+
 	return found;
 }
 
@@ -528,10 +535,12 @@ xmlDocPtr set_tech_from_sns(void)
 	xmlNodePtr snsTitle;
 	char fname[PATH_MAX];
 
-	if (sns_fname && find_brex_file(fname, sns_fname)) {
-		brex = xmlReadFile(fname, NULL, PARSE_OPTS);
-	} else if (maint_sns) {
+	if (maint_sns) {
 		brex = maint_sns_doc();
+	} else if (sns_fname && find_brex_file(fname, sns_fname)) {
+		brex = xmlReadFile(fname, NULL, PARSE_OPTS);
+	} else if (strcmp(brex_dmcode, "") != 0 && find_brex_file(fname, brex_dmcode)) {
+		brex = xmlReadFile(fname, NULL, PARSE_OPTS);
 	}
 
 	if (!brex) {
@@ -1409,7 +1418,7 @@ int main(int argc, char **argv)
 		exit(EXIT_BAD_DMC);
 	}
 
-	if (!tech_name_flag && (maint_sns || sns_fname)) {
+	if (!tech_name_flag && (maint_sns || sns_fname || strcmp(brex_dmcode, "") != 0)) {
 		xmlDocPtr brex;
 		brex = set_tech_from_sns();
 		xmlFreeDoc(brex);
