@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="031" inWork="00"/>
+        <issueInfo issueNumber="032" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="05"/>
+        <issueDate year="2018" month="07" day="11"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,7 +41,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -B option.</simplePara>
+        <simplePara>Add -k option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -135,7 +135,7 @@
                 <para>Do not include an info name for the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-B</listItemTerm>
               <listItemDefinition>
                 <para>When creating a new BREX data module, use the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to add a basic set of context rules.</para>
@@ -187,6 +187,12 @@
               <listItemTerm>-i &lt;info&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The info name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-k &lt;skill&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The skill level code of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

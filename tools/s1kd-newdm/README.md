@@ -80,6 +80,9 @@ Issue date of the new data module in the form of YYYY-MM-DD.
 -i &lt;info&gt;  
 The info name of the new data module.
 
+-k &lt;skill&gt;  
+The skill level code of the new data module.
+
 -L &lt;language&gt;  
 The language ISO code of the new data module.
 

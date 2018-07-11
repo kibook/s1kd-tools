@@ -50,6 +50,7 @@ Alphabetic index
 | `sender`                        | string                                   |
 | `senderIdent`                   | 5-character NCAGE code                   |
 | `seqNumber`                     | 00001-99999                              |
+| `skillLevelCode`                | sk01-sk99                                |
 | `sns`                           | Data module code of BREX data module     |
 | `subSubSystemCode`              | 1 alphanumeric character                 |
 | `subSystemCode`                 | 1 alphanumeric character                 |

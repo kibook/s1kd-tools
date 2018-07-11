@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="07"/>
+        <issueDate year="2018" month="07" day="11"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Change 'defaults' to '.defaults'</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add skillLevelCode default.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -47,12 +47,12 @@
     <description>
       <levelledPara>
         <title>General</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0001">This document contains an alphabetic index of all valid <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file identifiers, and a description of the values they may be assigned. It also contains examples of a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file using all identifiers in both the XML format and simple text format.</para>
+        <para>This document contains an alphabetic index of all valid <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file identifiers, and a description of the values they may be assigned. It also contains examples of a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file using all identifiers in both the XML format and simple text format.</para>
       </levelledPara>
       <levelledPara>
         <title>Alphabetic index</title>
         <table pgwide="1">
-          <title changeType="modify" reasonForUpdateRefIds="rfu-0001"><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file - Identifier value descriptions</title>
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file - Identifier value descriptions</title>
           <tgroup cols="2">
             <colspec colname="c1"/>
             <colspec colname="c2"/>
@@ -485,6 +485,16 @@
                 </entry>
                 <entry>
                   <para>00001-99999</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">skillLevelCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>sk01-sk99</para>
                 </entry>
               </row>
               <row>

@@ -45,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.4.1"
+#define VERSION "1.5.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
@@ -97,6 +97,7 @@ char *maint_sns = NULL;
 char issue_date[16] = "";
 
 xmlChar *remarks = NULL;
+xmlChar *skill_level_code;
 
 /* Omit the issue information from the object filename. */
 bool no_issue = false;
@@ -261,6 +262,7 @@ void show_help(void)
 	puts("  -s         Schema");
 	puts("  -I         Issue date");
 	puts("  -m         Remarks");
+	puts("  -k         Skill level");
 }
 
 void show_version(void)
@@ -336,6 +338,8 @@ void copy_default_value(const char *key, const char *val)
 		maint_sns = strdup(val);
 	else if (strcmp(key, "includePrevSnsTitle") == 0 && !sns_prev_title_set)
 		sns_prev_title = strcasecmp(val, "true") == 0;
+	else if (strcmp(key, "skillLevelCode") == 0 && !skill_level_code)
+		skill_level_code = xmlStrdup(BAD_CAST val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -1056,6 +1060,20 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+void set_skill_level(xmlDocPtr doc, xmlChar *code)
+{
+	xmlNodePtr skill_level;
+
+	skill_level = firstXPathNode(doc, NULL, "//skillLevel");
+
+	if (code) {
+		xmlSetProp(skill_level, BAD_CAST "skillLevelCode", code);
+	} else {
+		xmlUnlinkNode(skill_level);
+		xmlFreeNode(skill_level);
+	}
+}
+
 /* Dump the built-in dmtypes XML or text */
 void print_dmtypes(void)
 {
@@ -1186,7 +1204,7 @@ int main(int argc, char **argv)
 	xmlDocPtr defaults_xml;
 	xmlNodePtr brex_rules = NULL;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!h?";
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1235,6 +1253,7 @@ int main(int argc, char **argv)
 			case 'M': maint_sns = strdup(optarg); break;
 			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
 			case '!': no_info_name = true; break;
+			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -1517,6 +1536,8 @@ int main(int argc, char **argv)
 			xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST originator_enterpriseName);
 		}
 	}
+
+	set_skill_level(dm, skill_level_code);
 
 	set_remarks(dm, remarks);
 

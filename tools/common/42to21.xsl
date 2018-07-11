@@ -841,4 +841,16 @@
     <applic/>
   </xsl:template>
 
+  <xsl:template match="skillLevel">
+    <skill>
+      <xsl:apply-templates select="@*|node()"/>
+    </skill>
+  </xsl:template>
+
+  <xsl:template match="@skillLevelCode">
+    <xsl:attribute name="skill">
+      <xsl:apply-templates/>
+    </xsl:attribute>
+  </xsl:template>
+
 </xsl:stylesheet>
