@@ -1,10 +1,4 @@
-Usage: s1kd-instance [-e <ext>|-E] [-c <dmc>] [-l <lang>]
-                     [-m <remarks>] [-n <iss>] [-I <date>]
-                     [-o <file>|-O <dir>] [-t <techName>]
-                     [-i <infoName>] [-a|-A] [-Y <text>]
-                     [-C <comment>] [-X <path>]
-                     [-g [-G <CODE>/<NAME>]] [-R <CIR> ...] [-S] [-v]
-		     [-s <applic> ...] [<object>...]
+Usage: s1kd-instance [options] [<object>...]
 
 Options:
   -A            Simplify and remove unused applicability annotations.
@@ -20,6 +14,8 @@ Options:
   -h -?         Show this help/usage message.
   -I <date>     Set the issue date of the instance.
   -i <infoName> Give the data module instance a different infoName.
+  -k <level>    Set the skill level of the instance.
+  -K <levels>   Filter on the specified skill levels.
   -L            Source (-s/stdin) is a list of files instead of a DM.
   -l <lang>     Specify the language of the instance.
   -m <remarks>  Set the remarks for the instance.
@@ -34,12 +30,13 @@ Options:
   -S            Do not include <sourceDmIdent> or <repositorySourceDmIdent>.
   -s <applic>   An assign in the form of <ident>:<type>=<value>
   -t <techName> Give the instance a different techName/pmTitle.
+  -U <classes>  Filter on the specified security classes.
   -u <sec>      Set the security classification of the instance.
   -v            Print the file name of the instance when -O is used.
-  -w            Check the applic of the whole DM.
+  -w            Check the status of the whole object.
   -X            XPath where the -C comment will be inserted.
   -x <CIR>      Dump default XSLT for resolving CIR references.
   -Y <text>     Set applic for DM with text as the display text.
   -y            Set applic for DM based on the user-defined defs.
   --version     Show version information.
-  object...     Source CSDB object(s)
+  <object>...   Source CSDB object(s)

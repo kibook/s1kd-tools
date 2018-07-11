@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1924,7 +1924,7 @@ void remove_emptry_pmentries(xmlDocPtr doc)
 }
 
 /* General XSLT transformation with embedded stylesheet, preserving the DTD. */
-void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
+void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc, res, src;
 	xsltStylesheetPtr style;
@@ -1935,7 +1935,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 	style = xsltParseStylesheetDoc(styledoc);
 
 	src = xmlCopyDoc(doc, 1);
-	res = xsltApplyStylesheet(style, src, NULL);
+	res = xsltApplyStylesheet(style, src, params);
 	xmlFreeDoc(src);
 
 	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
@@ -1948,7 +1948,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 /* Flatten alts elements. */
 void flatten_alts(xmlDocPtr doc)
 {
-	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len);
+	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len, NULL);
 }
 
 /* Insert a custom comment. */
@@ -2030,6 +2030,105 @@ void set_remarks(xmlDocPtr doc, const char *s)
 	}
 }
 
+/* Return whether objects with the given classification code should be
+ * instantiated. */
+bool valid_object(xmlDocPtr doc, const char *path, const char *codes)
+{
+	xmlNodePtr obj;
+	xmlChar *code;
+	bool has;
+	if (!(obj = first_xpath_node(doc, NULL, path))) {
+		return true;
+	}
+	code = xmlNodeGetContent(obj);
+	has = strstr(codes, (char *) code);
+	xmlFree(code);
+	return has;
+}
+
+/* Remove elements that have an attribute whose value does not match a given
+ * set of valid values. */
+void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *codes)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlChar xpath[256];
+
+	ctx = xmlXPathNewContext(doc);
+
+	xmlStrPrintf(xpath, 256, "//content//*[@%s]", att);
+	obj = xmlXPathEvalExpression(xpath, ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *val;
+
+			val = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST att);
+
+			if (!strstr(codes, (char *) val)) {
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
+			}
+
+			xmlFree(val);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+/* Determine whether or not to create an instance based on the object's:
+ * - Applicability
+ * - Skill level
+ * - Security classification
+ */
+bool create_instance(xmlDocPtr doc, const char *skills, const char *securities)
+{
+	if (!check_wholedm_applic(doc)) {
+		return false;
+	}
+
+	if (securities && !valid_object(doc, "//dmStatus/security/@securityClassification", securities)) {
+		return false;
+	}
+
+	if (skills && !valid_object(doc, "//dmStatus/skillLevel/@skillLevelCode", skills)) {
+		return false;
+	}
+
+	return true;
+}
+
+/* Set the skill level code of the instance. */
+void set_skill(xmlDocPtr doc, const char *skill)
+{
+	xmlNodePtr skill_level;
+
+	if (xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "dmodule") != 0) {
+		return;
+	}
+
+	skill_level = first_xpath_node(doc, NULL, "//skillLevel");
+
+	if (!skill_level) {
+		xmlNodePtr node;
+		node = first_xpath_node(doc, NULL,
+			"("
+			"//qualityAssurance|"
+			"//systemBreakdownCode|"
+			"//functionalItemCode|"
+			"//dmStatus/functionalItemRef"
+			")[last()]");
+		skill_level = xmlNewNode(NULL, BAD_CAST "skillLevel");
+		xmlAddNextSibling(node, skill_level);
+	}
+
+	xmlSetProp(skill_level, BAD_CAST "skillLevelCode", BAD_CAST skill);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -2083,10 +2182,13 @@ int main(int argc, char **argv)
 	char *origspec = NULL;
 	bool flat_alts = false;
 	char *remarks = NULL;
+	char *skill_codes = NULL;
+	char *sec_classes = NULL;
+	char *skill = NULL;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:m:h?";
+	const char *sopts = "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:m:k:U:K:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2142,6 +2244,9 @@ int main(int argc, char **argv)
 			case 'G': setorig = true; origspec = strdup(optarg); break;
 			case 'F': flat_alts = true; break;
 			case 'm': remarks = strdup(optarg); break;
+			case 'k': skill = strdup(optarg); break;
+			case 'U': sec_classes = strdup(optarg); break;
+			case 'K': skill_codes = strdup(optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2218,7 +2323,7 @@ int main(int argc, char **argv)
 		root = xmlDocGetRootElement(doc);
 		ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
 
-		if (!wholedm || check_wholedm_applic(doc)) {
+		if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
 			if (add_source_ident) {
 				add_source(doc);
 			}
@@ -2254,6 +2359,17 @@ int main(int argc, char **argv)
 				if (simpl) {
 					simpl_applic_clean(referencedApplicGroup);
 				}
+			}
+
+			/* Remove elements whose securityClassification is not
+			 * in the given list. */
+			if (sec_classes) {
+				filter_elements_by_att(doc, "securityClassification", sec_classes);
+			}
+			/* Remove elements whose skillLevelCode is not in the
+			 * given list. */
+			if (skill_codes) {
+				filter_elements_by_att(doc, "skillLevelCode", skill_codes);
 			}
 
 			if (strcmp(extension, "") != 0) {
@@ -2292,6 +2408,10 @@ int main(int argc, char **argv)
 
 			if (setorig) {
 				set_orig(doc, origspec);
+			}
+
+			if (skill) {
+				set_skill(doc, skill);
 			}
 
 			if (remarks) {
@@ -2338,6 +2458,9 @@ int main(int argc, char **argv)
 
 	free(origspec);
 	free(remarks);
+	free(skill);
+	free(skill_codes);
+	free(sec_classes);
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();

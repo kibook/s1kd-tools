@@ -6,13 +6,7 @@ s1kd-instance - Create S1000D data/pub module instances
 SYNOPSIS
 ========
 
-    s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
-                  [-g|-G <CODE>/<NAME>] [-I <date>] [-i <infoName>]
-                  [-l <lang>] [-m <remarks>] [-n <iss>]
-                  [-o <file>|-O <dir>] [-P <PCT> -p <id>] [-R <CIR> ...]
-                  [-r <XSL>] [-s <applic> ...] [-t <techName>] [-u <sec>]
-                  [-x <CIR>] [-X <path>] [-y|-Y <text>] [-FfLNS]
-                  [<object>...]
+    s1kd-instance [options] [<object>...]
 
 DESCRIPTION
 ===========
@@ -20,6 +14,8 @@ DESCRIPTION
 The *s1kd-instance* tool produces an "instance" of an S1000D CSDB object, derived from a "master" (or "source") object. The tool supports multiple methods of instantiating an object:
 
 -   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
+
+-   Filtering on skill levels and security classifications.
 
 -   Using a CIR (Common Information Repository) to produce a standalone instance from a CIR-dependent master.
 
@@ -65,6 +61,12 @@ Set the issue date of the instance. By default, the issue date is taken from the
 
 -i &lt;infoName&gt;  
 Give the data module instance a different infoName.
+
+-K &lt;levels&gt;  
+Filter the object on the specified skill levels. Elements which are marked with skill levels not contained in the string &lt;levels&gt; are removed in the resulting instance.
+
+-k &lt;level&gt;  
+Set the skill level of the instance.
 
 -L  
 Source is a list of object filenames to create instances of, rather than an object itself.
@@ -152,6 +154,9 @@ Any number of values can be defined by specifying this option multiple times.
 -t &lt;techName&gt;  
 Give the instance a different techName/pmTitle.
 
+-U &lt;classes&gt;  
+Filter the object on the specified security classes. Elements marked with security classes not contained in the string &lt;classes&gt; are removed in the resulting instance.
+
 -u &lt;sec&gt;  
 Set the security classification of the instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.
 
@@ -159,7 +164,7 @@ Set the security classification of the instance. An instance may have a lower se
 When -O is used, print the automatically generated file name of the instance.
 
 -w  
-Check the applicability of the whole object against the user-defined applicability. If the whole object is not applicable, then no instance is created.
+Check the applicability, skill level, and security classification of the whole object against the user-defined applicability, skill levels, and security classifications. If the whole object is not applicable, then no instance is created.
 
 -X &lt;path&gt;  
 The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.
@@ -374,6 +379,10 @@ Filtering a data module on specified applicability and writing to stdout:
 Filtering a data module on a specified product instance and writing to stdout:
 
     $ s1kd-instance -P <PCT> -p versionA <DM>
+
+Filtering a data module on specified skill levels and writing to stdout:
+
+    $ s1kd-instance -k sk01/sk02 <DMs>
 
 Filtering data modules for a particular customer and outputting with extended identification:
 

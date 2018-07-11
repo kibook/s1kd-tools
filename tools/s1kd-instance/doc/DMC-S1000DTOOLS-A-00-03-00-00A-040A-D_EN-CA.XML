@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="020" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="02"/>
+        <issueDate year="2018" month="07" day="10"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -m option.</simplePara>
+        <simplePara>Add -k, -K and -U options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
+        <simplePara>Simplify synopsis.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,13 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-instance [-a|-A] [-C <comment>] [-c <dmc>] [-e <ext>|-E]
-              [-g|-G <CODE>/<NAME>] [-I <date>] [-i <infoName>]
-              [-l <lang>] [-m <remarks>] [-n <iss>]
-              [-o <file>|-O <dir>] [-P <PCT> -p <id>] [-R <CIR> ...]
-              [-r <XSL>] [-s <applic> ...] [-t <techName>] [-u <sec>]
-              [-x <CIR>] [-X <path>] [-y|-Y <text>] [-FfLNS]
-              [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-instance [options] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -68,6 +65,9 @@
           <randomList>
             <listItem>
               <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition></acronym>.</para>
+            </listItem>
+            <listItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <para>Filtering on skill levels and security classifications.</para>
             </listItem>
             <listItem>
               <para>Using a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition></acronym> to produce a standalone instance from a CIR-dependent master.</para>
@@ -155,6 +155,18 @@
                 <para>Give the data module instance a different infoName.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-K &lt;levels&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Filter the object on the specified skill levels. Elements which are marked with skill levels not contained in the string &lt;levels&gt; are removed in the resulting instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-k &lt;level&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the skill level of the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-L</listItemTerm>
               <listItemDefinition>
@@ -167,7 +179,7 @@
                 <para>Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the remarks for the instance.</para>
@@ -305,6 +317,12 @@
                 <para>Give the instance a different techName/pmTitle.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-U &lt;classes&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Filter the object on the specified security classes. Elements marked with security classes not contained in the string &lt;classes&gt; are removed in the resulting instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-u &lt;sec&gt;</listItemTerm>
               <listItemDefinition>
@@ -317,10 +335,10 @@
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
-                <para>Check the applicability of the whole object against the user-defined applicability. If the whole object is not applicable, then no instance is created.</para>
+                <para>Check the applicability, skill level, and security classification of the whole object against the user-defined applicability, skill levels, and security classifications. If the whole object is not applicable, then no instance is created.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -566,6 +584,10 @@ is an item in the system.
         <para>Filtering a data module on a specified product instance and writing to stdout:</para>
         <para>
           <verbatimText verbatimStyle="vs24">$ s1kd-instance -P &lt;PCT&gt; -p versionA &lt;DM&gt;</verbatimText>
+        </para>
+        <para changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">Filtering a data module on specified skill levels and writing to stdout:</para>
+        <para changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+          <verbatimText verbatimStyle="vs24">$ s1kd-instance -k sk01/sk02 &lt;DMs&gt;</verbatimText>
         </para>
         <para>Filtering data modules for a particular customer and outputting with extended identification:</para>
         <para>
