@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -844,6 +844,41 @@ void show_learn_event_code(xmlNodePtr node, int endl)
 	show_simple_attr(node, "learnEventCode", endl);
 }
 
+void show_skill_level(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "skill") == 0) {
+		show_simple_attr(node, "skill", endl);
+	} else {
+		show_simple_attr(node, "skillLevelCode", endl);
+	}
+}
+
+int edit_skill_level(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "skill") == 0) {
+		return edit_simple_attr(node, "skill", val);
+	} else {
+		return edit_simple_attr(node, "skillLevelCode", val);
+	}
+}
+
+int create_skill_level(xmlXPathContextPtr ctx, const char *val)
+{
+	xmlNodePtr node, skill_level;
+	int iss30;
+	node = first_xpath_node(
+		"(//qualityAssurance|//qa|"
+		"//systemBreakdownCode|//sbc|"
+		"//functionalItemCode|//fic|"
+		"//dmStatus/functionalItemRef|//status/ein"
+		")[last()]", ctx);
+	iss30 = xmlStrcmp(node->parent->name, BAD_CAST "status") == 0;
+	skill_level = xmlNewNode(NULL, BAD_CAST (iss30 ? "skill" : "skillLevel"));
+	xmlAddNextSibling(node, skill_level);
+	xmlSetProp(skill_level, BAD_CAST (iss30 ? "skill" : "skillLevelCode"), BAD_CAST val);
+	return 0;
+}
+
 struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -1085,6 +1120,12 @@ struct metadata metadata[] = {
 		edit_simple_node,
 		NULL,
 		"Short title of a publication module"},
+	{"skillLevelCode",
+		"//dmStatus/skillLevel/@skillLevelCode|//status/skill/@skill",
+		show_skill_level,
+		edit_skill_level,
+		create_skill_level,
+		"Skill level code of the data module"},
 	{"subSubSystemCode",
 		"//@subSubSystemCode|//subsect",
 		show_sub_sub_system_code,
