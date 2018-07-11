@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <icnCatalog>
-  <notation name="png" systemId="png"/>
+  <notation name="JPG" systemId="JPG"/>
   <media name="github">
-    <icn infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-SLOGO-A-001-01" uri="doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-SLOGO-A-001-01.PNG" notation="png"/>
+    <icn infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01" uri="doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01.JPG" notation="JPG"/>
   </media>
 </icnCatalog>
