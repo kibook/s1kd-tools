@@ -106,6 +106,7 @@ Example - XML format
     <default ident="securityClassification" value="01"/>
     <default ident="senderIdent" value="12345"/>
     <default ident="seqNumber" value="00001"/>
+    <default ident="skillLevelCode" value="sk01"/>
     <default ident="sns" value="MYPRJ-A-00-00-00-00A-022A-D"/>
     <default ident="subSubSystem" value="0"/>
     <default ident="subSystem" value="0"/>
@@ -160,6 +161,7 @@ Example - Simple text format
     sender                         khzae.net
     senderIdent                    12345
     seqNumber                      00001
+    skillLevelCode                 sk01
     sns                            MYPRJ-A-00-00-00-00A-022A-D
     subSubSystem                   0
     subSystem                      0
