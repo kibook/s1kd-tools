@@ -1,8 +1,6 @@
 s1kd-tools
 ==========
 
-![Urocyon littoralis](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01.JPG)
-
 A set of small tools for manipulating S1000D data.
 
 [Introduction](INTRO.md)

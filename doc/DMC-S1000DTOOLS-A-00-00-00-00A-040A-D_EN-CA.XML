@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE dmodule [
-<!NOTATION JPG SYSTEM "JPG" >
-<!ENTITY ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01 SYSTEM "ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01.JPG" NDATA JPG>
-]>
+<!DOCTYPE dmodule>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="11"/>
+        <issueDate year="2018" month="07" day="13"/>
         <dmTitle>
           <techName>S1000D tools</techName>
           <infoName>Description</infoName>
@@ -42,25 +39,15 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add project title.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add logo.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Change title of S1000D spec sample link.</simplePara>
+      <reasonForUpdate id="rfu-0001">
+        <simplePara>Remove logo.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
-      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001 rfu-0002 rfu-0003">
+      <levelledPara>
         <title>s1kd-tools</title>
-        <figure>
-          <title>Urocyon littoralis</title>
-          <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
-        </figure>
         <para>A set of small tools for manipulating S1000D data.</para>
         <para>
           <externalPubRef xlink:href="INTRO.md">
