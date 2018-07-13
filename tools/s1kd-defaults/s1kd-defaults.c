@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -276,7 +276,7 @@ xmlDocPtr new_defaults_from_brex(xmlDocPtr brex)
 {
 	xmlDocPtr res, sorted;
 
-	res = transform_doc(brex, brex2defaults_xsl, brex2defaults_xsl_len);
+	res = transform_doc(brex, xsl_brex2defaults_xsl, xsl_brex2defaults_xsl_len);
 	sorted = sort_entries(res);
 	xmlFreeDoc(res);
 	return sorted;
@@ -287,7 +287,7 @@ xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex)
 {
 	xmlDocPtr res, sorted;
 
-	res = transform_doc(brex, brex2dmtypes_xsl, brex2dmtypes_xsl_len);
+	res = transform_doc(brex, xsl_brex2dmtypes_xsl, xsl_brex2dmtypes_xsl_len);
 	sorted = sort_entries(res);
 	xmlFreeDoc(res);
 	return sorted;

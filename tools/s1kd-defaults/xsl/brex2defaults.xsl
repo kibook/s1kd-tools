@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
- 
+
   <xsl:template match="/">
     <defaults>
       <xsl:apply-templates select="//structureObjectRule"/>
@@ -18,6 +18,7 @@
         <xsl:when test="objectPath = '//responsiblePartnerCompany/enterpriseName'">responsiblePartnerCompany</xsl:when>
         <xsl:when test="objectPath = '//responsiblePartnerCompany/@enterpriseCode'">responsiblePartnerCompanyCode</xsl:when>
         <xsl:when test="objectPath = '//@securityClassification'">securityClassification</xsl:when>
+        <xsl:when test="objectPath = '//@skillLevelCode">skillLevelCode</xsl:when>
       </xsl:choose>
     </xsl:variable>
     <xsl:if test="$ident != '' and objectValue">

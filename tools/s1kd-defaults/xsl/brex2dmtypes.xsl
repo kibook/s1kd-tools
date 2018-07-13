@@ -4,7 +4,7 @@
   <xsl:template match="/">
     <xsl:apply-templates select="//structureObjectRule[objectPath = '//@infoCode']"/>
   </xsl:template>
- 
+
   <xsl:template match="structureObjectRule">
     <dmtypes>
       <xsl:apply-templates select="objectValue"/>

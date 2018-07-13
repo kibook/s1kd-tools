@@ -45,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
@@ -1146,6 +1146,8 @@ void add_brex_rule(xmlNodePtr rules, const char *key, const char *val)
 		path = "//responsiblePartnerCompany/@enterpriseCode";
 	} else if (strcmp(key, "securityClassification") == 0) {
 		path = "//@securityClassification";
+	} else if (strcmp(key, "skillLevelCode") == 0) {
+		path = "//@skillLevelCode";
 	} else {
 		return;
 	}
