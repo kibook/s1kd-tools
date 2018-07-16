@@ -27,7 +27,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -921,7 +921,7 @@ int check_brex_notations(char brex_fnames[BREX_MAX][PATH_MAX], int nbrex_fnames,
 	for (i = 0; i < nbrex_fnames; ++i) {
 		xmlDocPtr brex;
 
-		brex = xmlReadFile(brex_fnames[i], NULL, PARSE_OPTS);
+		brex = load_brex(brex_fnames[i]);
 
 		xmlAddChild(notationRuleGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//notationRuleList"), 1));
 
