@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:attribute name="path" type="xs:string"/>
+  <xs:attribute name="ident" type="xs:string"/>
+  <xs:element name="dmtypes" type="dmtypesElemType"/>
+  <xs:complexType name="dmtypesElemType">
+    <xs:attribute ref="path" use="required"/>
+  </xs:complexType>
+  <xs:element name="default" type="defaultElemType"/>
+  <xs:complexType name="defaultElemType">
+    <xs:attribute ref="path" use="required"/>
+    <xs:attribute ref="ident" use="required"/>
+  </xs:complexType>
+  <xs:element name="brexMap" type="brexMapElemType"/>
+  <xs:complexType name="brexMapElemType">
+    <xs:sequence>
+      <xs:element ref="dmtypes" minOccurs="0"/>
+      <xs:element ref="default" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

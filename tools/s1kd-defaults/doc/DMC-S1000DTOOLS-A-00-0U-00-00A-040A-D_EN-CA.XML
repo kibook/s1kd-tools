@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="U" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="05"/>
+        <issueDate year="2018" month="07" day="16"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Load .defaults or .dmtypes template content from BREX with -b option.</simplePara>
+        <simplePara>Add -j option and .brexmap file.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-defaults [-DdFfisth?] [-b &lt;BREX&gt;] [&lt;file&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">s1kd-defaults [-DdFfisth?] [-b &lt;BREX&gt;] [-j &lt;map&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -66,7 +66,7 @@
             <definitionListItem>
               <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Use the specified BREX data module to build the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. This can be used both when initializing a new CSDB (-i) or either file can be generated from a BREX data module separately.</para>
+                <para>Use the specified BREX data module to build the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. This can be used both when initializing a new CSDB (-i) or either file can be generated from a BREX data module separately.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -97,6 +97,12 @@
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
                 <para>Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-j &lt;map&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom .brexmap file to map a BREX DM to a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> or <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -131,6 +137,19 @@
             </definitionListItem>
           </definitionList>
         </para>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+          <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>
+          <para>This file specifies a mapping between BREX structure object rules and <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. The path to an object can be written in many different ways in a BREX rule, so the <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file allows any project's BREX to be used to generate these files without having to modify the BREX data module itself.</para>
+          <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> in the current directory, but any file can be specified using the -j option. If there is no <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file and the -j option is not specified, a default mapping will be used.</para>
+          <para>Example of <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<brexMap>
+<dmtypes path="//@infoCode"/>
+<default path="//@languageIsoCode" ident="languageIsoCode"/>
+<default path="//@countryIsoCode" ident="countryIsoCode"/>
+</brexMap>]]></verbatimText>
+          </para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLES</title>

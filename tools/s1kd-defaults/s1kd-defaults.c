@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.3.2"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -34,7 +34,7 @@ enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
 /* Show the help/usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Ddfisth?] [<file>...]");
+	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [<file>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
@@ -44,6 +44,7 @@ void show_help(void)
 	puts("  -F         Convert a .fmtypes file.");
 	puts("  -f         Overwrite an existing file.");
 	puts("  -i         Initialize a new CSDB.");
+	puts("  -j <map>   Use a custom .brexmap file.");
 	puts("  -s         Sort entries.");
 	puts("  -t         Output in the simple text format.");
 	puts("  --version  Show version information.");
@@ -54,17 +55,23 @@ void show_version(void)
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 }
 
+xmlDocPtr transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc)
+{
+	xsltStylesheetPtr style;
+	xmlDocPtr res;
+	style = xsltParseStylesheetDoc(styledoc);
+	res = xsltApplyStylesheet(style, doc, NULL);
+	xsltFreeStylesheet(style);
+	return res;
+}
+
 /* Apply a built-in XSLT stylesheet to an XML document. */
 xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 {
 	xmlDocPtr styledoc, res;
-	xsltStylesheetPtr style;
 
 	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
-	style = xsltParseStylesheetDoc(styledoc);
-
-	res = xsltApplyStylesheet(style, doc, NULL);
-	xsltFreeStylesheet(style);
+	res = transform_doc_with(doc, styledoc);
 
 	return res;
 }
@@ -271,35 +278,59 @@ void set_defaults(xmlDocPtr doc)
 	}
 }
 
-/* Create a .defaults file from a BREX DM. */
-xmlDocPtr new_defaults_from_brex(xmlDocPtr brex)
+/* Use the .brexmap to create the XSL to transform a BREX DM to a .defaults
+ * file.
+ */
+xmlDocPtr make_brex2defaults_xsl(xmlDocPtr brexmap)
 {
-	xmlDocPtr res, sorted;
+	xmlDocPtr res;
+	res = transform_doc(brexmap, xsl_brexmap_defaults_xsl, xsl_brexmap_defaults_xsl_len);
+	return res;
+}
 
-	res = transform_doc(brex, xsl_brex2defaults_xsl, xsl_brex2defaults_xsl_len);
+/* Use the .brexmap to create the XSL to transform a BREX DM to a .dmtypes
+ * file.
+ */
+xmlDocPtr make_brex2dmtypes_xsl(xmlDocPtr brexmap)
+{
+	xmlDocPtr res;
+	res = transform_doc(brexmap, xsl_brexmap_dmtypes_xsl, xsl_brexmap_dmtypes_xsl_len);
+	return res;
+}
+
+/* Create a .defaults file from a BREX DM. */
+xmlDocPtr new_defaults_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
+{
+	xmlDocPtr styledoc, res, sorted;
+
+	styledoc = make_brex2defaults_xsl(brexmap);
+	res = transform_doc_with(brex, styledoc);
 	sorted = sort_entries(res);
 	xmlFreeDoc(res);
+
 	return sorted;
 }
 
 /* Create a .dmtypes file from a BREX DM. */
-xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex)
+xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
 {
-	xmlDocPtr res, sorted;
+	xmlDocPtr styledoc, res, sorted;
 
-	res = transform_doc(brex, xsl_brex2dmtypes_xsl, xsl_brex2dmtypes_xsl_len);
+	styledoc = make_brex2dmtypes_xsl(brexmap);
+	res = transform_doc_with(brex, styledoc);
 	sorted = sort_entries(res);
 	xmlFreeDoc(res);
+
 	return sorted;
 }
 
 /* Dump the built-in defaults in the XML format. */
-void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex)
+void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc;
 
 	if (brex) {
-		doc = new_defaults_from_brex(brex);
+		doc = new_defaults_from_brex(brex, brexmap);
 	} else {
 		doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
 		set_defaults(doc);
@@ -310,17 +341,18 @@ void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex)
 	} else {
 		xmlSaveFile("-", doc);
 	}
+
 	xmlFreeDoc(doc);
 }
 
 /* Dump the built-in defaults in the simple text format. */
-void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex)
+void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc, res;
 	FILE *f;
 
 	if (brex) {
-		doc = new_defaults_from_brex(brex);
+		doc = new_defaults_from_brex(brex, brexmap);
 	} else {
 		doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
 		set_defaults(doc);
@@ -344,17 +376,17 @@ void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex)
 	xmlFreeDoc(doc);
 }
 
-xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr brex)
+xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc = NULL;
 
 	switch (f) {
 		case NONE:
 		case DEFAULTS:
-			doc = brex ? new_defaults_from_brex(brex) : text_defaults_to_xml(path);
+			doc = brex ? new_defaults_from_brex(brex, brexmap) : text_defaults_to_xml(path);
 			break;
 		case DMTYPES:
-			doc = brex ? new_dmtypes_from_brex(brex) : text_dmtypes_to_xml(path);
+			doc = brex ? new_dmtypes_from_brex(brex, brexmap) : text_dmtypes_to_xml(path);
 			break;
 		case FMTYPES:
 			doc = text_fmtypes_to_xml(path);
@@ -372,12 +404,12 @@ xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr
 }
 
 /* Convert an XML defaults/dmtypes file to the simple text version. */
-void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex)
+void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc, res = NULL;
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
-		doc = simple_text_to_xml(path, f, sort, brex);
+		doc = simple_text_to_xml(path, f, sort, brex, brexmap);
 	}
 
 	switch (f) {
@@ -412,11 +444,11 @@ void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDo
 }
 
 /* Convert a simple text defaults/dmtypes file to the XML version. */
-void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex)
+void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc;
 
-	doc = simple_text_to_xml(path, f, sort, brex);
+	doc = simple_text_to_xml(path, f, sort, brex, brexmap);
 
 	if (sort) {
 		xmlDocPtr res;
@@ -434,7 +466,7 @@ void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDo
 	xmlFreeDoc(doc);
 }
 
-void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex)
+void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	if (f != NONE && (!brex || f == FMTYPES) && access(fname, F_OK) == -1) {
 		fprintf(stderr, S_NO_FILE_ERR, fname);
@@ -443,16 +475,25 @@ void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overw
 
 	if (fmt == TEXT) {
 		if (f == NONE) {
-			dump_defaults_text(fname, overwrite, brex);
+			dump_defaults_text(fname, overwrite, brex, brexmap);
 		} else {
-			xml_to_text(fname, f, overwrite, sort, brex);
+			xml_to_text(fname, f, overwrite, sort, brex, brexmap);
 		}
 	} else if (fmt == XML) {
 		if (f == NONE) {
-			dump_defaults_xml(fname, overwrite, brex);
+			dump_defaults_xml(fname, overwrite, brex, brexmap);
 		} else {
-			text_to_xml(fname, f, overwrite, sort, brex);
+			text_to_xml(fname, f, overwrite, sort, brex, brexmap);
 		}
+	}
+}
+
+xmlDocPtr read_default_brexmap(void)
+{
+	if (access(DEFAULT_BREXMAP_FNAME, F_OK) != -1) {
+		return xmlReadFile(DEFAULT_BREXMAP_FNAME, NULL, PARSE_OPTS);
+	} else {
+		return xmlReadMemory((const char *) brexmap_xml, brexmap_xml_len, NULL, NULL, PARSE_OPTS);
 	}
 }
 
@@ -466,8 +507,9 @@ int main(int argc, char **argv)
 	bool initialize = false;
 	bool sort = false;
 	xmlDocPtr brex = NULL;
+	xmlDocPtr brexmap = NULL;
 
-	const char *sopts = "b:DdFfisth?";
+	const char *sopts = "b:DdFfij:sth?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -503,6 +545,9 @@ int main(int argc, char **argv)
 			case 'i':
 				initialize = true;
 				break;
+			case 'j':
+				if (!brexmap) brexmap = xmlReadFile(optarg, NULL, PARSE_OPTS);
+				break;
 			case 's':
 				sort = true;
 				break;
@@ -520,10 +565,14 @@ int main(int argc, char **argv)
 		fname = strdup(DEFAULT_DEFAULTS_FNAME);
 	}
 
+	if (!brexmap) {
+		brexmap = read_default_brexmap();
+	}
+
 	if (initialize) {
 		char sys[256];
 		const char *opt;
-		void (*fn)(const char *, bool, xmlDocPtr);
+		void (*fn)(const char *, bool, xmlDocPtr, xmlDocPtr);
 
 		if (fmt == TEXT) {
 			opt = "-.";
@@ -533,12 +582,12 @@ int main(int argc, char **argv)
 			fn = dump_defaults_xml;
 		}
 
-		fn(DEFAULT_DEFAULTS_FNAME, true, brex);
+		fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap);
 
 		if (brex) {
 			xmlDocPtr dmtypes;
 
-			dmtypes = new_dmtypes_from_brex(brex);
+			dmtypes = new_dmtypes_from_brex(brex, brexmap);
 
 			if (fmt == TEXT) {
 				xmlDocPtr res;
@@ -568,14 +617,15 @@ int main(int argc, char **argv)
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			convert_or_dump(fmt, f, argv[i], overwrite, sort, brex);
+			convert_or_dump(fmt, f, argv[i], overwrite, sort, brex, brexmap);
 		}
 	} else {
-		convert_or_dump(fmt, f, fname, overwrite, sort, brex);
+		convert_or_dump(fmt, f, fname, overwrite, sort, brex, brexmap);
 	}
 
 	free(fname);
 	xmlFreeDoc(brex);
+	xmlFreeDoc(brexmap);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

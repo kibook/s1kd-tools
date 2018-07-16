@@ -17,9 +17,10 @@ $(OUTPUT): $(SOURCE) xsl.h defaults.h
 defaults.h: defaults.xml
 	xxd -i defaults.xml > defaults.h
 
-xsl.h: xsl/*
+xsl.h: xsl/* brexmap.xml
 	>xsl.h
 	for f in xsl/*; do xxd -i "$$f" >> xsl.h; done
+	xxd -i brexmap.xml >> xsl.h
 
 .PHONY: clean install uninstall
 

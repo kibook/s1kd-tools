@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<brexMap>
+  <dmtypes path="//@infoCode"/>
+  <default path="//@countryIsoCode" ident="countryIsoCode"/>
+  <default path="//@languageIsoCode" ident="languageIsoCode"/>
+  <default path="//@modelIdentCode" ident="modelIdentCode"/>
+  <default path="//@systemDiffCode" ident="systemDiffCode"/>
+  <default path="//responsiblePartnerCompany/@enterpriseCode" ident="responsiblePartnerCompanyCode"/>
+  <default path="//responsiblePartnerCompany/enterpriseName" ident="responsiblePartnerCompany"/>
+  <default path="//originator/@enterpriseCode" ident="originatorCode"/>
+  <default path="//originator/enterpriseName" ident="originator"/>
+  <default path="//@skillLevelCode" ident="skillLevelCode"/>
+  <default path="//@securityClassification" ident="securityClassification"/>
+</brexMap>
