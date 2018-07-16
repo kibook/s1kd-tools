@@ -1,8 +1,8 @@
-CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0 libxslt`
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
-
 SOURCE=s1kd-newdm.c
 OUTPUT=s1kd-newdm
+
+CFLAGS=-Wall -Werror -pedantic-errors -g -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
@@ -11,7 +11,7 @@ INSTALL=install -s
 all: $(OUTPUT)
 	$(MAKE) -C doc
 
-templates.h: templates/42/*.xml ../common/42to*.xsl
+templates.h: templates/42/*.xml ../common/42to*.xsl ../common/brexmap.xml
 	> templates.h
 	for t in templates/42/*.xml; do xxd -i $$t >> templates.h; done
 	xxd -i ../common/42to20.xsl >> templates.h
@@ -21,6 +21,7 @@ templates.h: templates/42/*.xml ../common/42to*.xsl
 	xxd -i ../common/42to30.xsl >> templates.h
 	xxd -i ../common/42to40.xsl >> templates.h
 	xxd -i ../common/42to41.xsl >> templates.h
+	xxd -i ../common/brexmap.xml >> templates.h
 
 dmtypes.h: dmtypes.xml dmtypes.txt
 	xxd -i dmtypes.xml > dmtypes.h

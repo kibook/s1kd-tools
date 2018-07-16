@@ -493,7 +493,7 @@ xmlDocPtr read_default_brexmap(void)
 	if (access(DEFAULT_BREXMAP_FNAME, F_OK) != -1) {
 		return xmlReadFile(DEFAULT_BREXMAP_FNAME, NULL, PARSE_OPTS);
 	} else {
-		return xmlReadMemory((const char *) brexmap_xml, brexmap_xml_len, NULL, NULL, PARSE_OPTS);
+		return xmlReadMemory((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len, NULL, NULL, PARSE_OPTS);
 	}
 }
 

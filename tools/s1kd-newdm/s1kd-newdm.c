@@ -45,7 +45,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.5.1"
+#define VERSION "1.6.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
@@ -242,6 +242,7 @@ void show_help(void)
 	puts("  -.         Dump default dmtypes text file.");
 	puts("  -!         Do not include an info name.");
 	puts("  -B         Generate BREX rules.");
+	puts("  -j         Use a custom .brexmap file.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
@@ -1124,31 +1125,16 @@ void set_env_lang(void)
 	free(lang);
 }
 
-void add_brex_rule(xmlNodePtr rules, const char *key, const char *val)
+void add_brex_rule(xmlNodePtr rules, xmlDocPtr brexmap, const char *key, const char *val)
 {
 	xmlNodePtr rule, objpath, objval;
 	char *path;
 	xmlChar use[256];
 
-	if (strcmp(key, "countryIsoCode") == 0) {
-		path = "//@countryIsoCode";
-	} else if (strcmp(key, "languageIsoCode") == 0) {
-		path = "//@languageIsoCode";
-	} else if (strcmp(key, "modelIdentCode") == 0) {
-		path = "//@modelIdentCode";
-	} else if (strcmp(key, "originator") == 0) {
-		path = "//originator/enterpriseName";
-	} else if (strcmp(key, "originatorCode") == 0) {
-		path = "//originator/@enterpriseCode";
-	} else if (strcmp(key, "responsiblePartnerCompany") == 0) {
-		path = "//responsiblePartnerCompany/enterpriseName";
-	} else if (strcmp(key, "responsiblePartnerCompanyCode") == 0) {
-		path = "//responsiblePartnerCompany/@enterpriseCode";
-	} else if (strcmp(key, "securityClassification") == 0) {
-		path = "//@securityClassification";
-	} else if (strcmp(key, "skillLevelCode") == 0) {
-		path = "//@skillLevelCode";
-	} else {
+	/* Read the object path from the .brexmap file. */
+	xmlStrPrintf(use, 256, "//default[@ident='%s']/@path", key);
+	path = (char *) xmlNodeGetContent(firstXPathNode(brexmap, NULL, (char *) use));
+	if (!path) {
 		return;
 	}
 
@@ -1161,6 +1147,17 @@ void add_brex_rule(xmlNodePtr rules, const char *key, const char *val)
 
 	xmlSetProp(objpath, BAD_CAST "allowedObjectFlag", BAD_CAST "2");
 	xmlSetProp(objval, BAD_CAST "valueAllowed", BAD_CAST val);
+
+	xmlFree(path);
+}
+
+xmlDocPtr read_default_brexmap(void)
+{
+	if (access(DEFAULT_BREXMAP_FNAME, F_OK) != -1) {
+		return xmlReadFile(DEFAULT_BREXMAP_FNAME, NULL, PARSE_OPTS);
+	} else {
+		return xmlReadMemory((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len, NULL, NULL, PARSE_OPTS);
+	}
 }
 
 int main(int argc, char **argv)
@@ -1205,8 +1202,9 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 	xmlNodePtr brex_rules = NULL;
+	xmlDocPtr brexmap = NULL;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:h?";
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1256,17 +1254,30 @@ int main(int argc, char **argv)
 			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
 			case '!': no_info_name = true; break;
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
+			case 'j': if (!brexmap) brexmap = xmlReadFile(optarg, NULL, PARSE_OPTS); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
 	}
 
+	if (!brexmap) {
+		brexmap = read_default_brexmap();
+	}
+
 	if (brex_rules) {
-		xmlNodePtr dmtypes_brex_rule;
+		xmlNodePtr dmtypes_brex_rule, objpath;
+		xmlChar *path;
+
+		path = xmlNodeGetContent(firstXPathNode(brexmap, NULL, "//dmtypes/@path"));
+
 		dmtypes_brex_rule = xmlNewChild(brex_rules, NULL, BAD_CAST "structureObjectRule", NULL);
-		xmlSetProp(xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectPath", BAD_CAST "//@infoCode"),
-			BAD_CAST "allowedObjectFlag", BAD_CAST "2");
+
+		objpath = xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectPath", path);
+		xmlSetProp(objpath, BAD_CAST "allowedObjectFlag", BAD_CAST "2");
+
 		xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectUse", BREX_INFOCODE_USE);
+
+		xmlFree(path);
 	}
 
 	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
@@ -1285,7 +1296,7 @@ int main(int argc, char **argv)
 			copy_default_value(def_key, def_val);
 
 			if (brex_rules) {
-				add_brex_rule(brex_rules, def_key, def_val);
+				add_brex_rule(brex_rules, brexmap, def_key, def_val);
 			}
 
 			xmlFree(def_key);
@@ -1305,7 +1316,7 @@ int main(int argc, char **argv)
 			copy_default_value(def_key, def_val);
 
 			if (brex_rules) {
-				add_brex_rule(brex_rules, def_key, def_val);
+				add_brex_rule(brex_rules, brexmap, def_key, def_val);
 			}
 		}
 
@@ -1630,9 +1641,11 @@ int main(int argc, char **argv)
 	free(template_dir);
 	free(sns_fname);
 	free(maint_sns);
+	free(skill_level_code);
 
 	xmlFree(remarks);
 
+	xmlFreeDoc(brexmap);
 	xmlFreeDoc(dm);
 
 	xmlCleanupParser();

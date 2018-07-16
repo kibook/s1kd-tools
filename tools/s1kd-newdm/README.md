@@ -80,6 +80,9 @@ Issue date of the new data module in the form of YYYY-MM-DD.
 -i &lt;info&gt;  
 The info name of the new data module.
 
+-j &lt;map&gt;  
+Use a custom `.brexmap` file when using the -B option.
+
 -k &lt;skill&gt;  
 The skill level code of the new data module.
 
@@ -272,6 +275,11 @@ Info code variants can also be given specific default schema and info names. To 
     258C  proced  Other procedure to clean, Clean with water
 
 The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the `.dmtypes` file. An info code with no variant matches all possible variants.
+
+`.brexmap` file
+---------------
+
+Refer to the documentation for s1kd-defaults(1) for a description of the `.brexmap` file.
 
 Custom XML templates (-%)
 -------------------------
