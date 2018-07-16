@@ -34,8 +34,11 @@ Overwrite the existing file after conversion.
 -i  
 Initialize a new CSDB by generating the `.defaults`, `.dmtypes` and `.fmtypes` files in the current directory.
 
+-J  
+Dump the default `.brexmap` file to stdout.
+
 -j &lt;map&gt;  
-Use a custom .brexmap file to map a BREX DM to a `.defaults` or `.dmtypes` file.
+Use a custom `.brexmap` file to map a BREX DM to a `.defaults` or `.dmtypes` file.
 
 -s  
 Sort the entries alphabetically for either file/output format.

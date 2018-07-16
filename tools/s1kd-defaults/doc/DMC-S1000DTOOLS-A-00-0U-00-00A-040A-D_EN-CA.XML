@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add -j option and .brexmap file.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add -J option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -99,10 +102,16 @@
                 <para>Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002" changeMark="1">
+              <listItemTerm>-J</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the default <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
               <listItemTerm>-j &lt;map&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Use a custom .brexmap file to map a BREX DM to a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> or <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
+                <para>Use a custom <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file to map a BREX DM to a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> or <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

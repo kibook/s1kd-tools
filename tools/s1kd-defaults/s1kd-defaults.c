@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.4.2"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -44,6 +44,7 @@ void show_help(void)
 	puts("  -F         Convert a .fmtypes file.");
 	puts("  -f         Overwrite an existing file.");
 	puts("  -i         Initialize a new CSDB.");
+	puts("  -J         Dump default .brexmap file.");
 	puts("  -j <map>   Use a custom .brexmap file.");
 	puts("  -s         Sort entries.");
 	puts("  -t         Output in the simple text format.");
@@ -497,6 +498,11 @@ xmlDocPtr read_default_brexmap(void)
 	}
 }
 
+void dump_brexmap(void)
+{
+	printf("%.*s", ___common_brexmap_xml_len, ___common_brexmap_xml);
+}
+
 int main(int argc, char **argv)
 {
 	int i;
@@ -509,7 +515,7 @@ int main(int argc, char **argv)
 	xmlDocPtr brex = NULL;
 	xmlDocPtr brexmap = NULL;
 
-	const char *sopts = "b:DdFfij:sth?";
+	const char *sopts = "b:DdFfiJj:sth?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -545,6 +551,9 @@ int main(int argc, char **argv)
 			case 'i':
 				initialize = true;
 				break;
+			case 'J':
+				dump_brexmap();
+				return 0;
 			case 'j':
 				if (!brexmap) brexmap = xmlReadFile(optarg, NULL, PARSE_OPTS);
 				break;
