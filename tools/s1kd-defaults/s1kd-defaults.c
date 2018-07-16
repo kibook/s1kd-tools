@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -582,10 +582,10 @@ int main(int argc, char **argv)
 			fn = dump_defaults_xml;
 		}
 
-		fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap);
-
 		if (brex) {
 			xmlDocPtr dmtypes;
+
+			fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap);
 
 			dmtypes = new_dmtypes_from_brex(brex, brexmap);
 
@@ -603,17 +603,25 @@ int main(int argc, char **argv)
 
 			xmlFreeDoc(dmtypes);
 		} else {
-			snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
+			if (overwrite || access(DEFAULT_DEFAULTS_FNAME, F_OK) == -1) {
+				fn(DEFAULT_DEFAULTS_FNAME, true, NULL, NULL);
+			}
 
-			if (system(sys) != 0) {
-				fprintf(stderr, S_DMTYPES_ERR);
+			if (overwrite || access(DEFAULT_DMTYPES_FNAME, F_OK) == -1) {
+				snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
+
+				if (system(sys) != 0) {
+					fprintf(stderr, S_DMTYPES_ERR);
+				}
 			}
 		}
 
-		snprintf(sys, 256, "s1kd-fmgen %s > %s", opt, DEFAULT_FMTYPES_FNAME);
+		if (overwrite || access(DEFAULT_FMTYPES_FNAME, F_OK) == -1) {
+			snprintf(sys, 256, "s1kd-fmgen %s > %s", opt, DEFAULT_FMTYPES_FNAME);
 
-		if (system(sys) != 0) {
-			fprintf(stderr, S_FMTYPES_ERR);
+			if (system(sys) != 0) {
+				fprintf(stderr, S_FMTYPES_ERR);
+			}
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
