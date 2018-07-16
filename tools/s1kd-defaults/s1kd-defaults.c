@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -582,32 +582,31 @@ int main(int argc, char **argv)
 			fn = dump_defaults_xml;
 		}
 
-		if (brex) {
-			xmlDocPtr dmtypes;
 
+		if (overwrite || access(DEFAULT_DEFAULTS_FNAME, F_OK) == -1) {
 			fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap);
+		}
 
-			dmtypes = new_dmtypes_from_brex(brex, brexmap);
+		if (overwrite || access(DEFAULT_DMTYPES_FNAME, F_OK) == -1) {
+			if (brex) {
+				xmlDocPtr dmtypes;
 
-			if (fmt == TEXT) {
-				xmlDocPtr res;
-				FILE *f;
-				res = xml_dmtypes_to_text(dmtypes);
-				f = fopen(DEFAULT_DMTYPES_FNAME, "w");
-				fprintf(f, "%s", (char *) res->children->content);
-				fclose(f);
-				xmlFreeDoc(res);
+				dmtypes = new_dmtypes_from_brex(brex, brexmap);
+
+				if (fmt == TEXT) {
+					xmlDocPtr res;
+					FILE *f;
+					res = xml_dmtypes_to_text(dmtypes);
+					f = fopen(DEFAULT_DMTYPES_FNAME, "w");
+					fprintf(f, "%s", (char *) res->children->content);
+					fclose(f);
+					xmlFreeDoc(res);
+				} else {
+					xmlSaveFile(DEFAULT_DMTYPES_FNAME, dmtypes);
+				}
+
+				xmlFreeDoc(dmtypes);
 			} else {
-				xmlSaveFile(DEFAULT_DMTYPES_FNAME, dmtypes);
-			}
-
-			xmlFreeDoc(dmtypes);
-		} else {
-			if (overwrite || access(DEFAULT_DEFAULTS_FNAME, F_OK) == -1) {
-				fn(DEFAULT_DEFAULTS_FNAME, true, NULL, NULL);
-			}
-
-			if (overwrite || access(DEFAULT_DMTYPES_FNAME, F_OK) == -1) {
 				snprintf(sys, 256, "s1kd-newdm %s > %s", opt, DEFAULT_DMTYPES_FNAME);
 
 				if (system(sys) != 0) {
