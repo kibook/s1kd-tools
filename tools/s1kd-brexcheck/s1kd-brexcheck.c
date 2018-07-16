@@ -27,7 +27,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.2.3"
+#define VERSION "1.2.4"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -647,8 +647,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 			xmlNodePtr err_path;
 
 			if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
-				severity = defaultBrSeverityLevel;
-				defaultBrSeverityLevel = NULL;
+				severity = xmlStrdup(defaultBrSeverityLevel);
 			}
 
 			brexError = xmlNewChild(brexCheck, NULL, BAD_CAST "brexError",
