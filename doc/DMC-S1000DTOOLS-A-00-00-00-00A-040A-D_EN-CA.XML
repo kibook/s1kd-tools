@@ -48,6 +48,12 @@
       <reasonForUpdate id="rfu-0002">
         <simplePara>Remove title.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003">
+        <simplePara>Move links to random list.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004">
+        <simplePara>Add link to S1000D website.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -56,8 +62,8 @@
         <title>s1kd-tools</title>
         <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
       </figure>
-      <para>A set of small tools for manipulating S1000D data.</para>
-      <para>
+      <para changeType="modify" reasonForUpdateRefIds="rfu-0004">A set of small tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
+      <para changeType="modify" reasonForUpdateRefIds="rfu-0003">
         <randomList>
           <listItem>
             <para>
