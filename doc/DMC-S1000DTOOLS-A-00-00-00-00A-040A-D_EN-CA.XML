@@ -58,32 +58,44 @@
       </figure>
       <para>A set of small tools for manipulating S1000D data.</para>
       <para>
-        <externalPubRef xlink:href="INTRO.md">
-          <externalPubRefIdent>
-            <externalPubTitle>Introduction</externalPubTitle>
-          </externalPubRefIdent>
-        </externalPubRef>
-      </para>
-      <para>
-        <externalPubRef xlink:href="INSTALL.md">
-          <externalPubRefIdent>
-            <externalPubTitle>Installation</externalPubTitle>
-          </externalPubRefIdent>
-        </externalPubRef>
-      </para>
-      <para>
-        <externalPubRef xlink:href="EXAMPLE.md">
-          <externalPubRefIdent>
-            <externalPubTitle>Usage examples</externalPubTitle>
-          </externalPubRefIdent>
-        </externalPubRef>
-      </para>
-      <para>
-        <externalPubRef xlink:href="DEFAULTS.md">
-          <externalPubRefIdent>
-            <externalPubTitle>List of .defaults file identifiers</externalPubTitle>
-          </externalPubRefIdent>
-        </externalPubRef>
+        <randomList>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="INTRO.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>Introduction</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="INSTALL.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>Installation</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="EXAMPLE.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>Usage examples</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="DEFAULTS.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>List of .defaults file identifiers</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+        </randomList>
       </para>
       <para>Some examples of S1000D data sets produced with these tools are available here:</para>
       <para>
@@ -110,11 +122,17 @@
       </para>
       <para>These tools have been primarily developed around Issue 4.2 of the specification, and are generally compatibile with the previous 4.X issues. Support for Issue 3.0 and lower is a work-in-progress. Support for SGML schemas is not planned.</para>
       <para>
-        <externalPubRef xlink:href="COMPATIBILITY.md">
-          <externalPubRefIdent>
-            <externalPubTitle>Compatibility with each issue of the specification</externalPubTitle>
-          </externalPubRefIdent>
-        </externalPubRef>
+        <randomList>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="COMPATIBILITY.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>Compatibility with each issue of the specification</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+        </randomList>
       </para>
     </description>
   </content>
