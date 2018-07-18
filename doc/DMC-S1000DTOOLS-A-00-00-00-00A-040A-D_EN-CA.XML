@@ -49,12 +49,12 @@
   </identAndStatusSection>
   <content>
     <description>
+      <figure changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <title>s1kd-tools logo</title>
+        <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
+      </figure>
       <levelledPara>
         <title>s1kd-tools</title>
-        <figure changeType="add" reasonForUpdateRefIds="rfu-0001">
-          <title>s1kd-tools logo</title>
-          <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
-        </figure>
         <para>A set of small tools for manipulating S1000D data.</para>
         <para>
           <externalPubRef xlink:href="INTRO.md">
