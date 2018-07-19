@@ -102,8 +102,8 @@ Output instance to file instead of stdout.
 -P &lt;PCT&gt;  
 PCT file to read product definitions from (-p).
 
--p &lt;id&gt;  
-Product ID of the product to read applicability definitions from, using the specified PCT data module (-P).
+-p &lt;product&gt;  
+The ID or primary key of a product in the the specified PCT data module (-P). A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "`serialno:prodattr=12345`"
 
 -R &lt;CIR&gt; ...  
 Use a CIR to resolve external dependencies in the master object, making the instance object standalone. Additional CIRs can be used by specifying the -R option multiple times.
@@ -145,11 +145,7 @@ Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.
 Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.
 
 -s &lt;applic&gt;  
-An applicability definition in the form of:
-
-    <ident>:<type>=<value>
-
-Any number of values can be defined by specifying this option multiple times.
+An applicability definition in the form of "`<ident>:<type>=<value>`". Any number of values can be defined by specifying this option multiple times.
 
 -t &lt;techName&gt;  
 Give the instance a different techName/pmTitle.

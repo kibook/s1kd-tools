@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="00"/>
+        <issueInfo issueNumber="021" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="10"/>
+        <issueDate year="2018" month="07" day="19"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -k, -K and -U options.</simplePara>
+        <simplePara>Allow argument of -p option to match a primary key in a PCT instance.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Simplify synopsis.</simplePara>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Reformat assign example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-instance [options] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-instance [options] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -66,7 +66,7 @@
             <listItem>
               <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition></acronym>.</para>
             </listItem>
-            <listItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <listItem>
               <para>Filtering on skill levels and security classifications.</para>
             </listItem>
             <listItem>
@@ -155,13 +155,13 @@
                 <para>Give the data module instance a different infoName.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-K &lt;levels&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Filter the object on the specified skill levels. Elements which are marked with skill levels not contained in the string &lt;levels&gt; are removed in the resulting instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-k &lt;level&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the skill level of the instance.</para>
@@ -232,10 +232,10 @@
                 <para><acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> file to read product definitions from (-p).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-p &lt;id&gt;</listItemTerm>
+            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-p &lt;product&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Product ID of the product to read applicability definitions from, using the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P).</para>
+                <para>The ID or primary key of a product in the the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P). A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>"</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -303,12 +303,8 @@
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-s &lt;applic&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>An applicability definition in the form of:</para>
-                <para>
-                  <verbatimText verbatimStyle="vs24">&lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</verbatimText>
-                </para>
-                <para>Any number of values can be defined by specifying this option multiple times.</para>
+              <listItemDefinition changeType="modify" reasonForUpdateRefIds="rfu-0002">
+                <para>An applicability definition in the form of "<verbatimText>&lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</verbatimText>". Any number of values can be defined by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -317,7 +313,7 @@
                 <para>Give the instance a different techName/pmTitle.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-U &lt;classes&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Filter the object on the specified security classes. Elements marked with security classes not contained in the string &lt;classes&gt; are removed in the resulting instance.</para>
@@ -335,7 +331,7 @@
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
                 <para>Check the applicability, skill level, and security classification of the whole object against the user-defined applicability, skill levels, and security classifications. If the whole object is not applicable, then no instance is created.</para>
@@ -585,8 +581,8 @@ is an item in the system.
         <para>
           <verbatimText verbatimStyle="vs24">$ s1kd-instance -P &lt;PCT&gt; -p versionA &lt;DM&gt;</verbatimText>
         </para>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">Filtering a data module on specified skill levels and writing to stdout:</para>
-        <para changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+        <para>Filtering a data module on specified skill levels and writing to stdout:</para>
+        <para>
           <verbatimText verbatimStyle="vs24">$ s1kd-instance -k sk01/sk02 &lt;DMs&gt;</verbatimText>
         </para>
         <para>Filtering data modules for a particular customer and outputting with extended identification:</para>

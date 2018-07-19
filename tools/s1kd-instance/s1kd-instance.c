@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -40,7 +40,7 @@
 #define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
 #define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
-#define S_NO_PRODUCT ERR_PREFIX "No product '%s' in PCT '%s'.\n"
+#define S_NO_PRODUCT ERR_PREFIX "No product matching '%s' in PCT '%s'.\n"
 #define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s.\n"
 #define S_NO_DIR ERR_PREFIX "No directory specified with -O.\n"
 #define S_NO_PCT ERR_PREFIX "No PCT specified (-P).\n"
@@ -131,6 +131,7 @@ void define_applic(char *ident, char *type, char *value)
 		if (xmlHasProp(assert, BAD_CAST "applicPropertyValues")) {
 			xmlChar *first_value = xmlGetProp(assert, BAD_CAST "applicPropertyValues");
 			xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
+			xmlFree(first_value);
 			xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
 		}
 		xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
@@ -538,9 +539,14 @@ bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const cha
 	bool result = false;
 
 	for (cur = multi->children; cur; cur = cur->next) {
-		char *cur_value = (char *) xmlNodeGetContent(cur);
+		xmlChar *cur_value;
+		bool in_set;
 
-		if (is_in_set(cur_value, value)) {
+		cur_value = xmlNodeGetContent(cur);
+		in_set = is_in_set((char *) cur_value, value);
+		xmlFree(cur_value);
+
+		if (in_set) {
 			result = true;
 			break;
 		}
@@ -1842,40 +1848,62 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	xmlDocPtr pct;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	char xpath[256];
+	char xpath[512];
+	int i;
 
 	pct = xmlReadFile(pctfname, NULL, PARSE_OPTS);
-
 	ctx = xmlXPathNewContext(pct);
 
-	snprintf(xpath, 256, "//product[@id='%s']/assign", product);
+	/* If the product is in the form of IDENT:TYPE:VALUE, it identifies the
+	 * primary key of a product instance.
+	 *
+	 * Otherwise, it is simply the XML ID of a product instance.
+	 */
+	if (strchr(product, ':')) {
+		char *prod, *ident, *type, *value;
+
+		prod  = strdup(product);
+
+		ident = strtok(prod, ":");
+		type  = strtok(NULL, "=");
+		value = strtok(NULL, "");
+
+		if (!(ident && type && value)) {
+			fprintf(stderr, S_BAD_ASSIGN, product);
+			exit(EXIT_BAD_APPLIC);
+		}
+
+		snprintf(xpath, 512, "//product[assign[@applicPropertyIdent='%s' and @applicPropertyType='%s' and @applicPropertyValue='%s']]/assign", ident, type, value);
+
+		free(prod);
+	} else {
+		snprintf(xpath, 512, "//product[@id='%s']/assign", product);
+	}
 
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		fprintf(stderr, S_NO_PRODUCT, product, pctfname);
 		exit(EXIT_BAD_APPLIC);
-	} else {
-		int i;
+	}
 
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			char *ident, *type, *value;
+	for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+		char *ident, *type, *value;
 
-			ident = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
-				BAD_CAST "applicPropertyIdent");
-			type  = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
-				BAD_CAST "applicPropertyType");
-			value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
-				BAD_CAST "applicPropertyValue");
+		ident = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+			BAD_CAST "applicPropertyIdent");
+		type  = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+			BAD_CAST "applicPropertyType");
+		value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+			BAD_CAST "applicPropertyValue");
 
-			define_applic(ident, type, value);
+		define_applic(ident, type, value);
 
-			napplics++;
+		napplics++;
 
-			xmlFree(ident);
-			xmlFree(type);
-			xmlFree(value);
-		}
+		xmlFree(ident);
+		xmlFree(type);
+		xmlFree(value);
 	}
 
 	xmlXPathFreeObject(obj);

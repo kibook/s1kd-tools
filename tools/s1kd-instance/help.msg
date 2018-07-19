@@ -23,8 +23,8 @@ Options:
   -n <iss>      Set the issue and inwork numbers of the instance.
   -O <dir>      Output instance in dir, automatically named.
   -o <file>     Output instance to file instead of stdout.
-  -P <PCT>      PCT file to read products from
-  -p <id>       ID of product in specified PCT to read applic defs from.
+  -P <PCT>      PCT file to read products from.
+  -p <product>  ID/primary key of a product in the PCT to filter on.
   -R <CIR>      Resolve externalized items using the given CIR.
   -r <XSL>      Use custom XSLT to resolve CIR references.
   -S            Do not include <sourceDmIdent> or <repositorySourceDmIdent>.
