@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -103,15 +103,17 @@ struct ident {
 /* User-defined applicability */
 xmlNodePtr applicability;
 int napplics = 0;
+
+/* Define a value for a product attribute or condition. */
 void define_applic(char *ident, char *type, char *value)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
 
+	/* Check if an assert has already been created for this property. */
 	for (cur = applicability->children; cur; cur = cur->next) {
 		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
 		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
-		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
 
 		if (strcmp(cur_ident, ident) == 0 && strcmp(cur_type, type) == 0) {
 			assert = cur;
@@ -119,23 +121,49 @@ void define_applic(char *ident, char *type, char *value)
 
 		xmlFree(cur_ident);
 		xmlFree(cur_type);
-		xmlFree(cur_value);
 	}
 
+	/* If no assert exists, add a new one. */
 	if (!assert) {
 		assert = xmlNewChild(applicability, NULL, BAD_CAST "assert", NULL);
 		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", BAD_CAST ident);
 		xmlSetProp(assert, BAD_CAST "applicPropertyType",  BAD_CAST type);
 		xmlSetProp(assert, BAD_CAST "applicPropertyValues", BAD_CAST value);
+		++napplics;
+	/* Or, if an assert already exists... */
 	} else {
+		/* Check for duplicate value in a single-assert. */
 		if (xmlHasProp(assert, BAD_CAST "applicPropertyValues")) {
-			xmlChar *first_value = xmlGetProp(assert, BAD_CAST "applicPropertyValues");
-			xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
+			xmlChar *first_value;
+
+			first_value = xmlGetProp(assert, BAD_CAST "applicPropertyValues");
+
+			/* If not a duplicate, convert to a multi-assert and
+			 * add the original and new values. */
+			if (xmlStrcmp(first_value, BAD_CAST value) != 0) {
+				xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
+				xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
+				xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
+			}
+
 			xmlFree(first_value);
-			xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
+		/* Check for duplicate value in a multi-assert. */
+		} else {
+			bool dup = false;
+
+			for (cur = assert->children; cur && !dup; cur = cur->next) {
+				xmlChar *cur_value;
+				cur_value = xmlNodeGetContent(cur);
+				dup = xmlStrcmp(cur_value, BAD_CAST value) == 0;
+				xmlFree(cur_value);
+			}
+
+			/* If not a duplicate, add the new value to the
+			 * multi-assert. */
+			if (!dup) {
+				xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
+			}
 		}
-		xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
-		--napplics;
 	}
 }
 
@@ -2013,8 +2041,6 @@ void read_applic(char *s)
 	value = strtok(NULL, "");
 
 	define_applic(ident, type, value);
-
-	++napplics;
 }
 
 /* Set the remarks for the object */
