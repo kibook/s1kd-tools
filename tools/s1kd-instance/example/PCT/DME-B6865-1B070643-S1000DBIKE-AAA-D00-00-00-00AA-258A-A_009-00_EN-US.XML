@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dmodule [
-<!NOTATION cgm PUBLIC "-//USA-DOD//NOTATION Computer Graphics Metafile//EN" >
 <!NOTATION png PUBLIC "-//W3C//NOTATION Portable Network Graphics//EN" >
+<!NOTATION cgm PUBLIC "-//USA-DOD//NOTATION Computer Graphics Metafile//EN" >
 <!ENTITY ICN-S3627-S1000D0619-001-01 SYSTEM "ICN-S3627-S1000D0619-001-01.PNG" NDATA png>
 <!ENTITY ICN-C0419-S1000D0359-001-01 SYSTEM "ICN-C0419-S1000D0359-001-01.CGM" NDATA cgm>
 <!ENTITY ICN-C0419-S1000D0400-001-01 SYSTEM "ICN-C0419-S1000D0400-001-01.CGM" NDATA cgm>
@@ -10,7 +10,7 @@
 	  <identAndStatusSection>
 		    <dmAddress>
 			      <dmIdent>
-				        <identExtension extensionProducer="B6865" extensionCode="MK1"/><dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="258" infoCodeVariant="A" itemLocationCode="A"/>
+				        <identExtension extensionProducer="B6865" extensionCode="1B070643"/><dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="258" infoCodeVariant="A" itemLocationCode="A"/>
 				        <language countryIsoCode="US" languageIsoCode="en"/>
 				        <issueInfo issueNumber="009" inWork="00"/>
 			      </dmIdent>
@@ -221,15 +221,15 @@
 						            <estimatedTime unitOfMeasure="h">1,0</estimatedTime>
 					          </person>
 				        </reqPersons>
-				        <reqPersons applicRefId="app-0002">
+				        
+				        <reqPersons applicRefId="app-0001">
 					          <person man="B">
 						            <personCategory personCategoryCode="Operator"/>
-						            <personSkill skillLevelCode="sk02"/>
+						            <personSkill skillLevelCode="sk03"/>
 						            <trade>Bike rider</trade>
-						            <estimatedTime unitOfMeasure="h">1,0</estimatedTime>
+						            <estimatedTime unitOfMeasure="h">0,8</estimatedTime>
 					          </person>
 				        </reqPersons>
-				        
 				        <reqTechInfoGroup>
 					          <reqTechInfo reqTechInfoCategory="ti01">
 						            <pmRef>
@@ -311,7 +311,17 @@
 							              </identNumber>
 							              <reqQuantity unitOfMeasure="L">1</reqQuantity>
 						            </supplyDescr>
-						            
+						            <supplyDescr id="sup-0003" applicRefId="app-0001" reasonForUpdateRefIds="rfu-Detergent" changeMark="1" changeType="modify">
+							              <name>BoeBus DeLux Detergent No.6</name>
+							              <shortName>Detergent C</shortName>
+							              <identNumber>
+								                <manufacturerCode>KZ666</manufacturerCode>
+								                <partAndSerialNumber>
+									                  <partNumber>BSK-TLST-001-15</partNumber>
+								                </partAndSerialNumber>
+							              </identNumber>
+							              <reqQuantity unitOfMeasure="L">1</reqQuantity>
+						            </supplyDescr>
 					          </supplyDescrGroup>
 				        </reqSupplies>
 				        <reqSpares>
@@ -322,14 +332,18 @@
 						            <warning>
 							              <warningAndCautionPara>Do not get <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> into your eyes. If it gets into your eyes, wash them immediately in clean warm water.</warningAndCautionPara>
 						            </warning>
-						            
+						            <warning applicRefId="app-0001" changeType="modify" changeMark="1" reasonForUpdateRefIds="rfu-applic">
+							              <warningAndCautionPara>Do not get <internalRef internalRefId="sup-0003" internalRefTargetType="irtt04"/> into your eyes. If it gets into your eyes, wash them immediately in clean warm water.</warningAndCautionPara>
+						            </warning>
 						            <caution>
 							              <warningAndCautionPara>Do not use a <internalRef internalRefId="seq-0001" internalRefTargetType="irtt05"/> that has high pressure. A water hose that has high pressure can cause some parts to become loose or full of water.</warningAndCautionPara>
 						            </caution>
 						            <caution>
 							              <warningAndCautionPara>Do not point the hose directly at the hub or at the bottom bracket bearings. This can cause damage to the parts.</warningAndCautionPara>
 						            </caution>
-						            
+						            <caution applicRefId="app-0001" changeType="modify" changeMark="1" reasonForUpdateRefIds="rfu-applic">
+							              <warningAndCautionPara>Apply <internalRef internalRefId="sup-0003" internalRefTargetType="irtt04"/> in accordance with the instruction on the container. The substance may cause damage to the Bike paint if it is not applied correctly.</warningAndCautionPara>
+						            </caution>
 					          </safetyRqmts>
 				        </reqSafety>
 			      </preliminaryRqmts>
@@ -372,22 +386,28 @@
 						            <notePara>If necessary, do the flush procedure again.</notePara>
 					          </note>
 				        </proceduralStep>
-				        <proceduralStep applicRefId="app-0002">
+				        
+				        <proceduralStep applicRefId="app-0001">
 					          <para>Wash the Bike</para>
 					          <proceduralStep>
-						            <para>Soak the <internalRef internalRefId="seq-0003" internalRefTargetType="irtt05" changeType="modify" changeMark="1" reasonForUpdateRefIds="rfu-Detergent"/> into <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> and water.</para>
+						            <para>Soak the <internalRef internalRefId="seq-0003" internalRefTargetType="irtt05"/> into <internalRef internalRefId="sup-0003" internalRefTargetType="irtt04" reasonForUpdateRefIds="rfu-Detergent"/> and water.</para>
 					          </proceduralStep>
 					          <proceduralStep>
 						            <para>Clean the bicycle with the soaked sponge.</para>
 					          </proceduralStep>
 					          <proceduralStep>
-						            <para>Flush the bicycle and make sure that all <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> is removed.</para>
+						            <para>Soak the <internalRef internalRefId="seq-0003" internalRefTargetType="irtt05"/> into <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> and water.</para>
+					          </proceduralStep>
+					          <proceduralStep>
+						            <para>Fully clean the bicycle with the soaked sponge.</para>
+					          </proceduralStep>
+					          <proceduralStep>
+						            <para>Flush the bicycle to make sure that all detergents are removed.</para>
 					          </proceduralStep>
 					          <proceduralStep>
 						            <para>Move the bicycle up and down on its tires to remove all water.</para>
 					          </proceduralStep>
 				        </proceduralStep>
-				        
 				        <proceduralStep>
 					          <para>Lubricate the bicycle. Refer to <dmRef>
 							              <dmRefIdent>
