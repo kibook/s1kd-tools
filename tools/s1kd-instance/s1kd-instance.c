@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <ctype.h>
+#include <dirent.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -14,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.6.1"
+#define VERSION "1.7.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -43,7 +44,7 @@
 #define S_NO_PRODUCT ERR_PREFIX "No product matching '%s' in PCT '%s'.\n"
 #define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s.\n"
 #define S_NO_DIR ERR_PREFIX "No directory specified with -O.\n"
-#define S_NO_PCT ERR_PREFIX "No PCT specified (-P).\n"
+#define S_MISSING_REF_DM ERR_PREFIX "Could not read referenced ACT/PCT: %s\n"
 #define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
 #define S_MISSING_CIR ERR_PREFIX "Could not find CIR %s."
 
@@ -105,7 +106,7 @@ xmlNodePtr applicability;
 int napplics = 0;
 
 /* Define a value for a product attribute or condition. */
-void define_applic(char *ident, char *type, char *value)
+void define_applic(char *ident, char *type, char *value, bool pct)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
@@ -164,6 +165,10 @@ void define_applic(char *ident, char *type, char *value)
 				xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
 			}
 		}
+	}
+
+	if (pct) {
+		xmlSetProp(assert, BAD_CAST "fromPct", BAD_CAST "true");
 	}
 }
 
@@ -1925,9 +1930,7 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 		value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
 			BAD_CAST "applicPropertyValue");
 
-		define_applic(ident, type, value);
-
-		napplics++;
+		define_applic(ident, type, value, true);
 
 		xmlFree(ident);
 		xmlFree(type);
@@ -2040,7 +2043,7 @@ void read_applic(char *s)
 	type  = strtok(NULL, "=");
 	value = strtok(NULL, "");
 
-	define_applic(ident, type, value);
+	define_applic(ident, type, value, false);
 }
 
 /* Set the remarks for the object */
@@ -2183,6 +2186,189 @@ void set_skill(xmlDocPtr doc, const char *skill)
 	xmlSetProp(skill_level, BAD_CAST "skillLevelCode", BAD_CAST skill);
 }
 
+/* Determine if the file is a data module. */
+bool is_dm(const char *name)
+{
+	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
+}
+
+/* Find a data module filename in the current directory based on the dmRefIdent
+ * element. */
+bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
+{
+	DIR *dir;
+	struct dirent *cur;
+	int len;
+	bool found = false;
+	char *model_ident_code;
+	char *system_diff_code;
+	char *system_code;
+	char *sub_system_code;
+	char *sub_sub_system_code;
+	char *assy_code;
+	char *disassy_code;
+	char *disassy_code_variant;
+	char *info_code;
+	char *info_code_variant;
+	char *item_location_code;
+	char *learn_code;
+	char *learn_event_code;
+	char code[64];
+	xmlNodePtr dmCode, issueInfo, language;
+
+	dmCode = find_child(dmRefIdent, "dmCode");
+	issueInfo = find_child(dmRefIdent, "issueInfo");
+	language = find_child(dmRefIdent, "language");
+
+	model_ident_code     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
+	system_diff_code     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
+	system_code          = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
+	sub_system_code      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
+	sub_sub_system_code  = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
+	assy_code            = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
+	disassy_code         = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
+	disassy_code_variant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
+	info_code            = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
+	info_code_variant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
+	item_location_code   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
+	learn_code           = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
+	learn_event_code     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
+
+	snprintf(code, 64, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
+		model_ident_code,
+		system_diff_code,
+		system_code,
+		sub_system_code,
+		sub_sub_system_code,
+		assy_code,
+		disassy_code,
+		disassy_code_variant,
+		info_code,
+		info_code_variant,
+		item_location_code);
+
+	xmlFree(model_ident_code);
+	xmlFree(system_diff_code);
+	xmlFree(system_code);
+	xmlFree(sub_system_code);
+	xmlFree(sub_sub_system_code);
+	xmlFree(assy_code);
+	xmlFree(disassy_code);
+	xmlFree(disassy_code_variant);
+	xmlFree(info_code);
+	xmlFree(info_code_variant);
+	xmlFree(item_location_code);
+
+	if (learn_code) {
+		char learn[8];
+		snprintf(learn, 8, "-%s%s", learn_code, learn_event_code);
+		strcat(code, learn);
+	}
+
+	xmlFree(learn_code);
+	xmlFree(learn_event_code);
+
+	if (issueInfo) {
+		char *issue_number;
+		char *in_work;
+		char iss[8];
+
+		issue_number = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
+		in_work      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+
+		snprintf(iss, 8, "_%s-%s", issue_number, in_work);
+		strcat(code, iss);
+
+		xmlFree(issue_number);
+		xmlFree(in_work);
+	}
+
+	if (language) {
+		char *language_iso_code;
+		char *country_iso_code;
+		char lang[8];
+
+		language_iso_code = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+		country_iso_code  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+
+		snprintf(lang, 8, "_%s-%s", language_iso_code, country_iso_code);
+		strcat(code, lang);
+
+		xmlFree(language_iso_code);
+		xmlFree(country_iso_code);
+	}
+
+	len = strlen(code);
+
+	dir = opendir(".");
+
+	while ((cur = readdir(dir))) {
+		if (strncmp(cur->d_name, code, len) == 0) {
+			if (is_dm(cur->d_name) && (!found || strcmp(cur->d_name, dst) > 0)) {
+				strcpy(dst, cur->d_name);
+			}
+
+			found = true;
+		}
+	}
+
+	closedir(dir);
+
+	if (!found) {
+		fprintf(stderr, S_MISSING_REF_DM, code);
+	}
+
+	return found;
+}
+
+/* Find the filename of a referenced ACT data module. */
+bool find_act_fname(char *dst, xmlDocPtr doc)
+{
+	xmlNodePtr actref;
+	actref = first_xpath_node(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent");
+	return actref && find_dmod_fname(dst, actref);
+}
+
+/* Find the filename of a referenced PCT data module via the ACT. */
+bool find_pct_fname(char *dst, xmlDocPtr doc)
+{
+	char act_fname[PATH_MAX];
+	xmlDocPtr act;
+	xmlNodePtr pctref;
+	bool found;
+
+	if (!find_act_fname(act_fname, doc)) {
+		return false;
+	}
+
+	if (!(act = xmlReadFile(act_fname, NULL, PARSE_OPTS))) {
+		return false;
+	}
+
+	pctref = first_xpath_node(act, NULL, "//productCrossRefTableRef/dmRef/dmRefIdent");
+	found = pctref && find_dmod_fname(dst, pctref);
+	xmlFreeDoc(act);
+
+	return found;
+}
+
+/* Unset all applicability assigned by a PCT. */
+void clear_pct_applic(void)
+{
+	xmlNodePtr cur;
+	cur = applicability->children;
+	while (cur) {
+		xmlNodePtr next;
+		next = cur->next;
+		if (xmlHasProp(cur, BAD_CAST "fromPct")) {
+			xmlUnlinkNode(cur);
+			xmlFreeNode(cur);
+			--napplics;
+		}
+		cur = next;
+	}
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -2227,6 +2413,7 @@ int main(int argc, char **argv)
 	bool no_issue = false;
 	char pctfname[PATH_MAX] = "";
 	char product[64] = "";
+	bool load_pct_per_dm = false;
 	bool dmlist = false;
 	FILE *list = NULL;
 	char issdate[16] = "";
@@ -2319,16 +2506,19 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(product, "") != 0) {
-		if (strcmp(pctfname, "") == 0) {
-			fprintf(stderr, S_NO_PCT);
-			exit(EXIT_MISSING_ARGS);
-		} else {
+		/* If a PCT filename is specified with -P, use that for all data
+		 * modules and ignore their individual ACT->PCT refs. */
+		if (strcmp(pctfname, "") != 0) {
 			if (access(pctfname, F_OK) == -1) {
 				fprintf(stderr, S_MISSING_PCT, pctfname);
 				exit(EXIT_MISSING_FILE);
 			} else {
 				load_applic_from_pct(pctfname, product);
 			}
+		/* Otherwise the PCT must be loaded separately for each data
+		 * module, since they may reference different ones. */
+		} else {
+			load_pct_per_dm = true;
 		}
 	}
 
@@ -2376,6 +2566,16 @@ int main(int argc, char **argv)
 
 		root = xmlDocGetRootElement(doc);
 		ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
+
+		/* Load the applic assigns from the PCT data module referenced
+		 * by the ACT data module referenced by this data module. */
+		if (load_pct_per_dm) {
+			char pct_fname[PATH_MAX];
+
+			if (find_pct_fname(pct_fname, doc)) {
+				load_applic_from_pct(pct_fname, product);
+			}
+		}
 
 		if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
 			if (add_source_ident) {
@@ -2501,6 +2701,13 @@ int main(int argc, char **argv)
 			}
 
 			xmlSaveFile(out, doc);
+		}
+
+		/* The ACT/PCT may be different for the next DM, so these
+		 * assigns must be cleared. Those directly set with -s will
+		 * carry over. */
+		if (load_pct_per_dm) {
+			clear_pct_applic();
 		}
 
 		xmlFreeDoc(doc);

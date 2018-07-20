@@ -100,10 +100,10 @@ If any of the above are not specified, the information is copied from the source
 Output instance to file instead of stdout.
 
 -P &lt;PCT&gt;  
-PCT file to read product definitions from (-p).
+PCT file to read product definitions from (-p). If a product is specified but no PCT is given, the tool will attempt to use the ACT reference of each source data module to find the ACT and PCT data modules in the current directory.
 
 -p &lt;product&gt;  
-The ID or primary key of a product in the the specified PCT data module (-P). A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "`serialno:prodattr=12345`"
+The ID or primary key of a product in the the specified PCT data module (-P) or the PCT data module referenced by the source data module. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "`serialno:prodattr=12345`"
 
 -R &lt;CIR&gt; ...  
 Use a CIR to resolve external dependencies in the master object, making the instance object standalone. Additional CIRs can be used by specifying the -R option multiple times.

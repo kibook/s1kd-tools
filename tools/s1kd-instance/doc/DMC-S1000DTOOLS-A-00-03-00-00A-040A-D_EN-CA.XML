@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="19"/>
+        <issueDate year="2018" month="07" day="20"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Allow argument of -p option to match a primary key in a PCT instance.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Reformat assign example.</simplePara>
+        <simplePara>Add automatic search for PCT.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -229,13 +226,13 @@
             <definitionListItem>
               <listItemTerm>-P &lt;PCT&gt;</listItemTerm>
               <listItemDefinition>
-                <para><acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> file to read product definitions from (-p).</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1"><acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> file to read product definitions from (-p). If a product is specified but no PCT is given, the tool will attempt to use the ACT reference of each source data module to find the ACT and PCT data modules in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-p &lt;product&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The ID or primary key of a product in the the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P). A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>"</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">The ID or primary key of a product in the the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P) or the PCT data module referenced by the source data module. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>"</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -303,7 +300,7 @@
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-s &lt;applic&gt;</listItemTerm>
-              <listItemDefinition changeType="modify" reasonForUpdateRefIds="rfu-0002">
+              <listItemDefinition>
                 <para>An applicability definition in the form of "<verbatimText>&lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</verbatimText>". Any number of values can be defined by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
