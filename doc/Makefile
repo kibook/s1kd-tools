@@ -23,7 +23,9 @@ MAN1_PREFIX=$(PREFIX)/share/man/man1
 MAN5_PREFIX=$(PREFIX)/share/man/man5
 INSTALL=install
 
-all: s1kd-tools.1 s1kd-defaults.5 $(README) $(INTRO) $(DEFAULTS) $(INSTALL_DOC) $(EXAMPLE) $(COMPAT)
+all:
+
+docs: s1kd-tools.1 s1kd-defaults.5 $(README) $(INTRO) $(DEFAULTS) $(INSTALL_DOC) $(EXAMPLE) $(COMPAT)
 
 $(README): $(README_SRC) .icncatalog
 	s1kd-icncatalog -m github $(README_SRC) | $(S1KD2DB) - | $(PANDOC_MD) -o $(README)
@@ -49,9 +51,11 @@ s1kd-tools.1: $(INTRO_SRC)
 s1kd-defaults.5: $(DEFAULTS_SRC)
 	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
 
-.PHONY: clean install uninstall
+.PHONY: docs clean maintainer-clean install uninstall
 
 clean:
+
+maintainer-clean:
 	rm -f s1kd-tools.1 s1kd-defaults.5 $(README) $(INTRO) $(DEFAULTS) $(INSTALL_DOC) $(EXAMPLE) $(COMPAT)
 
 install: s1kd-tools.1 s1kd-defaults.5

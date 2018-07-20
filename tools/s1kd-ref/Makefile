@@ -9,7 +9,6 @@ INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
 
 all: $(OUTPUT)
-	$(MAKE) -C doc
 
 $(OUTPUT): $(SOURCE) xslt.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
@@ -18,10 +17,15 @@ xslt.h: ../common/42to*.xsl
 	>xslt.h
 	for f in ../common/42to*.xsl; do xxd -i "$$f" >> xslt.h; done
 
-.PHONY: clean install uninstall
+.PHONY: docs clean maintainer-clean install uninstall
+
+docs:
+	$(MAKE) -C doc
 
 clean:
 	rm -f $(OUTPUT) xslt.h
+
+maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

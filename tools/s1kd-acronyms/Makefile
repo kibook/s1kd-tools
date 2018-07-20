@@ -9,7 +9,6 @@ INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
 
 all: $(OUTPUT)
-	$(MAKE) -C doc
 
 stylesheets.h: stylesheets/*.xsl
 	xxd -i stylesheets/acronyms.xsl >  stylesheets.h
@@ -26,10 +25,15 @@ stylesheets.h: stylesheets/*.xsl
 $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-.PHONY: clean install uninstall
+.PHONY: docs clean maintainer-clean install uninstall
+
+docs:
+	$(MAKE) -C doc
 
 clean:
 	rm -f $(OUTPUT) stylesheets.h
+
+maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

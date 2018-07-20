@@ -9,7 +9,6 @@ INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
 
 all: $(OUTPUT)
-	$(MAKE) -C doc
 
 template.h: icnmetadata.xml
 	xxd -i icnmetadata.xml > template.h
@@ -17,10 +16,15 @@ template.h: icnmetadata.xml
 $(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
-.PHONY: clean install uninstall
+.PHONY: docs clean maintainer-clean install uninstall
+
+docs:
+	$(MAKE) -C doc
 
 clean:
 	rm -f $(OUTPUT) template.h
+
+maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

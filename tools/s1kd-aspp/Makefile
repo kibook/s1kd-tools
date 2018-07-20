@@ -9,7 +9,6 @@ INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
 
 all: $(OUTPUT)
-	$(MAKE) -C doc
 
 $(OUTPUT): $(SOURCE) elements_list.h generateDisplayText.h identity.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
@@ -23,13 +22,15 @@ generateDisplayText.h: generateDisplayText.xsl
 identity.h: ../common/identity.xsl
 	xxd -i ../common/identity.xsl > identity.h
 
-.PHONY: clean install uninstall
+.PHONY: docs clean maintainer-clean install uninstall
+
+docs:
+	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT)
-	rm -f elements_list.h
-	rm -f generateDisplayText.h
-	rm -f identity.h
+	rm -f $(OUTPUT) elements_list.h generateDisplayText.h identity.h
+
+maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)

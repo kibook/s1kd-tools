@@ -9,7 +9,6 @@ INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
 
 all: $(OUTPUT)
-	$(MAKE) -C doc
 
 templates.h: templates/42/*.xml ../common/42to*.xsl ../common/brexmap.xml
 	> templates.h
@@ -34,10 +33,15 @@ sns.h: sns/*.XML
 $(OUTPUT): $(SOURCE) templates.h dmtypes.h sns.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
-.PHONY: clean install uninstall
+.PHONY: docs clean maintainer-clean install uninstall
+
+docs:
+	$(MAKE) -C doc
 
 clean:
 	rm -f $(OUTPUT) templates.h dmtypes.h sns.h
+
+maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
