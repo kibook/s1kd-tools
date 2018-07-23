@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="J" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="07" day="23"/>
         <dmTitle>
           <techName>s1kd-checkrefs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add --version option.</simplePara>
+        <simplePara>Add -q option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +53,7 @@
         <title>SYNOPSIS</title>
         <para>
           <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-checkrefs [-d <dir>] [-m <object>] [-s <source>] [-t <target>]
-               [-ceFfLlnuvh?] <modules>...]]></verbatimText>
+               [-ceFfLlnquvh?] <modules>...]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -124,6 +124,12 @@
                 <para>When listing invalid references (-l), include the source filenames of the objects in which the invalid references occur.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Do not display error messages for invalid references.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-s &lt;source&gt;</listItemTerm>
               <listItemDefinition>
@@ -148,7 +154,7 @@
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>

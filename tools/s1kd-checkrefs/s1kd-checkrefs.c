@@ -40,6 +40,7 @@ bool failOnInvalid = false;
 bool checkExtPubRefs = false;
 enum list {OFF, REFS, DMS} listInvalid = OFF;
 bool inclFname = false;
+bool quiet = false;
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -446,7 +447,7 @@ void validityError(xmlNodePtr ref, const char *fname)
 		}
 	} else if (listInvalid == DMS) {
 		printf("%s\n", fname);
-	} else {
+	} else if (!quiet) {
 		fprintf(stderr, ERR_PREFIX "%s (Line %d): invalid reference to %s %s.\n", fname, ref->line, prefix, code);
 	}
 
@@ -596,7 +597,7 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xml
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-m <object>] [-s <source>] [-t <target>] [-ceFLlnuvh?]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-m <object>] [-s <source>] [-t <target>] [-ceFLlnquvh?]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?          Show help/usage message.");
@@ -609,6 +610,7 @@ void showHelp(void)
 	puts("  -l             List invalid references.");
 	puts("  -m <object>    Change refs to <source> into refs to <object>.");
 	puts("  -n             Include filename in list of invalid references.");
+	puts("  -q             Do not show an error on invalid references.");
 	puts("  -s <source>    Use only <source> as source.");
 	puts("  -t <target>    Only check references in <target>.");
 	puts("  -u             Update address items of references.");
@@ -819,7 +821,7 @@ int main(int argc, char **argv)
 	bool isList = false;
 	char *recode = NULL;
 
-	const char *sopts = "s:t:cuFfveld:Lm:nh?";
+	const char *sopts = "s:t:cuFfveld:Lm:nqh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -873,6 +875,9 @@ int main(int argc, char **argv)
 				break;
 			case 'n':
 				inclFname = true;
+				break;
+			case 'q':
+				quiet = true;
 				break;
 			case 'h':
 			case '?':

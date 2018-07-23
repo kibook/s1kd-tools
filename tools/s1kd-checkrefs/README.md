@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-checkrefs [-d <dir>] [-m <object>] [-s <source>] [-t <target>]
-                   [-ceFfLlnuvh?] <modules>...
+                   [-ceFfLlnquvh?] <modules>...
 
 DESCRIPTION
 ===========
@@ -46,6 +46,9 @@ Change all references to the source object specified with -s into references tha
 
 -n  
 When listing invalid references (-l), include the source filenames of the objects in which the invalid references occur.
+
+-q  
+Do not display error messages for invalid references.
 
 -s &lt;source&gt;  
 Use only the specified module as the source of address items. Only references to this module will be checked and/or updated in all other modules.
