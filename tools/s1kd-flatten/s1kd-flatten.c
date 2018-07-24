@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -33,11 +33,14 @@ xmlNodePtr pub;
 
 xmlNodePtr search_paths;
 
+int flatten_ref = 1;
+
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-I <path>] [-Npxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-I <path>] [-dNpxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
+	puts("  -d         Remove unresolved refs without flattening.");
 	puts("  -I <path>  Search <path> for referenced objects.");
 	puts("  -N         Assume issue/inwork numbers are omitted.");
 	puts("  -p         Output a 'publication' XML file.");
@@ -211,28 +214,32 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		if (filesystem_fname(fs_pm_fname, pm_fname, path, is_pm)) {
 			found = true;
 
-			if (xinclude) {
-				xi = xmlNewNode(NULL, BAD_CAST "xi:include");
-				xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
+			if (flatten_ref) {
+				if (xinclude) {
+					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
+					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
 
-				if (use_pub_fmt) {
-					xi = xmlAddChild(pub, xi);
+					if (use_pub_fmt) {
+						xi = xmlAddChild(pub, xi);
+					} else {
+						xi = xmlAddPrevSibling(pm_ref, xi);
+					}
 				} else {
-					xi = xmlAddPrevSibling(pm_ref, xi);
+					doc = xmlReadFile(fs_pm_fname, NULL, PARSE_OPTS);
+					pm = xmlDocGetRootElement(doc);
+					xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
+					xmlFreeDoc(doc);
 				}
-			} else {
-				doc = xmlReadFile(fs_pm_fname, NULL, PARSE_OPTS);
-				pm = xmlDocGetRootElement(doc);
-				xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
-				xmlFreeDoc(doc);
 			}
 		}
 
 		xmlFree(path);
 	}
 
-	xmlUnlinkNode(pm_ref);
-	xmlFreeNode(pm_ref);
+	if (flatten_ref || !found) {
+		xmlUnlinkNode(pm_ref);
+		xmlFreeNode(pm_ref);
+	}
 }
 
 void flatten_dm_ref(xmlNodePtr dm_ref)
@@ -347,33 +354,37 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		if (filesystem_fname(fs_dm_fname, dm_fname, path, is_dm)) {
 			found = true;
 
-			if (xinclude) {
-				xi = xmlNewNode(NULL, BAD_CAST "xi:include");
-				xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
+			if (flatten_ref) {
+				if (xinclude) {
+					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
+					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
 
-				if (use_pub_fmt) {
-					xi = xmlAddChild(pub, xi);
+					if (use_pub_fmt) {
+						xi = xmlAddChild(pub, xi);
+					} else {
+						xi = xmlAddPrevSibling(dm_ref, xi);
+					}
 				} else {
-					xi = xmlAddPrevSibling(dm_ref, xi);
+					xmlChar *app;
+					doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
+					dmodule = xmlDocGetRootElement(doc);
+					if ((app = xmlGetProp(dm_ref, BAD_CAST "applicRefId"))) {
+						xmlSetProp(dmodule, BAD_CAST "applicRefId", app);
+					}
+					xmlFree(app);
+					xmlAddPrevSibling(dm_ref, xmlCopyNode(dmodule, 1));
+					xmlFreeDoc(doc);
 				}
-			} else {
-				xmlChar *app;
-				doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
-				dmodule = xmlDocGetRootElement(doc);
-				if ((app = xmlGetProp(dm_ref, BAD_CAST "applicRefId"))) {
-					xmlSetProp(dmodule, BAD_CAST "applicRefId", app);
-				}
-				xmlFree(app);
-				xmlAddPrevSibling(dm_ref, xmlCopyNode(dmodule, 1));
-				xmlFreeDoc(doc);
 			}
 		}
 
 		xmlFree(path);
 	}
 
-	xmlUnlinkNode(dm_ref);
-	xmlFreeNode(dm_ref);
+	if (flatten_ref || !found) {
+		xmlUnlinkNode(dm_ref);
+		xmlFreeNode(dm_ref);
+	}
 }
 
 void flatten_pm_entry(xmlNodePtr pm_entry)
@@ -395,6 +406,11 @@ void flatten_pm_entry(xmlNodePtr pm_entry)
 
 		cur = next;
 	}
+
+	if (xmlChildElementCount(pm_entry) == 0) {
+		xmlUnlinkNode(pm_entry);
+		xmlFreeNode(pm_entry);
+	}
 }
 
 int main(int argc, char **argv)
@@ -410,7 +426,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "xNpI:h?";
+	const char *sopts = "dxNpI:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -428,6 +444,7 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				break;
+			case 'd': flatten_ref = 0; break;
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; xinclude = 1; break;
@@ -468,10 +485,18 @@ int main(int argc, char **argv)
 	}
 
 	if (optind == argc - 1 || !use_pub_fmt) {
-		for (cur = content->children; cur; cur = cur->next) {
+		cur = content->children;
+
+		while (cur) {
+			xmlNodePtr next;
+
+			next = cur->next;
+
 			if (xmlStrcmp(cur->name, BAD_CAST "pmEntry") == 0 || xmlStrcmp(cur->name, BAD_CAST "pmentry") == 0) {
 				flatten_pm_entry(cur);
 			}
+
+			cur = next;
 		}
 	} else if (use_pub_fmt) {
 		int i;
@@ -488,6 +513,7 @@ int main(int argc, char **argv)
 
 	xmlFreeDoc(pm_doc);
 	xmlFreeNode(search_paths);
+	xmlFreeDoc(pub_doc);
 
 	xmlCleanupParser();
 

@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-I <path>] [-Npx] <PM> [<DM>...]
+    s1kd-flatten [-I <path>] [-dNpx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -17,6 +17,9 @@ Data modules are by default searched for in the current directory using the data
 
 OPTIONS
 =======
+
+-d  
+Remove unresolved references, but do not flatten resolved ones.
 
 -h -?  
 Show help/usage message.
