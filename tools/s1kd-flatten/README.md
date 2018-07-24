@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-I <path>] [-dNpx] <PM> [<DM>...]
+    s1kd-flatten [-I <path>] [-dfNpx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -20,6 +20,9 @@ OPTIONS
 
 -d  
 Remove unresolved references, but do not flatten resolved ones.
+
+-f  
+Overwrite input publication module instead of writing to stdout.
 
 -h -?  
 Show help/usage message.

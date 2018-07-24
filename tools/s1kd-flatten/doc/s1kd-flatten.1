@@ -9,7 +9,7 @@ s1kd\-flatten \- Flatten a publication module for publishing
 .IP
 .nf
 \f[C]
-s1kd\-flatten\ [\-I\ <path>]\ [\-dNpx]\ <PM>\ [<DM>...]
+s1kd\-flatten\ [\-I\ <path>]\ [\-dfNpx]\ <PM>\ [<DM>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -26,6 +26,11 @@ Additional directories can be searched using the \-I option.
 .TP
 .B \-d
 Remove unresolved references, but do not flatten resolved ones.
+.RS
+.RE
+.TP
+.B \-f
+Overwrite input publication module instead of writing to stdout.
 .RS
 .RE
 .TP

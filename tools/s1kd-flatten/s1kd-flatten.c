@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -37,10 +37,11 @@ int flatten_ref = 1;
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-I <path>] [-dNpxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-I <path>] [-dfNpxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -d         Remove unresolved refs without flattening.");
+	puts("  -f         Overwrite publication module.");
 	puts("  -I <path>  Search <path> for referenced objects.");
 	puts("  -N         Assume issue/inwork numbers are omitted.");
 	puts("  -p         Output a 'publication' XML file.");
@@ -426,12 +427,14 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "dxNpI:h?";
+	const char *sopts = "dfxNpI:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	int overwrite = 0;
 
 	search_paths = xmlNewNode(NULL, BAD_CAST "searchPaths");
 	xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST ".");
@@ -445,6 +448,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'd': flatten_ref = 0; break;
+			case 'f': overwrite = 1; break;
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; xinclude = 1; break;
@@ -509,7 +513,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	xmlSaveFormatFile("-", use_pub_fmt ? pub_doc : pm_doc, 1);
+	xmlSaveFormatFile(overwrite ? pm_fname : "-", use_pub_fmt ? pub_doc : pm_doc, 1);
 
 	xmlFreeDoc(pm_doc);
 	xmlFreeNode(search_paths);

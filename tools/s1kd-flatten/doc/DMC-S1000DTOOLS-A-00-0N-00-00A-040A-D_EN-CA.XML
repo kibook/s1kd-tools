@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add -d option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add -f option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-flatten [-I &lt;path&gt;] [-dNpx] &lt;PM&gt; [&lt;DM&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-flatten [-I &lt;path&gt;] [-dfNpx] &lt;PM&gt; [&lt;DM&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -68,6 +71,12 @@
               <listItemTerm>-d</listItemTerm>
               <listItemDefinition>
                 <para>Remove unresolved references, but do not flatten resolved ones.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002" changeMark="1">
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite input publication module instead of writing to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
