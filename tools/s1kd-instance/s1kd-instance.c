@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -721,6 +721,10 @@ xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 	xmlNodePtr cur;
 	char *cid;
 
+	if (!root) {
+		return NULL;
+	}
+
 	for (cur = root->children; cur; cur = cur->next) {
 		xmlNodePtr ch;
 		bool match;
@@ -772,7 +776,26 @@ void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	}
 }
 
-/* Remove applic references on content where all assertions are unambigously true */
+/* Remove unambigously true or false applic statements. */
+void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
+{
+	xmlNodePtr cur;
+
+	cur = referencedApplicGroup->children;
+
+	while (cur) {
+		xmlNodePtr next = cur->next;
+
+		if (cur->type == XML_ELEMENT_NODE && (eval_applic_stmt(cur, false) || !eval_applic_stmt(cur, true))) {
+			xmlUnlinkNode(cur);
+			xmlFreeNode(cur);
+		}
+
+		cur = next;
+	}
+}
+
+/* Remove applic references on content where the applic statement was removed by clean_applic_stmts. */
 void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur;
@@ -785,7 +808,7 @@ void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 		applic = get_element_by_id(referencedApplicGroup, applicRefId);
 		xmlFree(applicRefId);
 
-		if (applic && eval_applic_stmt(applic, false)) {
+		if (!applic) {
 			xmlUnsetProp(node, BAD_CAST "applicRefId");
 		}
 	}
@@ -796,7 +819,7 @@ void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 }
 
 /* Remove applic statements or parts of applic statements where all assertions
- * are unambigously true */
+ * are unambigously true or false */
 void simpl_applic(xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
@@ -886,7 +909,7 @@ void simpl_applic_evals(xmlNodePtr node)
 }
 
 /* Remove <referencedApplicGroup> if all applic statements are removed */
-void simpl_applic_clean(xmlNode* referencedApplicGroup)
+void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
 {
 	bool has_applic = false;
 	xmlNodePtr cur;
@@ -2607,6 +2630,14 @@ int main(int argc, char **argv)
 				strip_applic(referencedApplicGroup, root);
 
 				if (clean || simpl) {
+					clean_applic_stmts(referencedApplicGroup);
+
+					if (xmlChildElementCount(referencedApplicGroup) == 0) {
+						xmlUnlinkNode(referencedApplicGroup);
+						xmlFreeNode(referencedApplicGroup);
+						referencedApplicGroup = NULL;
+					}
+
 					clean_applic(referencedApplicGroup, root);
 				}
 

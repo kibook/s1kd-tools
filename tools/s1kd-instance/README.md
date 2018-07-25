@@ -30,7 +30,7 @@ OPTIONS
 Remove unused applicability annotations and simplify/remove unused applicability statements.
 
 -a  
-Remove unused applicability annotations but not statements.
+Remove unused applicability annotations and statements.
 
 -C &lt;comment&gt;  
 Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
@@ -208,17 +208,6 @@ Show version information.
 &lt;object&gt;...  
 Source CSDB objects to instantiate.
 
--a vs -A
---------
-
-The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). The applicability statements themselves however will be untouched.
-
-The -A option will do the above, but will also attempt to simplify unused parts of applicability statements or remove unused applicability statements entirely. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
-
-> **Note**
->
-> The -A option may change the *meaning* of certain applicability statements without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect.
-
 Identifying the source of an instance
 -------------------------------------
 
@@ -232,6 +221,170 @@ Instance module code (-c) vs extension (-e)
 -------------------------------------------
 
 When creating a data module or publication module instance, the instance should have the same data module/publication module code as the master, with an added extension code, the DME/PME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules/publication modules, it may be desirable to change the data module/publication module code instead. These two options can be used together as well to give an instance a new DMC/PMC as well an extension.
+
+Removing/simplifying statements (-a vs -A)
+------------------------------------------
+
+The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid or invalid (their validity does not rely on applicability values left undefined by the user). The corresponding applicability statements (applic) are also removed.
+
+The -A option will do the same as above, but will also attempt to simplify unused parts of applicability statements. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
+
+For example, given the following input:
+
+    <referencedApplicGroup>
+    <applic id="app-0001">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="app-0002">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    <applic id="app-0003">
+    <evaluate andOr="or">
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="normal"/>
+    </evaluate>
+    <evaluate andOr"and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="icy"/>
+    </evaluate>
+    </evaluate>
+    </applic>
+    </referencedApplicGroup>
+    <!-- snip -->
+    <para applicRefId="app-0001">This applies to version A.</para>
+    <para applicRefId="app-0002">This applies to version B.</para>
+    <para applicRefId="app-0003">
+    This applies to version A if the weather is normal, or version B if
+    the weather is icy.
+    </para>
+
+If this data is filtered for version A, without specifying a value for the weather, and neither the -a or -A option is used, the following will be the result:
+
+    <referencedApplicGroup>
+    <applic id="app-0001">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="app-0002">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    <applic id="app-0003">
+    <evaluate andOr="or">
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="normal"/>
+    </evaluate>
+    <evaluate andOr"and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="icy"/>
+    </evaluate>
+    </evaluate>
+    </applic>
+    </referencedApplicGroup>
+    <!-- snip -->
+    <para applicRefId="app-0001">This applies to version A.</para>
+    <para applicRefId="app-0003">
+    This applies to version A if the weather is normal, or version B if
+    the weather is icy.
+    </para>
+
+The second paragraph is removed, because it only applies to version B.
+
+If the -a option is used, the following would be the result:
+
+    <referencedApplicGroup>
+    <applic id="app-0003">
+    <evaluate andOr="or">
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="normal"/>
+    </evaluate>
+    <evaluate andOr"and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="icy"/>
+    </evaluate>
+    </evaluate>
+    </applic>
+    </referencedApplicGroup>
+    <!-- snip -->
+    <para>This applies to version A.</para>
+    <para applicRefId="app-0003">
+    This applies to version A if the weather is normal, or version B if
+    the weather is icy.
+    </para>
+
+The applicability for the first paragraph is removed, because given that the version is A it must be true. The two corresponding applicability statements are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A *and* the weather is normal, and no value has been given for the weather.
+
+If the -A option is used, the following would be the result:
+
+    <referencedApplicGroup>
+    <applic id="app-0003">
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="normal"/>
+    </applic>
+    </referencedApplicGroup>
+    <!-- snip -->
+    <para>This applies to version A.</para>
+    <para applicRefId="app-0003">
+    This applies to version A if the weather is normal, or version B if
+    the weather is icy.
+    </para>
+
+The statement is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the statement in which the version is *not* A can be removed as invalid. This leaves only the assertion about the weather.
+
+> **Note**
+>
+> The -A option may change the *meaning* of certain applicability statements without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
 
 Filtering for multiple values of a single property
 --------------------------------------------------
