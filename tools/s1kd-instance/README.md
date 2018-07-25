@@ -1,7 +1,7 @@
 NAME
 ====
 
-s1kd-instance - Create S1000D data/pub module instances
+s1kd-instance - Create instances of S1000D CSDB objects
 
 SYNOPSIS
 ========
@@ -35,7 +35,7 @@ Remove unused applicability annotations.
 -C &lt;comment&gt;  
 Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
 
--c &lt;dmc&gt;  
+-c &lt;code&gt;  
 Specify a new data module code (DMC) or publication module code (PMC) for the instance.
 
 -E  

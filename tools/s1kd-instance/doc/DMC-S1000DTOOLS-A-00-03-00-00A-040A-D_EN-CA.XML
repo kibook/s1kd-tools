@@ -41,13 +41,19 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Change in -a behaviour and provide a more detailed explanation of the -a and -A options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Change tool summary.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
+        <simplePara>Change 'dmc' to more generic 'code'.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-instance - Create S1000D data/pub module instances</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0002" changeMark="1">s1kd-instance - Create instances of S1000D CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
@@ -83,13 +89,13 @@
             <definitionListItem>
               <listItemTerm>-A</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Simplify applicability annotations and remove unused ones.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Simplify applicability annotations and remove unused ones.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001">Remove unused applicability annotations.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Remove unused applicability annotations.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -99,7 +105,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-c &lt;dmc&gt;</listItemTerm>
+              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0003" changeMark="1">-c &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a new data module code (DMC) or publication module code (PMC) for the instance.</para>
               </listItemDefinition>
