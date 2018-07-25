@@ -14,6 +14,9 @@
         -   [Quality assurance verification](#quality-assurance-verification)
     -   [Changes to official data modules](#changes-to-official-data-modules)
     -   [Deleting data modules](#deleting-data-modules)
+-   [Building publications](#building-publications)
+    -   [Publication module content](#publication-module-content)
+    -   [Creating a customized publication](#creating-a-customized-publication)
 -   [Use with other version control systems](#use-with-other-version-control-systems)
 
 General
@@ -324,6 +327,98 @@ Deleted data modules may be reinstated later in a similar way:
     $ s1kd-upissue -is rinstate-status ...
 
 The data module is once again upissued to the next official issue, and the issue type is set to one of the "`rinstate-..."` types.
+
+Building publications
+=====================
+
+S1000D publications are managed by use of publication modules. Like data modules, publication modules may be created as part of the project's DMRL:
+
+    <dmlEntry>
+    <pmRef>
+    <pmRefIdent>
+    <pmCode modelIdentCode="MYPRJ" pmIssuer="12345" pmNumber="00001"
+    pmVolume="00"/>
+    </pmRefIdent>
+    <pmRefAddressItems>
+    <pmTitle>My publication</pmTitle>
+    </pmRefAddressItems>
+    </pmRef>
+    <responsiblePartnerCompany>
+    <enterpriseName>khzae.net</enterpriseName>
+    </responsiblePartnerCompany>
+    </dmlEntry>
+
+or "on-the-fly" with the **s1kd-newpm** tool:
+
+    $ s1kd-newpm -# MYPRJ-12345-00001-00
+
+Publication module content
+--------------------------
+
+The publication module lays out the hierarchical structure of the data modules in a publication:
+
+    <content>
+    <pmEntry>
+    <pmEntryTitle>Front matter</pmEntryTitle>
+    <dmRef>
+    <dmRefIdent>
+    <dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+    subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+    disassyCodeVariant="A" infoCode="001" infoCodeVariant="A"
+    itemLocationCode="D"/>
+    </dmRefIdent>
+    <dmRefAddressItems>
+    <dmTitle>
+    <techName>My project</techName>
+    <infoName>Title page</infoName>
+    </dmTitle>
+    </dmRefAddressItems>
+    </dmRef>
+    </pmEntry>
+    <pmEntry>
+    <pmEntryTitle>General info</pmEntryTitle>
+    <dmRef>
+    <dmRefIdent>
+    <dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+    subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+    disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+    itemLocationCode="D"/>
+    </dmRefIdent>
+    <dmRefAddressItems>
+    <dmTitle>
+    <techName>My project</techName>
+    <infoName>Description</infoName>
+    </dmTitle>
+    </dmRefAddressItems>
+    </dmRef>
+    </pmEntry>
+    </content>
+
+Creating a customized publication
+---------------------------------
+
+The S1000D applicability model and the **s1kd-instance** tool enable the creation of customized publications, which are filtered for a particular customer or product. For example, a data module may contain applicabilty for two versions of a product:
+
+    <para>
+    This is some common information about the product.
+    </para>
+    <para applicRefId="app-versionA">
+    This information only applies to version A.
+    </para>
+    <para applicRefId="app-versionB">
+    This information only applies to version B.
+    </para>
+
+When you deliver this data module to a customer with Version B, you can exclude information which is not applicable to them by filtering it:
+
+    $ s1kd-instance -s version:prodattr=B <DM>
+
+To filter a whole publication, create a directory for the customized delivery and use the -O option of the s1kd-instance tool:
+
+    $ mkdir customerB
+    $ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML
+
+The `customerB` directory will contain the filtered versions of these data modules.
 
 Use with other version control systems
 ======================================

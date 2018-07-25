@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="05"/>
+        <issueDate year="2018" month="07" day="25"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -40,10 +40,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add example of creating a basic BREX from defaults files.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Add example of BREX attribute value tailoring.</simplePara>
+        <simplePara>Add examples of building publications.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -266,8 +263,8 @@ infoCodeVariant="A" itemLocationCode="D"/>
 <objectUse>The emphasis element is not allowed.</objectUse>
 </structureObjectRule>]]></verbatimText>
             </para>
-            <para changeType="add" reasonForUpdateRefIds="rfu-0002">Or by tailoring the allowed values of certain elements or attributes:</para>
-            <para changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <para>Or by tailoring the allowed values of certain elements or attributes:</para>
+            <para>
               <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
 <objectPath allowedObjectFlag="2">
 //@securityClassification
@@ -282,8 +279,8 @@ or 02 (Classified).
             </para>
             <para>Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.</para>
             <para>Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.</para>
-            <para changeType="add" reasonForUpdateRefIds="rfu-0001">To get started with your project's own business rules, you can create a simple BREX data module based on the current defaults of your CSDB using the -B option of the s1kd-newdm tool:</para>
-            <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <para>To get started with your project's own business rules, you can create a simple BREX data module based on the current defaults of your CSDB using the -B option of the s1kd-newdm tool:</para>
+            <para>
               <verbatimText verbatimStyle="vs23">$ s1kd-newdm -B# MYPRJ-A-00-00-00-00A-022A-D</verbatimText>
             </para>
             <para>This will use the customized <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to generate a basic set of business rules.</para>
@@ -354,6 +351,97 @@ S1000D and s1kd-tools.&lt;/para&gt;
             <verbatimText verbatimStyle="vs23">$ s1kd-upissue -is rinstate-status ...</verbatimText>
           </para>
           <para>The data module is once again upissued to the next official issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-..."</verbatimText> types.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+        <title>Building publications</title>
+        <para>S1000D publications are managed by use of publication modules. Like data modules, publication modules may be created as part of the project's DMRL:</para>
+        <para>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<dmlEntry>
+<pmRef>
+<pmRefIdent>
+<pmCode modelIdentCode="MYPRJ" pmIssuer="12345" pmNumber="00001"
+pmVolume="00"/>
+</pmRefIdent>
+<pmRefAddressItems>
+<pmTitle>My publication</pmTitle>
+</pmRefAddressItems>
+</pmRef>
+<responsiblePartnerCompany>
+<enterpriseName>khzae.net</enterpriseName>
+</responsiblePartnerCompany>
+</dmlEntry>]]></verbatimText>
+        </para>
+        <para>or "on-the-fly" with the <emphasis>s1kd-newpm</emphasis> tool:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-newpm -# MYPRJ-12345-00001-00</verbatimText>
+        </para>
+        <levelledPara>
+          <title>Publication module content</title>
+          <para>The publication module lays out the hierarchical structure of the data modules in a publication:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<content>
+<pmEntry>
+<pmEntryTitle>Front matter</pmEntryTitle>
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="001" infoCodeVariant="A"
+itemLocationCode="D"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>My project</techName>
+<infoName>Title page</infoName>
+</dmTitle>
+</dmRefAddressItems>
+</dmRef>
+</pmEntry>
+<pmEntry>
+<pmEntryTitle>General info</pmEntryTitle>
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>My project</techName>
+<infoName>Description</infoName>
+</dmTitle>
+</dmRefAddressItems>
+</dmRef>
+</pmEntry>
+</content>]]></verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Creating a customized publication</title>
+          <para>The S1000D applicability model and the <emphasis>s1kd-instance</emphasis> tool enable the creation of customized publications, which are filtered for a particular customer or product. For example, a data module may contain applicabilty for two versions of a product:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<para>
+This is some common information about the product.
+</para>
+<para applicRefId="app-versionA">
+This information only applies to version A.
+</para>
+<para applicRefId="app-versionB">
+This information only applies to version B.
+</para>]]></verbatimText>
+          </para>
+          <para>When you deliver this data module to a customer with Version B, you can exclude information which is not applicable to them by filtering it:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B &lt;DM&gt;</verbatimText>
+          </para>
+          <para>To filter a whole publication, create a directory for the customized delivery and use the -O option of the s1kd-instance tool:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ mkdir customerB
+$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
+          </para>
+          <para>The <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory will contain the filtered versions of these data modules.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
