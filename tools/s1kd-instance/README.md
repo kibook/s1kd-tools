@@ -13,7 +13,7 @@ DESCRIPTION
 
 The *s1kd-instance* tool produces an "instance" of an S1000D CSDB object, derived from a "master" (or "source") object. The tool supports multiple methods of instantiating an object:
 
--   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability statements are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
+-   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
 
 -   Filtering on skill levels and security classifications.
 
@@ -27,10 +27,10 @@ OPTIONS
 =======
 
 -A  
-Remove unused applicability annotations and simplify/remove unused applicability statements.
+Simplify applicability annotations and remove unused ones.
 
 -a  
-Remove unused applicability annotations and statements.
+Remove unused applicability annotations.
 
 -C &lt;comment&gt;  
 Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
@@ -222,12 +222,14 @@ Instance module code (-c) vs extension (-e)
 
 When creating a data module or publication module instance, the instance should have the same data module/publication module code as the master, with an added extension code, the DME/PME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules/publication modules, it may be desirable to change the data module/publication module code instead. These two options can be used together as well to give an instance a new DMC/PMC as well an extension.
 
-Removing/simplifying statements (-a vs -A)
-------------------------------------------
+Removing/simplifying applicability annotations (-a vs -A)
+---------------------------------------------------------
 
-The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid or invalid (their validity does not rely on applicability values left undefined by the user). The corresponding applicability statements (applic) are also removed.
+By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a and -A options provide two methods of doing this.
 
-The -A option will do the same as above, but will also attempt to simplify unused parts of applicability statements. It simplifies a statement by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
+The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). Unused occurrences of the corresponding applic elements are removed as well.
+
+The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
 
 For example, given the following input:
 
@@ -361,7 +363,7 @@ If the -a option is used, the following would be the result:
     the weather is icy.
     </para>
 
-The applicability for the first paragraph is removed, because given that the version is A it must be true. The two corresponding applicability statements are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A *and* the weather is normal, and no value has been given for the weather.
+The applicability annotation reference for the first paragraph is removed because, given that the version must is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A *and* the weather is normal, and no value has been given for the weather.
 
 If the -A option is used, the following would be the result:
 
@@ -380,11 +382,11 @@ If the -A option is used, the following would be the result:
     the weather is icy.
     </para>
 
-The statement is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the statement in which the version is *not* A can be removed as invalid. This leaves only the assertion about the weather.
+The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is *not* A can be removed as invalid. This leaves only the assertion about the weather.
 
 > **Note**
 >
-> The -A option may change the *meaning* of certain applicability statements without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
+> The -A option may change the *meaning* of certain applicability annotation without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
 
 Filtering for multiple values of a single property
 --------------------------------------------------

@@ -20,7 +20,7 @@ The tool supports multiple methods of instantiating an object:
 .IP \[bu] 2
 Filtering on user\-supplied applicability definitions, so that
 non\-applicable elements and (optionally) unused applicability
-statements are removed in the instance.
+annotations are removed in the instance.
 The definitions can be supplied directly or read from a PCT (Product
 Cross\-reference Table).
 .IP \[bu] 2
@@ -35,13 +35,12 @@ Any combination of these methods can be used when producing an instance.
 .SH OPTIONS
 .TP
 .B \-A
-Remove unused applicability annotations and simplify/remove unused
-applicability statements.
+Simplify applicability annotations and remove unused ones.
 .RS
 .RE
 .TP
 .B \-a
-Remove unused applicability annotations and statements.
+Remove unused applicability annotations.
 .RS
 .RE
 .TP
@@ -381,18 +380,24 @@ modules/publication modules, it may be desirable to change the data
 module/publication module code instead.
 These two options can be used together as well to give an instance a new
 DMC/PMC as well an extension.
-.SS Removing/simplifying statements (\-a vs \-A)
+.SS Removing/simplifying applicability annotations (\-a vs \-A)
+.PP
+By default, filtering on applicability will remove invalid elements from
+the resulting instance.
+In some cases, though, it may be desirable to remove redundant
+applicability annotations on valid elements.
+The \-a and \-A options provide two methods of doing this.
 .PP
 The \-a option will remove applicability annotations (applicRefId) from
-elements which are deemed to be unambiguously valid or invalid (their
-validity does not rely on applicability values left undefined by the
-user).
-The corresponding applicability statements (applic) are also removed.
+elements which are deemed to be unambiguously valid (their validity does
+not rely on applicability values left undefined by the user).
+Unused occurrences of the corresponding applic elements are removed as
+well.
 .PP
-The \-A option will do the same as above, but will also attempt to
-simplify unused parts of applicability statements.
-It simplifies a statement by removing <assert> elements determined to be
-either unambiguously valid or invalid given the user\-defined values,
+The \-A option will do the same as the \-a option, but will also attempt
+to simplify unused parts of applicability annotations.
+It simplifies an annotation by removing <assert> elements determined to
+be either unambiguously valid or invalid given the user\-defined values,
 and removing unneeded <evaluate> elements when they contain only one
 remaining <assert>.
 .PP
@@ -542,9 +547,10 @@ the\ weather\ is\ icy.
 \f[]
 .fi
 .PP
-The applicability for the first paragraph is removed, because given that
-the version is A it must be true.
-The two corresponding applicability statements are also removed.
+The applicability annotation reference for the first paragraph is
+removed because, given that the version must is A, it must be true.
+The corresponding applicability annotations, which are no longer
+referenced, are also removed.
 The applicability on the third paragraph remains, however, because it is
 only true if the version is A \f[I]and\f[] the weather is normal, and no
 value has been given for the weather.
@@ -570,9 +576,9 @@ the\ weather\ is\ icy.
 \f[]
 .fi
 .PP
-The statement is now simplified to remove resolved assertions.
+The annotation is now simplified to remove resolved assertions.
 Because the version must be A, any assertions restating this can be
-removed as redundant, and any portions of the statement in which the
+removed as redundant, and any portions of the annotation in which the
 version is \f[I]not\f[] A can be removed as invalid.
 This leaves only the assertion about the weather.
 .RS
@@ -580,7 +586,7 @@ This leaves only the assertion about the weather.
 \f[B]Note\f[]
 .PP
 The \-A option may change the \f[I]meaning\f[] of certain applicability
-statements without changing the \f[I]display text\f[].
+annotation without changing the \f[I]display text\f[].
 Display text is always left untouched, so using this option may cause
 display text to be technically incorrect.
 This option is best used when display text will be automatically
