@@ -363,7 +363,7 @@ If the -a option is used, the following would be the result:
     the weather is icy.
     </para>
 
-The applicability annotation reference for the first paragraph is removed because, given that the version must is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A *and* the weather is normal, and no value has been given for the weather.
+The applicability annotation reference for the first paragraph is removed because, given that the version is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A *and* the weather is normal, and no value has been given for the weather.
 
 If the -A option is used, the following would be the result:
 

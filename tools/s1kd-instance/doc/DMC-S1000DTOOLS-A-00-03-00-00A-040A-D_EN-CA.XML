@@ -562,7 +562,7 @@ This applies to version A if the weather is normal, or version B if
 the weather is icy.
 </para>]]></verbatimText>
           </para>
-          <para>The applicability annotation reference for the first paragraph is removed because, given that the version must is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A <emphasis>and</emphasis> the weather is normal, and no value has been given for the weather.</para>
+          <para>The applicability annotation reference for the first paragraph is removed because, given that the version is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A <emphasis>and</emphasis> the weather is normal, and no value has been given for the weather.</para>
           <para>If the -A option is used, the following would be the result:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
