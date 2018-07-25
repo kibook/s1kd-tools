@@ -2,7 +2,7 @@ Usage: s1kd-instance [options] [<object>...]
 
 Options:
   -A            Simplify and remove unused applicability annotations.
-  -a            Only remove unused applicability annotation references.
+  -a            Remove unused applicability annotations.
   -C <comment>  Add an XML comment to the top of the instance.
   -c <DMC>      The new code of the instance.
   -E            Remove extension from instance.
