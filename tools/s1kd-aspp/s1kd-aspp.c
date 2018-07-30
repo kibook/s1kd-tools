@@ -20,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
