@@ -61,7 +61,7 @@
     <xsl:value-of select="translate(str:replace(., '|', ', '), '~', '-')"/>
   </xsl:template>
 
-  <xsl:template match="assert[not(@*)]" mode="text">
+  <xsl:template match="assert[text()]" mode="text">
     <xsl:apply-templates/>
   </xsl:template>
 
