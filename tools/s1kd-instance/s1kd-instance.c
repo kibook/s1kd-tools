@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2020,35 +2020,6 @@ void strip_extension(xmlDocPtr doc)
 	xmlFreeNode(ext);
 }
 
-void delete_xpath(xmlDocPtr doc, const char *xpath)
-{
-
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-
-	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-}
-
-/* Removes invalid empty sections in a PM after all references have
- * been filtered out.
- */
-void remove_emptry_pmentries(xmlDocPtr doc)
-{
-	delete_xpath(doc, "//pmEntry[not(dmRef|pmRef|externalPubRef)]");
-}
-
 /* General XSLT transformation with embedded stylesheet, preserving the DTD. */
 void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
 {
@@ -2075,6 +2046,14 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const ch
 void flatten_alts(xmlDocPtr doc)
 {
 	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len, NULL);
+}
+
+/* Removes invalid empty sections in a PM after all references have
+ * been filtered out.
+ */
+void remove_emptry_pmentries(xmlDocPtr doc)
+{
+	transform_doc(doc, xsl_remove_empty_pmentries_xsl, xsl_remove_empty_pmentries_xsl_len, NULL);
 }
 
 /* Insert a custom comment. */
