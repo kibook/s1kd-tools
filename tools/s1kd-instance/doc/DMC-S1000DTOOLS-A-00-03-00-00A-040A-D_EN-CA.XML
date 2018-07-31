@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="023" inWork="00"/>
+        <issueInfo issueNumber="024" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="25"/>
+        <issueDate year="2018" month="07" day="31"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,13 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Change in -a behaviour and provide a more detailed explanation of the -a and -A options.</simplePara>
+        <simplePara>Change default behaviour of -Y/-y options and add -W option to restore original behaviour.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Change tool summary.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Change 'dmc' to more generic 'code'.</simplePara>
+        <simplePara>Clarify that -a and -A operate on inline applicability annotations.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +50,7 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002" changeMark="1">s1kd-instance - Create instances of S1000D CSDB objects</para>
+        <para>s1kd-instance - Create instances of S1000D CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
@@ -89,13 +86,13 @@
             <definitionListItem>
               <listItemTerm>-A</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Simplify applicability annotations and remove unused ones.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Simplify inline applicability annotations and remove unused ones.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Remove unused applicability annotations.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Remove unused inline applicability annotations.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -105,7 +102,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeType="modify" reasonForUpdateRefIds="rfu-0003" changeMark="1">-c &lt;code&gt;</listItemTerm>
+              <listItemTerm>-c &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a new data module code (DMC) or publication module code (PMC) for the instance.</para>
               </listItemDefinition>
@@ -334,6 +331,12 @@
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-W</listItemTerm>
+              <listItemDefinition>
+                <para>Set the applicability for the whole object, overwriting the current applicability with the user-defined applicability values.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
@@ -399,13 +402,13 @@
             <definitionListItem>
               <listItemTerm>-Y &lt;text&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set the applicability for the whole object using the user-defined applicability values, using text as the new display text.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Update the applicability for the whole object using the user-defined applicability values, and using &lt;text&gt; as the new display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-y</listItemTerm>
               <listItemDefinition>
-                <para>Set the applicability for the whole data object using the user-defined applicability values, with no display text.</para>
+                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Update the applicability for the whole object using the user-defined applicability values.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -432,7 +435,7 @@
           <title>Instance module code (-c) vs extension (-e)</title>
           <para>When creating a data module or publication module instance, the instance should have the same data module/publication module code as the master, with an added extension code, the DME/PME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules/publication modules, it may be desirable to change the data module/publication module code instead. These two options can be used together as well to give an instance a new DMC/PMC as well an extension.</para>
         </levelledPara>
-        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+        <levelledPara>
           <title>Removing/simplifying applicability annotations (-a vs -A)</title>
           <para>By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a and -A options provide two methods of doing this.</para>
           <para>The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). Unused occurrences of the corresponding applic elements are removed as well.</para>
@@ -590,6 +593,73 @@ the weather is icy.
           <note>
             <notePara>The -A option may change the <emphasis>meaning</emphasis> of certain applicability annotation without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.</notePara>
           </note>
+        </levelledPara>
+        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+          <title>Applicability of an instance (-W, -Y, -y)</title>
+          <para>The applicability of an instance may change as a result of filtering. For example, a source data module which is applicable to two versions of a product may produce two instances which are each only applicable to one version. There are three options which control how the applicability of the whole instance object is updated.</para>
+          <para>The -W option will create an applicability annotation for the instance using only the user-defined applicability values. This means, for example, that given the following command:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=A -W ...</verbatimText>
+          </para>
+          <para>The instance would contain the following annotation:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
+<!-- snip -->
+<applic>
+<assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
+</applic>
+<!-- snip -->
+</dmStatus>]]></verbatimText>
+          </para>
+          <para>regardless of what the applicability of the source object was.</para>
+          <para>The -y option will create an applicability annotation for the instance by combining the user-defined applicability with the applicability of the source object. For example, given the following annotation in the source object:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
+<!-- snip -->
+<applic>
+<assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
+</applic>
+<!-- snip -->
+</dmStatus>]]></verbatimText>
+          </para>
+          <para>and the following command:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s weather:condition=icy -y ...</verbatimText>
+          </para>
+          <para>The annotation for the instance would be as follows:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
+<!-- snip -->
+<applic>
+<evaluate andOr="and">
+<assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
+<assert applicPropertyIdent="weather"
+applicPropertyType="condition" applicPropertyValues="icy"/>
+</evaluate>
+</applic>
+<!-- snip -->
+</dmStatus>]]></verbatimText>
+          </para>
+          <para>The -Y option by itself works the same as the -y option, but allows custom display text to be set for the annotation. It can also be combined with the -W option to add custom display text to the overwriting annotation:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=A -WY "Version A" ...</verbatimText>
+          </para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
+<!-- snip -->
+<applic>
+<displayText>
+<simplePara>Version A</simplePara>
+</displayText>
+<assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
+</applic>
+<!-- snip -->
+</dmStatus>]]></verbatimText>
+          </para>
         </levelledPara>
         <levelledPara>
           <title>Filtering for multiple values of a single property</title>

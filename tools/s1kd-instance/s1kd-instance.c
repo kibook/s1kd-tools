@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -820,7 +820,7 @@ void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 
 /* Remove applic statements or parts of applic statements where all assertions
  * are unambigously true or false */
-void simpl_applic(xmlNodePtr node)
+bool simpl_applic(xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
@@ -828,13 +828,13 @@ void simpl_applic(xmlNodePtr node)
 		if (eval_applic_stmt(node, false) || !eval_applic_stmt(node, true)) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
-			return;
+			return true;
 		}
 	} else if (strcmp((char *) node->name, "evaluate") == 0) {
 		if (eval_applic(node, false) || !eval_applic(node, true)) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
-			return;
+			return false;
 		}
 	} else if (strcmp((char *) node->name, "assert") == 0) {
 		xmlNodePtr ident_attr  = first_xpath_node(NULL, node, "@applicPropertyIdent|@actidref");
@@ -854,7 +854,7 @@ void simpl_applic(xmlNodePtr node)
 		if (uneeded) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
-			return;
+			return false;
 		}
 	}
 
@@ -864,6 +864,8 @@ void simpl_applic(xmlNodePtr node)
 		simpl_applic(cur);
 		cur = next;
 	}
+
+	return false;
 }
 
 /* If an <evaluate> contains only one (or no) child elements, remove it. */
@@ -894,6 +896,10 @@ void simpl_applic_evals(xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
+	if (!node) {
+		return;
+	}
+
 	cur = node->children;
 	while (cur) {
 		next = cur->next;
@@ -903,7 +909,7 @@ void simpl_applic_evals(xmlNodePtr node)
 		cur = next;
 	}
 
-	if (strcmp((char *) node->name, "evaluate") == 0) {
+	if (xmlStrcmp(node->name, BAD_CAST "evaluate") == 0) {
 		simpl_evaluate(node);
 	}
 }
@@ -933,6 +939,33 @@ void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
 	}
 }
 
+xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
+{
+	xmlNodePtr applic, orig;
+
+	orig = first_xpath_node(doc, NULL, "//dmStatus/applic|//pmStatus/applic");
+
+	if (!orig) {
+		return NULL;
+	}
+
+	applic = xmlCopyNode(orig, 1);
+
+	if (simpl_applic(applic)) {
+		xmlNodePtr disptext;
+		applic = xmlNewNode(NULL, BAD_CAST "applic");
+		disptext = xmlNewChild(applic, NULL, BAD_CAST "displayText", NULL);
+		xmlNewChild(disptext, NULL, BAD_CAST "simplePara", BAD_CAST "All");
+	} else {
+		simpl_applic_evals(applic);
+	}
+
+	xmlAddNextSibling(orig, applic);
+	xmlUnlinkNode(orig);
+	xmlFreeNode(orig);
+
+	return applic;
+}
 
 /* Add metadata linking the data module instance with the master data module */
 void add_source(xmlDocPtr doc)
@@ -1307,8 +1340,8 @@ xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values, enum issu
 	return or;
 }
 
-/* Set the applicability for the whole datamodule instance */
-void set_applic(xmlDocPtr doc, char *new_text)
+/* Set the applicability for the whole data module instance */
+void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 {
 	xmlNodePtr new_applic, new_displayText, new_simplePara, new_evaluate, cur, applic;
 	enum issue iss;
@@ -1332,6 +1365,17 @@ void set_applic(xmlDocPtr doc, char *new_text)
 		new_displayText = xmlNewChild(new_applic, NULL, BAD_CAST (iss == ISS_30 ? "displaytext" : "displayText"), NULL);
 		new_simplePara = xmlNewChild(new_displayText, NULL, BAD_CAST (iss == ISS_30 ? "p" : "simplePara"), NULL);
 		xmlNodeSetContent(new_simplePara, BAD_CAST new_text);
+	}
+
+	if (combine && first_xpath_node(doc, applic, "assert|evaluate|expression")) {
+		new_applic = xmlNewChild(new_applic, NULL, BAD_CAST "evaluate", NULL);
+		xmlSetProp(new_applic, BAD_CAST (iss == ISS_30 ? "operator" : "andOr"), BAD_CAST "and");
+		for (cur = applic->children; cur; cur = cur->next) {
+			if (cur->type != XML_ELEMENT_NODE || xmlStrcmp(cur->name, BAD_CAST "displayText") == 0 || xmlStrcmp(cur->name, BAD_CAST "displaytext") == 0) {
+				continue;
+			}
+			xmlAddChild(new_applic, xmlCopyNode(cur, 1));
+		}
 	}
 
 	if (napplics > 1) {
@@ -2449,10 +2493,11 @@ int main(int argc, char **argv)
 	char *skill_codes = NULL;
 	char *sec_classes = NULL;
 	char *skill = NULL;
+	bool combine_applic = true;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "s:Se:Ec:o:O:faAt:i:Y:yC:l:R:r:n:u:wNP:p:LI:vx:gG:FX:m:k:U:K:h?";
+	const char *sopts = "AaC:c:Ee:FfG:gh?I:i:K:k:Ll:m:Nn:O:o:P:p:R:r:Ss:t:U:u:vWwX:x:Y:y";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2475,42 +2520,43 @@ int main(int argc, char **argv)
 					return EXIT_SUCCESS;
 				}
 				break;
-			case 's': read_applic(optarg); break;
-			case 'S': add_source_ident = false; break;
-			case 'e': strncpy(extension, optarg, 255); break;
-			case 'E': stripext = true; break;
-			case 'c': strncpy(code, optarg, 255); break;
-			case 'o': strncpy(out, optarg, PATH_MAX - 1); break;
-			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
-			case 'f': force_overwrite = true; break;
 			case 'a': clean = true; break;
 			case 'A': simpl = true; break;
-			case 't': strncpy(tech, optarg, 255); break;
-			case 'i': strncpy(info, optarg, 255); break;
-			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
-			case 'y': new_applic = true; break;
+			case 'c': strncpy(code, optarg, 255); break;
 			case 'C': strncpy(comment_text, optarg, 255); break;
-			case 'X': strncpy(comment_path, optarg, 255); break;
-			case 'l': strncpy(language, optarg, 255); break;
-			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
-			case 'r': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
-			case 'n': strncpy(issinfo, optarg, 6); break;
-			case 'u': strncpy(secu, optarg, 2); break;
-			case 'w': wholedm = true; break;
-			case 'N': no_issue = true; break;
-			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
-			case 'p': strncpy(product, optarg, 63); break;
-			case 'L': dmlist = true; break;
-			case 'I': strncpy(issdate, optarg, 15); break;
-			case 'v': verbose = true; break;
-			case 'x': dump_cir_xsl(optarg); exit(0);
+			case 'E': stripext = true; break;
+			case 'e': strncpy(extension, optarg, 255); break;
+			case 'F': flat_alts = true; break;
+			case 'f': force_overwrite = true; break;
 			case 'g': setorig = true; break;
 			case 'G': setorig = true; origspec = strdup(optarg); break;
-			case 'F': flat_alts = true; break;
-			case 'm': remarks = strdup(optarg); break;
-			case 'k': skill = strdup(optarg); break;
-			case 'U': sec_classes = strdup(optarg); break;
+			case 'i': strncpy(info, optarg, 255); break;
+			case 'I': strncpy(issdate, optarg, 15); break;
 			case 'K': skill_codes = strdup(optarg); break;
+			case 'k': skill = strdup(optarg); break;
+			case 'L': dmlist = true; break;
+			case 'l': strncpy(language, optarg, 255); break;
+			case 'm': remarks = strdup(optarg); break;
+			case 'N': no_issue = true; break;
+			case 'n': strncpy(issinfo, optarg, 6); break;
+			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
+			case 'o': strncpy(out, optarg, PATH_MAX - 1); break;
+			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
+			case 'p': strncpy(product, optarg, 63); break;
+			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
+			case 'r': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
+			case 'S': add_source_ident = false; break;
+			case 's': read_applic(optarg); break;
+			case 't': strncpy(tech, optarg, 255); break;
+			case 'U': sec_classes = strdup(optarg); break;
+			case 'u': strncpy(secu, optarg, 2); break;
+			case 'v': verbose = true; break;
+			case 'W': combine_applic = false; break;
+			case 'w': wholedm = true; break;
+			case 'x': dump_cir_xsl(optarg); exit(0);
+			case 'X': strncpy(comment_path, optarg, 255); break;
+			case 'y': new_applic = true; break;
+			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2676,7 +2722,18 @@ int main(int argc, char **argv)
 			}
 
 			if (new_applic && napplics > 0) {
-				set_applic(doc, new_display_text);
+				/* Simplify the whole object applic before
+				 * adding the user-defined applicability, to
+				 * remove duplicate information.
+				 *
+				 * If overwriting the applic instead of merging
+				 * it, there's no need to do this.
+				 */
+				if (combine_applic) {
+					simpl_whole_applic(doc);
+				}
+
+				set_applic(doc, new_display_text, combine_applic);
 			}
 
 			if (strcmp(issinfo, "") != 0) {

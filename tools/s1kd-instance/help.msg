@@ -33,6 +33,7 @@ Options:
   -U <classes>  Filter on the specified security classes.
   -u <sec>      Set the security classification of the instance.
   -v            Print the file name of the instance when -O is used.
+  -W            Overwrite whole object applicability.
   -w            Check the status of the whole object.
   -X            XPath where the -C comment will be inserted.
   -x <CIR>      Dump default XSLT for resolving CIR references.

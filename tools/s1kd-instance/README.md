@@ -27,10 +27,10 @@ OPTIONS
 =======
 
 -A  
-Simplify applicability annotations and remove unused ones.
+Simplify inline applicability annotations and remove unused ones.
 
 -a  
-Remove unused applicability annotations.
+Remove unused inline applicability annotations.
 
 -C &lt;comment&gt;  
 Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
@@ -159,6 +159,9 @@ Set the security classification of the instance. An instance may have a lower se
 -v  
 When -O is used, print the automatically generated file name of the instance.
 
+-W  
+Set the applicability for the whole object, overwriting the current applicability with the user-defined applicability values.
+
 -w  
 Check the applicability, skill level, and security classification of the whole object against the user-defined applicability, skill levels, and security classifications. If the whole object is not applicable, then no instance is created.
 
@@ -197,10 +200,10 @@ The following types currently have built-in XSLT and can therefore be used as va
 -   zoneRepository
 
 -Y &lt;text&gt;  
-Set the applicability for the whole object using the user-defined applicability values, using text as the new display text.
+Update the applicability for the whole object using the user-defined applicability values, and using &lt;text&gt; as the new display text.
 
 -y  
-Set the applicability for the whole data object using the user-defined applicability values, with no display text.
+Update the applicability for the whole object using the user-defined applicability values.
 
 --version  
 Show version information.
@@ -387,6 +390,74 @@ The annotation is now simplified to remove resolved assertions. Because the vers
 > **Note**
 >
 > The -A option may change the *meaning* of certain applicability annotation without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
+
+Applicability of an instance (-W, -Y, -y)
+-----------------------------------------
+
+The applicability of an instance may change as a result of filtering. For example, a source data module which is applicable to two versions of a product may produce two instances which are each only applicable to one version. There are three options which control how the applicability of the whole instance object is updated.
+
+The -W option will create an applicability annotation for the instance using only the user-defined applicability values. This means, for example, that given the following command:
+
+    $ s1kd-instance -s version:prodattr=A -W ...
+
+The instance would contain the following annotation:
+
+    <dmStatus>
+    <!-- snip -->
+    <applic>
+    <assert applicPropertyIdent="version"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
+    </applic>
+    <!-- snip -->
+    </dmStatus>
+
+regardless of what the applicability of the source object was.
+
+The -y option will create an applicability annotation for the instance by combining the user-defined applicability with the applicability of the source object. For example, given the following annotation in the source object:
+
+    <dmStatus>
+    <!-- snip -->
+    <applic>
+    <assert applicPropertyIdent="version"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
+    </applic>
+    <!-- snip -->
+    </dmStatus>
+
+and the following command:
+
+    $ s1kd-instance -s weather:condition=icy -y ...
+
+The annotation for the instance would be as follows:
+
+    <dmStatus>
+    <!-- snip -->
+    <applic>
+    <evaluate andOr="and">
+    <assert applicPropertyIdent="version"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
+    <assert applicPropertyIdent="weather"
+    applicPropertyType="condition" applicPropertyValues="icy"/>
+    </evaluate>
+    </applic>
+    <!-- snip -->
+    </dmStatus>
+
+The -Y option by itself works the same as the -y option, but allows custom display text to be set for the annotation. It can also be combined with the -W option to add custom display text to the overwriting annotation:
+
+    $ s1kd-instance -s version:prodattr=A -WY "Version A" ...
+
+    <dmStatus>
+    <!-- snip -->
+    <applic>
+    <displayText>
+    <simplePara>Version A</simplePara>
+    </displayText>
+    <assert applicPropertyIdent="version"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
+    </applic>
+    <!-- snip -->
+    </dmStatus>
 
 Filtering for multiple values of a single property
 --------------------------------------------------
