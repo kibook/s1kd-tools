@@ -10,6 +10,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
+#include <dirent.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xinclude.h>
@@ -20,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -103,6 +104,11 @@ xmlNodePtr lastXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	xmlXPathFreeContext(ctx);
 
 	return last;
+}
+
+xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+{
+	return xmlNodeGetContent(firstXPathNode(doc, node, xpath));
 }
 
 /* Set an explicit applicability statement on a node.
@@ -300,8 +306,192 @@ void processDmodules(xmlNodeSetPtr dmodules)
 	}
 }
 
+/* Determine if the file is a data module. */
+bool is_dm(const char *name)
+{
+	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
+}
+
+/* Find a data module filename in the current directory based on the dmRefIdent
+ * element. */
+bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
+{
+	DIR *dir;
+	struct dirent *cur;
+	int len;
+	bool found = false;
+	char *model_ident_code;
+	char *system_diff_code;
+	char *system_code;
+	char *sub_system_code;
+	char *sub_sub_system_code;
+	char *assy_code;
+	char *disassy_code;
+	char *disassy_code_variant;
+	char *info_code;
+	char *info_code_variant;
+	char *item_location_code;
+	char *learn_code;
+	char *learn_event_code;
+	char code[64];
+	xmlNodePtr dmCode, issueInfo, language;
+
+	dmCode = firstXPathNode(NULL, dmRefIdent, "dmCode|avee");
+	issueInfo = firstXPathNode(NULL, dmRefIdent, "issueInfo|issno");
+	language = firstXPathNode(NULL, dmRefIdent, "language");
+
+	model_ident_code     = (char *) first_xpath_value(NULL, dmCode, "modelic|@modelIdentCode");
+	system_diff_code     = (char *) first_xpath_value(NULL, dmCode, "sdc|@systemDiffCode");
+	system_code          = (char *) first_xpath_value(NULL, dmCode, "chapnum|@systemCode");
+	sub_system_code      = (char *) first_xpath_value(NULL, dmCode, "section|@subSystemCode");
+	sub_sub_system_code  = (char *) first_xpath_value(NULL, dmCode, "subsect|@subSubSystemCode");
+	assy_code            = (char *) first_xpath_value(NULL, dmCode, "subject|@assyCode");
+	disassy_code         = (char *) first_xpath_value(NULL, dmCode, "discode|@disassyCode");
+	disassy_code_variant = (char *) first_xpath_value(NULL, dmCode, "discodev|@disassyCodeVariant");
+	info_code            = (char *) first_xpath_value(NULL, dmCode, "incode|@infoCode");
+	info_code_variant    = (char *) first_xpath_value(NULL, dmCode, "incodev|@infoCodeVariant");
+	item_location_code   = (char *) first_xpath_value(NULL, dmCode, "itemloc|@itemLocationCode");
+	learn_code           = (char *) first_xpath_value(NULL, dmCode, "@learnCode");
+	learn_event_code     = (char *) first_xpath_value(NULL, dmCode, "@learnEventCode");
+
+	snprintf(code, 64, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
+		model_ident_code,
+		system_diff_code,
+		system_code,
+		sub_system_code,
+		sub_sub_system_code,
+		assy_code,
+		disassy_code,
+		disassy_code_variant,
+		info_code,
+		info_code_variant,
+		item_location_code);
+
+	xmlFree(model_ident_code);
+	xmlFree(system_diff_code);
+	xmlFree(system_code);
+	xmlFree(sub_system_code);
+	xmlFree(sub_sub_system_code);
+	xmlFree(assy_code);
+	xmlFree(disassy_code);
+	xmlFree(disassy_code_variant);
+	xmlFree(info_code);
+	xmlFree(info_code_variant);
+	xmlFree(item_location_code);
+
+	if (learn_code) {
+		char learn[8];
+		snprintf(learn, 8, "-%s%s", learn_code, learn_event_code);
+		strcat(code, learn);
+	}
+
+	xmlFree(learn_code);
+	xmlFree(learn_event_code);
+
+	if (issueInfo) {
+		char *issue_number;
+		char *in_work;
+		char iss[8];
+
+		issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
+		in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
+
+		snprintf(iss, 8, "_%s-%s", issue_number, in_work);
+		strcat(code, iss);
+
+		xmlFree(issue_number);
+		xmlFree(in_work);
+	}
+
+	if (language) {
+		char *language_iso_code;
+		char *country_iso_code;
+		char lang[8];
+
+		language_iso_code = (char *) first_xpath_value(NULL, language, "@language|@languageIsoCode");
+		country_iso_code  = (char *) first_xpath_value(NULL, language, "@country|@countryIsoCode");
+
+		snprintf(lang, 8, "_%s-%s", language_iso_code, country_iso_code);
+		strcat(code, lang);
+
+		xmlFree(language_iso_code);
+		xmlFree(country_iso_code);
+	}
+
+	len = strlen(code);
+
+	dir = opendir(".");
+
+	while ((cur = readdir(dir))) {
+		if (strncmp(cur->d_name, code, len) == 0) {
+			if (is_dm(cur->d_name) && (!found || strcmp(cur->d_name, dst) > 0)) {
+				strcpy(dst, cur->d_name);
+			}
+
+			found = true;
+		}
+	}
+
+	closedir(dir);
+
+	return found;
+}
+
+/* Find the filename of a referenced ACT data module. */
+bool find_act_fname(char *dst, xmlDocPtr doc)
+{
+	xmlNodePtr actref;
+	actref = firstXPathNode(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
+	return actref && find_dmod_fname(dst, actref);
+}
+
+/* Find the filename of a referenced PCT data module via the ACT. */
+bool find_cct_fname(char *dst, xmlDocPtr act)
+{
+	xmlNodePtr pctref;
+	bool found;
+
+	pctref = firstXPathNode(act, NULL, "//condCrossRefTableRef/dmRef/dmRefIdent|//cctref/refdm");
+	found = pctref && find_dmod_fname(dst, pctref);
+
+	return found;
+}
+
+/* Add cross-reference tables by searching for them in the current directory. */
+void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
+{
+	char act_fname[PATH_MAX];
+	xmlDocPtr act = NULL;
+
+	if (find_act_fname(act_fname, doc) && (act = xmlReadFile(act_fname, NULL, PARSE_OPTS))) {
+		char cct_fname[PATH_MAX];
+
+		xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST act_fname);
+
+		if (find_cct_fname(cct_fname, act)) {
+			xmlNewChild(ccts, NULL, BAD_CAST "cct", BAD_CAST cct_fname);
+		}
+
+		xmlFreeDoc(act);
+	}
+}
+
+/* Remove all ACTs/CCTs from the cross-reference table list. */
+void clear_ct(xmlNodePtr ct)
+{
+	xmlNodePtr cur;
+	cur = ct->children;
+	while (cur) {
+		xmlNodePtr next;
+		next = cur->next;
+		xmlUnlinkNode(cur);
+		xmlFreeNode(cur);
+		cur = next;
+	}
+}
+
 void processFile(const char *in, const char *out, bool xincl, bool process,
-	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts)
+	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -311,6 +501,10 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 
 	if (xincl) {
 		xmlXIncludeProcess(doc);
+	}
+
+	if (findcts) {
+		find_cross_ref_tables(doc, acts, ccts);
 	}
 
 	if (process) {
@@ -329,17 +523,25 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 
 	xmlSaveFile(out, doc);
 
+	/* The next data module could reference a different ACT/CCT, so
+	 * the list must be cleared. */
+	if (findcts) {
+		clear_ct(acts);
+		clear_ct(ccts);
+	}
+
 	xmlFreeDoc(doc);
 }
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-dfxh?] [<modules>]");
+	puts("Usage: " PROG_NAME " [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-cdfxh?] [<modules>]");
 	puts("");
 	puts("Options:");
 	puts("  -A <ACT>   Use <ACT> when generating display text.");
 	puts("  -a <ID>    Use <ID> for DM-level applic.");
 	puts("  -C <CCT>   Use <CCT> when generating display text.");
+	puts("  -c         Ignore ACT/CCT refs.");
 	puts("  -d         Dump built-in XSLT for generating display text.");
 	puts("  -f         Overwrite input file(s).");
 	puts("  -G <XSL>   Use custom XSLT script to generate display text.");
@@ -361,10 +563,11 @@ int main(int argc, char **argv)
 	bool xincl = false;
 	bool genDispText = false;
 	bool process = false;
+	bool findcts = true;
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:dfG:gpxh?";
+	const char *sopts = "A:a:C:cdfG:gpxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -390,6 +593,7 @@ int main(int argc, char **argv)
 				break;
 			case 'A':
 				xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST optarg);
+				findcts = false;
 				break;
 			case 'a':
 				xmlFree(dmApplicId);
@@ -397,6 +601,10 @@ int main(int argc, char **argv)
 				break;
 			case 'C':
 				xmlNewChild(ccts, NULL, BAD_CAST "cct", BAD_CAST optarg);
+				findcts = false;
+				break;
+			case 'c':
+				findcts = false;
 				break;
 			case 'd':
 				dumpGenDispTextXsl();
@@ -424,11 +632,11 @@ int main(int argc, char **argv)
 	}
 
 	if (optind >= argc) {
-		processFile("-", "-", xincl, process, genDispText, acts, ccts);
+		processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts);
 	} else {
 		for (i = optind; i < argc; ++i) {
 			processFile(argv[i], overwrite ? argv[i] : "-", xincl,
-				process, genDispText, acts, ccts);
+				process, genDispText, acts, ccts, findcts);
 		}
 	}
 

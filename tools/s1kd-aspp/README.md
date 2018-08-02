@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-aspp [-g [-A <ACT>]... [-C <CCT>]... [-G <XSL>]]
-              [-p [-a <ID>]] [-dfxh?] [<modules>...]
+              [-p [-a <ID>]] [-cdfxh?] [<modules>...]
 
 DESCRIPTION
 ===========
@@ -18,9 +18,9 @@ The *s1kd-aspp* tool has two main functions:
 
 -   Preprocesses "semantic" applicability statements in a data module to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet.
 
-    "Semantic" applicability statements are those entered by the author to encode the applicability of elements within a data module. "Presentation" applicability statements are those that are actually displayed in page-oriented output, also referred to as the "human-readable" statements.
+"Semantic" applicability statements are those entered by the author to encode the applicability of elements within a data module. "Presentation" applicability statements are those that are actually displayed in page-oriented output, also referred to as the "human-readable" statements.
 
-    The applicability in the resulting XML is longer semantically correct, but an XSLT stylesheet can simply place a statement on any element with attribute `applicRefId` without needing to consider inherited applicability statements on elements without the attribute.
+The applicability in the resulting XML is longer semantically correct, but an XSLT stylesheet can simply place a statement on any element with attribute `applicRefId` without needing to consider inherited applicability statements on elements without the attribute.
 
 OPTIONS
 =======
@@ -33,6 +33,9 @@ The ID to use for the inline applicability annotation representing the whole dat
 
 -C &lt;CCT&gt;  
 Add a CCT to use when generating display text for conditions. Multiple CCT data modules can be used by specifying this option multiple times.
+
+-c  
+Normally, if neither the -A nor -C options are specified, the tool will search for the ACT/CCT in the current directory using the ACT reference in each input data module. But if this option is specified, it will not search for ACT(s)/CCT(s) referenced by the data module(s). Only the applicability property attributes in the data module(s) will be used to generate the display text.
 
 -d  
 Dump the built-in XSLT used to generate display text for applicability statements.

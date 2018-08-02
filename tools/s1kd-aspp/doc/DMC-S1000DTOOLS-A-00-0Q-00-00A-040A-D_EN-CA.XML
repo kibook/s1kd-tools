@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="Q" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="01"/>
+        <issueDate year="2018" month="08" day="01"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add --version option.</simplePara>
+        <simplePara>Try finding ACT/CCT using data module ACT reference if none are specified.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -53,7 +53,7 @@
         <title>SYNOPSIS</title>
         <para>
           <verbatimText verbatimStyle="vs24">s1kd-aspp [-g [-A &lt;ACT&gt;]... [-C &lt;CCT&gt;]... [-G &lt;XSL&gt;]]
-          [-p [-a &lt;ID&gt;]] [-dfxh?] [&lt;modules&gt;...]</verbatimText>
+          [-p [-a &lt;ID&gt;]] [-cdfxh?] [&lt;modules&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -66,11 +66,11 @@
             </listItem>
             <listItem>
               <para>Preprocesses "semantic" applicability statements in a data module to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet.</para>
-              <para>"Semantic" applicability statements are those entered by the author to encode the applicability of elements within a data module. "Presentation" applicability statements are those that are actually displayed in page-oriented output, also referred to as the "human-readable" statements.</para>
-              <para>The applicability in the resulting XML is longer semantically correct, but an XSLT stylesheet can simply place a statement on any element with attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> without needing to consider inherited applicability statements on elements without the attribute.</para>
             </listItem>
           </randomList>
         </para>
+        <para>"Semantic" applicability statements are those entered by the author to encode the applicability of elements within a data module. "Presentation" applicability statements are those that are actually displayed in page-oriented output, also referred to as the "human-readable" statements.</para>
+        <para>The applicability in the resulting XML is longer semantically correct, but an XSLT stylesheet can simply place a statement on any element with attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> without needing to consider inherited applicability statements on elements without the attribute.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -92,6 +92,12 @@
               <listItemTerm>-C &lt;CCT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add a CCT to use when generating display text for conditions. Multiple CCT data modules can be used by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>Normally, if neither the -A nor -C options are specified, the tool will search for the ACT/CCT in the current directory using the ACT reference in each input data module. But if this option is specified, it will not search for ACT(s)/CCT(s) referenced by the data module(s). Only the applicability property attributes in the data module(s) will be used to generate the display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -130,7 +136,7 @@
                 <para>Process the modules using the XInclude specification.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>
