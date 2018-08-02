@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.8.2"
+#define VERSION "1.8.3"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2056,7 +2056,7 @@ void flatten_alts(xmlDocPtr doc)
 /* Removes invalid empty sections in a PM after all references have
  * been filtered out.
  */
-void remove_emptry_pmentries(xmlDocPtr doc)
+void remove_empty_pmentries(xmlDocPtr doc)
 {
 	transform_doc(doc, xsl_remove_empty_pmentries_xsl, xsl_remove_empty_pmentries_xsl_len, NULL);
 }
@@ -2535,7 +2535,7 @@ int main(int argc, char **argv)
 			case 'U': sec_classes = strdup(optarg); break;
 			case 'u': strncpy(secu, optarg, 2); break;
 			case 'v': verbose = true; break;
-			case 'W': combine_applic = false; break;
+			case 'W': new_applic = true; combine_applic = false; break;
 			case 'w': wholedm = true; break;
 			case 'x': dump_cir_xsl(optarg); exit(0);
 			case 'X': strncpy(comment_path, optarg, 255); break;
@@ -2749,7 +2749,7 @@ int main(int argc, char **argv)
 			}
 
 			if (ispm) {
-				remove_emptry_pmentries(doc);
+				remove_empty_pmentries(doc);
 			}
 
 			if (flat_alts) {
