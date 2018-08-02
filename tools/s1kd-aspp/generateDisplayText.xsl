@@ -35,7 +35,7 @@
   <xsl:template match="assert" mode="text">
     <xsl:call-template name="applicPropertyName"/>
     <xsl:text>: </xsl:text>
-    <xsl:apply-templates select="@applicPropertyValues|@actvalues" mode="text"/>
+    <xsl:call-template name="applicPropertyVal"/>
   </xsl:template>
 
   <xsl:template name="applicPropertyName">
@@ -53,6 +53,22 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$id"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="applicPropertyVal">
+    <xsl:param name="id" select="@applicPropertyIdent|@actidref"/>
+    <xsl:param name="type" select="@applicPropertyType|@actreftype"/>
+    <xsl:variable name="prop" select="//productAttribute[$type='prodattr' and @id=$id]|//prodattr[$type='prodattr' and @id=$id]|//cond[$type='condition' and @id=$id]|//condition[$type='condition' and @id=$id]"/>
+    <xsl:variable name="values" select="@applicPropertyValues|@actvalues"/>
+    <xsl:variable name="label" select="$prop/enumeration[@applicPropertyValues=$values]/@enumerationLabel"/>
+    <xsl:choose>
+      <xsl:when test="$label">
+        <xsl:value-of select="$label"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="$values" mode="text"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
