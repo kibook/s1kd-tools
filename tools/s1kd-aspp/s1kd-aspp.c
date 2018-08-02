@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -476,26 +476,13 @@ void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 	}
 }
 
-/* Remove all ACTs/CCTs from the cross-reference table list. */
-void clear_ct(xmlNodePtr ct)
-{
-	xmlNodePtr cur;
-	cur = ct->children;
-	while (cur) {
-		xmlNodePtr next;
-		next = cur->next;
-		xmlUnlinkNode(cur);
-		xmlFreeNode(cur);
-		cur = next;
-	}
-}
-
 void processFile(const char *in, const char *out, bool xincl, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+	xmlNodePtr all_acts, all_ccts;
 
 	doc = xmlReadFile(in, NULL, PARSE_OPTS);
 
@@ -504,7 +491,15 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	}
 
 	if (findcts) {
-		find_cross_ref_tables(doc, acts, ccts);
+		/* Copy the user-defined ACTs/CCTs. */
+		all_acts = xmlCopyNode(acts, 1);
+		all_ccts = xmlCopyNode(ccts, 1);
+		/* Find the ACT/CCT referenced by the current DM. */
+		find_cross_ref_tables(doc, all_acts, all_ccts);
+	} else {
+		/* Only use the user-defined ACTs/CCTs. */
+		all_acts = acts;
+		all_ccts = ccts;
 	}
 
 	if (process) {
@@ -518,7 +513,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	}
 
 	if (genDispText) {
-		generateDisplayText(doc, acts, ccts);
+		generateDisplayText(doc, all_acts, all_ccts);
 	}
 
 	xmlSaveFile(out, doc);
@@ -526,8 +521,8 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	/* The next data module could reference a different ACT/CCT, so
 	 * the list must be cleared. */
 	if (findcts) {
-		clear_ct(acts);
-		clear_ct(ccts);
+		xmlFreeNode(all_acts);
+		xmlFreeNode(all_ccts);
 	}
 
 	xmlFreeDoc(doc);
@@ -541,7 +536,7 @@ void showHelp(void)
 	puts("  -A <ACT>   Use <ACT> when generating display text.");
 	puts("  -a <ID>    Use <ID> for DM-level applic.");
 	puts("  -C <CCT>   Use <CCT> when generating display text.");
-	puts("  -c         Ignore ACT/CCT refs.");
+	puts("  -c         Search for ACT/CCT data modules.");
 	puts("  -d         Dump built-in XSLT for generating display text.");
 	puts("  -f         Overwrite input file(s).");
 	puts("  -G <XSL>   Use custom XSLT script to generate display text.");
@@ -563,7 +558,7 @@ int main(int argc, char **argv)
 	bool xincl = false;
 	bool genDispText = false;
 	bool process = false;
-	bool findcts = true;
+	bool findcts = false;
 	
 	xmlNodePtr acts, ccts;
 
@@ -604,7 +599,7 @@ int main(int argc, char **argv)
 				findcts = false;
 				break;
 			case 'c':
-				findcts = false;
+				findcts = true;
 				break;
 			case 'd':
 				dumpGenDispTextXsl();

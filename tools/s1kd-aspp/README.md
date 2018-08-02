@@ -35,7 +35,7 @@ The ID to use for the inline applicability annotation representing the whole dat
 Add a CCT to use when generating display text for conditions. Multiple CCT data modules can be used by specifying this option multiple times.
 
 -c  
-Normally, if neither the -A nor -C options are specified, the tool will search for the ACT/CCT in the current directory using the ACT reference in each input data module. But if this option is specified, it will not search for ACT(s)/CCT(s) referenced by the data module(s). Only the applicability property attributes in the data module(s) will be used to generate the display text.
+Search for the ACT and CCT referenced by each data module, and add them to the list of ACTs/CCTs to use when generating display text for that data module.
 
 -d  
 Dump the built-in XSLT used to generate display text for applicability statements.
