@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.8.1"
+#define VERSION "1.8.2"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -212,6 +212,11 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 	xmlXPathFreeContext(ctx);
 
 	return first;
+}
+
+xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *path)
+{
+	return xmlNodeGetContent(first_xpath_node(doc, node, path));
 }
 
 void lowercase(char *s)
@@ -2262,23 +2267,23 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 	char code[64];
 	xmlNodePtr dmCode, issueInfo, language;
 
-	dmCode = find_child(dmRefIdent, "dmCode");
-	issueInfo = find_child(dmRefIdent, "issueInfo");
-	language = find_child(dmRefIdent, "language");
+	dmCode = first_xpath_node(NULL, dmRefIdent, "dmCode|avee");
+	issueInfo = first_xpath_node(NULL, dmRefIdent, "issueInfo|issno");
+	language = first_xpath_node(NULL, dmRefIdent, "language");
 
-	model_ident_code     = (char *) xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-	system_diff_code     = (char *) xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-	system_code          = (char *) xmlGetProp(dmCode, BAD_CAST "systemCode");
-	sub_system_code      = (char *) xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-	sub_sub_system_code  = (char *) xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-	assy_code            = (char *) xmlGetProp(dmCode, BAD_CAST "assyCode");
-	disassy_code         = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCode");
-	disassy_code_variant = (char *) xmlGetProp(dmCode, BAD_CAST "disassyCodeVariant");
-	info_code            = (char *) xmlGetProp(dmCode, BAD_CAST "infoCode");
-	info_code_variant    = (char *) xmlGetProp(dmCode, BAD_CAST "infoCodeVariant");
-	item_location_code   = (char *) xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
-	learn_code           = (char *) xmlGetProp(dmCode, BAD_CAST "learnCode");
-	learn_event_code     = (char *) xmlGetProp(dmCode, BAD_CAST "learnEventCode");
+	model_ident_code     = (char *) first_xpath_value(NULL, dmCode, "modelic|@modelIdentCode");
+	system_diff_code     = (char *) first_xpath_value(NULL, dmCode, "sdc|@systemDiffCode");
+	system_code          = (char *) first_xpath_value(NULL, dmCode, "chapnum|@systemCode");
+	sub_system_code      = (char *) first_xpath_value(NULL, dmCode, "section|@subSystemCode");
+	sub_sub_system_code  = (char *) first_xpath_value(NULL, dmCode, "subsect|@subSubSystemCode");
+	assy_code            = (char *) first_xpath_value(NULL, dmCode, "subject|@assyCode");
+	disassy_code         = (char *) first_xpath_value(NULL, dmCode, "discode|@disassyCode");
+	disassy_code_variant = (char *) first_xpath_value(NULL, dmCode, "discodev|@disassyCodeVariant");
+	info_code            = (char *) first_xpath_value(NULL, dmCode, "incode|@infoCode");
+	info_code_variant    = (char *) first_xpath_value(NULL, dmCode, "incodev|@infoCodeVariant");
+	item_location_code   = (char *) first_xpath_value(NULL, dmCode, "itemloc|@itemLocationCode");
+	learn_code           = (char *) first_xpath_value(NULL, dmCode, "@learnCode");
+	learn_event_code     = (char *) first_xpath_value(NULL, dmCode, "@learnEventCode");
 
 	snprintf(code, 64, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		model_ident_code,
@@ -2319,8 +2324,8 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		char *in_work;
 		char iss[8];
 
-		issue_number = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
-		in_work      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+		issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
+		in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
 
 		snprintf(iss, 8, "_%s-%s", issue_number, in_work);
 		strcat(code, iss);
@@ -2334,8 +2339,8 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		char *country_iso_code;
 		char lang[8];
 
-		language_iso_code = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-		country_iso_code  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		language_iso_code = (char *) first_xpath_value(NULL, language, "@language|@languageIsoCode");
+		country_iso_code  = (char *) first_xpath_value(NULL, language, "@country|@countryIsoCode");
 
 		snprintf(lang, 8, "_%s-%s", language_iso_code, country_iso_code);
 		strcat(code, lang);
@@ -2371,7 +2376,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 bool find_act_fname(char *dst, xmlDocPtr doc)
 {
 	xmlNodePtr actref;
-	actref = first_xpath_node(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent");
+	actref = first_xpath_node(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
 	return actref && find_dmod_fname(dst, actref);
 }
 
@@ -2391,7 +2396,7 @@ bool find_pct_fname(char *dst, xmlDocPtr doc)
 		return false;
 	}
 
-	pctref = first_xpath_node(act, NULL, "//productCrossRefTableRef/dmRef/dmRefIdent");
+	pctref = first_xpath_node(act, NULL, "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
 	found = pctref && find_dmod_fname(dst, pctref);
 	xmlFreeDoc(act);
 
