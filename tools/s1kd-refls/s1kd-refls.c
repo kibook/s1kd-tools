@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -281,11 +281,16 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 void getICN(char *dst, xmlNodePtr ref)
 {
 	char *icn;
-
 	icn = (char *) xmlGetProp(ref, BAD_CAST "infoEntityRefIdent");
-
 	strcpy(dst, icn);
+	xmlFree(icn);
+}
 
+void getICNAttr(char *dst, xmlNodePtr ref)
+{
+	xmlChar *icn;
+	icn = xmlNodeGetContent(ref);
+	strcpy(dst, (char *) icn);
 	xmlFree(icn);
 }
 
@@ -395,10 +400,13 @@ void printReference(xmlNodePtr ref, const char *src)
 	else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 ||
 	         xmlStrcmp(ref->name, BAD_CAST "refpm") == 0)
 		getPmCode(code, ref);
-	else if (strcmp((char *) ref->name, "infoEntityRef") == 0)
+	else if (xmlStrcmp(ref->name, BAD_CAST "infoEntityRef") == 0)
 		getICN(code, ref);
-	else if (strcmp((char *) ref->name, "commentRef") == 0)
+	else if (xmlStrcmp(ref->name, BAD_CAST "commentRef") == 0)
 		getComCode(code, ref);
+	else if (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0 ||
+	         xmlStrcmp(ref->name, BAD_CAST "boardno") == 0)
+		getICNAttr(code, ref);
 	else
 		return;
 
@@ -425,7 +433,7 @@ void listReferences(const char *path)
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|.//commentRef", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
