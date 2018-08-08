@@ -1,6 +1,14 @@
 ![s1kd-tools](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01.PNG)
 
-A set of small tools for manipulating [S1000D](http://www.s1000d.org) data.
+A set of small, free and open source tools for manipulating [S1000D](http://www.s1000d.org) data.
+
+Links:
+
+-   [s1kd-tools GitHub repository](http://github.com/kibook/s1kd-tools)
+
+-   [s1kd-tools on khzae.net](http://khzae.net/1/s1kd/s1kd-tools)
+
+<!-- -->
 
 -   [Introduction](INTRO.md)
 
