@@ -71,6 +71,15 @@
           </listItem>
           <listItem>
             <para>
+              <externalPubRef xlink:href="http://kibook.github.io/s1kd-tools">
+                <externalPubRefIdent>
+                  <externalPubTitle>s1kd-tools GitHub Pages site</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
               <externalPubRef xlink:href="http://khzae.net/1/s1kd/s1kd-tools">
                 <externalPubRefIdent>
                   <externalPubTitle>s1kd-tools on khzae.net</externalPubTitle>
