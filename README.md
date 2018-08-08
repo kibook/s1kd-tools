@@ -2,8 +2,6 @@
 
 A set of small, free and open source tools for manipulating [S1000D](http://www.s1000d.org) data.
 
-Getting started:
-
 -   [Introduction](INTRO.md)
 
 -   [Installation](INSTALL.md)
