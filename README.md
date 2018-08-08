@@ -8,7 +8,7 @@ Links:
 
 -   [s1kd-tools on khzae.net](http://khzae.net/1/s1kd/s1kd-tools)
 
-<!-- -->
+Getting started:
 
 -   [Introduction](INTRO.md)
 
