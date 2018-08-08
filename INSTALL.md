@@ -11,7 +11,7 @@ To build the executables:
 
 To build the documentation from source:
 
--   s1kd2db XSLT script
+-   [s1kd2db](http://github.com/kibook/s1kd2db)
 
 -   pandoc
 
