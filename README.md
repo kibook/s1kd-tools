@@ -2,14 +2,6 @@
 
 A set of small, free and open source tools for manipulating [S1000D](http://www.s1000d.org) data.
 
-Links:
-
--   [s1kd-tools GitHub repository](http://github.com/kibook/s1kd-tools)
-
--   [s1kd-tools GitHub Pages site](http://kibook.github.io/s1kd-tools)
-
--   [s1kd-tools on khzae.net](http://khzae.net/1/s1kd/s1kd-tools)
-
 Getting started:
 
 -   [Introduction](INTRO.md)
@@ -29,3 +21,11 @@ Some examples of S1000D data sets produced with these tools are available here:
 These tools have been primarily developed around Issue 4.2 of the specification, and are generally compatibile with the previous 4.X issues. Support for Issue 3.0 and lower is a work-in-progress. Support for SGML schemas is not planned.
 
 -   [Compatibility with each issue of the specification](COMPATIBILITY.md)
+
+Additional links:
+
+-   [s1kd-tools GitHub repository](http://github.com/kibook/s1kd-tools)
+
+-   [s1kd-tools GitHub Pages site](http://kibook.github.io/s1kd-tools)
+
+-   [s1kd-tools on khzae.net](http://khzae.net/1/s1kd/s1kd-tools)

@@ -57,38 +57,6 @@
         <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
       </figure>
       <para changeType="modify" reasonForUpdateRefIds="rfu-0001">A set of small, free and open source tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
-      <para changeType="add" reasonForUpdateRefIds="rfu-0002">Links:</para>
-      <para changeType="add" reasonForUpdateRefIds="rfu-0002">
-        <randomList>
-          <listItem>
-            <para>
-              <externalPubRef xlink:href="http://github.com/kibook/s1kd-tools">
-                <externalPubRefIdent>
-                  <externalPubTitle>s1kd-tools GitHub repository</externalPubTitle>
-                </externalPubRefIdent>
-              </externalPubRef>
-            </para>
-          </listItem>
-          <listItem>
-            <para>
-              <externalPubRef xlink:href="http://kibook.github.io/s1kd-tools">
-                <externalPubRefIdent>
-                  <externalPubTitle>s1kd-tools GitHub Pages site</externalPubTitle>
-                </externalPubRefIdent>
-              </externalPubRef>
-            </para>
-          </listItem>
-          <listItem>
-            <para>
-              <externalPubRef xlink:href="http://khzae.net/1/s1kd/s1kd-tools">
-                <externalPubRefIdent>
-                  <externalPubTitle>s1kd-tools on khzae.net</externalPubTitle>
-                </externalPubRefIdent>
-              </externalPubRef>
-            </para>
-          </listItem>
-        </randomList>
-      </para>
       <para changeType="add" reasonForUpdateRefIds="rfu-0002">Getting started:</para>
       <para>
         <randomList>
@@ -161,6 +129,38 @@
               <externalPubRef xlink:href="COMPATIBILITY.md">
                 <externalPubRefIdent>
                   <externalPubTitle>Compatibility with each issue of the specification</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+        </randomList>
+      </para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0002">Additional links:</para>
+      <para changeType="add" reasonForUpdateRefIds="rfu-0002">
+        <randomList>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="http://github.com/kibook/s1kd-tools">
+                <externalPubRefIdent>
+                  <externalPubTitle>s1kd-tools GitHub repository</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="http://kibook.github.io/s1kd-tools">
+                <externalPubRefIdent>
+                  <externalPubTitle>s1kd-tools GitHub Pages site</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <externalPubRef xlink:href="http://khzae.net/1/s1kd/s1kd-tools">
+                <externalPubRefIdent>
+                  <externalPubTitle>s1kd-tools on khzae.net</externalPubTitle>
                 </externalPubRefIdent>
               </externalPubRef>
             </para>
