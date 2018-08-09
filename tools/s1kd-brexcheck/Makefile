@@ -1,7 +1,7 @@
 SOURCE=s1kd-brexcheck.c
 OUTPUT=s1kd-brexcheck
 
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0`
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
 PREFIX=/usr/local

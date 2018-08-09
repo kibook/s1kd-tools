@@ -18,6 +18,7 @@
 #include <libxml/xmlregexp.h>
 
 #include "brex.h"
+#include "s1kd_tools.h"
 
 #define STRUCT_OBJ_RULE_PATH \
 	"//contextRules[not(@rulesContext) or @rulesContext='%s']//structureObjectRule|" \
@@ -27,7 +28,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.2.4"
+#define VERSION "1.3.0"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -224,7 +225,7 @@ bool check_single_object_values(xmlNodePtr rule, xmlNodePtr node)
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		ret = check_node_values(node, obj->nodesetval);
 	} else {
-		ret = true;
+		ret = false;
 	}
 
 	xmlXPathFreeObject(obj);
@@ -1322,6 +1323,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	if (!brsl_fname && access(DEFAULT_BRSL_FNAME, F_OK) != -1) {
+		brsl_fname = strdup(DEFAULT_BRSL_FNAME);
+	}
+
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (is_list) {
@@ -1445,6 +1450,7 @@ int main(int argc, char *argv[])
 
 	if (brsl_fname) {
 		xmlFreeDoc(brsl);
+		free(brsl_fname);
 	}
 
 	xmlCleanupParser();

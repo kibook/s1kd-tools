@@ -8,5 +8,6 @@
 #define DEFAULT_ACRONYMS_FNAME ".acronyms"
 #define DEFAULT_INDEXFLAGS_FNAME ".indexflags"
 #define DEFAULT_BREXMAP_FNAME ".brexmap"
+#define DEFAULT_BRSL_FNAME ".brseveritylevels"
 
 #endif

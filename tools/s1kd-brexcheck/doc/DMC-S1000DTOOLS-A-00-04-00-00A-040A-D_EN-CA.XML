@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="06"/>
+        <issueDate year="2018" month="08" day="09"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Add details on object value checking (-c).</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Change -w option to -W, add new -w option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -163,9 +163,10 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara>
-          <title>Business rule severity levels (-w)</title>
-          <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The -w option takes an XML file containing a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
+        <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+          <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
+          <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
+          <para>By default, the program will search the current directory for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
@@ -215,7 +216,7 @@
           </para>
           <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Object value checking (-c)</title>
           <para>There are two ways to restrict the allowable values of an object in a BREX rule. One is to use the XPath expression itself. For example, this expression will match any <verbatimText verbatimStyle="vs13">securityClassification</verbatimText> attribute whose value is neither <verbatimText verbatimStyle="vs14">"01"</verbatimText> nor <verbatimText verbatimStyle="vs14">"02"</verbatimText>, and because the <verbatimText verbatimStyle="vs13">allowedObjectFlag</verbatimText> is <verbatimText verbatimStyle="vs14">"0"</verbatimText>, will generate a BREX error if any match is found:</para>
           <para>
