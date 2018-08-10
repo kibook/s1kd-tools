@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
