@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
-                   [-o <file>] [-ifh?] [<object> ...]
+                   [-o <file>] [-filh?] [<object> ...]
 
 DESCRIPTION
 ===========
@@ -25,6 +25,9 @@ Show usage message.
 
 -i  
 Includes an "identity" template in to each specified stylesheet.
+
+-l  
+Treat input (stdin or arguments) as lists of CSDB objects to transform, rather than CSDB objects themselves.
 
 -o &lt;file&gt;  
 Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single CSDB object.

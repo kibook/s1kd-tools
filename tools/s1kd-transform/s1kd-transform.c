@@ -13,7 +13,11 @@
 bool includeIdentity = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -130,6 +134,30 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 	xmlFreeDoc(doc);
 }
 
+void transform_list(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		transformFile(line, stylesheets, out, overwrite);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 void addParam(xmlNodePtr stylesheet, char *s)
 {
 	char *n, *v;
@@ -145,12 +173,13 @@ void addParam(xmlNodePtr stylesheet, char *s)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-fih?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-filh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?              Show usage message.");
 	puts("  -f                 Overwrite input CSDB objects.");
 	puts("  -i                 Include identity template in stylesheets.");
+	puts("  -l                 Treat input as list of objects.");
 	puts("  -o <file>          Output result of transformation to <path>.");
 	puts("  -p <name>=<value>  Pass parameters to stylesheets.");
 	puts("  -s <stylesheet>    Apply XSLT stylesheet to CSDB objects.");
@@ -171,8 +200,9 @@ int main(int argc, char **argv)
 
 	char *out = strdup("-");
 	bool overwrite = false;
+	bool islist = false;
 
-	const char *sopts = "s:io:p:fh?";
+	const char *sopts = "s:ilo:p:fh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -198,6 +228,9 @@ int main(int argc, char **argv)
 			case 'i':
 				includeIdentity = true;
 				break;
+			case 'l':
+				islist = true;
+				break;
 			case 'o':
 				free(out);
 				out = strdup(optarg);
@@ -217,8 +250,14 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			transformFile(argv[i], stylesheets, out, overwrite);
+			if (islist) {
+				transform_list(argv[i], stylesheets, out, overwrite);
+			} else {
+				transformFile(argv[i], stylesheets, out, overwrite);
+			}
 		}
+	} else if (islist) {
+		transform_list(NULL, stylesheets, out, false);
 	} else {
 		transformFile("-", stylesheets, out, false);
 	}
