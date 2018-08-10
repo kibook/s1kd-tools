@@ -12,7 +12,11 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -63,14 +67,39 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite)
 	xmlFreeDoc(orig);
 }
 
+void neutralizeList(const char *path, const char *outfile, bool overwrite)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		neutralizeFile(line, outfile, overwrite);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-o <file>] [-fh?] [<data module> ...]");
+	puts("Usage: " PROG_NAME " [-o <file>] [-flh?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -o <file>  Output to <file> instead of stdout.");
-	puts("  -f         Overwrite data modules automatically.");
+	puts("  -f         Overwrite CSDB objects automatically.");
 	puts("  -h -?      Show usage message.");
+	puts("  -l         Treat input as list of CSDB objects.");
+	puts("  -o <file>  Output to <file> instead of stdout.");
 	puts("  --version  Show version information.");
 }
 
@@ -84,8 +113,9 @@ int main(int argc, char **argv)
 	int i;
 	char *outfile = strdup("-");
 	bool overwrite = false;
+	bool islist = false;
 
-	const char *sopts = "o:fh?";
+	const char *sopts = "flo:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -100,12 +130,15 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				break;
+			case 'f':
+				overwrite = true;
+				break;
+			case 'l':
+				islist = true;
+				break;
 			case 'o':
 				free(outfile);
 				outfile = strdup(optarg);
-				break;
-			case 'f':
-				overwrite = true;
 				break;
 			case 'h':
 			case '?':
@@ -116,8 +149,14 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			neutralizeFile(argv[i], outfile, overwrite);
+			if (islist) {
+				neutralizeList(argv[i], outfile, overwrite);
+			} else {
+				neutralizeFile(argv[i], outfile, overwrite);
+			}
 		}
+	} else if (islist) {
+		neutralizeList(NULL, outfile, overwrite);
 	} else {
 		neutralizeFile("-", outfile, false);
 	}

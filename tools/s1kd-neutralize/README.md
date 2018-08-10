@@ -1,17 +1,17 @@
 NAME
 ====
 
-s1kd-neutralize - S1000D IETP neutral translation of data modules
+s1kd-neutralize - S1000D IETP neutral translation of CSDB objects
 
 SYNOPSIS
 ========
 
-    s1kd-neutralize [-o <file>] [-fh?] [<data module> ...]
+    s1kd-neutralize [-o <file>] [-flh?] [<object>...]
 
 DESCRIPTION
 ===========
 
-Generates neutral metadata for the specified data modules. This includes:
+Generates neutral metadata for the specified CSDB objects. This includes:
 
 -   XLink attributes for references, using the S1000D URN scheme.
 
@@ -21,13 +21,16 @@ OPTIONS
 =======
 
 -f  
-Overwrite specified data module(s) automatically.
+Overwrite specified CSDB object(s) automatically.
 
 -h -?  
 Show usage message.
 
+-l  
+Treat input (stdin or arguments) as lists of CSDB objects to neutralize, rather than CSDB objects themselves.
+
 -o &lt;file&gt;  
-Output neutralized data module XML to &lt;file&gt; instead of stdout.
+Output neutralized CSDB object XML to &lt;file&gt; instead of stdout.
 
 --version  
 Show version information.
