@@ -662,7 +662,7 @@ int main(int argc, char **argv)
 
 	if (optind >= argc) {
 		if (islist) {
-			process_list(NULL, false, xincl, process, genDispText, acts, ccts, findcts);
+			process_list(NULL, overwrite, xincl, process, genDispText, acts, ccts, findcts);
 		} else {
 			processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts);
 		}

@@ -440,7 +440,7 @@ int main(int argc, char **argv)
 			xmlSaveFile("-", icns);
 		}
 	} else if (islist) {
-		resolve_icns_in_list(NULL, icns, false, xinclude, media);
+		resolve_icns_in_list(NULL, icns, overwrite, xinclude, media);
 	} else {
 		resolve_icns_in_file("-", icns, false, xinclude, media);
 	}

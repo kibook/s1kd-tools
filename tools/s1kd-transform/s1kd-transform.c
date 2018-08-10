@@ -257,7 +257,7 @@ int main(int argc, char **argv)
 			}
 		}
 	} else if (islist) {
-		transform_list(NULL, stylesheets, out, false);
+		transform_list(NULL, stylesheets, out, overwrite);
 	} else {
 		transformFile("-", stylesheets, out, false);
 	}
