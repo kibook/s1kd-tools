@@ -28,6 +28,9 @@ Delete an ICN from the catalog. The -m option specifies a media group to delete 
 -f  
 Overwrite the input CSDB objects when resolving ICNs, or overwrite the catalog file when modifying it. Otherwise, output is written to stdout.
 
+-l  
+Treat input (stdin or arguments) as lists of filenames of CSDB objects, rather than CSDB objects themselves.
+
 -m &lt;media&gt;  
 Resolve ICNs for this intended output media. The catalog may contain alternative formats for the same ICN to be used for different output media.
 

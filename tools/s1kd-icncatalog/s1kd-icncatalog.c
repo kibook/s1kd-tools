@@ -12,7 +12,11 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -212,6 +216,30 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 	xmlFreeDoc(doc);
 }
 
+void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, bool xinclude, const char *media)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		resolve_icns_in_file(line, icns, overwrite, xinclude, media);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	xmlXPathContextPtr ctx;
@@ -284,6 +312,7 @@ void show_help(void)
 	puts("  -c <catalog>   Use <catalog> as the ICN catalog.");
 	puts("  -d <icn>       Delete an ICN from the catalog.");
 	puts("  -f             Overwrite input objects.");
+	puts("  -l             Treat input as list of objects.");
 	puts("  -m <media>     Specify intended output media.");
 	puts("  -n <notation>  Set the notation of the new ICN.");
 	puts("  -t             Create new ICN catalog.");
@@ -307,8 +336,9 @@ int main(int argc, char **argv)
 	char *media = NULL;
 	xmlDocPtr icns;
 	xmlNodePtr add, del, cur = NULL;
+	bool islist = false;
 
-	const char *sopts = "a:c:d:fm:n:tu:xh?";
+	const char *sopts = "a:c:d:flm:n:tu:xh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -341,6 +371,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'l':
+				islist = true;
 				break;
 			case 'm':
 				if (!media) {
@@ -394,7 +427,11 @@ int main(int argc, char **argv)
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			resolve_icns_in_file(argv[i], icns, overwrite, xinclude, media);
+			if (islist) {
+				resolve_icns_in_list(argv[i], icns, overwrite, xinclude, media);
+			} else {
+				resolve_icns_in_file(argv[i], icns, overwrite, xinclude, media);
+			}
 		}
 	} else if (createnew) {
 		if (overwrite) {
@@ -402,6 +439,8 @@ int main(int argc, char **argv)
 		} else {
 			xmlSaveFile("-", icns);
 		}
+	} else if (islist) {
+		resolve_icns_in_list(NULL, icns, false, xinclude, media);
 	} else {
 		resolve_icns_in_file("-", icns, false, xinclude, media);
 	}
