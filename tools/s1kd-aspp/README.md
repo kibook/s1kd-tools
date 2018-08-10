@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-aspp [-g [-A <ACT>]... [-C <CCT>]... [-G <XSL>]]
-              [-p [-a <ID>]] [-cdfxh?] [<modules>...]
+              [-p [-a <ID>]] [-cdflxh?] [<modules>...]
 
 DESCRIPTION
 ===========
@@ -48,6 +48,9 @@ Use custom XSLT to generate display text for applicability statements.
 
 -g  
 Generate display text for applicability statements.
+
+-l  
+Treat input (stdin or arguments) as lists of filenames of modules, rather than modules themselves.
 
 -p  
 Preprocess applicability statements to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet. The applicability in the resulting XML is no longer semantically correct.

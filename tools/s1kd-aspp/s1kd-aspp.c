@@ -21,7 +21,11 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.1.2"
+#define VERSION "1.2.0"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -528,6 +532,31 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	xmlFreeDoc(doc);
 }
 
+void process_list(const char *path, bool overwrite, bool xincl, bool process,
+	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		processFile(line, overwrite ? line : "-", xincl, process, genDispText, acts, ccts, findcts);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-cdfxh?] [<modules>]");
@@ -541,6 +570,7 @@ void showHelp(void)
 	puts("  -f         Overwrite input file(s).");
 	puts("  -G <XSL>   Use custom XSLT script to generate display text.");
 	puts("  -g         Generate display text for applicability statements.");
+	puts("  -l         Treat input as list of modules.");
 	puts("  -p         Convert semantic applicability to presentation applicability.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
@@ -559,10 +589,11 @@ int main(int argc, char **argv)
 	bool genDispText = false;
 	bool process = false;
 	bool findcts = false;
+	bool islist = false;
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cdfG:gpxh?";
+	const char *sopts = "A:a:C:cdfG:glpxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -613,6 +644,9 @@ int main(int argc, char **argv)
 			case 'g':
 				genDispText = true;
 				break;
+			case 'l':
+				islist = true;
+				break;
 			case 'p':
 				process = true;
 				break;
@@ -627,11 +661,21 @@ int main(int argc, char **argv)
 	}
 
 	if (optind >= argc) {
-		processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts);
+		if (islist) {
+			process_list(NULL, false, xincl, process, genDispText, acts, ccts, findcts);
+		} else {
+			processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts);
+		}
 	} else {
 		for (i = optind; i < argc; ++i) {
-			processFile(argv[i], overwrite ? argv[i] : "-", xincl,
-				process, genDispText, acts, ccts, findcts);
+			if (islist) {
+				process_list(argv[i], overwrite, xincl, process,
+					genDispText, acts, ccts, findcts);
+			} else {
+				processFile(argv[i], overwrite ? argv[i] : "-",
+					xincl, process, genDispText, acts,
+					ccts, findcts);
+			}
 		}
 	}
 
