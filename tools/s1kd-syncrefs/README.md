@@ -6,7 +6,7 @@ s1kd-syncrefs - Synchronize references in a data module
 SYNOPSIS
 ========
 
-`s1kd-syncrefs [-df] [-o <out>] [<data module>...]`
+`s1kd-syncrefs [-dfl] [-o <out>] [<data module>...]`
 
 DESCRIPTION
 ===========
@@ -21,6 +21,9 @@ Delete the &lt;refs&gt; element.
 
 -f  
 Overwrite the data modules automatically.
+
+-l  
+Treat input (stdin or arguments) as lists of data modules to synchronize references in, rather than data modules themselves.
 
 -o &lt;out&gt;  
 The resulting XML is written to &lt;out&gt; instead of stdout.

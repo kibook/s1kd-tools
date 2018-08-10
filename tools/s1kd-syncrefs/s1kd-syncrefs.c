@@ -13,9 +13,11 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 #define EXIT_INVALID_DM 1
 
@@ -318,6 +320,52 @@ void sync_refs(xmlNodePtr dmodule)
 	}
 }
 
+void sync_refs_file(const char *path, const char *out, bool overwrite)
+{
+	xmlDocPtr dm;
+	xmlNodePtr dmodule;
+
+	if (!(dm = xmlReadFile(path, NULL, PARSE_OPTS))) {
+		return;
+	}
+
+	dmodule = xmlDocGetRootElement(dm);
+
+	sync_refs(dmodule);
+
+	if (overwrite) {
+		xmlSaveFile(path, dm);
+	} else {
+		xmlSaveFile(out, dm);
+	}
+
+	xmlFreeDoc(dm);
+}
+
+void sync_refs_list(const char *path, const char *out, bool overwrite)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		sync_refs_file(line, out, overwrite);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-o <out>] <dms>");
@@ -339,15 +387,12 @@ int main(int argc, char *argv[])
 {
 	int i;
 
-	xmlDocPtr dm;
-
-	xmlNodePtr dmodule;
-	
 	char out[PATH_MAX] = "-";
 
 	bool overwrite = false;
+	bool islist = false;
 
-	const char *sopts = "o:dfh?";
+	const char *sopts = "dflo:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -362,14 +407,17 @@ int main(int argc, char *argv[])
 					return 0;
 				}
 				break;
-			case 'o':
-				strcpy(out, optarg);
-				break;
 			case 'd':
 				only_delete = true;
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'l':
+				islist = true;
+				break;
+			case 'o':
+				strcpy(out, optarg);
 				break;
 			case 'h':
 			case '?':
@@ -380,26 +428,16 @@ int main(int argc, char *argv[])
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			dm = xmlReadFile(argv[i], NULL, PARSE_OPTS);
-
-			dmodule = xmlDocGetRootElement(dm);
-
-			sync_refs(dmodule);
-
-			if (overwrite) {
-				xmlSaveFile(argv[i], dm);
+			if (islist) {
+				sync_refs_list(argv[i], out, overwrite);
 			} else {
-				xmlSaveFile(out, dm);
+				sync_refs_file(argv[i], out, overwrite);
 			}
-
-			xmlFreeDoc(dm);
 		}
+	} else if (islist) {
+		sync_refs_list(NULL, out, overwrite);
 	} else {
-		dm = xmlReadFile("-", NULL, PARSE_OPTS);
-		dmodule = xmlDocGetRootElement(dm);
-		sync_refs(dmodule);
-		xmlSaveFile(out, dm);
-		xmlFreeDoc(dm);
+		sync_refs_file("-", out, false);
 	}
 
 	xmlCleanupParser();
