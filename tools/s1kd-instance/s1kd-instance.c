@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -15,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.8.3"
+#define VERSION "1.8.4"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -43,10 +44,10 @@
 #define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
 #define S_NO_PRODUCT ERR_PREFIX "No product matching '%s' in PCT '%s'.\n"
 #define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s.\n"
-#define S_NO_DIR ERR_PREFIX "No directory specified with -O.\n"
 #define S_MISSING_REF_DM ERR_PREFIX "Could not read referenced ACT/PCT: %s\n"
 #define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
 #define S_MISSING_CIR ERR_PREFIX "Could not find CIR %s."
+#define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -2553,9 +2554,19 @@ int main(int argc, char **argv)
 		list = stdin;
 	}
 
-	if (autoname && strcmp(dir, "") == 0) {
-		fprintf(stderr, S_NO_DIR);
-		exit(EXIT_MISSING_ARGS);
+	if (autoname && access(dir, F_OK) == -1) {
+		int err;
+
+		#ifdef _WIN32
+			err = mkdir(dir);
+		#else
+			err = mkdir(dir, S_IRWXU);
+		#endif
+
+		if (err) {
+			fprintf(stderr, S_MKDIR_FAILED, dir);
+			exit(EXIT_BAD_ARG);
+		}
 	}
 
 	if (strcmp(product, "") != 0) {
