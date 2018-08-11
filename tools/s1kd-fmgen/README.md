@@ -32,6 +32,9 @@ Specify a custom `.fmtypes` file.
 -f  
 Overwrite the specified front matter data module files after generating their content.
 
+-l  
+Treat input (stdin or arguments) as lists of front matter data modules to generate content for, rather than data modules themselves. If reading list from stdin, the -P option must be used to specify the publication module.
+
 -P &lt;PM&gt;  
 Publication module or s1kd-flatten(1) PM format file to generate contents from. If none is specified, the tool will read from stdin.
 

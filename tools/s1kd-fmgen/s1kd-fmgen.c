@@ -11,7 +11,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.3.2"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -24,6 +24,7 @@
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
 #define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -190,6 +191,30 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 	xmlFreeDoc(res);
 }
 
+void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		generate_fm_content_for_dm(pm, line, fmtypes, fmtype, overwrite, xslpath, params);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 void dump_fmtypes_xml(void)
 {
 	xmlDocPtr doc;
@@ -251,7 +276,7 @@ void add_param(xmlNodePtr params, char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,fxh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,flxh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
 	puts("  -,                 Dump the built-in .fmtypes file in XML format.");
@@ -259,6 +284,7 @@ void show_help(void)
 	puts("  -h -?              Show usage message.");
 	puts("  -F <FMTYPES>       Specify .fmtypes file.");
 	puts("  -f                 Overwrite input data modules.");
+	puts("  -l                 Treat input as list of data modules.");
 	puts("  -P <PM>            Generate front matter from the specified PM.");
 	puts("  -p <name>=<value>  Pass parameters to the XSLT specified with -X.");
 	puts("  -t <TYPE>          Generate the specified type of front matter.");
@@ -277,7 +303,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.F:fP:p:t:X:xh?";
+	const char *sopts = ",.F:flP:p:t:X:xh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -291,6 +317,7 @@ int main(int argc, char **argv)
 
 	bool overwrite = false;
 	bool xincl = false;
+	bool islist = false;
 	char *xslpath = NULL;
 	xmlNodePtr params_node;
 	int nparams = 0;
@@ -319,6 +346,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'l':
+				islist = true;
 				break;
 			case 'P':
 				pmpath = strdup(optarg);
@@ -382,14 +412,25 @@ int main(int argc, char **argv)
 	}
 
 	if (optind < argc) {
+		void (*gen_fn)(xmlDocPtr, const char *, xmlDocPtr, const char *,
+			bool, const char *, const char **);
+
+		if (islist) {
+			gen_fn = generate_fm_content_for_list;
+		} else {
+			gen_fn = generate_fm_content_for_dm;
+		}
+
 		for (i = optind; i < argc; ++i) {
-			generate_fm_content_for_dm(pm, argv[i], fmtypes, fmtype, overwrite, xslpath, params);
+			gen_fn(pm, argv[i], fmtypes, fmtype, overwrite, xslpath, params);
 		}
 	} else if (fmtype) {
 		xmlDocPtr res;
 		res = generate_fm_content_for_type(pm, fmtype, xslpath, params);
 		xmlSaveFile("-", res);
 		xmlFreeDoc(res);
+	} else if (islist) {
+		generate_fm_content_for_list(pm, NULL, fmtypes, fmtype, overwrite, xslpath, params);
 	} else {
 		fprintf(stderr, S_NO_TYPE_ERR);
 		exit(EXIT_NO_TYPE);
