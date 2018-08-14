@@ -359,9 +359,9 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		if (filesystem_fname(fs_dm_fname, dm_fname, path, is_dm)) {
 			found = true;
 
-			/* Flatten a container data module by replacing the
-			 * dmRef to the container with the references inside
-			 * the container.
+			/* Flatten a container data module by copying the
+			 * dmRefs inside the container directly in to the
+			 * publication module.
 			 */
 			if (flatten_container) {
 				xmlDocPtr doc;
@@ -385,15 +385,12 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 						}
 						xmlAddNextSibling(dm_ref, xmlCopyNode(c, 1));
 					}
-
-					/* Ignore the dmRef to the container. */
-					found = false;
 				}
 
 				xmlFreeDoc(doc);
 			}
 
-			if (found && flatten_ref) {
+			if (flatten_ref) {
 				if (xinclude) {
 					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
