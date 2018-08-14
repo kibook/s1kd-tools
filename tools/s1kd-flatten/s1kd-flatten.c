@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -34,12 +34,14 @@ xmlNodePtr pub;
 xmlNodePtr search_paths;
 
 int flatten_ref = 1;
+int flatten_container = 0;
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-I <path>] [-dfNpxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-I <path>] [-cdfNpxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
+	puts("  -c         Flatten referenced container data modules.");
 	puts("  -d         Remove unresolved refs without flattening.");
 	puts("  -f         Overwrite publication module.");
 	puts("  -I <path>  Search <path> for referenced objects.");
@@ -130,6 +132,8 @@ bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool 
 
 	return found;
 }
+
+void flatten_pm_entry(xmlNodePtr pm_entry);
 
 void flatten_pm_ref(xmlNodePtr pm_ref)
 {
@@ -355,7 +359,41 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		if (filesystem_fname(fs_dm_fname, dm_fname, path, is_dm)) {
 			found = true;
 
-			if (flatten_ref) {
+			/* Flatten a container data module by replacing the
+			 * dmRef to the container with the references inside
+			 * the container.
+			 */
+			if (flatten_container) {
+				xmlDocPtr doc;
+				xmlNodePtr refs;
+
+				doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
+				refs = first_xpath_node(doc, NULL, "//container/refs");
+
+				if (refs) {
+					xmlNodePtr c;
+
+					/* First, flatten the dmRefs in the
+					 * container itself. */
+					flatten_pm_entry(refs);
+
+					/* Copy each dmRef from the container
+					 * into the PM. */
+					for (c = refs->children; c; c = c->next) {
+						if (c->type != XML_ELEMENT_NODE) {
+							continue;
+						}
+						xmlAddNextSibling(dm_ref, xmlCopyNode(c, 1));
+					}
+
+					/* Ignore the dmRef to the container. */
+					found = false;
+				}
+
+				xmlFreeDoc(doc);
+			}
+
+			if (found && flatten_ref) {
 				if (xinclude) {
 					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
@@ -427,7 +465,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "dfxNpI:h?";
+	const char *sopts = "cdfxNpI:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -447,6 +485,7 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				break;
+			case 'c': flatten_container = 1; break;
 			case 'd': flatten_ref = 0; break;
 			case 'f': overwrite = 1; break;
 			case 'x': xinclude = 1; break;

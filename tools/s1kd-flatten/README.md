@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-I <path>] [-dfNpx] <PM> [<DM>...]
+    s1kd-flatten [-I <path>] [-cdfNpx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -17,6 +17,9 @@ Data modules are by default searched for in the current directory using the data
 
 OPTIONS
 =======
+
+-c  
+Flatten referenced container data modules by copying the references inside the container directly in to the publication module. The copied references will also be flattened, unless the -d option is specified.
 
 -d  
 Remove unresolved references, but do not flatten resolved ones.
