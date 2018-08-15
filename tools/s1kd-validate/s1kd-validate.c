@@ -8,7 +8,7 @@
 #include <libxml/xinclude.h>
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -49,7 +49,7 @@
 #define PARSE_OPTS 0
 #endif
 
-enum verbosity_level {SILENT, NORMAL, VERBOSE, DEBUG} verbosity = NORMAL;
+enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
 
 /* Cache schemas to prevent parsing them twice (mainly needed when accessing
  * the schema over a network)
@@ -331,9 +331,9 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 
 	if (verbosity >= VERBOSE) {
 		if (err) {
-			printf(FAILED_PREFIX "%s fails to validate\n", fname);
+			printf(FAILED_PREFIX "%s fails to validate against schema %s\n", fname, url);
 		} else {
-			printf(SUCCESS_PREFIX "%s validates\n", fname);
+			printf(SUCCESS_PREFIX "%s validates against schema %s\n", fname, url);
 		}
 	}
 
@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqDd:X:xflh?";
+	const char *sopts = "vqd:X:xflh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -405,7 +405,6 @@ int main(int argc, char *argv[])
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
-			case 'D': verbosity = DEBUG; break;
 			case 'd': strcpy(schema_dir, optarg); break;
 			case 'X': add_ignore_ns(ignore_ns, optarg); break;
 			case 'x': xinclude = 1; break;

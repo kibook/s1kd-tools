@@ -6,7 +6,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-X <URI>] [-Dflqvx] [<object>...]
+    s1kd-validate [-d <dir>] [-X <URI>] [-flqvx] [<object>...]
 
 DESCRIPTION
 ===========
@@ -27,8 +27,8 @@ List invalid files.
 -l  
 Treat input as a list of object names to validate, rather than an object itself.
 
--v -q -D  
-Set the verbosity of the output, verbose, quiet, and debug. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.
+-v -q  
+Set the verbosity of the output, verbose or quiet. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.
 
 -X &lt;URI&gt;  
 Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.
