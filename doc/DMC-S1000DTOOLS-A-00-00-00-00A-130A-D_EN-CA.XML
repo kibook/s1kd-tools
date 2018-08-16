@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="25"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -39,9 +39,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Add examples of building publications.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -353,7 +350,7 @@ S1000D and s1kd-tools.&lt;/para&gt;
           <para>The data module is once again upissued to the next official issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-..."</verbatimText> types.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+      <levelledPara>
         <title>Building publications</title>
         <para>S1000D publications are managed by use of publication modules. Like data modules, publication modules may be created as part of the project's DMRL:</para>
         <para>

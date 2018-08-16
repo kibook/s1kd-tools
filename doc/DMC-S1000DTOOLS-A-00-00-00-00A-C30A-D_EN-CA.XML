@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="15"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -39,9 +39,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
-        <simplePara>Add s1kd-sns tool.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -808,7 +805,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-sns</para>
               </entry>

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="V" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="25"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-newupf(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -v option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -109,7 +106,7 @@
                 <para>Do not report an error when the file already exists.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>Print the file name of the newly created data update file.</para>

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="L" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="00"/>
+        <issueInfo issueNumber="018" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="02"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -m option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -157,7 +154,7 @@
                 <para>When creating a DMRL from SNS rules (-S), use the specified info code for each entry. Specify this option multiple times to create multiple data modules for each part of the SNS.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the remarks for the new data management list.</para>

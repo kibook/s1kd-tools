@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="033" inWork="00"/>
+        <issueInfo issueNumber="034" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="16"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,9 +40,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -j option and .brexmap file.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -189,7 +186,7 @@
                 <para>The info name of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-j &lt;map&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file when using the -B option.</para>
@@ -488,7 +485,7 @@ securityClassification       01]]></verbatimText>
           </para>
           <para>The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file. An info code with no variant matches all possible variants.</para>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>
           <para>Refer to the documentation for s1kd-defaults(1) for a description of the <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file.</para>
         </levelledPara>

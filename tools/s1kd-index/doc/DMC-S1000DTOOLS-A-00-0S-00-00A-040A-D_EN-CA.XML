@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="S" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="06" day="30"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-index(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -D option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -l option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-index -h?
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-index -h?
 s1kd-index [-I <index>] [-fil] [<module>...]
 s1kd-index -D [-fil] [<module>...]]]></verbatimText>
         </para>
@@ -68,7 +62,7 @@ s1kd-index -D [-fil] [<module>...]]]></verbatimText>
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-D</listItemTerm>
               <listItemDefinition>
                 <para>Remove the current index flags from a data module.</para>
@@ -92,7 +86,7 @@ s1kd-index -D [-fil] [<module>...]]]></verbatimText>
                 <para>Ignore case when flagging terms.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of data modules to add index flags to, rather than data modules themselves.</para>

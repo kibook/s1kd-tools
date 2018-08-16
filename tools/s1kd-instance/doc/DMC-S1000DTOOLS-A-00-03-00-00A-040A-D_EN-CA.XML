@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="3" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="024" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="07" day="31"/>
+        <issueDate year="2018" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Change default behaviour of -Y/-y options and add -W option to restore original behaviour.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Clarify that -a and -A operate on inline applicability annotations.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -86,13 +80,13 @@
             <definitionListItem>
               <listItemTerm>-A</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Simplify inline applicability annotations and remove unused ones.</para>
+                <para>Simplify inline applicability annotations and remove unused ones.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0002">Remove unused inline applicability annotations.</para>
+                <para>Remove unused inline applicability annotations.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -331,7 +325,7 @@
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-W</listItemTerm>
               <listItemDefinition>
                 <para>Set the applicability for the whole object, overwriting the current applicability with the user-defined applicability values.</para>
@@ -402,13 +396,13 @@
             <definitionListItem>
               <listItemTerm>-Y &lt;text&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Update the applicability for the whole object using the user-defined applicability values, and using &lt;text&gt; as the new display text.</para>
+                <para>Update the applicability for the whole object using the user-defined applicability values, and using &lt;text&gt; as the new display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-y</listItemTerm>
               <listItemDefinition>
-                <para changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">Update the applicability for the whole object using the user-defined applicability values.</para>
+                <para>Update the applicability for the whole object using the user-defined applicability values.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -594,7 +588,7 @@ the weather is icy.
             <notePara>The -A option may change the <emphasis>meaning</emphasis> of certain applicability annotation without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.</notePara>
           </note>
         </levelledPara>
-        <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+        <levelledPara>
           <title>Applicability of an instance (-W, -Y, -y)</title>
           <para>The applicability of an instance may change as a result of filtering. For example, a source data module which is applicable to two versions of a product may produce two instances which are each only applicable to one version. There are three options which control how the applicability of the whole instance object is updated.</para>
           <para>The -W option will create an applicability annotation for the instance using only the user-defined applicability values. This means, for example, that given the following command:</para>
