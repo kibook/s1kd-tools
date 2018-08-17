@@ -126,7 +126,7 @@
             <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>&lt;object&gt;|&lt;dir&gt; ...</listItemTerm>
               <listItemDefinition>
-                <para>An optional list of CSDB objects to list or directories to search for CSDB objets in. If none are specified, CSDB objects in  the current directory are listed by default.</para>
+                <para>An optional list of CSDB objects to list or directories to search for CSDB objects in. If none are specified, CSDB objects in  the current directory are listed by default.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

@@ -47,7 +47,7 @@ Show only writable object files.
 Show version information.
 
 &lt;object&gt;|&lt;dir&gt; ...  
-An optional list of CSDB objects to list or directories to search for CSDB objets in. If none are specified, CSDB objects in the current directory are listed by default.
+An optional list of CSDB objects to list or directories to search for CSDB objects in. If none are specified, CSDB objects in the current directory are listed by default.
 
 EXAMPLE
 =======
