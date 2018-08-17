@@ -99,7 +99,7 @@ int isdml(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-CDiLlMPrwX]");
+	puts("Usage: " PROG_NAME " [-CDiLlMPrwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -0         Output null-delimited list");

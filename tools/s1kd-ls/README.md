@@ -6,7 +6,7 @@ s1kd-ls - List CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ls [-0CDIiLlMoPrwX]
+    s1kd-ls [-0CDIiLlMoPrwX] [<object>|<dir> ...]
 
 DESCRIPTION
 ===========
@@ -45,6 +45,9 @@ Show only writable object files.
 
 --version  
 Show version information.
+
+&lt;object&gt;|&lt;dir&gt; ...  
+An optional list of CSDB objects to list or directories to search for CSDB objets in. If none are specified, CSDB objects in the current directory are listed by default.
 
 EXAMPLE
 =======
