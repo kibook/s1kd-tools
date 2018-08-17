@@ -12,7 +12,7 @@
 #define OBJECT_MAX 10240
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
