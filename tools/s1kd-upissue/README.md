@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-upissue [-dfIilNqRrv] [-1 <type>] [-2 <type>]
-                 [-s <status>] <file>...
+                 [-s <status>] [<file>...]
 
 DESCRIPTION
 ===========
@@ -60,6 +60,9 @@ Print the file name of the upissued CSDB object.
 
 --version  
 Show version information.
+
+&lt;file&gt;...  
+Any number of CSDB objects or other files to upissue. If none are specified, the object will be read from stdin and the upissued object will be written to stdout.
 
 EXAMPLES
 ========

@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfIilNqRrv] [-s <status>] [-1 <type>] [-2 <type>] <file>...");
+	puts("Usage: " PROG_NAME " [-dfIilNqRrv] [-s <status>] [-1 <type>] [-2 <type>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1 <type>    Set first verification type");
@@ -303,7 +303,7 @@ void upissue(const char *path)
 
 	strcpy(dmfile, path);
 
-	if (access(dmfile, F_OK) == -1) {
+	if (access(dmfile, F_OK) == -1 && strcmp(dmfile, "-") != 0) {
 		fprintf(stderr, ERR_PREFIX "Could not read file %s.\n", dmfile);
 		exit(EXIT_NO_FILE);
 	}
@@ -317,7 +317,7 @@ void upissue(const char *path)
 	}
 
 	if (!issueInfo && no_issue) {
-		fprintf(stderr, ERR_PREFIX "Cannot use -N when file does not contain issue info metadata.\n");
+		fprintf(stderr, ERR_PREFIX "Cannot use -N or read from stdin when file does not contain issue info metadata.\n");
 		exit(EXIT_NO_OVERWRITE);
 	}
 
@@ -554,6 +554,10 @@ int main(int argc, char **argv)
 		}
 	} else if (islist) {
 		upissue_list(NULL);
+	} else {
+		no_issue = true;
+		overwrite = true;
+		upissue("-");
 	}
 
 	free(firstver);
