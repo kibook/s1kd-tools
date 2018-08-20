@@ -456,28 +456,28 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -$         Specify which S1000D issue to use.");
-	puts("  -@         Output to specified file.");
-	puts("  -%         Use templates in specified directory.");
-	puts("  -~         Dump built-in XML template to directory.");
-	puts("  -d         Specify the .defaults file name.");
-	puts("  -f         Overwrite existing file.");
-	puts("  -p         Prompt the user for each value.");
-	puts("  -q         Don't report an error if file exists.");
-	puts("  -v         Print file name of comment.");
-	puts("  --version  Show version information.");
+	puts("  -$ <issue>     Specify which S1000D issue to use.");
+	puts("  -@ <file>      Output to specified file.");
+	puts("  -% <dir>       Use templates in specified directory.");
+	puts("  -~ <dir>       Dump built-in XML template to directory.");
+	puts("  -d <defaults>  Specify the .defaults file name.");
+	puts("  -f             Overwrite existing file.");
+	puts("  -p             Prompt the user for each value.");
+	puts("  -q             Don't report an error if file exists.");
+	puts("  -v             Print file name of comment.");
+	puts("  --version      Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -#         Comment code");
-	puts("  -b         BREX data module code");
-	puts("  -C         Country ISO code");
-	puts("  -c         Security classification");
-	puts("  -I         Issue date");
-	puts("  -m         Remarks");
-	puts("  -L         Language ISO code");
-	puts("  -o         Originator");
-	puts("  -r         Response type");
-	puts("  -t         Title");
+	puts("  -# <code>      Comment code");
+	puts("  -b <BREX>      BREX data module code");
+	puts("  -C <country>   Country ISO code");
+	puts("  -c <sec>       Security classification");
+	puts("  -I <date>      Issue date");
+	puts("  -m <remarks>   Remarks");
+	puts("  -L <lang>      Language ISO code");
+	puts("  -o <orig>      Originator");
+	puts("  -r <type>      Response type");
+	puts("  -t <title>     Comment title");
 }
 
 void show_version(void)
