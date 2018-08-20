@@ -556,6 +556,7 @@ void show_help(void)
 	puts("  -$         Specify which S1000d issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use template in specified directory.");
+	puts("  -~ <dir>   Dump built-in template to directory.");
 	puts("  -d         Specify .defaults file name.");
 	puts("  -f         Overwrite existing file.");
 	puts("  -h -?      Show usage message.");
