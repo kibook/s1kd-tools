@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -28,6 +28,9 @@
 #define EXIT_BAD_DATE 4
 #define EXIT_BAD_ISSUE 5
 #define EXIT_BAD_TEMPLATE 6
+#define EXIT_BAD_TEMPL_DIR 7
+
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template to directory: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -230,31 +233,31 @@ void prompt(const char *prompt, char *str, int n)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [options] <files>...");
+	puts("Usage: " PROG_NAME " [options] [<files>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d <defaults>    Specify the .defaults file name.");
-	puts("  -p               Prompt user for values.");
-	puts("  -q               Don't report an error if file exists.");
-	puts("  -v               Print file name of DDN.");
-	puts("  -f               Overwrite existing file.");
 	puts("  -$               Specify which S1000D issue to use.");
 	puts("  -@               Output to specified file.");
 	puts("  -%               Use templates in specified directory.");
+	puts("  -d <defaults>    Specify the .defaults file name.");
+	puts("  -f               Overwrite existing file.");
+	puts("  -p               Prompt user for values.");
+	puts("  -q               Don't report an error if file exists.");
+	puts("  -v               Print file name of DDN.");
 	puts("  --version        Show version information.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
 	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
-	puts("  -o <sender>      Sender enterprise name");
-	puts("  -r <receiver>    Receiver enterprise name");
-	puts("  -t <city>        Sender city");
-	puts("  -T <city>        Receiver city");
-	puts("  -n <country>     Sender country");
-	puts("  -N <country>     Receiver country");
 	puts("  -a <auth>        Authorization");
 	puts("  -b <BREX>        BREX data module code");
 	puts("  -I <date>        Issue date");
 	puts("  -m <remarks>     Remarks");
+	puts("  -N <country>     Receiver country");
+	puts("  -n <country>     Sender country");
+	puts("  -o <sender>      Sender enterprise name");
+	puts("  -r <receiver>    Receiver enterprise name");
+	puts("  -T <city>        Receiver city");
+	puts("  -t <city>        Sender city");
 }
 
 void show_version(void)
@@ -440,6 +443,20 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+void dump_template(const char *path)
+{
+	FILE *f;
+
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	f = fopen("ddn.xml", "w");
+	fprintf(f, "%.*s", templates_ddn_xml_len, templates_ddn_xml);
+	fclose(f);
+}
+
 int main(int argc, char **argv)
 {
 	int c;
@@ -471,7 +488,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:h?";
+	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -505,6 +522,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = 1; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
+			case '~': dump_template(optarg); return 0;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
