@@ -11,7 +11,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -19,6 +19,9 @@
 #define EXIT_BAD_BREX_DMC 2
 #define EXIT_BAD_DATE 3
 #define EXIT_BAD_TEMPLATE 4
+#define EXIT_BAD_TEMPL_DIR 5
+
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -133,33 +136,47 @@ xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 	return result;
 }
 
+void dump_template(const char *path)
+{
+	FILE *f;
+
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	f = fopen("icnmetadata.xml", "w");
+	fprintf(f, "%.*s", icnmetadata_xml_len, icnmetadata_xml);
+	fclose(f);
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
+	puts("  -% <dir>    Use template in specified directory.");
 	puts("  -d <path>   Specify .defaults file path.");
+	puts("  -f          Overwrite existing file.");
+	puts("  -N          Omit issue/inwork numbers from filename.");
 	puts("  -p          Show prompts.");
 	puts("  -q          Don't report an error if file exists.");
-	puts("  -N          Omit issue/inwork numbers from filename.");
 	puts("  -v          Print file name of IMF.");
-	puts("  -f          Overwrite existing file.");
-	puts("  -% <dir>    Use template in specified directory.");
 	puts("  --version   Show version information.");
 	puts("  <icns>      1 or more ICNs to generate a metadata file for.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
-	puts("  -n          Issue number");
-	puts("  -w          Inwork issue");
-	puts("  -c          Security classification");
-	puts("  -r          Responsible partner company");
-	puts("  -R          Responsible partner company CAGE code");
-	puts("  -o          Originator");
-	puts("  -O          Originator CAGE code");
-	puts("  -t          ICN title");
 	puts("  -b          BREX data module code");
+	puts("  -c          Security classification");
 	puts("  -I          Issue date");
 	puts("  -m          Remarks");
+	puts("  -n          Issue number");
+	puts("  -O          Originator CAGE code");
+	puts("  -o          Originator");
+	puts("  -R          Responsible partner company CAGE code");
+	puts("  -r          Responsible partner company");
+	puts("  -t          ICN title");
+	puts("  -w          Inwork issue");
 }
 
 void show_version(void)
@@ -310,7 +327,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:h?";
+	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -343,6 +360,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
+			case '~': dump_template(optarg); return 0;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
