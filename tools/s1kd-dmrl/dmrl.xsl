@@ -8,6 +8,7 @@
   <xsl:param name="no-overwrite-error" select="false()"/>
   <xsl:param name="verbose" select="false()"/>
   <xsl:param name="spec-issue"/>
+  <xsl:param name="templates"/>
 
   <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -59,6 +60,11 @@
     </xsl:if>
     <xsl:if test="$verbose">
       <xsl:text> -v</xsl:text>
+    </xsl:if>
+    <xsl:if test="$templates">
+      <xsl:text> -% "</xsl:text>
+      <xsl:value-of select="$templates"/>
+      <xsl:text>"</xsl:text>
     </xsl:if>
     <xsl:apply-templates select="*"/>
     <xsl:text>&#10;</xsl:text>
