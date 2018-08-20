@@ -367,6 +367,7 @@ void show_help(void)
 	puts("  -$         Specify which S1000D issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use template in specified directory.");
+	puts("  -~ <dir>   Dump built-in template to directory.");
 	puts("  -D         Include issue date in referenced data modules.");
 	puts("  -d         Specify the .defaults file name.");
 	puts("  -f         Overwrite existing file.");
