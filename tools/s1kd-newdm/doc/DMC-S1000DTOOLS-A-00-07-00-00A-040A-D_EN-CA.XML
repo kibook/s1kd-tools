@@ -8,10 +8,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="7" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="034" inWork="00"/>
+        <issueInfo issueNumber="034" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add -~ option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -112,6 +115,12 @@
               <listItemTerm>-% &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use XML templates in the specified directory instead of the built-in templates.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-~ &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XML templates to the specified directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

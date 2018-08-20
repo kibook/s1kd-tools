@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -45,10 +46,11 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump templates in directory: %s\n"
 
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
@@ -56,6 +58,7 @@
 #define EXIT_BAD_BREX_DMC 4
 #define EXIT_BAD_DATE 5
 #define EXIT_BAD_ISSUE 6
+#define EXIT_BAD_TEMPL_DIR 7
 
 char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -225,45 +228,46 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -d         Specify .defaults file name.");
-	puts("  -D         Specify .dmtypes file name.");
-	puts("  -f         Overwrite existing file.");
-	puts("  -N         Omit issue/inwork from filename.");
-	puts("  -p         Prompt the user for each value");
-	puts("  -q         Don't report an error if file exists.");
-	puts("  -S         Get tech name from BREX SNS.");
-	puts("  -M         Use one of the maintained SNS.");
-	puts("  -P         Include previous level of SNS in tech name.");
-	puts("  -v         Print file name of new data module.");
 	puts("  -$         Specify which S1000D issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use templates in specified directory.");
+	puts("  -~         Dump default templates to a directory.");
 	puts("  -,         Dump default dmtypes XML.");
 	puts("  -.         Dump default dmtypes text file.");
 	puts("  -!         Do not include an info name.");
 	puts("  -B         Generate BREX rules.");
+	puts("  -D         Specify .dmtypes file name.");
+	puts("  -d         Specify .defaults file name.");
+	puts("  -f         Overwrite existing file.");
 	puts("  -j         Use a custom .brexmap file.");
+	puts("  -M         Use one of the maintained SNS.");
+	puts("  -N         Omit issue/inwork from filename.");
+	puts("  -P         Include previous level of SNS in tech name.");
+	puts("  -p         Prompt the user for each value");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -S         Get tech name from BREX SNS.");
+	puts("  -v         Print file name of new data module.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#         Data module code");
-	puts("  -L         Language ISO code");
-	puts("  -C         Country ISO code");
-	puts("  -n         Issue number");
-	puts("  -w         Inwork issue");
-	puts("  -c         Security classification");
-	puts("  -r         Responsible partner company enterprise name");
-	puts("  -R         Responsible partner company CAGE code.");
-	puts("  -o         Originator enterprise name");
-	puts("  -O         Originator CAGE code.");
-	puts("  -t         Tech name");
-	puts("  -i         Info name");
-	puts("  -T         DM type (descript, proced, frontmatter, etc.)");
 	puts("  -b         BREX data module code");
-	puts("  -s         Schema");
+	puts("  -C         Country ISO code");
+	puts("  -c         Security classification");
 	puts("  -I         Issue date");
-	puts("  -m         Remarks");
+	puts("  -i         Info name");
 	puts("  -k         Skill level");
+	puts("  -L         Language ISO code");
+	puts("  -m         Remarks");
+	puts("  -n         Issue number");
+	puts("  -O         Originator CAGE code.");
+	puts("  -o         Originator enterprise name");
+	puts("  -R         Responsible partner company CAGE code.");
+	puts("  -r         Responsible partner company enterprise name");
+	puts("  -s         Schema");
+	puts("  -T         DM type (descript, proced, frontmatter, etc.)");
+	puts("  -t         Tech name");
+	puts("  -w         Inwork issue");
 }
 
 void show_version(void)
@@ -1160,6 +1164,89 @@ xmlDocPtr read_default_brexmap(void)
 	}
 }
 
+void dump_templ(const char *fname, const unsigned char *xml, const unsigned int len)
+{
+	FILE *f;
+	f = fopen(fname, "w");
+	fprintf(f, "%.*s", len, xml);
+	fclose(f);
+}
+
+void dump_templates(const char *path)
+{
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	dump_templ("appliccrossreftable.xml",
+		templates_42_appliccrossreftable_xml,
+		templates_42_appliccrossreftable_xml_len);
+	dump_templ("brdoc.xml",
+		templates_42_brdoc_xml,
+		templates_42_brdoc_xml_len);
+	dump_templ("brex.xml",
+		templates_42_brex_xml,
+		templates_42_brex_xml_len);
+	dump_templ("checklist.xml",
+		templates_42_checklist_xml,
+		templates_42_checklist_xml_len);
+	dump_templ("comrep.xml",
+		templates_42_comrep_xml,
+		templates_42_comrep_xml_len);
+	dump_templ("condcrossreftable.xml",
+		templates_42_condcrossreftable_xml,
+		templates_42_condcrossreftable_xml_len);
+	dump_templ("container.xml",
+		templates_42_container_xml,
+		templates_42_container_xml_len);
+	dump_templ("crew.xml",
+		templates_42_crew_xml,
+		templates_42_crew_xml_len);
+	dump_templ("descript.xml",
+		templates_42_descript_xml,
+		templates_42_descript_xml_len);
+	dump_templ("fault.xml",
+		templates_42_fault_xml,
+		templates_42_fault_xml_len);
+	dump_templ("frontmatter.xml",
+		templates_42_frontmatter_xml,
+		templates_42_frontmatter_xml_len);
+	dump_templ("ipd.xml",
+		templates_42_ipd_xml,
+		templates_42_ipd_xml_len);
+	dump_templ("learning.xml",
+		templates_42_learning_xml,
+		templates_42_learning_xml_len);
+	dump_templ("prdcrossreftable.xml",
+		templates_42_prdcrossreftable_xml,
+		templates_42_prdcrossreftable_xml_len);
+	dump_templ("proced.xml",
+		templates_42_proced_xml,
+		templates_42_proced_xml_len);
+	dump_templ("process.xml",
+		templates_42_process_xml,
+		templates_42_process_xml_len);
+	dump_templ("sb.xml",
+		templates_42_sb_xml,
+		templates_42_sb_xml_len);
+	dump_templ("schedul.xml",
+		templates_42_schedul_xml,
+		templates_42_schedul_xml_len);
+	dump_templ("scocontent.xml",
+		templates_42_scocontent_xml,
+		templates_42_scocontent_xml_len);
+	dump_templ("techrep.xml",
+		templates_42_techrep_xml,
+		templates_42_techrep_xml_len);
+	dump_templ("wrngdata.xml",
+		templates_42_wrngdata_xml,
+		templates_42_wrngdata_xml_len);
+	dump_templ("wrngflds.xml",
+		templates_42_wrngflds_xml,
+		templates_42_wrngflds_xml_len);
+}
+
 int main(int argc, char **argv)
 {
 	char learn[6] = "";
@@ -1204,7 +1291,7 @@ int main(int argc, char **argv)
 	xmlNodePtr brex_rules = NULL;
 	xmlDocPtr brexmap = NULL;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:h?";
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1255,6 +1342,7 @@ int main(int argc, char **argv)
 			case '!': no_info_name = true; break;
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
 			case 'j': if (!brexmap) brexmap = xmlReadFile(optarg, NULL, PARSE_OPTS); break;
+			case '~': dump_templates(optarg); return 0;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
