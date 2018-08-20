@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

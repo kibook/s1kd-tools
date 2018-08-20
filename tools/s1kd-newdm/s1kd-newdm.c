@@ -46,7 +46,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
