@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -26,6 +26,9 @@
 #define EXIT_BAD_DATE 5
 #define EXIT_BAD_ISSUE 6
 #define EXIT_BAD_TEMPLATE 7
+#define EXIT_BAD_TEMPL_DIR 8
+
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -531,35 +534,49 @@ void sort_entries(xmlDocPtr doc)
 	transform_doc(doc, sort_xsl, sort_xsl_len, NULL);
 }
 
+void dump_template(const char *path)
+{
+	FILE *f;
+
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	f = fopen("dml.xml", "w");
+	fprintf(f, "%.*s", dml_xml_len, dml_xml);
+	fclose(f);
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] <datamodules>");
 	puts("");
 	puts("Options:");
-	puts("  -h -?      Show usage message.");
-	puts("  -d         Specify .defaults file name.");
-	puts("  -p         Prompt the user for each value.");
-	puts("  -q         Don't report an error if file exists.");
-	puts("  -N         Omit issue/inwork from filename.");
-	puts("  -v         Print file name of DML.");
-	puts("  -f         Overwrite existing file.");
 	puts("  -$         Specify which S1000d issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use template in specified directory.");
-	puts("  -S         Create a DMRL from SNS rules.");
+	puts("  -d         Specify .defaults file name.");
+	puts("  -f         Overwrite existing file.");
+	puts("  -h -?      Show usage message.");
 	puts("  -i         Specify info codes for SNS-generated DMRL.");
+	puts("  -N         Omit issue/inwork from filename.");
+	puts("  -p         Prompt the user for each value.");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -S         Create a DMRL from SNS rules.");
+	puts("  -v         Print file name of DML.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#         DML code");
-	puts("  -n         Issue number");
-	puts("  -w         Inwork issue");
-	puts("  -c         Security classification");
 	puts("  -b         BREX data module code");
+	puts("  -c         Security classification");
 	puts("  -I         Issue date");
-	puts("  -r         Default RPC name");
-	puts("  -R         Default RPC code");
 	puts("  -m         Remarks");
+	puts("  -n         Issue number");
+	puts("  -R         Default RPC code");
+	puts("  -r         Default RPC name");
+	puts("  -w         Inwork issue");
 }
 
 void show_version(void)
@@ -693,7 +710,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:h?";
+	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -730,6 +747,7 @@ int main(int argc, char **argv)
 			case 'S': sns = strdup(optarg); break;
 			case 'i': xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST optarg); break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
+			case '~': dump_template(optarg); return 0;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
