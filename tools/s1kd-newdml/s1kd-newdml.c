@@ -550,34 +550,35 @@ void dump_template(const char *path)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [options] <datamodules>");
+	puts("Usage: " PROG_NAME " [options] [<datamodules>]");
 	puts("");
 	puts("Options:");
-	puts("  -$         Specify which S1000d issue to use.");
-	puts("  -@         Output to specified file.");
-	puts("  -%         Use template in specified directory.");
-	puts("  -~ <dir>   Dump built-in template to directory.");
-	puts("  -d         Specify .defaults file name.");
-	puts("  -f         Overwrite existing file.");
-	puts("  -h -?      Show usage message.");
-	puts("  -i         Specify info codes for SNS-generated DMRL.");
-	puts("  -N         Omit issue/inwork from filename.");
-	puts("  -p         Prompt the user for each value.");
-	puts("  -q         Don't report an error if file exists.");
-	puts("  -S         Create a DMRL from SNS rules.");
-	puts("  -v         Print file name of DML.");
-	puts("  --version  Show version information.");
+	puts("  -$ <issue>     Specify which S1000d issue to use.");
+	puts("  -@ <file>      Output to specified file.");
+	puts("  -% <dir>       Use template in specified directory.");
+	puts("  -~ <dir>       Dump built-in template to directory.");
+	puts("  -d <defaults>  Specify .defaults file name.");
+	puts("  -f             Overwrite existing file.");
+	puts("  -h -?          Show usage message.");
+	puts("  -i <codes>     Specify info codes for SNS-generated DMRL.");
+	puts("  -N             Omit issue/inwork from filename.");
+	puts("  -p             Prompt the user for each value.");
+	puts("  -q             Don't report an error if file exists.");
+	puts("  -S <BREX>      Create a DMRL from SNS rules.");
+	puts("  -v             Print file name of DML.");
+	puts("  --version      Show version information.");
+	puts("  <datamodules>  DMs to add to new list.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
-	puts("  -#         DML code");
-	puts("  -b         BREX data module code");
-	puts("  -c         Security classification");
-	puts("  -I         Issue date");
-	puts("  -m         Remarks");
-	puts("  -n         Issue number");
-	puts("  -R         Default RPC code");
-	puts("  -r         Default RPC name");
-	puts("  -w         Inwork issue");
+	puts("  -# <code>      DML code");
+	puts("  -b <BREX>      BREX data module code");
+	puts("  -c <sec>       Security classification");
+	puts("  -I <date>      Issue date");
+	puts("  -m <remarks>   Remarks");
+	puts("  -n <iss>       Issue number");
+	puts("  -R <CAGE>      Default RPC code");
+	puts("  -r <RPC>       Default RPC name");
+	puts("  -w <inwork>    Inwork issue");
 }
 
 void show_version(void)
