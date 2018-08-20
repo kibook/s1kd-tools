@@ -44,6 +44,9 @@ Save the new comment as &lt;filename&gt; instead of an automatically named file 
 -% &lt;dir&gt;  
 Use the XML template in the specified directory instead of the built-in template. The template must be named `comment.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
 
+-~ &lt;dir&gt;  
+Dump the built-in XML template to the specified directory.
+
 -b &lt;BREX&gt;  
 BREX data module code.
 

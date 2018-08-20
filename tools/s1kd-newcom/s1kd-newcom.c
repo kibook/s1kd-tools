@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -23,6 +23,9 @@
 #define EXIT_BAD_DATE 4
 #define EXIT_BAD_ISSUE 5
 #define EXIT_BAD_TEMPLATE 6
+#define EXIT_BAD_TEMPL_DIR 7
+
+#define E_BAD_TEMPL_DIR "Cannot dump templates in directory: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -434,32 +437,46 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+void dump_template(const char *path)
+{
+	FILE *f;
+
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	f = fopen("comment.xml", "w");
+	fprintf(f, "%.*s", comment_xml_len, comment_xml);
+	fclose(f);
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -d         Specify the .defaults file name.");
-	puts("  -p         Prompt the user for each value.");
-	puts("  -q         Don't report an error if file exists.");
-	puts("  -v         Print file name of comment.");
-	puts("  -f         Overwrite existing file.");
 	puts("  -$         Specify which S1000D issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use templates in specified directory.");
+	puts("  -d         Specify the .defaults file name.");
+	puts("  -f         Overwrite existing file.");
+	puts("  -p         Prompt the user for each value.");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -v         Print file name of comment.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#         Comment code");
-	puts("  -L         Language ISO code");
+	puts("  -b         BREX data module code");
 	puts("  -C         Country ISO code");
 	puts("  -c         Security classification");
-	puts("  -o         Originator");
-	puts("  -t         Title");
-	puts("  -r         Response type");
-	puts("  -b         BREX data module code");
 	puts("  -I         Issue date");
 	puts("  -m         Remarks");
+	puts("  -L         Language ISO code");
+	puts("  -o         Originator");
+	puts("  -r         Response type");
+	puts("  -t         Title");
 }
 
 void show_version(void)
@@ -509,7 +526,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:h?";
+	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -582,10 +599,13 @@ int main(int argc, char **argv)
 			case 'm':
 				remarks = xmlStrdup(BAD_CAST optarg);
 				break;
+			case '~':
+				dump_template(optarg);
+				return 0;
 			case 'h':
 			case '?':
 				show_help();
-				exit(0);
+				return 0;
 		}
 	}
 
