@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
 
@@ -28,6 +28,9 @@
 #define EXIT_BAD_DATE 4
 #define EXIT_BAD_ISSUE 5
 #define EXIT_BAD_TEMPLATE 6
+#define EXIT_BAD_TEMPL_DIR 7
+
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template to directory: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -342,39 +345,53 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
+void dump_template(const char *path)
+{
+	FILE *f;
+
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	f = fopen("pm.xml", "w");
+	fprintf(f, "%.*s", pm_xml_len, pm_xml);
+	fclose(f);
+}
+
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d         Specify the .defaults file name.");
-	puts("  -p         Prompt the user for each value.");
-	puts("  -q         Don't report an error if file exists.");
-	puts("  -N         Omit issue/inwork from file name.");
-	puts("  -v         Print file name of pub module.");
-	puts("  -f         Overwrite existing file.");
 	puts("  -$         Specify which S1000D issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use template in specified directory.");
 	puts("  -D         Include issue date in referenced data modules.");
+	puts("  -d         Specify the .defaults file name.");
+	puts("  -f         Overwrite existing file.");
 	puts("  -i         Include issue info in referenced data modules.");
 	puts("  -l         Include language info in referenced data modules.");
+	puts("  -N         Omit issue/inwork from file name.");
+	puts("  -p         Prompt the user for each value.");
+	puts("  -q         Don't report an error if file exists.");
+	puts("  -v         Print file name of pub module.");
 	puts("  -T         Include titles in referenced data modules.");
 	puts("  --version  Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -#         Publication module code");
-	puts("  -L         Language ISO code");
-	puts("  -C         Country ISO code");
-	puts("  -n         Issue number");
-	puts("  -w         Inwork issue");
-	puts("  -c         Security classification");
-	puts("  -r         Responsible partner company enterprise name");
-	puts("  -t         Publication module title");
-	puts("  -s         Short PM title");
 	puts("  -b         BREX data module code");
+	puts("  -C         Country ISO code");
+	puts("  -c         Security classification");
 	puts("  -I         Issue date");
+	puts("  -L         Language ISO code");
 	puts("  -m         Remarks");
+	puts("  -n         Issue number");
+	puts("  -r         Responsible partner company enterprise name");
+	puts("  -s         Short PM title");
+	puts("  -t         Publication module title");
+	puts("  -w         Inwork issue");
 }
 
 void show_version(void)
@@ -591,7 +608,7 @@ int main(int argc, char **argv)
 
 	char *out = NULL;
 
-	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:h?";
+	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -632,6 +649,7 @@ int main(int argc, char **argv)
 			case 's': strcpy(short_pm_title, optarg); break;
 			case 'q': no_overwrite_error = true; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
+			case '~': dump_template(optarg); return 0;
 			case 'h':
 			case '?':
 				show_help();
