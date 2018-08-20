@@ -156,6 +156,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -% <dir>    Use template in specified directory.");
+	puts("  -~ <dir>    Dump built-in template to directory.");
 	puts("  -d <path>   Specify .defaults file path.");
 	puts("  -f          Overwrite existing file.");
 	puts("  -N          Omit issue/inwork numbers from filename.");
