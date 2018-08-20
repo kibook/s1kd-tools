@@ -24,6 +24,8 @@ Additional links:
 
 -   [s1kd-tools GitHub repository](http://github.com/kibook/s1kd-tools)
 
+-   [s1kd-tools GitLab repository](http://gitlab.com/kibukj/s1kd-tools)
+
 -   [s1kd-tools GitHub Pages site](http://kibook.github.io/s1kd-tools)
 
 -   [s1kd-tools on khzae.net](http://khzae.net/1/s1kd/s1kd-tools)
