@@ -236,9 +236,10 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<files>...]");
 	puts("");
 	puts("Options:");
-	puts("  -$               Specify which S1000D issue to use.");
-	puts("  -@               Output to specified file.");
-	puts("  -%               Use templates in specified directory.");
+	puts("  -$ <issue>       Specify which S1000D issue to use.");
+	puts("  -@ <file>        Output to specified file.");
+	puts("  -% <dir>         Use templates in specified directory.");
+	puts("  -~ <dir>         Dump built-in XML template to directory.");
 	puts("  -d <defaults>    Specify the .defaults file name.");
 	puts("  -f               Overwrite existing file.");
 	puts("  -p               Prompt user for values.");
