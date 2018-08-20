@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="V" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-newupf(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add -~ option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -86,6 +89,12 @@
               <listItemTerm>-% &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">update.xml</verbatimText> in the directory &lt;dir&gt;, and must conform to the default S1000D issue of this tool (4.2).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-~ &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XML template to the specified directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

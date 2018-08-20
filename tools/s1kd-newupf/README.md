@@ -29,6 +29,9 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -% &lt;dir&gt;  
 Use XML template in the specified directory instead of the built-in template. The template must be named `update.xml` in the directory &lt;dir&gt;, and must conform to the default S1000D issue of this tool (4.2).
 
+-~ &lt;dir&gt;  
+Dump the built-in XML template to the specified directory.
+
 -d &lt;defaults&gt;  
 Specify the `.defaults` file name.
 

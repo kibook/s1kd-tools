@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -21,6 +21,9 @@
 #define EXIT_INVALID_ARGS 3
 #define EXIT_BAD_ISSUE 4
 #define EXIT_BAD_TEMPLATE 5
+#define EXIT_BAD_TEMPL_DIR 6
+
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
 enum issue { NO_ISS, ISS_41, ISS_42 } issue = NO_ISS;
 
@@ -580,17 +583,32 @@ void copyDefaultValue(const char *key, const char *val)
 	}
 }
 
+void dump_template(const char *path)
+{
+	FILE *f;
+
+	if (access(path, W_OK) == -1 || chdir(path)) {
+		fprintf(stderr, E_BAD_TEMPL_DIR, path);
+		exit(EXIT_BAD_TEMPL_DIR);
+	}
+
+	f = fopen("update.xml", "w");
+	fprintf(f, "%.*s", update_xml_len, update_xml);
+	fclose(f);
+}
+
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [options] <SOURCE> <TARGET>");
 	puts("");
 	puts("Options:");
-	puts("  -h -?       Show help/usage message.");
-	puts("  -@ <file>   Output to <file>.");
 	puts("  -$ <issue>  Specify which S1000D issue to use.");
+	puts("  -@ <file>   Output to <file>.");
 	puts("  -% <dir>    Use templates in specified directory.");
+	puts("  -~ <dir>    Dump built-in template to directory.");
 	puts("  -d <file>   Specify the .defaults file name.");
 	puts("  -f          Overwrite existing file.");
+	puts("  -h -?       Show help/usage message.");
 	puts("  -q          Don't report an error if file exists.");
 	puts("  -v          Print file name of new update file.");
 	puts("  --version   Show version information.");
@@ -616,7 +634,7 @@ int main(int argc, char **argv)
 	char defaultsFname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
 	xmlDocPtr defaultsXml;
 
-	const char *sopts = "@:$:%:d:fqvh?";
+	const char *sopts = "@:$:%:d:fqv~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -652,6 +670,9 @@ int main(int argc, char **argv)
 			case 'v':
 				verbose = true;
 				break;
+			case '~':
+				dump_template(optarg);
+				return 0;
 			case 'h':
 			case '?':
 				showHelp();
