@@ -25,7 +25,7 @@
 #define EXIT_BAD_TEMPLATE 6
 #define EXIT_BAD_TEMPL_DIR 7
 
-#define E_BAD_TEMPL_DIR "Cannot dump templates in directory: %s\n"
+#define E_BAD_TEMPL_DIR "Cannot dump template in directory: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -459,6 +459,7 @@ void show_help(void)
 	puts("  -$         Specify which S1000D issue to use.");
 	puts("  -@         Output to specified file.");
 	puts("  -%         Use templates in specified directory.");
+	puts("  -~         Dump built-in XML template to directory.");
 	puts("  -d         Specify the .defaults file name.");
 	puts("  -f         Overwrite existing file.");
 	puts("  -p         Prompt the user for each value.");
