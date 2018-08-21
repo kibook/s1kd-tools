@@ -389,7 +389,7 @@ The annotation is now simplified to remove resolved assertions. Because the vers
 
 > **Note**
 >
-> The -A option may change the *meaning* of certain applicability annotation without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
+> The -A option may change the *meaning* of certain applicability annotations without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
 
 Applicability of an instance (-W, -Y, -y)
 -----------------------------------------
