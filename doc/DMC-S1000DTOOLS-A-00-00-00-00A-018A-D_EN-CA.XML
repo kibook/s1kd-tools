@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="16"/>
+        <issueDate year="2018" month="08" day="22"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt03">
+        <simplePara>Markup CSDB acronym.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -50,7 +53,7 @@
         <title>DESCRIPTION</title>
         <levelledPara>
           <title>S1000D</title>
-          <para><emphasis>S1000D</emphasis> is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a Common Source Database (CSDB) and validated against a defined set of project "business rules".</para>
+          <para><emphasis>S1000D</emphasis> is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a <acronym acronymType="at01" changeType="add" reasonForUpdateRefIds="rfu-0001"><acronymTerm>CSDB</acronymTerm><acronymDefinition>Common Source Database</acronymDefinition></acronym> and validated against a defined set of project "business rules".</para>
         </levelledPara>
         <levelledPara>
           <title>s1kd-tools</title>

@@ -9,7 +9,7 @@ DESCRIPTION
 S1000D
 ------
 
-**S1000D** is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a Common Source Database (CSDB) and validated against a defined set of project "business rules".
+**S1000D** is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a CSDB (Common Source Database) and validated against a defined set of project "business rules".
 
 s1kd-tools
 ----------
