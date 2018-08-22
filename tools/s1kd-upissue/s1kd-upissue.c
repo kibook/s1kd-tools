@@ -295,11 +295,6 @@ void upissue(const char *path)
 	bool iss30 = false;
 	char upissued_issueNumber[32];
 	char upissued_inWork[32];
-	time_t now;
-	struct tm *local;
-	int year, month, day;
-	char year_s[5], month_s[3], day_s[3];
-
 
 	strcpy(dmfile, path);
 
@@ -380,6 +375,11 @@ void upissue(const char *path)
 		}
 
 		if (set_date) {
+			time_t now;
+			struct tm *local;
+			int year, month, day;
+			char year_s[5], month_s[3], day_s[3];
+
 			issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
 
 			time(&now);
