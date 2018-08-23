@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="16"/>
+        <issueDate year="2018" month="08" day="23"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -39,6 +39,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Simplify s1kd-instance -O example.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -435,10 +438,9 @@ This information only applies to version B.
           </para>
           <para>To filter a whole publication, create a directory for the customized delivery and use the -O option of the s1kd-instance tool:</para>
           <para>
-            <verbatimText verbatimStyle="vs23">$ mkdir customerB
-$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
+            <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
           </para>
-          <para>The <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory will contain the filtered versions of these data modules.</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The newly created <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory will contain the filtered versions of these data modules.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

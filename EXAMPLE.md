@@ -415,10 +415,9 @@ When you deliver this data module to a customer with Version B, you can exclude 
 
 To filter a whole publication, create a directory for the customized delivery and use the -O option of the s1kd-instance tool:
 
-    $ mkdir customerB
     $ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML
 
-The `customerB` directory will contain the filtered versions of these data modules.
+The newly created `customerB` directory will contain the filtered versions of these data modules.
 
 Use with other version control systems
 ======================================
