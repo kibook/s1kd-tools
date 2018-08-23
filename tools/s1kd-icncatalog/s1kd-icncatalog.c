@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -324,6 +324,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 int main(int argc, char **argv)

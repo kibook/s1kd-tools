@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.5.1"
+#define VERSION "1.5.2"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -55,6 +55,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)

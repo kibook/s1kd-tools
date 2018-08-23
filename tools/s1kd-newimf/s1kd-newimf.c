@@ -11,7 +11,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -183,6 +183,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 void copy_default_value(const char *def_key, const char *def_val)

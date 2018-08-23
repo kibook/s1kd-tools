@@ -14,7 +14,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
@@ -49,6 +49,7 @@ void showHelp(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 int main(int argc, char **argv)

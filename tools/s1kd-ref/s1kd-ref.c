@@ -11,7 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.1.2"
+#define VERSION "1.1.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -906,6 +906,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 int main(int argc, char **argv)

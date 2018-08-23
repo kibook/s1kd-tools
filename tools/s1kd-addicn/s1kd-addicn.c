@@ -8,7 +8,7 @@
 #include <libxml/valid.h>
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -36,6 +36,7 @@ void showHelp(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 void addNotation(xmlDocPtr doc, const char *name, const char *sysId)

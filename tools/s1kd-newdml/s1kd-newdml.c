@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.5.1"
+#define VERSION "1.5.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -584,6 +584,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 void set_brex(xmlDocPtr doc, const char *code)

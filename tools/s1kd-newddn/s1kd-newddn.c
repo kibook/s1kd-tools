@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -264,6 +264,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 int matches_key_and_not_set(const char *key, const char *match, const char *var)

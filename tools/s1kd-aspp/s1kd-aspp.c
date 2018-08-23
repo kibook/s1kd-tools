@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.2.1"
+#define VERSION "1.2.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -579,6 +579,8 @@ void showHelp(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s, libxslt %s and libexslt %s\n",
+		xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);
 }
 
 int main(int argc, char **argv)

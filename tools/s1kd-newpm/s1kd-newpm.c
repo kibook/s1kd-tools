@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define ERR_PREFIX "s1kd-newpm: ERROR: "
 
@@ -399,6 +399,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 void copy_default_value(const char *key, const char *val)

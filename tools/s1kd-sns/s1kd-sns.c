@@ -13,7 +13,7 @@
 #endif
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -347,6 +347,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 int main(int argc, char **argv)

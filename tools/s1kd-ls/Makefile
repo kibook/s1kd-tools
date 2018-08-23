@@ -1,8 +1,7 @@
 SOURCE=s1kd-ls.c
 OUTPUT=s1kd-ls
 
-CFLAGS=-Wall -Werror -O3 `pkg-config --cflags libxml-2.0`
-LDFLAGS=`pkg-config --libs libxml-2.0`
+CFLAGS=-Wall -Werror -O3
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
