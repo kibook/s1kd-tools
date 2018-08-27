@@ -56,7 +56,7 @@
         <title>s1kd-tools</title>
         <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
       </figure>
-      <para>A set of small, free and open source software tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
+      <para changeType="modify" reasonForUpdateRefIds="rfu-0002">A set of small, free and open source software tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
       <para>
         <randomList>
           <listItem>
