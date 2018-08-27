@@ -1,6 +1,6 @@
 ![s1kd-tools](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01.PNG)
 
-A set of small, free and open source tools for manipulating [S1000D](http://www.s1000d.org) data.
+A set of small, free and open source software tools for manipulating [S1000D](http://www.s1000d.org) data.
 
 -   [Introduction](INTRO.md)
 

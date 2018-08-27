@@ -45,6 +45,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
         <simplePara>Add link to GitLab repo.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
+        <simplePara>Include the word "software" in the description.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -53,7 +56,7 @@
         <title>s1kd-tools</title>
         <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
       </figure>
-      <para>A set of small, free and open source tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
+      <para>A set of small, free and open source software tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
       <para>
         <randomList>
           <listItem>
