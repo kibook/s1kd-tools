@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,8 +32,9 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-dfIilNqRrv] [-s <status>] [-1 <type>] [-2 <type>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
-	puts("  -1 <type>    Set first verification type");
-	puts("  -2 <type>    Set second verification type");
+	puts("  -1 <type>    Set first verification type.");
+	puts("  -2 <type>    Set second verification type.");
+	puts("  -c <reason>  Add an RFU to the upissued object.");
 	puts("  -d           Do not write anything, only print new filename.");
 	puts("  -f           Overwrite existing upissued object.");
 	puts("  -I           Do not change issue date.");
@@ -267,6 +268,47 @@ void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 	}
 }
 
+/* Add RFUs to the upissued object. */
+#define ISS_30_RFU_PATH "(//qa|//sbc|//fic|//ein|//skill|//rfu)[last()]"
+#define ISS_4X_RFU_PATH "(//qualityAssurance|//systemBreakdownCode|//functionalItemCode|//functionalItemRef|//skillLevel|//reasonForUpdate)[last()]"
+
+void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
+{
+	xmlNodePtr node, cur, next;
+
+	node = firstXPathNode(iss30 ? ISS_30_RFU_PATH : ISS_4X_RFU_PATH, doc);
+
+	if (!node) {
+		return;
+	}
+
+	next = xmlNextElementSibling(node);
+
+	while (next && (
+		xmlStrcmp(next->name, BAD_CAST "rfu") == 0 ||
+		xmlStrcmp(next->name, BAD_CAST "reasonForUpdate") == 0)) {
+		node = next;
+		next = xmlNextElementSibling(node);
+	}
+
+	for (cur = rfus->last; cur; cur = cur->prev) {
+		xmlNodePtr rfu;
+
+		if (iss30) {
+			xmlAddNextSibling(node, xmlCopyNode(cur, 1));
+		} else {
+			xmlChar *content;
+
+			rfu = xmlNewNode(NULL, BAD_CAST "reasonForUpdate");
+			content = xmlNodeGetContent(cur);
+			xmlNewChild(rfu, NULL, BAD_CAST "simplePara", content);
+			xmlFree(content);
+
+			xmlAddNextSibling(node, rfu);
+		}
+	}
+}
+
 /* Upissue options */
 bool verbose = false;
 bool newissue = false;
@@ -280,6 +322,7 @@ bool set_unverif = true;
 bool dry_run = false;
 char *firstver = NULL;
 char *secondver = NULL;
+xmlNodePtr rfus = NULL;
 
 void upissue(const char *path)
 {
@@ -398,6 +441,7 @@ void upissue(const char *path)
 		}
 
 		set_qa(dmdoc, firstver, secondver, iss30);
+		add_rfus(dmdoc, rfus, iss30);
 
 		/* Default status is "new" before issue 1, and "changed" after */
 		if (issueNumber_int < 1 && !status) {
@@ -482,12 +526,14 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:dlh?";
+	const char *sopts = "ivs:NfrRIq1:2:dlc:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	rfus = xmlNewNode(NULL, BAD_CAST "rfus");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -502,6 +548,9 @@ int main(int argc, char **argv)
 				break;
 			case '2':
 				secondver = strdup(optarg);
+				break;
+			case 'c':
+				xmlNewChild(rfus, NULL, BAD_CAST "rfu", BAD_CAST optarg);
 				break;
 			case 'd':
 				dry_run = true;
@@ -564,6 +613,7 @@ int main(int argc, char **argv)
 	free(firstver);
 	free(secondver);
 	free(status);
+	xmlFreeNode(rfus);
 
 	xmlCleanupParser();
 

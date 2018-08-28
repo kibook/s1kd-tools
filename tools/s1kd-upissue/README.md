@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-upissue [-dfIilNqRrv] [-1 <type>] [-2 <type>]
-                 [-s <status>] [<file>...]
+                 [-c <reason>] [-s <status>] [<file>...]
 
 DESCRIPTION
 ===========
@@ -24,6 +24,9 @@ Set first verification type (tabtop, onobject, ttandoo).
 
 -2 &lt;type&gt;  
 Set second verification type (tabtop, onobject, ttandoo).
+
+-c &lt;reason&gt;  
+Add a reason for update to the upissued objects. Multiple RFUs can be added by specifying this option multiple times.
 
 -d  
 Do not actually create or modify any files, only print the name of the file that would be created or modified.
