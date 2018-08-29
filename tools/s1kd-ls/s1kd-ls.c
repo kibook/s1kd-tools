@@ -7,12 +7,14 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 /* Maximum number of CSDB objects of each type. */
 #define OBJECT_MAX 10240
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.0.2"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -34,7 +36,17 @@
 #define SHOW_DDN 0x10
 #define SHOW_DML 0x20
 
+/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
+ * XML_PARSE_NOENT is not specified.
+ */
+#if LIBXML_VERSION < 20902
+#define PARSE_OPTS XML_PARSE_NONET
+#else
+#define PARSE_OPTS 0
+#endif
+
 char sep = '\n';
+int no_issue = 0;
 
 void printfiles(char files[OBJECT_MAX][PATH_MAX], int n)
 {
@@ -110,6 +122,7 @@ void show_help(void)
 	puts("  -L         List DMLs");
 	puts("  -l         Show only latest official/inwork issue");
 	puts("  -M         List ICN metadata files");
+	puts("  -N         Assume issue/inwork numbers are omitted");
 	puts("  -o         Show only old official/inwork issues");
 	puts("  -P         List publication modules");
 	puts("  -r         Recursively search directories");
@@ -122,6 +135,7 @@ void show_help(void)
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 int is_directory(const char *path, int recursive)
@@ -234,12 +248,57 @@ void list_dir(const char *path,
 	closedir(dir);
 }
 
+/* Return the first node matching an XPath expression. */
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
+
+	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		first = NULL;
+	} else {
+		first = obj->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
+}
+
+/* Return the content of the first node matching an XPath expression. */
+xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+{
+	return xmlNodeGetContent(first_xpath_node(doc, node, xpath));
+}
+
 /* Checks if a CSDB object is in the official state (inwork = 00). */
 int is_official_issue(const char *fname)
 {
-	char inwork[3] = "";
-	sscanf(fname, "%*[^_]_%*[^-]-%2s", inwork);
-	return strcmp(inwork, "00") == 0;
+	if (no_issue) {
+		xmlDocPtr doc;
+		xmlChar *inwork;
+		int official;
+
+		doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+		inwork = first_xpath_value(doc, NULL, "//@inWork|//@inwork");
+		official = xmlStrcmp(inwork, BAD_CAST "00") == 0;
+
+		xmlFree(inwork);
+		xmlFreeDoc(doc);
+
+		return official;
+	} else {
+		char inwork[3] = "";
+		sscanf(fname, "%*[^_]_%*[^-]-%2s", inwork);
+		return strcmp(inwork, "00") == 0;
+	}
 }
 
 /* Copy only the latest issues of CSDB objects. */
@@ -370,7 +429,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDiLlMPrwXoIh?";
+	const char *sopts = "0CDiLlMPrwXoINh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -398,6 +457,7 @@ int main(int argc, char **argv)
 			case 'X': show |= SHOW_DDN; break;
 			case 'o': only_old = 1; break;
 			case 'I': only_inwork = 1; break;
+			case 'N': no_issue = 1; break;
 			case 'h':
 			case '?': show_help();
 				  return 0;
@@ -631,6 +691,8 @@ int main(int argc, char **argv)
 	free(dmls);
 	free(latest_dmls);
 	free(issue_dmls);
+
+	xmlCleanupParser();
 
 	return 0;
 }

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="6" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="08" day="29"/>
         <dmTitle>
           <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,11 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Document additional arguments.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add -N option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Improve the descriptions of the tool.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -47,17 +50,18 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-ls - List CSDB objects</para>
+        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-ls - List CSDB objects in a directory hierarchy</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-ls [-0CDIiLlMoPrwX] [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDIiLlMNoPrwX] [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-ls</emphasis> tool lists CSDB objects in a directory hierarchy.</para>
+        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-ls</emphasis> tool searches the current directory or specified directory trees and lists the file names of CSDB objects matching certain criteria.</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">The files representing the CSDB objects must use either the standard S1000D file naming conventions, or the alternate naming convention supported by these tools using the -N option.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -99,6 +103,12 @@
                 <para>Show only the latest official/inwork issue of objects.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-N</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the files being listed do not include the issue info in their filenames, i.e. they were created using the -N option of the s1kd-new* tools.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-o</listItemTerm>
               <listItemDefinition>
@@ -123,7 +133,7 @@
                 <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>&lt;object&gt;|&lt;dir&gt; ...</listItemTerm>
               <listItemDefinition>
                 <para>An optional list of CSDB objects to list or directories to search for CSDB objects in. If none are specified, CSDB objects in  the current directory are listed by default.</para>
