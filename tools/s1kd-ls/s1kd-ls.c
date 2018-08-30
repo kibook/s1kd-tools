@@ -14,7 +14,7 @@
 #define OBJECT_MAX 10240
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -111,7 +111,7 @@ int isdml(const char *name)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-CDiLlMPrwX] [<object>|<dir> ...]");
+	puts("Usage: " PROG_NAME " [-0CDIiLlMNoPrwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -0         Output null-delimited list");
@@ -279,15 +279,25 @@ xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 }
 
 /* Checks if a CSDB object is in the official state (inwork = 00). */
-int is_official_issue(const char *fname)
+int is_official_issue(const char *fname, const char *path)
 {
 	if (no_issue) {
 		xmlDocPtr doc;
 		xmlChar *inwork;
 		int official;
 
-		doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+		doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+
+		if (!doc) {
+			return 1;
+		}
+
 		inwork = first_xpath_value(doc, NULL, "//@inWork|//@inwork");
+
+		if (!inwork) {
+			return 1;
+		}
+
 		official = xmlStrcmp(inwork, BAD_CAST "00") == 0;
 
 		xmlFree(inwork);
@@ -296,8 +306,9 @@ int is_official_issue(const char *fname)
 		return official;
 	} else {
 		char inwork[3] = "";
-		sscanf(fname, "%*[^_]_%*[^-]-%2s", inwork);
-		return strcmp(inwork, "00") == 0;
+		int n;
+		n = sscanf(fname, "%*[^_]_%*3s-%2s", inwork);
+		return n < 1 || strcmp(inwork, "00") == 0;
 	}
 }
 
@@ -370,7 +381,7 @@ int extract_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX]
 		char *name = strdup(files[i]);
 		char *base = basename(name);
 
-		if (is_official_issue(base)) {
+		if (is_official_issue(base, files[i])) {
 			strcpy(official[nofficial++], files[i]);
 		}
 
@@ -386,7 +397,7 @@ int remove_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][
 		char *name = strdup(files[i]);
 		char *base = basename(name);
 
-		if (!is_official_issue(base)) {
+		if (!is_official_issue(base, files[i])) {
 			strcpy(official[nofficial++], files[i]);
 		}
 
