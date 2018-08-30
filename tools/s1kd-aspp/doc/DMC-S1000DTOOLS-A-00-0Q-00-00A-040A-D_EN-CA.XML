@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="Q" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="08" day="30"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -l option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001" changeMark="1">s1kd-aspp [-g [-A &lt;ACT&gt;]... [-C &lt;CCT&gt;]... [-G &lt;XSL&gt;]]
+          <verbatimText verbatimStyle="vs24">s1kd-aspp [-g [-A &lt;ACT&gt;]... [-C &lt;CCT&gt;]... [-G &lt;XSL&gt;]]
           [-p [-a &lt;ID&gt;]] [-cdflxh?] [&lt;modules&gt;...]</verbatimText>
         </para>
       </levelledPara>
@@ -124,7 +121,7 @@
                 <para>Generate display text for applicability statements.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeType="add" reasonForUpdateRefIds="rfu-0001" changeMark="1">
+            <definitionListItem>
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of modules, rather than modules themselves.</para>

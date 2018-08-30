@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="2" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="08" day="30"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Remove unused -D option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-flqvx] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-flqvx] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -82,7 +79,7 @@
                 <para>Treat input as a list of object names to validate, rather than an object itself.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-v -q</listItemTerm>
               <listItemDefinition>
                 <para>Set the verbosity of the output, verbose or quiet. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.</para>
