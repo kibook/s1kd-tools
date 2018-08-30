@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE pm [
-]>
+<!DOCTYPE pm>
 <pm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/pm.xsd">
   <identAndStatusSection>
     <pmAddress>
@@ -37,7 +36,7 @@
   </identAndStatusSection>
   <content>
     <pmEntry>
-      <pmEntryTitle></pmEntryTitle>
+      <pmEntryTitle/>
     </pmEntry>
   </content>
 </pm>
