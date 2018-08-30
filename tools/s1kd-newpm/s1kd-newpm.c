@@ -717,7 +717,7 @@ int main(int argc, char **argv)
 			pm_volume);
 
 		if (n != 4) {
-			fprintf(stderr, ERR_PREFIX "Bad pub module code.\n");
+			fprintf(stderr, ERR_PREFIX "Bad publication module code.\n");
 			exit(EXIT_BAD_PMC);
 		}
 	}
