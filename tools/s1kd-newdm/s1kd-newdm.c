@@ -46,7 +46,7 @@
 #define MAX_INFO_NAME 256
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.2"
+#define VERSION "1.7.3"
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
@@ -100,7 +100,7 @@ char *maint_sns = NULL;
 char issue_date[16] = "";
 
 xmlChar *remarks = NULL;
-xmlChar *skill_level_code;
+xmlChar *skill_level_code = NULL;
 
 /* Omit the issue information from the object filename. */
 bool no_issue = false;
