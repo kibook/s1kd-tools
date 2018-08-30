@@ -71,7 +71,6 @@ The object(s) to show/edit metadata on. The default is to read from stdin.
 EXAMPLE
 =======
 
-
     $ ls
     DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
     DMC-S1000DTOOLS-A-00-0Q-00-00A-040A-D_EN-CA.XML
