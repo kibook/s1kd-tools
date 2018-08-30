@@ -18,9 +18,9 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.4.2"
+#define VERSION "1.4.3"
 
-#define ERR_PREFIX "s1kd-newpm: ERROR: "
+#define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_BAD_PMC 1
 #define EXIT_PM_EXISTS 2
@@ -213,7 +213,7 @@ xmlNodePtr find_child(xmlNodePtr parent, char *name)
 		}
 	}
 
-	exit(1);
+	return NULL;
 }
 
 void prompt(const char *prompt, char *str, int n)
