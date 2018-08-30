@@ -46,6 +46,9 @@ Alphabetic index
 | `responsiblePartnerCompanyCode` | 5-character NCAGE code                   |
 | `responsiblePartnerCompany`     | string                                   |
 | `schema`                        | URI                                      |
+| `scormContentPackageIssuer`     | 5-character NCAGE code                   |
+| `scormContentPackageNumber`     | 5 alphanumeric characters                |
+| `scormContentPackageVolume`     | 2 digits                                 |
 | `securityClassification`        | 2 digits                                 |
 | `sender`                        | string                                   |
 | `senderIdent`                   | 5-character NCAGE code                   |

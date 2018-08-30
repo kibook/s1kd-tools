@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="004" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="16"/>
+        <issueDate year="2018" month="08" day="30"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02">
+        <simplePara>Add defaults for s1kd-newsmc tool.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -442,6 +445,36 @@
                 </entry>
                 <entry>
                   <para>URI</para>
+                </entry>
+              </row>
+              <row changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">scormContentPackageIssuer</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">scormContentPackageNumber</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">scormContentPackageVolume</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 digits</para>
                 </entry>
               </row>
               <row>

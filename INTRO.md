@@ -125,6 +125,8 @@ Manpages for each tool:
 
 -   s1kd-newpm(1)
 
+-   s1kd-newsmc(1)
+
 -   s1kd-newupf(1)
 
 -   s1kd-ref(1)

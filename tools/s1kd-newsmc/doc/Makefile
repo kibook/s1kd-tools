@@ -1,0 +1,26 @@
+SOURCE=DMC-S1000DTOOLS-A-00-0Z-00-00A-040A-D_EN-CA.XML
+OUTPUT=s1kd-newsmc.1
+README=../README.md
+
+PREFIX=/usr/local
+MAN_PREFIX=$(PREFIX)/share/man/man1
+INSTALL=install
+
+all: $(OUTPUT) $(README)
+
+$(README): $(SOURCE)
+	s1kd2db $(SOURCE) | pandoc -f docbook -t markdown_github -s -o $(README)
+
+$(OUTPUT): $(SOURCE)
+	s1kd2db $(SOURCE) | pandoc -f docbook -t man -s -o $(OUTPUT)
+
+.PHONY: clean install uninstall
+
+clean:
+	rm -f $(OUTPUT) $(README)
+
+install: $(OUTPUT)
+	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)
+
+uninstall:
+	rm -f $(MAN_PREFIX)/$(OUTPUT)
