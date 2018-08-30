@@ -19,7 +19,7 @@ s1kd-addicn.1: $(SOURCE)
 clean:
 	rm -f $(OUTPUT) $(README)
 
-install: $(OUTPUT)
+install:
 	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)
 
 uninstall:
