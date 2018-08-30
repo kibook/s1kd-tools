@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="8" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="08" day="30"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Remove extra space from example.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -152,8 +155,7 @@ itemLocationCode="D"/>
         </para>
         <para>Reference to data module with data module code and issue/language:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[
-$ s1kd-ref -il DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -il DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA
 <dmRef>
 <dmRefIdent>
 <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
@@ -167,7 +169,7 @@ itemLocationCode="D"/>
         </para>
         <para>Reference to data module with all information, from a file:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -dilt DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA.XML
+          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ s1kd-ref -dilt DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA.XML
 <dmRef>
 <dmRefIdent>
 <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
