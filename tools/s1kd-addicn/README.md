@@ -36,3 +36,8 @@ Show version information.
 
 &lt;ICN&gt;..  
 Any number of ICN files to add.
+
+EXAMPLE
+=======
+
+    $ s1kd-addicn -fs <DM> ICN-EX-12345-001-01.JPG
