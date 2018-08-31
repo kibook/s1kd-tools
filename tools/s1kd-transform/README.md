@@ -56,3 +56,8 @@ The -i option includes an "identity" template in to each stylesheet specified wi
     </xsl:template>
 
 This means that any attributes or nodes which are not matched by a more specific template in the user-specified stylesheet are copied.
+
+EXAMPLE
+=======
+
+    $ s1kd-transform -s <XSL> <DM1> <DM2> ...
