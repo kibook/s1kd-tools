@@ -6,8 +6,8 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-dfIilNqRrv] [-1 <type>] [-2 <type>]
-                 [-c <reason>] [-s <status>] [<file>...]
+    s1kd-upissue [-dfHIilNqRrv] [-1 <type>] [-2 <type>]
+                 [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
 
 DESCRIPTION
 ===========
@@ -34,6 +34,9 @@ Do not actually create or modify any files, only print the name of the file that
 -f  
 Overwrite existing upissued CSDB objects.
 
+-H  
+Mark the last specified reason for update (-c) as a highlight.
+
 -I  
 Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.
 
@@ -57,6 +60,9 @@ Keep old RFUs. Normally, when upissuing an offical CSDB object to the first in-w
 
 -s &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.
+
+-t &lt;urt&gt;  
+Set the updateReasonType of the last specified reason for update (-c).
 
 -v  
 Print the file name of the upissued CSDB object.

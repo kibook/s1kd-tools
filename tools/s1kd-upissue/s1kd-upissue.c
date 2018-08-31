@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfIilNqRrv] [-s <status>] [-1 <type>] [-2 <type>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-dfHIilNqRrv] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1 <type>    Set first verification type.");
@@ -45,6 +45,8 @@ void show_help(void)
 	puts("  -R           Only delete change marks associated with an RFU.");
 	puts("  -r           Keep RFUs from old issue.");
 	puts("  -s <status>  Set change status type.");
+	puts("  -t <urt>     Set the updateReasonType of the last RFU.");
+	puts("  -H           Highlight the last RFU.");
 	puts("  -v           Print filename of upissued objects.");
 	puts("  --version    Show version information");
 }
@@ -294,18 +296,22 @@ void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 	for (cur = rfus->last; cur; cur = cur->prev) {
 		xmlNodePtr rfu;
 
+		rfu = xmlCopyNode(cur, 1);
+
 		if (iss30) {
-			xmlAddNextSibling(node, xmlCopyNode(cur, 1));
+			xmlNodeSetName(rfu, BAD_CAST "rfu");
+			xmlUnsetProp(rfu, BAD_CAST "updateReasonType");
+			xmlUnsetProp(rfu, BAD_CAST "updateHighlight");
 		} else {
 			xmlChar *content;
 
-			rfu = xmlNewNode(NULL, BAD_CAST "reasonForUpdate");
-			content = xmlNodeGetContent(cur);
+			content = xmlNodeGetContent(rfu);
+			xmlNodeSetContent(rfu, NULL);
 			xmlNewChild(rfu, NULL, BAD_CAST "simplePara", content);
 			xmlFree(content);
-
-			xmlAddNextSibling(node, rfu);
 		}
+
+		xmlAddNextSibling(node, rfu);
 	}
 }
 
@@ -526,7 +532,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:dlc:h?";
+	const char *sopts = "ivs:NfrRIq1:2:dlc:t:Hh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -550,7 +556,7 @@ int main(int argc, char **argv)
 				secondver = strdup(optarg);
 				break;
 			case 'c':
-				xmlNewChild(rfus, NULL, BAD_CAST "rfu", BAD_CAST optarg);
+				xmlNewChild(rfus, NULL, BAD_CAST "reasonForUpdate", BAD_CAST optarg);
 				break;
 			case 'd':
 				dry_run = true;
@@ -583,6 +589,12 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				status = strdup(optarg);
+				break;
+			case 't':
+				xmlSetProp(rfus->last, BAD_CAST "updateReasonType", BAD_CAST optarg);
+				break;
+			case 'H':
+				xmlSetProp(rfus->last, BAD_CAST "updateHighlight", BAD_CAST "1");
 				break;
 			case 'v':
 				verbose = true;

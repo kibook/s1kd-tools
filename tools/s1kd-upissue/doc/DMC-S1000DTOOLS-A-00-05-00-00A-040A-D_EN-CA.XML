@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="5" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="01"/>
+        <issueInfo issueNumber="012" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="28"/>
+        <issueDate year="2018" month="08" day="31"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -c option.</simplePara>
+        <simplePara>Add -c, -t and -H options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,8 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-upissue [-dfIilNqRrv] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
-             [-c &lt;reason&gt;] [-s &lt;status&gt;] [&lt;file&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-upissue [-dfHIilNqRrv] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
+             [-c &lt;reason&gt;] [-s &lt;status&gt;] [-t &lt;urt&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -93,6 +93,12 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing upissued CSDB objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-H</listItemTerm>
+              <listItemDefinition>
+                <para>Mark the last specified reason for update (-c) as a highlight.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -141,6 +147,12 @@
               <listItemTerm>-s &lt;status&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the status of the new issue. Default is 'changed'.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-t &lt;urt&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the updateReasonType of the last specified reason for update (-c).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
