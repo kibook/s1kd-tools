@@ -42,3 +42,8 @@ Show version information.
 
 &lt;object&gt;...  
 CSDB object(s) to list references in. If none are specified, the tool will read from stdin.
+
+EXAMPLE
+=======
+
+    $ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
