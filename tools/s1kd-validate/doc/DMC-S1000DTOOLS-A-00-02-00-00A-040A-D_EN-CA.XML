@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="2" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="01"/>
+        <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="30"/>
+        <issueDate year="2018" month="08" day="31"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add example.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -136,6 +139,12 @@ rewritePrefix="/usr/share/s1kd/schemas/"/>
           </para>
           <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>) to remove the need to use the -d option.</para>
         </levelledPara>
+      </levelledPara>
+      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-validate DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
+        </para>
       </levelledPara>
     </description>
   </content>

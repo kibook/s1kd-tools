@@ -68,3 +68,8 @@ Below is an example of a catalog file which maps the S1000D schemas to a local d
     </catalog>
 
 This can be placed in a catalog file automatically loaded by libxml2 (e.g., `/etc/xml/catalog`) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., `XML_CATALOG_FILES`) to remove the need to use the -d option.
+
+EXAMPLE
+=======
+
+    $ s1kd-validate DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
