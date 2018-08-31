@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="M" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="01"/>
+        <issueInfo issueNumber="008" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="20"/>
+        <issueDate year="2018" month="08" day="31"/>
         <dmTitle>
           <techName>s1kd-dmrl(1) | s1kd-tools</techName>
         </dmTitle>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
         <simplePara>Add -$ option to synopsis.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
+        <simplePara>Add example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -133,6 +136,12 @@
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0003">
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-dmrl DML-EX-12345-C-2018-00001_001-00.XML</verbatimText>
         </para>
       </levelledPara>
     </description>

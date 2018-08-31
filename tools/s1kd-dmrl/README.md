@@ -48,3 +48,8 @@ Show version information.
 
 &lt;DML&gt;...  
 One or more S1000D data management lists.
+
+EXAMPLE
+=======
+
+    $ s1kd-dmrl DML-EX-12345-C-2018-00001_001-00.XML
