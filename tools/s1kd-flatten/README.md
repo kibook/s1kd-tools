@@ -50,3 +50,8 @@ When using the -p option, the filenames to include can be specified manually as 
 
 &lt;PM&gt;  
 The publication module to flatten.
+
+EXAMPLE
+=======
+
+    $ s1kd-flatten -x PMC-EX-12345-00001-00_001-00_EN-CA.XML > Book.xml
