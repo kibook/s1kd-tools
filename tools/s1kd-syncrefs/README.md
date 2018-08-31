@@ -33,3 +33,8 @@ Show version information.
 
 &lt;data module&gt;...  
 The data module(s) to synchronize references in. Default is to read from stdin.
+
+EXAMPLE
+=======
+
+    $ s1kd-syncrefs -f DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
