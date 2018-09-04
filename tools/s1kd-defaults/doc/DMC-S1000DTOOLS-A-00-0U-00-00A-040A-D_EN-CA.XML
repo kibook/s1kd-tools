@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="U" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="09" day="04"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -143,7 +146,7 @@
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>
           <para>This file specifies a mapping between BREX structure object rules and <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. The path to an object can be written in many different ways in a BREX rule, so the <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file allows any project's BREX to be used to generate these files without having to modify the BREX data module itself.</para>
-          <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> in the current directory, but any file can be specified using the -j option. If there is no <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file and the -j option is not specified, a default mapping will be used.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> in the current directory and parent directories, but any file can be specified using the -j option. If there is no <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file and the -j option is not specified, a default mapping will be used.</para>
           <para>Example of <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<brexMap>

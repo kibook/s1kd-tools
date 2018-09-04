@@ -84,7 +84,7 @@ Data modules to find acronyms in. If none are specified, input is taken from std
 `.acronyms` file
 ----------------
 
-This file specifies a list of acronyms for a project. By default, the program will search for a file named `.acronyms` in the current directory, but any file can be specified using the -M option.
+This file specifies a list of acronyms for a project. By default, the program will search for a file named `.acronyms` in the current directory and parent directories, but any file can be specified using the -M option.
 
 Example of .acronyms file format:
 

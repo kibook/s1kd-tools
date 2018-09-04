@@ -67,7 +67,7 @@ Front matter data modules to generate content for.
 `.fmtypes` file
 ---------------
 
-This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named `.fmtypes` in the current directory, but any file can be specified using the -F option.
+This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named `.fmtypes` in the current directory and parent directories, but any file can be specified using the -F option.
 
 Example of simple text format:
 

@@ -72,7 +72,7 @@ Business rule severity levels (`.brseveritylevels`)
 
 The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The `.brseveritylevels` file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.
 
-By default, the program will search the current directory for a file named `.brseveritylevels`, but any file can be specified by using the -w option.
+By default, the program will search the current directory and parent directories for a file named `.brseveritylevels`, but any file can be specified by using the -w option.
 
 An example of the format of this file is given below:
 

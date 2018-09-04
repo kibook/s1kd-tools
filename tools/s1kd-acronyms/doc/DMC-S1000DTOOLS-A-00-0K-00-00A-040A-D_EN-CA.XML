@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="K" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="17"/>
+        <issueDate year="2018" month="09" day="04"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -181,7 +184,7 @@ s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]]]></verbatimText>
         </para>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file</title>
-          <para>This file specifies a list of acronyms for a project. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> in the current directory, but any file can be specified using the -M option.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This file specifies a list of acronyms for a project. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> in the current directory and parent directories, but any file can be specified using the -M option.</para>
           <para>Example of .acronyms file format:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<acronyms>

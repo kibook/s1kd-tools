@@ -42,7 +42,7 @@ Show version information.
 `.indexflags` file
 ------------------
 
-This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named `.indexflags` in the current directory, but any file can be specified using the -I option.
+This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named `.indexflags` in the current directory or parent directories, but any file can be specified using the -I option.
 
 Exmaple of `.indexflags` file format:
 

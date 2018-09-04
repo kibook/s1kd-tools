@@ -60,7 +60,7 @@ Names of files to convert. If none are specified, the default names of `.default
 
 This file specifies a mapping between BREX structure object rules and `.defaults` and `.dmtypes` files. The path to an object can be written in many different ways in a BREX rule, so the `.brexmap` file allows any project's BREX to be used to generate these files without having to modify the BREX data module itself.
 
-By default, the program will search for a file named `.brexmap` in the current directory, but any file can be specified using the -j option. If there is no `.brexmap` file and the -j option is not specified, a default mapping will be used.
+By default, the program will search for a file named `.brexmap` in the current directory and parent directories, but any file can be specified using the -j option. If there is no `.brexmap` file and the -j option is not specified, a default mapping will be used.
 
 Example of `.brexmap` file:
 
