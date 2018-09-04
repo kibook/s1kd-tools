@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.4"
+#define VERSION "1.7.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -371,7 +371,7 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 void set_brex(xmlDocPtr doc, const char *code)
 {
 	xmlNodePtr dmCode;
-	int n;
+	int n, offset;
 
 	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -389,7 +389,9 @@ void set_brex(xmlDocPtr doc, const char *code)
 
 	dmCode = firstXPathNode(doc, NULL, "//brexDmRef/dmRef/dmRefIdent/dmCode");
 
-	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+	offset = strncmp(code, "DMC-", 4) == 0 ? 4 : 0;
+
+	n = sscanf(code + offset, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
 		modelIdentCode,
 		systemDiffCode,
 		systemCode,
@@ -464,13 +466,16 @@ bool find_brex_file(char *dst, const char *code)
 	struct dirent *cur;
 	int n = strlen(code);
 	bool found = false;
+	int offset;
 
 	dir = opendir(".");
 
 	strcpy(dst, "");
 
+	offset = strncmp(code, "DMC-", 4) == 0 ? 4 : 0;
+
 	while ((cur = readdir(dir))) {
-		if (strncmp(code, cur->d_name + 4, n) == 0 && strcmp(cur->d_name, dst) > 0) {
+		if (strncmp(code + offset, cur->d_name + 4, n) == 0 && strcmp(cur->d_name, dst) > 0) {
 			strcpy(dst, cur->d_name);
 			found = true;
 		}
@@ -479,7 +484,7 @@ bool find_brex_file(char *dst, const char *code)
 	closedir(dir);
 
 	if (!found) {
-		fprintf(stderr, E_BREX_NOT_FOUND, code);
+		fprintf(stderr, E_BREX_NOT_FOUND, code + offset);
 		exit(EXIT_BAD_BREX_DMC);
 	}
 
