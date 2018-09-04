@@ -6,10 +6,16 @@
 #include <dirent.h>
 #include <libgen.h>
 #include <stdbool.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
+
 #include "templates.h"
 #include "s1kd_tools.h"
 

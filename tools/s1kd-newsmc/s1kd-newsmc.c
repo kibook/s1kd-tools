@@ -8,6 +8,10 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 

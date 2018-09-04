@@ -6,6 +6,11 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>

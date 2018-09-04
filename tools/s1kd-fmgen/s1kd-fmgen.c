@@ -4,9 +4,15 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xinclude.h>
 #include <libxslt/transform.h>
+
 #include "s1kd_tools.h"
 #include "xsl.h"
 

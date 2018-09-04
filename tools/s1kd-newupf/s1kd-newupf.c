@@ -4,10 +4,16 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <getopt.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/debugXML.h>
 #include <libxslt/transform.h>
+
 #include "templates.h"
 #include "s1kd_tools.h"
 

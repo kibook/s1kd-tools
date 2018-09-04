@@ -4,10 +4,16 @@
 #include <stdbool.h>
 #include <string.h>
 #include <libgen.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xinclude.h>
 #include <libxml/valid.h>
 #include <libxml/xpath.h>
+
 #include "templates.h"
 #include "s1kd_tools.h"
 

@@ -3,6 +3,11 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -10,6 +15,7 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 #include <libxml/debugXML.h>
+
 #include "stylesheets.h"
 #include "s1kd_tools.h"
 

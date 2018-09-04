@@ -3,9 +3,15 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/transform.h>
+
 #include "xslt.h"
 #include "s1kd_tools.h"
 

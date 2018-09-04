@@ -5,6 +5,11 @@
 #include <stdbool.h>
 #include <libxml/tree.h>
 #include <libxslt/transform.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "xsl.h"
 #include "defaults.h"
 #include "s1kd_tools.h"
