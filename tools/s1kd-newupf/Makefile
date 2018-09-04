@@ -1,4 +1,4 @@
-SOURCE=s1kd-newupf.c
+SOURCE=s1kd-newupf.c ../common/s1kd_tools.c
 OUTPUT=s1kd-newupf
 
 CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0 libxslt`

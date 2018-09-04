@@ -7,10 +7,6 @@
 #include <dirent.h>
 #include <libgen.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
@@ -28,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.3.3"
+#define VERSION "1.3.4"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -568,18 +564,6 @@ xmlChar *brsl_type(xmlChar *severity)
 	xmlXPathFreeContext(ctx);
 
 	return type;
-}
-
-char *real_path(const char *path, char *real)
-{
-	#ifdef _WIN32
-	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
-	#else
-	if (!realpath(path, real)) {
-	#endif
-		strcpy(real, path);
-	}
-	return real;
 }
 
 void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
@@ -1230,35 +1214,6 @@ const char *default_brex_dmc(xmlDocPtr doc)
 	xmlFree(schema);
 
 	return code;
-}
-
-/* Search up the directory tree to find a configuration file. */
-bool find_config(char *dst, const char *name)
-{
-	char cwd[PATH_MAX], prev[PATH_MAX];
-	bool found = true;
-
-	real_path(".", cwd);
-	strcpy(prev, cwd);
-
-	while (access(name, F_OK) == -1) {
-		char cur[PATH_MAX];
-
-		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
-			found = false;
-			break;
-		}
-
-		strcpy(prev, cur);
-	}
-
-	if (found) {
-		real_path(name, dst);
-	} else {
-		strcpy(dst, name);
-	}
-
-	return chdir(cwd) == 0 && found;
 }
 
 int main(int argc, char *argv[])

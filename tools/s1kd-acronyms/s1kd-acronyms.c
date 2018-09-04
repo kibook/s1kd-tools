@@ -4,10 +4,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -20,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.3.4"
+#define VERSION "1.3.5"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
@@ -594,47 +590,6 @@ void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 	}
 
 	fclose(f);
-}
-
-char *real_path(const char *path, char *real)
-{
-	#ifdef _WIN32
-	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
-	#else
-	if (!realpath(path, real)) {
-	#endif
-		strcpy(real, path);
-	}
-	return real;
-}
-
-/* Search up the directory tree to find a configuration file. */
-int find_config(char *dst, const char *name)
-{
-	char cwd[PATH_MAX], prev[PATH_MAX];
-	bool found = true;
-
-	real_path(".", cwd);
-	strcpy(prev, cwd);
-
-	while (access(name, F_OK) == -1) {
-		char cur[PATH_MAX];
-
-		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
-			found = false;
-			break;
-		}
-
-		strcpy(prev, cur);
-	}
-
-	if (found) {
-		real_path(name, dst);
-	} else {
-		strcpy(dst, name);
-	}
-
-	return chdir(cwd);
 }
 
 void showHelp(void)

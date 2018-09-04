@@ -1,4 +1,4 @@
-SOURCE=s1kd-icncatalog.c
+SOURCE=s1kd-icncatalog.c ../common/s1kd_tools.c
 OUTPUT=s1kd-icncatalog
 
 CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0`

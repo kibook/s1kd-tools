@@ -1,8 +1,8 @@
+SOURCE=s1kd-newimf.c ../common/s1kd_tools.c
+OUTPUT=s1kd-newimf
+
 CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0`
 LDFLAGS=`pkg-config --libs libxml-2.0`
-
-SOURCE=s1kd-newimf.c
-OUTPUT=s1kd-newimf
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin

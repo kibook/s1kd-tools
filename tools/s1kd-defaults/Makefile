@@ -1,4 +1,4 @@
-SOURCE=s1kd-defaults.c
+SOURCE=s1kd-defaults.c ../common/s1kd_tools.c
 OUTPUT=s1kd-defaults
 
 CFLAGS=-Wall -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0 libxslt`

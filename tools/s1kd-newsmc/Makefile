@@ -1,8 +1,8 @@
+SOURCE=s1kd-newsmc.c ../common/s1kd_tools.c
+OUTPUT=s1kd-newsmc
+
 CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0 libxslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
-
-SOURCE=s1kd-newsmc.c
-OUTPUT=s1kd-newsmc
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin

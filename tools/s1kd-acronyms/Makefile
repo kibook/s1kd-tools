@@ -1,4 +1,4 @@
-SOURCE=s1kd-acronyms.c
+SOURCE=s1kd-acronyms.c ../common/s1kd_tools.c
 OUTPUT=s1kd-acronyms
 
 CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0 libxslt`

@@ -1,4 +1,4 @@
-SOURCE=s1kd-newdm.c
+SOURCE=s1kd-newdm.c ../common/s1kd_tools.c
 OUTPUT=s1kd-newdm
 
 CFLAGS=-Wall -Werror -pedantic-errors -g -I ../common `pkg-config --cflags libxml-2.0 libxslt`
