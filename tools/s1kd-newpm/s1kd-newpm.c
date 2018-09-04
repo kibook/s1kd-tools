@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.4.4"
+#define VERSION "1.4.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -368,7 +368,7 @@ void show_help(void)
 	puts("  -@ <file>      Output to specified file.");
 	puts("  -% <dir>       Use template in specified directory.");
 	puts("  -~ <dir>       Dump built-in template to directory.");
-	puts("  -D <dmtypes>   Include issue date in referenced data modules.");
+	puts("  -D             Include issue date in referenced data modules.");
 	puts("  -d <defaults>  Specify the .defaults file name.");
 	puts("  -f             Overwrite existing file.");
 	puts("  -i             Include issue info in referenced data modules.");
