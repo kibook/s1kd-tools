@@ -18,6 +18,14 @@
 #include "sns.h"
 #include "s1kd_tools.h"
 
+#define PROG_NAME "s1kd-newdm"
+#define VERSION "1.7.4"
+
+#define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump templates in directory: %s\n"
+
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
 #define MAX_SYSTEM_CODE			 3	+ 2
@@ -44,13 +52,6 @@
 
 #define MAX_TECH_NAME 256
 #define MAX_INFO_NAME 256
-
-#define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.3"
-#define ERR_PREFIX PROG_NAME ": ERROR: "
-
-#define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
-#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump templates in directory: %s\n"
 
 #define EXIT_DM_EXISTS 1
 #define EXIT_UNKNOWN_DMTYPE 2
@@ -1156,10 +1157,53 @@ void add_brex_rule(xmlNodePtr rules, xmlDocPtr brexmap, const char *key, const c
 	xmlFree(path);
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+bool find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd) == 0 && found;
+}
+
 xmlDocPtr read_default_brexmap(void)
 {
-	if (access(DEFAULT_BREXMAP_FNAME, F_OK) != -1) {
-		return xmlReadFile(DEFAULT_BREXMAP_FNAME, NULL, PARSE_OPTS);
+	char fname[PATH_MAX];
+
+	if (find_config(fname, DEFAULT_BREXMAP_FNAME)) {
+		return xmlReadFile(fname, NULL, PARSE_OPTS);
 	} else {
 		return xmlReadMemory((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len, NULL, NULL, PARSE_OPTS);
 	}
@@ -1273,8 +1317,10 @@ int main(int argc, char **argv)
 
 	FILE *defaults;
 
-	char defaults_fname[256] = DEFAULT_DEFAULTS_FNAME;
-	char dmtypes_fname[256] = DEFAULT_DMTYPES_FNAME;
+	char defaults_fname[PATH_MAX];
+	char dmtypes_fname[PATH_MAX];
+	bool custom_defaults = false;
+	bool custom_dmtypes = false;
 
 	int i;
 	int c;
@@ -1308,8 +1354,8 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'p': showprompts = true; break;
-			case 'd': strcpy(defaults_fname, optarg); break;
-			case 'D': strcpy(dmtypes_fname, optarg); break;
+			case 'd': strcpy(defaults_fname, optarg); custom_defaults = true; break;
+			case 'D': strcpy(dmtypes_fname, optarg); custom_dmtypes = true; break;
 			case 'L': strcpy(languageIsoCode, optarg); break;
 			case 'C': strcpy(countryIsoCode, optarg); break;
 			case 'n': strcpy(issueNumber, optarg); break;
@@ -1347,6 +1393,13 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?': show_help(); return 0;
 		}
+	}
+
+	if (!custom_defaults) {
+		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
+	}
+	if (!custom_dmtypes) {
+		find_config(dmtypes_fname, DEFAULT_DMTYPES_FNAME);
 	}
 
 	if (!brexmap) {

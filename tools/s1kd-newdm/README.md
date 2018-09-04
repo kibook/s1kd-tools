@@ -224,7 +224,7 @@ If this option is specified, the program will prompt the user to enter values fo
 `.defaults` file
 ----------------
 
-This file sets default values for each piece of metadata. By default, the program will search the current directory for a file named `.defaults`, but any file can be specified by using the -d option.
+This file sets default values for each piece of metadata. By default, the program will search the current directory and parent directories for a file named `.defaults`, but any file can be specified by using the -d option.
 
 All of the s1kd-new\* commands use the same `.defaults` file format, so this file can contain default values for multiple types of metadata.
 
@@ -252,7 +252,7 @@ Alternatively, the `.defaults` file can be written using an XML format, containi
 `.dmtypes` file
 ---------------
 
-This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory for a file named `.dmtypes`, but any file can be specified by using the -D option.
+This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory and parent directories for a file named `.dmtypes`, but any file can be specified by using the -D option.
 
 Each line consists of an info code, a schema identifier, and optionally a default info name. Example:
 

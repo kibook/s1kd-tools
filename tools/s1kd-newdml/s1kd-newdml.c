@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.5.2"
+#define VERSION "1.5.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -493,6 +493,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		template_dir = strdup(def_val);
 	else if (strcmp(def_key, "remarks") == 0 && !remarks)
 		remarks = xmlStrdup(BAD_CAST def_val);
+	else if (strcmp(def_key, "issue") == 0 && issue == NO_ISS)
+		issue = get_issue(def_val);
 }
 
 void add_sns(xmlNodePtr content, const char *path, const char *incode)
@@ -546,6 +548,47 @@ void dump_template(const char *path)
 	f = fopen("dml.xml", "w");
 	fprintf(f, "%.*s", dml_xml_len, dml_xml);
 	fclose(f);
+}
+
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+int find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd);
 }
 
 void show_help(void)
@@ -696,7 +739,8 @@ int main(int argc, char **argv)
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
 
-	char defaults_fname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
+	char defaults_fname[PATH_MAX];
+	bool custom_defaults = false;
 
 	bool showprompts = false;
 	char code[256];
@@ -731,7 +775,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'p': showprompts = true; break;
-			case 'd': strcpy(defaults_fname, optarg); break;
+			case 'd': strcpy(defaults_fname, optarg); custom_defaults = true; break;
 			case '#': strcpy(code, optarg); skipcode = true; break;
 			case 'n': strcpy(issue_number, optarg); break;
 			case 'w': strcpy(in_work, optarg); break;
@@ -754,6 +798,10 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?': show_help(); return 0;
 		}
+	}
+
+	if (!custom_defaults) {
+		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
 	if (!sns_incodes->children) {

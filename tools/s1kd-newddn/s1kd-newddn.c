@@ -5,6 +5,7 @@
 #include <time.h>
 #include <dirent.h>
 #include <libgen.h>
+#include <stdbool.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -13,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.4.2"
+#define VERSION "1.4.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -459,11 +460,53 @@ void dump_template(const char *path)
 	fclose(f);
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+int find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd);
+}
+
 int main(int argc, char **argv)
 {
 	int c;
 
-	char defaults_fname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
+	char defaults_fname[PATH_MAX];
+	bool custom_defaults = false;
 
 	char ddncode[256] = "";
 
@@ -506,7 +549,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'p': showprompts = 1; break;
-			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); break;
+			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); custom_defaults = true; break;
 			case '#': strncpy(ddncode, optarg, 255); skipcode = 1; break;
 			case 'o': strncpy(sender, optarg, 255); break;
 			case 'r': strncpy(receiver, optarg, 255); break;
@@ -528,6 +571,10 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?': show_help(); return 0;
 		}
+	}
+
+	if (!custom_defaults) {
+		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
 	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {

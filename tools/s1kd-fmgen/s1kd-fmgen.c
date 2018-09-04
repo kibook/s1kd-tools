@@ -11,7 +11,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -261,6 +261,45 @@ xmlDocPtr read_fmtypes(const char *path)
 	return doc;
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+bool find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	}
+
+	return chdir(cwd) == 0 && found;
+}
+
 void add_param(xmlNodePtr params, char *s)
 {
 	char *n, *v;
@@ -395,8 +434,10 @@ int main(int argc, char **argv)
 	xmlFreeNode(params_node);
 
 	if (!fmtypes) {
-		if (access(DEFAULT_FMTYPES_FNAME, F_OK) != -1) {
-			fmtypes = read_fmtypes(DEFAULT_FMTYPES_FNAME);
+		char fmtypes_fname[PATH_MAX];
+
+		if (find_config(fmtypes_fname, DEFAULT_FMTYPES_FNAME)) {
+			fmtypes = read_fmtypes(fmtypes_fname);
 		} else {
 			fmtypes = xmlReadMemory((const char *) fmtypes_xml, fmtypes_xml_len, NULL, NULL, 0);
 		}

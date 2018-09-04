@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.4.3"
+#define VERSION "1.4.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -572,6 +572,47 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+int find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd);
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr pm_doc;
@@ -597,7 +638,8 @@ int main(int argc, char **argv)
 	char pmcode[256] = "";
 	bool showprompts = false;
 	bool skippmc = false;
-	char defaults_fname[256] = DEFAULT_DEFAULTS_FNAME;
+	char defaults_fname[PATH_MAX];
+	bool custom_defaults = false;
 	bool no_issue = false;
 	char iss[8] = "";
 	bool include_issue_info = false;
@@ -628,7 +670,7 @@ int main(int argc, char **argv)
 				break;
 			case 'p': showprompts = true; break;
 			case 'D': include_date = true; break;
-			case 'd': strcpy(defaults_fname, optarg); break;
+			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); custom_defaults = true; break;
 			case '#': strcpy(pmcode, optarg); skippmc = true; break;
 			case 'L': strcpy(language_iso_code, optarg); break;
 			case 'C': strcpy(country_iso_code, optarg); break;
@@ -658,6 +700,10 @@ int main(int argc, char **argv)
 				show_help();
 				return 0;
 		}
+	}
+
+	if (!custom_defaults) {
+		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
 	defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);

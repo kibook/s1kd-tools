@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.5.1"
+#define VERSION "1.5.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_OVERWRITE 1
@@ -490,10 +490,53 @@ void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overw
 	}
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+bool find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd) == 0 && found;
+}
+
 xmlDocPtr read_default_brexmap(void)
 {
-	if (access(DEFAULT_BREXMAP_FNAME, F_OK) != -1) {
-		return xmlReadFile(DEFAULT_BREXMAP_FNAME, NULL, PARSE_OPTS);
+	char fname[PATH_MAX];
+
+	if (find_config(fname, DEFAULT_BREXMAP_FNAME)) {
+		return xmlReadFile(fname, NULL, PARSE_OPTS);
 	} else {
 		return xmlReadMemory((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len, NULL, NULL, PARSE_OPTS);
 	}

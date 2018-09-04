@@ -28,7 +28,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.3.2"
+#define VERSION "1.3.3"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -1232,6 +1232,35 @@ const char *default_brex_dmc(xmlDocPtr doc)
 	return code;
 }
 
+/* Search up the directory tree to find a configuration file. */
+bool find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd) == 0 && found;
+}
+
 int main(int argc, char *argv[])
 {
 	int c;
@@ -1324,8 +1353,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (!brsl_fname && access(DEFAULT_BRSL_FNAME, F_OK) != -1) {
-		brsl_fname = strdup(DEFAULT_BRSL_FNAME);
+	if (!brsl_fname) {
+		char fname[PATH_MAX];
+		if (find_config(fname, DEFAULT_BRSL_FNAME)) {
+			brsl_fname = strdup(fname);
+		}
 	}
 
 	if (optind < argc) {

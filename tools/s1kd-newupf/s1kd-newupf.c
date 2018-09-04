@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -597,6 +597,47 @@ void dump_template(const char *path)
 	fclose(f);
 }
 
+char *real_path(const char *path, char *real)
+{
+	#ifdef _WIN32
+	if (!GetFullPathName(path, PATH_MAX, real, NULL)) {
+	#else
+	if (!realpath(path, real)) {
+	#endif
+		strcpy(real, path);
+	}
+	return real;
+}
+
+/* Search up the directory tree to find a configuration file. */
+int find_config(char *dst, const char *name)
+{
+	char cwd[PATH_MAX], prev[PATH_MAX];
+	bool found = true;
+
+	real_path(".", cwd);
+	strcpy(prev, cwd);
+
+	while (access(name, F_OK) == -1) {
+		char cur[PATH_MAX];
+
+		if (chdir("..") || strcmp(real_path(".", cur), prev) == 0) {
+			found = false;
+			break;
+		}
+
+		strcpy(prev, cur);
+	}
+
+	if (found) {
+		real_path(name, dst);
+	} else {
+		strcpy(dst, name);
+	}
+
+	return chdir(cwd);
+}
+
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [options] <SOURCE> <TARGET>");
@@ -632,7 +673,8 @@ int main(int argc, char **argv)
 	bool no_overwrite_error = false;
 	bool verbose = false;
 	char *out = NULL;
-	char defaultsFname[PATH_MAX] = DEFAULT_DEFAULTS_FNAME;
+	char defaultsFname[PATH_MAX];
+	bool custom_defaults = false;
 	xmlDocPtr defaultsXml;
 
 	const char *sopts = "@:$:%:d:fqv~:h?";
@@ -661,6 +703,7 @@ int main(int argc, char **argv)
 				break;
 			case 'd':
 				strncpy(defaultsFname, optarg, PATH_MAX - 1);
+				custom_defaults = true;
 				break;
 			case 'f':
 				overwrite = true;
@@ -690,6 +733,10 @@ int main(int argc, char **argv)
 
 	sourceDoc = xmlReadFile(source, NULL, PARSE_OPTS);
 	targetDoc = xmlReadFile(target, NULL, PARSE_OPTS);
+
+	if (!custom_defaults) {
+		find_config(defaultsFname, DEFAULT_DEFAULTS_FNAME);
+	}
 
 	if ((defaultsXml = xmlReadFile(defaultsFname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
 		xmlNodePtr cur;
