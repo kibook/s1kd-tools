@@ -10,14 +10,8 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-template.h: scormcontentpackage.xml ../common/42to*.xsl
+template.h: scormcontentpackage.xml ../common/42to41.xsl
 	xxd -i scormcontentpackage.xml > template.h
-	xxd -i ../common/42to20.xsl >> template.h
-	xxd -i ../common/42to21.xsl >> template.h
-	xxd -i ../common/42to22.xsl >> template.h
-	xxd -i ../common/42to23.xsl >> template.h
-	xxd -i ../common/42to30.xsl >> template.h
-	xxd -i ../common/42to40.xsl >> template.h
 	xxd -i ../common/42to41.xsl >> template.h
 
 $(OUTPUT): $(SOURCE) template.h
