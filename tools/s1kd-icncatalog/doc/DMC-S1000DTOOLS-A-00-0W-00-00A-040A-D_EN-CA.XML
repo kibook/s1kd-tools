@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Search for configuration files in upper directories.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Remove extra space from example.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -196,8 +199,7 @@ NDATA jpg>]]></verbatimText>
             <verbatimText verbatimStyle="vs24">$ s1kd-icncatalog -c &lt;catalog&gt; -m web &lt;object&gt;</verbatimText>
           </para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[
-<!NOTATION png SYSTEM "png">
+            <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
 <!NOTATION svg SYSTEM "svg">
 <!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.SVG"
 NDATA svg>]]></verbatimText>
