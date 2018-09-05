@@ -26,6 +26,15 @@ Check the CSDB objects against this BREX. Multiple BREX data modules can be spec
 -c  
 When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.
 
+-D -q -v  
+Verbosity of the output:
+
+-   -D - Debug mode gives the most amount of information.
+
+-   -q - Quiet mode gives no output, errors are only indicated via the return code.
+
+-   -v - Verbose mode lists the overall success/failure of all checks.
+
 -f  
 Output only the filenames of CSDB objects with BREX/SNS errors.
 
@@ -54,9 +63,6 @@ Check SNS (Standard Numbering System) rules. The SNS of each specified data modu
 
 -s  
 Use shortened, single-line messages to report BREX errors instead of multiline indented messages.
-
--v -V -q -D  
-Verbosity of the output.
 
 -w &lt;severities&gt;  
 Specify a list of severity levels for business rules.

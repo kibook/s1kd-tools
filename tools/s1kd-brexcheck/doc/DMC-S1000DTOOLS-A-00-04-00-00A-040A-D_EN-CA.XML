@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="02"/>
+        <issueInfo issueNumber="020" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2018" month="09" day="04"/>
@@ -43,6 +43,12 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
         <simplePara>Improve example.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Remove unused -V option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
+        <simplePara>Expand upon explanation of -D, -q, and -v.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -83,6 +89,25 @@
               <listItemTerm>-c</listItemTerm>
               <listItemDefinition>
                 <para>When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-D -q -v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbosity of the output:</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0004">
+                  <randomList>
+                    <listItem>
+                      <para>-D - Debug mode gives the most amount of information.</para>
+                    </listItem>
+                    <listItem>
+                      <para>-q - Quiet mode gives no output, errors are only indicated via the return code.</para>
+                    </listItem>
+                    <listItem>
+                      <para>-v - Verbose mode lists the overall success/failure of all checks.</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -138,12 +163,6 @@
               <listItemTerm>-s</listItemTerm>
               <listItemDefinition>
                 <para>Use shortened, single-line messages to report BREX errors instead of multiline indented messages.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-v -V -q -D</listItemTerm>
-              <listItemDefinition>
-                <para>Verbosity of the output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -45,6 +45,18 @@ the value of each object is within the allowed set of values.
 .RS
 .RE
 .TP
+.B \-D \-q \-v
+Verbosity of the output:
+.RS
+.IP \[bu] 2
+\-D \- Debug mode gives the most amount of information.
+.IP \[bu] 2
+\-q \- Quiet mode gives no output, errors are only indicated via the
+return code.
+.IP \[bu] 2
+\-v \- Verbose mode lists the overall success/failure of all checks.
+.RE
+.TP
 .B \-f
 Output only the filenames of CSDB objects with BREX/SNS errors.
 .RS
@@ -106,11 +118,6 @@ of all SNS rules of all specified BREX data modules.
 .B \-s
 Use shortened, single\-line messages to report BREX errors instead of
 multiline indented messages.
-.RS
-.RE
-.TP
-.B \-v \-V \-q \-D
-Verbosity of the output.
 .RS
 .RE
 .TP

@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.3.4"
+#define VERSION "1.3.5"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -70,7 +70,7 @@
 #define PARSE_OPTS 0
 #endif
 
-enum verbosity {SILENT, NORMAL, MESSAGE, INFO, DEBUG};
+enum verbosity {SILENT, NORMAL, VERBOSE, DEBUG};
 
 enum verbosity verbose = NORMAL;
 bool shortmsg = false;
@@ -497,7 +497,7 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char spaths[BREX_PATH_
 		found = search_brex_fname_from_default_brex(fname, dmcode, len);
 	}
 
-	if (verbose >= INFO && found) {
+	if (verbose >= DEBUG && found) {
 		fprintf(stderr, I_FILE_FOUND, dmcode, fname);
 	}
 
@@ -687,22 +687,24 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 
 void show_help(void)
 {
-	puts("Usage: s1kd-brexcheck [-b <brex>] [-I <path>] [-vVqsxlStupfcLh?] <datamodules>");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-I <path>] [-w <sev>] [-BcDfLlnpqS[tu]svxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?        Show this help message.");
 	puts("  -B           Use the default BREX.");
 	puts("  -b <brex>    Use <brex> as the BREX data module.");
 	puts("  -c           Check object values.");
+	puts("  -D           Debug mode.");
 	puts("  -f           Output only filenames of invalid modules.");
 	puts("  -I <path>    Add <path> to search path for BREX data module.");
 	puts("  -L           Input is a list of data module filenames.");
 	puts("  -l           Check BREX referenced by other BREX.");
 	puts("  -n           Check notation rules.");
 	puts("  -p           Display progress bar.");
+	puts("  -q           Quiet mode.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict).");
 	puts("  -s           Short messages.");
-	puts("  -v -V -q -D  Message verbosity.");
+	puts("  -v           Verbose mode.");
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -x           XML output.");
 	puts("  --version    Show version information.");
@@ -974,12 +976,12 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 			status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
 				brex_fnames[i], brexCheck);
 
-			if (verbose >= MESSAGE) {
+			if (verbose >= VERBOSE) {
 				fprintf(stderr, status || !valid_sns || invalid_notations ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
 			}
 
 			total += status;
-		} else if (verbose >= MESSAGE) {
+		} else if (verbose >= VERBOSE) {
 			fprintf(stderr, valid_sns && !invalid_notations ? E_VALIDDOC : E_INVALIDDOC, docname, brex_fnames[i]);
 		}
 
@@ -1245,7 +1247,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:I:xvVDqslw:StupfncLh?";
+	const char *sopts = "Bb:DI:xvqslw:StupfncLh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1273,6 +1275,7 @@ int main(int argc, char *argv[])
 					strcpy(brex_fnames[num_brex_fnames++], optarg);
 				}
 				break;
+			case 'D': verbose = DEBUG; break;
 			case 'I':
 				if (num_brex_search_paths == BREX_PATH_MAX) {
 					if (verbose > SILENT) {
@@ -1287,9 +1290,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'x': xmlout = true; break;
 			case 'q': verbose = SILENT; break;
-			case 'v': verbose = MESSAGE; break;
-			case 'V': verbose = INFO; break;
-			case 'D': verbose = DEBUG; break;
+			case 'v': verbose = VERBOSE; break;
 			case 's': shortmsg = true; break;
 			case 'l': layered = true; break;
 			case 'w': brsl_fname = strdup(optarg); break;
