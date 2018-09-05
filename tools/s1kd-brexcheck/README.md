@@ -166,7 +166,7 @@ The number of BREX errors encountered is returned in the exit status code.
 EXAMPLE
 =======
 
-    $ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+    $ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
     $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
     $ cat $DMOD
     [...]
@@ -180,6 +180,7 @@ EXAMPLE
 
     $ s1kd-brexcheck -b $BREX $DMOD
     BREX ERROR: DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+      BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
       Only when the reference target is a step can the value of attribute
     internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
       line 53:

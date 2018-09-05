@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="4" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="01"/>
+        <issueInfo issueNumber="020" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2018" month="09" day="04"/>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Improve example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -261,7 +264,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ DMOD=DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
@@ -275,6 +278,7 @@ internalRefTargetType="irtt08"/>.</para>
 
 $ s1kd-brexcheck -b $BREX $DMOD
 BREX ERROR: DMC-S1000DTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+  BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
   Only when the reference target is a step can the value of attribute
 internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
   line 53:
