@@ -22,9 +22,11 @@
 General
 =======
 
-This document provides examples of the usage of the **s1kd-tools**.
+This document provides examples of the usage of the *s1kd-tools*.
 
 The sample commands have been written as they would be used on a Linux or other Unix-like system, but should work more-or-less the same on most operating systems. OS-specific commands used in examples (e.g., `mkdir`) may need to be adapted.
+
+![Example - Authoring with Vim + MuPDF](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG)
 
 Initial setup
 =============
@@ -34,7 +36,7 @@ This first step is to create a folder for the new S1000D project. Example:
     $ mkdir myproject
     $ cd myproject
 
-After that, you should create two files: `.defaults` and `.dmtypes`. These files can be created automatically using the **s1kd-defaults** tool to initialize the new CSDB:
+After that, you should create two files: `.defaults` and `.dmtypes`. These files can be created automatically using the *s1kd-defaults* tool to initialize the new CSDB:
 
     $ s1kd-defaults -i
 
@@ -45,7 +47,7 @@ Afterwards, these files can be edited to customize them for your project. More i
 
 The `.defaults` file is used by all of the s1kd-new\* tools. It provides default values for various S1000D metadata. The `.defaults` file can be written in either a simple text format or an XML format.
 
-**Example of simple text format:**
+*Example of simple text format:*
 
     languageIsoCode            en
     countryIsoCode             CA
@@ -54,7 +56,7 @@ The `.defaults` file is used by all of the s1kd-new\* tools. It provides default
     brex                       MYPRJ-A-00-00-00-00A-022A-D
     techName                   My project
 
-**Example of XML format:**
+*Example of XML format:*
 
     <?xml version="1.0"?>
     <defaults>
@@ -69,16 +71,16 @@ The `.defaults` file is used by all of the s1kd-new\* tools. It provides default
 `.dmtypes` file
 ---------------
 
-The `.dmtypes` file is used by the **s1kd-newdm** tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the `.defaults` file, it can be written using either the simple text format or XML format.
+The `.dmtypes` file is used by the *s1kd-newdm* tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the `.defaults` file, it can be written using either the simple text format or XML format.
 
-**Example of simple text format:**
+*Example of simple text format:*
 
     009  frontmatter  Table of contents
     022  brex         Business rules exchange
     040  descript     Description
     130  proced       Normal operation
 
-**Example of XML format:**
+*Example of XML format:*
 
     <?xml version="1.0"?>
     <dmtypes>
@@ -103,7 +105,7 @@ Creating the DMRL and populating the CSDB
 
 The next step is to prepare the Data Management Requirements List (DMRL) for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.
 
-If you do not already have a DMRL, the **s1kd-newdml** tool can be used to create a new one:
+If you do not already have a DMRL, the *s1kd-newdml* tool can be used to create a new one:
 
     $ s1kd-newdml -# MYPRJ-NCAGE-C-2017-00001
 
@@ -138,20 +140,20 @@ Each entry in the DMRL describes a data module that is planned to be created, gi
     ...
     </dmlContent>
 
-The XML for the `dmRef` of each entry can be quickly generated using the **s1kd-ref** tool:
+The XML for the `dmRef` of each entry can be quickly generated using the *s1kd-ref* tool:
 
     $ s1kd-ref DMC-MYPRJ-A-00-00-00-00A-040A-D
 
 Populating the CSDB from the DMRL
 ---------------------------------
 
-Once the DMRL is prepared, the **s1kd-dmrl** tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:
+Once the DMRL is prepared, the *s1kd-dmrl* tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:
 
     $ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML
 
 Information not included in the DMRL entry for a CSDB object is pulled from the `.defaults` file (and the `.dmtypes` file for data modules).
 
-The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the **s1kd-dmrl** tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:
+The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the *s1kd-dmrl* tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:
 
     $ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML
 
@@ -169,7 +171,7 @@ Each of the s1kd-new\* tools has various options for setting specific metadata, 
 Data module workflow
 ====================
 
-Data modules are put through the general S1000D workflow with the **s1kd-upissue** tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.
+Data modules are put through the general S1000D workflow with the *s1kd-upissue* tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.
 
 Inwork data modules
 -------------------
@@ -180,7 +182,7 @@ When a data module is in the inwork state, the s1kd-upissue tool is called witho
 
 Assuming this data module was just created, it would be incremented from initial inwork issue 000-01 to initial inwork issue 000-02. After upissuing, make the changes. For example:
 
-**`DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML`:**
+*`DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML`:*
 
     <content>
     <description>
@@ -191,7 +193,7 @@ Assuming this data module was just created, it would be incremented from initial
     </description>
     </content>
 
-**`DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML`:**
+*`DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML`:*
 
     <content>
     <description>
@@ -218,13 +220,13 @@ Before a data module can be made official, it must be validated. This means:
 
 ### Validating against the schema
 
-The first two points can be verified with the **s1kd-validate** tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:
+The first two points can be verified with the *s1kd-validate* tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:
 
     $ s1kd-validate DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
 
 ### Validating against a BREX data module
 
-The third point can be verified using the **s1kd-brexcheck** tool. This tool will indicate any places where a data module violates computable business rules as specified in a Business Rules Exchange (BREX) data module.
+The third point can be verified using the *s1kd-brexcheck* tool. This tool will indicate any places where a data module violates computable business rules as specified in a Business Rules Exchange (BREX) data module.
 
     $ s1kd-brexcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
 
@@ -278,7 +280,7 @@ When a change must be made to an official data module (for example, as a result 
 
 Changes between official issues of a data module are indicated with reasons for update and change marking. For example:
 
-**`DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML`:**
+*`DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML`:*
 
     <content>
     <description>
@@ -290,7 +292,7 @@ Changes between official issues of a data module are indicated with reasons for 
     </description>
     </content>
 
-**`DMC-MYPRJ-A-00-00-00-00A-040A-D_001-01_EN-CA.XML`:**
+*`DMC-MYPRJ-A-00-00-00-00A-040A-D_001-01_EN-CA.XML`:*
 
     <dmStatus issueType="changed">
     <!-- ...... -->
@@ -348,7 +350,7 @@ S1000D publications are managed by use of publication modules. Like data modules
     </responsiblePartnerCompany>
     </dmlEntry>
 
-or "on-the-fly" with the **s1kd-newpm** tool:
+or "on-the-fly" with the *s1kd-newpm* tool:
 
     $ s1kd-newpm -# MYPRJ-12345-00001-00
 
@@ -397,7 +399,7 @@ The publication module lays out the hierarchical structure of the data modules i
 Creating a customized publication
 ---------------------------------
 
-The S1000D applicability model and the **s1kd-instance** tool enable the creation of customized publications, which are filtered for a particular customer or product. For example, a data module may contain applicabilty for two versions of a product:
+The S1000D applicability model and the *s1kd-instance* tool enable the creation of customized publications, which are filtered for a particular customer or product. For example, a data module may contain applicabilty for two versions of a product:
 
     <para>
     This is some common information about the product.

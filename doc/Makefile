@@ -16,6 +16,7 @@ S1KD2DB=s1kd2db
 S1KD2DB_FLAGS+=-param include.emphasis.role 1
 
 PANDOC_MD=pandoc -f docbook -t markdown_github -s
+PANDOC_MD_TOC=pandoc -f docbook -t markdown | pandoc -f markdown -t markdown_github -s --toc
 PANDOC_MAN=pandoc -f docbook -t man -s
 
 PREFIX=/usr/local
@@ -40,7 +41,7 @@ $(INSTALL_DOC): $(INSTALL_SRC)
 	$(S1KD2DB) $(INSTALL_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INSTALL_DOC)
 
 $(EXAMPLE): $(EXAMPLE_SRC)
-	$(S1KD2DB) $(EXAMPLE_SRC) $(S1KD2DB_FLAGS) | pandoc -f docbook -t markdown | pandoc -f markdown -t markdown_github -s --toc -o $(EXAMPLE)
+	s1kd-icncatalog -m github $(EXAMPLE_SRC) | $(S1KD2DB) - | $(PANDOC_MD_TOC) -o $(EXAMPLE)
 
 $(COMPAT): $(COMPAT_SRC)
 	$(S1KD2DB) $(COMPAT_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(COMPAT)
