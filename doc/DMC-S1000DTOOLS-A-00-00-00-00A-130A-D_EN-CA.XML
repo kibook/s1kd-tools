@@ -53,7 +53,7 @@
         <title>General</title>
         <para>This document provides examples of the usage of the <emphasis>s1kd-tools</emphasis>.</para>
         <para>The sample commands have been written as they would be used on a Linux or other Unix-like system, but should work more-or-less the same on most operating systems. OS-specific commands used in examples (e.g., <verbatimText>mkdir</verbatimText>) may need to be adapted.</para>
-        <figure>
+        <figure changeType="add" reasonForUpdateRefIds="rfu-0001">
           <title>Example - Authoring with Vim + MuPDF</title>
           <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00002-A-001-01"/>
         </figure>
