@@ -176,7 +176,7 @@ Data modules are put through the general S1000D workflow with the **s1kd-upissue
 Inwork data modules
 -------------------
 
-When a data module is in the inwork state, the s1kd-upissue tool is called without any additional arguments:
+To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional arguments:
 
     $ s1kd-upissue DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 

@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="01"/>
+        <issueInfo issueNumber="012" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="05"/>
+        <issueDate year="2018" month="09" day="11"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -44,6 +44,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
         <simplePara>Add example screenshot.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Improve description of the s1kd-upissue tool.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -202,7 +205,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
         <para>Data modules are put through the general S1000D workflow with the <emphasis>s1kd-upissue</emphasis> tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.</para>
         <levelledPara>
           <title>Inwork data modules</title>
-          <para>When a data module is in the inwork state, the s1kd-upissue tool is called without any additional arguments:</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0002">To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional arguments:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-upissue DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
           </para>
