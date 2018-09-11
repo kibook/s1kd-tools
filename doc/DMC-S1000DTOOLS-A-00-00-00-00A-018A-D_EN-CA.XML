@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="31"/>
+        <issueDate year="2018" month="09" day="11"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt03">
-        <simplePara>Markup CSDB acronym.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02">
-        <simplePara>Add s1kd-newsmc tool.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Improve description of tools.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -56,11 +53,11 @@
         <title>DESCRIPTION</title>
         <levelledPara>
           <title>S1000D</title>
-          <para><emphasis>S1000D</emphasis> is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a <acronym acronymType="at01" changeType="add" reasonForUpdateRefIds="rfu-0001"><acronymTerm>CSDB</acronymTerm><acronymDefinition>Common Source Database</acronymDefinition></acronym> and validated against a defined set of project "business rules".</para>
+          <para><emphasis>S1000D</emphasis> is "an international specification for the procurement and production of technical publications", part of the S-Series of ILS specifications. The main focus of S1000D is the breakdown and classification of documents in to individual components, called "data modules", which can be re-used in multiple publications. These data modules are typically authored using a set of provided XML schemas, allowing them to be automatically managed in a <acronym acronymType="at01"><acronymTerm>CSDB</acronymTerm><acronymDefinition>Common Source Database</acronymDefinition></acronym> and validated against a defined set of project "business rules".</para>
         </levelledPara>
         <levelledPara>
           <title>s1kd-tools</title>
-          <para>The <emphasis>s1kd-tools</emphasis> are a set of small tools for creating and manipulating S1000D data. Together, they form a "suite" of tools for producing and maintaining S1000D publications within a CSDB. They may also be used individually, to support other S1000D "suites" (usually from an S1000D "vendor") already in use by a project.</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-tools</emphasis> are a set of small tools for creating and manipulating S1000D data. They are designed to be used as a standalone method of maintaining a simple S1000D CSDB, in conjunction with a more typical version control system such as Git or SVN, as a backend to implement a more complex S1000D CSDB, or to support an existing S1000D CSDB already in use by a project.</para>
         </levelledPara>
         <levelledPara>
           <title>CSDB</title>
@@ -177,7 +174,7 @@
             <listItem>
               <para>s1kd-newpm(1)</para>
             </listItem>
-            <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <listItem>
               <para>s1kd-newsmc(1)</para>
             </listItem>
             <listItem>

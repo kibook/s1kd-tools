@@ -14,7 +14,7 @@ S1000D
 s1kd-tools
 ----------
 
-The **s1kd-tools** are a set of small tools for creating and manipulating S1000D data. Together, they form a "suite" of tools for producing and maintaining S1000D publications within a CSDB. They may also be used individually, to support other S1000D "suites" (usually from an S1000D "vendor") already in use by a project.
+The **s1kd-tools** are a set of small tools for creating and manipulating S1000D data. They are designed to be used as a standalone method of maintaining a simple S1000D CSDB, in conjunction with a more typical version control system such as Git or SVN, as a backend to implement a more complex S1000D CSDB, or to support an existing S1000D CSDB already in use by a project.
 
 CSDB
 ----
