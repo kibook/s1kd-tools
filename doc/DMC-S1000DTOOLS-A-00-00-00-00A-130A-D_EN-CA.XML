@@ -205,7 +205,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
         <para>Data modules are put through the general S1000D workflow with the <emphasis>s1kd-upissue</emphasis> tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.</para>
         <levelledPara>
           <title>Inwork data modules</title>
-          <para changeType="modify" reasonForUpdateRefIds="rfu-0002">To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional arguments:</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0002">To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional options:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-upissue DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
           </para>
