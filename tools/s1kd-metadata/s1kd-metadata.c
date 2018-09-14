@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1476,7 +1476,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	int edit = 0;
 	xmlNodePtr cond;
 
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+	doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
 
 	ctxt = xmlXPathNewContext(doc);
 
