@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="6" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="31"/>
+        <issueDate year="2018" month="09" day="14"/>
         <dmTitle>
           <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -N option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Improve the descriptions of the tool.</simplePara>
+        <simplePara>List ICNs and add -G option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -50,18 +47,18 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-ls - List CSDB objects in a directory hierarchy</para>
+        <para>s1kd-ls - List CSDB objects in a directory hierarchy</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDIiLlMNoPrwX] [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDGIiLlMNoPrwX] [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-ls</emphasis> tool searches the current directory or specified directory trees and lists the file names of CSDB objects matching certain criteria.</para>
-        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">The files representing the CSDB objects must use either the standard S1000D file naming conventions, or the alternate naming convention supported by these tools using the -N option.</para>
+        <para>The <emphasis>s1kd-ls</emphasis> tool searches the current directory or specified directory trees and lists the file names of CSDB objects matching certain criteria.</para>
+        <para>The files representing the CSDB objects must use either the standard S1000D file naming conventions, or the alternate naming convention supported by these tools using the -N option.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -73,10 +70,10 @@
                 <para>Output a null-delimited list of CSDB object paths.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-C, -D, -L, -M, -P, -X</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-C, -D, -G, -L, -M, -P, -X</listItemTerm>
               <listItemDefinition>
-                <para>List comments, data modules, data management lists, ICN metadata files, publication modules, and data dispatch notes respectively. If none are specified, -CDLMPX is assumed.</para>
+                <para>List comments, data modules, ICNs, data management lists, ICN metadata files, publication modules, and data dispatch notes respectively. If none are specified, -CDGLMPX is assumed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -103,7 +100,7 @@
                 <para>Show only the latest official/inwork issue of objects.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
                 <para>Assume that the files being listed do not include the issue info in their filenames, i.e. they were created using the -N option of the s1kd-new* tools.</para>

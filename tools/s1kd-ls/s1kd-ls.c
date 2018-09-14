@@ -14,7 +14,7 @@
 #define OBJECT_MAX 10240
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -24,6 +24,7 @@
 #define S_MAX_DM ERR_PREFIX "Maximum DMs reached (%d).\n"
 #define S_MAX_PM ERR_PREFIX "Maximum PMs reached (%d).\n"
 #define S_MAX_COM ERR_PREFIX "Maximum comments reached (%d).\n"
+#define S_MAX_ICN ERR_PREFIX "Maximum ICNs reached (%d).\n"
 #define S_MAX_IMF ERR_PREFIX "Maximum IMFs reached (%d).\n"
 #define S_MAX_DDN ERR_PREFIX "Maximum DDNs reached (%d).\n"
 #define S_MAX_DML ERR_PREFIX "Maximum DMLs reached (%d).\n"
@@ -35,6 +36,7 @@
 #define SHOW_IMF 0x08
 #define SHOW_DDN 0x10
 #define SHOW_DML 0x20
+#define SHOW_ICN 0x40
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -109,14 +111,20 @@ int isdml(const char *name)
 	return strncmp(name, "DML-", 4) == 0 && isxml(name);
 }
 
+int isicn(const char *name)
+{
+	return strncmp(name, "ICN-", 4) == 0;
+}
+
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-0CDIiLlMNoPrwX] [<object>|<dir> ...]");
+	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPrwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -0         Output null-delimited list");
 	puts("  -C         List comments");
 	puts("  -D         List data modules");
+	puts("  -G         List ICN files");
 	puts("  -I         Show only inwork issues");
 	puts("  -i         Show only official issues");
 	puts("  -L         List DMLs");
@@ -166,6 +174,7 @@ void list_dir(const char *path,
               char dms[OBJECT_MAX][PATH_MAX], int *ndms,
               char pms[OBJECT_MAX][PATH_MAX], int *npms,
 	      char coms[OBJECT_MAX][PATH_MAX], int *ncoms,
+	      char icns[OBJECT_MAX][PATH_MAX], int *nicns,
 	      char imfs[OBJECT_MAX][PATH_MAX], int *nimfs,
 	      char ddns[OBJECT_MAX][PATH_MAX], int *nddns,
 	      char dmls[OBJECT_MAX][PATH_MAX], int *ndmls,
@@ -221,6 +230,12 @@ void list_dir(const char *path,
 				exit(EXIT_OBJECT_MAX);
 			}
 			strcpy(imfs[(*nimfs)++], cpath);
+		} else if (icns && isicn(cur->d_name)) {
+			if (*nicns == OBJECT_MAX) {
+				fprintf(stderr, S_MAX_ICN, OBJECT_MAX);
+				exit(EXIT_OBJECT_MAX);
+			}
+			strcpy(icns[(*nicns)++], cpath);
 		} else if (ddns && isddn(cur->d_name)) {
 			if (*nddns == OBJECT_MAX) {
 				fprintf(stderr, S_MAX_DDN, OBJECT_MAX);
@@ -238,6 +253,7 @@ void list_dir(const char *path,
 				dms, ndms,
 				pms, npms,
 				coms, ncoms,
+				icns, nicns,
 				imfs, nimfs,
 				ddns, nddns,
 				dmls, ndmls,
@@ -413,10 +429,11 @@ int main(int argc, char **argv)
 	char (*dms)[PATH_MAX] = NULL;
 	char (*pms)[PATH_MAX] = NULL;
 	char (*coms)[PATH_MAX] = NULL;
+	char (*icns)[PATH_MAX] = NULL;
 	char (*imfs)[PATH_MAX] = NULL;
 	char (*ddns)[PATH_MAX] = NULL;
 	char (*dmls)[PATH_MAX] = NULL;
-	int ndms = 0, npms = 0, ncoms = 0, nimfs = 0, nddns = 0, ndmls = 0;
+	int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0;
 
 	char (*latest_dms)[PATH_MAX] = NULL;
 	char (*latest_pms)[PATH_MAX] = NULL;
@@ -440,7 +457,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDiLlMPrwXoINh?";
+	const char *sopts = "0CDGiLlMPrwXoINh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -458,6 +475,7 @@ int main(int argc, char **argv)
 			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;
 			case 'D': show |= SHOW_DM; break;
+			case 'G': show |= SHOW_ICN; break;
 			case 'i': only_official_issue = 1; break;
 			case 'L': show |= SHOW_DML; break;
 			case 'l': only_latest = 1; break;
@@ -475,7 +493,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_IMF | SHOW_DDN | SHOW_DML;
+	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML;
 
 	if (hasopt(show, SHOW_DM)) {
 		dms = malloc(OBJECT_MAX * PATH_MAX);
@@ -489,6 +507,9 @@ int main(int argc, char **argv)
 	}
 	if (hasopt(show, SHOW_COM)) {
 		coms = malloc(OBJECT_MAX * PATH_MAX);
+	}
+	if (hasopt(show, SHOW_ICN)) {
+		icns = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_IMF)) {
 		imfs = malloc(OBJECT_MAX * PATH_MAX);
@@ -536,6 +557,12 @@ int main(int argc, char **argv)
 					exit(EXIT_OBJECT_MAX);
 				}
 				strcpy(coms[ncoms++], argv[i]);
+			} else if (icns && isicn(base)) {
+				if (nicns == OBJECT_MAX) {
+					fprintf(stderr, S_MAX_ICN, OBJECT_MAX);
+					exit(EXIT_OBJECT_MAX);
+				}
+				strcpy(icns[nicns++], argv[i]);
 			} else if (imfs && isimf(base)) {
 				if (nimfs == OBJECT_MAX) {
 					fprintf(stderr, S_MAX_IMF, OBJECT_MAX);
@@ -559,6 +586,7 @@ int main(int argc, char **argv)
 					dms, &ndms,
 					pms, &npms,
 					coms, &ncoms,
+					icns, &nicns,
 					imfs, &nimfs,
 					ddns, &nddns,
 					dmls, &ndmls,
@@ -571,6 +599,7 @@ int main(int argc, char **argv)
 			dms, &ndms,
 			pms, &npms,
 			coms, &ncoms,
+			icns, &nicns,
 			imfs, &nimfs,
 			ddns, &nddns,
 			dmls, &ndmls,
@@ -660,6 +689,10 @@ int main(int argc, char **argv)
 		printfiles(coms, ncoms);
 	}
 
+	if (nicns && !only_old) {
+		printfiles(icns, nicns);
+	}
+
 	if (nimfs) {
 		if (only_latest || only_old) {
 			printfiles(latest_imfs, nlatest_imfs);
@@ -695,6 +728,7 @@ int main(int argc, char **argv)
 	free(latest_pms);
 	free(issue_pms);
 	free(coms);
+	free(icns);
 	free(imfs);
 	free(latest_imfs);
 	free(issue_imfs);
