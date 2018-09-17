@@ -39,7 +39,7 @@ Include the language information in the reference (target must be a file)
 Output to &lt;dst&gt; instead of stdout.
 
 -r  
-Add the generated reference to the source data module's `refs` table rather than printing the XML to stdout.
+Add the generated reference to the source data module's `refs` table and output the modified data module to stdout.
 
 -s &lt;src&gt;  
 Specify a source data module &lt;src&gt; to add references to when using the -r option.
