@@ -68,6 +68,8 @@ An optional third part, the learn type, identifies information about training co
 
 The model identification code identifies the overall product or project to which a data module belongs. It consists of 2 thru 14 uppercase alphanumeric characters. It is encouraged that S1000D users register their model identification codes with the NATO Support and Procurement Agency, which maintains a list of registered codes, to avoid conflicts with other projects.
 
+<https://www.nspa.nato.int/PDF/Log/S2000M/S2000M%20MOI%20codes.pdf>
+
 An example of a model identification code might be "BIKE" if you are documenting the operation and maintenance of a line of bicycles.
 
 ### System difference code
@@ -81,6 +83,14 @@ Continuing with the example above, "A" might represent one model of bicycle and 
 The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes.
 
 A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS. For example, data modules related to the pedals on the bicycle might fall under A9-10 of the "General surface vehicles" SNS provided in the specification, where A9 is the system code and means "Controls (drivers)" and 10 is the subsystem and subsubsystem codes and means "Foot controls".
+
+| System | Subsystem | Name               |
+|:-------|:----------|:-------------------|
+| A9     |           | Controls (drivers) |
+|        | -00       | General            |
+|        | -10       | Foot controls      |
+|        | -20       | Hand controls      |
+|        | -30       | Ancillary controls |
 
 ### Disassembly code
 
