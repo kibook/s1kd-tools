@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.1.2"
+#define VERSION "1.1.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -352,9 +352,11 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 	char item_location_code[2];
 	char learn_code[4];
 	char learn_event_code[2];
-	int n;
+	int n, offset;
 
-	n = sscanf(val, "%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
+	offset = strncmp(val, "DMC-", 4) == 0 ? 4 : 0;
+
+	n = sscanf(val + offset, "%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
