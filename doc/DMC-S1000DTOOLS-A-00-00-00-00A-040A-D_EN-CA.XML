@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1000DTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="31"/>
+        <issueDate year="2018" month="09" day="18"/>
         <dmTitle>
           <techName>S1000D tools</techName>
           <infoName>Description</infoName>
@@ -42,11 +42,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Add link to GitLab repo.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Include the word "software" in the description.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add link to basic S1000D tutorial.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -56,7 +53,7 @@
         <title>s1kd-tools</title>
         <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00001-A-001-01"/>
       </figure>
-      <para changeType="modify" reasonForUpdateRefIds="rfu-0002">A set of small, free and open source software tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
+      <para>A set of small, free and open source software tools for manipulating <externalPubRef xlink:href="http://www.s1000d.org"><externalPubRefIdent><externalPubTitle>S1000D</externalPubTitle></externalPubRefIdent></externalPubRef> data.</para>
       <para>
         <randomList>
           <listItem>
@@ -64,6 +61,15 @@
               <externalPubRef xlink:href="INTRO.md">
                 <externalPubRefIdent>
                   <externalPubTitle>Introduction</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <para>
+              <externalPubRef xlink:href="TUTORIAL.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>Basic S1000D tutorial</externalPubTitle>
                 </externalPubRefIdent>
               </externalPubRef>
             </para>
@@ -146,7 +152,7 @@
               </externalPubRef>
             </para>
           </listItem>
-          <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <listItem>
             <para>
               <externalPubRef xlink:href="http://gitlab.com/kibukj/s1kd-tools">
                 <externalPubRefIdent>

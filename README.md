@@ -4,6 +4,8 @@ A set of small, free and open source software tools for manipulating [S1000D](ht
 
 -   [Introduction](INTRO.md)
 
+-   [Basic S1000D tutorial](TUTORIAL.md)
+
 -   [Installation](INSTALL.md)
 
 -   [Usage examples](EXAMPLE.md)
