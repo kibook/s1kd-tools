@@ -65,20 +65,20 @@
               </externalPubRef>
             </para>
           </listItem>
-          <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
-            <para>
-              <externalPubRef xlink:href="TUTORIAL.md">
-                <externalPubRefIdent>
-                  <externalPubTitle>Basic S1000D tutorial</externalPubTitle>
-                </externalPubRefIdent>
-              </externalPubRef>
-            </para>
-          </listItem>
           <listItem>
             <para>
               <externalPubRef xlink:href="INSTALL.md">
                 <externalPubRefIdent>
                   <externalPubTitle>Installation</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <para>
+              <externalPubRef xlink:href="TUTORIAL.md">
+                <externalPubRefIdent>
+                  <externalPubTitle>Basic S1000D tutorial</externalPubTitle>
                 </externalPubRefIdent>
               </externalPubRef>
             </para>
