@@ -45,6 +45,9 @@
   </identAndStatusSection>
   <content>
     <description>
+      <note>
+        <notePara>This is a work-in-progress tutorial to introduce the basic concepts of S1000D to new users of the specification or those who have never heard of it before.</notePara>
+      </note>
       <levelledPara>
         <title>What is S1000D?</title>
         <para>S1000D is "an international specification for the procurement and production of technical publications". It combines common, international standards and best practices for writing and managing documentation into a single, open specification.</para>

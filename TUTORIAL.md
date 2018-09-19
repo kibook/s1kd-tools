@@ -11,6 +11,10 @@
     -   [Data module title](#data-module-title)
     -   [Data module content](#data-module-content)
 
+> **Note**
+>
+> This is a work-in-progress tutorial to introduce the basic concepts of S1000D to new users of the specification or those who have never heard of it before.
+
 What is S1000D?
 ===============
 
