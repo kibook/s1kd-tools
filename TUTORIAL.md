@@ -9,6 +9,7 @@
         -   [Information code](#information-code)
         -   [Item location code](#item-location-code)
     -   [Data module title](#data-module-title)
+    -   [Data module content](#data-module-content)
 
 What is S1000D?
 ===============
@@ -152,3 +153,48 @@ The title of an S1000D data module is formed from two parts:
 -   The information name
 
 The tech name is derived from the SNS of the data module, and the info name is derived from the short definition of the information code of the data module. For example, the data module BIKE-A9-10-00-00A-040A-D, which has the SNS A9-10-00 (Foot controls) and information code 040 (Description), would be titled "Foot controls - Description".
+
+Data module content
+-------------------
+
+S1000D provides a number of different schemas for different kinds of content within a data module. The schema dictates what elements can be used within that data module's contents. This limits the author of a data module to only using the appropriate elements for a particular context, and helps keep data consistent.
+
+For example, the data module BIKE-A9-10-00-00A-040A-D, which will contain the description of the foot controls of the bicycle, might use the **descriptive** schema. Another data module, BIKE-A9-10-00-00A-520A-D, which is titled "Foot controls - Remove procedure" and enumerates the steps to remove the foot controls from the bicycle, might use the **procedural** schema.
+
+Example of descriptive data module contents:
+
+    <levelledPara>
+    <title>General</title>
+    <para>A bicycle is a frame and a number of movable components with
+    mechanical parts that are completely open. There are no covers or
+    sheet metal panels that prevent access to the mechanical parts. Thus,
+    you can disassemble the different components of a bicycle to do:
+    <randomList>
+    <listItem>
+    <para>an inspection</para>
+    </listItem>
+    <listItem>
+    <para>a maintenance task</para>
+    </listItem>
+    <listItem>
+    <para>a repair task</para>
+    </listItem>
+    </randomList>
+    </para>
+    </levelledPara>
+
+Example of procedural data module contents:
+
+    <proceduralStep>
+    <para>Hold the front of the bicycle.</para>
+    </proceduralStep>
+    <proceduralStep>
+    <para>Use the toolset to disengage the fork from the chainring by
+    pushing the wheel forwards and down.</para>
+    </proceduralStep>
+    <proceduralStep>
+    <para>Lift the wheel away from the frame.</para>
+    </proceduralStep>
+    <proceduralStep>
+    <para>Put the frame on the floor.</para>
+    </proceduralStep>
