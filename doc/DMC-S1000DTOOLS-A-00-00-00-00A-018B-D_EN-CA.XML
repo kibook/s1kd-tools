@@ -2,6 +2,7 @@
 <!DOCTYPE dmodule [
 <!NOTATION PNG SYSTEM "PNG" >
 <!ENTITY ICN-1654N-S1000D0002-001-01 SYSTEM "ICN-1654N-S1000D0002-001-01.PNG" NDATA PNG>
+<!ENTITY ICN-S1000DTOOLS-A-000000-A-KHZAE-00003-A-001-01 SYSTEM "ICN-S1000DTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG" NDATA PNG>
 ]>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
@@ -46,7 +47,7 @@
   <content>
     <description>
       <note>
-        <notePara>This is a work-in-progress tutorial to introduce the basic concepts of S1000D to new users of the specification or those who have never heard of it before.</notePara>
+        <notePara>This is a work-in-progress tutorial to introduce the basic concepts of S1000D.</notePara>
       </note>
       <levelledPara>
         <title>What is S1000D?</title>
@@ -57,10 +58,32 @@
       <levelledPara>
         <title>The CSDB</title>
         <para>The full title of the S1000D specification is "International specification for technical publications using a common source database". The common source database, or CSDB, is where all the data for your S1000D project is stored, including the data modules. This means a data module is not tied to a particular publication, but can be reused among several publications wherever it is needed, avoiding duplication of data.</para>
-        <para>The S1000D specification does not give specific requirements for the CSDB, and so CSDBs can be implemented in any number of ways. Often, a CSDB is built on top of an existing relational database management system.</para>
+        <figure>
+          <title>Traditional publications vs. CSDB</title>
+          <graphic infoEntityIdent="ICN-S1000DTOOLS-A-000000-A-KHZAE-00003-A-001-01"/>
+        </figure>
+        <para>The S1000D specification does not give specific requirements for the implementation of a CSDB, and so CSDBs can be implemented in any number of ways. Often, a CSDB is built on top of an existing relational database management system.</para>
         <note>
-          <notePara>For the purposes of the s1kd-tools, the CSDB is simply be a folder in a typical filesystem.</notePara>
+          <notePara>For the purposes of the s1kd-tools, the CSDB is simply a folder in a typical filesystem.</notePara>
         </note>
+        <levelledPara>
+          <title>CSDB objects</title>
+          <para>The CSDB is made up of many CSDB objects. These include:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>Data modules, which represent individual topics</para>
+              </listItem>
+              <listItem>
+                <para>Publication modules, which place data modules in to a hierarchical structure for publishing</para>
+              </listItem>
+              <listItem>
+                <para>Information control numbers (ICNs), such as illustrations, which support data modules.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The following sections will discuss some of these different types of objects in more detail.</para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>Data modules</title>

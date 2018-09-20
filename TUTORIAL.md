@@ -1,5 +1,6 @@
 -   [What is S1000D?](#what-is-s1000d)
 -   [The CSDB](#the-csdb)
+    -   [CSDB objects](#csdb-objects)
 -   [Data modules](#data-modules)
     -   [Data module code](#data-module-code)
         -   [Model identification code](#model-identification-code)
@@ -13,7 +14,7 @@
 
 > **Note**
 >
-> This is a work-in-progress tutorial to introduce the basic concepts of S1000D to new users of the specification or those who have never heard of it before.
+> This is a work-in-progress tutorial to introduce the basic concepts of S1000D.
 
 What is S1000D?
 ===============
@@ -29,11 +30,26 @@ The CSDB
 
 The full title of the S1000D specification is "International specification for technical publications using a common source database". The common source database, or CSDB, is where all the data for your S1000D project is stored, including the data modules. This means a data module is not tied to a particular publication, but can be reused among several publications wherever it is needed, avoiding duplication of data.
 
-The S1000D specification does not give specific requirements for the CSDB, and so CSDBs can be implemented in any number of ways. Often, a CSDB is built on top of an existing relational database management system.
+![Traditional publications vs. CSDB](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG)
+
+The S1000D specification does not give specific requirements for the implementation of a CSDB, and so CSDBs can be implemented in any number of ways. Often, a CSDB is built on top of an existing relational database management system.
 
 > **Note**
 >
-> For the purposes of the s1kd-tools, the CSDB is simply be a folder in a typical filesystem.
+> For the purposes of the s1kd-tools, the CSDB is simply a folder in a typical filesystem.
+
+CSDB objects
+------------
+
+The CSDB is made up of many CSDB objects. These include:
+
+-   Data modules, which represent individual topics
+
+-   Publication modules, which place data modules in to a hierarchical structure for publishing
+
+-   Information control numbers (ICNs), such as illustrations, which support data modules.
+
+The following sections will discuss some of these different types of objects in more detail.
 
 Data modules
 ============
