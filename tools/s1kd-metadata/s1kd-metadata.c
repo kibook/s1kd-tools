@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -479,6 +479,60 @@ void show_pmcode(xmlNodePtr node, int endl)
 	xmlFree(pmissuer);
 	xmlFree(pmnumber);
 	xmlFree(pmvolume);
+}
+
+void show_pm_issuer(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "pmissuer") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "pmIssuer", endl);
+	}
+}
+
+int edit_pm_issuer(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "pmissuer") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "pmIssuer", val);
+	}
+}
+
+void show_pm_number(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "pmnumber") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "pmNumber", endl);
+	}
+}
+
+int edit_pm_number(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "pmnumber") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "pmNumber", val);
+	}
+}
+
+void show_pm_volume(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "pmvolume") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "pmVolume", endl);
+	}
+}
+
+int edit_pm_volume(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "pmvolume") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "pmVolume", val);
+	}
 }
 
 void show_comment_code(xmlNodePtr node, int endl)
@@ -1195,12 +1249,30 @@ struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Publication module code"},
+	{"pmIssuer",
+		"//@pmIssuer|//pmissuer",
+		show_pm_issuer,
+		edit_pm_issuer,
+		NULL,
+		"Issuing authority of the PM"},
+	{"pmNumber",
+		"//@pmNumber|//pmnumber",
+		show_pm_number,
+		edit_pm_number,
+		NULL,
+		"PM number"},
 	{"pmTitle",
 		"//pmTitle|//pmtitle",
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Title of a publication module"},
+	{"pmVolume",
+		"//@pmVolume|//pmvolume",
+		show_pm_volume,
+		edit_pm_volume,
+		NULL,
+		"Volume of the PM"},
 	{"responsiblePartnerCompany",
 		"//responsiblePartnerCompany/enterpriseName|//rpc/@rpcname",
 		show_simple_node,
