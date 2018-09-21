@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.1.3"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -746,12 +746,30 @@ void show_model_ident_code(xmlNodePtr node, int endl)
 	}
 }
 
+int edit_model_ident_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "modelic") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "modelIdentCode", val);
+	}
+}
+
 void show_system_diff_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sdc") == 0) {
 		show_simple_node(node, endl);
 	} else {
 		show_simple_attr(node, "systemDiffCode", endl);
+	}
+}
+
+int edit_system_diff_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "sdc") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "systemDiffCode", val);
 	}
 }
 
@@ -764,12 +782,30 @@ void show_system_code(xmlNodePtr node, int endl)
 	}
 }
 
+int edit_system_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "chapnum") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "systemCode", val);
+	}
+}
+
 void show_sub_system_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "section") == 0) {
 		show_simple_node(node, endl);
 	} else {
 		show_simple_attr(node, "subSystemCode", endl);
+	}
+}
+
+int edit_sub_system_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "section") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "subSystemCode", val);
 	}
 }
 
@@ -782,12 +818,30 @@ void show_sub_sub_system_code(xmlNodePtr node, int endl)
 	}
 }
 
+int edit_sub_sub_system_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "subsect") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "subSubSystemCode", val);
+	}
+}
+
 void show_assy_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subject") == 0) {
 		show_simple_node(node, endl);
 	} else {
 		show_simple_attr(node, "assyCode", endl);
+	}
+}
+
+int edit_assy_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "subject") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "assyCode", val);
 	}
 }
 
@@ -800,12 +854,30 @@ void show_disassy_code(xmlNodePtr node, int endl)
 	}
 }
 
+int edit_disassy_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "discode") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "disassyCode", val);
+	}
+}
+
 void show_disassy_code_variant(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discodev") == 0) {
 		show_simple_node(node, endl);
 	} else {
 		show_simple_attr(node, "disassyCodeVariant", endl);
+	}
+}
+
+int edit_disassy_code_variant(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "discodev") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "disassyCodeVariant", val);
 	}
 }
 
@@ -818,12 +890,30 @@ void show_info_code(xmlNodePtr node, int endl)
 	}
 }
 
+int edit_info_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "incode") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "infoCode", val);
+	}
+}
+
 void show_info_code_variant(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incodev") == 0) {
 		show_simple_node(node, endl);
 	} else {
 		show_simple_attr(node, "infoCodeVariant", endl);
+	}
+}
+
+int edit_info_code_variant(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "incodev") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "infoCodeVariant", val);
 	}
 }
 
@@ -836,14 +926,33 @@ void show_item_location_code(xmlNodePtr node, int endl)
 	}
 }
 
+int edit_item_location_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "itemloc") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "itemLocationCode", val);
+	}
+}
+
 void show_learn_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "learnCode", endl);
 }
 
+int edit_learn_code(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "learnCode", val);
+}
+
 void show_learn_event_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "learnEventCode", endl);
+}
+
+int edit_learn_event_code(xmlNodePtr node, const char *val)
+{
+	return edit_simple_attr(node, "learnEventCode", val);
 }
 
 void show_skill_level(xmlNodePtr node, int endl)
@@ -897,7 +1006,7 @@ struct metadata metadata[] = {
 	{"assyCode",
 		"//@assyCode|//avee/subject",
 		show_assy_code,
-		NULL,
+		edit_assy_code,
 		NULL,
 		"Assembly code"},
 	{"authorization",
@@ -957,13 +1066,13 @@ struct metadata metadata[] = {
 	{"disassyCode",
 		"//@disassyCode|//discode",
 		show_disassy_code,
-		NULL,
+		edit_disassy_code,
 		NULL,
 		"Disassembly code"},
 	{"disassyCodeVariant",
 		"//@disassyCodeVariant|//discodev",
 		show_disassy_code_variant,
-		NULL,
+		edit_disassy_code_variant,
 		NULL,
 		"Disassembly code variant"},
 	{"dmCode",
@@ -993,13 +1102,13 @@ struct metadata metadata[] = {
 	{"infoCode",
 		"//@infoCode|//incode",
 		show_info_code,
-		NULL,
+		edit_info_code,
 		NULL,
 		"Information code"},
 	{"infoCodeVariant",
 		"//@infoCodeVariant|//incodev",
 		show_info_code_variant,
-		NULL,
+		edit_info_code_variant,
 		NULL,
 		"Information code variant"},
 	{"infoName",
@@ -1035,7 +1144,7 @@ struct metadata metadata[] = {
 	{"itemLocationCode",
 		"//@itemLocationCode|//itemloc",
 		show_item_location_code,
-		NULL,
+		edit_item_location_code,
 		NULL,
 		"Item location code"},
 	{"languageIsoCode",
@@ -1047,19 +1156,19 @@ struct metadata metadata[] = {
 	{"learnCode",
 		"//@learnCode",
 		show_learn_code,
-		NULL,
+		edit_learn_code,
 		NULL,
 		"Learn code"},
 	{"learnEventCode",
 		"//@learnEventCode",
 		show_learn_event_code,
-		NULL,
+		edit_learn_event_code,
 		NULL,
 		"Learn event code"},
 	{"modelIdentCode",
 		"//@modelIdentCode|//modelic",
 		show_model_ident_code,
-		NULL,
+		edit_model_ident_code,
 		NULL,
 		"Model identification code"},
 	{"originator",
@@ -1131,25 +1240,25 @@ struct metadata metadata[] = {
 	{"subSubSystemCode",
 		"//@subSubSystemCode|//subsect",
 		show_sub_sub_system_code,
-		NULL,
+		edit_sub_sub_system_code,
 		NULL,
 		"Subsubsystem code"},
 	{"subSystemCode",
 		"//@subSystemCode|//section",
 		show_sub_system_code,
-		NULL,
+		edit_sub_system_code,
 		NULL,
 		"Subsystem code"},
 	{"systemCode",
 		"//@systemCode|//chapnum",
 		show_system_code,
-		NULL,
+		edit_system_code,
 		NULL,
 		"System code"},
 	{"systemDiffCode",
 		"//@systemDiffCode|//sdc",
 		show_system_diff_code,
-		NULL,
+		edit_system_diff_code,
 		NULL,
 		"System difference code"},
 	{"techName",
