@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="22" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="31"/>
+        <issueDate year="2018" month="09" day="21"/>
         <dmTitle>
           <techName>s1kd-dmrl(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,15 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -% option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Add -$ option to synopsis.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Add example.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -75,7 +66,7 @@
                 <para>Specify which issue of S1000D to use when creating objects.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-% &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use XML templates in the specified directory instead of the built-in templates of each of the s1kd-new* tools.</para>
@@ -138,7 +129,7 @@
           </definitionList>
         </para>
       </levelledPara>
-      <levelledPara changeType="add" reasonForUpdateRefIds="rfu-0003">
+      <levelledPara>
         <title>EXAMPLE</title>
         <para>
           <verbatimText verbatimStyle="vs24">$ s1kd-dmrl DML-EX-12345-C-2018-00001_001-00.XML</verbatimText>

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="31"/>
+        <issueDate year="2018" month="09" day="21"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -c, -t and -H options.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-upissue [-dfHIilNqRrv] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
+          <verbatimText verbatimStyle="vs24">s1kd-upissue [-dfHIilNqRrv] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
              [-c &lt;reason&gt;] [-s &lt;status&gt;] [-t &lt;urt&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
@@ -77,7 +74,7 @@
                 <para>Set second verification type (tabtop, onobject, ttandoo).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-c &lt;reason&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add a reason for update to the upissued objects. Multiple RFUs can be added by specifying this option multiple times.</para>
@@ -95,7 +92,7 @@
                 <para>Overwrite existing upissued CSDB objects.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-H</listItemTerm>
               <listItemDefinition>
                 <para>Mark the last specified reason for update (-c) as a highlight.</para>
@@ -149,7 +146,7 @@
                 <para>Set the status of the new issue. Default is 'changed'.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-t &lt;urt&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the updateReasonType of the last specified reason for update (-c).</para>

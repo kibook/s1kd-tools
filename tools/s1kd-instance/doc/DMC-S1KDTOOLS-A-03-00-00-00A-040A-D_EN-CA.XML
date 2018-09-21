@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="00"/>
+        <issueInfo issueNumber="026" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="08" day="31"/>
+        <issueDate year="2018" month="09" day="21"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Fix grammar error.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -588,7 +585,7 @@ the weather is icy.
           </para>
           <para>The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is <emphasis>not</emphasis> A can be removed as invalid. This leaves only the assertion about the weather.</para>
           <note>
-            <notePara changeType="modify" reasonForUpdateRefIds="rfu-0001">The -A option may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.</notePara>
+            <notePara>The -A option may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.</notePara>
           </note>
         </levelledPara>
         <levelledPara>
