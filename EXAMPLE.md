@@ -26,7 +26,7 @@ This document provides examples of the usage of the **s1kd-tools**.
 
 The sample commands have been written as they would be used on a Linux or other Unix-like system, but should work more-or-less the same on most operating systems. OS-specific commands used in examples (e.g., `mkdir`) may need to be adapted.
 
-![Example - Authoring with Vim + MuPDF](ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG)
+![Example - Authoring with Vim + MuPDF](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG)
 
 Initial setup
 =============
