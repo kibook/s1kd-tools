@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="010" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="08" day="31"/>
+        <dmTitle>
+          <techName>s1kd-aspp(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-aspp - Applicability statement preprocessor</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-aspp [-g [-A &lt;ACT&gt;]... [-C &lt;CCT&gt;]... [-G &lt;XSL&gt;]]
+          [-p [-a &lt;ID&gt;]] [-cdflxh?] [&lt;modules&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-aspp</emphasis> tool has two main functions:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>Generates display text for applicability statements. The text is derived from the logic described by the <verbatimText verbatimStyle="vs12">assert</verbatimText> and <verbatimText verbatimStyle="vs12">evaluate</verbatimText> elements.</para>
+            </listItem>
+            <listItem>
+              <para>Preprocesses "semantic" applicability statements in a data module to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet.</para>
+            </listItem>
+          </randomList>
+        </para>
+        <para>"Semantic" applicability statements are those entered by the author to encode the applicability of elements within a data module. "Presentation" applicability statements are those that are actually displayed in page-oriented output, also referred to as the "human-readable" statements.</para>
+        <para>The applicability in the resulting XML is longer semantically correct, but an XSLT stylesheet can simply place a statement on any element with attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> without needing to consider inherited applicability statements on elements without the attribute.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-A &lt;ACT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add an ACT to use when generating display text for product attributes. Multiple ACT data modules can be used by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a &lt;ID&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The ID to use for the inline applicability annotation representing the whole data module's applicability. Default is "applic-0000".</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C &lt;CCT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add a CCT to use when generating display text for conditions. Multiple CCT data modules can be used by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>Search for the ACT and CCT referenced by each data module, and add them to the list of ACTs/CCTs to use when generating display text for that data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite input data module(s) rather than outputting to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-G &lt;XSLT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use custom XSLT to generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-g</listItemTerm>
+              <listItemDefinition>
+                <para>Generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of filenames of modules, rather than modules themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Preprocess applicability statements to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet. The applicability in the resulting XML is no longer semantically correct.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x</listItemTerm>
+              <listItemDefinition>
+                <para>Process the modules using the XInclude specification.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;modules&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>The module(s) to preprocess. This can include both individual modules and combined files such as those produced by s1kd-flatten(1).</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Generating display text</title>
+          <para>The built-in XSLT for generating display text follows the guidance in Chap 7.8 of the S1000D 4.2 specification. For example, given the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
+<assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>]]></verbatimText>
+          </para>
+          <para>The resulting XML would contain:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
+<displayText>
+<simplePara>prodversion: A</simplePara>
+</displayText>
+<assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>]]></verbatimText>
+          </para>
+          <para>If ACTs or CCTs are supplied which define display names for a property, this will be used instead of the ident. For example, the ACT defines the display name for the "<verbatimText verbatimStyle="vs14">prodversion</verbatimText>" product attribute:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<productAttribute id="prodversion">
+<name>Product version</name>
+<displayName>Version</displayName>
+<descr>The version of the product.</descr>
+<enumeration applicPropertyValues="A|B|C"/>
+</productAttribute>]]></verbatimText>
+          </para>
+          <para>When supplied with the -A option:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-aspp -g -A &lt;ACT&gt; &lt;DM&gt;</verbatimText>
+          </para>
+          <para>The resulting XML would instead contain:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
+<displayText>
+<simplePara>Version: A</simplePara>
+<assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</displayText>
+</applic>]]></verbatimText>
+          </para>
+          <para>The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -d option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="@*|node()">
+<xsl:copy>
+<xsl:apply-templates select="@*|node()"/>
+</xsl:copy>
+</xsl:template>]]></verbatimText>
+          </para>
+          <para>This means any elements or attributes not matched by a more specific template in the script are copied.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Creating presentation applicability statements</title>
+          <para>Given the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+<identAndStatusSection>
+<dmAddress>...</dmAddress>
+<dmStatus>
+...
+<applic>
+<displayText>
+<simplePara>A or B</simplePara>
+</displayText>
+</applic>
+...
+</dmStatus>
+</identAndStatusSection>
+<content>
+<referencedApplicGroup>
+<applic id="applic-B">
+<displayText>
+<simplePara>B</simplePara>
+</displayText>
+</applic>
+</referencedApplicGroup>
+<procedure>
+<preliminaryRqmts>...</preliminaryRqmts>
+<mainProcedure>
+<proceduralStep>
+<para>This step is applicable to A or B.</para>
+</proceduralStep>
+<proceduralStep applicRefId="applic-B">
+<para>This step is applicable to B only.</para>
+</proceduralStep>
+<proceduralStep applicRefId="applic-B">
+<para>This step is also applicable to B only.</para>
+</proceduralStep>
+<proceduralStep>
+<para>This step is also applicable to A or B.</para>
+</proceduralStep>
+</mainProcedure>
+<closeRqmts>...</closeRqmts>
+</procedure>
+</content>
+</dmodule>]]></verbatimText>
+          </para>
+          <para>Applicability statements should be displayed whenever applicability changes:</para>
+          <para>
+            <sequentialList>
+              <listItem>
+                <para>This step is applicable to A or B.</para>
+              </listItem>
+              <listItem>
+                <para>
+                  <emphasis>Applicable to: B</emphasis>
+                </para>
+                <para>This step is applicable to B only.</para>
+              </listItem>
+              <listItem>
+                <para>This step is also applicable to B only.</para>
+              </listItem>
+              <listItem>
+                <para>
+                  <emphasis>Applicable to: A or B</emphasis>
+                </para>
+                <para>This step is also applicable to A or B.</para>
+              </listItem>
+            </sequentialList>
+          </para>
+          <para>There are two parts which are difficult to do in an XSLT stylesheet:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>No statement is shown on Step 3 despite having attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> because the applicability has not changed since the last statement on Step 2.</para>
+              </listItem>
+              <listItem>
+                <para>A statement is shown on Step 4 despite not having attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> because the applicability has changed back to that of the whole data module.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>Using the s1kd-aspp tool, the above XML would produce the following output:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+<identAndStatusSection>
+<dmAddress>...</dmAddress>
+<dmStatus>
+...
+<applic>
+<displayText>
+<simplePara>A or B</simplePara>
+</displayText>
+</applic>
+...
+</dmStatus>
+</identAndStatusSection>
+<content>
+<referencedApplicGroup>
+<applic id="applic-B">
+<displayText>
+<simplePara>B</simplePara>
+</displayText>
+</applic>
+<applic id="applic-0000">
+<displayText>
+<simplePara>A or B</simplePara>
+</displayText>
+</applic>
+</referencedApplicGroup>
+<procedure>
+<preliminaryRqmts>...</preliminaryRqmts>
+<mainProcedure>
+<proceduralStep>
+<para>This step is applicable to A or B.</para>
+</proceduralStep>
+<proceduralStep applicRefId="applic-B">
+<para>This step is applicable to B only.</para>
+</proceduralStep>
+<proceduralStep>
+<para>This step is also applicable to B only.</para>
+</proceduralStep>
+<proceduralStep applicRefId="applic-0000">
+<para>This step is also applicable to A or B.</para>
+</proceduralStep>
+</mainProcedure>
+</procedure>
+</content>
+</dmodule>]]></verbatimText>
+          </para>
+          <para>With attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> only on those elements where a statement should be shown, and an additional inline applicability to represent the whole data module's applicability. This XML is semantically incorrect but easier for a stylesheet to transform for page-oriented output.</para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

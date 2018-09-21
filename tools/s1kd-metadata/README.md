@@ -72,10 +72,10 @@ EXAMPLE
 =======
 
     $ ls
-    DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
-    DMC-S1000DTOOLS-A-00-0Q-00-00A-040A-D_EN-CA.XML
+    DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+    DMC-S1KDTOOLS-A-00-0Q-00-00A-040A-D_EN-CA.XML
 
-    $ DMOD=DMC-S1000DTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+    $ DMOD=DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
     $ s1kd-metadata $DMOD
     issueDate                      2017-08-14
     techName                       s1kd-metadata(1) | s1kd-tools
@@ -92,7 +92,7 @@ EXAMPLE
     countryIsoCode                 CA
     issueNumber                    001
     inWork                         00
-    dmCode                         S1000DTOOLS-A-00-09-00-00A-040A-D
+    dmCode                         S1KDTOOLS-A-00-09-00-00A-040A-D
 
     $ s1kd-metadata -n techName -v "New title" $DMOD
     $ s1kd-metadata -n techName $DMOD

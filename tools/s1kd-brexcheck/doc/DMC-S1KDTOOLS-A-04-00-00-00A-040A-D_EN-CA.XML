@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="020" inWork="03"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="09" day="04"/>
+        <dmTitle>
+          <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Improve example.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Remove unused -V option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
+        <simplePara>Expand upon explanation of -D, -q, and -v.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-brexcheck - Validate S1000D CSDB objects against BREX data modules</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+               [-BcDfLlpqSstuVvxh?] [<object>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates S1000D CSDB objects using the context, SNS, and/or notation rules of one or multiple <acronym acronymType="at01"><acronymTerm>BREX</acronymTerm><acronymDefinition>Business Rules EXchange</acronymDefinition></acronym> data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-B</listItemTerm>
+              <listItemDefinition>
+                <para>Check each input object against the appropriate built-in S1000D default BREX only. The actual BREX reference of each object is ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;brex&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Check the CSDB objects against this BREX. Multiple BREX data modules can be specified by adding this option multiple times. When no BREX data modules are specified, the BREX data module referenced in &lt;brexDmRef&gt; in the CSDB object is attempted to be used instead.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-D -q -v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbosity of the output:</para>
+                <para changeType="add" reasonForUpdateRefIds="rfu-0004">
+                  <randomList>
+                    <listItem>
+                      <para>-D - Debug mode gives the most amount of information.</para>
+                    </listItem>
+                    <listItem>
+                      <para>-q - Quiet mode gives no output, errors are only indicated via the return code.</para>
+                    </listItem>
+                    <listItem>
+                      <para>-v - Verbose mode lists the overall success/failure of all checks.</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Output only the filenames of CSDB objects with BREX/SNS errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show the help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add a search path for BREX data modules. By default, only the current directory is searched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of object filenames to check, rather than an object itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified CSDB objects) will also be checked against.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n</listItemTerm>
+              <listItemDefinition>
+                <para>Check notation rules. Any notation names listed in any of the BREX data modules with attribute <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "1" or omitted are considered valid notations. If a notation in a CSDB object is not present or has <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "0", an error will be returned.</para>
+                <para>For notations not included but not explicitly excluded, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the first inclusion rule will be returned with the error. For explicitly excluded notations, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the explicit exclusion rule is returned.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Display a progress bar.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-S[tu]</listItemTerm>
+              <listItemDefinition>
+                <para>Check <acronym acronymType="at01"><acronymTerm>SNS</acronymTerm><acronymDefinition>Standard Numbering System</acronymDefinition></acronym> rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s</listItemTerm>
+              <listItemDefinition>
+                <para>Use shortened, single-line messages to report BREX errors instead of multiline indented messages.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w &lt;severities&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a list of severity levels for business rules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x</listItemTerm>
+              <listItemDefinition>
+                <para>Output an XML report instead of a plain-text one.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
+          <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
+          <para>An example of the format of this file is given below:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+<brSeverityLevels>
+<brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
+<brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
+</brSeverityLevels>]]></verbatimText>
+          </para>
+          <para>When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of "yes" (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is no, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Normal, strict and unstrict SNS check (-S, -St, -Su)</title>
+          <para>There are three modes for SNS checking: normal, strict, and unstrict. The main difference between them is how they handle the optional levels of an SNS description in the BREX.</para>
+          <para>-St enables <emphasis>strict</emphasis> SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
+</snsSystem>]]></verbatimText>
+          </para>
+          <para>is equivalent to</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
+<snsSubSystem>
+<snsCode>0</snsCode>
+<snsTitle>General</snsTitle>
+<snsSubSubSystem>
+<snsCode>0</snsCode>
+<snsTitle>General</snsTitle>
+<snsAssy>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
+</snsAssy>
+</snsSubSubSystem>
+</snsSubSystem>
+</snsSystem>]]></verbatimText>
+          </para>
+          <para>Using strict checking will disable this shorthand, and missing optional elements will result in an error.</para>
+          <para>-Su enables <emphasis>unstrict</emphasis> SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, <emphasis>any</emphasis> code used will not produce an error when the relevant optional elements are omitted. This means that given the following...</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
+<snsCode>00</snsCode>
+<snsTitle>General</snsTitle>
+</snsSystem>]]></verbatimText>
+          </para>
+          <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Object value checking (-c)</title>
+          <para>There are two ways to restrict the allowable values of an object in a BREX rule. One is to use the XPath expression itself. For example, this expression will match any <verbatimText verbatimStyle="vs13">securityClassification</verbatimText> attribute whose value is neither <verbatimText verbatimStyle="vs14">"01"</verbatimText> nor <verbatimText verbatimStyle="vs14">"02"</verbatimText>, and because the <verbatimText verbatimStyle="vs13">allowedObjectFlag</verbatimText> is <verbatimText verbatimStyle="vs14">"0"</verbatimText>, will generate a BREX error if any match is found:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<objectPath allowedObjectFlag="0">
+//@securityClassification[
+. != '01' and
+. != '02'
+]
+</objectPath>]]></verbatimText>
+          </para>
+          <para>However, this method can lead to fairly complex expressions and requires a reversal of logic. The BREX schema provides an alternative method using the element <verbatimText verbatimStyle="vs12">objectValue</verbatimText>:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
+<objectPath allowedObjectFlag="2">
+//@securityClassification
+</objectPath>
+<objectValue valueAllowed="01">Unclassified</objectValue>
+<objectValue valueAllowed="02">Classified</objectValue>
+</structureObjectRule>]]></verbatimText>
+          </para>
+          <para>Specifying the -c option will enable checking of these types of rules, and if the value is not within the allowed set a BREX error will be reported. The <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute can be used to specify what kind of notation the <verbatimText verbatimStyle="vs13">valueAllowed</verbatimText> attribute will contain:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs14">"single"</verbatimText> - A single, exact value.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs14">"range"</verbatimText> - Values given in the S1000D range/set notation, e.g. <verbatimText verbatimStyle="vs14">"a~c"</verbatimText> or <verbatimText verbatimStyle="vs14">"a|b|c"</verbatimText>.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs14">"pattern"</verbatimText> - A regular expression.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The s1kd-brexcheck tool supports all three types. If the <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute is omitted, it will assume the value is in the <verbatimText verbatimStyle="vs14">"single"</verbatimText> notation.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>RETURN VALUE</title>
+        <para>The number of BREX errors encountered is returned in the exit status code.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+$ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+$ cat $DMOD
+[...]
+<listItem id="stp-0001">
+<para>List items shouldn't be used as steps...</para>
+</listItem>
+[...]
+<para>Refer to <internalRef internalRefId="stp-0001"
+internalRefTargetType="irtt08"/>.</para>
+[...]
+
+$ s1kd-brexcheck -b $BREX $DMOD
+BREX ERROR: DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+  BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+  Only when the reference target is a step can the value of attribute
+internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
+  line 53:
+    ELEMENT internalRef
+      ATTRIBUTE internalRefId
+        TEXT
+          content=stp-0001
+      ATTRIBUTE internalRefTargetType
+        TEXT
+          content=irtt08]]></verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="19" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="012" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="08" day="17"/>
+        <dmTitle>
+          <techName>s1kd-checkrefs(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-checkrefs - Check and update references in S1000D modules</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-checkrefs [-d <dir>] [-m <object>] [-s <source>] [-t <target>]
+               [-ceFfLlnquvh?] <modules>...]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-checkrefs</emphasis> tool takes a list of S1000D data modules and pub modules, and lists any invalid references to data/pub modules within them (references to modules not included in the list). It can also update the address items (title, issueDate if applicable) of all valid references using the corresponding address items of the given modules.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>Only check/update references within the content section of modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Check references between data modules in the specified directory. Additional data modules can still be specified with -s.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e</listItemTerm>
+              <listItemDefinition>
+                <para>Check/update external publication references against a pre-defined list of publications.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F</listItemTerm>
+              <listItemDefinition>
+                <para>Fail on first invalid reference and return an error code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>List files which contain invalid references.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of data module filenames, rather than a data module itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>List all invalid references found.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m &lt;object&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Change all references to the source object specified with -s into references that point to &lt;object&gt;.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n</listItemTerm>
+              <listItemDefinition>
+                <para>When listing invalid references (-l), include the source filenames of the objects in which the invalid references occur.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Do not display error messages for invalid references.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s &lt;source&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use only the specified module as the source of address items. Only references to this module will be checked and/or updated in all other modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;target&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Only check and/or update references within this module. All other modules will only be used as sources.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-u</listItemTerm>
+              <listItemDefinition>
+                <para>Update the address items of all valid references found within the specified modules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title>External publication list (-e)</title>
+          <para>Since external publications can be of any format, in order to check references to them, their metadata must be specified in an XML format for the s1kd-checkrefs tool to read.</para>
+          <para>The root element of the XML file is the <verbatimText verbatimStyle="vs12">externalPubs</verbatimText> element. Each external publication is represented by an element <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText>. The identifying elements of the publication are stored in the <verbatimText verbatimStyle="vs12">externalPubIdent</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefIdent</verbatimText> element). The address items are stored in the <verbatimText verbatimStyle="vs12">externalPubAddress</verbatimText> element (corresponding with the <verbatimText verbatimStyle="vs12">externalPubRefAddressItems</verbatimText> element).</para>
+          <para>Example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+<externalPubs>
+<externalPubAddress>
+<externalPubIdent>
+<externalPubCode>s1kd-checkrefs</externalPubCode>
+<externalPubTitle>s1kd-checkrefs manual</externalPubTitle>
+</externalPubIdent>
+<externalPubAddressItems>
+<externalPubIssueDate year="2017" month="08" day="14"/>
+</externalPubAddressItems>
+</externalPubAddress>
+</externalPubs>]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <para>Validate all references in all data modules:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-checkrefs DMC-*.XML</verbatimText>
+        </para>
+        <para>Validate references in a single data module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-checkrefs -t &lt;DM&gt; DMC-*.XML</verbatimText>
+        </para>
+        <para>Update all references in all data modules:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-checkrefs -u DMC-*.XML</verbatimText>
+        </para>
+        <para>Change references from one data module to another in all data modules:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-checkrefs -s &lt;old DM&gt; -m &lt;new DM&gt; DMC-*.XML</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

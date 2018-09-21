@@ -5,7 +5,7 @@ all: $(OUTPUT)
 
 $(OUTPUT): $(SOURCE)
 	s1kd-upissue $(SOURCE)
-	s1kd-syncrefs $(OUTPUT)
+	s1kd-syncrefs -f $(OUTPUT)
 	xmllint --format $(OUTPUT) -o $(OUTPUT)
 
 clean:

@@ -30,7 +30,7 @@ The CSDB
 
 The full title of the S1000D specification is "International specification for technical publications using a common source database". The common source database, or CSDB, is where all the data for your S1000D project is stored, including the data modules. This means a data module is not tied to a particular publication, but can be reused among several publications wherever it is needed, avoiding duplication of data.
 
-![Traditional publications vs. CSDB](doc/ICN-S1000DTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG)
+![Traditional publications vs. CSDB](ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG)
 
 The S1000D specification does not give specific requirements for the implementation of a CSDB, and so CSDBs can be implemented in any number of ways. Often, a CSDB is built on top of an existing relational database management system.
 

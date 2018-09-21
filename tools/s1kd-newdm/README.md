@@ -296,4 +296,4 @@ The `templates` default can also be specified in the `.defaults` file to use the
 EXAMPLE
 =======
 
-    $ s1kd-newdm -# S1000DTOOLS-A-00-07-00-00A-040A-D
+    $ s1kd-newdm -# S1KDTOOLS-A-00-07-00-00A-040A-D

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="09" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="017" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="08" day="31"/>
+        <dmTitle>
+          <techName>s1kd-metadata(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Remove extra space from example.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-metadata - View and edit S1000D CSDB object metadata</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-metadata [options] [<object>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-metadata</emphasis> tool provides a simple way to fetch and change metadata on S1000D CSDB objects.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-0</listItemTerm>
+              <listItemDefinition>
+                <para>Print a null-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e</listItemTerm>
+              <listItemDefinition>
+                <para>When showing all metadata, only list editable items. This is useful when creating a file for use with the -c option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F &lt;fmt&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Print a formatted line for each CSDB object. Metadata names surrounded with % (e.g. %issueDate%) will be substituted by the value read from the object.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>When editing metadata, overwrite the object. The default is to output the modified object to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-H</listItemTerm>
+              <listItemDefinition>
+                <para>Lists all available metadata with a short description of each. Specify specific metadata to describe with the -n option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of object filenames to read or edit metadata on, rather than an object itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;name&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The name of the piece of metadata to fetch. This option can be specified multiple times to fetch multiple pieces of metadata. If -n is not specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Non-fatal errors such as a missing piece of optional metadata in an object will not be printed to stderr.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T</listItemTerm>
+              <listItemDefinition>
+                <para>Do not format columns in output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Print a tab-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v &lt;value&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>When following a -n option, this specifies the new value for that piece of metadata.</para>
+                <para>When following a -w or -W option, this specifies the value to compare that piece of metadata to.</para>
+                <para>Each -n, -w, or -W can be followed by -v to edit or define conditions on multiple pieces of metadata.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-W &lt;name&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Show or edit metadata only on objects where the value of &lt;name&gt; is not equal to the value specified in the following -v option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w &lt;name&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Show or edit metadata only on objects where the value of &lt;name&gt; is equal to the value specified in the following -v option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>The object(s) to show/edit metadata on. The default is to read from stdin.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ ls
+DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+DMC-S1KDTOOLS-A-00-0Q-00-00A-040A-D_EN-CA.XML
+
+$ DMOD=DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+$ s1kd-metadata $DMOD
+issueDate                      2017-08-14
+techName                       s1kd-metadata(1) | s1kd-tools
+responsiblePartnerCompany      khzae.net
+originator                     khzae.net
+securityClassification         01
+schema                         http://www.s1000d.org/S1000D_4-2/xml_
+schema_flat/descript.xsd
+type                           dmodule
+applic                         All
+brex                           S1000D-F-04-10-0301-00A-022A-D
+issueType                      new
+languageIsoCode                en
+countryIsoCode                 CA
+issueNumber                    001
+inWork                         00
+dmCode                         S1KDTOOLS-A-00-09-00-00A-040A-D
+
+$ s1kd-metadata -n techName -v "New title" $DMOD
+$ s1kd-metadata -n techName $DMOD
+New title
+
+$ s1kd-metadata -n techName DMC-*.XML
+New title
+s1kd-aspp(1) | s1kd-tools
+
+$ s1kd-metadata -F "%techName% (%issueDate%) %issueType%" DMC-*.XML
+New title (2017-08-14) new
+s1kd-aspp(1) | s1kd-tools (2018-03-28) changed
+
+$ s1kd-metadata -F "%techName%" -w subSubSystemCode -v Q DMC-*.XML
+s1kd-aspp(1) | s1kd-tools]]></verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

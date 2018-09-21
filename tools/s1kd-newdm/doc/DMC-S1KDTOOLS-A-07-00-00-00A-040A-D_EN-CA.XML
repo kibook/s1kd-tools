@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="035" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="09" day="04"/>
+        <dmTitle>
+          <techName>s1kd-newdm(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-newdm - Create a new S1000D data module</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-newdm [options]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-newdm</emphasis> tool creates a new S1000D data module with the data module code and other metadata specified.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-# &lt;DMC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The data module code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>4.2 (default)</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>3.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.3</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.2</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.0</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new data module as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use XML templates in the specified directory instead of the built-in templates.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-~ &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XML templates to the specified directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-,</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> XML. This can be used to quickly set up a starting point for a project's custom info codes, from which info names can be modified and unused codes can be removed to fit the project.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-.</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the simple text form of the built-in default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-!</listItemTerm>
+              <listItemDefinition>
+                <para>Do not include an info name for the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-B</listItemTerm>
+              <listItemDefinition>
+                <para>When creating a new BREX data module, use the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to add a basic set of context rules.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C &lt;country&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The country ISO code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-D &lt;dmtypes&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Issue date of the new data module in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i &lt;info&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The info name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-j &lt;map&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file when using the -B option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-k &lt;skill&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The skill level code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L &lt;language&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The language ISO code of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-M &lt;SNS&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Determine the tech name from on one of the built-in S1000D maintained SNS. Supported SNS:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>Generic</para>
+                    </listItem>
+                    <listItem>
+                      <para>Support and training equipment</para>
+                    </listItem>
+                    <listItem>
+                      <para>Ordnance</para>
+                    </listItem>
+                    <listItem>
+                      <para>General communications</para>
+                    </listItem>
+                    <listItem>
+                      <para>Air vehicle, engines and equipment</para>
+                    </listItem>
+                    <listItem>
+                      <para>Tactical missiles</para>
+                    </listItem>
+                    <listItem>
+                      <para>General surface vehicles</para>
+                    </listItem>
+                    <listItem>
+                      <para>General sea vehicles</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>When creating a BREX data module, this SNS will be included as the SNS rules of the new data module. The "<verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can be used to set one of the above SNS as the default.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set remarks for the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N</listItemTerm>
+              <listItemDefinition>
+                <para>Omit issue/inwork numbers from filename. The "<verbatimText verbatimStyle="vs14">omitIssueInfo</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-O &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the originator.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o &lt;orig&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The originator enterprise name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P</listItemTerm>
+              <listItemDefinition>
+                <para>When determining tech name from an SNS (-S or -M), include the previous level of SNS in the tech name. This means that:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>tech names derived from a subsystem will be formatted as "System - Subsystem"</para>
+                    </listItem>
+                    <listItem>
+                      <para>tech names derived from a subsubsystem will be formatted as "Subsystem - Subsubsystem"</para>
+                    </listItem>
+                    <listItem>
+                      <para>and tech names derived from an assembly will be formatted as "Subsubsystem - Assembly".</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>If both levels have the same title, then only one will be used. The "<verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>" <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file key can also be set to control this option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p</listItemTerm>
+              <listItemDefinition>
+                <para>Prompts the user for any values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Do not report an error when the file already exists.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the responsible partner company.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r &lt;RPC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The responsible partner company enterprise name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-S &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s &lt;schema&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The schema URL.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T &lt;schema&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The type (schema) of the new data module. Supported schemas:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>appliccrossreftable - Applicability cross-reference table</para>
+                    </listItem>
+                    <listItem>
+                      <para>brdoc - Business rule document</para>
+                    </listItem>
+                    <listItem>
+                      <para>brex - Business rule exchange</para>
+                    </listItem>
+                    <listItem>
+                      <para>checklist - Maintenance checklist</para>
+                    </listItem>
+                    <listItem>
+                      <para>comrep - Common information repository</para>
+                    </listItem>
+                    <listItem>
+                      <para>condcrossreftable - Conditions cross-reference table</para>
+                    </listItem>
+                    <listItem>
+                      <para>container - Container</para>
+                    </listItem>
+                    <listItem>
+                      <para>crew - Crew/Operator information</para>
+                    </listItem>
+                    <listItem>
+                      <para>descript - Descriptive</para>
+                    </listItem>
+                    <listItem>
+                      <para>fault - Fault information</para>
+                    </listItem>
+                    <listItem>
+                      <para>frontmatter - Front matter</para>
+                    </listItem>
+                    <listItem>
+                      <para>ipd - Illustrated parts data</para>
+                    </listItem>
+                    <listItem>
+                      <para>learning - Technical training information</para>
+                    </listItem>
+                    <listItem>
+                      <para>prdcrossreftable - Product cross-reference table</para>
+                    </listItem>
+                    <listItem>
+                      <para>proced - Procedural</para>
+                    </listItem>
+                    <listItem>
+                      <para>process - Process</para>
+                    </listItem>
+                    <listItem>
+                      <para>sb - Service bulletin</para>
+                    </listItem>
+                    <listItem>
+                      <para>schedul - Maintenance planning information</para>
+                    </listItem>
+                    <listItem>
+                      <para>scocontent - SCO content information</para>
+                    </listItem>
+                    <listItem>
+                      <para>techrep - Technical repository (replaced by comrep in issue 4.1)</para>
+                    </listItem>
+                    <listItem>
+                      <para>wrngdata - Wiring data</para>
+                    </listItem>
+                    <listItem>
+                      <para>wrngflds - Wiring fields</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;tech&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The tech name of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w &lt;inwork&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The inwork number of the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title>Prompt (-p) option</title>
+          <para>If this option is specified, the program will prompt the user to enter values for metadata which was not specified when calling the program. If a piece of metadata has a default value (from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files), it will be displayed in square brackets [] in the prompt, and pressing Enter without typing any value will select this default value.</para>
+        </levelledPara>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This file sets default values for each piece of metadata. By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, but any file can be specified by using the -d option.</para>
+          <para>All of the s1kd-new* commands use the same <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file format, so this file can contain default values for multiple types of metadata.</para>
+          <para>Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23"><![CDATA[# General
+countryIsoCode               CA
+languageIsoCode              en
+originator                   khzae.net
+responsiblePartnerCompany    khzae.net
+securityClassification       01]]></verbatimText>
+          </para>
+          <para>Alternatively, the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
+          <para>
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
+<defaults>
+<!-- General -->
+<default ident="countryIsoCode" value="CA"/>
+<default ident="languageIsoCode" value="en"/>
+<default ident="originator" value="khzae.net"/>
+<default ident="responsiblePartnerCompany" value="khzae.net"/>
+<default ident="securityClassification" value="01"/>
+</defaults>]]></verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file</title>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>, but any file can be specified by using the -D option.</para>
+          <para>Each line consists of an info code, a schema identifier, and optionally a default info name. Example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23"><![CDATA[000    descript
+022    brex        Business rules
+040    descript    Description
+520    proced      Remove procedure]]></verbatimText>
+          </para>
+          <para>Like the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file, the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText>, an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>, and optionally an attribute <verbatimText verbatimStyle="vs13">infoName</verbatimText>.</para>
+          <para>
+            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
+<dmtypes>
+<type infoCode="000" schema="descript"/>
+<type infoCode="022" schema="brex" infoName="Business rules"/>
+<type infoCode="040" schema="descript" infoName="Description"/>
+<type infoCode="520" schema="proced" infoName="Remove procedure"/>
+</dmtypes>]]></verbatimText>
+          </para>
+          <para>Info code variants can also be given specific default schema and info names. To do this, include the variant with the info code:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">258A  proced  Other procedure to clean
+258B  proced  Other procedure to clean, Clean with air
+258C  proced  Other procedure to clean, Clean with water</verbatimText>
+          </para>
+          <para>The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file. An info code with no variant matches all possible variants.</para>
+        </levelledPara>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>
+          <para>Refer to the documentation for s1kd-defaults(1) for a description of the <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Custom XML templates (-%)</title>
+          <para>A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named <verbatimText verbatimStyle="vs02">&lt;schema&gt;.xml</verbatimText>, where <verbatimText verbatimStyle="vs02">&lt;schema&gt;</verbatimText> is the name of the schema, matching one of the schema names in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file or the schema specified with the -T option.</para>
+          <para>The templates must be written to conform to the default S1000D issue of this tool (currently 4.2). They will be automatically transformed when another issue is specified with the -$ option.</para>
+          <para>The <verbatimText>templates</verbatimText> default can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file to use these custom templates by default.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-newdm -# S1KDTOOLS-A-00-07-00-00A-040A-D</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

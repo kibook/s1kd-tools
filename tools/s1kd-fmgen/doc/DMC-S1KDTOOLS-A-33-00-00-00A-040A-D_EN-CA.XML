@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="006" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="09" day="04"/>
+        <dmTitle>
+          <techName>s1kd-fmgen(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-fmgen - Generate front matter data module contents</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]]
+           [-,.fhx?] (-t <TYPE>|<DM>...)]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-fmgen</emphasis> tool generates the content section for front matter data modules from either a standard publication module, or the combined format of the s1kd-flatten(1) tool. Some front matter types require the use of the combined format, particularly those that list information not directly found in the publication module, such as the highlights (HIGH) type.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-,</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> XML format.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-.</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> simple text format.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F &lt;FMTYPES&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a custom <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite the specified front matter data module files after generating their content.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of front matter data modules to generate content for, rather than data modules themselves. If reading list from stdin, the -P option must be used to specify the publication module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P &lt;PM&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Publication module or s1kd-flatten(1) PM format file to generate contents from. If none is specified, the tool will read from stdin.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p &lt;name&gt;=&lt;value&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Pass a parameter to the XSLT specified with the -X option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;TYPE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Generate content for this type of front matter when no data modules are specified. Supported types are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>HIGH - Highlights</para>
+                    </listItem>
+                    <listItem>
+                      <para>LOEDM - List of effective data modules</para>
+                    </listItem>
+                    <listItem>
+                      <para>TOC - Table of contents</para>
+                    </listItem>
+                    <listItem>
+                      <para>TP - Title page</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-X &lt;XSL&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Transform the front matter contents after generating them using the specified XSLT. This can be used, for example, to generate content for a descriptive schema data module instead, to support older issues of the specification, or for types of generated front matter not covered by the frontmatter schema.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;DM&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Front matter data modules to generate content for.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file</title>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
+          <para>Example of simple text format:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[001    TP
+009    TOC
+00S    LOEDM
+00U    HIGH]]></verbatimText>
+          </para>
+          <para>Example of XML format</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<fmtypes>
+<fm infoCode="001" type="TP"/>
+<fm infoCode="009" type="TOC"/>
+<fm infoCode="00S" type="LOEDM"/>
+</fmtypes>]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>Generate the content for a title page front matter data module and overwrite the file:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-flatten PMC-EX-12345-00001-00_001-00_EN-CA.XML |
+> s1kd-fmgen -f DMC-EX-A-00-00-00-00A-001A-D_001-00_EN-CA.XML]]></verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

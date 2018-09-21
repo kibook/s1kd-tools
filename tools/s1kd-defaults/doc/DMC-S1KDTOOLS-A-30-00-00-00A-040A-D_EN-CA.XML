@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="30" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="009" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="09" day="04"/>
+        <dmTitle>
+          <techName>s1kd-defaults(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Search for configuration files in upper directories.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-defaults - <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files management tool</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-defaults [-DdFfisth?] [-b &lt;BREX&gt;] [-j &lt;map&gt;] [&lt;file&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-defaults</emphasis> tool generates a basic <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file for a new CSDB, which is used by several of the other s1kd-tools to determine default values for S1000D metadata. It also provides a way to convert between the simple text and XML formats of the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use the specified BREX data module to build the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. This can be used both when initializing a new CSDB (-i) or either file can be generated from a BREX data module separately.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-D</listItemTerm>
+              <listItemDefinition>
+                <para>Convert a <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d</listItemTerm>
+              <listItemDefinition>
+                <para>Convert a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F</listItemTerm>
+              <listItemDefinition>
+                <para>Convert a <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite the existing file after conversion.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i</listItemTerm>
+              <listItemDefinition>
+                <para>Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-J</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the default <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-j &lt;map&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file to map a BREX DM to a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> or <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s</listItemTerm>
+              <listItemDefinition>
+                <para>Sort the entries alphabetically for either file/output format.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t</listItemTerm>
+              <listItemDefinition>
+                <para>Output using the simple text format. Otherwise, the XML format is used by default.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;file&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Names of files to convert. If none are specified, the default names of <verbatimText verbatimStyle="vs02">.defaults</verbatimText> (for the -d option), <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> (for the -D option) or <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> (for the -F option) in the current directory are used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>
+          <para>This file specifies a mapping between BREX structure object rules and <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. The path to an object can be written in many different ways in a BREX rule, so the <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file allows any project's BREX to be used to generate these files without having to modify the BREX data module itself.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> in the current directory and parent directories, but any file can be specified using the -j option. If there is no <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file and the -j option is not specified, a default mapping will be used.</para>
+          <para>Example of <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<brexMap>
+<dmtypes path="//@infoCode"/>
+<default path="//@languageIsoCode" ident="languageIsoCode"/>
+<default path="//@countryIsoCode" ident="countryIsoCode"/>
+</brexMap>]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Initialize a new CSDB, using the XML format</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ mkdir mycsdb
+$ cd mycsdb
+$ s1kd-defaults -i</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Initialize a new CSDB, using the simple text format</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ mkdir mycsdb
+$ cd mycsdb
+$ s1kd-defaults -ti</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Generate a custom-named <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults &gt; custom-defaults.xml</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Convert a simple text formatted file to XML</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults -df</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Sort entries and output in text format</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults -dts custom-defaults.txt</verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
