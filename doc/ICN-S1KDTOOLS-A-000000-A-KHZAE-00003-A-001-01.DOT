@@ -10,7 +10,7 @@ digraph {
 	]
 
 	subgraph cluster_traditional {
-		label = "Traditional publications"
+		label = <Traditional publications<br/><font point-size="10">(Monolithic)</font>>
 		fillcolor = khaki1
 
 		node [
@@ -35,7 +35,7 @@ digraph {
 	}
 
 	subgraph cluster_s1000d {
-		label = "CSDB"
+		label = <CSDB<br/><font point-size="10">(Modular)</font>>
 		fillcolor = khaki1
 
 		pub_s1000d1 [
