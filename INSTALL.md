@@ -13,7 +13,7 @@ To build the documentation from source:
 
 -   [s1kd2db](http://github.com/kibook/s1kd2db)
 
--   pandoc
+-   [pandoc](https://pandoc.org/)
 
 Building the executables
 ========================

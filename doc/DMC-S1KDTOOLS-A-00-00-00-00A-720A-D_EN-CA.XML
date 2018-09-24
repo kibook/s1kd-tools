@@ -72,7 +72,13 @@
               </para>
             </listItem>
             <listItem>
-              <para>pandoc</para>
+              <para>
+                <externalPubRef xlink:href="https://pandoc.org/">
+                  <externalPubRefIdent>
+                    <externalPubTitle>pandoc</externalPubTitle>
+                  </externalPubRefIdent>
+                </externalPubRef>
+              </para>
             </listItem>
           </randomList>
         </para>
