@@ -9,6 +9,10 @@ digraph {
 		fillcolor = gainsboro
 	]
 
+	edge [
+		fontname = "Helvetica"
+	]
+
 	subgraph cluster_traditional {
 		label = <Traditional publications<br/><font point-size="10">(Monolithic)</font>>
 		fillcolor = khaki1
