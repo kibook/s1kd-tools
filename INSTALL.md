@@ -27,7 +27,7 @@ To change where these are installed, specify the PREFIX make variable. The defau
 
 For example:
 
-    $ make PREFIX=/usr install
+    # make PREFIX=/usr install
 
 Uninstalling
 ============

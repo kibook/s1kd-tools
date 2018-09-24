@@ -87,7 +87,7 @@
         <para>To change where these are installed, specify the PREFIX make variable. The default value of this variable is /usr/local.</para>
         <para>For example:</para>
         <para>
-          <verbatimText verbatimStyle="vs24">$ make PREFIX=/usr install</verbatimText>
+          <verbatimText verbatimStyle="vs24"># make PREFIX=/usr install</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
