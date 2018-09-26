@@ -117,6 +117,8 @@ A number of common SNS are provided by the S1000D specification for any project 
 
 The disassembly code identifies further breakdown on an assembly to which maintenance information applies. The code consists of 2 typically numeric but optionally alphanumeric characters, plus a 1 thru 3 alphanumeric variant code. The variant code identifies minor variants in components, smaller than the major variants identified by the system difference code.
 
+For example, two alternative physical parts that perform the same function (and thus have the same SNS in a functional breakdown) could be identified by disassembly code variants B and C respectively.
+
 ### Information code
 
 The information code identifies the kind of information contained within a data module. It consists of 3 alphanumeric characters, referred to as the primary, secondary, and tertiary codes. The S1000D specification defines a base set of information codes divided in to 11 primary categories:
