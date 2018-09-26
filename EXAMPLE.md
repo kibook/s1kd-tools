@@ -42,6 +42,10 @@ After that, you should create two files: `.defaults` and `.dmtypes`. These files
 
 Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.
 
+> **Note**
+>
+> If the tools are run in a directory that does not have these configuration files, they will search for them in the parent directories to find the top of the CSDB directory tree.
+
 `.defaults` file
 ----------------
 

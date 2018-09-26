@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="21"/>
+        <issueDate year="2018" month="09" day="26"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -42,11 +42,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Add example screenshot.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Improve description of the s1kd-upissue tool.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add note explaining the recursive search for configuration files.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -56,7 +53,7 @@
         <title>General</title>
         <para>This document provides examples of the usage of the <emphasis>s1kd-tools</emphasis>.</para>
         <para>The sample commands have been written as they would be used on a Linux or other Unix-like system, but should work more-or-less the same on most operating systems. OS-specific commands used in examples (e.g., <verbatimText>mkdir</verbatimText>) may need to be adapted.</para>
-        <figure changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <figure>
           <title>Example - Authoring with Vim + MuPDF</title>
           <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01"/>
         </figure>
@@ -73,6 +70,9 @@ $ cd myproject</verbatimText>
           <verbatimText verbatimStyle="vs23">$ s1kd-defaults -i</verbatimText>
         </para>
         <para>Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
+        <note changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <notePara>If the tools are run in a directory that does not have these configuration files, they will search for them in the parent directories to find the top of the CSDB directory tree.</notePara>
+        </note>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
           <para>The <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
@@ -205,7 +205,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
         <para>Data modules are put through the general S1000D workflow with the <emphasis>s1kd-upissue</emphasis> tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.</para>
         <levelledPara>
           <title>Inwork data modules</title>
-          <para changeType="modify" reasonForUpdateRefIds="rfu-0002">To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional options:</para>
+          <para>To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional options:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-upissue DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
           </para>
