@@ -6,7 +6,7 @@ s1kd-neutralize - S1000D IETP neutral translation of CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-neutralize [-o <file>] [-flh?] [<object>...]
+    s1kd-neutralize [-o <file>] [-flnh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -28,6 +28,9 @@ Show usage message.
 
 -l  
 Treat input (stdin or arguments) as lists of CSDB objects to neutralize, rather than CSDB objects themselves.
+
+-n  
+Include the IETP namespaces for data module and publication module elements.
 
 -o &lt;file&gt;  
 Output neutralized CSDB object XML to &lt;file&gt; instead of stdout.

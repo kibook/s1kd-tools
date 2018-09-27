@@ -12,7 +12,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -27,7 +27,7 @@
 #define PARSE_OPTS 0
 #endif
 
-void neutralizeFile(const char *fname, const char *outfile, bool overwrite)
+void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool namesp)
 {
 	xmlDocPtr doc, res, styledoc, orig;
 	xsltStylesheetPtr style;
@@ -51,6 +51,17 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite)
 	xmlFreeDoc(doc);
 	xsltFreeStylesheet(style);
 
+	if (namesp) {
+		doc = res;
+		styledoc = xmlReadMemory((const char *)
+			stylesheets_namespace_xsl,
+			stylesheets_namespace_xsl_len, NULL, NULL, 0);
+		style = xsltParseStylesheetDoc(styledoc);
+		res = xsltApplyStylesheet(style, doc, NULL);
+		xmlFreeDoc(doc);
+		xsltFreeStylesheet(style);
+	}
+
 	oldroot = xmlDocGetRootElement(orig);
 	xmlUnlinkNode(oldroot);
 	xmlFreeNode(oldroot);
@@ -67,7 +78,7 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite)
 	xmlFreeDoc(orig);
 }
 
-void neutralizeList(const char *path, const char *outfile, bool overwrite)
+void neutralizeList(const char *path, const char *outfile, bool overwrite, bool namesp)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -83,7 +94,7 @@ void neutralizeList(const char *path, const char *outfile, bool overwrite)
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		neutralizeFile(line, outfile, overwrite);
+		neutralizeFile(line, outfile, overwrite, namesp);
 	}
 
 	if (path) {
@@ -99,6 +110,7 @@ void show_help(void)
 	puts("  -f         Overwrite CSDB objects automatically.");
 	puts("  -h -?      Show usage message.");
 	puts("  -l         Treat input as list of CSDB objects.");
+	puts("  -n         Include IETP namespaces on elements.");
 	puts("  -o <file>  Output to <file> instead of stdout.");
 	puts("  --version  Show version information.");
 }
@@ -115,8 +127,9 @@ int main(int argc, char **argv)
 	char *outfile = strdup("-");
 	bool overwrite = false;
 	bool islist = false;
+	bool namesp = false;
 
-	const char *sopts = "flo:h?";
+	const char *sopts = "flno:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -137,6 +150,9 @@ int main(int argc, char **argv)
 			case 'l':
 				islist = true;
 				break;
+			case 'n':
+				namesp = true;
+				break;
 			case 'o':
 				free(outfile);
 				outfile = strdup(optarg);
@@ -151,15 +167,15 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				neutralizeList(argv[i], outfile, overwrite);
+				neutralizeList(argv[i], outfile, overwrite, namesp);
 			} else {
-				neutralizeFile(argv[i], outfile, overwrite);
+				neutralizeFile(argv[i], outfile, overwrite, namesp);
 			}
 		}
 	} else if (islist) {
-		neutralizeList(NULL, outfile, overwrite);
+		neutralizeList(NULL, outfile, overwrite, namesp);
 	} else {
-		neutralizeFile("-", outfile, false);
+		neutralizeFile("-", outfile, false, namesp);
 	}
 
 	free(outfile);
