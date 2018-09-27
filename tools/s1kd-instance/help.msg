@@ -12,7 +12,7 @@ Options:
   -G            Use custom NCAGE/name for originator.
   -g            Set originator of the instance to identify this tool.
   -h -?         Show this help/usage message.
-  -I <date>     Set the issue date of the instance.
+  -I <date>     Set the issue date of the instance (- for current date).
   -i <infoName> Give the data module instance a different infoName.
   -k <level>    Set the skill level of the instance.
   -K <levels>   Filter on the specified skill levels.

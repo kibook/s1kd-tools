@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
@@ -16,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.8.5"
+#define VERSION "1.9.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1831,21 +1832,15 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 }
 
 /* Set the issue date of the instance. */
-void set_issue_date(xmlDocPtr doc, const char *issdate)
+void set_issue_date(xmlDocPtr doc, const char *year, const char *month, const char *day)
 {
-	char year_s[5], month_s[3], day_s[3];
 	xmlNodePtr issueDate;
 
 	issueDate = first_xpath_node(doc, NULL, "//issueDate|//issdate");
 
-	if (sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
-		fprintf(stderr, S_BAD_DATE, issdate);
-		exit(EXIT_BAD_DATE);
-	}
-
-	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year_s);
-	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month_s);
-	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
+	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year);
+	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month);
+	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day);
 }
 
 /* Set the securty classification of the instance. */
@@ -2471,6 +2466,9 @@ int main(int argc, char **argv)
 	bool dmlist = false;
 	FILE *list = NULL;
 	char issdate[16] = "";
+	char issdate_year[5];
+	char issdate_month[3];
+	char issdate_day[3];
 	bool stripext = false;
 	bool verbose = false;
 	bool setorig = false;
@@ -2585,6 +2583,24 @@ int main(int argc, char **argv)
 		 * module, since they may reference different ones. */
 		} else {
 			load_pct_per_dm = true;
+		}
+	}
+
+	/* Determine the issue date from the -I option. */
+	if (strcmp(issdate, "-") == 0) {
+		time_t now;
+		struct tm *local;
+
+		time(&now);
+		local = localtime(&now);
+
+		sprintf(issdate_year, "%d", local->tm_year + 1900);
+		sprintf(issdate_month, "%.2d", local->tm_mon + 1);
+		sprintf(issdate_day, "%.2d", local->tm_mday);
+	} else if (strcmp(issdate, "") != 0) {
+		if (sscanf(issdate, "%4s-%2s-%2s", issdate_year, issdate_month, issdate_day) != 3) {
+			fprintf(stderr, S_BAD_DATE, issdate);
+			exit(EXIT_BAD_DATE);
 		}
 	}
 
@@ -2738,7 +2754,7 @@ int main(int argc, char **argv)
 			}
 
 			if (strcmp(issdate, "") != 0) {
-				set_issue_date(doc, issdate);
+				set_issue_date(doc, issdate_year, issdate_month, issdate_day);
 			}
 
 			if (strcmp(secu, "") != 0) {

@@ -57,7 +57,7 @@ Similar to the -g option, but instead of the default enterprise code and name, u
 Set the originator of the instance. When this option is specified, the code "`S1KDI`" and the name "`s1kd-instance tool`" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.
 
 -I &lt;date&gt;  
-Set the issue date of the instance. By default, the issue date is taken from the source.
+Set the issue date of the instance. By default, the issue date is taken from the source. If - is given for &lt;date&gt;, the current date will be used.
 
 -i &lt;infoName&gt;  
 Give the data module instance a different infoName.
