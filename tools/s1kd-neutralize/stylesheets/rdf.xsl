@@ -92,6 +92,87 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="pm">
+    <xsl:variable name="pmtitle" select="(//pmTitle|//pmtitle)[1]"/>
+    <xsl:variable name="orig" select="(//originator|//orig)[1]"/>
+    <xsl:variable name="rpc" select="(//responsiblePartnerCompany|//rpc)[1]"/>
+    <xsl:variable name="schema" select="@xsi:noNamespaceSchemaLocation"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <rdf:Description>
+        <xsl:choose>
+          <xsl:when test="contains($schema, 'S1000D_2-0') or
+                          contains($schema, 'S1000D_2-1') or
+                          contains($schema, 'S1000D_2-2')">
+            <dc:Title>
+              <xsl:apply-templates select="$pmtitle" mode="dc"/>
+            </dc:Title>
+            <dc:Creator>
+              <xsl:apply-templates select="$rpc" mode="dc"/>
+            </dc:Creator>
+            <dc:Subject>
+              <xsl:apply-templates select="$pmtitle" mode="dc"/>
+            </dc:Subject>
+            <dc:Publisher>
+              <xsl:apply-templates select="(//@pmIssuer|//pmissuer)[1]" mode="dc"/>
+            </dc:Publisher>
+            <dc:Contributor>
+              <xsl:apply-templates select="$orig" mode="dc"/>
+            </dc:Contributor>
+            <dc:Date>
+              <xsl:apply-templates select="(//issueDate|//issdate)[1]" mode="dc"/>
+            </dc:Date>
+            <dc:Type>text</dc:Type>
+            <dc:Format>text/xml</dc:Format>
+            <dc:Identifier>
+              <xsl:apply-templates select="(//pmIdent|//pmaddres)[1]" mode="dc"/>
+            </dc:Identifier>
+            <dc:Language>
+              <xsl:apply-templates select="(//language)[1]" mode="dc"/>
+            </dc:Language>
+            <xsl:apply-templates select="//derivativeSource" mode="dc"/>
+            <dc:Rights>
+              <xsl:value-of select="(//@securityClassification|//@class)[1]"/>
+            </dc:Rights>
+          </xsl:when>
+          <xsl:otherwise>
+            <dc:title>
+              <xsl:apply-templates select="$pmtitle" mode="dc"/>
+            </dc:title>
+            <dc:creator>
+              <xsl:apply-templates select="$rpc" mode="dc"/>
+            </dc:creator>
+            <dc:subject>
+              <xsl:apply-templates select="$pmtitle" mode="dc"/>
+            </dc:subject>
+            <dc:publisher>
+              <xsl:apply-templates select="(//@pmIssuer|//pmissuer)[1]" mode="dc"/>
+            </dc:publisher>
+            <dc:contributor>
+              <xsl:apply-templates select="$orig" mode="dc"/>
+            </dc:contributor>
+            <dc:date>
+              <xsl:apply-templates select="(//issueDate|//issdate)[1]" mode="dc"/>
+            </dc:date>
+            <dc:type>text</dc:type>
+            <dc:format>text/xml</dc:format>
+            <dc:identifier>
+              <xsl:apply-templates select="(//pmIdent|//pmaddres)[1]" mode="dc"/>
+            </dc:identifier>
+            <dc:language>
+              <xsl:apply-templates select="(//language)[1]" mode="dc"/>
+            </dc:language>
+            <xsl:apply-templates select="//derivativeSource" mode="dc"/>
+            <dc:rights>
+              <xsl:value-of select="(//@securityClassification|//@class)[1]"/>
+            </dc:rights>
+          </xsl:otherwise>
+        </xsl:choose>
+      </rdf:Description>
+      <xsl:apply-templates select="node()[not(self::rdf:Description)]"/>
+    </xsl:copy>
+  </xsl:template>
+
   <xsl:template match="originator|responsiblePartnerCompany" mode="dc">
     <xsl:choose>
       <xsl:when test="enterpriseName">
@@ -128,6 +209,10 @@
       <xsl:text> - </xsl:text>
       <xsl:value-of select="infoname"/>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="pmTitle" mode="dc">
+    <xsl:value-of select="."/>
   </xsl:template>
 
   <xsl:template match="issueDate|issdate" mode="dc">
@@ -233,6 +318,32 @@
     <dc:source>
       <xsl:apply-templates/>
     </dc:source>
+  </xsl:template>
+
+  <xsl:template match="pmIdent" mode="dc">
+    <xsl:if test="identExtension">
+      <xsl:apply-templates select="identExtension" mode="dc"/>
+      <xsl:text>_</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="pmCode" mode="dc"/>
+    <xsl:text>_</xsl:text>
+    <xsl:apply-templates select="issueInfo" mode="dc"/>
+  </xsl:template>
+
+  <xsl:template match="pmaddres" mode="dc">
+    <xsl:apply-templates select="pmc" mode="dc"/>
+    <xsl:text>_</xsl:text>
+    <xsl:apply-templates select="issno" mode="dc"/>
+  </xsl:template>
+
+  <xsl:template match="pmCode|pmc" mode="dc">
+    <xsl:value-of select="@modelIdentCode|modelic"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@pmIssuer|pmissuer"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@pmNumber|pmnumber"/>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="@pmVolume|pmvolume"/>
   </xsl:template>
 
 </xsl:stylesheet>
