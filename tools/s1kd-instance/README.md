@@ -11,17 +11,23 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-instance* tool produces an "instance" of an S1000D CSDB object, derived from a "master" (or "source") object. The tool supports multiple methods of instantiating an object:
+The *s1kd-instance* tool produces "instances" of S1000D CSDB objects, derived from "master" (or "source") objects. The tool supports multiple methods of instantiating objects:
 
 -   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
 
--   Filtering on skill levels and security classifications.
+-   Filtering on skill levels and security classifications to remove sensitive data.
 
 -   Using a CIR (Common Information Repository) to produce a standalone instance from a CIR-dependent master.
 
--   Changing various pieces of metadata in the instance.
-
 Any combination of these methods can be used when producing an instance.
+
+The applications for this tool include:
+
+-   Delivering customized data modules or publications to different customers.
+
+-   Creating customized instances of CSDB objects which are maintained within the CSDB.
+
+-   As a backend to filter content or resolve CIR dependencies at runtime in an electronic viewer application.
 
 OPTIONS
 =======
@@ -219,11 +225,6 @@ The resulting data module instances will contain the element &lt;sourceDmIdent&g
 Additionally, the data module instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.
 
 If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.
-
-Instance module code (-c) vs extension (-e)
--------------------------------------------
-
-When creating a data module or publication module instance, the instance should have the same data module/publication module code as the master, with an added extension code, the DME/PME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules/publication modules, it may be desirable to change the data module/publication module code instead. These two options can be used together as well to give an instance a new DMC/PMC as well an extension.
 
 Removing/simplifying applicability annotations (-a vs -A)
 ---------------------------------------------------------
@@ -612,4 +613,4 @@ Filtering data modules for a particular customer and outputting with extended id
 
 Writing out a data module from stdin to a directory with automatic naming:
 
-    $ s1kd-transform -s <xsl> <DM> | s1kd-instance -O <dir>
+    $ s1kd-transform -s <xsl> <DM> | s1kd-instance -SO <dir>

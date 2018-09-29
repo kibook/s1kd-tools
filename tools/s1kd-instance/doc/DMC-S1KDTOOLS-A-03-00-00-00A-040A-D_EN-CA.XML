@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="01"/>
+        <issueInfo issueNumber="027" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="27"/>
+        <issueDate year="2018" month="09" day="29"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,6 +41,15 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Allow - to signify the current date when using the -I option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Improve description.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
+        <simplePara>Improve example of automatic naming.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
+        <simplePara>Remove paragraph about base code vs extension code.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,26 +64,37 @@
           <verbatimText verbatimStyle="vs24">s1kd-instance [options] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
-      <levelledPara>
+      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0002">
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-instance</emphasis> tool produces an "instance" of an S1000D CSDB object, derived from a "master" (or "source") object. The tool supports multiple methods of instantiating an object:</para>
+        <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of S1000D CSDB objects, derived from "master" (or "source") objects. The tool supports multiple methods of instantiating objects:</para>
         <para>
           <randomList>
             <listItem>
               <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition></acronym>.</para>
             </listItem>
             <listItem>
-              <para>Filtering on skill levels and security classifications.</para>
+              <para>Filtering on skill levels and security classifications to remove sensitive data.</para>
             </listItem>
             <listItem>
               <para>Using a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition></acronym> to produce a standalone instance from a CIR-dependent master.</para>
             </listItem>
-            <listItem>
-              <para>Changing various pieces of metadata in the instance.</para>
-            </listItem>
           </randomList>
         </para>
         <para>Any combination of these methods can be used when producing an instance.</para>
+        <para>The applications for this tool include:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>Delivering customized data modules or publications to different customers.</para>
+            </listItem>
+            <listItem>
+              <para>Creating customized instances of CSDB objects which are maintained within the CSDB.</para>
+            </listItem>
+            <listItem>
+              <para>As a backend to filter content or resolve CIR dependencies at runtime in an electronic viewer application.</para>
+            </listItem>
+          </randomList>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -427,10 +447,6 @@
           <para>The resulting data module instances will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.</para>
           <para>Additionally, the data module instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.</para>
           <para>If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
-        </levelledPara>
-        <levelledPara>
-          <title>Instance module code (-c) vs extension (-e)</title>
-          <para>When creating a data module or publication module instance, the instance should have the same data module/publication module code as the master, with an added extension code, the DME/PME. However, in cases where a vendor does not support this extension or possibly when this tool is used to create "instances" which will from that point on be maintained as normal standalone data modules/publication modules, it may be desirable to change the data module/publication module code instead. These two options can be used together as well to give an instance a new DMC/PMC as well an extension.</para>
         </levelledPara>
         <levelledPara>
           <title>Removing/simplifying applicability annotations (-a vs -A)</title>
@@ -812,7 +828,7 @@ is an item in the system.
         </para>
         <para>Writing out a data module from stdin to a directory with automatic naming:</para>
         <para>
-          <verbatimText verbatimStyle="vs24">$ s1kd-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -O &lt;dir&gt;</verbatimText>
+          <verbatimText verbatimStyle="vs24">$ s1kd-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>
