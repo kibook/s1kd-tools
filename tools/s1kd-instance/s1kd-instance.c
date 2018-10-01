@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.9.1"
+#define VERSION "1.9.2"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -36,7 +36,7 @@
 #define S_MISSING_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define S_BAD_TYPE ERR_PREFIX "Cannot automatically name unsupported object types.\n"
 #define S_FILE_EXISTS ERR_PREFIX "%s already exists. Use -f to overwrite.\n"
-#define S_BAD_XML "%s does not contain valid XML.\n"
+#define S_BAD_XML ERR_PREFIX "%s does not contain valid XML.\n"
 #define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
 #define S_BAD_CODE ERR_PREFIX "Bad %s code: %s.\n"
 #define S_NO_XSLT ERR_PREFIX "No built-in XSLT for CIR type: %s\n"
