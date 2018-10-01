@@ -6,7 +6,7 @@ s1kd-refls - List references in a CSDB object
 SYNOPSIS
 ========
 
-    s1kd-refls [-acflNqh?] [<object>...]
+    s1kd-refls [-acflNquh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -36,6 +36,9 @@ Assume filenames of referenced CSDB objects omit the issue info, i.e. they were 
 
 -q  
 Quiet mode. Errors are not printed.
+
+-u  
+Show only unmatched reference errors, or unmatched codes if combined with the -a option.
 
 --version  
 Show version information.

@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -19,6 +19,7 @@ bool quiet = false;
 bool noIssue = false;
 bool showUnmatched = false;
 bool inclSrcFname = false;
+bool showMatched = true;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -410,12 +411,19 @@ void printReference(xmlNodePtr ref, const char *src)
 	else
 		return;
 
-	if (showUnmatched)
-		printMatched(src, code);
-	else if (getFileName(fname, code, "."))
-		printMatched(src, fname);
-	else if (!quiet)
+	if (showUnmatched) {
+		if (showMatched) {
+			printMatched(src, code);
+		} else if (!getFileName(fname, code, ".")) {
+			printMatched(src, code);
+		}
+	} else if (getFileName(fname, code, ".")) {
+		if (showMatched) {
+			printMatched(src, fname);
+		}
+	} else if (!quiet) {
 		printUnmatched(src, code);
+	}
 }
 
 void listReferences(const char *path)
@@ -474,18 +482,19 @@ void listReferencesInList(const char *path)
 
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-acflNqh?] [<object>...]");
+	puts("Usage: s1kd-refls [-acflNquh?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -a         Print unmatched codes");
-	puts("  -c         Only show references in content section");
-	puts("  -f         Print the source filename for each reference");
-	puts("  -l         Treat input as list of CSDB objects");
-	puts("  -N         Assume filenames omit issue info");
-	puts("  -q         Quiet mode");
-	puts("  -h -?      Show help/usage message");
-	puts("  --version  Show version information");
-	puts("  <object>   CSDB object to list references in");
+	puts("  -a         Print unmatched codes.");
+	puts("  -c         Only show references in content section.");
+	puts("  -f         Print the source filename for each reference.");
+	puts("  -l         Treat input as list of CSDB objects.");
+	puts("  -N         Assume filenames omit issue info.");
+	puts("  -q         Quiet mode.");
+	puts("  -u         Show only unmatched references.");
+	puts("  -h -?      Show help/usage message.");
+	puts("  --version  Show version information.");
+	puts("  <object>   CSDB object to list references in.");
 }
 
 void show_version(void)
@@ -500,7 +509,7 @@ int main(int argc, char **argv)
 
 	bool isList = false;
 
-	const char *sopts = "qcNaflh?";
+	const char *sopts = "qcNafluh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -532,6 +541,9 @@ int main(int argc, char **argv)
 				break;
 			case 'l':
 				isList = true;
+				break;
+			case 'u':
+				showMatched = false;
 				break;
 			case 'h':
 			case '?':
