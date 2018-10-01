@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.5.2"
+#define VERSION "1.6.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -35,10 +35,11 @@ xmlNodePtr search_paths;
 
 int flatten_ref = 1;
 int flatten_container = 0;
+int recursive = 0;
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-I <path>] [-cdfNpxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-I <path>] [-cdfNprxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -c         Flatten referenced container data modules.");
@@ -47,6 +48,7 @@ void show_help(void)
 	puts("  -I <path>  Search <path> for referenced objects.");
 	puts("  -N         Assume issue/inwork numbers are omitted.");
 	puts("  -p         Output a 'publication' XML file.");
+	puts("  -r         Recursively flatten referenced PMs.");
 	puts("  -x         Use XInclude references.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
@@ -220,7 +222,28 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		if (filesystem_fname(fs_pm_fname, pm_fname, path, is_pm)) {
 			found = true;
 
-			if (flatten_ref) {
+			if (recursive) {
+				xmlDocPtr subpm;
+				xmlNodePtr content;
+
+				subpm = xmlReadFile(fs_pm_fname, NULL, PARSE_OPTS);
+				content = first_xpath_node(subpm, NULL, "//content");
+
+				if (content) {
+					xmlNodePtr c;
+
+					flatten_pm_entry(content);
+
+					for (c = content->children; c; c = c->next) {
+						if (xmlStrcmp(c->name, BAD_CAST "pmEntry") != 0) {
+							continue;
+						}
+						xmlAddNextSibling(pm_ref, xmlCopyNode(c, 1));
+					}
+				}
+
+				xmlFreeDoc(subpm);
+			} else if (flatten_ref) {
 				if (xinclude) {
 					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
@@ -463,7 +486,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "cdfxNpI:h?";
+	const char *sopts = "cdfxNprI:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -489,6 +512,7 @@ int main(int argc, char **argv)
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; xinclude = 1; break;
+			case 'r': recursive = 1; break;
 			case 'I': xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);

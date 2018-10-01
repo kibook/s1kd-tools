@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-I <path>] [-cdfNpx] <PM> [<DM>...]
+    s1kd-flatten [-I <path>] [-cdfNprx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -38,6 +38,9 @@ Assume that the files representing the referenced data modules do not include th
 
 -p  
 Instead of the "flat" PM format, use a "publication" XML format, where the root element `publication` contains XInclude references to the publication module and the referenced data modules.
+
+-r  
+Recursively flatten referenced publication modules, copying their content in to the "master" publication module.
 
 -x  
 Use XInclude rather than copying each data module's contents directly inside the publication module. DTD entities in data modules will only be carried over to the final publication when using this option, otherwise they do not carry over when copying the data module.
