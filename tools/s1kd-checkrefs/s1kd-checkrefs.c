@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-checkrefs"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -349,7 +349,7 @@ bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 	getDmCode(addcode, add_dmIdent, withIssue, withLang);
 
 	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
-		printf("    Updating reference to data module %s...\n", addcode);
+		fprintf(stderr, "    Updating reference to data module %s...\n", addcode);
 	}
 
 	return strcmp(refcode, addcode) == 0;
@@ -386,7 +386,7 @@ bool samePm(xmlNodePtr ref, xmlNodePtr address)
 	getPmCode(addcode, add_pmIdent, withIssue, withLang);
 
 	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
-		printf("    Updating reference to pub module %s...\n", addcode);
+		fprintf(stderr, "    Updating reference to pub module %s...\n", addcode);
 	}
 
 	return strcmp(refcode, addcode) == 0;
@@ -417,7 +417,7 @@ bool sameExtPubRef(xmlNodePtr ref, xmlNodePtr address)
 	getExtPubCode(addcode, add_extPubIdent, withIssue, false);
 
 	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
-		printf("    Updating reference to external pub %s...\n", addcode);
+		fprintf(stderr, "    Updating reference to external pub %s...\n", addcode);
 	}
 
 	return strcmp(refcode, addcode) == 0;
@@ -483,7 +483,7 @@ bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 					if (verbose) {
 						char code[256];
 						getDmCode(code, dmIdent, refIssueInfo, refLanguage);
-						printf("      Recoding to %s...\n", code);
+						fprintf(stderr, "      Recoding to %s...\n", code);
 					}
 
 					replaceNode(dmRefCode, dmCode);
@@ -527,7 +527,7 @@ bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 					if (verbose) {
 						char code[256];
 						getPmCode(code, pmIdent, refIssueInfo, refLanguage);
-						printf("      Recoding to %s...\n", code);
+						fprintf(stderr, "      Recoding to %s...\n", code);
 					}
 
 					replaceNode(pmRefCode, pmCode);
@@ -653,7 +653,7 @@ void addAddress(const char *fname, xmlNodePtr addresses)
 	root = xmlDocGetRootElement(doc);
 
 	if (verbose)
-		printf("Registering %s...\n", fname);
+		fprintf(stderr, "Registering %s...\n", fname);
 
 	if (checkExtPubRefs && strcmp((char *) root->name, "externalPubs") == 0) {
 		xmlXPathContextPtr ctx;
@@ -699,7 +699,7 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	}
 
 	if (verbose) {
-		printf("Checking refs in %s...\n", fname);
+		fprintf(stderr, "Checking refs in %s...\n", fname);
 	}
 
 	ctx = xmlXPathNewContext(doc);
