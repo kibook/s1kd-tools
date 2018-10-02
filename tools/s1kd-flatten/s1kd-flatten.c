@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -467,7 +467,9 @@ void flatten_pm_entry(xmlNodePtr pm_entry)
 		cur = next;
 	}
 
-	if (xmlChildElementCount(pm_entry) == 0) {
+	if (xmlChildElementCount(pm_entry) == 0 ||
+	    xmlStrcmp((cur = xmlLastElementChild(pm_entry))->name, BAD_CAST "pmEntryTitle") == 0 ||
+	    xmlStrcmp(cur->name, BAD_CAST "title") == 0) {
 		xmlUnlinkNode(pm_entry);
 		xmlFreeNode(pm_entry);
 	}
