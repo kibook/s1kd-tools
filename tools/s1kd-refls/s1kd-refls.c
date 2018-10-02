@@ -395,15 +395,12 @@ void getComCode(char *dst, xmlNodePtr ref)
 bool isDir(const char *path)
 {
 	struct stat st;
-	char *s, *b;
-	bool ignore;
+	char s[PATH_MAX], *b;
 
-	s = strdup(path);
+	strcpy(s, path);
 	b = basename(s);
-	ignore = strcmp(b, ".") == 0 || strcmp(b, "..") == 0;
-	free(s);
 
-	if (ignore) {
+	if (strcmp(b, ".") == 0 || strcmp(b, "..") == 0) {
 		return 0;
 	}
 
