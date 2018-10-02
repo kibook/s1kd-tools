@@ -5,11 +5,13 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <libgen.h>
+#include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.5.1"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -27,6 +29,10 @@ bool showUnmatched = false;
 bool inclSrcFname = false;
 /* Show references which are matched in the filesystem. */
 bool showMatched = true;
+/* Recurse in to child directories. */
+bool recursive = false;
+/* Directory to start search in. */
+char *directory;
 
 /* Possible objects to list references to. */
 #define SHOW_COM 0x01
@@ -385,6 +391,26 @@ void getComCode(char *dst, xmlNodePtr ref)
 	}
 }
 
+/* Determine if path is a directory. */
+bool isDir(const char *path)
+{
+	struct stat st;
+	char *s, *b;
+	bool ignore;
+
+	s = strdup(path);
+	b = basename(s);
+	ignore = strcmp(b, ".") == 0 || strcmp(b, "..") == 0;
+	free(s);
+
+	if (ignore) {
+		return 0;
+	}
+
+	stat(path, &st);
+	return S_ISDIR(st.st_mode);
+}
+
 /* Find the filename of a referenced object by its code. */
 bool getFileName(char *dst, char *code, char *path)
 {
@@ -392,16 +418,36 @@ bool getFileName(char *dst, char *code, char *path)
 	struct dirent *cur;
 	int n;
 	bool found = false;
+	int len = strlen(path);
+	char fpath[PATH_MAX], cpath[PATH_MAX];
 
 	n = strlen(code);
+
+	if (strcmp(path, ".") == 0) {
+		strcpy(fpath, "");
+	} else if (path[len - 1] != '/') {
+		strcpy(fpath, path);
+		strcat(fpath, "/");
+	} else {
+		strcpy(fpath, path);
+	}
 
 	dir = opendir(path);
 
 	while ((cur = readdir(dir))) {
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
+
 		if (strncasecmp(code, cur->d_name, n) == 0) {
-			strcpy(dst, cur->d_name);
+			strcpy(dst, cpath);
 			found = true;
 			break;
+		} else if (recursive && isDir(cpath)) {
+			found = getFileName(dst, code, cpath);
+
+			if (found) {
+				break;
+			}
 		}
 	}
 
@@ -460,10 +506,10 @@ void printReference(xmlNodePtr ref, const char *src)
 	if (showUnmatched) {
 		if (showMatched) {
 			printMatched(src, code);
-		} else if (!getFileName(fname, code, ".")) {
+		} else if (!getFileName(fname, code, directory)) {
 			printMatched(src, code);
 		}
-	} else if (getFileName(fname, code, ".")) {
+	} else if (getFileName(fname, code, directory)) {
 		if (showMatched) {
 			printMatched(src, fname);
 		}
@@ -531,19 +577,21 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDfGlNPquh?] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDfGlNPqruh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
 	puts("  -C         List commnent references.");
 	puts("  -c         Only show references in content section.");
 	puts("  -D         List data module references.");
+	puts("  -d         Directory to search for matches in.");
 	puts("  -f         Print the source filename for each reference.");
 	puts("  -G         List ICN references.");
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -N         Assume filenames omit issue info.");
 	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
+	puts("  -r         Search recursively for matches.");
 	puts("  -u         Show only unmatched references.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
@@ -563,12 +611,14 @@ int main(int argc, char **argv)
 
 	bool isList = false;
 
-	const char *sopts = "qcNafluCDGPh?";
+	const char *sopts = "qcNafluCDGPrd:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	directory = strdup(".");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -611,6 +661,13 @@ int main(int argc, char **argv)
 			case 'P':
 				showObjects |= SHOW_PMC;
 				break;
+			case 'r':
+				recursive = true;
+				break;
+			case 'd':
+				free(directory);
+				directory = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -637,6 +694,7 @@ int main(int argc, char **argv)
 		listReferences("-");
 	}
 
+	free(directory);
 	xmlCleanupParser();
 
 	return 0;

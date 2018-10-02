@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -C, -D, -G, -P, and -u options.</simplePara>
+        <simplePara>Add -C, -D, -d, -G, -P, -r and -u options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGlNPquh?] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGlNPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -79,6 +79,12 @@
               <listItemTerm>-c</listItemTerm>
               <listItemDefinition>
                 <para>List references in the <verbatimText verbatimStyle="vs12">content</verbatimText> section of a CSDB object only.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Directory to search for matches to references in. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -109,6 +115,12 @@
               <listItemTerm>-q</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Errors are not printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r</listItemTerm>
+              <listItemDefinition>
+                <para>Search for matches to references in directories recursively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
