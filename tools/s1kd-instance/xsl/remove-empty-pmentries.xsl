@@ -8,5 +8,6 @@
   </xsl:template>
 
   <xsl:template match="pmEntry[not(.//dmRef|.//pmRef|.//externalPubRef)]"/>
+  <xsl:template match="pmentry[not(.//refdm|.//refpm|.//refextp)]"/>
 
 </xsl:stylesheet>
