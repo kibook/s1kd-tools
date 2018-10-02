@@ -8,18 +8,33 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
+/* List only references found in the content section. */
 bool contentOnly = false;
+/* Do not display errors. */
 bool quiet = false;
+/* Assume objects were created with the -N option. */
 bool noIssue = false;
+/* Show unmatched references instead of an error. */
 bool showUnmatched = false;
+/* Include the name of the object where each reference is found. */
 bool inclSrcFname = false;
+/* Show references which are matched in the filesystem. */
 bool showMatched = true;
+
+/* Possible objects to list references to. */
+#define SHOW_COM 0x01
+#define SHOW_DMC 0x02
+#define SHOW_ICN 0x04
+#define SHOW_PMC 0x08
+
+/* Which types of object references will be listed. */
+int showObjects = 0;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -30,6 +45,7 @@ bool showMatched = true;
 #define PARSE_OPTS 0
 #endif
 
+/* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(const char *path, xmlDocPtr doc, xmlNodePtr root)
 {
 	xmlNodePtr node;
@@ -62,11 +78,13 @@ xmlNodePtr firstXPathNode(const char *path, xmlDocPtr doc, xmlNodePtr root)
 	return node;
 }
 
+/* Return the value of the first node matching an XPath expression. */
 char *firstXPathValue(const char *path, xmlDocPtr doc, xmlNodePtr root)
 {
 	return (char *) xmlNodeGetContent(firstXPathNode(path, doc, root));
 }
 
+/* Get the DMC as a string from a dmRef. */
 void getDmCode(char *dst, xmlNodePtr dmRef)
 {
 	char *modelIdentCode;
@@ -195,6 +213,7 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 	}
 }
 
+/* Get the PMC as a string from a pmRef. */
 void getPmCode(char *dst, xmlNodePtr pmRef)
 {
 	xmlNodePtr identExtension, pmCode, issueInfo, language;
@@ -279,6 +298,7 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 	}
 }
 
+/* Get the ICN as a string from an ICN reference. */
 void getICN(char *dst, xmlNodePtr ref)
 {
 	char *icn;
@@ -287,6 +307,7 @@ void getICN(char *dst, xmlNodePtr ref)
 	xmlFree(icn);
 }
 
+/* Get the ICN as a string from an ICN entity reference. */
 void getICNAttr(char *dst, xmlNodePtr ref)
 {
 	xmlChar *icn;
@@ -295,6 +316,7 @@ void getICNAttr(char *dst, xmlNodePtr ref)
 	xmlFree(icn);
 }
 
+/* Get the comment code as a string from a commentRef. */
 void getComCode(char *dst, xmlNodePtr ref)
 {
 	xmlNodePtr commentCode, language;
@@ -347,6 +369,7 @@ void getComCode(char *dst, xmlNodePtr ref)
 	}
 }
 
+/* Find the filename of a referenced object by its code. */
 bool getFileName(char *dst, char *code, char *path)
 {
 	DIR *dir;
@@ -371,6 +394,7 @@ bool getFileName(char *dst, char *code, char *path)
 	return found;
 }
 
+/* Print a reference which is matched in the filesystem. */
 void printMatched(const char *src, const char *ref)
 {
 	if (inclSrcFname) {
@@ -380,6 +404,7 @@ void printMatched(const char *src, const char *ref)
 	}
 }
 
+/* Print an error for references which are unmatched. */
 void printUnmatched(const char *src, const char *ref)
 {
 	if (inclSrcFname) {
@@ -389,24 +414,29 @@ void printUnmatched(const char *src, const char *ref)
 	}
 }
 
+/* Print a reference found in an object. */
 void printReference(xmlNodePtr ref, const char *src)
 {
 	char code[256];
 	char fname[PATH_MAX];
 
-	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
-	    xmlStrcmp(ref->name, BAD_CAST "refdm") == 0 ||
-	    xmlStrcmp(ref->name, BAD_CAST "addresdm") == 0)
+	if ((showObjects & SHOW_DMC) == SHOW_DMC &&
+	    (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
+	     xmlStrcmp(ref->name, BAD_CAST "refdm") == 0 ||
+	     xmlStrcmp(ref->name, BAD_CAST "addresdm") == 0))
 		getDmCode(code, ref);
-	else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 ||
-	         xmlStrcmp(ref->name, BAD_CAST "refpm") == 0)
+	else if ((showObjects & SHOW_PMC) == SHOW_PMC &&
+		 (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 ||
+	          xmlStrcmp(ref->name, BAD_CAST "refpm") == 0))
 		getPmCode(code, ref);
-	else if (xmlStrcmp(ref->name, BAD_CAST "infoEntityRef") == 0)
+	else if ((showObjects & SHOW_ICN) == SHOW_ICN &&
+	         (xmlStrcmp(ref->name, BAD_CAST "infoEntityRef") == 0))
 		getICN(code, ref);
-	else if (xmlStrcmp(ref->name, BAD_CAST "commentRef") == 0)
+	else if ((showObjects & SHOW_COM) == SHOW_COM && (xmlStrcmp(ref->name, BAD_CAST "commentRef") == 0))
 		getComCode(code, ref);
-	else if (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0 ||
-	         xmlStrcmp(ref->name, BAD_CAST "boardno") == 0)
+	else if ((showObjects & SHOW_ICN) == SHOW_ICN &&
+		 (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0 ||
+	          xmlStrcmp(ref->name, BAD_CAST "boardno") == 0))
 		getICNAttr(code, ref);
 	else
 		return;
@@ -426,6 +456,7 @@ void printReference(xmlNodePtr ref, const char *src)
 	}
 }
 
+/* List all references in the given object. */
 void listReferences(const char *path)
 {
 	xmlDocPtr doc;
@@ -456,6 +487,7 @@ void listReferences(const char *path)
 	xmlFreeDoc(doc);
 }
 
+/* Parse a list of filenames as input. */
 void listReferencesInList(const char *path)
 {
 	FILE *f;
@@ -480,16 +512,21 @@ void listReferencesInList(const char *path)
 	}
 }
 
+/* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-acflNquh?] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDfGlNPquh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
+	puts("  -C         List commnent references.");
 	puts("  -c         Only show references in content section.");
+	puts("  -D         List data module references.");
 	puts("  -f         Print the source filename for each reference.");
+	puts("  -G         List ICN references.");
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -N         Assume filenames omit issue info.");
+	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
 	puts("  -u         Show only unmatched references.");
 	puts("  -h -?      Show help/usage message.");
@@ -497,6 +534,7 @@ void showHelp(void)
 	puts("  <object>   CSDB object to list references in.");
 }
 
+/* Display version information. */
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
@@ -509,7 +547,7 @@ int main(int argc, char **argv)
 
 	bool isList = false;
 
-	const char *sopts = "qcNafluh?";
+	const char *sopts = "qcNafluCDGPh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -545,11 +583,28 @@ int main(int argc, char **argv)
 			case 'u':
 				showMatched = false;
 				break;
+			case 'C':
+				showObjects |= SHOW_COM;
+				break;
+			case 'D':
+				showObjects |= SHOW_DMC;
+				break;
+			case 'G':
+				showObjects |= SHOW_ICN;
+				break;
+			case 'P':
+				showObjects |= SHOW_PMC;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
 				return 0;
 		}
+	}
+
+	/* If none of -CDGP are given, show all types of objects. */
+	if (!showObjects) {
+		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC;
 	}
 
 	if (optind < argc) {
