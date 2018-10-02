@@ -4,11 +4,12 @@
 #include <string.h>
 #include <dirent.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -82,6 +83,15 @@ xmlNodePtr firstXPathNode(const char *path, xmlDocPtr doc, xmlNodePtr root)
 char *firstXPathValue(const char *path, xmlDocPtr doc, xmlNodePtr root)
 {
 	return (char *) xmlNodeGetContent(firstXPathNode(path, doc, root));
+}
+
+/* Convert string to uppercase. */
+void uppercase(char *s)
+{
+	int i;
+	for (i = 0; s[i]; ++i) {
+		s[i] = toupper(s[i]);
+	}
 }
 
 /* Get the DMC as a string from a dmRef. */
@@ -203,6 +213,8 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 		languageIsoCode = firstXPathValue("@languageIsoCode|@language", NULL, language);
 		countryIsoCode  = firstXPathValue("@countryIsoCode|@country", NULL, language);
 
+		uppercase(languageIsoCode);
+
 		strcat(dst, "_");
 		strcat(dst, languageIsoCode);
 		strcat(dst, "-");
@@ -288,6 +300,8 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 		languageIsoCode = firstXPathValue("@languageIsoCode|@language", NULL, language);
 		countryIsoCode  = firstXPathValue("@countryIsoCode|@country", NULL, language);
 
+		uppercase(languageIsoCode);
+
 		strcat(dst, "_");
 		strcat(dst, languageIsoCode);
 		strcat(dst, "-");
@@ -358,6 +372,8 @@ void getComCode(char *dst, xmlNodePtr ref)
 
 		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
 		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+
+		uppercase(languageIsoCode);
 
 		strcat(dst, "_");
 		strcat(dst, languageIsoCode);
