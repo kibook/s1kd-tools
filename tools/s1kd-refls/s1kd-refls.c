@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
