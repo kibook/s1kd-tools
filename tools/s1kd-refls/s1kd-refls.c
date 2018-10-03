@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.6.1"
+#define VERSION "1.6.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -408,6 +408,20 @@ bool isDir(const char *path)
 	return S_ISDIR(st.st_mode);
 }
 
+/* Compare the codes of two paths. */
+int codecmp(const char *p1, const char *p2)
+{
+	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
+
+	strcpy(s1, p1);
+	strcpy(s2, p2);
+
+	b1 = basename(s1);
+	b2 = basename(s2);
+
+	return strcmp(b1, b2);
+}
+
 /* Find the filename of a referenced object by its code. */
 bool getFileName(char *dst, char *code, char *path)
 {
@@ -435,15 +449,17 @@ bool getFileName(char *dst, char *code, char *path)
 		strcpy(cpath, fpath);
 		strcat(cpath, cur->d_name);
 
-		if (strncasecmp(code, cur->d_name, n) == 0) {
-			strcpy(dst, cpath);
-			found = true;
-			break;
-		} else if (recursive && isDir(cpath)) {
-			found = getFileName(dst, code, cpath);
+		if (recursive && isDir(cpath)) {
+			char tmp[PATH_MAX];
 
-			if (found) {
-				break;
+			if (getFileName(tmp, code, cpath) && (!found || codecmp(tmp, dst) > 0)) {
+				strcpy(dst, tmp);
+				found = true;
+			}
+		} else if (strncmp(code, cur->d_name, n) == 0) {
+			if (!found || codecmp(cpath, dst) > 0) {
+				strcpy(dst, cpath);
+				found = true;
 			}
 		}
 	}
