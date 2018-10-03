@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -C, -D, -d, -G, -P, -r and -u options.</simplePara>
+        <simplePara>Add -C, -D, -d, -G, -i, -P, -r and -u options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGlNPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGilNPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -97,6 +97,12 @@
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-i</listItemTerm>
+              <listItemDefinition>
+                <para>Ignore issue and language info when matching references.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
