@@ -11,10 +11,10 @@
 #include <libxml/xpath.h>
 
 /* Maximum number of CSDB objects of each type. */
-#define OBJECT_MAX 10240
+#define OBJECT_MAX 102400
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -497,13 +497,9 @@ int main(int argc, char **argv)
 
 	if (hasopt(show, SHOW_DM)) {
 		dms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest || only_old) latest_dms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue || only_inwork) issue_dms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_PM)) {
 		pms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest || only_old) latest_pms = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue || only_inwork) issue_pms = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_COM)) {
 		coms = malloc(OBJECT_MAX * PATH_MAX);
@@ -513,16 +509,12 @@ int main(int argc, char **argv)
 	}
 	if (hasopt(show, SHOW_IMF)) {
 		imfs = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest || only_old) latest_imfs = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue || only_inwork) issue_imfs = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DDN)) {
 		ddns = malloc(OBJECT_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DML)) {
 		dmls = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_latest || only_old) latest_dmls = malloc(OBJECT_MAX * PATH_MAX);
-		if (only_official_issue || only_inwork) issue_dmls = malloc(OBJECT_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
@@ -610,6 +602,23 @@ int main(int argc, char **argv)
 	if (npms) qsort(pms, npms, PATH_MAX, compare);
 	if (nimfs) qsort(imfs, nimfs, PATH_MAX, compare);
 	if (ndmls) qsort(dmls, ndmls, PATH_MAX, compare);
+
+	if (ndms) {
+		if (only_latest || only_old) latest_dms = malloc(ndms * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_dms = malloc(ndms * PATH_MAX);
+	}
+	if (npms) {
+		if (only_latest || only_old) latest_pms = malloc(npms * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_pms = malloc(npms * PATH_MAX);
+	}
+	if (nimfs) {
+		if (only_latest || only_old) latest_imfs = malloc(nimfs * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_imfs = malloc(nimfs * PATH_MAX);
+	}
+	if (ndmls) {
+		if (only_latest || only_old) latest_dmls = malloc(ndmls * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_dmls = malloc(ndmls * PATH_MAX);
+	}
 
 	if (only_official_issue || only_inwork) {
 		if (only_old) {
