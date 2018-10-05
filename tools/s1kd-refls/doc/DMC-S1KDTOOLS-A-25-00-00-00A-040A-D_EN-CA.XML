@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="01"/>
+        <issueInfo issueNumber="009" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="01"/>
+        <issueDate year="2018" month="10" day="05"/>
         <dmTitle>
           <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -C, -D, -d, -G, -i, -P, -r and -u options.</simplePara>
+        <simplePara>Add -C, -D, -d, -G, -i, -n, -P, -r and -u options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGilNPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGilNnPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -115,6 +115,12 @@
               <listItemTerm>-N</listItemTerm>
               <listItemDefinition>
                 <para>Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new* tools.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-n</listItemTerm>
+              <listItemDefinition>
+                <para>If the -f option is used, display the line number where the reference occurs in the source file after its filename.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

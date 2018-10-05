@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -35,6 +35,8 @@ bool recursive = false;
 char *directory;
 /* Only match against code, ignore language/issue info even if present. */
 bool fullMatch = true;
+/* Include line numbers where references occur. */
+bool inclLineNum = false;
 
 /* Possible objects to list references to. */
 #define SHOW_COM 0x01
@@ -495,20 +497,28 @@ bool getFileName(char *dst, char *code, char *path)
 }
 
 /* Print a reference which is matched in the filesystem. */
-void printMatched(const char *src, const char *ref)
+void printMatched(const char *src, unsigned short line, const char *ref)
 {
 	if (inclSrcFname) {
-		printf("%s: %s\n", src, ref);
+		if (inclLineNum) {
+			printf("%s (%d): %s\n", src, line, ref);
+		} else {
+			printf("%s: %s\n", src, ref);
+		}
 	} else {
 		puts(ref);
 	}
 }
 
 /* Print an error for references which are unmatched. */
-void printUnmatched(const char *src, const char *ref)
+void printUnmatched(const char *src, unsigned short line, const char *ref)
 {
 	if (inclSrcFname) {
-		fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
+		if (inclLineNum) {
+			fprintf(stderr, ERR_PREFIX "%s (%d): Unmatched reference: %s\n", src, line, ref);
+		} else {
+			fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
+		}
 	} else {
 		fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", ref);
 	}
@@ -519,6 +529,7 @@ void printReference(xmlNodePtr ref, const char *src)
 {
 	char code[256];
 	char fname[PATH_MAX];
+	unsigned short line;
 
 	if ((showObjects & SHOW_DMC) == SHOW_DMC &&
 	    (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
@@ -541,18 +552,27 @@ void printReference(xmlNodePtr ref, const char *src)
 	else
 		return;
 
+	/* If the ref is an attribute, the line number must come from its
+	 * parent element.
+	 */
+	if (ref->type == XML_ATTRIBUTE_NODE) {
+		line = ref->parent->line;
+	} else {
+		line = ref->line;
+	}
+
 	if (showUnmatched) {
 		if (showMatched) {
-			printMatched(src, code);
+			printMatched(src, line, code);
 		} else if (!getFileName(fname, code, directory)) {
-			printMatched(src, code);
+			printMatched(src, line, code);
 		}
 	} else if (getFileName(fname, code, directory)) {
 		if (showMatched) {
-			printMatched(src, fname);
+			printMatched(src, line, fname);
 		}
 	} else if (!quiet) {
-		printUnmatched(src, code);
+		printUnmatched(src, line, code);
 	}
 }
 
@@ -615,7 +635,7 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDfGilNPqruh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDfGilNnPqruh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -628,6 +648,7 @@ void showHelp(void)
 	puts("  -i         Ignore issue info/language when matching.");
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -N         Assume filenames omit issue info.");
+	puts("  -n         Show line number of reference with source filename.");
 	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
 	puts("  -r         Search recursively for matches.");
@@ -650,7 +671,7 @@ int main(int argc, char **argv)
 
 	bool isList = false;
 
-	const char *sopts = "qcNafluCDGPrd:ih?";
+	const char *sopts = "qcNafluCDGPrd:inh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -709,6 +730,9 @@ int main(int argc, char **argv)
 				break;
 			case 'i':
 				fullMatch = false;
+				break;
+			case 'n':
+				inclLineNum = true;
 				break;
 			case 'h':
 			case '?':
