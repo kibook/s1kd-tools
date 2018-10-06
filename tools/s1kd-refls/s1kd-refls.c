@@ -501,7 +501,7 @@ void printMatched(const char *src, unsigned short line, const char *ref)
 {
 	if (inclSrcFname) {
 		if (inclLineNum) {
-			printf("%s (%d): %s\n", src, line, ref);
+			printf("%s (%u): %s\n", src, line, ref);
 		} else {
 			printf("%s: %s\n", src, ref);
 		}
@@ -515,7 +515,7 @@ void printUnmatched(const char *src, unsigned short line, const char *ref)
 {
 	if (inclSrcFname) {
 		if (inclLineNum) {
-			fprintf(stderr, ERR_PREFIX "%s (%d): Unmatched reference: %s\n", src, line, ref);
+			fprintf(stderr, ERR_PREFIX "%s (%u): Unmatched reference: %s\n", src, line, ref);
 		} else {
 			fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
 		}
