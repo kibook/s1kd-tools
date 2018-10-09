@@ -131,6 +131,8 @@ Manpages for each tool:
 
 -   s1kd-ref(1)
 
+-   s1kd-refls(1)
+
 -   s1kd-sns(1)
 
 -   s1kd-syncrefs(1)
@@ -141,4 +143,6 @@ Manpages for each tool:
 
 -   s1kd-validate(1)
 
-s1kd-defaults(5)
+Configuration files:
+
+-   s1kd-defaults(5)

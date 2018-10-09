@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="21"/>
+        <issueDate year="2018" month="10" day="09"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Improve description of tools.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+        <simplePara>Add missing s1kd-refls manpage reference.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -57,7 +57,7 @@
         </levelledPara>
         <levelledPara>
           <title>s1kd-tools</title>
-          <para changeType="modify" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-tools</emphasis> are a set of small tools for creating and manipulating S1000D data. They are designed to be used as a standalone method of maintaining a simple S1000D CSDB, in conjunction with a more typical version control system such as Git or SVN, as a backend to implement a more complex S1000D CSDB, or to support an existing S1000D CSDB already in use by a project.</para>
+          <para>The <emphasis>s1kd-tools</emphasis> are a set of small tools for creating and manipulating S1000D data. They are designed to be used as a standalone method of maintaining a simple S1000D CSDB, in conjunction with a more typical version control system such as Git or SVN, as a backend to implement a more complex S1000D CSDB, or to support an existing S1000D CSDB already in use by a project.</para>
         </levelledPara>
         <levelledPara>
           <title>CSDB</title>
@@ -183,6 +183,9 @@
             <listItem>
               <para>s1kd-ref(1)</para>
             </listItem>
+            <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <para>s1kd-refls(1)</para>
+            </listItem>
             <listItem>
               <para>s1kd-sns(1)</para>
             </listItem>
@@ -200,7 +203,14 @@
             </listItem>
           </randomList>
         </para>
-        <para>s1kd-defaults(5)</para>
+        <para>Configuration files:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>s1kd-defaults(5)</para>
+            </listItem>
+          </randomList>
+        </para>
       </levelledPara>
     </description>
   </content>

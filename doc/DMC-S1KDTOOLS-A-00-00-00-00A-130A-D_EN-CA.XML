@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="01"/>
+        <issueInfo issueNumber="013" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="26"/>
+        <issueDate year="2018" month="10" day="09"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -44,6 +44,18 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
         <simplePara>Add note explaining the recursive search for configuration files.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Change 'and' to 'or'.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
+        <simplePara>Use "rinstate-x" as generic value, since this is what the spec uses.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
+        <simplePara>Clarify example of -O option of s1kd-instance.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0005" updateReasonType="urt01">
+        <simplePara>Capitalize 'Git'.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -297,7 +309,7 @@ or 02 (Classified).
           </levelledPara>
           <levelledPara>
             <title>Quality assurance verification</title>
-            <para>In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:</para>
+            <para changeType="modify" reasonForUpdateRefIds="rfu-0002">In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first or second QA tested can be indicated with the s1kd-upissue tool:</para>
             <para>
               <verbatimText verbatimStyle="vs23">$ s1kd-upissue -1 tabtop -2 ttandoo ...</verbatimText>
             </para>
@@ -360,7 +372,7 @@ S1000D and s1kd-tools.&lt;/para&gt;
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-upissue -is rinstate-status ...</verbatimText>
           </para>
-          <para>The data module is once again upissued to the next official issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-..."</verbatimText> types.</para>
+          <para>The data module is once again upissued to the next official issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14" changeType="modify" reasonForUpdateRefIds="rfu-0003">rinstate-x"</verbatimText> types.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
@@ -446,7 +458,7 @@ This information only applies to version B.
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B &lt;DM&gt;</verbatimText>
           </para>
-          <para>To filter a whole publication, create a directory for the customized delivery and use the -O option of the s1kd-instance tool:</para>
+          <para changeType="modify" reasonForUpdateRefIds="rfu-0004">To filter a whole publication, use the -O option of the s1kd-instance tool to output multiple filtered objects into a directory:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
           </para>
@@ -475,7 +487,7 @@ This information only applies to version B.
             </listItem>
           </randomList>
         </para>
-        <para>However, if you prefer to use an existing version control system such as git or SVN, it is often more useful for each file to represent a whole object, since these systems typically track changes based on filenames.</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0005">However, if you prefer to use an existing version control system such as Git or SVN, it is often more useful for each file to represent a whole object, since these systems typically track changes based on filenames.</para>
         <para>The s1kd-tools support an alternate naming convention for this case. Specifying the -N option to certain tools will omit the issue and inwork numbers from filenames of CSDB objects. Taking the s1kd-newdm tool example from above, but adding the -N option as follows:</para>
         <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-newdm -N# MYPRJ-A-00-00-00-00A-040A-D</verbatimText>

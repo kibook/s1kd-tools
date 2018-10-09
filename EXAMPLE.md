@@ -267,7 +267,7 @@ This will use the customized `.defaults` and `.dmtypes` files to generate a basi
 
 ### Quality assurance verification
 
-In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first and second QA tested can be indicated with the s1kd-upissue tool:
+In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first or second QA tested can be indicated with the s1kd-upissue tool:
 
     $ s1kd-upissue -1 tabtop -2 ttandoo ...
 
@@ -332,7 +332,7 @@ Deleted data modules may be reinstated later in a similar way:
 
     $ s1kd-upissue -is rinstate-status ...
 
-The data module is once again upissued to the next official issue, and the issue type is set to one of the "`rinstate-..."` types.
+The data module is once again upissued to the next official issue, and the issue type is set to one of the "`rinstate-x"` types.
 
 Building publications
 =====================
@@ -419,7 +419,7 @@ When you deliver this data module to a customer with Version B, you can exclude 
 
     $ s1kd-instance -s version:prodattr=B <DM>
 
-To filter a whole publication, create a directory for the customized delivery and use the -O option of the s1kd-instance tool:
+To filter a whole publication, use the -O option of the s1kd-instance tool to output multiple filtered objects into a directory:
 
     $ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML
 
@@ -436,7 +436,7 @@ The issue/inwork numbers and S1000D file naming conventions as seen above provid
 
 -   `DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML`
 
-However, if you prefer to use an existing version control system such as git or SVN, it is often more useful for each file to represent a whole object, since these systems typically track changes based on filenames.
+However, if you prefer to use an existing version control system such as Git or SVN, it is often more useful for each file to represent a whole object, since these systems typically track changes based on filenames.
 
 The s1kd-tools support an alternate naming convention for this case. Specifying the -N option to certain tools will omit the issue and inwork numbers from filenames of CSDB objects. Taking the s1kd-newdm tool example from above, but adding the -N option as follows:
 
