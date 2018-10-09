@@ -256,6 +256,8 @@ void sync_refs(xmlNodePtr dmodule)
 
 		xmlUnlinkNode(old_refs);
 		xmlFreeNode(old_refs);
+	} else {
+		refgrp = NULL;
 	}
 
 	if (only_delete) return;

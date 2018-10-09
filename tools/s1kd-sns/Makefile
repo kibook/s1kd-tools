@@ -1,7 +1,14 @@
 SOURCE=s1kd-sns.c
 OUTPUT=s1kd-sns
 
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors `pkg-config --cflags libxml-2.0`
+
+ifeq ($(DEBUG),1)
+	CFLAGS+=-g
+else
+	CFLAGS+=-O3
+endif
+
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
 PREFIX=/usr/local
@@ -11,7 +18,7 @@ INSTALL=install -s
 all: $(OUTPUT)
 
 $(OUTPUT): $(SOURCE)
-	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 .PHONY: docs clean maintainer-clean install uninstall
 

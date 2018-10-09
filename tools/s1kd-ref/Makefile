@@ -1,8 +1,15 @@
-CFLAGS=-Wall -Werror -pedantic-errors -O3 `pkg-config --cflags libxml-2.0 libxslt`
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
-
 SOURCE=s1kd-ref.c
 OUTPUT=s1kd-ref
+
+CFLAGS=-Wall -Werror -pedantic-errors `pkg-config --cflags libxml-2.0 libxslt`
+
+ifeq ($(DEBUG),1)
+	CFLAGS+=-g
+else
+	CFLAGS+=-O3
+endif
+
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
@@ -11,7 +18,7 @@ INSTALL=install -s
 all: $(OUTPUT)
 
 $(OUTPUT): $(SOURCE) xslt.h
-	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 xslt.h: ../common/42to*.xsl
 	>xslt.h

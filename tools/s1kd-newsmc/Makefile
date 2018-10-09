@@ -1,7 +1,14 @@
 SOURCE=s1kd-newsmc.c ../common/s1kd_tools.c
 OUTPUT=s1kd-newsmc
 
-CFLAGS=-Wall -Werror -pedantic-errors -O3 -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+
+ifeq ($(DEBUG),1)
+	CFLAGS+=-g
+else
+	CFLAGS+=-O3
+endif
+
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
