@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.8.1"
+#define VERSION "1.8.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -351,8 +351,13 @@ void getICN(char *dst, xmlNodePtr ref)
 void getICNAttr(char *dst, xmlNodePtr ref)
 {
 	xmlChar *icn;
+	xmlEntityPtr ent;
 	icn = xmlNodeGetContent(ref);
-	strcpy(dst, (char *) icn);
+	if ((ent = xmlGetDocEntity(ref->doc, icn))) {
+		strcpy(dst, (char *) ent->URI);
+	} else {
+		strcpy(dst, (char *) icn);
+	}
 	xmlFree(icn);
 }
 
