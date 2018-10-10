@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="00"/>
+        <issueInfo issueNumber="021" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="21"/>
+        <issueDate year="2018" month="10" day="10"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,17 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Search for configuration files in upper directories.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Improve example.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Remove unused -V option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
-        <simplePara>Expand upon explanation of -D, -q, and -v.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="0">
+        <simplePara>Update example to include XPath.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -91,11 +82,11 @@
                 <para>When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-D -q -v</listItemTerm>
               <listItemDefinition>
                 <para>Verbosity of the output:</para>
-                <para changeType="add" reasonForUpdateRefIds="rfu-0004">
+                <para>
                   <randomList>
                     <listItem>
                       <para>-D - Debug mode gives the most amount of information.</para>
@@ -188,7 +179,7 @@
         <levelledPara>
           <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
           <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
+          <para>By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
@@ -283,7 +274,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
@@ -300,14 +291,15 @@ BREX ERROR: DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
   BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
   Only when the reference target is a step can the value of attribute
 internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
-  line 53:
+  line 52 (/dmodule[1]/content[1]/description[1]/para[2]/
+internalRef[1]):
     ELEMENT internalRef
-      ATTRIBUTE internalRefId
-        TEXT
-          content=stp-0001
       ATTRIBUTE internalRefTargetType
         TEXT
-          content=irtt08]]></verbatimText>
+          content=irtt08
+      ATTRIBUTE internalRefId
+        TEXT
+          content=stp-0001]]></verbatimText>
         </para>
       </levelledPara>
     </description>

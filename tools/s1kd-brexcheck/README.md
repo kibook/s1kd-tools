@@ -189,11 +189,12 @@ EXAMPLE
       BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
       Only when the reference target is a step can the value of attribute
     internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
-      line 53:
+      line 52 (/dmodule[1]/content[1]/description[1]/para[2]/
+    internalRef[1]):
         ELEMENT internalRef
-          ATTRIBUTE internalRefId
-            TEXT
-              content=stp-0001
           ATTRIBUTE internalRefTargetType
             TEXT
               content=irtt08
+          ATTRIBUTE internalRefId
+            TEXT
+              content=stp-0001

@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.3.5"
+#define VERSION "1.4.0"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -111,6 +111,85 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
 {
 	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
+}
+
+/* Generate an XPath expression for a node. */
+xmlChar *xpath_of(xmlNodePtr node)
+{
+	xmlNodePtr path, cur;
+	xmlChar *dst = NULL;
+
+	path = xmlNewNode(NULL, BAD_CAST "path");
+
+	/* Build XPath expression node by traversing up the tree. */
+	while (node && node->type != XML_DOCUMENT_NODE) {
+		xmlNodePtr e;
+		const xmlChar *name;
+
+		e = xmlNewChild(path, NULL, BAD_CAST "node", NULL);
+
+		switch (node->type) {
+			case XML_COMMENT_NODE:
+				name = BAD_CAST "comment()";
+				break;
+			case XML_PI_NODE:
+				name = BAD_CAST "processing-instruction()";
+				break;
+			case XML_TEXT_NODE:
+				name = BAD_CAST "text()";
+				break;
+			default:
+				name = node->name;
+				break;
+		}
+
+		xmlSetProp(e, BAD_CAST "name", name);
+
+		/* Locate the node's position within its parent. */
+		if (node->type != XML_ATTRIBUTE_NODE) {
+			int n = 1;
+			xmlChar pos[16];
+
+			for (cur = node->parent->children; cur; cur = cur->next) {
+				if (cur == node) {
+					break;
+				} else if (cur->type == node->type && (node->type != XML_ELEMENT_NODE || xmlStrcmp(cur->name, node->name) == 0)) {
+					++n;
+				}
+			}
+
+			xmlStrPrintf(pos, 16, "%d", n);
+			xmlSetProp(e, BAD_CAST "pos", pos);
+		}
+
+		node = node->parent;
+	}
+
+	/* Convert XPath expression node to string. */
+	for (cur = path->last; cur; cur = cur->prev) {
+		xmlChar *name, *pos;
+
+		name = xmlGetProp(cur, BAD_CAST "name");
+		pos = xmlGetProp(cur, BAD_CAST "pos");
+
+		dst = xmlStrcat(dst, BAD_CAST "/");
+		if (!pos) {
+			dst = xmlStrcat(dst, BAD_CAST "@");
+		}
+		dst = xmlStrcat(dst, name);
+		if (pos) {
+			dst = xmlStrcat(dst, BAD_CAST "[");
+			dst = xmlStrcat(dst, pos);
+			dst = xmlStrcat(dst, BAD_CAST "]");
+		}
+
+		xmlFree(name);
+		xmlFree(pos);
+	}
+
+	xmlFreeNode(path);
+
+	return dst;
 }
 
 /* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
@@ -294,17 +373,22 @@ void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError
 	for (i = 0; i < nodes->nodeNr; ++i) {
 		xmlNodePtr node = nodes->nodeTab[i];
 		xmlNodePtr object;
-		char line_s[256];
+		char line_s[16];
+		xmlChar *xpath;
 
 		if (check_values && check_single_object_values(rule, node)) {
 			continue;
 		}
 
-		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
-
-		snprintf(line_s, 256, "%d", node->line);
+		snprintf(line_s, 16, "%ld", xmlGetLineNo(node));
 		object = xmlNewChild(brexError, NULL, BAD_CAST "object", NULL);
 		xmlSetProp(object, BAD_CAST "line", BAD_CAST line_s);
+
+		xpath = xpath_of(node);
+		xmlSetProp(object, BAD_CAST "xpath", xpath);
+		xmlFree(xpath);
+
+		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
 		xmlAddChild(object, xmlCopyNode(node, 2));
 	}
@@ -1052,13 +1136,15 @@ void print_node(xmlNodePtr node)
 		xmlFree(allowed);
 	} else if (strcmp((char *) node->name, "object") == 0) {
 		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
+		char *path = (char *) xmlGetProp(node, BAD_CAST "xpath");
 		if (shortmsg) {
 			printf(" (line %s)\n", line);
 		} else {
-			printf("  line %s:\n", line);
+			printf("  line %s (%s):\n", line, path);
 			xmlDebugDumpOneNode(stdout, node->children, 2);
 		}
 		xmlFree(line);
+		xmlFree(path);
 	} else if (strcmp((char *) node->name, "snsError") == 0) {
 		printf("SNS ERROR: ");
 	} else if (strcmp((char *) node->name, "code") == 0) {
