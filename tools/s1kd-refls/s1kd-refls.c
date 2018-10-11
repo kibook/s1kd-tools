@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -434,6 +434,17 @@ void getExternalPubCode(char *dst, xmlNodePtr ref)
 	code = (char *) xmlNodeGetContent(externalPubCode);
 
 	strcpy(dst, code);
+
+	xmlFree(code);
+}
+
+/* Get filename from DDN item. */
+void getDispatchFileName(char *dst, xmlNodePtr ref)
+{
+	char *fname;
+	fname = (char *) xmlNodeGetContent(ref);
+	strcpy(dst, fname);
+	xmlFree(fname);
 }
 
 /* Determine if path is a directory. */
@@ -570,7 +581,10 @@ void printReference(xmlNodePtr ref, const char *src)
 	else if ((showObjects & SHOW_EPR) == SHOW_EPR &&
 	         (xmlStrcmp(ref->name, BAD_CAST "externalPubRef") == 0 ||
 		  xmlStrcmp(ref->name, BAD_CAST "reftp") == 0))
-		 getExternalPubCode(code, ref);
+		getExternalPubCode(code, ref);
+	else if (xmlStrcmp(ref->name, BAD_CAST "dispatchFileName") == 0 ||
+	         xmlStrcmp(ref->name, BAD_CAST "ddnfilen") == 0)
+		getDispatchFileName(code, ref);
 	else
 		return;
 
@@ -610,11 +624,11 @@ void listReferences(const char *path)
 	ctx = xmlXPathNewContext(doc);
 
 	if (contentOnly)
-		ctx->node = firstXPathNode("//content|//dmlContent|//dml", doc, NULL);
+		ctx->node = firstXPathNode("//content|//dmlContent|//dml|//ddnContent|//delivlst", doc, NULL);
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
