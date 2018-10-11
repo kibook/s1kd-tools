@@ -13,7 +13,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -245,7 +245,8 @@ void sync_refs(xmlNodePtr dmodule)
 	struct ref refs[256];
 	int n = 0, i;
 
-	xmlNodePtr content, old_refs, new_refs, searchable, new_node, refgrp, refdms, reftp, rdandrt;
+	xmlNodePtr content, old_refs, new_refs, searchable, new_node,
+		refgrp = NULL, refdms = NULL, reftp = NULL, rdandrt = NULL;
 
 	content = find_child(dmodule, "content");
 
@@ -256,8 +257,6 @@ void sync_refs(xmlNodePtr dmodule)
 
 		xmlUnlinkNode(old_refs);
 		xmlFreeNode(old_refs);
-	} else {
-		refgrp = NULL;
 	}
 
 	if (only_delete) return;
