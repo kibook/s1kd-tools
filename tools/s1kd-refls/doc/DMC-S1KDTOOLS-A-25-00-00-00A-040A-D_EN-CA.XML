@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="02"/>
+        <issueInfo issueNumber="009" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="05"/>
+        <issueDate year="2018" month="10" day="11"/>
         <dmTitle>
           <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -C, -D, -d, -G, -i, -n, -P, -r and -u options.</simplePara>
+        <simplePara>Add -C, -D, -d, -E, -G, -i, -n, -P, -r and -u options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDfGilNnPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDEfGilNnPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -70,9 +70,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-C, -D, -G, -P</listItemTerm>
+              <listItemTerm>-C, -D, -E, -G, -P</listItemTerm>
               <listItemDefinition>
-                <para>List references to comments, data modules, ICNs, and publication modules respectively. If none are specified, -CDGP is assumed.</para>
+                <para>List references to comments, data modules, external publications, ICNs, and publication modules respectively. If none are specified, -CDEGP is assumed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

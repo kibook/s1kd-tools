@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.8.3"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -39,10 +39,11 @@ bool fullMatch = true;
 bool inclLineNum = false;
 
 /* Possible objects to list references to. */
-#define SHOW_COM 0x01
-#define SHOW_DMC 0x02
-#define SHOW_ICN 0x04
-#define SHOW_PMC 0x08
+#define SHOW_COM 0x01 /* Comments */
+#define SHOW_DMC 0x02 /* Data modules */
+#define SHOW_ICN 0x04 /* ICNs */
+#define SHOW_PMC 0x08 /* Publication modules */
+#define SHOW_EPR 0x10 /* External publications */
 
 /* Which types of object references will be listed. */
 int showObjects = 0;
@@ -423,6 +424,18 @@ void getComCode(char *dst, xmlNodePtr ref)
 	}
 }
 
+/* Get the external pub code as a string from an externalPubRef. */
+void getExternalPubCode(char *dst, xmlNodePtr ref)
+{
+	xmlNodePtr externalPubCode;
+	char *code;
+
+	externalPubCode = firstXPathNode("externalPubRefIdent/externalPubCode|externalPubRefIdent/externalPubTitle|pubcode|pubtitle", NULL, ref);
+	code = (char *) xmlNodeGetContent(externalPubCode);
+
+	strcpy(dst, code);
+}
+
 /* Determine if path is a directory. */
 bool isDir(const char *path)
 {
@@ -532,7 +545,7 @@ void printUnmatched(const char *src, unsigned short line, const char *ref)
 /* Print a reference found in an object. */
 void printReference(xmlNodePtr ref, const char *src)
 {
-	char code[256];
+	char code[PATH_MAX];
 	char fname[PATH_MAX];
 	unsigned short line;
 
@@ -554,6 +567,10 @@ void printReference(xmlNodePtr ref, const char *src)
 		 (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0 ||
 	          xmlStrcmp(ref->name, BAD_CAST "boardno") == 0))
 		getICNAttr(code, ref);
+	else if ((showObjects & SHOW_EPR) == SHOW_EPR &&
+	         (xmlStrcmp(ref->name, BAD_CAST "externalPubRef") == 0 ||
+		  xmlStrcmp(ref->name, BAD_CAST "reftp") == 0))
+		 getExternalPubCode(code, ref);
 	else
 		return;
 
@@ -597,7 +614,7 @@ void listReferences(const char *path)
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -640,7 +657,7 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDfGilNnPqruh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDEfGilNnPqruh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -648,6 +665,7 @@ void showHelp(void)
 	puts("  -c         Only show references in content section.");
 	puts("  -D         List data module references.");
 	puts("  -d         Directory to search for matches in.");
+	puts("  -E         List external pub refs.");
 	puts("  -f         Print the source filename for each reference.");
 	puts("  -G         List ICN references.");
 	puts("  -i         Ignore issue info/language when matching.");
@@ -676,7 +694,7 @@ int main(int argc, char **argv)
 
 	bool isList = false;
 
-	const char *sopts = "qcNafluCDGPrd:inh?";
+	const char *sopts = "qcNafluCDGPrd:inEh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -739,6 +757,9 @@ int main(int argc, char **argv)
 			case 'n':
 				inclLineNum = true;
 				break;
+			case 'E':
+				showObjects |= SHOW_EPR;
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -748,7 +769,7 @@ int main(int argc, char **argv)
 
 	/* If none of -CDGP are given, show all types of objects. */
 	if (!showObjects) {
-		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC;
+		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR;
 	}
 
 	if (optind < argc) {
