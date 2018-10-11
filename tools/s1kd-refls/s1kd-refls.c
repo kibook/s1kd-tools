@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.9.1"
+#define VERSION "1.9.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -430,8 +430,13 @@ void getExternalPubCode(char *dst, xmlNodePtr ref)
 	xmlNodePtr externalPubCode;
 	char *code;
 
-	externalPubCode = firstXPathNode("externalPubRefIdent/externalPubCode|externalPubRefIdent/externalPubTitle|pubcode|pubtitle", NULL, ref);
-	code = (char *) xmlNodeGetContent(externalPubCode);
+	externalPubCode = firstXPathNode("externalPubRefIdent/externalPubCode|externalPubRefIdent/externalPubTitle|pubcode", NULL, ref);
+
+	if (externalPubCode) {
+		code = (char *) xmlNodeGetContent(externalPubCode);
+	} else {
+		code = (char *) xmlNodeGetContent(ref);
+	}
 
 	strcpy(dst, code);
 
