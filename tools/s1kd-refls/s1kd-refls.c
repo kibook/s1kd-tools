@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.8.2"
+#define VERSION "1.8.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -451,7 +451,7 @@ int codecmp(const char *p1, const char *p2)
 	b1 = basename(s1);
 	b2 = basename(s2);
 
-	return strcmp(b1, b2);
+	return strcasecmp(b1, b2);
 }
 
 /* Find the filename of a referenced object by its code. */
@@ -488,7 +488,7 @@ bool getFileName(char *dst, char *code, char *path)
 				strcpy(dst, tmp);
 				found = true;
 			}
-		} else if (strncmp(code, cur->d_name, n) == 0) {
+		} else if (strncasecmp(code, cur->d_name, n) == 0) {
 			if (!found || codecmp(cpath, dst) > 0) {
 				strcpy(dst, cpath);
 				found = true;
