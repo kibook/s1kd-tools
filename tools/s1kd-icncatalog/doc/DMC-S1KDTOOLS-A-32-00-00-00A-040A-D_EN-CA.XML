@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="32" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="21"/>
+        <issueDate year="2018" month="10" day="12"/>
         <dmTitle>
           <techName>s1kd-icncatalog(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Search for configuration files in upper directories.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Remove extra space from example.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -75,7 +69,7 @@
             <definitionListItem>
               <listItemTerm>-c &lt;catalog&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the catalog file to manage or resolve against. By default, the file <verbatimText verbatimStyle="vs02">.icncatalog</verbatimText> in the current directory is used. If the current directory does not contain this file, the parent directories will be searched.</para>
+                <para>Specify the catalog file to manage or resolve against. By default, the file <verbatimText verbatimStyle="vs02">.icncatalog</verbatimText> in the current directory is used. If the current directory does not contain this file, the parent directories will be searched.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
