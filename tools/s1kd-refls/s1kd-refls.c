@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.10.0"
+#define VERSION "1.10.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -442,7 +442,10 @@ void getICNAttr(char *dst, xmlNodePtr ref)
 	xmlEntityPtr ent;
 	icn = xmlNodeGetContent(ref);
 	if ((ent = xmlGetDocEntity(ref->doc, icn))) {
-		strcpy(dst, (char *) ent->URI);
+		char uri[PATH_MAX], *base;
+		strcpy(uri, (char *) ent->URI);
+		base = basename(uri);
+		strcpy(dst, base);
 	} else {
 		strcpy(dst, (char *) icn);
 	}
