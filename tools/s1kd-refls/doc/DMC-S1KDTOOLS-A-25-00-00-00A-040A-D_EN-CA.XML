@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="04"/>
+        <issueInfo issueNumber="009" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="11"/>
+        <issueDate year="2018" month="10" day="12"/>
         <dmTitle>
           <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,13 +41,16 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add -C, -D, -d, -E, -G, -i, -n, -P, -r, -u and -x options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
+        <simplePara>Improve description and example of tool.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para>s1kd-refls - List references in a CSDB object</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-refls - List references in CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
@@ -57,7 +60,7 @@
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-refls</emphasis> tool lists external references to other CSDB objects (dmRef, pmRef), optionally matching them to a filename in the current directory. This makes it easy to see what a given CSDB object "depends" on.</para>
+        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-refls</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -165,7 +168,10 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24">$ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0002">$ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
+DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-001-01.JPG</verbatimText>
         </para>
       </levelledPara>
     </description>

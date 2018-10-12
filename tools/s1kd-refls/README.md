@@ -1,7 +1,7 @@
 NAME
 ====
 
-s1kd-refls - List references in a CSDB object
+s1kd-refls - List references in CSDB objects
 
 SYNOPSIS
 ========
@@ -11,7 +11,7 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-refls* tool lists external references to other CSDB objects (dmRef, pmRef), optionally matching them to a filename in the current directory. This makes it easy to see what a given CSDB object "depends" on.
+The *s1kd-refls* tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.
 
 OPTIONS
 =======
@@ -67,4 +67,7 @@ CSDB object(s) to list references in. If none are specified, the tool will read 
 EXAMPLE
 =======
 
-    $ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML
+    $ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+    DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
+    DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
+    ICN-12345-00001-001-01.JPG
