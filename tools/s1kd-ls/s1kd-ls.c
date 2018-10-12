@@ -14,7 +14,7 @@
 #define OBJECT_MAX 102400
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -310,11 +310,7 @@ int is_official_issue(const char *fname, const char *path)
 
 		inwork = first_xpath_value(doc, NULL, "//@inWork|//@inwork");
 
-		if (!inwork) {
-			return 1;
-		}
-
-		official = xmlStrcmp(inwork, BAD_CAST "00") == 0;
+		official = !inwork || xmlStrcmp(inwork, BAD_CAST "00") == 0;
 
 		xmlFree(inwork);
 		xmlFreeDoc(doc);

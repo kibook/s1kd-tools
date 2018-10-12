@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.6.1"
+#define VERSION "1.6.2"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -186,7 +186,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
 		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 		strcpy(pm_fname_temp, pm_fname);
-		snprintf(pm_fname, 256, "%s_%s-%s", pm_fname_temp, issue_number, in_work);
+		snprintf(pm_fname, 256, "%s_%s-%s", pm_fname_temp, issue_number, in_work ? in_work : "00");
 	}
 
 	if (language) {
@@ -340,7 +340,7 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
 		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 		strcpy(dm_fname_temp, dm_fname);
-		snprintf(dm_fname, 256, "%s_%s-%s", dm_fname_temp, issue_number, in_work);
+		snprintf(dm_fname, 256, "%s_%s-%s", dm_fname_temp, issue_number, in_work ? in_work : "00");
 	}
 
 	if (language) {

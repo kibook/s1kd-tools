@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.9.3"
+#define VERSION "1.9.4"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -421,6 +421,10 @@ bool init_ident(struct ident *ident, xmlDocPtr doc)
 
 		ident->issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST issueNumberName);
 		ident->inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST inWorkName);
+
+		if (!ident->inWork) {
+			ident->inWork = strdup("00");
+		}
 	}
 
 	if (ident->type == DM || ident->type == PM || ident->type == COM || ident->type == UPF) {
@@ -2323,7 +2327,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
 		in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
 
-		snprintf(iss, 8, "_%s-%s", issue_number, in_work);
+		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
 		strcat(code, iss);
 
 		xmlFree(issue_number);

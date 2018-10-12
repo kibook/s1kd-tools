@@ -14,7 +14,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 

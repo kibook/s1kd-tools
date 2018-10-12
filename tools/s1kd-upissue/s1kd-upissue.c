@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -379,6 +379,10 @@ void upissue(const char *path)
 
 		issueNumber = (char *) xmlGetProp(issueInfo, issno_name);
 		inWork = (char *) xmlGetProp(issueInfo, inwork_name);
+
+		if (!inWork) {
+			inWork = strdup("00");
+		}
 	} else { /* Get issue/inwork from filename only */
 		char *i;
 

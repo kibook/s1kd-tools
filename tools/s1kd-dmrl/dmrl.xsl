@@ -151,14 +151,23 @@
     <xsl:value-of select="@inWork"/>
   </xsl:template>
 
-  <xsl:template match="language">
-    <xsl:text> -L </xsl:text>
-    <xsl:value-of select="@languageIsoCode"/>
-    <xsl:text> -C </xsl:text>
-    <xsl:value-of select="@countryIsoCode"/>
+  <xsl:template match="issno">
+    <xsl:text> -n </xsl:text>
+    <xsl:value-of select="@issno"/>
+    <xsl:if test="@inwork">
+      <xsl:text> -w </xsl:text>
+      <xsl:value-of select="@inwork"/>
+    </xsl:if>
   </xsl:template>
 
-  <xsl:template match="issueDate">
+  <xsl:template match="language">
+    <xsl:text> -L </xsl:text>
+    <xsl:value-of select="@languageIsoCode|@language"/>
+    <xsl:text> -C </xsl:text>
+    <xsl:value-of select="@countryIsoCode|@country"/>
+  </xsl:template>
+
+  <xsl:template match="issueDate|issdate">
     <xsl:text> -I </xsl:text>
     <xsl:value-of select="@year"/>
     <xsl:text>-</xsl:text>
@@ -167,11 +176,11 @@
     <xsl:value-of select="@day"/>
   </xsl:template>
 
-  <xsl:template match="dmTitle">
-    <xsl:apply-templates select="techName"/>
+  <xsl:template match="dmTitle|dmtitle">
+    <xsl:apply-templates select="techName|techname"/>
     <xsl:choose>
-      <xsl:when test="infoName">
-        <xsl:apply-templates select="infoName"/>
+      <xsl:when test="infoName|infoname">
+        <xsl:apply-templates select="infoName|infoname"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text> -!</xsl:text>
@@ -179,13 +188,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="techName">
+  <xsl:template match="techName|techname">
     <xsl:text> -t "</xsl:text>
     <xsl:value-of select="."/>
     <xsl:text>"</xsl:text>
   </xsl:template>
 
-  <xsl:template match="infoName">
+  <xsl:template match="infoName|infoname">
     <xsl:text> -i "</xsl:text>
     <xsl:value-of select="."/>
     <xsl:text>"</xsl:text>

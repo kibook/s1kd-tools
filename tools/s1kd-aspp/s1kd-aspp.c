@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.2.3"
+#define VERSION "1.2.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -400,7 +400,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
 		in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
 
-		snprintf(iss, 8, "_%s-%s", issue_number, in_work);
+		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
 		strcat(code, iss);
 
 		xmlFree(issue_number);

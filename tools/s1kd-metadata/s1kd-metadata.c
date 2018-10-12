@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -659,8 +659,11 @@ void show_in_work(xmlNodePtr node, int endl)
 {
 	if (xmlHasProp(node, BAD_CAST "inWork")) {
 		show_simple_attr(node, "inWork", endl);
-	} else {
+	} else if (xmlHasProp(node, BAD_CAST "inwork")) {
 		show_simple_attr(node, "inwork", endl);
+	} else {
+		printf("00");
+		if (endl > -1) putchar(endl);
 	}
 }
 
@@ -1172,7 +1175,7 @@ struct metadata metadata[] = {
 		create_info_name,
 		"Information name of a data module"},
 	{"inWork",
-		"//issueInfo/@inWork|//issno/@inwork",
+		"//issueInfo/@inWork|//issno",
 		show_in_work,
 		edit_in_work,
 		NULL,

@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-checkrefs"
-#define VERSION "1.2.2"
+#define VERSION "1.2.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -150,7 +150,7 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		issueNumber = firstXPathString("@issueNumber|@issno", NULL, issueInfo);
 		inWork      = firstXPathString("@inWork|@inwork", NULL, issueInfo);
 
-		sprintf(cat, "_%s-%s", issueNumber, inWork);
+		sprintf(cat, "_%s-%s", issueNumber, inWork ? inWork : "00");
 
 		xmlFree(issueNumber);
 		xmlFree(inWork);
@@ -268,7 +268,7 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		issueNumber = firstXPathString("@issueNumber|@issno", NULL, issueInfo);
 		inWork      = firstXPathString("@inWork|@inwork", NULL, issueInfo);
 
-		sprintf(cat, "_%s-%s", issueNumber, inWork);
+		sprintf(cat, "_%s-%s", issueNumber, inWork ? inWork : "00");
 
 		xmlFree(issueNumber);
 		xmlFree(inWork);

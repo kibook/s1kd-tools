@@ -11,7 +11,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.9.2"
+#define VERSION "1.9.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -215,6 +215,10 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 
 			issueNumber = firstXPathValue("@issueNumber|@issno", NULL, issueInfo);
 			inWork      = firstXPathValue("@inWork|@inwork", NULL, issueInfo);
+
+			if (!inWork) {
+				inWork = strdup("00");
+			}
 
 			strcat(dst, "_");
 			strcat(dst, issueNumber);

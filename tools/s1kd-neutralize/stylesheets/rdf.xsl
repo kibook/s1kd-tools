@@ -285,7 +285,14 @@
   <xsl:template match="issueInfo|issno" mode="dc">
     <xsl:value-of select="@issueNumber|@issno"/>
     <xsl:text>-</xsl:text>
-    <xsl:value-of select="@inWork|@inwork"/>
+    <xsl:choose>
+      <xsl:when test="@inWork|@inwork">
+        <xsl:value-of select="@inWork|@inwork"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>00</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="language" mode="dc">
