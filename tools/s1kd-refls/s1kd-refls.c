@@ -9,9 +9,11 @@
 #include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxml/debugXML.h>
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.9.3"
+#define VERSION "1.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -25,8 +27,6 @@ bool quiet = false;
 bool noIssue = false;
 /* Show unmatched references instead of an error. */
 bool showUnmatched = false;
-/* Include the name of the object where each reference is found. */
-bool inclSrcFname = false;
 /* Show references which are matched in the filesystem. */
 bool showMatched = true;
 /* Recurse in to child directories. */
@@ -35,8 +35,6 @@ bool recursive = false;
 char *directory;
 /* Only match against code, ignore language/issue info even if present. */
 bool fullMatch = true;
-/* Include line numbers where references occur. */
-bool inclLineNum = false;
 
 /* Possible objects to list references to. */
 #define SHOW_COM 0x01 /* Comments */
@@ -104,6 +102,91 @@ void uppercase(char *s)
 		s[i] = toupper(s[i]);
 	}
 }
+
+/* Print a reference which is matched in the filesystem. */
+void printMatched(xmlNodePtr node, const char *src, const char *ref)
+{
+	puts(ref);
+}
+void printMatchedSrc(xmlNodePtr node, const char *src, const char *ref)
+{
+	printf("%s: %s\n", src, ref);
+}
+void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
+{
+	printf("%s (%ld): %s\n", src, xmlGetLineNo(node), ref);
+}
+void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
+{
+	xmlChar *s, *r, *xpath;
+
+	s = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST src);
+	r = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST ref);
+	xpath = xpath_of(node);
+
+	printf("<found>");
+
+	printf("<ref>");
+	if (node->type == XML_ATTRIBUTE_NODE) {
+		xmlShellPrintNode(node->parent);
+	} else {
+		xmlShellPrintNode(node);
+	}
+	printf("</ref>");
+
+	printf("<source line=\"%ld\" xpath=\"%s\">%s</source>", xmlGetLineNo(node), xpath, s);
+	printf("<filename>%s</filename>", r);
+
+	printf("</found>");
+
+	xmlFree(s);
+	xmlFree(r);
+	xmlFree(xpath);
+}
+
+/* Print an error for references which are unmatched. */
+void printUnmatched(xmlNodePtr node, const char *src, const char *ref)
+{
+	fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", ref);
+}
+void printUnmatchedSrc(xmlNodePtr node, const char *src, const char *ref)
+{
+	fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
+}
+void printUnmatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
+{
+	fprintf(stderr, ERR_PREFIX "%s (%ld): Unmatched reference: %s\n", src, xmlGetLineNo(node), ref);
+}
+void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
+{
+	xmlChar *s, *r, *xpath;
+
+	s = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST src);
+	r = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST ref);
+	xpath = xpath_of(node);
+
+	printf("<missing>");
+
+	printf("<ref>");
+	if (node->type == XML_ATTRIBUTE_NODE) {
+		xmlShellPrintNode(node->parent);
+	} else {
+		xmlShellPrintNode(node);
+	}
+	printf("</ref>");
+
+	printf("<source line=\"%ld\" xpath=\"%s\">%s</source>", xmlGetLineNo(node), xpath, s);
+	printf("<code>%s</code>", r);
+
+	printf("</missing>");
+
+	xmlFree(s);
+	xmlFree(r);
+	xmlFree(xpath);
+}
+
+void (*printMatchedFn)(xmlNodePtr, const char *, const char *) = printMatched;
+void (*printUnmatchedFn)(xmlNodePtr, const char *, const char*) = printUnmatched;
 
 /* Get the DMC as a string from a dmRef. */
 void getDmCode(char *dst, xmlNodePtr dmRef)
@@ -534,40 +617,11 @@ bool getFileName(char *dst, char *code, char *path)
 	return found;
 }
 
-/* Print a reference which is matched in the filesystem. */
-void printMatched(const char *src, unsigned short line, const char *ref)
-{
-	if (inclSrcFname) {
-		if (inclLineNum) {
-			printf("%s (%u): %s\n", src, line, ref);
-		} else {
-			printf("%s: %s\n", src, ref);
-		}
-	} else {
-		puts(ref);
-	}
-}
-
-/* Print an error for references which are unmatched. */
-void printUnmatched(const char *src, unsigned short line, const char *ref)
-{
-	if (inclSrcFname) {
-		if (inclLineNum) {
-			fprintf(stderr, ERR_PREFIX "%s (%u): Unmatched reference: %s\n", src, line, ref);
-		} else {
-			fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
-		}
-	} else {
-		fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", ref);
-	}
-}
-
 /* Print a reference found in an object. */
 void printReference(xmlNodePtr ref, const char *src)
 {
 	char code[PATH_MAX];
 	char fname[PATH_MAX];
-	unsigned short line;
 
 	if ((showObjects & SHOW_DMC) == SHOW_DMC &&
 	    (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
@@ -597,27 +651,18 @@ void printReference(xmlNodePtr ref, const char *src)
 	else
 		return;
 
-	/* If the ref is an attribute, the line number must come from its
-	 * parent element.
-	 */
-	if (ref->type == XML_ATTRIBUTE_NODE) {
-		line = ref->parent->line;
-	} else {
-		line = ref->line;
-	}
-
 	if (showUnmatched) {
 		if (showMatched) {
-			printMatched(src, line, code);
+			printMatchedFn(ref, src, code);
 		} else if (!getFileName(fname, code, directory)) {
-			printMatched(src, line, code);
+			printMatchedFn(ref, src, code);
 		}
 	} else if (getFileName(fname, code, directory)) {
 		if (showMatched) {
-			printMatched(src, line, fname);
+			printMatchedFn(ref, src, fname);
 		}
 	} else if (!quiet) {
-		printUnmatched(src, line, code);
+		printUnmatchedFn(ref, src, code);
 	}
 }
 
@@ -680,7 +725,7 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDEfGilNnPqruh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDEfGilNnPqruxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -699,6 +744,7 @@ void showHelp(void)
 	puts("  -q         Quiet mode.");
 	puts("  -r         Search recursively for matches.");
 	puts("  -u         Show only unmatched references.");
+	puts("  -x         Output XML report.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
 	puts("  <object>   CSDB object to list references in.");
@@ -716,8 +762,11 @@ int main(int argc, char **argv)
 	int i;
 
 	bool isList = false;
+	bool xmlOutput = false;
+	bool inclSrcFname = false;
+	bool inclLineNum = false;
 
-	const char *sopts = "qcNafluCDGPrd:inEh?";
+	const char *sopts = "qcNafluCDGPrd:inExh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -778,10 +827,14 @@ int main(int argc, char **argv)
 				fullMatch = false;
 				break;
 			case 'n':
+				inclSrcFname = true;
 				inclLineNum = true;
 				break;
 			case 'E':
 				showObjects |= SHOW_EPR;
+				break;
+			case 'x':
+				xmlOutput = true;
 				break;
 			case 'h':
 			case '?':
@@ -790,9 +843,25 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* If none of -CDGP are given, show all types of objects. */
+	/* If none of -CDEGP are given, show all types of objects. */
 	if (!showObjects) {
 		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR;
+	}
+
+	/* Set the functions for printing matched/unmatched refs. */
+	if (xmlOutput) {
+		printMatchedFn = printMatchedXml;
+		printUnmatchedFn = printUnmatchedXml;
+		puts("<?xml version=\"1.0\"?>");
+		printf("<results>");
+	} else if (inclSrcFname) {
+		if (inclLineNum) {
+			printMatchedFn = printMatchedSrcLine;
+			printUnmatchedFn = printUnmatchedSrcLine;
+		} else {
+			printMatchedFn = printMatchedSrc;
+			printUnmatchedFn = printUnmatchedSrc;
+		}
 	}
 
 	if (optind < argc) {
@@ -807,6 +876,10 @@ int main(int argc, char **argv)
 		listReferencesInList(NULL);
 	} else {
 		listReferences("-");
+	}
+
+	if (xmlOutput) {
+		printf("</results>\n");
 	}
 
 	free(directory);

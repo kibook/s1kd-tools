@@ -9,7 +9,7 @@ s1kd\-refls \- List references in a CSDB object
 .IP
 .nf
 \f[C]
-s1kd\-refls\ [\-aCcDEfGilNnPqruh?]\ [\-d\ <dir>]\ [<object>...]
+s1kd\-refls\ [\-aCcDEfGilNnPqruxh?]\ [\-d\ <dir>]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -72,8 +72,9 @@ they were created with the \-N option to the s1kd\-new* tools.
 .RE
 .TP
 .B \-n
-If the \-f option is used, display the line number where the reference
-occurs in the source file after its filename.
+Include the filename of the source object where each reference was
+found, and display the line number where the reference occurs in the
+source file after its filename.
 .RS
 .RE
 .TP
@@ -91,6 +92,11 @@ Search for matches to references in directories recursively.
 .B \-u
 Show only unmatched reference errors, or unmatched codes if combined
 with the \-a option.
+.RS
+.RE
+.TP
+.B \-x
+Output a detailed XML report instead of plain text messages.
 .RS
 .RE
 .TP

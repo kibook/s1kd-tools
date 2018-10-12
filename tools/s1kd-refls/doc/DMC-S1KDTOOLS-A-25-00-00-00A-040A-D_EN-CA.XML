@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="03"/>
+        <issueInfo issueNumber="009" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2018" month="10" day="11"/>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -C, -D, -d, -E, -G, -i, -n, -P, -r and -u options.</simplePara>
+        <simplePara>Add -C, -D, -d, -E, -G, -i, -n, -P, -r, -u and -x options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDEfGilNnPqruh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDEfGilNnPqruxh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -120,7 +120,7 @@
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-n</listItemTerm>
               <listItemDefinition>
-                <para>If the -f option is used, display the line number where the reference occurs in the source file after its filename.</para>
+                <para>Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -139,6 +139,12 @@
               <listItemTerm>-u</listItemTerm>
               <listItemDefinition>
                 <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x</listItemTerm>
+              <listItemDefinition>
+                <para>Output a detailed XML report instead of plain text messages.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
