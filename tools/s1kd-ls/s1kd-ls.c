@@ -10,24 +10,24 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
-/* Maximum number of CSDB objects of each type. */
-unsigned OBJECT_MAX = 51200;
+/* Initial maximum number of CSDB objects of each type. */
+#define OBJECT_MAX 1
+unsigned DM_MAX  = OBJECT_MAX;
+unsigned PM_MAX  = OBJECT_MAX;
+unsigned COM_MAX = OBJECT_MAX;
+unsigned IMF_MAX = OBJECT_MAX;
+unsigned DDN_MAX = OBJECT_MAX;
+unsigned DML_MAX = OBJECT_MAX;
+unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.2.3"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
-#define EXIT_OBJECT_MAX 1
-#define EXIT_BAD_XML 2
+#define EXIT_OBJECT_MAX 1 /* Cannot allocate memory for more objects. */
 
-#define S_MAX_DM ERR_PREFIX "Maximum DMs reached (%d).\n"
-#define S_MAX_PM ERR_PREFIX "Maximum PMs reached (%d).\n"
-#define S_MAX_COM ERR_PREFIX "Maximum comments reached (%d).\n"
-#define S_MAX_ICN ERR_PREFIX "Maximum ICNs reached (%d).\n"
-#define S_MAX_IMF ERR_PREFIX "Maximum IMFs reached (%d).\n"
-#define S_MAX_DDN ERR_PREFIX "Maximum DDNs reached (%d).\n"
-#define S_MAX_DML ERR_PREFIX "Maximum DMLs reached (%d).\n"
+#define E_MAX_OBJECT ERR_PREFIX "Maximum CSDB objects reached: %d\n"
 
 /* Set of CSDB object types to list. */
 #define SHOW_DM  0x01
@@ -47,10 +47,23 @@ unsigned OBJECT_MAX = 51200;
 #define PARSE_OPTS 0
 #endif
 
+/* Lists of CSDB objects. */
+char (*dms)[PATH_MAX] = NULL;
+char (*pms)[PATH_MAX] = NULL;
+char (*coms)[PATH_MAX] = NULL;
+char (*icns)[PATH_MAX] = NULL;
+char (*imfs)[PATH_MAX] = NULL;
+char (*ddns)[PATH_MAX] = NULL;
+char (*dmls)[PATH_MAX] = NULL;
+int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0;
+
+/* Separator between printed CSDB objects. */
 char sep = '\n';
+
+/* Whether the CSDB objects were created with the -N option. */
 int no_issue = 0;
 
-void printfiles(char files[OBJECT_MAX][PATH_MAX], int n)
+void printfiles(char (*files)[PATH_MAX], int n)
 {
 	int i;
 	for (i = 0; i < n; ++i) {
@@ -58,6 +71,7 @@ void printfiles(char files[OBJECT_MAX][PATH_MAX], int n)
 	}
 }
 
+/* Compare the base names of two files. */
 int compare(const void *a, const void *b)
 {
 	char *sa, *sb, *ba, *bb;
@@ -76,46 +90,41 @@ int compare(const void *a, const void *b)
 	return d;
 }
 
+/* Determine whether files are CSDB objects. */
 int isxml(const char *name)
 {
 	return strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
-
 int isdm(const char *name)
 {
 	return (strncmp(name, "DMC-", 4) == 0 || strncmp(name, "DME-", 4) == 0) && isxml(name);
 }
-
 int ispm(const char *name)
 {
 	return (strncmp(name, "PMC-", 4) == 0 || strncmp(name, "PME-", 4) == 0) && isxml(name);
 }
-
 int iscom(const char *name)
 {
 	return strncmp(name, "COM-", 4) == 0 && isxml(name);
 }
-
 int isimf(const char *name)
 {
 	return strncmp(name, "IMF-", 4) == 0 && isxml(name);
 }
-
 int isddn(const char *name)
 {
 	return strncmp(name, "DDN-", 4) == 0 && isxml(name);
 }
-
 int isdml(const char *name)
 {
 	return strncmp(name, "DML-", 4) == 0 && isxml(name);
 }
-
 int isicn(const char *name)
 {
 	return strncmp(name, "ICN-", 4) == 0;
 }
 
+/* Show usage message. */
 void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPrwX] [<object>|<dir> ...]");
@@ -140,12 +149,14 @@ void show_help(void)
 	puts("  --version  Show version information");
 }
 
+/* Show version information. */
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
+/* Determine if a path is a directory. */
 int is_directory(const char *path, int recursive)
 {
 	struct stat st;
@@ -164,21 +175,24 @@ int is_directory(const char *path, int recursive)
 	return S_ISDIR(st.st_mode);
 }
 
+/* Determine whether a bitset contains a value. */
 int hasopt(int opts, int opt)
 {
 	return ((opts & opt) == opt);
 }
 
+/* Resize CSDB object lists when it is full. */
+void resize(char (**list)[PATH_MAX], unsigned *max)
+{
+	if (!(*list = realloc(*list, (*max *= 2) * PATH_MAX))) {
+		fprintf(stderr, E_MAX_OBJECT,
+			ndms + npms + ncoms + nimfs + nicns + nddns + ndmls);
+		exit(EXIT_OBJECT_MAX);
+	}
+}
+
 /* Find CSDB objects in a given directory. */
-void list_dir(const char *path,
-              char dms[OBJECT_MAX][PATH_MAX], int *ndms,
-              char pms[OBJECT_MAX][PATH_MAX], int *npms,
-	      char coms[OBJECT_MAX][PATH_MAX], int *ncoms,
-	      char icns[OBJECT_MAX][PATH_MAX], int *nicns,
-	      char imfs[OBJECT_MAX][PATH_MAX], int *nimfs,
-	      char ddns[OBJECT_MAX][PATH_MAX], int *nddns,
-	      char dmls[OBJECT_MAX][PATH_MAX], int *ndmls,
-	      int only_writable, int recursive)
+void list_dir(const char *path, int only_writable, int recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -207,57 +221,42 @@ void list_dir(const char *path,
 		else if (only_writable && access(cur->d_name, W_OK) != 0)
 			continue;
 		else if (dms && isdm(cur->d_name)) {
-			if (*ndms == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_DM, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (ndms == DM_MAX) {
+				resize(&dms, &DM_MAX);
 			}
-			strcpy(dms[(*ndms)++], cpath);
+			strcpy(dms[(ndms)++], cpath);
 		} else if (pms && ispm(cur->d_name)) {
-			if (*npms == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_PM, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (npms == PM_MAX) {
+				resize(&pms, &PM_MAX);
 			}
-			strcpy(pms[(*npms)++], cpath);
+			strcpy(pms[(npms)++], cpath);
 		} else if (coms && iscom(cur->d_name)) {
-			if (*ncoms == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_COM, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (ncoms == COM_MAX) {
+				resize(&coms, &COM_MAX);
 			}
-			strcpy(coms[(*ncoms)++], cpath);
+			strcpy(coms[(ncoms)++], cpath);
 		} else if (imfs && isimf(cur->d_name)) {
-			if (*nimfs == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_IMF, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (nimfs == IMF_MAX) {
+				resize(&imfs, &IMF_MAX);
 			}
-			strcpy(imfs[(*nimfs)++], cpath);
+			strcpy(imfs[(nimfs)++], cpath);
 		} else if (icns && isicn(cur->d_name)) {
-			if (*nicns == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_ICN, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (nicns == ICN_MAX) {
+				resize(&icns, &ICN_MAX);
 			}
-			strcpy(icns[(*nicns)++], cpath);
+			strcpy(icns[(nicns)++], cpath);
 		} else if (ddns && isddn(cur->d_name)) {
-			if (*nddns == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_DDN, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (nddns == DDN_MAX) {
+				resize(&ddns, &DDN_MAX);
 			}
-			strcpy(ddns[(*nddns)++], cpath);
+			strcpy(ddns[(nddns)++], cpath);
 		} else if (dmls && isdml(cur->d_name)) {
-			if (*ndmls == OBJECT_MAX) {
-				fprintf(stderr, S_MAX_DML, OBJECT_MAX);
-				exit(EXIT_OBJECT_MAX);
+			if (ndmls == DML_MAX) {
+				resize(&dmls, &DML_MAX);
 			}
-			strcpy(dmls[(*ndmls)++], cpath);
+			strcpy(dmls[(ndmls)++], cpath);
 		} else if (recursive && is_directory(cpath, recursive)) {
-			list_dir(cpath,
-				dms, ndms,
-				pms, npms,
-				coms, ncoms,
-				icns, nicns,
-				imfs, nimfs,
-				ddns, nddns,
-				dmls, ndmls,
-				only_writable, recursive);
+			list_dir(cpath, only_writable, recursive);
 		}
 	}
 
@@ -325,7 +324,7 @@ int is_official_issue(const char *fname, const char *path)
 }
 
 /* Copy only the latest issues of CSDB objects. */
-int extract_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
+int extract_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -353,7 +352,7 @@ int extract_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PAT
 }
 
 /* Copy only old issues of CSDB objects. */
-int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
+int remove_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -386,7 +385,7 @@ int remove_latest(char latest[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH
 }
 
 /* Copy only official issues of CSDB objects. */
-int extract_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
+int extract_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nofficial = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -402,7 +401,8 @@ int extract_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX]
 	return nofficial;
 }
 
-int remove_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][PATH_MAX], int nfiles)
+/* Copy a list, removing official CSDB objects. */
+int remove_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nofficial = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -421,15 +421,6 @@ int remove_official(char official[OBJECT_MAX][PATH_MAX], char files[OBJECT_MAX][
 int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
-
-	char (*dms)[PATH_MAX] = NULL;
-	char (*pms)[PATH_MAX] = NULL;
-	char (*coms)[PATH_MAX] = NULL;
-	char (*icns)[PATH_MAX] = NULL;
-	char (*imfs)[PATH_MAX] = NULL;
-	char (*ddns)[PATH_MAX] = NULL;
-	char (*dmls)[PATH_MAX] = NULL;
-	int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0;
 
 	char (*latest_dms)[PATH_MAX] = NULL;
 	char (*latest_pms)[PATH_MAX] = NULL;
@@ -453,7 +444,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPrwXoIN#:h?";
+	const char *sopts = "0CDGiLlMPrwXoINh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -483,7 +474,6 @@ int main(int argc, char **argv)
 			case 'o': only_old = 1; break;
 			case 'I': only_inwork = 1; break;
 			case 'N': no_issue = 1; break;
-			case '#': OBJECT_MAX = atoi(optarg); break;
 			case 'h':
 			case '?': show_help();
 				  return 0;
@@ -493,25 +483,25 @@ int main(int argc, char **argv)
 	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML;
 
 	if (hasopt(show, SHOW_DM)) {
-		dms = malloc(OBJECT_MAX * PATH_MAX);
+		dms = malloc(DM_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_PM)) {
-		pms = malloc(OBJECT_MAX * PATH_MAX);
+		pms = malloc(PM_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_COM)) {
-		coms = malloc(OBJECT_MAX * PATH_MAX);
+		coms = malloc(COM_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_ICN)) {
-		icns = malloc(OBJECT_MAX * PATH_MAX);
+		icns = malloc(ICN_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_IMF)) {
-		imfs = malloc(OBJECT_MAX * PATH_MAX);
+		imfs = malloc(IMF_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DDN)) {
-		ddns = malloc(OBJECT_MAX * PATH_MAX);
+		ddns = malloc(DDN_MAX * PATH_MAX);
 	}
 	if (hasopt(show, SHOW_DML)) {
-		dmls = malloc(OBJECT_MAX * PATH_MAX);
+		dmls = malloc(DML_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
@@ -529,70 +519,47 @@ int main(int argc, char **argv)
 				continue;
 
 			if (dms && isdm(base)) {
-				if (ndms == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_DM, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (ndms == DM_MAX) {
+					resize(&dms, &DM_MAX);
 				}
 				strcpy(dms[ndms++], argv[i]);
 			} else if (pms && ispm(base)) {
-				if (npms == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_PM, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (npms == PM_MAX) {
+					resize(&pms, &PM_MAX);
 				}
 				strcpy(pms[npms++], argv[i]);
 			} else if (coms && iscom(base)) {
-				if (ncoms == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_COM, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (ncoms == COM_MAX) {
+					resize(&coms, &COM_MAX);
 				}
 				strcpy(coms[ncoms++], argv[i]);
 			} else if (icns && isicn(base)) {
-				if (nicns == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_ICN, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (nicns == ICN_MAX) {
+					resize(&icns, &ICN_MAX);
 				}
 				strcpy(icns[nicns++], argv[i]);
 			} else if (imfs && isimf(base)) {
-				if (nimfs == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_IMF, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (nimfs == IMF_MAX) {
+					resize(&imfs, &IMF_MAX);
 				}
 				strcpy(imfs[nimfs++], argv[i]);
 			} else if (ddns && isddn(base)) {
-				if (nddns == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_DDN, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (nddns == DDN_MAX) {
+					resize(&ddns, &DDN_MAX);
 				}
 				strcpy(ddns[nddns++], argv[i]);
 			} else if (dmls && isdml(base)) {
-				if (ndmls == OBJECT_MAX) {
-					fprintf(stderr, S_MAX_DML, OBJECT_MAX);
-					exit(EXIT_OBJECT_MAX);
+				if (ndmls == DML_MAX) {
+					resize(&dmls, &DML_MAX);
 				}
 				strcpy(dmls[ndmls++], argv[i]);
 			} else if (is_directory(argv[i], 0)) {
-				list_dir(argv[i],
-					dms, &ndms,
-					pms, &npms,
-					coms, &ncoms,
-					icns, &nicns,
-					imfs, &nimfs,
-					ddns, &nddns,
-					dmls, &ndmls,
-					only_writable, recursive);
+				list_dir(argv[i], only_writable, recursive);
 			}
 		}
 	} else {
 		/* Read dms to list from current directory */
-		list_dir(".",
-			dms, &ndms,
-			pms, &npms,
-			coms, &ncoms,
-			icns, &nicns,
-			imfs, &nimfs,
-			ddns, &nddns,
-			dmls, &ndmls,
-			only_writable, recursive);
+		list_dir(".", only_writable, recursive);
 	}
 
 
