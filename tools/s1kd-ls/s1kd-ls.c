@@ -742,13 +742,17 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (ncoms && !only_old) {
-		printfiles(coms, ncoms);
+	if (ncoms) {
+		if (!only_old) {
+			printfiles(coms, ncoms);
+		}
 		free(coms);
 	}
 
-	if (nicns && !only_old) {
-		printfiles(icns, nicns);
+	if (nicns) {
+		if (!only_old) {
+			printfiles(icns, nicns);
+		}
 		free(icns);
 	}
 
@@ -765,8 +769,10 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (nddns && !only_old) {
-		printfiles(ddns, nddns);
+	if (nddns) {
+		if (!only_old) {
+			printfiles(ddns, nddns);
+		}
 		free(ddns);
 	}
 
