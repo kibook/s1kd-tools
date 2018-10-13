@@ -21,7 +21,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -631,20 +631,21 @@ int main(int argc, char **argv)
 
 			if (nissue_dms) {
 				nlatest_dms = f(latest_dms, issue_dms, nissue_dms);
-				free(issue_dms);
 			}
 			if (nissue_pms) {
 				nlatest_pms = f(latest_pms, issue_pms, nissue_pms);
-				free(issue_pms);
 			}
 			if (nissue_imfs) {
 				nlatest_imfs = f(latest_imfs, issue_imfs, nissue_imfs);
-				free(issue_imfs);
 			}
 			if (nissue_dmls) {
 				nlatest_dmls = f(latest_dmls, issue_dmls, nissue_dmls);
-				free(issue_dmls);
 			}
+
+			free(issue_dms);
+			free(issue_pms);
+			free(issue_imfs);
+			free(issue_dmls);
 		} else {
 			int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
 
@@ -674,20 +675,21 @@ int main(int argc, char **argv)
 			if (only_latest) {
 				if (nissue_dms) {
 					nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
-					free(issue_dms);
 				}
 				if (nissue_pms) {
 					nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
-					free(issue_pms);
 				}
 				if (nissue_imfs) {
 					nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
-					free(issue_imfs);
 				}
 				if (nissue_dmls) {
 					nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
-					free(issue_dmls);
 				}
+
+				free(issue_dms);
+				free(issue_pms);
+				free(issue_imfs);
+				free(issue_dmls);
 			}
 		}
 	} else if (only_latest || only_old) {
