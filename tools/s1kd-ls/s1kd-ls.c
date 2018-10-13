@@ -11,10 +11,10 @@
 #include <libxml/xpath.h>
 
 /* Maximum number of CSDB objects of each type. */
-#define OBJECT_MAX 102400
+unsigned OBJECT_MAX = 51200;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.2.2"
+#define VERSION "1.2.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -453,7 +453,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPrwXoINh?";
+	const char *sopts = "0CDGiLlMPrwXoIN#:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -483,6 +483,7 @@ int main(int argc, char **argv)
 			case 'o': only_old = 1; break;
 			case 'I': only_inwork = 1; break;
 			case 'N': no_issue = 1; break;
+			case '#': OBJECT_MAX = atoi(optarg); break;
 			case 'h':
 			case '?': show_help();
 				  return 0;
@@ -594,36 +595,66 @@ int main(int argc, char **argv)
 			only_writable, recursive);
 	}
 
-	if (ndms) qsort(dms, ndms, PATH_MAX, compare);
-	if (npms) qsort(pms, npms, PATH_MAX, compare);
-	if (nimfs) qsort(imfs, nimfs, PATH_MAX, compare);
-	if (ndmls) qsort(dmls, ndmls, PATH_MAX, compare);
 
 	if (ndms) {
+		qsort(dms, ndms, PATH_MAX, compare);
 		if (only_latest || only_old) latest_dms = malloc(ndms * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_dms = malloc(ndms * PATH_MAX);
+	} else {
+		free(dms);
 	}
 	if (npms) {
+		qsort(pms, npms, PATH_MAX, compare);
 		if (only_latest || only_old) latest_pms = malloc(npms * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_pms = malloc(npms * PATH_MAX);
+	} else {
+		free(pms);
 	}
 	if (nimfs) {
+		qsort(imfs, nimfs, PATH_MAX, compare);
 		if (only_latest || only_old) latest_imfs = malloc(nimfs * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_imfs = malloc(nimfs * PATH_MAX);
+	} else {
+		free(imfs);
 	}
 	if (ndmls) {
+		qsort(dmls, ndmls, PATH_MAX, compare);
 		if (only_latest || only_old) latest_dmls = malloc(ndmls * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_dmls = malloc(ndmls * PATH_MAX);
+	} else {
+		free(dmls);
+	}
+
+	if (!ncoms) {
+		free(coms);
+	}
+	if (!nicns) {
+		free(icns);
+	}
+	if (!nddns) {
+		free(ddns);
 	}
 
 	if (only_official_issue || only_inwork) {
 		if (only_old) {
 			int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
 
-			if (ndms) nissue_dms = remove_latest(issue_dms, dms, ndms);
-			if (npms) nissue_pms = remove_latest(issue_pms, pms, npms);
-			if (nimfs) nissue_imfs = remove_latest(issue_imfs, imfs, nimfs);
-			if (ndmls) nissue_dmls = remove_latest(issue_dmls, dmls, ndmls);
+			if (ndms) {
+				nissue_dms = remove_latest(issue_dms, dms, ndms);
+				free(dms);
+			}
+			if (npms) {
+				nissue_pms = remove_latest(issue_pms, pms, npms);
+				free(pms);
+			}
+			if (nimfs) {
+				nissue_imfs = remove_latest(issue_imfs, imfs, nimfs);
+				free(imfs);
+			}
+			if (ndmls) {
+				nissue_dmls = remove_latest(issue_dmls, dmls, ndmls);
+				free(dmls);
+			}
 
 			if (only_official_issue) {
 				f = extract_official;
@@ -631,10 +662,22 @@ int main(int argc, char **argv)
 				f = remove_official;
 			}
 
-			if (nissue_dms) nlatest_dms = f(latest_dms, issue_dms, nissue_dms);
-			if (nissue_pms) nlatest_pms = f(latest_pms, issue_pms, nissue_pms);
-			if (nissue_imfs) nlatest_imfs = f(latest_imfs, issue_imfs, nissue_imfs);
-			if (nissue_dmls) nlatest_dmls = f(latest_dmls, issue_dmls, nissue_dmls);
+			if (nissue_dms) {
+				nlatest_dms = f(latest_dms, issue_dms, nissue_dms);
+				free(issue_dms);
+			}
+			if (nissue_pms) {
+				nlatest_pms = f(latest_pms, issue_pms, nissue_pms);
+				free(issue_pms);
+			}
+			if (nissue_imfs) {
+				nlatest_imfs = f(latest_imfs, issue_imfs, nissue_imfs);
+				free(issue_imfs);
+			}
+			if (nissue_dmls) {
+				nlatest_dmls = f(latest_dmls, issue_dmls, nissue_dmls);
+				free(issue_dmls);
+			}
 		} else {
 			int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
 
@@ -644,16 +687,40 @@ int main(int argc, char **argv)
 				f = remove_official;
 			}
 
-			if (ndms) nissue_dms = f(issue_dms, dms, ndms);
-			if (npms) nissue_pms = f(issue_pms, pms, npms);
-			if (nimfs) nissue_imfs = f(issue_imfs, imfs, nimfs);
-			if (ndmls) nissue_dmls = f(issue_dmls, dmls, ndmls);
+			if (ndms) {
+				nissue_dms = f(issue_dms, dms, ndms);
+				free(dms);
+			}
+			if (npms) {
+				nissue_pms = f(issue_pms, pms, npms);
+				free(pms);
+			}
+			if (nimfs) {
+				nissue_imfs = f(issue_imfs, imfs, nimfs);
+				free(imfs);
+			}
+			if (ndmls) {
+				nissue_dmls = f(issue_dmls, dmls, ndmls);
+				free(dmls);
+			}
 
 			if (only_latest) {
-				if (nissue_dms) nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
-				if (nissue_pms) nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
-				if (nissue_imfs) nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
-				if (nissue_dmls) nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
+				if (nissue_dms) {
+					nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
+					free(issue_dms);
+				}
+				if (nissue_pms) {
+					nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
+					free(issue_pms);
+				}
+				if (nissue_imfs) {
+					nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
+					free(issue_imfs);
+				}
+				if (nissue_dmls) {
+					nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
+					free(issue_dmls);
+				}
 			}
 		}
 	} else if (only_latest || only_old) {
@@ -664,83 +731,94 @@ int main(int argc, char **argv)
 		} else {
 			f = remove_latest;
 		}
-		if (ndms) nlatest_dms = f(latest_dms, dms, ndms);
-		if (npms) nlatest_pms = f(latest_pms, pms, npms);
-		if (nimfs) nlatest_imfs = f(latest_imfs, imfs, nimfs);
-		if (ndmls) nlatest_dmls = f(latest_dmls, dmls, ndmls);
+		if (ndms) {
+			nlatest_dms = f(latest_dms, dms, ndms);
+			free(dms);
+		}
+		if (npms) {
+			nlatest_pms = f(latest_pms, pms, npms);
+			free(pms);
+		}
+		if (nimfs) {
+			nlatest_imfs = f(latest_imfs, imfs, nimfs);
+			free(imfs);
+		}
+		if (ndmls) {
+			nlatest_dmls = f(latest_dmls, dmls, ndmls);
+			free(dmls);
+		}
 	}
 
 	if (ndms) {
 		if (only_latest || only_old) {
 			printfiles(latest_dms, nlatest_dms);
+			free(latest_dms);
 		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_dms, nissue_dms);
+			free(issue_dms);
 		} else {
 			printfiles(dms, ndms);
+			free(dms);
 		}
 	}
 
 	if (npms) {
 		if (only_latest || only_old) {
 			printfiles(latest_pms, nlatest_pms);
+			free(latest_pms);
 		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_pms, nissue_pms);
+			free(issue_pms);
 		} else {
 			printfiles(pms, npms);
+			free(pms);
 		}
 	}
 
 	if (ncoms && !only_old) {
 		printfiles(coms, ncoms);
+		free(coms);
 	}
 
 	if (nicns && !only_old) {
 		printfiles(icns, nicns);
+		free(icns);
 	}
 
 	if (nimfs) {
 		if (only_latest || only_old) {
 			printfiles(latest_imfs, nlatest_imfs);
+			free(latest_imfs);
 		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_imfs, nissue_imfs);
+			free(issue_imfs);
 		} else {
 			printfiles(imfs, nimfs);
+			free(imfs);
 		}
 	}
 
 	if (nddns && !only_old) {
 		printfiles(ddns, nddns);
+		free(ddns);
 	}
 
 	if (ndmls) {
 		if (only_latest || only_old) {
 			printfiles(latest_dmls, nlatest_dmls);
+			free(latest_dmls);
 		} else if (only_official_issue || only_inwork) {
 			printfiles(issue_dmls, nissue_dmls);
+			free(issue_dmls);
 		} else {
 			printfiles(dmls, ndmls);
+			free(dmls);
 		}
 	}
 
 	if (dir) {
 		closedir(dir);
 	}
-
-	free(dms);
-	free(latest_dms);
-	free(issue_dms);
-	free(pms);
-	free(latest_pms);
-	free(issue_pms);
-	free(coms);
-	free(icns);
-	free(imfs);
-	free(latest_imfs);
-	free(issue_imfs);
-	free(ddns);
-	free(dmls);
-	free(latest_dmls);
-	free(issue_dmls);
 
 	xmlCleanupParser();
 
