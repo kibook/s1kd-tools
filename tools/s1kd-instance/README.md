@@ -90,7 +90,7 @@ Omit issue/inwork numbers from automatically generated filenames.
 Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.
 
 -O &lt;dir&gt;  
-Output instance(s) in dir, automatically naming them based on:
+Output instance(s) in &lt;dir&gt;, automatically naming them based on:
 
 -   the extension specified with -e
 
@@ -101,6 +101,8 @@ Output instance(s) in dir, automatically naming them based on:
 -   the language and country specified with -L
 
 If any of the above are not specified, the information is copied from the source object.
+
+When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.
 
 -o &lt;file&gt;  
 Output instance to file instead of stdout.

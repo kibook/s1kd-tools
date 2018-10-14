@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2018" month="10" day="14"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,16 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Allow - to signify the current date when using the -I option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Improve description.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt01">
-        <simplePara>Improve example of automatic naming.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateReasonType="urt01">
-        <simplePara>Remove paragraph about base code vs extension code.</simplePara>
+        <simplePara>Handle non-XML files with the -O option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -64,7 +55,7 @@
           <verbatimText verbatimStyle="vs24">s1kd-instance [options] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
-      <levelledPara changeType="modify" reasonForUpdateRefIds="rfu-0002">
+      <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of S1000D CSDB objects, derived from "master" (or "source") objects. The tool supports multiple methods of instantiating objects:</para>
         <para>
@@ -163,7 +154,7 @@
             <definitionListItem>
               <listItemTerm>-I &lt;date&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Set the issue date of the instance. By default, the issue date is taken from the source. If - is given for &lt;date&gt;, the current date will be used.</para>
+                <para>Set the issue date of the instance. By default, the issue date is taken from the source. If - is given for &lt;date&gt;, the current date will be used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -217,7 +208,7 @@
             <definitionListItem>
               <listItemTerm>-O &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Output instance(s) in dir, automatically naming them based on:</para>
+                <para>Output instance(s) in &lt;dir&gt;, automatically naming them based on:</para>
                 <para>
                   <randomList>
                     <listItem>
@@ -235,6 +226,7 @@
                   </randomList>
                 </para>
                 <para>If any of the above are not specified, the information is copied from the source object.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

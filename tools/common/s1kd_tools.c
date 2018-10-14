@@ -119,3 +119,32 @@ xmlChar *xpath_of(xmlNodePtr node)
 
 	return dst;
 }
+
+/* Make a copy of a file. */
+int copy(const char *from, const char *to)
+{
+
+	FILE *f1, *f2;
+	char buf[4096];
+	size_t n;
+	struct stat sf, st;
+
+	if (stat(from, &sf) == -1) {
+		return 1;
+	}
+	if (stat(to, &st) == 0 && sf.st_dev == st.st_dev && sf.st_ino == st.st_ino) {
+		return 1;
+	}
+
+	f1 = fopen(from, "rb");
+	f2 = fopen(to, "wb");
+
+	while ((n = fread(buf, 1, 4096, f1)) > 0) {
+		fwrite(buf, 1, n, f2);
+	}
+
+	fclose(f1);
+	fclose(f2);
+
+	return 0;
+}

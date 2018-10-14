@@ -6,9 +6,10 @@
 #include <time.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -75,24 +76,6 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 	xmlXPathFreeContext(ctx);
 
 	return node;
-}
-
-void copy(const char *from, const char *to)
-{
-
-	FILE *f1, *f2;
-	char buf[4096];
-	size_t n;
-
-	f1 = fopen(from, "rb");
-	f2 = fopen(to, "wb");
-
-	while ((n = fread(buf, 1, 4096, f1)) > 0) {
-		fwrite(buf, 1, n, f2);
-	}
-
-	fclose(f1);
-	fclose(f2);
 }
 
 /* Remove change markup attributes from elements referencing old RFUs */

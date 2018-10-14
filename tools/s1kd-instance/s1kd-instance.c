@@ -7,17 +7,18 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <libgen.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
-
+#include "s1kd_tools.h"
 #include "strings.h"
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.9.4"
+#define VERSION "1.10.0"
 
 /* Prefix before errors printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -36,7 +37,7 @@
 #define S_MISSING_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define S_BAD_TYPE ERR_PREFIX "Cannot automatically name unsupported object types.\n"
 #define S_FILE_EXISTS ERR_PREFIX "%s already exists. Use -f to overwrite.\n"
-#define S_BAD_XML ERR_PREFIX "%s does not contain valid XML.\n"
+#define S_BAD_XML ERR_PREFIX "%s does not contain valid XML. If it is a list, specify the -L option.\n"
 #define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
 #define S_BAD_CODE ERR_PREFIX "Bad %s code: %s.\n"
 #define S_NO_XSLT ERR_PREFIX "No built-in XSLT for CIR type: %s\n"
@@ -2643,179 +2644,195 @@ int main(int argc, char **argv)
 			exit(EXIT_MISSING_FILE);
 		}
 
-		doc = xmlReadFile(src, NULL, PARSE_OPTS);
+		doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
 
-		if (!doc) {
-			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
-			exit(EXIT_BAD_XML);
-		}
+		if (doc) {
+			root = xmlDocGetRootElement(doc);
+			ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
 
-		root = xmlDocGetRootElement(doc);
-		ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
+			/* Load the applic assigns from the PCT data module referenced
+			 * by the ACT data module referenced by this data module. */
+			if (load_pct_per_dm) {
+				char pct_fname[PATH_MAX];
 
-		/* Load the applic assigns from the PCT data module referenced
-		 * by the ACT data module referenced by this data module. */
-		if (load_pct_per_dm) {
-			char pct_fname[PATH_MAX];
-
-			if (find_pct_fname(pct_fname, doc)) {
-				load_applic_from_pct(pct_fname, product);
-			}
-		}
-
-		if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
-			if (add_source_ident) {
-				add_source(doc);
+				if (find_pct_fname(pct_fname, doc)) {
+					load_applic_from_pct(pct_fname, product);
+				}
 			}
 
-			for (cir = cirs->children; cir; cir = cir->next) {
-				char *cirdocfname = (char *) xmlNodeGetContent(cir);
-				char *cirxsl = (char *) xmlGetProp(cir, BAD_CAST "xsl");
+			if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
+				if (add_source_ident) {
+					add_source(doc);
+				}
 
-				if (access(cirdocfname, F_OK) == -1) {
-					fprintf(stderr, S_MISSING_CIR, cirdocfname);
-					continue;
+				for (cir = cirs->children; cir; cir = cir->next) {
+					char *cirdocfname = (char *) xmlNodeGetContent(cir);
+					char *cirxsl = (char *) xmlGetProp(cir, BAD_CAST "xsl");
+
+					if (access(cirdocfname, F_OK) == -1) {
+						fprintf(stderr, S_MISSING_CIR, cirdocfname);
+						continue;
+					}
+
+					if (ispm) {
+						undepend_cir(doc, cirdocfname, false, cirxsl);
+					} else {
+						undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
+					}
+
+					xmlFree(cirdocfname);
+					xmlFree(cirxsl);
+				}
+
+				referencedApplicGroup = first_xpath_node(doc, NULL, "//referencedApplicGroup|//inlineapplics");
+
+				if (referencedApplicGroup) {
+					strip_applic(referencedApplicGroup, root);
+
+					if (clean || simpl) {
+						clean_applic_stmts(referencedApplicGroup);
+
+						if (xmlChildElementCount(referencedApplicGroup) == 0) {
+							xmlUnlinkNode(referencedApplicGroup);
+							xmlFreeNode(referencedApplicGroup);
+							referencedApplicGroup = NULL;
+						}
+
+						clean_applic(referencedApplicGroup, root);
+					}
+
+					if (simpl) {
+						simpl_applic_clean(referencedApplicGroup);
+					}
+				}
+
+				/* Remove elements whose securityClassification is not
+				 * in the given list. */
+				if (sec_classes) {
+					filter_elements_by_att(doc, "securityClassification", sec_classes);
+				}
+				/* Remove elements whose skillLevelCode is not in the
+				 * given list. */
+				if (skill_codes) {
+					filter_elements_by_att(doc, "skillLevelCode", skill_codes);
+				}
+
+				if (strcmp(extension, "") != 0) {
+					set_extd(doc, extension);
+				}
+
+				if (stripext) {
+					strip_extension(doc);
+				}
+
+				if (strcmp(code, "") != 0) {
+					set_code(doc, code);
+				}
+
+				set_title(doc, tech, info);
+
+				if (strcmp(language, "") != 0) {
+					set_lang(doc, language);
+				}
+
+				if (new_applic && napplics > 0) {
+					/* Simplify the whole object applic before
+					 * adding the user-defined applicability, to
+					 * remove duplicate information.
+					 *
+					 * If overwriting the applic instead of merging
+					 * it, there's no need to do this.
+					 */
+					if (combine_applic) {
+						simpl_whole_applic(doc);
+					}
+
+					set_applic(doc, new_display_text, combine_applic);
+				}
+
+				if (strcmp(issinfo, "") != 0) {
+					set_issue(doc, issinfo);
+				}
+
+				if (strcmp(issdate, "") != 0) {
+					set_issue_date(doc, issdate_year, issdate_month, issdate_day);
+				}
+
+				if (strcmp(secu, "") != 0) {
+					set_security(doc, secu);
+				}
+
+				if (setorig) {
+					set_orig(doc, origspec);
+				}
+
+				if (skill) {
+					set_skill(doc, skill);
+				}
+
+				if (remarks) {
+					set_remarks(doc, remarks);
+				}
+
+				if (strcmp(comment_text, "") != 0) {
+					insert_comment(doc, comment_text, comment_path);
 				}
 
 				if (ispm) {
-					undepend_cir(doc, cirdocfname, false, cirxsl);
-				} else {
-					undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
+					remove_empty_pmentries(doc);
 				}
 
-				xmlFree(cirdocfname);
-				xmlFree(cirxsl);
-			}
+				if (flat_alts) {
+					flatten_alts(doc);
+				}
 
-			referencedApplicGroup = first_xpath_node(doc, NULL, "//referencedApplicGroup|//inlineapplics");
-
-			if (referencedApplicGroup) {
-				strip_applic(referencedApplicGroup, root);
-
-				if (clean || simpl) {
-					clean_applic_stmts(referencedApplicGroup);
-
-					if (xmlChildElementCount(referencedApplicGroup) == 0) {
-						xmlUnlinkNode(referencedApplicGroup);
-						xmlFreeNode(referencedApplicGroup);
-						referencedApplicGroup = NULL;
+				if (autoname) {
+					if (!auto_name(out, doc, dir, no_issue)) {
+						fprintf(stderr, S_BAD_TYPE);
+						exit(EXIT_BAD_XML);
 					}
 
-					clean_applic(referencedApplicGroup, root);
+					if (access(out, F_OK) == 0 && !force_overwrite) {
+						fprintf(stderr, S_FILE_EXISTS, out);
+						exit(EXIT_NO_OVERWRITE);
+					}
+
+					if (verbose) {
+						puts(out);
+					}
 				}
 
-				if (simpl) {
-					simpl_applic_clean(referencedApplicGroup);
-				}
+				xmlSaveFile(out, doc);
 			}
 
-			/* Remove elements whose securityClassification is not
-			 * in the given list. */
-			if (sec_classes) {
-				filter_elements_by_att(doc, "securityClassification", sec_classes);
-			}
-			/* Remove elements whose skillLevelCode is not in the
-			 * given list. */
-			if (skill_codes) {
-				filter_elements_by_att(doc, "skillLevelCode", skill_codes);
+			/* The ACT/PCT may be different for the next DM, so these
+			 * assigns must be cleared. Those directly set with -s will
+			 * carry over. */
+			if (load_pct_per_dm) {
+				clear_pct_applic();
 			}
 
-			if (strcmp(extension, "") != 0) {
-				set_extd(doc, extension);
+			xmlFreeDoc(doc);
+		} else if (autoname) { /* Copy the non-XML object to the directory. */
+			char *base;
+
+			base = basename(src);
+			snprintf(out, PATH_MAX, "%s/%s", dir, base);
+
+			if (access(out, F_OK) == 0 && !force_overwrite) {
+				fprintf(stderr, S_FILE_EXISTS, out);
+				exit(EXIT_NO_OVERWRITE);
 			}
 
-			if (stripext) {
-				strip_extension(doc);
+			copy(src, out);
+
+			if (verbose) {
+				puts(out);
 			}
-
-			if (strcmp(code, "") != 0) {
-				set_code(doc, code);
-			}
-
-			set_title(doc, tech, info);
-
-			if (strcmp(language, "") != 0) {
-				set_lang(doc, language);
-			}
-
-			if (new_applic && napplics > 0) {
-				/* Simplify the whole object applic before
-				 * adding the user-defined applicability, to
-				 * remove duplicate information.
-				 *
-				 * If overwriting the applic instead of merging
-				 * it, there's no need to do this.
-				 */
-				if (combine_applic) {
-					simpl_whole_applic(doc);
-				}
-
-				set_applic(doc, new_display_text, combine_applic);
-			}
-
-			if (strcmp(issinfo, "") != 0) {
-				set_issue(doc, issinfo);
-			}
-
-			if (strcmp(issdate, "") != 0) {
-				set_issue_date(doc, issdate_year, issdate_month, issdate_day);
-			}
-
-			if (strcmp(secu, "") != 0) {
-				set_security(doc, secu);
-			}
-
-			if (setorig) {
-				set_orig(doc, origspec);
-			}
-
-			if (skill) {
-				set_skill(doc, skill);
-			}
-
-			if (remarks) {
-				set_remarks(doc, remarks);
-			}
-
-			if (strcmp(comment_text, "") != 0) {
-				insert_comment(doc, comment_text, comment_path);
-			}
-
-			if (ispm) {
-				remove_empty_pmentries(doc);
-			}
-
-			if (flat_alts) {
-				flatten_alts(doc);
-			}
-
-			if (autoname) {
-				if (!auto_name(out, doc, dir, no_issue)) {
-					fprintf(stderr, S_BAD_TYPE);
-					exit(EXIT_BAD_XML);
-				}
-
-				if (access(out, F_OK) == 0 && !force_overwrite) {
-					fprintf(stderr, S_FILE_EXISTS, out);
-					exit(EXIT_NO_OVERWRITE);
-				}
-
-				if (verbose) {
-					puts(out);
-				}
-			}
-
-			xmlSaveFile(out, doc);
+		} else {
+			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
+			exit(EXIT_BAD_XML);
 		}
-
-		/* The ACT/PCT may be different for the next DM, so these
-		 * assigns must be cleared. Those directly set with -s will
-		 * carry over. */
-		if (load_pct_per_dm) {
-			clear_pct_applic();
-		}
-
-		xmlFreeDoc(doc);
 
 		if (!dmlist && (use_stdin || i >= argc)) {
 			break;
