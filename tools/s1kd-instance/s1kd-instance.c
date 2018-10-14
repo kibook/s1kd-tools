@@ -1453,13 +1453,16 @@ void set_lang(xmlDocPtr doc, char *lang)
 	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "country" : "countryIsoCode"), BAD_CAST country_iso_code);
 }
 
-bool auto_name(char *out, xmlDocPtr dm, const char *dir, bool noiss)
+bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool noiss)
 {
 	struct ident ident;
 	char iss[8] = "";
 
 	if (!init_ident(&ident, dm)) {
-		return false;
+		char *base;
+		base = basename(src);
+		snprintf(out, PATH_MAX, "%s/%s", dir, base);
+		return true;
 	}
 
 	if (ident.type == DM || ident.type == PM || ident.type == COM || ident.type == UPF) {
@@ -2788,7 +2791,7 @@ int main(int argc, char **argv)
 					flatten_alts(doc);
 				}
 
-				if (autoname && !auto_name(out, doc, dir, no_issue)) {
+				if (autoname && !auto_name(out, src, doc, dir, no_issue)) {
 					fprintf(stderr, S_BAD_TYPE);
 					exit(EXIT_BAD_XML);
 				}
