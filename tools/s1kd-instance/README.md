@@ -102,6 +102,10 @@ Output instance(s) in &lt;dir&gt;, automatically naming them based on:
 
 If any of the above are not specified, the information is copied from the source object.
 
+If &lt;dir&gt; does not exist, it will be created.
+
+If a file exists with the same name in the specified directory, a warning will be display and the file will not be overwritten, unless the -f option is specified.
+
 When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.
 
 -o &lt;file&gt;  

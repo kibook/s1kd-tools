@@ -181,6 +181,12 @@ the language and country specified with \-L
 If any of the above are not specified, the information is copied from
 the source object.
 .PP
+If <dir> does not exist, it will be created.
+.PP
+If a file exists with the same name in the specified directory, a
+warning will be display and the file will not be overwritten, unless the
+\-f option is specified.
+.PP
 When using this option, non\-XML files, such as external publications,
 may be specified as objects.
 They will be copied to <dir>.

@@ -18,16 +18,16 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 
-/* Prefix before errors printed to console */
+/* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define WRN_PREFIX PROG_NAME ": WARNING: "
 
 /* Error codes */
 #define EXIT_MISSING_ARGS 1 /* Option or parameter missing */
 #define EXIT_MISSING_FILE 2 /* File does not exist */
 #define EXIT_BAD_APPLIC 4 /* Malformed applic definitions */
-#define EXIT_NO_OVERWRITE 5 /* Did not overwrite existing out file */
 #define EXIT_BAD_XML 6 /* Invalid XML/S1000D */
 #define EXIT_BAD_ARG 7 /* Malformed argument */
 #define EXIT_BAD_DATE 8 /* Malformed issue date */
@@ -36,7 +36,6 @@
 #define S_MISSING_OBJECT ERR_PREFIX "Could not read source object: %s\n"
 #define S_MISSING_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define S_BAD_TYPE ERR_PREFIX "Cannot automatically name unsupported object types.\n"
-#define S_FILE_EXISTS ERR_PREFIX "%s already exists. Use -f to overwrite.\n"
 #define S_BAD_XML ERR_PREFIX "%s does not contain valid XML. If it is a list, specify the -L option.\n"
 #define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
 #define S_BAD_CODE ERR_PREFIX "Bad %s code: %s.\n"
@@ -50,6 +49,9 @@
 #define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
 #define S_MISSING_CIR ERR_PREFIX "Could not find CIR %s."
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
+
+/* Warning messages */
+#define S_FILE_EXISTS WRN_PREFIX "%s already exists. Use -f to overwrite.\n"
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -2786,23 +2788,20 @@ int main(int argc, char **argv)
 					flatten_alts(doc);
 				}
 
-				if (autoname) {
-					if (!auto_name(out, doc, dir, no_issue)) {
-						fprintf(stderr, S_BAD_TYPE);
-						exit(EXIT_BAD_XML);
-					}
+				if (autoname && !auto_name(out, doc, dir, no_issue)) {
+					fprintf(stderr, S_BAD_TYPE);
+					exit(EXIT_BAD_XML);
+				}
 
-					if (access(out, F_OK) == 0 && !force_overwrite) {
-						fprintf(stderr, S_FILE_EXISTS, out);
-						exit(EXIT_NO_OVERWRITE);
-					}
+				if (access(out, F_OK) == 0 && !force_overwrite) {
+					fprintf(stderr, S_FILE_EXISTS, out);
+				} else {
+					xmlSaveFile(out, doc);
 
 					if (verbose) {
 						puts(out);
 					}
 				}
-
-				xmlSaveFile(out, doc);
 			}
 
 			/* The ACT/PCT may be different for the next DM, so these
@@ -2821,13 +2820,12 @@ int main(int argc, char **argv)
 
 			if (access(out, F_OK) == 0 && !force_overwrite) {
 				fprintf(stderr, S_FILE_EXISTS, out);
-				exit(EXIT_NO_OVERWRITE);
-			}
+			} else {
+				copy(src, out);
 
-			copy(src, out);
-
-			if (verbose) {
-				puts(out);
+				if (verbose) {
+					puts(out);
+				}
 			}
 		} else {
 			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);

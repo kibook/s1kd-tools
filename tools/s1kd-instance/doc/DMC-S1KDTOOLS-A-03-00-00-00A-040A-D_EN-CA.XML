@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Handle non-XML files with the -O option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Skip past existing files without -f instead of failing immediately.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -226,6 +229,8 @@
                   </randomList>
                 </para>
                 <para>If any of the above are not specified, the information is copied from the source object.</para>
+                <para>If &lt;dir&gt; does not exist, it will be created.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">If a file exists with the same name in the specified directory, a warning will be display and the file will not be overwritten, unless the -f option is specified.</para>
                 <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.</para>
               </listItemDefinition>
             </definitionListItem>
