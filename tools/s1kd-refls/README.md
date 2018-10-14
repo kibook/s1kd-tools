@@ -52,6 +52,9 @@ Quiet mode. Errors are not printed.
 -r  
 Search for matches to references in directories recursively.
 
+-s  
+Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.
+
 -u  
 Show only unmatched reference errors, or unmatched codes if combined with the -a option.
 

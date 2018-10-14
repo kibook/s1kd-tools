@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.10.1"
+#define VERSION "1.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -35,6 +35,8 @@ bool recursive = false;
 char *directory;
 /* Only match against code, ignore language/issue info even if present. */
 bool fullMatch = true;
+/* Include the source object as a reference. */
+bool listSrc = false;
 
 /* Possible objects to list references to. */
 #define SHOW_COM 0x01 /* Comments */
@@ -119,6 +121,10 @@ void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
 void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 {
 	xmlChar *s, *r, *xpath;
+
+	if (!node) {
+		return;
+	}
 
 	s = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST src);
 	r = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST ref);
@@ -676,6 +682,10 @@ void listReferences(const char *path)
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
+	if (listSrc) {
+		printMatched(NULL, path, path);
+	}
+
 	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 
 	ctx = xmlXPathNewContext(doc);
@@ -746,6 +756,7 @@ void showHelp(void)
 	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
 	puts("  -r         Search recursively for matches.");
+	puts("  -s         Include the source object as a reference.");
 	puts("  -u         Show only unmatched references.");
 	puts("  -x         Output XML report.");
 	puts("  -h -?      Show help/usage message.");
@@ -769,7 +780,7 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 
-	const char *sopts = "qcNafluCDGPrd:inExh?";
+	const char *sopts = "qcNafluCDGPrd:inExsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -838,6 +849,9 @@ int main(int argc, char **argv)
 				break;
 			case 'x':
 				xmlOutput = true;
+				break;
+			case 's':
+				listSrc = true;
 				break;
 			case 'h':
 			case '?':

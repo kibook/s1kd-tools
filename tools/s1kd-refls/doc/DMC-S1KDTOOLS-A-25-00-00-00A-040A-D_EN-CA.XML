@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2018" month="10" day="14"/>
         <dmTitle>
           <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -C, -D, -d, -E, -G, -i, -n, -P, -r, -u and -x options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01">
-        <simplePara>Improve description and example of tool.</simplePara>
+        <simplePara>Add -s option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -50,17 +47,17 @@
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-refls - List references in CSDB objects</para>
+        <para>s1kd-refls - List references in CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDEfGilNnPqruxh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-refls [-aCcDEfGilNnPqruxh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeType="modify" reasonForUpdateRefIds="rfu-0002">The <emphasis>s1kd-refls</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.</para>
+        <para>The <emphasis>s1kd-refls</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -72,7 +69,7 @@
                 <para>List all references, not attempting to match them to an actual filename.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-C, -D, -E, -G, -P</listItemTerm>
               <listItemDefinition>
                 <para>List references to comments, data modules, external publications, ICNs, and publication modules respectively. If none are specified, -CDEGP is assumed.</para>
@@ -84,7 +81,7 @@
                 <para>List references in the <verbatimText verbatimStyle="vs12">content</verbatimText> section of a CSDB object only.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Directory to search for matches to references in. By default, the current directory is used.</para>
@@ -102,7 +99,7 @@
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
                 <para>Ignore issue and language info when matching references.</para>
@@ -120,7 +117,7 @@
                 <para>Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new* tools.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-n</listItemTerm>
               <listItemDefinition>
                 <para>Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.</para>
@@ -132,13 +129,19 @@
                 <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
                 <para>Search for matches to references in directories recursively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-s</listItemTerm>
+              <listItemDefinition>
+                <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-u</listItemTerm>
               <listItemDefinition>
                 <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
@@ -168,7 +171,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeType="modify" reasonForUpdateRefIds="rfu-0002">$ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs24">$ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
 DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
 ICN-12345-00001-001-01.JPG</verbatimText>
