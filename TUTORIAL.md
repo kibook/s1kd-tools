@@ -101,17 +101,29 @@ Continuing with the example above, "A" might represent one model of bicycle and 
 
 ### Standard numbering system
 
-The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes.
+The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes. A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS.
 
-A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS. For example, data modules related to the pedals on the bicycle might fall under A9-10 of the "General surface vehicles" SNS provided in the specification, where A9 is the system code and means "Controls (drivers)" and 10 is the subsystem and subsubsystem codes and means "Foot controls".
+For example, data modules related to the pedals on the bicycle might fall under A9-10 of the "General surface vehicles" SNS provided in the specification, where A9 is the system code and means "Controls (drivers)" and 10 is the subsystem and subsubsystem codes and means "Foot controls".
 
-| System | Subsystem | Name               |
-|:-------|:----------|:-------------------|
-| A9     |           | Controls (drivers) |
-|        | -00       | General            |
-|        | -10       | Foot controls      |
-|        | -20       | Hand controls      |
-|        | -30       | Ancillary controls |
+For example, the bicycle might be broken down as follows:
+
+| System | Subsystem | Name            |
+|:-------|:----------|:----------------|
+| D00    | -00       | Bicycle         |
+| DA0    | -00       | Wheels          |
+|        | -10       | Front wheel     |
+|        | -20       | Rear wheel      |
+| DA1    | -00       | Brakes          |
+|        | -10       | Brake pads      |
+|        | -20       | Front brake     |
+| DA2    | -00       | Steering system |
+|        | -10       | Stem            |
+|        | -20       | Handlebar       |
+|        | -30       | Headset         |
+| DA3    | -00       | Frame           |
+|        | -10       | Horn            |
+| DA4    | -00       | Drivetrain      |
+|        | -10       | Chain           |
 
 ### Disassembly code
 
@@ -174,14 +186,14 @@ The title of an S1000D data module is formed from two parts:
 
 -   The information name
 
-The tech name is derived from the SNS of the data module, and the info name is derived from the short definition of the information code of the data module. For example, the data module BIKE-A9-10-00-00A-040A-D, which has the SNS A9-10-00 (Foot controls) and information code 040 (Description), would be titled "Foot controls - Description".
+The tech name is derived from the SNS of the data module, and the info name is derived from the short definition of the information code of the data module. For example, the data module BIKE-DA0-00-00-00A-040A-D, which has the SNS DA0-00-00 (Wheels) and information code 040 (Description), would be titled "Wheels - Description".
 
 Data module content
 -------------------
 
 S1000D provides a number of different schemas for different kinds of content within a data module. The schema dictates what elements can be used within that data module's contents. This limits the author of a data module to only using the appropriate elements for a particular context, and helps keep data consistent.
 
-For example, the data module BIKE-A9-10-00-00A-040A-D, which will contain the description of the foot controls of the bicycle, might use the **descriptive** schema. Another data module, BIKE-A9-10-00-00A-520A-D, which is titled "Foot controls - Remove procedure" and enumerates the steps to remove the foot controls from the bicycle, might use the **procedural** schema.
+For example, the data module BIKE-DA0-20-00-00A-040A-D, which will contain the description of the rear wheel of the bicycle, might use the **descriptive** schema. Another data module, BIKE-DA0-20-00-00A-520A-A, which is titled "Rear wheel - Remove procedure" and enumerates the steps to remove the rear wheel from the bicycle, might use the **procedural** schema.
 
 Example of descriptive data module contents:
 

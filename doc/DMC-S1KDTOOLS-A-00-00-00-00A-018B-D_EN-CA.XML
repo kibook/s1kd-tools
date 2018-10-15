@@ -153,8 +153,9 @@
           </levelledPara>
           <levelledPara>
             <title>Standard numbering system</title>
-            <para>The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes.</para>
-            <para>A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS. For example, data modules related to the pedals on the bicycle might fall under A9-10 of the "General surface vehicles" SNS provided in the specification, where A9 is the system code and means "Controls (drivers)" and 10 is the subsystem and subsubsystem codes and means "Foot controls".</para>
+            <para>The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes. A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS.</para>
+            <para>For example, data modules related to the pedals on the bicycle might fall under A9-10 of the "General surface vehicles" SNS provided in the specification, where A9 is the system code and means "Controls (drivers)" and 10 is the subsystem and subsubsystem codes and means "Foot controls".</para>
+            <para>For example, the bicycle might be broken down as follows:</para>
             <table>
               <title>Example SNS</title>
               <tgroup cols="3">
@@ -174,20 +175,24 @@
                 <tbody>
                   <row>
                     <entry>
-                      <para>A9</para>
+                      <para>D00</para>
                     </entry>
-                    <entry/>
-                    <entry>
-                      <para>Controls (drivers)</para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry/>
                     <entry>
                       <para>-00</para>
                     </entry>
                     <entry>
-                      <para>General</para>
+                      <para>Bicycle</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <para>DA0</para>
+                    </entry>
+                    <entry>
+                      <para>-00</para>
+                    </entry>
+                    <entry>
+                      <para>Wheels</para>
                     </entry>
                   </row>
                   <row>
@@ -196,7 +201,7 @@
                       <para>-10</para>
                     </entry>
                     <entry>
-                      <para>Foot controls</para>
+                      <para>Front wheel</para>
                     </entry>
                   </row>
                   <row>
@@ -205,7 +210,65 @@
                       <para>-20</para>
                     </entry>
                     <entry>
-                      <para>Hand controls</para>
+                      <para>Rear wheel</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <para>DA1</para>
+                    </entry>
+                    <entry>
+                      <para>-00</para>
+                    </entry>
+                    <entry>
+                      <para>Brakes</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry/>
+                    <entry>
+                      <para>-10</para>
+                    </entry>
+                    <entry>
+                      <para>Brake pads</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry/>
+                    <entry>
+                      <para>-20</para>
+                    </entry>
+                    <entry>
+                      <para>Front brake</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <para>DA2</para>
+                    </entry>
+                    <entry>
+                      <para>-00</para>
+                    </entry>
+                    <entry>
+                      <para>Steering system</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry/>
+                    <entry>
+                      <para>-10</para>
+                    </entry>
+                    <entry>
+                      <para>Stem</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry/>
+                    <entry>
+                      <para>-20</para>
+                    </entry>
+                    <entry>
+                      <para>Handlebar</para>
                     </entry>
                   </row>
                   <row>
@@ -214,7 +277,47 @@
                       <para>-30</para>
                     </entry>
                     <entry>
-                      <para>Ancillary controls</para>
+                      <para>Headset</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <para>DA3</para>
+                    </entry>
+                    <entry>
+                      <para>-00</para>
+                    </entry>
+                    <entry>
+                      <para>Frame</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry/>
+                    <entry>
+                      <para>-10</para>
+                    </entry>
+                    <entry>
+                      <para>Horn</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <para>DA4</para>
+                    </entry>
+                    <entry>
+                      <para>-00</para>
+                    </entry>
+                    <entry>
+                      <para>Drivetrain</para>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry/>
+                    <entry>
+                      <para>-10</para>
+                    </entry>
+                    <entry>
+                      <para>Chain</para>
                     </entry>
                   </row>
                 </tbody>
@@ -307,12 +410,12 @@
               </listItem>
             </randomList>
           </para>
-          <para>The tech name is derived from the SNS of the data module, and the info name is derived from the short definition of the information code of the data module. For example, the data module BIKE-A9-10-00-00A-040A-D, which has the SNS A9-10-00 (Foot controls) and information code 040 (Description), would be titled "Foot controls - Description".</para>
+          <para>The tech name is derived from the SNS of the data module, and the info name is derived from the short definition of the information code of the data module. For example, the data module BIKE-DA0-00-00-00A-040A-D, which has the SNS DA0-00-00 (Wheels) and information code 040 (Description), would be titled "Wheels - Description".</para>
         </levelledPara>
         <levelledPara>
           <title>Data module content</title>
           <para>S1000D provides a number of different schemas for different kinds of content within a data module. The schema dictates what elements can be used within that data module's contents. This limits the author of a data module to only using the appropriate elements for a particular context, and helps keep data consistent.</para>
-          <para>For example, the data module BIKE-A9-10-00-00A-040A-D, which will contain the description of the foot controls of the bicycle, might use the <emphasis>descriptive</emphasis> schema. Another data module, BIKE-A9-10-00-00A-520A-D, which is titled "Foot controls - Remove procedure" and enumerates the steps to remove the foot controls from the bicycle, might use the <emphasis>procedural</emphasis> schema.</para>
+          <para>For example, the data module BIKE-DA0-20-00-00A-040A-D, which will contain the description of the rear wheel of the bicycle, might use the <emphasis>descriptive</emphasis> schema. Another data module, BIKE-DA0-20-00-00A-520A-A, which is titled "Rear wheel - Remove procedure" and enumerates the steps to remove the rear wheel from the bicycle, might use the <emphasis>procedural</emphasis> schema.</para>
           <para>Example of descriptive data module contents:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
