@@ -103,8 +103,6 @@ Continuing with the example above, "A" might represent one model of bicycle and 
 
 The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes. A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS.
 
-For example, data modules related to the pedals on the bicycle might fall under A9-10 of the "General surface vehicles" SNS provided in the specification, where A9 is the system code and means "Controls (drivers)" and 10 is the subsystem and subsubsystem codes and means "Foot controls".
-
 For example, the bicycle might be broken down as follows:
 
 | System | Subsystem | Name            |
