@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.11.0"
+#define VERSION "1.11.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -738,7 +738,7 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDEfGilNnPqruxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDEfGilNnPqrsuxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");

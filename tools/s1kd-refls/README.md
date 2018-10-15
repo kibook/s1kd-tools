@@ -6,7 +6,7 @@ s1kd-refls - List references in CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refls [-aCcDEfGilNnPqruxh?] [-d <dir>] [<object>...]
+    s1kd-refls [-aCcDEfGilNnPqrsuxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
