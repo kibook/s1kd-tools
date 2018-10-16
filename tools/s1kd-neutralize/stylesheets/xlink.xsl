@@ -3,9 +3,9 @@
 
   <!-- Add xlink attributes to linking elements. -->
   
-  <xsl:template match="node()|@*">
+  <xsl:template match="@*|node()">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*"/>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
@@ -169,7 +169,7 @@
           <xsl:otherwise>replace</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      <xsl:apply-templates select="node()|@*"/>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
@@ -234,7 +234,7 @@
       <xsl:attribute name="xlink:title">
         <xsl:apply-templates select="parent::figure/title" mode="xlink"/>
       </xsl:attribute>
-      <xsl:apply-templates select="node()|@*"/>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
@@ -245,12 +245,18 @@
         <xsl:text>#</xsl:text>
         <xsl:value-of select="@internalRefId"/>
       </xsl:attribute>
-      <xsl:if test="@targetTitle">
-        <xsl:attribute name="xlink:title">
-          <xsl:value-of select="@targetTitle"/>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:attribute name="xlink:title">
+        <xsl:choose>
+          <xsl:when test="@targetTitle">
+            <xsl:value-of select="@targetTitle"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:attribute name="xlink:show">replace</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
