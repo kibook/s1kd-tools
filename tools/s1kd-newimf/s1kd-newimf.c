@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.3.4"
+#define VERSION "1.3.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -68,7 +68,7 @@ xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
 		char src[PATH_MAX];
-		sprintf(src, "%s/icnmetadata.xml", template_dir);
+		snprintf(src, PATH_MAX, "%s/icnmetadata.xml", template_dir);
 
 		if (access(src, F_OK) == -1) {
 			fprintf(stderr, ERR_PREFIX "No schema icnmetadata in template directory \"%s\".\n", template_dir);
@@ -282,9 +282,9 @@ void set_issue_date(xmlNodePtr issueDate)
 		year = local->tm_year + 1900;
 		month = local->tm_mon + 1;
 		day = local->tm_mday;
-		sprintf(year_s, "%d", year);
-		sprintf(month_s, "%.2d", month);
-		sprintf(day_s, "%.2d", day);
+		snprintf(year_s, 4, "%d", year);
+		snprintf(month_s, 2, "%.2d", month);
+		snprintf(day_s, 2, "%.2d", day);
 	} else {
 		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
 			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
@@ -425,7 +425,7 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		int n;
 		char icn[256];
-		char fname[256];
+		char fname[PATH_MAX];
 		xmlDocPtr template;
 		xmlNodePtr node;
 		xmlXPathContextPtr ctx;
@@ -480,9 +480,9 @@ int main(int argc, char **argv)
 		set_remarks(template, remarks);
 
 		if (no_issue) {
-			snprintf(fname, 256, "IMF-%s.XML", icn);
+			snprintf(fname, PATH_MAX, "IMF-%s.XML", icn);
 		} else {
-			snprintf(fname, 256, "IMF-%s_%s-%s.XML", icn, issue_number, in_work);
+			snprintf(fname, PATH_MAX, "IMF-%s_%s-%s.XML", icn, issue_number, in_work);
 		}
 
 		if (!overwrite && access(fname, F_OK) != -1) {
