@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.4.5"
+#define VERSION "1.4.6"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -260,9 +260,9 @@ void set_issue_date(xmlNodePtr issueDate)
 		month = local->tm_mon + 1;
 		day = local->tm_mday;
 
-		if (snprintf(year_s, 5, "%d", year) < 0 ||
-		    snprintf(month_s, 3, "%.2d", month) < 0 ||
-		    snprintf(day_s, 3, "%.2d", day) < 0)
+		if (snprintf(year_s, 5, "%u", year) < 0 ||
+		    snprintf(month_s, 3, "%.2u", month) < 0 ||
+		    snprintf(day_s, 3, "%.2u", day) < 0)
 			exit(EXIT_BAD_DATE);
 	} else {
 		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {

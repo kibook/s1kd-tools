@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.4.3"
+#define VERSION "1.4.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -415,7 +415,7 @@ void upissue(const char *path)
 		if (set_date) {
 			time_t now;
 			struct tm *local;
-			int year, month, day;
+			unsigned short year, month, day;
 			char year_s[5], month_s[3], day_s[3];
 
 			issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
@@ -427,9 +427,9 @@ void upissue(const char *path)
 			month = local->tm_mon + 1;
 			day = local->tm_mday;
 
-			if (snprintf(year_s, 5, "%d", year) < 0 ||
-			    snprintf(month_s, 3, "%.2d", month) < 0 ||
-			    snprintf(day_s, 3, "%.2d", day) < 0)
+			if (snprintf(year_s, 5, "%u", year) < 0 ||
+			    snprintf(month_s, 3, "%.2u", month) < 0 ||
+			    snprintf(day_s, 3, "%.2u", day) < 0)
 				exit(EXIT_BAD_DATE);
 
 			xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
