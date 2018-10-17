@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -328,14 +328,14 @@ bool search_brex_fname(char *fname, const char *dpath, const char *dmcode, int l
 
 	bool found = false;
 
-	char tmp_fname[256] = "";
+	char tmp_fname[PATH_MAX] = "";
 
 	dir = opendir(dpath);
 
 	while ((cur = readdir(dir))) {
 		if (strncmp(cur->d_name, dmcode, len) == 0) {
 
-			sprintf(tmp_fname, "%s/%s", dpath, cur->d_name);
+			snprintf(tmp_fname, PATH_MAX, "%s/%s", dpath, cur->d_name);
 
 			if (is_xml_file(tmp_fname) && (!found || strcmp(tmp_fname, fname) > 0)) {
 				strcpy(fname, tmp_fname);
