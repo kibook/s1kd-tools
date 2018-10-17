@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.11.1"
+#define VERSION "1.11.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2604,9 +2604,10 @@ int main(int argc, char **argv)
 		time(&now);
 		local = localtime(&now);
 
-		sprintf(issdate_year, "%d", local->tm_year + 1900);
-		sprintf(issdate_month, "%.2d", local->tm_mon + 1);
-		sprintf(issdate_day, "%.2d", local->tm_mday);
+		if (snprintf(issdate_year, 5, "%d", local->tm_year + 1900) < 0 ||
+		    snprintf(issdate_month, 3, "%.2d", local->tm_mon + 1) < 0 ||
+		    snprintf(issdate_day, 3, "%.2d", local->tm_mday) < 0)
+			exit(EXIT_BAD_DATE);
 	} else if (strcmp(issdate, "") != 0) {
 		if (sscanf(issdate, "%4s-%2s-%2s", issdate_year, issdate_month, issdate_day) != 3) {
 			fprintf(stderr, S_BAD_DATE, issdate);
@@ -2819,7 +2820,9 @@ int main(int argc, char **argv)
 			char *base;
 
 			base = basename(src);
-			snprintf(out, PATH_MAX, "%s/%s", dir, base);
+			if (snprintf(out, PATH_MAX, "%s/%s", dir, base) < 0) {
+				exit(EXIT_BAD_ARG);
+			}
 
 			if (access(out, F_OK) == 0 && !force_overwrite) {
 				fprintf(stderr, S_FILE_EXISTS, out);
