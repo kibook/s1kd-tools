@@ -9,7 +9,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.6.3"
+#define VERSION "1.6.4"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -23,6 +23,7 @@
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
 #define EXIT_BAD_PM 1
+#define EXIT_BAD_CODE 2
 
 int xinclude = 0;
 int no_issue = 0;
@@ -154,9 +155,9 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	char *country_iso_code = NULL;
 
 	char pmc[256];
-	char pm_fname[256];
-	char pm_fname_temp[256];
-	char fs_pm_fname[256] = "";
+	char pm_fname[PATH_MAX];
+	char pm_fname_temp[PATH_MAX];
+	char fs_pm_fname[PATH_MAX] = "";
 
 	xmlNodePtr xi;
 	xmlDocPtr doc;
@@ -180,13 +181,16 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		pm_number,
 		pm_volume);
 
-	snprintf(pm_fname, 256, "PMC-%s", pmc);
+	snprintf(pm_fname, PATH_MAX, "PMC-%s", pmc);
 
 	if (issue_info && !no_issue) {
 		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
 		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 		strcpy(pm_fname_temp, pm_fname);
-		snprintf(pm_fname, 256, "%s_%s-%s", pm_fname_temp, issue_number, in_work ? in_work : "00");
+
+		if (snprintf(pm_fname, PATH_MAX, "%s_%s-%s", pm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
+			exit(EXIT_BAD_CODE);
+		}
 	}
 
 	if (language) {
@@ -198,21 +202,20 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		for (i = 0; language_iso_code[i]; ++i)
 			language_iso_code[i] = toupper(language_iso_code[i]);
 		strcpy(pm_fname_temp, pm_fname);
-		snprintf(pm_fname, 256, "%s_%s-%s", pm_fname_temp, language_iso_code, country_iso_code);
+
+		if (snprintf(pm_fname, PATH_MAX, "%s_%s-%s", pm_fname_temp, language_iso_code, country_iso_code) < 0) {
+			exit(EXIT_BAD_CODE);
+		}
 	}
 
 	xmlFree(model_ident_code);
 	xmlFree(pm_issuer);
 	xmlFree(pm_number);
 	xmlFree(pm_volume);
-	if(issue_info && !no_issue) {
-		xmlFree(issue_number);
-		xmlFree(in_work);
-	}
-	if (language) {
-		xmlFree(language_iso_code);
-		xmlFree(country_iso_code);
-	}
+	xmlFree(issue_number);
+	xmlFree(in_work);
+	xmlFree(language_iso_code);
+	xmlFree(country_iso_code);
 
 	for (cur = search_paths->children; cur && !found; cur = cur->next) {
 		char *path;
@@ -290,13 +293,13 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	char *item_location_code;
 	char *issue_number = NULL;
 	char *in_work = NULL;
-	char *language_iso_code;
-	char *country_iso_code;
+	char *language_iso_code = NULL;
+	char *country_iso_code = NULL;
 
 	char dmc[256];
-	char dm_fname[256];
-	char dm_fname_temp[256];
-	char fs_dm_fname[256] = "";
+	char dm_fname[PATH_MAX];
+	char dm_fname_temp[PATH_MAX];
+	char fs_dm_fname[PATH_MAX] = "";
 
 	xmlNodePtr xi;
 	xmlDocPtr doc;
@@ -334,13 +337,16 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		info_code_variant,
 		item_location_code);
 
-	snprintf(dm_fname, 256, "DMC-%s", dmc);
+	snprintf(dm_fname, PATH_MAX, "DMC-%s", dmc);
 
 	if (issue_info && !no_issue) {
 		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
 		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 		strcpy(dm_fname_temp, dm_fname);
-		snprintf(dm_fname, 256, "%s_%s-%s", dm_fname_temp, issue_number, in_work ? in_work : "00");
+
+		if (snprintf(dm_fname, PATH_MAX, "%s_%s-%s", dm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
+			exit(EXIT_BAD_CODE);
+		}
 	}
 
 	if (language) {
@@ -352,7 +358,10 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 		for (i = 0; language_iso_code[i]; ++i)
 			language_iso_code[i] = toupper(language_iso_code[i]);
 		strcpy(dm_fname_temp, dm_fname);
-		snprintf(dm_fname, 256, "%s_%s-%s", dm_fname_temp, language_iso_code, country_iso_code);
+
+		if (snprintf(dm_fname, PATH_MAX, "%s_%s-%s", dm_fname_temp, language_iso_code, country_iso_code) < 0) {
+			exit(EXIT_BAD_CODE);
+		}
 	}
 
 	xmlFree(model_ident_code);
@@ -366,14 +375,10 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	xmlFree(info_code);
 	xmlFree(info_code_variant);
 	xmlFree(item_location_code);
-	if (issue_info && !no_issue) {
-		xmlFree(issue_number);
-		xmlFree(in_work);
-	}
-	if (language) {
-		xmlFree(language_iso_code);
-		xmlFree(country_iso_code);
-	}
+	xmlFree(issue_number);
+	xmlFree(in_work);
+	xmlFree(language_iso_code);
+	xmlFree(country_iso_code);
 
 	for (cur = search_paths->children; cur && !found; cur = cur->next) {
 		char *path;
