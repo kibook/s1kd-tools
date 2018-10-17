@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.6"
+#define VERSION "1.7.7"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -597,17 +597,19 @@ void set_issue_date(xmlNodePtr issueDate)
 	if (strcmp(issue_date, "") == 0) {
 		time_t now;
 		struct tm *local;
-		int year, month, day;
+		unsigned short year, month, day;
 
 		time(&now);
 		local = localtime(&now);
+
 		year = local->tm_year + 1900;
 		month = local->tm_mon + 1;
 		day = local->tm_mday;
 
-		sprintf(day_s, "%.2d", day);
-		sprintf(month_s, "%.2d", month);
-		sprintf(year_s, "%d", year);
+		if (snprintf(day_s, 3, "%.2u", day) < 0 ||
+		    snprintf(month_s, 3, "%.2u", month) < 0 ||
+		    snprintf(year_s, 5, "%u", year) < 0)
+			exit(EXIT_BAD_DATE);
 	} else {
 		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
 			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
@@ -1258,8 +1260,8 @@ void dump_templates(const char *path)
 
 int main(int argc, char **argv)
 {
-	char learn[6] = "";
-	char iss[8] = "";
+	char learn[8] = "";
+	char iss[16] = "";
 
 	xmlDocPtr dm;
 	xmlNode *dmodule;
@@ -1675,11 +1677,11 @@ int main(int argc, char **argv)
 	for (i = 0; languageIsoCode[i]; ++i) languageIsoCode[i] = toupper(languageIsoCode[i]);
 
 	if (strcmp(learnCode, "") != 0 && strcmp(learnEventCode, "") != 0) {
-		sprintf(learn, "-%s%s", learnCode, learnEventCode);
+		snprintf(learn, 8, "-%s%s", learnCode, learnEventCode);
 	}
 
 	if (!no_issue) {
-		sprintf(iss, "_%s-%s", issueNumber, inWork);
+		snprintf(iss, 16, "_%s-%s", issueNumber, inWork);
 	}
 
 	if (issue < ISS_42) {
