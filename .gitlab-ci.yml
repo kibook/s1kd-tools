@@ -1,0 +1,9 @@
+image: gcc
+
+before_script:
+        - apt-get update -qq
+        - apt-get install -y -qq libxml2-dev libxslt1-dev vim-common
+
+build:
+        stage: build
+        script: make
