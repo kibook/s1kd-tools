@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.5.4"
+#define VERSION "1.5.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -654,16 +654,19 @@ void set_issue_date(xmlNodePtr issueDate)
 	if (strcmp(issue_date, "") == 0) {
 		time_t now;
 		struct tm *local;
-		int year, month, day;
+		unsigned short year, month, day;
 
 		time(&now);
 		local = localtime(&now);
+
 		year = local->tm_year + 1900;
 		month = local->tm_mon + 1;
 		day = local->tm_mday;
-		sprintf(year_s, "%d", year);
-		sprintf(month_s, "%.2d", month);
-		sprintf(day_s, "%.2d", day);
+
+		if (snprintf(year_s, 5, "%u", year) < 0 ||
+		    snprintf(month_s, 3, "%.2u", month) < 0 ||
+		    snprintf(day_s, 3, "%.2u", day) < 0)
+			exit(EXIT_BAD_DATE);
 	} else {
 		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
 			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
