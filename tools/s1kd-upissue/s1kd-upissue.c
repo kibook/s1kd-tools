@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.4.2"
+#define VERSION "1.4.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -18,6 +18,7 @@
 #define EXIT_NO_FILE 1
 #define EXIT_NO_OVERWRITE 2
 #define EXIT_BAD_FILENAME 3
+#define EXIT_BAD_DATE 4
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -421,12 +422,15 @@ void upissue(const char *path)
 
 			time(&now);
 			local = localtime(&now);
+
 			year = local->tm_year + 1900;
 			month = local->tm_mon + 1;
 			day = local->tm_mday;
-			sprintf(year_s, "%d", year);
-			sprintf(month_s, "%.2d", month);
-			sprintf(day_s, "%.2d", day);
+
+			if (snprintf(year_s, 5, "%d", year) < 0 ||
+			    snprintf(month_s, 3, "%.2d", month) < 0 ||
+			    snprintf(day_s, 3, "%.2d", day) < 0)
+				exit(EXIT_BAD_DATE);
 
 			xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
 			xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
