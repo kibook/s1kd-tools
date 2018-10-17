@@ -282,9 +282,9 @@ void set_issue_date(xmlNodePtr issueDate)
 		year = local->tm_year + 1900;
 		month = local->tm_mon + 1;
 		day = local->tm_mday;
-		snprintf(year_s, 4, "%d", year);
-		snprintf(month_s, 2, "%.2d", month);
-		snprintf(day_s, 2, "%.2d", day);
+		snprintf(year_s, 5, "%d", year);
+		snprintf(month_s, 3, "%.2d", month);
+		snprintf(day_s, 3, "%.2d", day);
 	} else {
 		if (sscanf(issue_date, "%4s-%2s-%2s", year_s, month_s, day_s) != 3) {
 			fprintf(stderr, ERR_PREFIX "Bad issue date: %s\n", issue_date);
