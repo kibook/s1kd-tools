@@ -5,11 +5,13 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <libgen.h>
+#include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "1.6.4"
+#define VERSION "2.0.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -33,23 +35,27 @@ xmlDocPtr pub_doc = NULL;
 xmlNodePtr pub;
 
 xmlNodePtr search_paths;
+char *search_dir;
 
 int flatten_ref = 1;
 int flatten_container = 0;
 int recursive = 0;
+int recursive_search = 0;
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-I <path>] [-cdfNprxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfNpRrxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -c         Flatten referenced container data modules.");
-	puts("  -d         Remove unresolved refs without flattening.");
+	puts("  -D         Remove unresolved refs without flattening.");
+	puts("  -d <dir>   Directory to start search in.");
 	puts("  -f         Overwrite publication module.");
 	puts("  -I <path>  Search <path> for referenced objects.");
 	puts("  -N         Assume issue/inwork numbers are omitted.");
 	puts("  -p         Output a 'publication' XML file.");
-	puts("  -r         Recursively flatten referenced PMs.");
+	puts("  -R         Recursively flatten referenced PMs.");
+	puts("  -r         Search directories recursively.");
 	puts("  -x         Use XInclude references.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
@@ -108,27 +114,79 @@ bool is_pm(const char *fname)
 	return strncmp(fname, "PMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
+bool is_dir(const char *path)
+{
+	struct stat st;
+	char s[PATH_MAX], *b;
+
+	strcpy(s, path);
+	b = basename(s);
+
+	if (strcmp(b, ".") == 0 || strcmp(b, "..") == 0) {
+		return 0;
+	}
+
+	stat(path, &st);
+	return S_ISDIR(st.st_mode);
+}
+
+int codecmp(const char *p1, const char *p2)
+{
+	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
+
+	strcpy(s1, p1);
+	strcpy(s2, p2);
+
+	b1 = basename(s1);
+	b2 = basename(s2);
+
+	return strcasecmp(b1, b2);
+}
+
 bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool (*is)(const char *))
 {
 	DIR *dir;
 	struct dirent *cur;
 	int fname_len;
 	bool found = false;
+	int len = strlen(path);
+	char fpath[PATH_MAX], cpath[PATH_MAX];
+
+	if (!is_dir(path)) {
+		return false;
+	}
+
+	if (strcmp(path, ".") == 0) {
+		strcpy(fpath, "");
+	} else if (path[len - 1] != '/') {
+		strcpy(fpath, path);
+		strcat(fpath, "/");
+	} else {
+		strcpy(fpath, path);
+	}
 
 	fname_len = strlen(fname);
-	dir = opendir(path);
+
+	if (!(dir = opendir(path))) {
+		return false;
+	}
 
 	while ((cur = readdir(dir))) {
-		if (is(cur->d_name) && strncmp(cur->d_name, fname, fname_len) == 0) {
-			if (strcmp(path, ".") == 0) {
-				strcpy(fs_fname, cur->d_name);
-			} else {
-				strcpy(fs_fname, path);
-				strcat(fs_fname, "/");
-				strcat(fs_fname, cur->d_name);
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
+
+		if (recursive_search && is_dir(cpath)) {
+			char tmp[PATH_MAX];
+
+			if (filesystem_fname(tmp, fname, cpath, is) && (!found || codecmp(tmp, fs_fname) > 0)) {
+				strcpy(fs_fname, tmp);
+				found = true;
 			}
-			found = true;
-			break;
+		} else if (is(cur->d_name) && strncmp(cur->d_name, fname, fname_len) == 0) {
+			if (!found || codecmp(cpath, fs_fname) > 0) {
+				strcpy(fs_fname, cpath);
+				found = true;
+			}
 		}
 	}
 
@@ -268,7 +326,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 		xmlFree(path);
 	}
 
-	if (flatten_ref || !found) {
+	if (flatten_ref || recursive || !found) {
 		xmlUnlinkNode(pm_ref);
 		xmlFreeNode(pm_ref);
 	}
@@ -493,7 +551,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "cdfxNprI:h?";
+	const char *sopts = "cDd:fxNpRrI:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -503,7 +561,7 @@ int main(int argc, char **argv)
 	int overwrite = 0;
 
 	search_paths = xmlNewNode(NULL, BAD_CAST "searchPaths");
-	xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST ".");
+	search_dir = strdup(".");
 
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
@@ -514,17 +572,22 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'c': flatten_container = 1; break;
-			case 'd': flatten_ref = 0; break;
+			case 'D': flatten_ref = 0; break;
+			case 'd': search_dir = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; xinclude = 1; break;
-			case 'r': recursive = 1; break;
+			case 'R': recursive = 1; break;
+			case 'r': recursive_search = 1; break;
 			case 'I': xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
 	}
+
+	xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST search_dir);
+	free(search_dir);
 
 	if (optind < argc) {
 		pm_fname = argv[optind];

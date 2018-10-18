@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="23" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2018" month="10" day="18"/>
         <dmTitle>
           <techName>s1kd-flatten(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -r option.</simplePara>
+        <simplePara>Change -d to -D and -r to -R, and add new -d and -r options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,13 +52,13 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-flatten [-I &lt;path&gt;] [-cdfNprx] &lt;PM&gt; [&lt;DM&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-flatten [-d &lt;dir&gt;] [-I &lt;path&gt;] [-cDfNpRrx] &lt;PM&gt; [&lt;DM&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-flatten</emphasis> tool combines a publication module and the data modules it references in to a single file for use with a publishing system.</para>
-        <para>Data modules are by default searched for in the current directory using the data module code, language and/or issue info provided in each reference. Additional directories can be searched using the -I option.</para>
+        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Data modules are by default searched for in the current directory using the data module code, language and/or issue info provided in each reference.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -71,9 +71,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-D</listItemTerm>
               <listItemDefinition>
                 <para>Remove unresolved references, but do not flatten resolved ones.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Directory to start search in. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -106,10 +112,16 @@
                 <para>Instead of the "flat" PM format, use a "publication" XML format, where the root element <verbatimText verbatimStyle="vs12">publication</verbatimText> contains XInclude references to the publication module and the referenced data modules.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-r</listItemTerm>
+            <definitionListItem>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-R</listItemTerm>
               <listItemDefinition>
                 <para>Recursively flatten referenced publication modules, copying their content in to the "master" publication module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r</listItemTerm>
+              <listItemDefinition>
+                <para>Search directories recursively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
