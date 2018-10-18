@@ -16,10 +16,12 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.3.5"
+#define VERSION "1.4.0"
 
 /* Paths to text nodes where acronyms may occur */
-#define ACRO_MARKUP_XPATH BAD_CAST "//para/text()"
+#define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
+
+xmlChar *acro_markup_xpath = NULL;
 
 /* Characters that must occur before/after a set of characters in order for the
  * set to be considered a valid acronym. */
@@ -400,7 +402,7 @@ void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 
 			ctx = xmlXPathNewContext(doc);
 
-			obj = xmlXPathEvalExpression(ACRO_MARKUP_XPATH, ctx);
+			obj = xmlXPathEvalExpression(acro_markup_xpath, ctx);
 
 			if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 				int i;
@@ -597,25 +599,26 @@ void showHelp(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " [-dlptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
-	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-fl] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-fl] [-o <file>] [-X <xpath>] [<dmodules>]");
 	puts("  " PROG_NAME " -D [-fl] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
-	puts("  -D          Remove acronym markup");
-	puts("  -d          Format XML output as definitionList");
-	puts("  -f          Overwrite data modules when marking up acronyms");
-	puts("  -i -I -!    Markup acronyms in interactive modes");
-	puts("  -l          Input is a list of file names");
+	puts("  -D          Remove acronym markup.");
+	puts("  -d          Format XML output as definitionList.");
+	puts("  -f          Overwrite data modules when marking up acronyms.");
+	puts("  -i -I -!    Markup acronyms in interactive modes.");
+	puts("  -l          Input is a list of file names.");
 	puts("  -M <list>   Markup acronyms from specified list.");
 	puts("  -m          Markup acronyms from .acronyms file.");
-	puts("  -n <#>      Minimum spaces after term in pretty printed output");
-	puts("  -o <file>   Output to <file> instead of stdout");
-	puts("  -p          Pretty print text/XML output");
-	puts("  -T <types>  Only search for acronyms of these types");
-	puts("  -t          Format XML output as table");
-	puts("  -x          Output XML instead of text");
-	puts("  -h -?       Show usage message");
-	puts("  --version   Show version information");
+	puts("  -n <#>      Minimum spaces after term in pretty printed output.");
+	puts("  -o <file>   Output to <file> instead of stdout.");
+	puts("  -p          Pretty print text/XML output.");
+	puts("  -T <types>  Only search for acronyms of these types.");
+	puts("  -t          Format XML output as table.");
+	puts("  -X <xpath>  Use custom XPath to markup elements.");
+	puts("  -x          Output XML instead of text.");
+	puts("  -h -?       Show usage message.");
+	puts("  --version   Show version information.");
 }
 
 void show_version(void)
@@ -639,7 +642,7 @@ int main(int argc, char **argv)
 	bool list = false;
 	bool delete = false;
 
-	const char *sopts = "pn:xDdtT:o:M:miIfl!h?";
+	const char *sopts = "pn:xDdtT:o:M:miIfl!X:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -703,6 +706,11 @@ int main(int argc, char **argv)
 				interactive = true;
 				deferChoice = true;
 				break;
+			case 'X':
+				if (!acro_markup_xpath) {
+					acro_markup_xpath = xmlStrdup(BAD_CAST optarg);
+				}
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -710,6 +718,9 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (!acro_markup_xpath) {
+		acro_markup_xpath = xmlStrdup(ACRO_MARKUP_XPATH);
+	}
 
 	if (delete) {
 		if (optind >= argc) {
@@ -821,6 +832,8 @@ int main(int argc, char **argv)
 	free(markup);
 
 	xmlFreeDoc(doc);
+
+	xmlFree(acro_markup_xpath);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

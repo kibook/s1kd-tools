@@ -9,7 +9,7 @@ SYNOPSIS
     s1kd-acronyms -h?
     s1kd-acronyms [-dlptx] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
-    s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
+    s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
                   [<dmodule>...]
     s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]
 
@@ -71,6 +71,9 @@ Only search for acronyms with an attribute `acronymType` whose value is containe
 
 -t  
 Format XML output as an S1000D `<table>`.
+
+-X &lt;xpath&gt;  
+When marking up acronyms with -m/-M, use a custom XPath expression to specify which text nodes to search for acronyms in. By default, this is all text nodes in any element where acronyms are allowed. This must be the path to the text() nodes, not the elements, e.g. `//para/text()` and not simply `//para`.
 
 -x  
 Use XML output instead of plain text.

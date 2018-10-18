@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="20" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="013" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2018" month="10" day="18"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add -X option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,10 +52,10 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-acronyms -h?
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-acronyms -h?
 s1kd-acronyms [-dlptx] [-n <#>] [-o <file>] [-T <types>]
               [<dmodule>...]
-s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>]
+s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
               [<dmodule>...]
 s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]]]></verbatimText>
         </para>
@@ -157,6 +160,12 @@ s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]]]></verbatimText>
               <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
                 <para>Format XML output as an S1000D <verbatimText verbatimStyle="vs12">&lt;table&gt;</verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-X &lt;xpath&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>When marking up acronyms with -m/-M, use a custom XPath expression to specify which text nodes to search for acronyms in. By default, this is all text nodes in any element where acronyms are allowed. This must be the path to the text() nodes, not the elements, e.g. <verbatimText>//para/text()</verbatimText> and not simply <verbatimText>//para</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
