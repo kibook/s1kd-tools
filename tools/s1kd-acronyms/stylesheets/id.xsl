@@ -8,8 +8,15 @@
   </xsl:template>
 
   <xsl:template match="acronymDefinition" mode="id">
-    <xsl:text>acr-</xsl:text>
-    <xsl:number count="acronym" from="dmodule" level="any" format="0001"/>
+    <xsl:choose>
+      <xsl:when test="@keepId">
+        <xsl:value-of select="@id"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>acr-</xsl:text>
+        <xsl:number count="acronym" from="dmodule" level="any" format="0001"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="acronymDefinition/@id">
@@ -17,6 +24,8 @@
       <xsl:apply-templates select=".." mode="id"/>
     </xsl:attribute>
   </xsl:template>
+
+  <xsl:template match="acronymDefinition/@keepId"/>
 
   <xsl:template match="acronymTerm/@internalRefId">
     <xsl:variable name="ref" select="."/>
