@@ -16,17 +16,16 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
-
 xmlChar *acro_markup_xpath = NULL;
 
 /* Characters that must occur before/after a set of characters in order for the
  * set to be considered a valid acronym. */
-#define PRE_ACRONYM_DELIM BAD_CAST " "
-#define POST_ACRONYM_DELIM BAD_CAST " .,"
+#define PRE_ACRONYM_DELIM BAD_CAST " (/\n"
+#define POST_ACRONYM_DELIM BAD_CAST " .,)/\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
