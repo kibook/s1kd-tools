@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.7"
+#define VERSION "1.7.8"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -94,8 +94,8 @@ char infoName_content[MAX_INFO_NAME] = "";
 
 char dmtype[32] = "";
 
-char schema[1024] = "";
-char brex_dmcode[256] = "";
+char schema[PATH_MAX] = "";
+char brex_dmcode[PATH_MAX] = "";
 char *sns_fname = NULL;
 char *maint_sns = NULL;
 char issue_date[16] = "";
@@ -467,6 +467,11 @@ bool find_brex_file(char *dst, const char *code)
 	int n = strlen(code);
 	bool found = false;
 	int offset;
+
+	if (access(code, F_OK) != -1) {
+		strcpy(dst, code);
+		return true;
+	}
 
 	dir = opendir(".");
 
