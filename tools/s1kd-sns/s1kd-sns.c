@@ -11,9 +11,10 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.0.4"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -332,11 +333,13 @@ void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdn
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-npsh?] [<BREX> ...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-cmnpsh?] [<BREX> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
+	puts("  -c         Copy files instead of linking.");
 	puts("  -d <dir>   Directory to organize DMs in to. Default is '" DEFAULT_SNS_DNAME "'.");
+	puts("  -m         Move files instead of linking.");
 	puts("  -n         Only use the SNS code to name directories.");
 	puts("  -p         Print SNS instead of organizing.");
 	puts("  -s         Use symbolic links.");
@@ -356,7 +359,7 @@ int main(int argc, char **argv)
 	bool printsns = false;
 	char *snsdname = NULL;
 
-	const char *sopts = "d:npsh?";
+	const char *sopts = "cd:mnpsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -371,8 +374,10 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				break;
+			case 'c': linkfn = copy; break;
 			case 'd': snsdname = strdup(optarg); break;
 			case 's': linkfn = slink; break;
+			case 'm': linkfn = rename; break;
 			case 'n': only_numb = true; break;
 			case 'p': printsns = true; break;
 			case 'h':

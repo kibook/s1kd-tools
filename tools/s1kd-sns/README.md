@@ -6,7 +6,7 @@ s1kd-sns - Organize data modules based on an SNS
 SYNOPSIS
 ========
 
-    s1kd-sns [-d <dir>] [-npsh?] [<BREX> ...]
+    s1kd-sns [-d <dir>] [-cmnpsh?] [<BREX> ...]
 
 DESCRIPTION
 ===========
@@ -16,11 +16,17 @@ The *s1kd-sns* tool can be used to automatically organize data modules in a CSDB
 OPTIONS
 =======
 
+-c  
+Copy files in to the SNS subfolders instead of linking them.
+
 -d &lt;dir&gt;  
 The root directory of the new SNS structure. By default, the tool will use the name "SNS" in the current directory.
 
 -h -?  
 Show usage message.
+
+-m  
+Move files in to the SNS subfolders instead of linking them.
 
 -n  
 Use only the SNS codes when naming directories. By default, each directory will be named in the form of "snsCode - snsTitle".
