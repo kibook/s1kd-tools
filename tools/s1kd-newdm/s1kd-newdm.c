@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <libgen.h>
 #include <sys/stat.h>
 
 #include <libxml/tree.h>
@@ -19,7 +20,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.8"
+#define VERSION "1.7.9"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -368,10 +369,11 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	return first;
 }
 
-void set_brex(xmlDocPtr doc, const char *code)
+void set_brex(xmlDocPtr doc, const char *fname)
 {
 	xmlNodePtr dmCode;
 	int n, offset;
+	char *path, *code;
 
 	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -386,6 +388,9 @@ void set_brex(xmlDocPtr doc, const char *code)
 	char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
 	char learnCode[MAX_LEARN_CODE] = "";
 	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+
+	path = strdup(fname);
+	code = basename(path);
 
 	dmCode = firstXPathNode(doc, NULL, "//brexDmRef/dmRef/dmRefIdent/dmCode");
 
@@ -425,6 +430,8 @@ void set_brex(xmlDocPtr doc, const char *code)
 
 	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+
+	free(path);
 }
 
 #define SNS_XPATH_1 "//snsSystem[snsCode='%s']/snsSubSystem[snsCode='%s']/snsSubSubSystem[snsCode='%s']/snsAssy[snsCode='%s']/snsTitle"
@@ -487,11 +494,6 @@ bool find_brex_file(char *dst, const char *code)
 	}
 
 	closedir(dir);
-
-	if (!found) {
-		fprintf(stderr, E_BREX_NOT_FOUND, code + offset);
-		exit(EXIT_BAD_BREX_DMC);
-	}
 
 	return found;
 }
