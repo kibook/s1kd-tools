@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.11.2"
+#define VERSION "1.11.3"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2618,7 +2618,6 @@ int main(int argc, char **argv)
 	i = optind;
 
 	while (1) {
-		bool ispm;
 		char src[PATH_MAX] = "";
 
 		if (dmlist) {
@@ -2653,6 +2652,8 @@ int main(int argc, char **argv)
 		doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
 
 		if (doc) {
+			bool ispm;
+
 			root = xmlDocGetRootElement(doc);
 			ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
 
