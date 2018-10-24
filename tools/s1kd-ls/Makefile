@@ -1,7 +1,7 @@
-SOURCE=s1kd-ls.c
+SOURCE=s1kd-ls.c ../common/s1kd_tools.c
 OUTPUT=s1kd-ls
 
-CFLAGS=-Wall -Werror `pkg-config --cflags libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

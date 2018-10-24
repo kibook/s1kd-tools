@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.11.1"
+#define VERSION "1.11.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -548,23 +548,6 @@ void getDispatchFileName(char *dst, xmlNodePtr ref)
 	xmlFree(fname);
 }
 
-/* Determine if path is a directory. */
-bool isDir(const char *path)
-{
-	struct stat st;
-	char s[PATH_MAX], *b;
-
-	strcpy(s, path);
-	b = basename(s);
-
-	if (strcmp(b, ".") == 0 || strcmp(b, "..") == 0) {
-		return 0;
-	}
-
-	stat(path, &st);
-	return S_ISDIR(st.st_mode);
-}
-
 /* Compare the codes of two paths. */
 int codecmp(const char *p1, const char *p2)
 {
@@ -606,7 +589,7 @@ bool getFileName(char *dst, char *code, char *path)
 		strcpy(cpath, fpath);
 		strcat(cpath, cur->d_name);
 
-		if (recursive && isDir(cpath)) {
+		if (recursive && isdir(cpath, recursive)) {
 			char tmp[PATH_MAX];
 
 			if (getFileName(tmp, code, cpath) && (!found || codecmp(tmp, dst) > 0)) {

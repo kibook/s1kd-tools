@@ -10,8 +10,10 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include "s1kd_tools.h"
+
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -114,22 +116,6 @@ bool is_pm(const char *fname)
 	return strncmp(fname, "PMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
-bool is_dir(const char *path)
-{
-	struct stat st;
-	char s[PATH_MAX], *b;
-
-	strcpy(s, path);
-	b = basename(s);
-
-	if (strcmp(b, ".") == 0 || strcmp(b, "..") == 0) {
-		return 0;
-	}
-
-	stat(path, &st);
-	return S_ISDIR(st.st_mode);
-}
-
 int codecmp(const char *p1, const char *p2)
 {
 	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
@@ -152,7 +138,7 @@ bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool 
 	int len = strlen(path);
 	char fpath[PATH_MAX], cpath[PATH_MAX];
 
-	if (!is_dir(path)) {
+	if (!isdir(path, true)) {
 		return false;
 	}
 
@@ -175,7 +161,7 @@ bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool 
 		strcpy(cpath, fpath);
 		strcat(cpath, cur->d_name);
 
-		if (recursive_search && is_dir(cpath)) {
+		if (recursive_search && isdir(cpath, true)) {
 			char tmp[PATH_MAX];
 
 			if (filesystem_fname(tmp, fname, cpath, is) && (!found || codecmp(tmp, fs_fname) > 0)) {

@@ -148,3 +148,20 @@ int copy(const char *from, const char *to)
 
 	return 0;
 }
+
+/* Determine if path is a directory. */
+bool isdir(const char *path, bool recursive)
+{
+	struct stat st;
+	char s[PATH_MAX], *b;
+
+	strcpy(s, path);
+	b = basename(s);
+
+	if (recursive && (strcmp(b, ".") == 0 || strcmp(b, "..") == 0)) {
+		return 0;
+	}
+
+	stat(path, &st);
+	return S_ISDIR(st.st_mode);
+}

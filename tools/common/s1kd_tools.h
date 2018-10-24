@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <unistd.h>
+#include <libgen.h>
 #include <sys/stat.h>
 #include <libxml/tree.h>
 
@@ -26,5 +27,6 @@ char *real_path(const char *path, char *real);
 bool find_config(char *dst, const char *name);
 xmlChar *xpath_of(xmlNodePtr node);
 int copy(const char *from, const char *to);
+bool isdir(const char *path, bool recursive);
 
 #endif

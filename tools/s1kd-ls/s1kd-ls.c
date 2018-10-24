@@ -10,6 +10,8 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include "s1kd_tools.h"
+
 /* Initial maximum number of CSDB objects of each type. */
 #define OBJECT_MAX 1
 unsigned DM_MAX  = OBJECT_MAX;
@@ -21,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.3.2"
+#define VERSION "1.3.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -156,25 +158,6 @@ void show_version(void)
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-/* Determine if a path is a directory. */
-int is_directory(const char *path, int recursive)
-{
-	struct stat st;
-
-	char scratch[PATH_MAX];
-	char *base;
-
-	strcpy(scratch, path);
-	base = basename(scratch);
-
-	/* Do not recurse in to current or parent directory */
-	if (recursive && (strcmp(base, ".") == 0 || strcmp(base, "..") == 0))
-		return 0;
-
-	stat(path, &st);
-	return S_ISDIR(st.st_mode);
-}
-
 /* Determine whether a bitset contains a value. */
 int hasopt(int opts, int opt)
 {
@@ -255,7 +238,7 @@ void list_dir(const char *path, int only_writable, int recursive)
 				resize(&dmls, &DML_MAX);
 			}
 			strcpy(dmls[(ndmls)++], cpath);
-		} else if (recursive && is_directory(cpath, recursive)) {
+		} else if (recursive && isdir(cpath, recursive)) {
 			list_dir(cpath, only_writable, recursive);
 		}
 	}
@@ -553,7 +536,7 @@ int main(int argc, char **argv)
 					resize(&dmls, &DML_MAX);
 				}
 				strcpy(dmls[ndmls++], argv[i]);
-			} else if (is_directory(argv[i], 0)) {
+			} else if (isdir(argv[i], 0)) {
 				list_dir(argv[i], only_writable, recursive);
 			}
 		}
