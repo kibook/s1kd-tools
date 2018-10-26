@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.3.4"
+#define VERSION "1.3.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -167,6 +167,42 @@ int edit_simple_attr(xmlNodePtr node, const char *attr, const char *val)
 {
 	xmlSetProp(node, BAD_CAST attr, BAD_CAST val);
 	return 0;
+}
+
+void show_rpc_name(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
+		show_simple_attr(node, "rpcname", endl);
+	} else {
+		show_simple_node(node, endl);
+	}
+}
+
+int edit_rpc_name(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
+		return edit_simple_attr(node, "rpcname", val);
+	} else {
+		return edit_simple_node(node, val);
+	}
+}
+
+void show_orig_name(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
+		show_simple_attr(node, "origname", endl);
+	} else {
+		show_simple_node(node, endl);
+	}
+}
+
+int edit_orig_name(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
+		return edit_simple_attr(node, "origname", val);
+	} else {
+		return edit_simple_node(node, val);
+	}
 }
 
 void show_ent_code(xmlNodePtr node, int endl)
@@ -1320,8 +1356,8 @@ struct metadata metadata[] = {
 		"Model identification code"},
 	{"originator",
 		"//originator/enterpriseName|//orig/@origname",
-		show_simple_node,
-		edit_simple_node,
+		show_orig_name,
+		edit_orig_name,
 		create_orig_name,
 		"Name of the originator"},
 	{"originatorCode",
@@ -1374,8 +1410,8 @@ struct metadata metadata[] = {
 		"Receiving authority"},
 	{"responsiblePartnerCompany",
 		"//responsiblePartnerCompany/enterpriseName|//rpc/@rpcname",
-		show_simple_node,
-		edit_simple_node,
+		show_rpc_name,
+		edit_rpc_name,
 		create_rpc_name,
 		"Name of the RPC"},
 	{"responsiblePartnerCompanyCode",
