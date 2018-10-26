@@ -1885,7 +1885,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		} else {
 			xmlSaveFile("-", doc);
 		}
-	} else if (endl != '\n') {
+	} else if (endl != '\n' && err != EXIT_CONDITION_UNMET) {
 		putchar('\n');
 	}
 
