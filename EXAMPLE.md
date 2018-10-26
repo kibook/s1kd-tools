@@ -427,7 +427,8 @@ The newly created `customerB` directory will contain the filtered versions of th
 
 If your CSDB contains multiple, separate publications, the **s1kd-refls** tool can be used to select only those data modules which apply to a particular publication module:
 
-    $ s1kd-refls -s <PM> | xargs s1kd-instance -s version:prodattr=B -O customerB
+    $ s1kd-refls -s <PM> |
+    > xargs s1kd-instance -s version:prodattr=B -O customerB
 
 The above command will filter the publication module and all included data modules, and output the resulting objects to the `customerB` directory.
 
