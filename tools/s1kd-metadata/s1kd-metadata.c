@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1144,12 +1144,6 @@ struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Data management list code"},
-	{"url",
-		"/",
-		show_url,
-		NULL,
-		NULL,
-		"URL of the document"},
 	{"icnTitle",
 		"//imfAddressItems/icnTitle",
 		show_simple_node,
@@ -1354,6 +1348,12 @@ struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Name of the root element of the document"},
+	{"url",
+		"/",
+		show_url,
+		NULL,
+		NULL,
+		"URL of the document"},
 	{NULL}
 };
 
