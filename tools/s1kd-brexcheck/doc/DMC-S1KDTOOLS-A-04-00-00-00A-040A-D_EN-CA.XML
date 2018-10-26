@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2018" month="10" day="26"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Update example to include XPath.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -274,7 +271,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
