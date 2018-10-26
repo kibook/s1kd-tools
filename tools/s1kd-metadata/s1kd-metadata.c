@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.3.2"
+#define VERSION "1.3.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
