@@ -1047,6 +1047,78 @@ int create_skill_level(xmlXPathContextPtr ctx, const char *val)
 	return 0;
 }
 
+void show_comment_type(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "ctype") == 0) {
+		show_simple_attr(node, "type", endl);
+	} else {
+		show_simple_attr(node, "commentType", endl);
+	}
+}
+
+int edit_comment_type(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "ctype") == 0) {
+		return edit_simple_attr(node, "type", val);
+	} else {
+		return edit_simple_attr(node, "commentType", val);
+	}
+}
+
+void show_seq_number(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "seqnum") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "seqNumber", endl);
+	}
+}
+
+int edit_seq_number(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "seqnum") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "seqNumber", val);
+	}
+}
+
+void show_year_of_data_issue(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "diyear") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "yearOfDataIssue", endl);
+	}
+}
+
+int edit_year_of_data_issue(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "diyear") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "yearOfDataIssue", val);
+	}
+}
+
+void show_sender_ident(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "sendid") == 0) {
+		show_simple_node(node, endl);
+	} else {
+		show_simple_attr(node, "senderIdent", endl);
+	}
+}
+
+int edit_sender_ident(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "sendid") == 0) {
+		return edit_simple_node(node, val);
+	} else {
+		return edit_simple_attr(node, "senderIdent", val);
+	}
+}
+
 struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -1108,6 +1180,12 @@ struct metadata metadata[] = {
 		edit_simple_node,
 		create_comment_title,
 		"Title of a comment"},
+	{"commentType",
+		"//@commentType|//ctype/@type",
+		show_comment_type,
+		edit_comment_type,
+		NULL,
+		"Type of a comment"},
 	{"countryIsoCode",
 		"//language/@countryIsoCode|//language/@country",
 		show_country_iso_code,
@@ -1294,6 +1372,18 @@ struct metadata metadata[] = {
 		edit_sec_class,
 		NULL,
 		"Security classification (01, 02...)"},
+	{"senderIdent",
+		"//@senderIdent|//sendid",
+		show_sender_ident,
+		edit_sender_ident,
+		NULL,
+		"Issuing authority"},
+	{"seqNumber",
+		"//@seqNumber|//seqnum",
+		show_seq_number,
+		edit_seq_number,
+		NULL,
+		"Sequence number"},
 	{"shortPmTitle",
 		"//shortPmTitle",
 		show_simple_node,
@@ -1354,6 +1444,12 @@ struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"URL of the document"},
+	{"yearOfDataIssue",
+		"//@yearOfDataIssue|//diyear",
+		show_year_of_data_issue,
+		edit_year_of_data_issue,
+		NULL,
+		"Year of data issue"},
 	{NULL}
 };
 
