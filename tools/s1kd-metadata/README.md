@@ -11,62 +11,85 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-metadata* tool provides a simple way to fetch and change metadata on S1000D CSDB objects.
+The *s1kd-metadata* tool provides a simple way to fetch and change
+metadata on S1000D CSDB objects.
 
 OPTIONS
 =======
 
 -0  
-Print a null-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.
+Print a null-delimited list of values of the pieces of metadata
+specified with -n, or all available metadata if -n is not specified.
 
 -c &lt;file&gt;  
-Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines starting with a metadata name, followed by whitespace, followed by the new value for the metadata (the program uses this same format when outputting all metadata if no &lt;name&gt; is specified).
+Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines
+starting with a metadata name, followed by whitespace, followed by the
+new value for the metadata (the program uses this same format when
+outputting all metadata if no &lt;name&gt; is specified).
 
 -e  
-When showing all metadata, only list editable items. This is useful when creating a file for use with the -c option.
+When showing all metadata, only list editable items. This is useful when
+creating a file for use with the -c option.
 
 -F &lt;fmt&gt;  
-Print a formatted line for each CSDB object. Metadata names surrounded with % (e.g. %issueDate%) will be substituted by the value read from the object.
+Print a formatted line for each CSDB object. Metadata names surrounded
+with % (e.g. %issueDate%) will be substituted by the value read from the
+object.
 
 -f  
-When editing metadata, overwrite the object. The default is to output the modified object to stdout.
+When editing metadata, overwrite the object. The default is to output
+the modified object to stdout.
 
 -H  
-Lists all available metadata with a short description of each. Specify specific metadata to describe with the -n option.
+Lists all available metadata with a short description of each. Specify
+specific metadata to describe with the -n option.
 
 -l  
-Treat input as a list of object filenames to read or edit metadata on, rather than an object itself.
+Treat input as a list of object filenames to read or edit metadata on,
+rather than an object itself.
 
 -n &lt;name&gt;  
-The name of the piece of metadata to fetch. This option can be specified multiple times to fetch multiple pieces of metadata. If -n is not specified, all available metadata names are printed with their values. This output can be sent to a text file, edited, and then specified with the -c option as a means of editing metadata in any text editor.
+The name of the piece of metadata to fetch. This option can be specified
+multiple times to fetch multiple pieces of metadata. If -n is not
+specified, all available metadata names are printed with their values.
+This output can be sent to a text file, edited, and then specified with
+the -c option as a means of editing metadata in any text editor.
 
 -q  
-Quiet mode. Non-fatal errors such as a missing piece of optional metadata in an object will not be printed to stderr.
+Quiet mode. Non-fatal errors such as a missing piece of optional
+metadata in an object will not be printed to stderr.
 
 -T  
 Do not format columns in output.
 
 -t  
-Print a tab-delimited list of values of the pieces of metadata specified with -n, or all available metadata if -n is not specified.
+Print a tab-delimited list of values of the pieces of metadata specified
+with -n, or all available metadata if -n is not specified.
 
 -v &lt;value&gt;  
-When following a -n option, this specifies the new value for that piece of metadata.
+When following a -n option, this specifies the new value for that piece
+of metadata.
 
-When following a -w or -W option, this specifies the value to compare that piece of metadata to.
+When following a -w or -W option, this specifies the value to compare
+that piece of metadata to.
 
-Each -n, -w, or -W can be followed by -v to edit or define conditions on multiple pieces of metadata.
+Each -n, -w, or -W can be followed by -v to edit or define conditions on
+multiple pieces of metadata.
 
 -W &lt;name&gt;  
-Show or edit metadata only on objects where the value of &lt;name&gt; is not equal to the value specified in the following -v option.
+Show or edit metadata only on objects where the value of &lt;name&gt; is
+not equal to the value specified in the following -v option.
 
 -w &lt;name&gt;  
-Show or edit metadata only on objects where the value of &lt;name&gt; is equal to the value specified in the following -v option.
+Show or edit metadata only on objects where the value of &lt;name&gt; is
+equal to the value specified in the following -v option.
 
 --version  
 Show version information.
 
 &lt;object&gt;...  
-The object(s) to show/edit metadata on. The default is to read from stdin.
+The object(s) to show/edit metadata on. The default is to read from
+stdin.
 
 EXAMPLE
 =======

@@ -18,12 +18,14 @@ To build the documentation from source:
 Building the executables
 ========================
 
-Run the following commands to build the executables, and install both the executables and documentation:
+Run the following commands to build the executables, and install both
+the executables and documentation:
 
     $ make
     # make install
 
-To change where these are installed, specify the PREFIX make variable. The default value of this variable is /usr/local.
+To change where these are installed, specify the PREFIX make variable.
+The default value of this variable is /usr/local.
 
 For example:
 
@@ -36,4 +38,5 @@ To uninstall the executables and documentation:
 
     # make uninstall
 
-Remember to specify the PREFIX make variable if a different prefix was used during installation.
+Remember to specify the PREFIX make variable if a different prefix was
+used during installation.

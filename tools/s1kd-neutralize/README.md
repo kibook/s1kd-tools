@@ -11,7 +11,8 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-Generates neutral metadata for the specified CSDB objects. This includes:
+Generates neutral metadata for the specified CSDB objects. This
+includes:
 
 -   XLink attributes for references, using the S1000D URN scheme.
 
@@ -27,10 +28,12 @@ Overwrite specified CSDB object(s) automatically.
 Show usage message.
 
 -l  
-Treat input (stdin or arguments) as lists of CSDB objects to neutralize, rather than CSDB objects themselves.
+Treat input (stdin or arguments) as lists of CSDB objects to neutralize,
+rather than CSDB objects themselves.
 
 -n  
-Include the IETP namespaces for data module and publication module elements.
+Include the IETP namespaces for data module and publication module
+elements.
 
 -o &lt;file&gt;  
 Output neutralized CSDB object XML to &lt;file&gt; instead of stdout.

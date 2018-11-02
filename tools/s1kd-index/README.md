@@ -13,7 +13,8 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-index* tool adds index flags to a data module based on a user-defined set of keywords.
+The *s1kd-index* tool adds index flags to a data module based on a
+user-defined set of keywords.
 
 OPTIONS
 =======
@@ -25,13 +26,15 @@ Remove the current index flags from a data module.
 Overwrite input module(s).
 
 -I &lt;index&gt;  
-Flag the terms in the specified &lt;index&gt; XML file instead of the default `.indexflags` file.
+Flag the terms in the specified &lt;index&gt; XML file instead of the
+default `.indexflags` file.
 
 -i  
 Ignore case when flagging terms.
 
 -l  
-Treat input (stdin or arguments) as lists of filenames of data modules to add index flags to, rather than data modules themselves.
+Treat input (stdin or arguments) as lists of filenames of data modules
+to add index flags to, rather than data modules themselves.
 
 -h -?  
 Show help/usage message.
@@ -42,7 +45,10 @@ Show version information.
 `.indexflags` file
 ------------------
 
-This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named `.indexflags` in the current directory or parent directories, but any file can be specified using the -I option.
+This file specifies the list of indexable keywords for the project and
+their level. By default, the program will search for a file named
+`.indexflags` in the current directory or parent directories, but any
+file can be specified using the -I option.
 
 Exmaple of `.indexflags` file format:
 

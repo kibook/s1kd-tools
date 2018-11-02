@@ -11,7 +11,8 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-newsmc* tool creates a new S1000D SCORM content package with the SCORM content package code and other metadata specified.
+The *s1kd-newsmc* tool creates a new S1000D SCORM content package with
+the SCORM content package code and other metadata specified.
 
 OPTIONS
 =======
@@ -27,12 +28,15 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -   4.1
 
 -@ &lt;filename&gt;  
-Save new SCORM content package as &lt;filename&gt; instead of an automatically named file in the current directory.
+Save new SCORM content package as &lt;filename&gt; instead of an
+automatically named file in the current directory.
 
 -% &lt;dir&gt;  
-Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named `scormcontentpackage.xml` in &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+Use the XML template in &lt;dir&gt; instead of the built-in template.
+The template must be named `scormcontentpackage.xml` in &lt;dir&gt; and
+must conform to the default S1000D issue (4.2).
 
--~ &lt;dir&gt;  
+-\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
 -b &lt;BREX&gt;  
@@ -54,7 +58,8 @@ Specify the `.defaults` file name.
 Overwrite existing file.
 
 -I &lt;date&gt;  
-The issue date of the new SCORM content package in the form of YYYY-MM-DD.
+The issue date of the new SCORM content package in the form of
+YYYY-MM-DD.
 
 -i  
 Include issue information in referenced data modules.
@@ -84,7 +89,8 @@ Do not report an error when the file already exists.
 The CAGE code of the responsible partner company.
 
 -r &lt;RPC&gt;  
-The responsible partner company enterprise name of the new SCORM content package.
+The responsible partner company enterprise name of the new SCORM content
+package.
 
 -T  
 Include titles in referenced data modules.
@@ -102,12 +108,14 @@ The inwork number of the new SCORM content package.
 Show version information.
 
 &lt;DM&gt;...  
-Any number of data modules to automatically reference in the new SCORM content package's content.
+Any number of data modules to automatically reference in the new SCORM
+content package's content.
 
 `.defaults` file
 ----------------
 
-Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is
+used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

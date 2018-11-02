@@ -11,7 +11,10 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-sns* tool can be used to automatically organize data modules in a CSDB in to a directory hierarchy based on a specified SNS structure. It may also be used to simply print an indented text version of an SNS structure.
+The *s1kd-sns* tool can be used to automatically organize data modules
+in a CSDB in to a directory hierarchy based on a specified SNS
+structure. It may also be used to simply print an indented text version
+of an SNS structure.
 
 OPTIONS
 =======
@@ -20,7 +23,8 @@ OPTIONS
 Copy files in to the SNS subfolders instead of linking them.
 
 -d &lt;dir&gt;  
-The root directory of the new SNS structure. By default, the tool will use the name "SNS" in the current directory.
+The root directory of the new SNS structure. By default, the tool will
+use the name "SNS" in the current directory.
 
 -h -?  
 Show usage message.
@@ -29,19 +33,22 @@ Show usage message.
 Move files in to the SNS subfolders instead of linking them.
 
 -n  
-Use only the SNS codes when naming directories. By default, each directory will be named in the form of "snsCode - snsTitle".
+Use only the SNS codes when naming directories. By default, each
+directory will be named in the form of "snsCode - snsTitle".
 
 -p  
 Print the SNS structure only.
 
 -s  
-Use symbolic links to organize the SNS instead of the default hard links.
+Use symbolic links to organize the SNS instead of the default hard
+links.
 
 --version  
 Show version information.
 
 &lt;BREX&gt;  
-Read the SNS structure from the specified BREX data module. If none is specified, the tool will read from stdin.
+Read the SNS structure from the specified BREX data module. If none is
+specified, the tool will read from stdin.
 
 EXAMPLE
 =======

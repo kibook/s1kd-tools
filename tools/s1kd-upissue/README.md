@@ -12,9 +12,13 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-upissue* tool increases the in-work or issue number of an S1000D CSDB object.
+The *s1kd-upissue* tool increases the in-work or issue number of an
+S1000D CSDB object.
 
-Any files using an S1000D-esque naming convention, placing the issue and in-work numbers after the first underscore (\_) character, can also be "upissued". Files which do not contain the appropriate S1000D metadata are simply copied.
+Any files using an S1000D-esque naming convention, placing the issue and
+in-work numbers after the first underscore (\_) character, can also be
+"upissued". Files which do not contain the appropriate S1000D metadata
+are simply copied.
 
 OPTIONS
 =======
@@ -26,10 +30,12 @@ Set first verification type (tabtop, onobject, ttandoo).
 Set second verification type (tabtop, onobject, ttandoo).
 
 -c &lt;reason&gt;  
-Add a reason for update to the upissued objects. Multiple RFUs can be added by specifying this option multiple times.
+Add a reason for update to the upissued objects. Multiple RFUs can be
+added by specifying this option multiple times.
 
 -d  
-Do not actually create or modify any files, only print the name of the file that would be created or modified.
+Do not actually create or modify any files, only print the name of the
+file that would be created or modified.
 
 -f  
 Overwrite existing upissued CSDB objects.
@@ -38,25 +44,39 @@ Overwrite existing upissued CSDB objects.
 Mark the last specified reason for update (-c) as a highlight.
 
 -I  
-Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date. This option will keep the date of the previous inwork or official issue.
+Do not change issue date. Normally, when upissuing to the next inwork or
+official issue, the issue date is changed to the current date. This
+option will keep the date of the previous inwork or official issue.
 
 -i  
-Increase the issue number of the CSDB object. By default, the in-work issue is increased.
+Increase the issue number of the CSDB object. By default, the in-work
+issue is increased.
 
 -l  
-Treat input (stdin or arguments) as lists of CSDB objects to upissue, rather than CSDB objects themselves.
+Treat input (stdin or arguments) as lists of CSDB objects to upissue,
+rather than CSDB objects themselves.
 
 -N  
 Omit issue/inwork numbers from filename.
 
 -q  
-Keep quality assurance information from old issue. Normally, when upissuing an official CSDB object to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the CSDB object, and so does not require it to be re-verified.
+Keep quality assurance information from old issue. Normally, when
+upissuing an official CSDB object to the first in-work issue, the
+quality assurance is set back to "unverified". Specify this option to
+indicate the upissue will not affect the contents of the CSDB object,
+and so does not require it to be re-verified.
 
 -R  
-Delete only change markup on elements associated with an RFU (by use of the attribute `reasonForUpdateRefIds`. Change markup on other elements is ignored.
+Delete only change markup on elements associated with an RFU (by use of
+the attribute `reasonForUpdateRefIds`. Change markup on other elements
+is ignored.
 
 -r  
-Keep old RFUs. Normally, when upissuing an offical CSDB object to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements (when change type is "add" or "modify") or the elements themselves (when change type is "delete"). This option prevents their deletion.
+Keep old RFUs. Normally, when upissuing an offical CSDB object to the
+first in-work issue, any reasons for update are deleted automatically,
+along with any change markup attributes on elements (when change type is
+"add" or "modify") or the elements themselves (when change type is
+"delete"). This option prevents their deletion.
 
 -s &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.
@@ -71,7 +91,9 @@ Print the file name of the upissued CSDB object.
 Show version information.
 
 &lt;file&gt;...  
-Any number of CSDB objects or other files to upissue. If none are specified, the object will be read from stdin and the upissued object will be written to stdout.
+Any number of CSDB objects or other files to upissue. If none are
+specified, the object will be read from stdin and the upissued object
+will be written to stdout.
 
 EXAMPLES
 ========

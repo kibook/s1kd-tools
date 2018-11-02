@@ -11,15 +11,18 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-newimf* tool creates a new S1000D ICN metadata file for specified ICN files.
+The *s1kd-newimf* tool creates a new S1000D ICN metadata file for
+specified ICN files.
 
 OPTIONS
 =======
 
 -% &lt;dir&gt;  
-Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named `icnmetadata.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+Use the XML template in &lt;dir&gt; instead of the built-in template.
+The template must be named `icnmetadata.xml` inside &lt;dir&gt; and must
+conform to the default S1000D issue (4.2).
 
--~ &lt;dir&gt;  
+-\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
 -b &lt;BREX&gt;  
@@ -59,7 +62,8 @@ Do not report an error when the file already exists.
 The CAGE code of the responsible partner company.
 
 -r &lt;RPC&gt;  
-The responsible partner company enterprise name of the new ICN metadata file.
+The responsible partner company enterprise name of the new ICN metadata
+file.
 
 -t &lt;title&gt;  
 The ICN title (if creating multiple ICNs, they will all use this title).
@@ -76,7 +80,8 @@ Show version information.
 `.defaults` file
 ----------------
 
-Refer to s1kd-newdm(1) for information on the `.defaults` file used by all the s1kd-new\* tools.
+Refer to s1kd-newdm(1) for information on the `.defaults` file used by
+all the s1kd-new\* tools.
 
 EXAMPLE
 =======

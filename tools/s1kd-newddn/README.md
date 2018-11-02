@@ -11,13 +11,15 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-newddn* tool creates a new S1000D data dispatch note with the code, metadata, and list of files specified.
+The *s1kd-newddn* tool creates a new S1000D data dispatch note with the
+code, metadata, and list of files specified.
 
 OPTIONS
 =======
 
 -\# &lt;code&gt;  
-The code of the new data dispatch note, in the form of MODELIDENTCODE-SENDER-RECEIVER-YEAR-SEQUENCE.
+The code of the new data dispatch note, in the form of
+MODELIDENTCODE-SENDER-RECEIVER-YEAR-SEQUENCE.
 
 -$ &lt;issue&gt;  
 Specifiy which issue of S1000D to use. Currently supported issues are:
@@ -39,12 +41,15 @@ Specifiy which issue of S1000D to use. Currently supported issues are:
 -   2.0
 
 -@ &lt;filename&gt;  
-Save the new DDN as &lt;filename&gt; instead of an automatically named file in the current directory.
+Save the new DDN as &lt;filename&gt; instead of an automatically named
+file in the current directory.
 
 -% &lt;dir&gt;  
-Use the XML template in the specified directory instead of the built-in template. The template must be named `ddn.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+Use the XML template in the specified directory instead of the built-in
+template. The template must be named `ddn.xml` inside &lt;dir&gt; and
+must conform to the default S1000D issue (4.2).
 
--~ &lt;dir&gt;  
+-\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
 -a &lt;auth&gt;  
@@ -101,7 +106,8 @@ Show version information.
 `.defaults` file
 ----------------
 
-Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is
+used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

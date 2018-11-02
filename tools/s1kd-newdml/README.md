@@ -11,7 +11,8 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-newdml* tool creates a new S1000D data management list with the code and other metadata specified.
+The *s1kd-newdml* tool creates a new S1000D data management list with
+the code and other metadata specified.
 
 OPTIONS
 =======
@@ -39,12 +40,15 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -   2.0
 
 -@ &lt;filename&gt;  
-Save new DML to &lt;filename&gt; instead of an automatically named file in the current directory.
+Save new DML to &lt;filename&gt; instead of an automatically named file
+in the current directory.
 
 -% &lt;dir&gt;  
-Use the XML template in the specified directory instead of the built-in template. The template must be named `dml.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+Use the XML template in the specified directory instead of the built-in
+template. The template must be named `dml.xml` inside &lt;dir&gt; and
+must conform to the default S1000D issue (4.2).
 
--~ &lt;dir&gt;  
+-\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
 -b &lt;BREX&gt;  
@@ -66,7 +70,9 @@ Show usage message.
 The issue date of the new DML in the form of YYYY-MM-DD.
 
 -i &lt;info code&gt;  
-When creating a DMRL from SNS rules (-S), use the specified info code for each entry. Specify this option multiple times to create multiple data modules for each part of the SNS.
+When creating a DMRL from SNS rules (-S), use the specified info code
+for each entry. Specify this option multiple times to create multiple
+data modules for each part of the SNS.
 
 -m &lt;remarks&gt;  
 Set the remarks for the new data management list.
@@ -84,10 +90,14 @@ Prompts the user for any values left unspecified.
 Do not report an error when the file already exists.
 
 -R &lt;NCAGE&gt;  
-Specifies a default responsible partner company enterprise code for entries which do not carry this in their ID STATUS section (ICN, COM, DML).
+Specifies a default responsible partner company enterprise code for
+entries which do not carry this in their ID STATUS section (ICN, COM,
+DML).
 
 -r &lt;name&gt;  
-Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).
+Specifies a default responsible partner company enterprise name for
+entries which do not carry this in their IDSTATUS section (ICN, COM,
+DML).
 
 -S &lt;SNS&gt;  
 Create a DMRL using the specified SNS rules.
@@ -107,7 +117,8 @@ Any number of data module file names to automatically add to the list.
 `.defaults` file
 ----------------
 
-Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is
+used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

@@ -12,7 +12,10 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-ref* tool generates the XML for S1000D reference elements using the specified code or filename. When using a filename, it can parse the CSDB object to include the issue, language, and/or title information in the reference.
+The *s1kd-ref* tool generates the XML for S1000D reference elements
+using the specified code or filename. When using a filename, it can
+parse the CSDB object to include the issue, language, and/or title
+information in the reference.
 
 OPTIONS
 =======
@@ -33,16 +36,19 @@ Show the usage message.
 Include the issue information in the reference (target must be a file)
 
 -l  
-Include the language information in the reference (target must be a file)
+Include the language information in the reference (target must be a
+file)
 
 -o &lt;dst&gt;  
 Output to &lt;dst&gt; instead of stdout.
 
 -r  
-Add the generated reference to the source data module's `refs` table and output the modified data module to stdout.
+Add the generated reference to the source data module's `refs` table and
+output the modified data module to stdout.
 
 -s &lt;src&gt;  
-Specify a source data module &lt;src&gt; to add references to when using the -r option.
+Specify a source data module &lt;src&gt; to add references to when using
+the -r option.
 
 -t  
 Include the title in the reference (target must be a file).
@@ -50,8 +56,9 @@ Include the title in the reference (target must be a file).
 --version  
 Show version information.
 
-&lt;code&gt;|&lt;filename&gt;  
-Either a code, including the prefix (DMC, PMC, etc.), or the filename of a CSDB object.
+&lt;code&gt;\|&lt;filename&gt;  
+Either a code, including the prefix (DMC, PMC, etc.), or the filename of
+a CSDB object.
 
 EXAMPLES
 ========

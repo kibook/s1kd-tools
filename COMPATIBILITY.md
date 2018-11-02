@@ -1,7 +1,8 @@
 General
 =======
 
-This document summarizes the compatibility between the s1kd-tools and each issue of the S1000D specification for which support is planned.
+This document summarizes the compatibility between the s1kd-tools and
+each issue of the S1000D specification for which support is planned.
 
 X  
 Support is implemented.
@@ -9,8 +10,9 @@ Support is implemented.
 /  
 Support is partially implemented.
 
-~  
-Support is not planned. Usually this is because older issues of the specification did not cover the function of the tool.
+\~  
+Support is not planned. Usually this is because older issues of the
+specification did not cover the function of the tool.
 
 \[empty\]  
 Support is planned but not yet implemented.
@@ -19,16 +21,16 @@ Support is planned but not yet implemented.
 |-----------------|-----|-----|-----|-----|-----|-----|-----|-----|
 | s1kd-acronyms   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-aspp       | X   | X   | X   | X   | ~   | ~   | ~   | ~   |
-| s1kd-brexcheck  | X   | X   | X   | X   | X   | X   | ~   | ~   |
+| s1kd-aspp       | X   | X   | X   | X   | \~  | \~  | \~  | \~  |
+| s1kd-brexcheck  | X   | X   | X   | X   | X   | X   | \~  | \~  |
 | s1kd-checkrefs  | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-defaults   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-dmrl       | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-flatten    | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-fmgen      | X   | X   | ~   | ~   | ~   | ~   | ~   | ~   |
+| s1kd-fmgen      | X   | X   | \~  | \~  | \~  | \~  | \~  | \~  |
 | s1kd-icncatalog | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-index      | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-instance   | X   | X   | X   | /   | ~   | ~   | ~   | ~   |
+| s1kd-instance   | X   | X   | X   | /   | \~  | \~  | \~  | \~  |
 | s1kd-ls         | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-metadata   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-neutralize | X   | X   | X   | X   | X   | X   | X   | X   |
@@ -36,13 +38,13 @@ Support is planned but not yet implemented.
 | s1kd-newddn     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newdm      | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newdml     | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-newimf     | X   | ~   | ~   | ~   | ~   | ~   | ~   | ~   |
+| s1kd-newimf     | X   | \~  | \~  | \~  | \~  | \~  | \~  | \~  |
 | s1kd-newpm      | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-newsmc     | X   | X   | ~   | ~   | ~   | ~   | ~   | ~   |
-| s1kd-newupf     | X   | X   | ~   | ~   | ~   | ~   | ~   | ~   |
+| s1kd-newsmc     | X   | X   | \~  | \~  | \~  | \~  | \~  | \~  |
+| s1kd-newupf     | X   | X   | \~  | \~  | \~  | \~  | \~  | \~  |
 | s1kd-ref        | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-refls      | X   | X   | X   | X   | X   | X   | X   | X   |
-| s1kd-sns        | X   | X   | X   | ~   | ~   | ~   | ~   | ~   |
+| s1kd-sns        | X   | X   | X   | \~  | \~  | \~  | \~  | \~  |
 | s1kd-syncrefs   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-transform  | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-upissue    | X   | X   | X   | X   | X   | X   | X   | X   |

@@ -11,7 +11,11 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-syncrefs* tool copies all external references (dmRef, pmRef, externalPubRef) within the content of a data module and uses them to generate the &lt;refs&gt; element. Each unique reference is copied, sorted, and placed in to the &lt;refs&gt; element. If a &lt;refs&gt; element already exists, it is overwritten.
+The *s1kd-syncrefs* tool copies all external references (dmRef, pmRef,
+externalPubRef) within the content of a data module and uses them to
+generate the &lt;refs&gt; element. Each unique reference is copied,
+sorted, and placed in to the &lt;refs&gt; element. If a &lt;refs&gt;
+element already exists, it is overwritten.
 
 OPTIONS
 =======
@@ -23,7 +27,8 @@ Delete the &lt;refs&gt; element.
 Overwrite the data modules automatically.
 
 -l  
-Treat input (stdin or arguments) as lists of data modules to synchronize references in, rather than data modules themselves.
+Treat input (stdin or arguments) as lists of data modules to synchronize
+references in, rather than data modules themselves.
 
 -o &lt;out&gt;  
 The resulting XML is written to &lt;out&gt; instead of stdout.
@@ -32,7 +37,8 @@ The resulting XML is written to &lt;out&gt; instead of stdout.
 Show version information.
 
 &lt;data module&gt;...  
-The data module(s) to synchronize references in. Default is to read from stdin.
+The data module(s) to synchronize references in. Default is to read from
+stdin.
 
 EXAMPLE
 =======

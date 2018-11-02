@@ -11,7 +11,11 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-refls* tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.
+The *s1kd-refls* tool lists external references in CSDB objects,
+optionally matching them to a filename in the CSDB directory hierarchy.
+This makes it easy to obtain a list of dependencies for CSDB objects,
+such as ICNs, to ensure they are delivered together, or to check for
+references to CSDB objects which do not exist in the current CSDB.
 
 OPTIONS
 =======
@@ -20,16 +24,20 @@ OPTIONS
 List all references, not attempting to match them to an actual filename.
 
 -C, -D, -E, -G, -P  
-List references to comments, data modules, external publications, ICNs, and publication modules respectively. If none are specified, -CDEGP is assumed.
+List references to comments, data modules, external publications, ICNs,
+and publication modules respectively. If none are specified, -CDEGP is
+assumed.
 
 -c  
 List references in the `content` section of a CSDB object only.
 
 -d &lt;dir&gt;  
-Directory to search for matches to references in. By default, the current directory is used.
+Directory to search for matches to references in. By default, the
+current directory is used.
 
 -f  
-Include the filename of the source object where each reference was found in the output.
+Include the filename of the source object where each reference was found
+in the output.
 
 -h -?  
 Show help/usage message.
@@ -38,13 +46,17 @@ Show help/usage message.
 Ignore issue and language info when matching references.
 
 -l  
-Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.
+Treat input (stdin or arguments) as lists of filenames of CSDB objects
+to list references in, rather than CSDB objects themselves.
 
 -N  
-Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new\* tools.
+Assume filenames of referenced CSDB objects omit the issue info, i.e.
+they were created with the -N option to the s1kd-new\* tools.
 
 -n  
-Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.
+Include the filename of the source object where each reference was
+found, and display the line number where the reference occurs in the
+source file after its filename.
 
 -q  
 Quiet mode. Errors are not printed.
@@ -53,10 +65,13 @@ Quiet mode. Errors are not printed.
 Search for matches to references in directories recursively.
 
 -s  
-Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.
+Include the source object as a reference. This is helpful when the
+output of this tool is used to apply some operation to a source object
+and all its dependencies together.
 
 -u  
-Show only unmatched reference errors, or unmatched codes if combined with the -a option.
+Show only unmatched reference errors, or unmatched codes if combined
+with the -a option.
 
 -x  
 Output a detailed XML report instead of plain text messages.
@@ -65,7 +80,8 @@ Output a detailed XML report instead of plain text messages.
 Show version information.
 
 &lt;object&gt;...  
-CSDB object(s) to list references in. If none are specified, the tool will read from stdin.
+CSDB object(s) to list references in. If none are specified, the tool
+will read from stdin.
 
 EXAMPLE
 =======

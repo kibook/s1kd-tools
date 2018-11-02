@@ -11,7 +11,8 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-addicn* tool adds the required DTD entity and notation declarations to an S1000D module in order to reference an ICN file.
+The *s1kd-addicn* tool adds the required DTD entity and notation
+declarations to an S1000D module in order to reference an ICN file.
 
 OPTIONS
 =======

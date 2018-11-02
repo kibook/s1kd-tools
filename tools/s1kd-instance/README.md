@@ -11,23 +11,34 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-instance* tool produces "instances" of S1000D CSDB objects, derived from "master" (or "source") objects. The tool supports multiple methods of instantiating objects:
+The *s1kd-instance* tool produces "instances" of S1000D CSDB objects,
+derived from "master" (or "source") objects. The tool supports multiple
+methods of instantiating objects:
 
--   Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a PCT (Product Cross-reference Table).
+-   Filtering on user-supplied applicability definitions, so that
+    non-applicable elements and (optionally) unused applicability
+    annotations are removed in the instance. The definitions can be
+    supplied directly or read from a PCT (Product Cross-reference
+    Table).
 
--   Filtering on skill levels and security classifications to remove sensitive data.
+-   Filtering on skill levels and security classifications to remove
+    sensitive data.
 
--   Using a CIR (Common Information Repository) to produce a standalone instance from a CIR-dependent master.
+-   Using a CIR (Common Information Repository) to produce a standalone
+    instance from a CIR-dependent master.
 
 Any combination of these methods can be used when producing an instance.
 
 The applications for this tool include:
 
--   Delivering customized data modules or publications to different customers.
+-   Delivering customized data modules or publications to different
+    customers.
 
--   Creating customized instances of CSDB objects which are maintained within the CSDB.
+-   Creating customized instances of CSDB objects which are maintained
+    within the CSDB.
 
--   As a backend to filter content or resolve CIR dependencies at runtime in an electronic viewer application.
+-   As a backend to filter content or resolve CIR dependencies at
+    runtime in an electronic viewer application.
 
 OPTIONS
 =======
@@ -39,46 +50,68 @@ Simplify inline applicability annotations and remove unused ones.
 Remove unused inline applicability annotations.
 
 -C &lt;comment&gt;  
-Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.
+Add an XML comment to an instance. Useful as another way of identifying
+an object as an instance aside from the source address or extended code,
+or giving additional information about a particular instance. By
+default, the comment is inserted at the top of the document, but this
+can be customized with the -X option.
 
 -c &lt;code&gt;  
-Specify a new data module code (DMC) or publication module code (PMC) for the instance.
+Specify a new data module code (DMC) or publication module code (PMC)
+for the instance.
 
 -E  
-Remove the extension from an instance produced from an already extended object.
+Remove the extension from an instance produced from an already extended
+object.
 
 -e &lt;ext&gt;  
-Specify an extension on the data module code (DME) or publication module code (PME) for the instance.
+Specify an extension on the data module code (DME) or publication module
+code (PME) for the instance.
 
 -F  
-After filtering, "alts" elements containing only one child element will be "flattened" by replacing them with the applicable child element. Alts elements with multiple child elements are left untouched.
+After filtering, "alts" elements containing only one child element will
+be "flattened" by replacing them with the applicable child element. Alts
+elements with multiple child elements are left untouched.
 
 -f  
-Overwrite existing file with same name as the filename generated automatically with -O, if it exists.
+Overwrite existing file with same name as the filename generated
+automatically with -O, if it exists.
 
 -G &lt;CODE&gt;/&lt;NAME&gt;  
-Similar to the -g option, but instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.
+Similar to the -g option, but instead of the default enterprise code and
+name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated
+by a slash (/). To only include a code, specify &lt;CODE&gt; with no
+slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.
 
 -g  
-Set the originator of the instance. When this option is specified, the code "`S1KDI`" and the name "`s1kd-instance tool`" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.
+Set the originator of the instance. When this option is specified, the
+code "`S1KDI`" and the name "`s1kd-instance tool`" are used by default
+to identify that the instance was produced by this tool. A different
+code and name can be specified with the -G option.
 
 -I &lt;date&gt;  
-Set the issue date of the instance. By default, the issue date is taken from the source. If - is given for &lt;date&gt;, the current date will be used.
+Set the issue date of the instance. By default, the issue date is taken
+from the source. If - is given for &lt;date&gt;, the current date will
+be used.
 
 -i &lt;infoName&gt;  
 Give the data module instance a different infoName.
 
 -K &lt;levels&gt;  
-Filter the object on the specified skill levels. Elements which are marked with skill levels not contained in the string &lt;levels&gt; are removed in the resulting instance.
+Filter the object on the specified skill levels. Elements which are
+marked with skill levels not contained in the string &lt;levels&gt; are
+removed in the resulting instance.
 
 -k &lt;level&gt;  
 Set the skill level of the instance.
 
 -L  
-Source is a list of object filenames to create instances of, rather than an object itself.
+Source is a list of object filenames to create instances of, rather than
+an object itself.
 
 -l &lt;lang&gt;  
-Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".
+Set the language and country of the instance. For example, to create an
+instance for US English, lang would be "en-US".
 
 -m &lt;remarks&gt;  
 Set the remarks for the instance.
@@ -87,7 +120,8 @@ Set the remarks for the instance.
 Omit issue/inwork numbers from automatically generated filenames.
 
 -n &lt;iss&gt;  
-Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.
+Set the issue and inwork numbers of the instance. By default, the issue
+and inwork number are taken from the source.
 
 -O &lt;dir&gt;  
 Output instance(s) in &lt;dir&gt;, automatically naming them based on:
@@ -100,25 +134,37 @@ Output instance(s) in &lt;dir&gt;, automatically naming them based on:
 
 -   the language and country specified with -L
 
-If any of the above are not specified, the information is copied from the source object.
+If any of the above are not specified, the information is copied from
+the source object.
 
 If &lt;dir&gt; does not exist, it will be created.
 
-If a file exists with the same name in the specified directory, a warning will be display and the file will not be overwritten, unless the -f option is specified.
+If a file exists with the same name in the specified directory, a
+warning will be display and the file will not be overwritten, unless the
+-f option is specified.
 
-When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.
+When using this option, non-XML files, such as external publications,
+may be specified as objects. They will be copied to &lt;dir&gt;.
 
 -o &lt;file&gt;  
 Output instance to file instead of stdout.
 
 -P &lt;PCT&gt;  
-PCT file to read product definitions from (-p). If a product is specified but no PCT is given, the tool will attempt to use the ACT reference of each source data module to find the ACT and PCT data modules in the current directory.
+PCT file to read product definitions from (-p). If a product is
+specified but no PCT is given, the tool will attempt to use the ACT
+reference of each source data module to find the ACT and PCT data
+modules in the current directory.
 
 -p &lt;product&gt;  
-The ID or primary key of a product in the the specified PCT data module (-P) or the PCT data module referenced by the source data module. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "`serialno:prodattr=12345`"
+The ID or primary key of a product in the the specified PCT data module
+(-P) or the PCT data module referenced by the source data module. A
+primary key is given in the same form as the -s option and should match
+a unique assign of a product instance, e.g., "`serialno:prodattr=12345`"
 
 -R &lt;CIR&gt; ...  
-Use a CIR to resolve external dependencies in the master object, making the instance object standalone. Additional CIRs can be used by specifying the -R option multiple times.
+Use a CIR to resolve external dependencies in the master object, making
+the instance object standalone. Additional CIRs can be used by
+specifying the -R option multiple times.
 
 The following CIRs have some built-in support:
 
@@ -148,42 +194,64 @@ The following CIRs have some built-in support:
 
 -   Zones
 
-The methods of resolving the dependencies for a CIR can be changed by specifying a custom XSLT script with the -r option. The built-in XSLT used for the above CIR data modules can be dumped with the -x option.
+The methods of resolving the dependencies for a CIR can be changed by
+specifying a custom XSLT script with the -r option. The built-in XSLT
+used for the above CIR data modules can be dumped with the -x option.
 
 -r &lt;XSL&gt;  
-Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.
+Use a custom XSLT script to resolve CIR dependencies for the last
+specified CIR.
 
 -S  
-Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.
+Do not include
+&lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt;
+in the instance.
 
 -s &lt;applic&gt;  
-An applicability definition in the form of "`<ident>:<type>=<value>`". Any number of values can be defined by specifying this option multiple times.
+An applicability definition in the form of "`<ident>:<type>=<value>`".
+Any number of values can be defined by specifying this option multiple
+times.
 
 -t &lt;techName&gt;  
 Give the instance a different techName/pmTitle.
 
 -U &lt;classes&gt;  
-Filter the object on the specified security classes. Elements marked with security classes not contained in the string &lt;classes&gt; are removed in the resulting instance.
+Filter the object on the specified security classes. Elements marked
+with security classes not contained in the string &lt;classes&gt; are
+removed in the resulting instance.
 
 -u &lt;sec&gt;  
-Set the security classification of the instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.
+Set the security classification of the instance. An instance may have a
+lower security classification than the source if classified information
+is removed for a particular customer.
 
 -v  
-When -O is used, print the automatically generated file name of the instance.
+When -O is used, print the automatically generated file name of the
+instance.
 
 -W  
-Set the applicability for the whole object, overwriting the current applicability with the user-defined applicability values.
+Set the applicability for the whole object, overwriting the current
+applicability with the user-defined applicability values.
 
 -w  
-Check the applicability, skill level, and security classification of the whole object against the user-defined applicability, skill levels, and security classifications. If the whole object is not applicable, then no instance is created.
+Check the applicability, skill level, and security classification of the
+whole object against the user-defined applicability, skill levels, and
+security classifications. If the whole object is not applicable, then no
+instance is created.
 
 -X &lt;path&gt;  
-The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.
+The XPath expression indicating where the comment specified with -C will
+be inserted. This should be the path to an element where the comment
+will be inserted as the first child node. By default, this is the top of
+the document.
 
 -x &lt;CIR&gt;  
-Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -r option.
+Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR
+type to stdout. This can be used as a starting point for a custom XSLT
+script to be specified with the -r option.
 
-The following types currently have built-in XSLT and can therefore be used as values for &lt;CIR&gt;:
+The following types currently have built-in XSLT and can therefore be
+used as values for &lt;CIR&gt;:
 
 -   accessPointRepository
 
@@ -212,10 +280,12 @@ The following types currently have built-in XSLT and can therefore be used as va
 -   zoneRepository
 
 -Y &lt;text&gt;  
-Update the applicability for the whole object using the user-defined applicability values, and using &lt;text&gt; as the new display text.
+Update the applicability for the whole object using the user-defined
+applicability values, and using &lt;text&gt; as the new display text.
 
 -y  
-Update the applicability for the whole object using the user-defined applicability values.
+Update the applicability for the whole object using the user-defined
+applicability values.
 
 --version  
 Show version information.
@@ -226,20 +296,40 @@ Source CSDB objects to instantiate.
 Identifying the source of an instance
 -------------------------------------
 
-The resulting data module instances will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.
+The resulting data module instances will contain the element
+&lt;sourceDmIdent&gt;, which will contain the identification elements of
+the source data modules used to instantiate them. Publication module
+instances will contain the element &lt;sourcePmIdent&gt; instead.
 
-Additionally, the data module instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.
+Additionally, the data module instance will contain an element
+&lt;repositorySourceDmIdent&gt; for each CIR specified with the -R
+option.
 
-If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.
+If the -S option is used, neither the
+&lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or
+&lt;repositorySourceDmIdent&gt; elements are added. This can be useful
+when this tool is not used to make an "instance" per se, but more
+generally to make a module based on an existing module.
 
 Removing/simplifying applicability annotations (-a vs -A)
 ---------------------------------------------------------
 
-By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a and -A options provide two methods of doing this.
+By default, filtering on applicability will remove invalid elements from
+the resulting instance. In some cases, though, it may be desirable to
+remove redundant applicability annotations on valid elements. The -a and
+-A options provide two methods of doing this.
 
-The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). Unused occurrences of the corresponding applic elements are removed as well.
+The -a option will remove applicability annotations (applicRefId) from
+elements which are deemed to be unambiguously valid (their validity does
+not rely on applicability values left undefined by the user). Unused
+occurrences of the corresponding applic elements are removed as well.
 
-The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.
+The -A option will do the same as the -a option, but will also attempt
+to simplify unused parts of applicability annotations. It simplifies an
+annotation by removing &lt;assert&gt; elements determined to be either
+unambiguously valid or invalid given the user-defined values, and
+removing unneeded &lt;evaluate&gt; elements when they contain only one
+remaining &lt;assert&gt;.
 
 For example, given the following input:
 
@@ -289,7 +379,9 @@ For example, given the following input:
     the weather is icy.
     </para>
 
-If this data is filtered for version A, without specifying a value for the weather, and neither the -a or -A option is used, the following will be the result:
+If this data is filtered for version A, without specifying a value for
+the weather, and neither the -a or -A option is used, the following will
+be the result:
 
     <referencedApplicGroup>
     <applic id="app-0001">
@@ -373,7 +465,12 @@ If the -a option is used, the following would be the result:
     the weather is icy.
     </para>
 
-The applicability annotation reference for the first paragraph is removed because, given that the version is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A *and* the weather is normal, and no value has been given for the weather.
+The applicability annotation reference for the first paragraph is
+removed because, given that the version is A, it must be true. The
+corresponding applicability annotations, which are no longer referenced,
+are also removed. The applicability on the third paragraph remains,
+however, because it is only true if the version is A *and* the weather
+is normal, and no value has been given for the weather.
 
 If the -A option is used, the following would be the result:
 
@@ -392,18 +489,33 @@ If the -A option is used, the following would be the result:
     the weather is icy.
     </para>
 
-The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is *not* A can be removed as invalid. This leaves only the assertion about the weather.
+The annotation is now simplified to remove resolved assertions. Because
+the version must be A, any assertions restating this can be removed as
+redundant, and any portions of the annotation in which the version is
+*not* A can be removed as invalid. This leaves only the assertion about
+the weather.
 
 > **Note**
 >
-> The -A option may change the *meaning* of certain applicability annotations without changing the *display text*. Display text is always left untouched, so using this option may cause display text to be technically incorrect. This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool.
+> The -A option may change the *meaning* of certain applicability
+> annotations without changing the *display text*. Display text is
+> always left untouched, so using this option may cause display text to
+> be technically incorrect. This option is best used when display text
+> will be automatically generated after filtering, such as with the
+> s1kd-aspp tool.
 
 Applicability of an instance (-W, -Y, -y)
 -----------------------------------------
 
-The applicability of an instance may change as a result of filtering. For example, a source data module which is applicable to two versions of a product may produce two instances which are each only applicable to one version. There are three options which control how the applicability of the whole instance object is updated.
+The applicability of an instance may change as a result of filtering.
+For example, a source data module which is applicable to two versions of
+a product may produce two instances which are each only applicable to
+one version. There are three options which control how the applicability
+of the whole instance object is updated.
 
-The -W option will create an applicability annotation for the instance using only the user-defined applicability values. This means, for example, that given the following command:
+The -W option will create an applicability annotation for the instance
+using only the user-defined applicability values. This means, for
+example, that given the following command:
 
     $ s1kd-instance -s version:prodattr=A -W ...
 
@@ -420,7 +532,10 @@ The instance would contain the following annotation:
 
 regardless of what the applicability of the source object was.
 
-The -y option will create an applicability annotation for the instance by combining the user-defined applicability with the applicability of the source object. For example, given the following annotation in the source object:
+The -y option will create an applicability annotation for the instance
+by combining the user-defined applicability with the applicability of
+the source object. For example, given the following annotation in the
+source object:
 
     <dmStatus>
     <!-- snip -->
@@ -450,7 +565,10 @@ The annotation for the instance would be as follows:
     <!-- snip -->
     </dmStatus>
 
-The -Y option by itself works the same as the -y option, but allows custom display text to be set for the annotation. It can also be combined with the -W option to add custom display text to the overwriting annotation:
+The -Y option by itself works the same as the -y option, but allows
+custom display text to be set for the annotation. It can also be
+combined with the -W option to add custom display text to the
+overwriting annotation:
 
     $ s1kd-instance -s version:prodattr=A -WY "Version A" ...
 
@@ -469,7 +587,9 @@ The -Y option by itself works the same as the -y option, but allows custom displ
 Filtering for multiple values of a single property
 --------------------------------------------------
 
-Though not usually the case, it is possible to create an instance which is filtered on multiple values of the same applicabilty property. Given the following:
+Though not usually the case, it is possible to create an instance which
+is filtered on multiple values of the same applicabilty property. Given
+the following:
 
     <referencedApplicGroup>
     <applic id="apA">
@@ -493,7 +613,9 @@ Though not usually the case, it is possible to create an instance which is filte
     <para applicRefId="apB">Applies to B</para>
     <para applicRefId="apC">Applies to C</para>
 
-filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property multiple times in the applicability definition arguments. For example:
+filtering can be applied such that the instance will be applicable to
+both A and C, but not B. This is done by specifying a property multiple
+times in the applicability definition arguments. For example:
 
     $ s1kd-instance -A -Y "A or C" -s attr:prodattr=A -s attr:prodattr=C ...
 
@@ -536,13 +658,18 @@ This would produce the following in the instance:
 Resolving CIR dependencies with a custom XSLT script (-r)
 ---------------------------------------------------------
 
-A CIR contains more information about an item than can be captured in a data module's reference to it. If this additional information is required, there are two methods to include it:
+A CIR contains more information about an item than can be captured in a
+data module's reference to it. If this additional information is
+required, there are two methods to include it:
 
--   Distribute the CIR with the data module so the extra information can be linked to
+-   Distribute the CIR with the data module so the extra information can
+    be linked to
 
 -   "Flatten" the information to fit in the data module's schema.
 
-A custom XSLT script can be supplied with the -r option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:
+A custom XSLT script can be supplied with the -r option, which is then
+used to resolve the CIR dependencies of the last CIR specified with -R.
+For example:
 
     <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -555,7 +682,8 @@ A custom XSLT script can be supplied with the -r option, which is then used to r
     </xsl:template>
     </xsl:stylesheet>
 
-This script would resolve a `functionalItemRef` by "flattening" it to the value of the `name` element obtained from the CIR.
+This script would resolve a `functionalItemRef` by "flattening" it to
+the value of the `name` element obtained from the CIR.
 
 The example CIR would contain a specification like:
 
@@ -584,9 +712,15 @@ And the resulting XML would be:
 
     <para>The Hydraulic pump is an item in the system.</para>
 
-The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element `mux` contains two `dmodule` elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.
+The source data module and CIR are combined in to a single XML document
+which is used as the input to the XSLT script. The root element `mux`
+contains two `dmodule` elements. The first is the source data module,
+and the second is the CIR data module specified with the corresponding
+-R option. The CIR data module is first filtered on the defined
+applicability.
 
-An "identity" template is automatically inserted in to the custom XSLT script, equivalent to the following:
+An "identity" template is automatically inserted in to the custom XSLT
+script, equivalent to the following:
 
     <xsl:template match="@*|node()">
     <xsl:copy>
@@ -594,18 +728,22 @@ An "identity" template is automatically inserted in to the custom XSLT script, e
     </xsl:copy>
     </xsl:template>
 
-This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.
+This means any elements or attributes which are not matched with a more
+specific template in the custom XSLT script are automatically copied.
 
-The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.
+The set of built-in XSLT scripts used to resolve dependencies can be
+dumped using the -x option.
 
 EXAMPLES
 ========
 
-Filtering a data module on specified applicability and writing to stdout:
+Filtering a data module on specified applicability and writing to
+stdout:
 
     $ s1kd-instance -s version:prodattr=A <DM>
 
-Filtering a data module on a specified product instance and writing to stdout:
+Filtering a data module on a specified product instance and writing to
+stdout:
 
     $ s1kd-instance -P <PCT> -p versionA <DM>
 
@@ -613,10 +751,12 @@ Filtering a data module on specified skill levels and writing to stdout:
 
     $ s1kd-instance -k sk01/sk02 <DMs>
 
-Filtering data modules for a particular customer and outputting with extended identification:
+Filtering data modules for a particular customer and outputting with
+extended identification:
 
     $ s1kd-instance -s version:prodattr=A -e 12345-54321 -O . <DMs>
 
-Writing out a data module from stdin to a directory with automatic naming:
+Writing out a data module from stdin to a directory with automatic
+naming:
 
     $ s1kd-transform -s <xsl> <DM> | s1kd-instance -SO <dir>

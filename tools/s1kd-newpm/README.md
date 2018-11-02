@@ -11,7 +11,8 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-newpm* tool creates a new S1000D publication module with the publication module code and other metadata specified.
+The *s1kd-newpm* tool creates a new S1000D publication module with the
+publication module code and other metadata specified.
 
 OPTIONS
 =======
@@ -39,12 +40,15 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -   2.0
 
 -@ &lt;filename&gt;  
-Save new publication module as &lt;filename&gt; instead of an automatically named file in the current directory.
+Save new publication module as &lt;filename&gt; instead of an
+automatically named file in the current directory.
 
 -% &lt;dir&gt;  
-Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named `pm.xml` in &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+Use the XML template in &lt;dir&gt; instead of the built-in template.
+The template must be named `pm.xml` in &lt;dir&gt; and must conform to
+the default S1000D issue (4.2).
 
--~ &lt;dir&gt;  
+-\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
 -b &lt;BREX&gt;  
@@ -93,7 +97,8 @@ Do not report an error when the file already exists.
 The CAGE code of the responsible partner company.
 
 -r &lt;RPC&gt;  
-The responsible partner company enterprise name of the new publication module.
+The responsible partner company enterprise name of the new publication
+module.
 
 -s &lt;title&gt;  
 The short title of the new publication module.
@@ -114,12 +119,14 @@ The inwork number of the new publication module.
 Show version information.
 
 &lt;DM&gt;...  
-Any number of data modules to automatically reference in the new publication module's content.
+Any number of data modules to automatically reference in the new
+publication module's content.
 
 `.defaults` file
 ----------------
 
-Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is
+used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======

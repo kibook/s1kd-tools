@@ -12,7 +12,12 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-fmgen* tool generates the content section for front matter data modules from either a standard publication module, or the combined format of the s1kd-flatten(1) tool. Some front matter types require the use of the combined format, particularly those that list information not directly found in the publication module, such as the highlights (HIGH) type.
+The *s1kd-fmgen* tool generates the content section for front matter
+data modules from either a standard publication module, or the combined
+format of the s1kd-flatten(1) tool. Some front matter types require the
+use of the combined format, particularly those that list information not
+directly found in the publication module, such as the highlights (HIGH)
+type.
 
 OPTIONS
 =======
@@ -30,19 +35,25 @@ Show usage message.
 Specify a custom `.fmtypes` file.
 
 -f  
-Overwrite the specified front matter data module files after generating their content.
+Overwrite the specified front matter data module files after generating
+their content.
 
 -l  
-Treat input (stdin or arguments) as lists of front matter data modules to generate content for, rather than data modules themselves. If reading list from stdin, the -P option must be used to specify the publication module.
+Treat input (stdin or arguments) as lists of front matter data modules
+to generate content for, rather than data modules themselves. If reading
+list from stdin, the -P option must be used to specify the publication
+module.
 
 -P &lt;PM&gt;  
-Publication module or s1kd-flatten(1) PM format file to generate contents from. If none is specified, the tool will read from stdin.
+Publication module or s1kd-flatten(1) PM format file to generate
+contents from. If none is specified, the tool will read from stdin.
 
 -p &lt;name&gt;=&lt;value&gt;  
 Pass a parameter to the XSLT specified with the -X option.
 
 -t &lt;TYPE&gt;  
-Generate content for this type of front matter when no data modules are specified. Supported types are:
+Generate content for this type of front matter when no data modules are
+specified. Supported types are:
 
 -   HIGH - Highlights
 
@@ -53,7 +64,11 @@ Generate content for this type of front matter when no data modules are specifie
 -   TP - Title page
 
 -X &lt;XSL&gt;  
-Transform the front matter contents after generating them using the specified XSLT. This can be used, for example, to generate content for a descriptive schema data module instead, to support older issues of the specification, or for types of generated front matter not covered by the frontmatter schema.
+Transform the front matter contents after generating them using the
+specified XSLT. This can be used, for example, to generate content for a
+descriptive schema data module instead, to support older issues of the
+specification, or for types of generated front matter not covered by the
+frontmatter schema.
 
 -x  
 Do XInclude processing.
@@ -67,7 +82,10 @@ Front matter data modules to generate content for.
 `.fmtypes` file
 ---------------
 
-This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named `.fmtypes` in the current directory and parent directories, but any file can be specified using the -F option.
+This file specifies a list of info codes to associate with a particular
+type of front matter. By default, the program will search for a file
+named `.fmtypes` in the current directory and parent directories, but
+any file can be specified using the -F option.
 
 Example of simple text format:
 
@@ -87,7 +105,8 @@ Example of XML format
 EXAMPLE
 =======
 
-Generate the content for a title page front matter data module and overwrite the file:
+Generate the content for a title page front matter data module and
+overwrite the file:
 
     $ s1kd-flatten PMC-EX-12345-00001-00_001-00_EN-CA.XML |
     > s1kd-fmgen -f DMC-EX-A-00-00-00-00A-001A-D_001-00_EN-CA.XML

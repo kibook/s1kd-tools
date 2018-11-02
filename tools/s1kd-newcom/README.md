@@ -11,13 +11,15 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The *s1kd-newcom* tool creates a new S1000D comment with the code and metadata specified.
+The *s1kd-newcom* tool creates a new S1000D comment with the code and
+metadata specified.
 
 OPTIONS
 =======
 
 -\# &lt;code&gt;  
-The code of the comment, in the form of MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.
+The code of the comment, in the form of
+MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.
 
 -$ &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
@@ -39,12 +41,15 @@ Specify which issue of S1000D to use. Currently supported issues are:
 -   2.0
 
 -@ &lt;filename&gt;  
-Save the new comment as &lt;filename&gt; instead of an automatically named file in the current directory.
+Save the new comment as &lt;filename&gt; instead of an automatically
+named file in the current directory.
 
 -% &lt;dir&gt;  
-Use the XML template in the specified directory instead of the built-in template. The template must be named `comment.xml` inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).
+Use the XML template in the specified directory instead of the built-in
+template. The template must be named `comment.xml` inside &lt;dir&gt;
+and must conform to the default S1000D issue (4.2).
 
--~ &lt;dir&gt;  
+-\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
 -b &lt;BREX&gt;  
@@ -95,7 +100,8 @@ Show version information.
 `.defaults` file
 ----------------
 
-Refer to s1kd-newdm(1) for information on the `.defaults` file which is used by all the s1kd-new\* commands.
+Refer to s1kd-newdm(1) for information on the `.defaults` file which is
+used by all the s1kd-new\* commands.
 
 EXAMPLE
 =======
