@@ -6,7 +6,7 @@ s1kd-refls - List references in CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refls [-aCcDEfGilNnPqrsuxh?] [-d <dir>] [<object>...]
+    s1kd-refls [-aCcDEfGilNnPqRrsuxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -21,7 +21,7 @@ OPTIONS
 =======
 
 -a  
-List all references, not attempting to match them to an actual filename.
+List all references, both matched and unmatched.
 
 -C, -D, -E, -G, -P  
 List references to comments, data modules, external publications, ICNs,
@@ -60,6 +60,9 @@ source file after its filename.
 
 -q  
 Quiet mode. Errors are not printed.
+
+-R  
+List references in matched objects recursively.
 
 -r  
 Search for matches to references in directories recursively.

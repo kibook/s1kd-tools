@@ -13,11 +13,14 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.11.2"
+#define VERSION "1.12.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_OUT_OF_MEMORY "Too many files in recursive listing.\n"
+
+#define EXIT_OUT_OF_MEMORY 1
 
 /* List only references found in the content section. */
 bool contentOnly = false;
@@ -37,6 +40,15 @@ char *directory;
 bool fullMatch = true;
 /* Include the source object as a reference. */
 bool listSrc = false;
+/* List references in matched objects recursively. */
+bool listRecursively = false;
+
+/* When listing references recursively, keep track of files which have already 
+ * been listed to avoid loops.
+ */
+char (*listedFiles)[PATH_MAX] = NULL;
+int numListedFiles = 0;
+long unsigned maxListedFiles = 1;
 
 /* Possible objects to list references to. */
 #define SHOW_COM 0x01 /* Comments */
@@ -609,6 +621,8 @@ bool getFileName(char *dst, char *code, char *path)
 	return found;
 }
 
+void listReferences(const char *path);
+
 /* Print a reference found in an object. */
 void printReference(xmlNodePtr ref, const char *src)
 {
@@ -643,19 +657,43 @@ void printReference(xmlNodePtr ref, const char *src)
 	else
 		return;
 
-	if (showUnmatched) {
-		if (showMatched) {
-			printMatchedFn(ref, src, code);
-		} else if (!getFileName(fname, code, directory)) {
-			printMatchedFn(ref, src, code);
-		}
-	} else if (getFileName(fname, code, directory)) {
+	if (getFileName(fname, code, directory)) {
 		if (showMatched) {
 			printMatchedFn(ref, src, fname);
 		}
+		if (listRecursively) {
+			listReferences(fname);
+		}
+	} else if (showUnmatched) {
+		printMatchedFn(ref, src, code);
 	} else if (!quiet) {
 		printUnmatchedFn(ref, src, code);
 	}
+}
+
+/* Check if a file has already been listed when listing recursively. */
+bool listedFile(const char *path)
+{
+	int i;
+	for (i = 0; i < numListedFiles; ++i) {
+		if (strcmp(listedFiles[i], path) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/* Add a file to the list of files already checked. */
+void addFile(const char *path)
+{
+	if (!listedFiles || numListedFiles == maxListedFiles) {
+		if (!(listedFiles = realloc(listedFiles, (maxListedFiles *= 2) * PATH_MAX))) {
+			fprintf(stderr, E_OUT_OF_MEMORY);
+			exit(EXIT_OUT_OF_MEMORY);
+		}
+	}
+
+	strcpy(listedFiles[numListedFiles++], path);
 }
 
 /* List all references in the given object. */
@@ -665,11 +703,21 @@ void listReferences(const char *path)
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
+	if (listRecursively) {
+		if (listedFile(path)) {
+			return;
+		}
+
+		addFile(path);
+	}
+
 	if (listSrc) {
 		printMatched(NULL, path, path);
 	}
 
-	doc = xmlReadFile(path, NULL, PARSE_OPTS);
+	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		return;
+	}
 
 	ctx = xmlXPathNewContext(doc);
 
@@ -738,7 +786,8 @@ void showHelp(void)
 	puts("  -n         Show line number of reference with source filename.");
 	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
-	puts("  -r         Search recursively for matches.");
+	puts("  -R         List references in matched objects recursively.");
+	puts("  -r         Search for matches in directories recursively.");
 	puts("  -s         Include the source object as a reference.");
 	puts("  -u         Show only unmatched references.");
 	puts("  -x         Output XML report.");
@@ -763,7 +812,7 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 
-	const char *sopts = "qcNafluCDGPrd:inExsh?";
+	const char *sopts = "qcNafluCDGPRrd:inExsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -812,6 +861,9 @@ int main(int argc, char **argv)
 				break;
 			case 'P':
 				showObjects |= SHOW_PMC;
+				break;
+			case 'R':
+				listRecursively = true;
 				break;
 			case 'r':
 				recursive = true;

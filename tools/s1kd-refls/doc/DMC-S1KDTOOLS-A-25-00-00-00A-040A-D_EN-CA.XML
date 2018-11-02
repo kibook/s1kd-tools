@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="26"/>
+        <issueDate year="2018" month="11" day="02"/>
         <dmTitle>
           <techName>s1kd-refls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -s option.</simplePara>
+        <simplePara>Add -R option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
+        <simplePara>Improve description of -a option behaviour.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">s1kd-refls [-aCcDEfGilNnPqrsuxh?] [-d &lt;dir&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refls [-aCcDEfGilNnPqRrsuxh?] [-d <dir>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -66,7 +69,7 @@
             <definitionListItem>
               <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
-                <para>List all references, not attempting to match them to an actual filename.</para>
+                <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -129,13 +132,19 @@
                 <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-R</listItemTerm>
+              <listItemDefinition>
+                <para>List references in matched objects recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
                 <para>Search for matches to references in directories recursively.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-s</listItemTerm>
               <listItemDefinition>
                 <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
