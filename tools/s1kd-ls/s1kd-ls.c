@@ -23,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.3.3"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -129,26 +129,27 @@ int isicn(const char *name)
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPrwX] [<object>|<dir> ...]");
+	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPRrwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -0         Output null-delimited list");
-	puts("  -C         List comments");
-	puts("  -D         List data modules");
-	puts("  -G         List ICN files");
-	puts("  -I         Show only inwork issues");
-	puts("  -i         Show only official issues");
-	puts("  -L         List DMLs");
-	puts("  -l         Show only latest official/inwork issue");
-	puts("  -M         List ICN metadata files");
-	puts("  -N         Assume issue/inwork numbers are omitted");
-	puts("  -o         Show only old official/inwork issues");
-	puts("  -P         List publication modules");
-	puts("  -r         Recursively search directories");
-	puts("  -w         Show only writable object files");
-	puts("  -X         List DDNs");
-	puts("  -h -?      Show this help message");
-	puts("  --version  Show version information");
+	puts("  -0         Output null-delimited list.");
+	puts("  -C         List comments.");
+	puts("  -D         List data modules.");
+	puts("  -G         List ICN files.");
+	puts("  -I         Show only inwork issues.");
+	puts("  -i         Show only official issues.");
+	puts("  -L         List DMLs.");
+	puts("  -l         Show only latest official/inwork issue.");
+	puts("  -M         List ICN metadata files.");
+	puts("  -N         Assume issue/inwork numbers are omitted.");
+	puts("  -o         Show only old official/inwork issues.");
+	puts("  -P         List publication modules.");
+	puts("  -R         Show only non-writable object files.");
+	puts("  -r         Recursively search directories.");
+	puts("  -w         Show only writable object files.");
+	puts("  -X         List DDNs.");
+	puts("  -h -?      Show this help message.");
+	puts("  --version  Show version information.");
 }
 
 /* Show version information. */
@@ -175,7 +176,7 @@ void resize(char (**list)[PATH_MAX], unsigned *max)
 }
 
 /* Find CSDB objects in a given directory. */
-void list_dir(const char *path, int only_writable, int recursive)
+void list_dir(const char *path, int only_writable, int only_readonly, int recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -199,11 +200,13 @@ void list_dir(const char *path, int only_writable, int recursive)
 		strcpy(cpath, fpath);
 		strcat(cpath, cur->d_name);
 
-		if (access(cpath, R_OK) != 0)
+		if (access(cpath, R_OK) != 0) {
 			continue;
-		else if (only_writable && access(cur->d_name, W_OK) != 0)
+		} else if (only_writable && access(cpath, W_OK) != 0) {
 			continue;
-		else if (dms && isdm(cur->d_name)) {
+		} else if (only_readonly && access(cpath, W_OK) == 0) {
+			continue;
+		} else if (dms && isdm(cur->d_name)) {
 			if (ndms == DM_MAX) {
 				resize(&dms, &DM_MAX);
 			}
@@ -239,7 +242,7 @@ void list_dir(const char *path, int only_writable, int recursive)
 			}
 			strcpy(dmls[(ndmls)++], cpath);
 		} else if (recursive && isdir(cpath, recursive)) {
-			list_dir(cpath, only_writable, recursive);
+			list_dir(cpath, only_writable, only_readonly, recursive);
 		}
 	}
 
@@ -420,6 +423,7 @@ int main(int argc, char **argv)
 	int only_latest = 0;
 	int only_official_issue = 0;
 	int only_writable = 0;
+	int only_readonly = 0;
 	int only_old = 0;
 	int only_inwork = 0;
 	int recursive = 0;
@@ -427,7 +431,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPrwXoINh?";
+	const char *sopts = "0CDGiLlMPRrwXoINh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -451,6 +455,7 @@ int main(int argc, char **argv)
 			case 'l': only_latest = 1; break;
 			case 'M': show |= SHOW_IMF; break;
 			case 'P': show |= SHOW_PM; break;
+			case 'R': only_readonly = 1; break;
 			case 'r': recursive = 1; break;
 			case 'w': only_writable = 1; break;
 			case 'X': show |= SHOW_DDN; break;
@@ -495,13 +500,13 @@ int main(int argc, char **argv)
 			strcpy(path, argv[i]);
 			base = basename(path);
 
-			if (access(argv[i], R_OK) != 0)
+			if (access(argv[i], R_OK) != 0) {
 				continue;
-
-			if (only_writable && access(argv[i], W_OK) != 0)
+			} else if (only_writable && access(argv[i], W_OK) != 0) {
 				continue;
-
-			if (dms && isdm(base)) {
+			} else if (only_readonly && access(argv[i], W_OK) == 0) {
+				continue;
+			} else if (dms && isdm(base)) {
 				if (ndms == DM_MAX) {
 					resize(&dms, &DM_MAX);
 				}
@@ -537,12 +542,12 @@ int main(int argc, char **argv)
 				}
 				strcpy(dmls[ndmls++], argv[i]);
 			} else if (isdir(argv[i], 0)) {
-				list_dir(argv[i], only_writable, recursive);
+				list_dir(argv[i], only_writable, only_readonly, recursive);
 			}
 		}
 	} else {
 		/* Read dms to list from current directory */
-		list_dir(".", only_writable, recursive);
+		list_dir(".", only_writable, only_readonly, recursive);
 	}
 
 

@@ -6,14 +6,18 @@ s1kd-ls - List CSDB objects in a directory hierarchy
 SYNOPSIS
 ========
 
-    s1kd-ls [-0CDGIiLlMNoPrwX] [<object>|<dir> ...]
+    s1kd-ls [-0CDGIiLlMNoPRrwX] [<object>|<dir> ...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-ls* tool searches the current directory or specified directory trees and lists the file names of CSDB objects matching certain criteria.
+The *s1kd-ls* tool searches the current directory or specified directory
+trees and lists the file names of CSDB objects matching certain
+criteria.
 
-The files representing the CSDB objects must use either the standard S1000D file naming conventions, or the alternate naming convention supported by these tools using the -N option.
+The files representing the CSDB objects must use either the standard
+S1000D file naming conventions, or the alternate naming convention
+supported by these tools using the -N option.
 
 OPTIONS
 =======
@@ -22,7 +26,9 @@ OPTIONS
 Output a null-delimited list of CSDB object paths.
 
 -C, -D, -G, -L, -M, -P, -X  
-List comments, data modules, ICNs, data management lists, ICN metadata files, publication modules, and data dispatch notes respectively. If none are specified, -CDGLMPX is assumed.
+List comments, data modules, ICNs, data management lists, ICN metadata
+files, publication modules, and data dispatch notes respectively. If
+none are specified, -CDGLMPX is assumed.
 
 -h -?  
 Show the usage message.
@@ -37,10 +43,15 @@ Show only official issues of objects (inwork = 00).
 Show only the latest official/inwork issue of objects.
 
 -N  
-Assume that the files being listed do not include the issue info in their filenames, i.e. they were created using the -N option of the s1kd-new\* tools.
+Assume that the files being listed do not include the issue info in
+their filenames, i.e. they were created using the -N option of the
+s1kd-new\* tools.
 
 -o  
 Show only old official/inwork issues of objects.
+
+-R  
+Show only non-writable object files.
 
 -r  
 Recursively descend in to directories.
@@ -51,8 +62,10 @@ Show only writable object files.
 --version  
 Show version information.
 
-&lt;object&gt;|&lt;dir&gt; ...  
-An optional list of CSDB objects to list or directories to search for CSDB objects in. If none are specified, CSDB objects in the current directory are listed by default.
+&lt;object&gt;\|&lt;dir&gt; ...  
+An optional list of CSDB objects to list or directories to search for
+CSDB objects in. If none are specified, CSDB objects in the current
+directory are listed by default.
 
 EXAMPLE
 =======
