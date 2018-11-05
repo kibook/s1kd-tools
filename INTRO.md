@@ -127,6 +127,9 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     The **s1kd-syncrefs** tool generates the References table within
     data modules.
 
+    The **s1kd-uom** tool converts units of measure used in data
+    modules.
+
 SEE ALSO
 ========
 
@@ -189,6 +192,8 @@ Manpages for each tool:
 -   s1kd-syncrefs(1)
 
 -   s1kd-transform(1)
+
+-   s1kd-uom(1)
 
 -   s1kd-upissue(1)
 

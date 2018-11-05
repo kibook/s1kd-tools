@@ -22,6 +22,7 @@
 #define DEFAULT_INDEXFLAGS_FNAME ".indexflags"
 #define DEFAULT_BREXMAP_FNAME ".brexmap"
 #define DEFAULT_BRSL_FNAME ".brseveritylevels"
+#define DEFAULT_UOM_FNAME ".uom"
 
 char *real_path(const char *path, char *real);
 bool find_config(char *dst, const char *name);

@@ -47,5 +47,6 @@ Support is planned but not yet implemented.
 | s1kd-sns        | X   | X   | X   | \~  | \~  | \~  | \~  | \~  |
 | s1kd-syncrefs   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-transform  | X   | X   | X   | X   | X   | X   | X   | X   |
+| s1kd-uom        | X   | X   | X   | X   | X   | \~  | \~  | \~  |
 | s1kd-upissue    | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-validate   | X   | X   | X   | X   | X   | X   | X   | X   |
