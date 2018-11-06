@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="000" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2018" month="11" day="03"/>
@@ -58,7 +58,7 @@
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-uom</emphasis> tool converts between specified units of measure in quantity data in data, for example, to automatically localize units of measure in data modules.</para>
+        <para>The <emphasis>s1kd-uom</emphasis> tool converts between specified units of measure in quantity data, for example, to automatically localize units of measure in data modules.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -227,19 +227,19 @@
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<quantity>
 <quantityGroup>
-<quantityValue quantityUnitOfMeasure="in">5</quantityValue>
+<quantityValue quantityUnitOfMeasure="cm">15</quantityValue>
 </quantityGroup>
 </quantity>]]></verbatimText>
           </para>
           <para>Command:</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-uom -u in -t cm <DM>]]></verbatimText>
+            <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-uom -u cm -t in <DM>]]></verbatimText>
           </para>
           <para>Output:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<quantity>
 <quantityGroup>
-<quantityValue quantityUnitOfMeasure="cm">12.7</quantityValue>
+<quantityValue quantityUnitOfMeasure="in">5.91</quantityValue>
 </quantityGroup>
 </quantity>]]></verbatimText>
           </para>
@@ -250,17 +250,17 @@
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<quantity
 quantityType="qty02"
-quantityTypeSpecifics="USD">10</quantity>]]></verbatimText>
+quantityTypeSpecifics="CAD">10.00</quantity>]]></verbatimText>
           </para>
           <para>Command:</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-uom -u USD -t CAD -e '$value * 1.31' -F '0.00']]></verbatimText>
+            <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-uom -u CAD -t USD -e '$value div 1.31' -F '0.00']]></verbatimText>
           </para>
           <para>Output:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<quantity
 quantityType="qty02"
-quantityTypeSpecifics="CAD">13.10</quantity>]]></verbatimText>
+quantityTypeSpecifics="USD">7.36</quantity>]]></verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

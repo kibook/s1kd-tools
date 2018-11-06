@@ -16,8 +16,8 @@ s1kd\-uom\ [\-F\ <fmt>]\ [\-u\ <uom>\ \-t\ <uom>\ [\-e\ <expr>]\ [\-F\ <fmt>]\ .
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-uom\f[] tool converts between specified units of measure
-in quantity data in data, for example, to automatically localize units
-of measure in data modules.
+in quantity data, for example, to automatically localize units of
+measure in data modules.
 .SH OPTIONS
 .TP
 .B \-e <expr>
@@ -179,7 +179,7 @@ Input:
 \f[C]
 <quantity>
 <quantityGroup>
-<quantityValue\ quantityUnitOfMeasure="in">5</quantityValue>
+<quantityValue\ quantityUnitOfMeasure="cm">15</quantityValue>
 </quantityGroup>
 </quantity>
 \f[]
@@ -189,7 +189,7 @@ Command:
 .IP
 .nf
 \f[C]
-$\ s1kd\-uom\ \-u\ in\ \-t\ cm\ <DM>
+$\ s1kd\-uom\ \-u\ cm\ \-t\ in\ <DM>
 \f[]
 .fi
 .PP
@@ -199,7 +199,7 @@ Output:
 \f[C]
 <quantity>
 <quantityGroup>
-<quantityValue\ quantityUnitOfMeasure="cm">12.7</quantityValue>
+<quantityValue\ quantityUnitOfMeasure="in">5.91</quantityValue>
 </quantityGroup>
 </quantity>
 \f[]
@@ -212,7 +212,7 @@ Input:
 \f[C]
 <quantity
 quantityType="qty02"
-quantityTypeSpecifics="USD">10</quantity>
+quantityTypeSpecifics="CAD">10.00</quantity>
 \f[]
 .fi
 .PP
@@ -220,7 +220,7 @@ Command:
 .IP
 .nf
 \f[C]
-$\ s1kd\-uom\ \-u\ USD\ \-t\ CAD\ \-e\ \[aq]$value\ *\ 1.31\[aq]\ \-F\ \[aq]0.00\[aq]
+$\ s1kd\-uom\ \-u\ CAD\ \-t\ USD\ \-e\ \[aq]$value\ div\ 1.31\[aq]\ \-F\ \[aq]0.00\[aq]
 \f[]
 .fi
 .PP
@@ -230,7 +230,7 @@ Output:
 \f[C]
 <quantity
 quantityType="qty02"
-quantityTypeSpecifics="CAD">13.10</quantity>
+quantityTypeSpecifics="USD">7.36</quantity>
 \f[]
 .fi
 .SH UOM FILE SCHEMA

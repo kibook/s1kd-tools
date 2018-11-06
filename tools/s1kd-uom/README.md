@@ -13,8 +13,8 @@ DESCRIPTION
 ===========
 
 The *s1kd-uom* tool converts between specified units of measure in
-quantity data in data, for example, to automatically localize units of
-measure in data modules.
+quantity data, for example, to automatically localize units of measure
+in data modules.
 
 OPTIONS
 =======
@@ -136,19 +136,19 @@ Input:
 
     <quantity>
     <quantityGroup>
-    <quantityValue quantityUnitOfMeasure="in">5</quantityValue>
+    <quantityValue quantityUnitOfMeasure="cm">15</quantityValue>
     </quantityGroup>
     </quantity>
 
 Command:
 
-    $ s1kd-uom -u in -t cm <DM>
+    $ s1kd-uom -u cm -t in <DM>
 
 Output:
 
     <quantity>
     <quantityGroup>
-    <quantityValue quantityUnitOfMeasure="cm">12.7</quantityValue>
+    <quantityValue quantityUnitOfMeasure="in">5.91</quantityValue>
     </quantityGroup>
     </quantity>
 
@@ -159,17 +159,17 @@ Input:
 
     <quantity
     quantityType="qty02"
-    quantityTypeSpecifics="USD">10</quantity>
+    quantityTypeSpecifics="CAD">10.00</quantity>
 
 Command:
 
-    $ s1kd-uom -u USD -t CAD -e '$value * 1.31' -F '0.00'
+    $ s1kd-uom -u CAD -t USD -e '$value div 1.31' -F '0.00'
 
 Output:
 
     <quantity
     quantityType="qty02"
-    quantityTypeSpecifics="CAD">13.10</quantity>
+    quantityTypeSpecifics="USD">7.36</quantity>
 
 UOM FILE SCHEMA
 ===============
