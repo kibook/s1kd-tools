@@ -52,7 +52,7 @@
       <levelledPara>
         <title>What is S1000D?</title>
         <para>S1000D is "an international specification for the procurement and production of technical publications". It combines common, international standards and best practices for writing and managing documentation into a single, open specification.</para>
-        <para>The "S" stands for "specification", and the "D" for "documentation". The "1000" is inspired partly from S1000D's predecessor, ATA100. But while ATA100 was developed specifically for technical publications in the aerospace industry, S1000D takes many of the same ideas and generalizes them for any kind of publication.</para>
+        <para>The "S" stands for "specification", and the "D" for "documentation". The "1000" is based on S1000D's predecessor, ATA Spec 100. But while ATA100 was developed specifically for technical publications in the aerospace industry, S1000D takes many of the same ideas and generalizes them for any kind of publication.</para>
         <para>S1000D breaks from many of the traditional concepts of publications. These typically divide content in to "chapters", "sections", "subsections", etc. An S1000D publication, on the other hand, is topic-based and consists of units of information called <emphasis>data modules</emphasis>, which are stored in a Common Source Database (CSDB).</para>
       </levelledPara>
       <levelledPara>
