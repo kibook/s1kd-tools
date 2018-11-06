@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -51,11 +51,11 @@ void show_version(void)
 }
 
 /* Select specified UOM to convert. */
-void select_uoms(xmlDocPtr uom, xmlNodePtr conversions)
+void select_uoms(xmlNodePtr uom, xmlNodePtr conversions)
 {
 	xmlNodePtr cur;
 
-	cur = xmlDocGetRootElement(uom)->children;
+	cur = uom->children;
 
 	while (cur) {
 		xmlNodePtr next;
@@ -72,11 +72,11 @@ void select_uoms(xmlDocPtr uom, xmlNodePtr conversions)
 
 			c = conversions->children;
 			while (c) {
-				xmlNodePtr next;
+				xmlNodePtr n;
 				xmlChar *convert_from, *convert_to, *formula, *format;
 				bool m;
 
-				next = c->next;
+				n = c->next;
 
 				convert_from = xmlGetProp(c, BAD_CAST "from");
 				convert_to   = xmlGetProp(c, BAD_CAST "to");
@@ -87,7 +87,9 @@ void select_uoms(xmlDocPtr uom, xmlNodePtr conversions)
 					convert_to = xmlStrdup(convert_from);
 				}
 
-				m = convert_from && xmlStrcmp(uom_from, convert_from) == 0 && xmlStrcmp(uom_to, convert_to) == 0;
+				m = convert_from &&
+				    xmlStrcmp(uom_from, convert_from) == 0 &&
+				    xmlStrcmp(uom_to, convert_to) == 0;
 				
 				xmlFree(convert_from);
 				xmlFree(convert_to);
@@ -107,7 +109,7 @@ void select_uoms(xmlDocPtr uom, xmlNodePtr conversions)
 					break;
 				}
 
-				c = next;
+				c = n;
 			}
 
 			xmlFree(uom_from);
@@ -132,7 +134,7 @@ void select_uoms(xmlDocPtr uom, xmlNodePtr conversions)
 		next = cur->next;
 
 		if (xmlHasProp(cur, BAD_CAST "formula")) {
-			xmlAddChild(xmlDocGetRootElement(uom), xmlCopyNode(cur, 1));
+			xmlAddChild(uom, xmlCopyNode(cur, 1));
 		} else {
 			xmlChar *from, *to;
 
@@ -335,7 +337,7 @@ int main(int argc, char **argv)
 	}
 
 	if (conversions->children) {
-		select_uoms(uom, conversions);
+		select_uoms(xmlDocGetRootElement(uom), conversions);
 	}
 
 	if (dump_uom) {
