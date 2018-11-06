@@ -20,7 +20,7 @@ OPTIONS
 =======
 
 -e &lt;expr&gt;  
-Specify the formula for a conversion.
+Specify the formula for a conversion, given as an XPath expression.
 
 -F &lt;fmt&gt;  
 Specify the format for quantity values. When used before -u, this
@@ -85,35 +85,8 @@ To select only certain common rules when generating a `.uom` file, the
 This will generate a `.uom` file containing rules to convert inches to
 centimetres, and degrees Fahrenheit to degrees Celsius.
 
-Conversion formulas (-e)
-------------------------
-
-Formulas for conversions are XPath expressions. XPath supports the
-following common math operators and functions:
-
-+  
-Addition
-
--  
-Subtraction
-
-\*  
-Multiplication
-
-div  
-Division
-
-mod  
-Modulus
-
-floor(x)  
-Returns the largest integer value not greater than x
-
-ceiling(x)  
-Returns the smallest integer value not less than x
-
-round(x)  
-Returns the integer value closest to x
+Conversion formula variables (-e)
+---------------------------------
 
 When specifying a formula for conversion, the variable `$value`
 represents the original quantity value. For example, the formula to

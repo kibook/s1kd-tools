@@ -21,7 +21,7 @@ measure in data modules.
 .SH OPTIONS
 .TP
 .B \-e <expr>
-Specify the formula for a conversion.
+Specify the formula for a conversion, given as an XPath expression.
 .RS
 .RE
 .TP
@@ -115,50 +115,7 @@ $\ s1kd\-uom\ \-,\ \-u\ in\ \-t\ cm\ \-u\ degF\ \-t\ degC\ >\ .uom
 .PP
 This will generate a \f[C]\&.uom\f[] file containing rules to convert
 inches to centimetres, and degrees Fahrenheit to degrees Celsius.
-.SS Conversion formulas (\-e)
-.PP
-Formulas for conversions are XPath expressions.
-XPath supports the following common math operators and functions:
-.TP
-.B +
-Addition
-.RS
-.RE
-.TP
-.B \-
-Subtraction
-.RS
-.RE
-.TP
-.B *
-Multiplication
-.RS
-.RE
-.TP
-.B div
-Division
-.RS
-.RE
-.TP
-.B mod
-Modulus
-.RS
-.RE
-.TP
-.B floor(x)
-Returns the largest integer value not greater than x
-.RS
-.RE
-.TP
-.B ceiling(x)
-Returns the smallest integer value not less than x
-.RS
-.RE
-.TP
-.B round(x)
-Returns the integer value closest to x
-.RS
-.RE
+.SS Conversion formula variables (\-e)
 .PP
 When specifying a formula for conversion, the variable \f[C]$value\f[]
 represents the original quantity value.

@@ -67,7 +67,7 @@
             <definitionListItem>
               <listItemTerm>-e &lt;expr&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify the formula for a conversion.</para>
+                <para>Specify the formula for a conversion, given as an XPath expression.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -149,60 +149,7 @@
           <para>This will generate a <verbatimText verbatimStyle="vs02">.uom</verbatimText> file containing rules to convert inches to centimetres, and degrees Fahrenheit to degrees Celsius.</para>
         </levelledPara>
         <levelledPara>
-          <title>Conversion formulas (-e)</title>
-          <para>Formulas for conversions are XPath expressions. XPath supports the following common math operators and functions:</para>
-          <para>
-            <definitionList>
-              <definitionListItem>
-                <listItemTerm>+</listItemTerm>
-                <listItemDefinition>
-                  <para>Addition</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>-</listItemTerm>
-                <listItemDefinition>
-                  <para>Subtraction</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>*</listItemTerm>
-                <listItemDefinition>
-                  <para>Multiplication</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>div</listItemTerm>
-                <listItemDefinition>
-                  <para>Division</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>mod</listItemTerm>
-                <listItemDefinition>
-                  <para>Modulus</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>floor(x)</listItemTerm>
-                <listItemDefinition>
-                  <para>Returns the largest integer value not greater than x</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>ceiling(x)</listItemTerm>
-                <listItemDefinition>
-                  <para>Returns the smallest integer value not less than x</para>
-                </listItemDefinition>
-              </definitionListItem>
-              <definitionListItem>
-                <listItemTerm>round(x)</listItemTerm>
-                <listItemDefinition>
-                  <para>Returns the integer value closest to x</para>
-                </listItemDefinition>
-              </definitionListItem>
-            </definitionList>
-          </para>
+          <title>Conversion formula variables (-e)</title>
           <para>When specifying a formula for conversion, the variable <verbatimText>$value</verbatimText> represents the original quantity value. For example, the formula to convert between degrees Fahrenheit and degrees Celsius can be given as follows:</para>
           <para>
             <verbatimText verbatimStyle="vs14">($value - 32) * (5 div 9)</verbatimText>
