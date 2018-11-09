@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -605,6 +605,7 @@ int main(int argc, char **argv)
 			xmlDocPtr doc;
 			doc = xmlReadFile(pm_fname, NULL, PARSE_OPTS);
 			xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+			xmlFreeDoc(doc);
 		}
 	} else if (!content) {
 		fprintf(stderr, E_BAD_PM, pm_fname);
@@ -637,6 +638,7 @@ int main(int argc, char **argv)
 				xmlDocPtr doc;
 				doc = xmlReadFile(argv[i], NULL, PARSE_OPTS);
 				xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+				xmlFreeDoc(doc);
 			}
 		}
 	}
