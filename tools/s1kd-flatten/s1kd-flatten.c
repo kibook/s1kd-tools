@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.0.1"
+#define VERSION "2.1.0"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -55,7 +55,7 @@ void show_help(void)
 	puts("  -f         Overwrite publication module.");
 	puts("  -I <path>  Search <path> for referenced objects.");
 	puts("  -N         Assume issue/inwork numbers are omitted.");
-	puts("  -p         Output a 'publication' XML file.");
+	puts("  -p         Output a simple, flat XML file.");
 	puts("  -R         Recursively flatten referenced PMs.");
 	puts("  -r         Search directories recursively.");
 	puts("  -x         Use XInclude references.");
@@ -563,7 +563,7 @@ int main(int argc, char **argv)
 			case 'f': overwrite = 1; break;
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
-			case 'p': use_pub_fmt = 1; xinclude = 1; break;
+			case 'p': use_pub_fmt = 1; break;
 			case 'R': recursive = 1; break;
 			case 'r': recursive_search = 1; break;
 			case 'I': xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST optarg); break;
@@ -592,14 +592,20 @@ int main(int argc, char **argv)
 	content = find_child(pm, "content");
 
 	if (use_pub_fmt) {
-		xmlNodePtr xi;
-
 		pub_doc = xmlNewDoc(BAD_CAST "1.0");
 		pub = xmlNewNode(NULL, BAD_CAST "publication");
 		xmlDocSetRootElement(pub_doc, pub);
-		xmlSetProp(pub, BAD_CAST "xmlns:xi", BAD_CAST "http://www.w3.org/2001/XInclude");
-		xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
-		xmlSetProp(xi, BAD_CAST "href", BAD_CAST pm_fname);
+
+		if (xinclude) {
+			xmlNodePtr xi;
+			xmlSetProp(pub, BAD_CAST "xmlns:xi", BAD_CAST "http://www.w3.org/2001/XInclude");
+			xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
+			xmlSetProp(xi, BAD_CAST "href", BAD_CAST pm_fname);
+		} else {
+			xmlDocPtr doc;
+			doc = xmlReadFile(pm_fname, NULL, PARSE_OPTS);
+			xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+		}
 	} else if (!content) {
 		fprintf(stderr, E_BAD_PM, pm_fname);
 		exit(EXIT_BAD_PM);
@@ -623,10 +629,15 @@ int main(int argc, char **argv)
 		int i;
 
 		for (i = optind + 1; i < argc; ++i) {
-			xmlNodePtr xi;
-
-			xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
-			xmlSetProp(xi, BAD_CAST "href", BAD_CAST argv[i]);
+			if (xinclude) {
+				xmlNodePtr xi;
+				xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
+				xmlSetProp(xi, BAD_CAST "href", BAD_CAST argv[i]);
+			} else {
+				xmlDocPtr doc;
+				doc = xmlReadFile(argv[i], NULL, PARSE_OPTS);
+				xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
+			}
 		}
 	}
 

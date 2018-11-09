@@ -49,9 +49,8 @@ include the issue info in their filenames, i.e. they were created using
 the -N option of the s1kd-new\* tools.
 
 -p  
-Instead of the "flat" PM format, use a "publication" XML format, where
-the root element `publication` contains XInclude references to the
-publication module and the referenced data modules.
+Instead of the hierarchical PM-based format, use a simpler "flat"
+format.
 
 -R  
 Recursively flatten referenced publication modules, copying their
