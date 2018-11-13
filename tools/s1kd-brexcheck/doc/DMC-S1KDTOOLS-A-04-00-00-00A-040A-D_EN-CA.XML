@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="023" inWork="00"/>
+        <issueInfo issueNumber="023" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="26"/>
+        <issueDate year="2018" month="11" day="13"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Change format of XML report.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
+        <simplePara>Markup attribute names/values consistently.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -175,7 +181,7 @@
         </para>
         <levelledPara>
           <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
-          <para>The attribute brSeverityLevel on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
+          <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">The attribute <verbatimText verbatimStyle="vs13">brSeverityLevel</verbatimText> on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
           <para>By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
@@ -185,7 +191,7 @@
 <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
 </brSeverityLevels>]]></verbatimText>
           </para>
-          <para>When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of "yes" (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is no, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
+          <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of <verbatimText verbatimStyle="vs14">"yes"</verbatimText> (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is <verbatimText verbatimStyle="vs14">"no"</verbatimText>, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
         </levelledPara>
         <levelledPara>
           <title>Normal, strict and unstrict SNS check (-S, -St, -Su)</title>
@@ -297,6 +303,27 @@ internalRef[1]):
       ATTRIBUTE internalRefId
         TEXT
           content=stp-0001]]></verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Example of XML report format for the above:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+<brexCheck>
+<document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML">
+<brex path="DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML">
+<error fail="yes">
+<objectPath allowedObjectFlag="0">...</objectPath>
+<objectUse>Only when the refernce target is a step can the value of
+attribute internalRefTargetType be irtt08
+(Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+<object line="52"
+xpath="/dmodule[1]/content[1]/description[1]/para[2]/internalRef[1]">
+<internalRef internalRefId="stp-0001"
+internalRefTargetType="irtt08"/>
+</object>
+</error>
+</brex>
+</document>
+</brexCheck>]]></verbatimText>
         </para>
       </levelledPara>
     </description>

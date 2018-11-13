@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "1.4.2"
+#define VERSION "2.0.0"
 
 #define E_PREFIX PROG_NAME ": ERROR: "
 #define F_PREFIX PROG_NAME ": FAILED: "
@@ -593,26 +593,26 @@ void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 }
 
 int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
-	const char *brexfname, xmlNodePtr brexCheck)
+	const char *brexfname, xmlNodePtr documentNode)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
-
-	xmlNodePtr objectPath, objectUse;
 	xmlChar *defaultBrSeverityLevel;
-
 	int i;
-
 	int nerr = 0;
-	
-	xmlNodePtr brexError;
+	xmlNodePtr brexNode, brexError;
+	char rpath[PATH_MAX];
 
 	context = xmlXPathNewContext(doc);
 	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
 
 	defaultBrSeverityLevel = xmlGetProp(firstXPathNode(brex_doc, NULL, "//brex"), BAD_CAST "defaultBrSeverityLevel");
 
+	brexNode = xmlNewChild(documentNode, NULL, BAD_CAST "brex", NULL);
+	xmlSetProp(brexNode, BAD_CAST "path", BAD_CAST real_path(brexfname, rpath));
+
 	for (i = 0; i < rules->nodeNr; ++i) {
+		xmlNodePtr objectPath, objectUse;
 		xmlChar *allowedObjectFlag, *path, *use;
 
 		objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
@@ -632,7 +632,6 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 		}
 
 		if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object)) {
-			char rpath[PATH_MAX];
 			xmlChar *severity;
 			xmlNodePtr err_path;
 
@@ -640,20 +639,18 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 				severity = xmlStrdup(defaultBrSeverityLevel);
 			}
 
-			brexError = xmlNewChild(brexCheck, NULL, BAD_CAST "brexError",
-				NULL);
-
-			xmlNewChild(brexError, NULL, BAD_CAST "document", BAD_CAST real_path(fname, rpath));
-			xmlNewChild(brexError, NULL, BAD_CAST "brex", BAD_CAST real_path(brexfname, rpath));
+			brexError = xmlNewChild(brexNode, NULL, BAD_CAST "error", NULL);
 
 			if (severity) {
-				xmlNewChild(brexError, NULL, BAD_CAST "severity", severity);
+				xmlSetProp(brexError, BAD_CAST "brSeverityLevel", severity);
 
 				if (brsl_fname) {
 					xmlChar *type = brsl_type(severity);
 					xmlNewChild(brexError, NULL, BAD_CAST "type", type);
 					xmlFree(type);
 				}
+			} else {
+				xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "yes");
 			}
 
 			err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
@@ -670,6 +667,8 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 			if (severity) {
 				if (is_failure(severity)) {
 					++nerr;
+				} else {
+					xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "no");
 				}
 			} else {
 				++nerr;
@@ -682,6 +681,10 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 		xmlFree(allowedObjectFlag);
 		xmlFree(path);
 		xmlFree(use);
+	}
+
+	if (!brexNode->children) {
+		xmlNewChild(brexNode, NULL, BAD_CAST "noErrors", NULL);
 	}
 
 	xmlFree(defaultBrSeverityLevel);
@@ -938,6 +941,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char brex_fnames[BREX_MAX][PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
 {
 	xmlDocPtr brex_doc;
+	xmlNodePtr documentNode;
 
 	int i;
 	int status;
@@ -947,6 +951,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 	char *schema;
 	char xpath[512];
+	char rpath[PATH_MAX];
 
 	schema = (char *) xmlGetProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation");
 	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema, schema);
@@ -959,6 +964,9 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck);
 		total += invalid_notations;
 	}
+
+	documentNode = xmlNewChild(brexCheck, NULL, BAD_CAST "document", NULL);
+	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST real_path(docname, rpath));
 
 	for (i = 0; i < num_brex_fnames; ++i) {
 		xmlXPathContextPtr context;
@@ -979,7 +987,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 		if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
 			status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
-				brex_fnames[i], brexCheck);
+				brex_fnames[i], documentNode);
 
 			if (verbose >= VERBOSE) {
 				fprintf(stderr, status || !valid_sns || invalid_notations ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
@@ -1002,29 +1010,23 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 void print_node(xmlNodePtr node)
 {
-
 	xmlNodePtr cur;
 
-	if (strcmp((char *) node->name, "brexError") == 0) {
-		printf("BREX ERROR: ");
+	if (strcmp((char *) node->name, "error") == 0) {
+		char *dpath = (char *) xmlGetProp(node->parent->parent, BAD_CAST "path");
+		char *bpath = (char *) xmlGetProp(node->parent, BAD_CAST "path");
+		if (shortmsg) {
+			printf("BREX ERROR: %s: ", dpath);
+		} else {
+			printf("BREX ERROR: %s\n", dpath);
+			printf("  BREX: %s\n", bpath);
+		}
+		xmlFree(dpath);
+		xmlFree(bpath);
 	} else if (strcmp((char *) node->name, "type") == 0 && !shortmsg) {
 		char *type = (char *) xmlNodeGetContent(node);
 		printf("  TYPE: %s\n", type);
 		xmlFree(type);
-	} else if (strcmp((char *) node->name, "brex") == 0 && !shortmsg) {
-		char *brex = (char *) xmlNodeGetContent(node);
-		if (strcmp(brex, "") != 0) {
-			printf("  BREX: %s\n", brex);
-		}
-		xmlFree(brex);
-	} else if (strcmp((char *) node->name, "document") == 0) {
-		char *doc = (char *) xmlNodeGetContent(node);
-		if (shortmsg) {
-			printf("%s: ", doc);
-		} else {
-			printf("%s\n", doc);
-		}
-		xmlFree(doc);
 	} else if (strcmp((char *) node->name, "objectUse") == 0) {
 		char *use = (char *) xmlNodeGetContent(node);
 		if (shortmsg) {
@@ -1094,7 +1096,7 @@ void print_node(xmlNodePtr node)
 		print_node(cur);
 	}
 
-	if (shortmsg && xmlStrcmp(node->name, BAD_CAST "brexError") == 0) {
+	if (shortmsg && xmlStrcmp(node->name, BAD_CAST "error") == 0) {
 		putchar('\n');
 	}
 }
@@ -1103,9 +1105,9 @@ void print_fnames(xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
-	if (xmlStrcmp(node->name, BAD_CAST "document") == 0) {
+	if (xmlStrcmp(node->name, BAD_CAST "document") == 0 && firstXPathNode(NULL, node, "brex/error")) {
 		xmlChar *fname;
-		fname = xmlNodeGetContent(node);
+		fname = xmlGetProp(node, BAD_CAST "path");
 		puts((char *) fname);
 		xmlFree(fname);
 	}
@@ -1430,10 +1432,6 @@ int main(int argc, char *argv[])
 	if (progress)
 		show_progress(i, num_dmod_fnames);
 
-	if (!brexCheck->children) {
-		xmlNewChild(brexCheck, NULL, BAD_CAST "noErrors", NULL);
-	}
-
 	if (!xmlout) {
 		if (verbose > SILENT) {
 			if (only_fnames) {
@@ -1443,7 +1441,7 @@ int main(int argc, char *argv[])
 			}
 		}
 	} else {
-		xmlSaveFormatFile("-", outdoc, 1);
+		xmlSaveFile("-", outdoc);
 	}
 
 	xmlFreeDoc(outdoc);

@@ -100,7 +100,7 @@ Show version information.
 Business rule severity levels (`.brseveritylevels`)
 ---------------------------------------------------
 
-The attribute brSeverityLevel on a BREX rule allows for distinguishing
+The attribute `brSeverityLevel` on a BREX rule allows for distinguishing
 different kinds of errors. The `.brseveritylevels` file contains a list
 of severity levels, their user-defined type, and optionally if they
 should not be counted as true errors (causing the tool to return a
@@ -118,10 +118,10 @@ An example of the format of this file is given below:
     <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
     </brSeverityLevels>
 
-When the attribute `fail` has a value of "yes" (or is not included),
+When the attribute `fail` has a value of `"yes"` (or is not included),
 BREX errors pertaining to rules with the given severity level value will
-be counted as errors. When it is no, the errors are still displayed but
-are not counted as errors in the exit status code of the tool.
+be counted as errors. When it is `"no"`, the errors are still displayed
+but are not counted as errors in the exit status code of the tool.
 
 Normal, strict and unstrict SNS check (-S, -St, -Su)
 ----------------------------------------------------
@@ -255,3 +255,24 @@ EXAMPLE
           ATTRIBUTE internalRefId
             TEXT
               content=stp-0001
+
+Example of XML report format for the above:
+
+    <?xml version="1.0"?>
+    <brexCheck>
+    <document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML">
+    <brex path="DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML">
+    <error fail="yes">
+    <objectPath allowedObjectFlag="0">...</objectPath>
+    <objectUse>Only when the refernce target is a step can the value of
+    attribute internalRefTargetType be irtt08
+    (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+    <object line="52"
+    xpath="/dmodule[1]/content[1]/description[1]/para[2]/internalRef[1]">
+    <internalRef internalRefId="stp-0001"
+    internalRefTargetType="irtt08"/>
+    </object>
+    </error>
+    </brex>
+    </document>
+    </brexCheck>
