@@ -9,14 +9,14 @@
     <xsl:variable name="manufacturerCodeValue" select="@manufacturerCodeValue"/>
     <xsl:variable name="itemOriginator" select="@itemOriginator"/>
     <xsl:variable name="functionalItemIdent" select="
-      //functionalItemIdent[
+      (//functionalItemIdent[
         $functionalItemNumber = @functionalItemNumber and
         (not($functionalItemType) or $functionalItemType = @functionalItemType) and
         (not($installationIdent) or $installationIdent = @installationIdent) and
         (not($contextIdent) or $contextIdent = @contextIdent) and
         (not($manufacturerCodeValue) or $manufacturerCodeValue = @manufacturerCodeValue) and
         (not($itemOriginator) or $itemOriginator = @itemOriginator)
-      ]"/>
+      ])[1]"/>
     <xsl:variable name="functionalItemSpec" select="$functionalItemIdent/parent::functionalItemSpec"/>
     <xsl:variable name="functionalItem" select="$functionalItemSpec/functionalItemAlts/functionalItem[1]"/>
     <functionalItemRef>

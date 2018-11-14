@@ -3,7 +3,7 @@
   
   <xsl:template match="accessPointRef">
     <xsl:variable name="accessPointNumber" select="@accessPointNumber"/>
-    <xsl:variable name="accessPointIdent" select="//accessPointIdent[@accessPointNumber = $accessPointNumber]"/>
+    <xsl:variable name="accessPointIdent" select="(//accessPointIdent[@accessPointNumber = $accessPointNumber])[1]"/>
     <xsl:variable name="accessPointSpec" select="$accessPointIdent/parent::accessPointSpec"/>
     <xsl:variable name="accessPoint" select="$accessPointSpec/accessPointAlts/accessPoint[1]"/>
     <accessPointRef>

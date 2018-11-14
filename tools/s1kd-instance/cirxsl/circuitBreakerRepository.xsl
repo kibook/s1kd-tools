@@ -3,7 +3,7 @@
   
   <xsl:template match="circuitBreakerRef">
     <xsl:variable name="circuitBreakerNumber" select="@circuitBreakerNumber"/>
-    <xsl:variable name="circuitBreakerIdent" select="//circuitBreakerIdent[@circuitBreakerNumber = $circuitBreakerNumber]"/>
+    <xsl:variable name="circuitBreakerIdent" select="(//circuitBreakerIdent[@circuitBreakerNumber = $circuitBreakerNumber])[1]"/>
     <xsl:variable name="circuitBreakerSpec" select="$circuitBreakerIdent/parent::circuitBreakerSpec"/>
     <circuitBreakerRef>
       <xsl:apply-templates select="@*"/>

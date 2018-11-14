@@ -6,11 +6,11 @@
     <xsl:variable name="eintype" select="@eintype"/>
     <xsl:variable name="mfc" select="@mfc"/>
     <xsl:variable name="einid" select="
-      //einid[
+      (//einid[
         $einnbr = @einnbr and
         (not($eintype) or $eintype = @eintype) and
         (not($mfc) or $mfc = @mfc)
-      ]"/>
+      ])[1]"/>
     <xsl:variable name="eininfo" select="$einid/parent::eininfo"/>
     <xsl:variable name="einalt" select="$eininfo/einalt[1]"/>
     <ein>

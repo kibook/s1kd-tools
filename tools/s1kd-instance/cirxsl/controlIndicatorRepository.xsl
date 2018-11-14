@@ -3,7 +3,7 @@
   
   <xsl:template match="controlIndicatorRef">
     <xsl:variable name="controlIndicatorNumber" select="@controlIndicatorNumber"/>
-    <xsl:variable name="controlIndicatorSpec" select="//controlIndicatorSpec[@controlIndicatorNumber = $controlIndicatorNumber]"/>
+    <xsl:variable name="controlIndicatorSpec" select="(//controlIndicatorSpec[@controlIndicatorNumber = $controlIndicatorNumber])[1]"/>
     <controlIndicatorRef>
       <xsl:apply-templates select="@*"/>
       <xsl:choose>

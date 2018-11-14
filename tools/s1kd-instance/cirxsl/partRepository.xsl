@@ -4,7 +4,7 @@
   <xsl:template match="spareDescr[partRef]">
     <xsl:variable name="partNumberValue" select="partRef/@partNumberValue"/>
     <xsl:variable name="manufacturerCodeValue" select="partRef/@manufacturerCodeValue"/>
-    <xsl:variable name="partIdent" select="//partIdent[@partNumberValue = $partNumberValue and @manufacturerCodeValue = $manufacturerCodeValue]"/>
+    <xsl:variable name="partIdent" select="(//partIdent[@partNumberValue = $partNumberValue and @manufacturerCodeValue = $manufacturerCodeValue])[1]"/>
     <xsl:variable name="partSpec" select="$partIdent/parent::partSpec"/>
     <spareDescr>
       <xsl:choose>

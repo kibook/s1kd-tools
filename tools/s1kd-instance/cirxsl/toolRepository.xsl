@@ -4,7 +4,7 @@
   <xsl:template match="supportEquipDescr[toolRef]">
     <xsl:variable name="toolNumber" select="toolRef/@toolNumber"/>
     <xsl:variable name="manufacturerCodeValue" select="toolRef/@manufacturerCodeValue"/>
-    <xsl:variable name="toolIdent" select="//toolIdent[@toolNumber = $toolNumber and (not($manufacturerCodeValue) or @manufacturerCodeValue = $manufacturerCodeValue)]"/>
+    <xsl:variable name="toolIdent" select="(//toolIdent[@toolNumber = $toolNumber and (not($manufacturerCodeValue) or @manufacturerCodeValue = $manufacturerCodeValue)])[1]"/>
     <xsl:variable name="toolSpec" select="$toolIdent/parent::toolSpec"/>
     <supportEquipDescr>
       <xsl:choose>

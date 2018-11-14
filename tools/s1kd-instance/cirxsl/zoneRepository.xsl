@@ -3,7 +3,7 @@
   
   <xsl:template match="zoneRef">
     <xsl:variable name="zoneNumber" select="@zoneNumber"/>
-    <xsl:variable name="zoneIdent" select="//zoneIdent[@zoneNumber = $zoneNumber]"/>
+    <xsl:variable name="zoneIdent" select="(//zoneIdent[@zoneNumber = $zoneNumber])[1]"/>
     <xsl:variable name="zoneSpec" select="$zoneIdent/parent::zoneSpec"/>
     <xsl:variable name="zone" select="$zoneSpec/zoneAlts/zone[1]"/>
     <zoneRef>

@@ -3,7 +3,7 @@
   
   <xsl:template match="responsiblePartnerCompany|originator">
     <xsl:variable name="enterpriseCode" select="@enterpriseCode"/>
-    <xsl:variable name="enterpriseIdent" select="//enterpriseIdent[@manufacturerCodeValue = $enterpriseCode]"/>
+    <xsl:variable name="enterpriseIdent" select="(//enterpriseIdent[@manufacturerCodeValue = $enterpriseCode])[1]"/>
     <xsl:variable name="enterpriseSpec" select="$enterpriseIdent/parent::enterpriseSpec"/>
     <xsl:copy>
       <xsl:choose>

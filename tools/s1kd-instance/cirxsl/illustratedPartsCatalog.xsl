@@ -16,7 +16,7 @@
     <xsl:variable name="itemLocationCode" select="catalogSeqNumberRef/@itemLocationCode"/>
     <xsl:variable name="dmCode" select="//dmodule[2]//dmCode[1]"/>
     <xsl:variable name="catalogSeqNumber" select="
-      //catalogSeqNumber[
+      (//catalogSeqNumber[
         (not($modelIdentCode) or
          $modelIdentCode = @modelIdentCode or
          $modelIdentCode = $dmCode/@modelIdentCode) and
@@ -41,7 +41,7 @@
          $figureNumberVariant = $dmCode/@disassyCodeVariant) and
         @item = $item and
         (not($itemVariant) or $itemVariant = @itemVariant)
-      ]"/>
+      ])[1]"/>
     <xsl:copy>
       <xsl:choose>
         <xsl:when test="$catalogSeqNumber">

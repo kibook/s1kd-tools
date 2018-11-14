@@ -4,7 +4,7 @@
   <xsl:template match="supplyDescr[supplyRef]">
     <xsl:variable name="supplyNumber" select="supplyRef/@supplyNumber"/>
     <xsl:variable name="supplyNumberType" select="supplyRef/@supplyNumberType"/>
-    <xsl:variable name="supplyIdent" select="//supplyIdent[@supplyNumber = $supplyNumber and @supplyNumberType = $supplyNumberType]"/>
+    <xsl:variable name="supplyIdent" select="(//supplyIdent[@supplyNumber = $supplyNumber and @supplyNumberType = $supplyNumberType])[1]"/>
     <xsl:variable name="supplySpec" select="$supplyIdent/parent::supplySpec"/>
     <supplyDescr>
       <xsl:choose>
