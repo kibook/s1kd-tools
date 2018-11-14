@@ -24,7 +24,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.1.0"
+#define VERSION "2.2.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -771,18 +771,17 @@ bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr c
 
 /* Check the SNS rules of BREX DMs against a CSDB object. */
 bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
-	const char *dmod_fname, xmlNodePtr brexCheck)
+	const char *dmod_fname, xmlNodePtr documentNode)
 {
 	xmlNodePtr dmcode;
 	xmlChar *systemCode, *subSystemCode, *subSubSystemCode, *assyCode;
 	char xpath[256];
 	xmlNodePtr ctx = NULL;
 	xmlNodePtr snsError;
-	char rpath[PATH_MAX];
 	char value[256];
 	int i;
 	xmlDocPtr snsRulesDoc;
-	xmlNodePtr snsRulesGroup;
+	xmlNodePtr snsRulesGroup, snsCheck;
 	bool correct = true;
 
 	/* Only check SNS in data modules. */
@@ -811,8 +810,8 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 	subSubSystemCode = xmlGetProp(dmcode, BAD_CAST "subSubSystemCode");
 	assyCode         = xmlGetProp(dmcode, BAD_CAST "assyCode");
 
-	snsError = xmlNewNode(NULL, BAD_CAST "snsError");
-	xmlNewChild(snsError, NULL, BAD_CAST "document", BAD_CAST real_path(dmod_fname, rpath));
+	snsCheck = xmlNewChild(documentNode, NULL, BAD_CAST "sns", NULL);
+	snsError = xmlNewNode(NULL, BAD_CAST "error");
 
 	/* Check the SNS of the data module against the SNS rules in descending order. */
 
@@ -822,7 +821,7 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", systemCode);
-			xmlAddChild(brexCheck, snsError);
+			xmlAddChild(snsCheck, snsError);
 			correct = false;
 		}
 	}
@@ -834,7 +833,7 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSystemCode");
 			sprintf(value, "%s-%s", systemCode, subSystemCode);
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
-			xmlAddChild(brexCheck, snsError);
+			xmlAddChild(snsCheck, snsError);
 			correct = false;
 		}
 	}
@@ -846,7 +845,7 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSubSystemCode");
 			sprintf(value, "%s-%s%s", systemCode, subSystemCode, subSubSystemCode);
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
-			xmlAddChild(brexCheck, snsError);
+			xmlAddChild(snsCheck, snsError);
 			correct = false;
 		}
 	}
@@ -858,13 +857,14 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "assyCode");
 			sprintf(value, "%s-%s%s-%s", systemCode, subSystemCode, subSubSystemCode, assyCode);
 			xmlNewChild(snsError, NULL, BAD_CAST "invalidValue", BAD_CAST value);
-			xmlAddChild(brexCheck, snsError);
+			xmlAddChild(snsCheck, snsError);
 			correct = false;
 		}
 	}
 
 	if (correct) {
 		xmlFreeNode(snsError);
+		xmlNewChild(snsCheck, NULL, BAD_CAST "noErrors", NULL);
 	}
 
 	xmlFree(systemCode);
@@ -878,7 +878,7 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 
 /* Check the notation used by an entity against the notation rules. */
 int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
-	xmlNodePtr brexCheck, const char *docname)
+	xmlNodePtr notationCheck, const char *docname)
 {	
 	char xpath[256];
 	xmlNodePtr rule;
@@ -893,8 +893,7 @@ int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 	sprintf(xpath, "(//notationRule[notationName='%s']|//notationRule)[1]", (char *) entity->content);
 	rule = firstXPathNode(notationRuleDoc, NULL, xpath);
 
-	notationError = xmlNewChild(brexCheck, NULL, BAD_CAST "notationError", NULL);
-	xmlNewChild(notationError, NULL, BAD_CAST "document", BAD_CAST docname);
+	notationError = xmlNewChild(notationCheck, NULL, BAD_CAST "error", NULL);
 	xmlNewChild(notationError, NULL, BAD_CAST "invalidNotation", entity->content);
 	xmlAddChild(notationError, xmlCopyNode(firstXPathNode(notationRuleDoc, rule, "objectUse"), 1));
 
@@ -903,13 +902,13 @@ int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 
 /* Check the notation rules of BREX DMs against a CSDB object. */
 int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
-	const char *dmod_fname, xmlNodePtr brexCheck)
+	const char *dmod_fname, xmlNodePtr documentNode)
 {
 	xmlDocPtr notationRuleDoc;
 	xmlNodePtr notationRuleGroup;
 	int i;
 	xmlDtdPtr dtd;
-	xmlNodePtr cur;
+	xmlNodePtr cur, notationCheck;
 	int invalid = 0;
 
 	if (!(dtd = dmod_doc->intSubset))
@@ -929,11 +928,17 @@ int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDoc
 		xmlFreeDoc(brex);
 	}
 
+	notationCheck = xmlNewChild(documentNode, NULL, BAD_CAST "notations", NULL);
+
 	for (cur = dtd->children; cur; cur = cur->next) {
 		if (cur->type == XML_ENTITY_DECL && ((xmlEntityPtr) cur)->etype == 3) {
 			invalid += check_entity((xmlEntityPtr) cur, notationRuleDoc,
-				brexCheck, dmod_fname);
+				notationCheck, dmod_fname);
 		}
+	}
+
+	if (!notationCheck->children) {
+		xmlNewChild(notationCheck, NULL, BAD_CAST "noErrors", NULL);
 	}
 
 	xmlFreeDoc(notationRuleDoc);
@@ -962,16 +967,16 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema, schema);
 	xmlFree(schema);
 
-	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck)))
+	documentNode = xmlNewChild(brexCheck, NULL, BAD_CAST "document", NULL);
+	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST real_path(docname, rpath));
+
+	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, documentNode)))
 		++total;
 
 	if (check_notation) {
-		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, docname, brexCheck);
+		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, docname, documentNode);
 		total += invalid_notations;
 	}
-
-	documentNode = xmlNewChild(brexCheck, NULL, BAD_CAST "document", NULL);
-	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST real_path(docname, rpath));
 
 	for (i = 0; i < num_brex_fnames; ++i) {
 		xmlXPathContextPtr context;
@@ -1021,11 +1026,25 @@ void print_node(xmlNodePtr node)
 	if (strcmp((char *) node->name, "error") == 0) {
 		char *dpath = (char *) xmlGetProp(node->parent->parent, BAD_CAST "path");
 		char *bpath = (char *) xmlGetProp(node->parent, BAD_CAST "path");
-		if (shortmsg) {
-			printf("BREX ERROR: %s: ", dpath);
+		if (xmlStrcmp(node->parent->name, BAD_CAST "sns") == 0) {
+			if (shortmsg) {
+				printf("SNS ERROR: %s: ", dpath);
+			} else {
+				printf("SNS ERROR: %s\n", dpath);
+			}
+		} else if (xmlStrcmp(node->parent->name, BAD_CAST "notations") == 0) {
+			if (shortmsg) {
+				printf("NOTATION ERROR: %s: ", dpath);
+			} else {
+				printf("NOTATION ERROR: %s\n", dpath);
+			}
 		} else {
-			printf("BREX ERROR: %s\n", dpath);
-			printf("  BREX: %s\n", bpath);
+			if (shortmsg) {
+				printf("BREX ERROR: %s: ", dpath);
+			} else {
+				printf("BREX ERROR: %s\n", dpath);
+				printf("  BREX: %s\n", bpath);
+			}
 		}
 		xmlFree(dpath);
 		xmlFree(bpath);
@@ -1083,10 +1102,12 @@ void print_node(xmlNodePtr node)
 		xmlFree(code);
 	} else if (strcmp((char *) node->name, "invalidValue") == 0) {
 		char *value = (char *) xmlNodeGetContent(node);
-		printf("%s\n", value);
+		if (shortmsg) {
+			printf("%s", value);
+		} else {
+			printf("%s\n", value);
+		}
 		xmlFree(value);
-	} else if (strcmp((char *) node->name, "notationError") == 0) {
-		printf("NOTATION ERROR: ");
 	} else if (strcmp((char *) node->name, "invalidNotation") == 0) {
 		char *value = (char *) xmlNodeGetContent(node);
 		if (!shortmsg) printf("  ");
