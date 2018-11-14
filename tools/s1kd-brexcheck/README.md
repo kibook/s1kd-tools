@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-                   [-BcDfLlpqSstuVvxh?] [<object>...]
+                   [-BcfLlpqS[tu]svxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -34,16 +34,6 @@ modules are specified, the BREX data module referenced in
 -c  
 When a context rule defines values for an object (objectValue), check if
 the value of each object is within the allowed set of values.
-
--D -q -v  
-Verbosity of the output:
-
--   -D - Debug mode gives the most amount of information.
-
--   -q - Quiet mode gives no output, errors are only indicated via the
-    return code.
-
--   -v - Verbose mode lists the overall success/failure of all checks.
 
 -f  
 Output only the filenames of CSDB objects with BREX/SNS errors.
@@ -79,6 +69,10 @@ rule is returned.
 -p  
 Display a progress bar.
 
+-q  
+Quiet mode. No output is given, errors are only indicated via the return
+code.
+
 -S\[tu\]  
 Check SNS (Standard Numbering System) rules. The SNS of each specified
 data module is checked against the combination of all SNS rules of all
@@ -87,6 +81,9 @@ specified BREX data modules.
 -s  
 Use shortened, single-line messages to report BREX errors instead of
 multiline indented messages.
+
+-v  
+Verbose mode. The success or failure of each test is printed explicitly.
 
 -w &lt;severities&gt;  
 Specify a list of severity levels for business rules.

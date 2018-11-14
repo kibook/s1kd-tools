@@ -44,6 +44,12 @@
       <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
         <simplePara>Markup attribute names/values consistently.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Remove -D option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateReasonType="urt01" updateHighlight="0">
+        <simplePara>Separate -q and -v option descriptions.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,8 +61,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-               [-BcDfLlpqSstuVvxh?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+               [-BcfLlpqS[tu]svxh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -83,25 +89,6 @@
               <listItemTerm>-c</listItemTerm>
               <listItemDefinition>
                 <para>When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-D -q -v</listItemTerm>
-              <listItemDefinition>
-                <para>Verbosity of the output:</para>
-                <para>
-                  <randomList>
-                    <listItem>
-                      <para>-D - Debug mode gives the most amount of information.</para>
-                    </listItem>
-                    <listItem>
-                      <para>-q - Quiet mode gives no output, errors are only indicated via the return code.</para>
-                    </listItem>
-                    <listItem>
-                      <para>-v - Verbose mode lists the overall success/failure of all checks.</para>
-                    </listItem>
-                  </randomList>
-                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -147,6 +134,12 @@
                 <para>Display a progress bar.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+              <listItemTerm>-q</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. No output is given, errors are only indicated via the return code.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-S[tu]</listItemTerm>
               <listItemDefinition>
@@ -157,6 +150,12 @@
               <listItemTerm>-s</listItemTerm>
               <listItemDefinition>
                 <para>Use shortened, single-line messages to report BREX errors instead of multiline indented messages.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose mode. The success or failure of each test is printed explicitly.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
