@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="26"/>
+        <issueDate year="2018" month="11" day="15"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Handle non-XML files with the -O option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Skip past existing files without -f instead of failing immediately.</simplePara>
+        <simplePara>Add -j option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -166,6 +163,12 @@
                 <para>Give the data module instance a different infoName.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-j</listItemTerm>
+              <listItemDefinition>
+                <para>After filtering, remove external entities (such as ICNs) which are no longer used from the resulting instances.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-K &lt;levels&gt;</listItemTerm>
               <listItemDefinition>
@@ -230,8 +233,8 @@
                 </para>
                 <para>If any of the above are not specified, the information is copied from the source object.</para>
                 <para>If &lt;dir&gt; does not exist, it will be created.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">If a file exists with the same name in the specified directory, a warning will be display and the file will not be overwritten, unless the -f option is specified.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.</para>
+                <para>If a file exists with the same name in the specified directory, a warning will be display and the file will not be overwritten, unless the -f option is specified.</para>
+                <para>When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

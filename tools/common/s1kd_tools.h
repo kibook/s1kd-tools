@@ -29,5 +29,6 @@ bool find_config(char *dst, const char *name);
 xmlChar *xpath_of(xmlNodePtr node);
 int copy(const char *from, const char *to);
 bool isdir(const char *path, bool recursive);
+void xmlFreeEntity(xmlEntityPtr entity);
 
 #endif

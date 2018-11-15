@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.11.4"
+#define VERSION "1.12.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -191,7 +191,7 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -219,7 +219,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *path)
 	return first;
 }
 
-xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *path)
+xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	return xmlNodeGetContent(first_xpath_node(doc, node, path));
 }
@@ -242,7 +242,7 @@ void uppercase(char *s)
 
 /* Copy strings related to uniquely identifying a CSDB object. The strings are
  * dynamically allocated so they must be freed using free_ident. */
-#define IDENT_XPATH \
+#define IDENT_XPATH BAD_CAST \
 	"//dmIdent|//dmaddres|" \
 	"//pmIdent|//pmaddres|" \
 	"//dmlIdent|//dml[dmlc]|" \
@@ -250,11 +250,11 @@ void uppercase(char *s)
 	"//ddnIdent|//ddn|" \
 	"//imfIdent|" \
 	"//updateIdent"
-#define EXTENSION_XPATH \
+#define EXTENSION_XPATH BAD_CAST \
 	"//dmIdent/identExtension|//dmaddres/dmcextension|" \
 	"//pmIdent/identExtension|" \
 	"//updateIdent/identExtension"
-#define CODE_XPATH \
+#define CODE_XPATH BAD_CAST \
 	"//dmIdent/dmCode|//dmaddres/dmc/avee|" \
 	"//pmIdent/pmCode|//pmaddres/pmc|" \
 	"//dmlIdent/dmlCode|//dml/dmlc|" \
@@ -262,12 +262,12 @@ void uppercase(char *s)
 	"//ddnIdent/ddnCode|//ddn/ddnc|" \
 	"//imfIdent/imfCode|" \
 	"//updateIdent/updateCode"
-#define LANGUAGE_XPATH \
+#define LANGUAGE_XPATH BAD_CAST \
 	"//dmIdent/language|//dmaddres/language|" \
 	"//pmIdent/language|//pmaddres/language|" \
 	"//commentIdent/language|//cstatus/language|" \
 	"//updateIdent/language"
-#define ISSUE_INFO_XPATH \
+#define ISSUE_INFO_XPATH BAD_CAST \
 	"//dmIdent/issueInfo|//dmaddres/issno|" \
 	"//pmIdent/issueInfo|//pmaddres/issno|" \
 	"//dmlIdent/issueInfo|//dml/issno|" \
@@ -649,9 +649,9 @@ bool eval_assert(xmlNodePtr assert, bool assume)
 
 	bool ret;
 
-	ident_attr  = first_xpath_node(NULL, assert, "@applicPropertyIdent|@actidref");
-	type_attr   = first_xpath_node(NULL, assert, "@applicPropertyType|@actreftype");
-	values_attr = first_xpath_node(NULL, assert, "@applicPropertyValues|@actvalues");
+	ident_attr  = first_xpath_node(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	type_attr   = first_xpath_node(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	values_attr = first_xpath_node(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
 	ident  = (char *) xmlNodeGetContent(ident_attr);
 	type   = (char *) xmlNodeGetContent(type_attr);
@@ -765,7 +765,7 @@ void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	xmlNodePtr cur, next;
 	xmlNodePtr attr;
 
-	attr = first_xpath_node(NULL, node, "@applicRefId|@refapplic");
+	attr = first_xpath_node(NULL, node, BAD_CAST "@applicRefId|@refapplic");
 
 	if (attr) {
 		xmlChar *applicRefId;
@@ -851,9 +851,9 @@ bool simpl_applic(xmlNodePtr node)
 			return false;
 		}
 	} else if (strcmp((char *) node->name, "assert") == 0) {
-		xmlNodePtr ident_attr  = first_xpath_node(NULL, node, "@applicPropertyIdent|@actidref");
-		xmlNodePtr type_attr   = first_xpath_node(NULL, node, "@applicPropertyType|@actreftype");
-		xmlNodePtr values_attr = first_xpath_node(NULL, node, "@applicPropertyValues|@actvalues");
+		xmlNodePtr ident_attr  = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyIdent|@actidref");
+		xmlNodePtr type_attr   = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyType|@actreftype");
+		xmlNodePtr values_attr = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyValues|@actvalues");
 
 		char *ident  = (char *) xmlNodeGetContent(ident_attr);
 		char *type   = (char *) xmlNodeGetContent(type_attr);
@@ -957,7 +957,7 @@ xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
 {
 	xmlNodePtr applic, orig;
 
-	orig = first_xpath_node(doc, NULL, "//dmStatus/applic|//pmStatus/applic");
+	orig = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/applic|//pmStatus/applic");
 
 	if (!orig) {
 		return NULL;
@@ -987,9 +987,9 @@ void add_source(xmlDocPtr doc)
 	xmlNodePtr ident, sourceIdent, node, cur;
 	const xmlChar *type;
 
-	ident       = first_xpath_node(doc, NULL, "//dmIdent|//pmIdent|//dmaddres");
-	sourceIdent = first_xpath_node(doc, NULL, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
-	node        = first_xpath_node(doc, NULL, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
+	ident       = first_xpath_node(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//dmaddres");
+	sourceIdent = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
+	node        = first_xpath_node(doc, NULL, BAD_CAST "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
 
 	if (!node) {
 		return;
@@ -1026,8 +1026,8 @@ void set_extd(xmlDocPtr doc, const char *extension)
 	char *ext, *extensionProducer, *extensionCode;
 	enum issue issue;
 
-	identExtension = first_xpath_node(doc, NULL, "//dmIdent/identExtension|//pmIdent/identExtension|//dmaddres/dmcextension");
-	code = first_xpath_node(doc, NULL, "//dmIdent/dmCode|//pmIdent/pmCode|//dmaddres/dmc");
+	identExtension = first_xpath_node(doc, NULL, BAD_CAST "//dmIdent/identExtension|//pmIdent/identExtension|//dmaddres/dmcextension");
+	code = first_xpath_node(doc, NULL, BAD_CAST "//dmIdent/dmCode|//pmIdent/pmCode|//dmaddres/dmc");
 
 	if (xmlStrcmp(code->name, BAD_CAST "dmCode") == 0) {
 		issue = ISS_4X;
@@ -1244,7 +1244,7 @@ void set_code(xmlDocPtr doc, const char *new_code)
 {
 	xmlNodePtr code;
 
-	code = first_xpath_node(doc, NULL,
+	code = first_xpath_node(doc, NULL, BAD_CAST
 		"//dmIdent/dmCode|"
 		"//pmIdent/pmCode|"
 		"//commentIdent/commentCode|"
@@ -1283,17 +1283,17 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 	xmlNodePtr dmTitle, techName, infoName;
 	enum issue iss;
 	
-	dmTitle  = first_xpath_node(doc, NULL,
+	dmTitle  = first_xpath_node(doc, NULL, BAD_CAST
 		"//dmAddressItems/dmTitle|"
 		"//dmaddres/dmtitle");
-	techName = first_xpath_node(doc, NULL,
+	techName = first_xpath_node(doc, NULL, BAD_CAST
 		"//dmAddressItems/dmTitle/techName|"
 		"//pmAddressItems/pmTitle|"
 		"//commentAddressItems/commentTitle|"
 		"//dmaddres/dmtitle/techname|"
 		"//pmaddres/pmtitle|"
 		"//cstatus/ctitle");
-	infoName = first_xpath_node(doc, NULL,
+	infoName = first_xpath_node(doc, NULL, BAD_CAST
 		"//dmAddressItems/dmTitle/infoName|"
 		"//dmaddres/dmtitle/infoname");
 
@@ -1360,7 +1360,7 @@ void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 	xmlNodePtr new_applic, new_displayText, new_simplePara, new_evaluate, cur, applic;
 	enum issue iss;
 
-	applic = first_xpath_node(doc, NULL, "//dmStatus/applic|//pmStatus/applic|//status/applic|//pmstatus/applic");
+	applic = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/applic|//pmStatus/applic|//status/applic|//pmstatus/applic");
 
 	if (!applic) {
 		return;
@@ -1381,7 +1381,7 @@ void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 		xmlNodeSetContent(new_simplePara, BAD_CAST new_text);
 	}
 
-	if (combine && first_xpath_node(doc, applic, "assert|evaluate|expression")) {
+	if (combine && first_xpath_node(doc, applic, BAD_CAST "assert|evaluate|expression")) {
 		new_applic = xmlNewChild(new_applic, NULL, BAD_CAST "evaluate", NULL);
 		xmlSetProp(new_applic, BAD_CAST (iss == ISS_30 ? "operator" : "andOr"), BAD_CAST "and");
 		for (cur = applic->children; cur; cur = cur->next) {
@@ -1695,7 +1695,7 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 
 	res = xsltApplyStylesheet(style, muxdoc, NULL);
 
-	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, "/mux/dmodule[1]"), 1));
+	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, BAD_CAST "/mux/dmodule[1]"), 1));
 	xmlFreeDoc(res);
 	xmlFreeDoc(muxdoc);
 }
@@ -1778,7 +1778,7 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 
 	xmlXPathFreeContext(ctxt);
 
-	if (first_xpath_node(dm, NULL, "//idstatus")) {
+	if (first_xpath_node(dm, NULL, BAD_CAST "//idstatus")) {
 		add_src = false;
 	}
 
@@ -1846,7 +1846,7 @@ void set_issue_date(xmlDocPtr doc, const char *year, const char *month, const ch
 {
 	xmlNodePtr issueDate;
 
-	issueDate = first_xpath_node(doc, NULL, "//issueDate|//issdate");
+	issueDate = first_xpath_node(doc, NULL, BAD_CAST "//issueDate|//issdate");
 
 	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year);
 	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month);
@@ -1859,7 +1859,7 @@ void set_security(xmlDocPtr dm, char *sec)
 	xmlNodePtr security;
 	enum issue iss;
 
-	security = first_xpath_node(dm, NULL, "//security");
+	security = first_xpath_node(dm, NULL, BAD_CAST "//security");
 
 	if (!security) {
 		return;
@@ -1879,9 +1879,9 @@ void set_security(xmlDocPtr dm, char *sec)
 xmlNodePtr find_or_create_orig(xmlDocPtr doc)
 {
 	xmlNodePtr orig, rpc;
-	orig = first_xpath_node(doc, NULL, "//originator|//orig");
+	orig = first_xpath_node(doc, NULL, BAD_CAST "//originator|//orig");
 	if (!orig) {
-		rpc = first_xpath_node(doc, NULL, "//responsiblePartnerCompany|//rpc");
+		rpc = first_xpath_node(doc, NULL, BAD_CAST "//responsiblePartnerCompany|//rpc");
 		orig = xmlNewNode(NULL, BAD_CAST (xmlStrcmp(rpc->name, BAD_CAST "rpc") == 0 ? "orig" : "originator"));
 		orig = xmlAddNextSibling(rpc, orig);
 	}
@@ -1946,7 +1946,7 @@ bool check_wholedm_applic(xmlDocPtr dm)
 {
 	xmlNodePtr applic;
 
-	applic = first_xpath_node(dm, NULL, "//dmStatus/applic|//pmStatus/applic");
+	applic = first_xpath_node(dm, NULL, BAD_CAST "//dmStatus/applic|//pmStatus/applic");
 
 	return eval_applic_stmt(applic, true);
 }
@@ -2025,7 +2025,7 @@ void strip_extension(xmlDocPtr doc)
 {
 	xmlNodePtr ext;
 
-	ext = first_xpath_node(doc, NULL, "//identExtension");
+	ext = first_xpath_node(doc, NULL, BAD_CAST "//identExtension");
 
 	xmlUnlinkNode(ext);
 	xmlFreeNode(ext);
@@ -2073,7 +2073,7 @@ void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 	xmlNodePtr comment, pos;
 
 	comment = xmlNewComment(BAD_CAST text);
-	pos = first_xpath_node(doc, NULL, path);
+	pos = first_xpath_node(doc, NULL, BAD_CAST path);
 
 	if (!pos)
 		return;
@@ -2108,7 +2108,7 @@ void set_remarks(xmlDocPtr doc, const char *s)
 {
 	xmlNodePtr status, remarks;
 
-	status = first_xpath_node(doc, NULL,
+	status = first_xpath_node(doc, NULL, BAD_CAST
 		"//dmStatus|"
 		"//pmStatus|"
 		"//commentStatus|"
@@ -2122,7 +2122,7 @@ void set_remarks(xmlDocPtr doc, const char *s)
 		return;
 	}
 
-	remarks = first_xpath_node(doc, status, "//remarks");
+	remarks = first_xpath_node(doc, status, BAD_CAST "//remarks");
 
 	if (remarks) {
 		xmlNodePtr cur, next;
@@ -2151,7 +2151,7 @@ bool valid_object(xmlDocPtr doc, const char *path, const char *codes)
 	xmlNodePtr obj;
 	xmlChar *code;
 	bool has;
-	if (!(obj = first_xpath_node(doc, NULL, path))) {
+	if (!(obj = first_xpath_node(doc, NULL, BAD_CAST path))) {
 		return true;
 	}
 	code = xmlNodeGetContent(obj);
@@ -2225,11 +2225,11 @@ void set_skill(xmlDocPtr doc, const char *skill)
 		return;
 	}
 
-	skill_level = first_xpath_node(doc, NULL, "//skillLevel");
+	skill_level = first_xpath_node(doc, NULL, BAD_CAST "//skillLevel");
 
 	if (!skill_level) {
 		xmlNodePtr node;
-		node = first_xpath_node(doc, NULL,
+		node = first_xpath_node(doc, NULL, BAD_CAST
 			"("
 			"//qualityAssurance|"
 			"//systemBreakdownCode|"
@@ -2273,23 +2273,23 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 	char code[64];
 	xmlNodePtr dmCode, issueInfo, language;
 
-	dmCode = first_xpath_node(NULL, dmRefIdent, "dmCode|avee");
-	issueInfo = first_xpath_node(NULL, dmRefIdent, "issueInfo|issno");
-	language = first_xpath_node(NULL, dmRefIdent, "language");
+	dmCode = first_xpath_node(NULL, dmRefIdent, BAD_CAST "dmCode|avee");
+	issueInfo = first_xpath_node(NULL, dmRefIdent, BAD_CAST "issueInfo|issno");
+	language = first_xpath_node(NULL, dmRefIdent, BAD_CAST "language");
 
-	model_ident_code     = (char *) first_xpath_value(NULL, dmCode, "modelic|@modelIdentCode");
-	system_diff_code     = (char *) first_xpath_value(NULL, dmCode, "sdc|@systemDiffCode");
-	system_code          = (char *) first_xpath_value(NULL, dmCode, "chapnum|@systemCode");
-	sub_system_code      = (char *) first_xpath_value(NULL, dmCode, "section|@subSystemCode");
-	sub_sub_system_code  = (char *) first_xpath_value(NULL, dmCode, "subsect|@subSubSystemCode");
-	assy_code            = (char *) first_xpath_value(NULL, dmCode, "subject|@assyCode");
-	disassy_code         = (char *) first_xpath_value(NULL, dmCode, "discode|@disassyCode");
-	disassy_code_variant = (char *) first_xpath_value(NULL, dmCode, "discodev|@disassyCodeVariant");
-	info_code            = (char *) first_xpath_value(NULL, dmCode, "incode|@infoCode");
-	info_code_variant    = (char *) first_xpath_value(NULL, dmCode, "incodev|@infoCodeVariant");
-	item_location_code   = (char *) first_xpath_value(NULL, dmCode, "itemloc|@itemLocationCode");
-	learn_code           = (char *) first_xpath_value(NULL, dmCode, "@learnCode");
-	learn_event_code     = (char *) first_xpath_value(NULL, dmCode, "@learnEventCode");
+	model_ident_code     = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "modelic|@modelIdentCode");
+	system_diff_code     = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "sdc|@systemDiffCode");
+	system_code          = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "chapnum|@systemCode");
+	sub_system_code      = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "section|@subSystemCode");
+	sub_sub_system_code  = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "subsect|@subSubSystemCode");
+	assy_code            = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "subject|@assyCode");
+	disassy_code         = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "discode|@disassyCode");
+	disassy_code_variant = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "discodev|@disassyCodeVariant");
+	info_code            = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "incode|@infoCode");
+	info_code_variant    = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "incodev|@infoCodeVariant");
+	item_location_code   = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "itemloc|@itemLocationCode");
+	learn_code           = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "@learnCode");
+	learn_event_code     = (char *) first_xpath_value(NULL, dmCode, BAD_CAST "@learnEventCode");
 
 	snprintf(code, 64, "DMC-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		model_ident_code,
@@ -2330,8 +2330,8 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		char *in_work;
 		char iss[8];
 
-		issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
-		in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
+		issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
+		in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
 
 		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
 		strcat(code, iss);
@@ -2345,8 +2345,8 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		char *country_iso_code;
 		char lang[8];
 
-		language_iso_code = (char *) first_xpath_value(NULL, language, "@language|@languageIsoCode");
-		country_iso_code  = (char *) first_xpath_value(NULL, language, "@country|@countryIsoCode");
+		language_iso_code = (char *) first_xpath_value(NULL, language, BAD_CAST "@language|@languageIsoCode");
+		country_iso_code  = (char *) first_xpath_value(NULL, language, BAD_CAST "@country|@countryIsoCode");
 
 		snprintf(lang, 8, "_%s-%s", language_iso_code, country_iso_code);
 		strcat(code, lang);
@@ -2382,7 +2382,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 bool find_act_fname(char *dst, xmlDocPtr doc)
 {
 	xmlNodePtr actref;
-	actref = first_xpath_node(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
+	actref = first_xpath_node(doc, NULL, BAD_CAST "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
 	return actref && find_dmod_fname(dst, actref);
 }
 
@@ -2402,7 +2402,7 @@ bool find_pct_fname(char *dst, xmlDocPtr doc)
 		return false;
 	}
 
-	pctref = first_xpath_node(act, NULL, "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
+	pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
 	found = pctref && find_dmod_fname(dst, pctref);
 	xmlFreeDoc(act);
 
@@ -2424,6 +2424,28 @@ void clear_pct_applic(void)
 		}
 		cur = next;
 	}
+}
+
+/* Callback for clean_entities. */
+void clean_entities_callback(void *payload, void *data, xmlChar *name)
+{
+	xmlEntityPtr e = (xmlEntityPtr) payload;
+	xmlChar *xpath;
+
+	xpath = xmlStrdup(BAD_CAST "//@*[.='");
+	xpath = xmlStrcat(xpath, e->name);
+	xpath = xmlStrcat(xpath, BAD_CAST "']");
+
+	if (e->etype == XML_EXTERNAL_GENERAL_UNPARSED_ENTITY && !first_xpath_node(e->doc, NULL, xpath)) {
+		xmlUnlinkNode((xmlNodePtr) e);
+		xmlFreeEntity(e);
+	}
+}
+
+/* Remove unused external entities after filtering. */
+void clean_entities(xmlDocPtr doc)
+{
+	xmlHashScan(doc->intSubset->entities, clean_entities_callback, NULL);
 }
 
 /* Print a usage message */
@@ -2489,10 +2511,11 @@ int main(int argc, char **argv)
 	char *sec_classes = NULL;
 	char *skill = NULL;
 	bool combine_applic = true;
+	bool clean_ents = false;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:Ee:FfG:gh?I:i:K:k:Ll:m:Nn:O:o:P:p:R:r:Ss:t:U:u:vWwX:x:Y:y";
+	const char *sopts = "AaC:c:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:r:Ss:t:U:u:vWwX:x:Y:y";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2527,6 +2550,7 @@ int main(int argc, char **argv)
 			case 'G': setorig = true; origspec = strdup(optarg); break;
 			case 'i': strncpy(info, optarg, 255); break;
 			case 'I': strncpy(issdate, optarg, 15); break;
+			case 'j': clean_ents = true; break;
 			case 'K': skill_codes = strdup(optarg); break;
 			case 'k': skill = strdup(optarg); break;
 			case 'L': dmlist = true; break;
@@ -2555,7 +2579,7 @@ int main(int argc, char **argv)
 			case 'h':
 			case '?':
 				show_help();
-				exit(EXIT_SUCCESS);
+				return EXIT_SUCCESS;
 		}
 	}
 
@@ -2691,7 +2715,8 @@ int main(int argc, char **argv)
 					xmlFree(cirxsl);
 				}
 
-				referencedApplicGroup = first_xpath_node(doc, NULL, "//referencedApplicGroup|//inlineapplics");
+				referencedApplicGroup = first_xpath_node(doc, NULL,
+					BAD_CAST "//referencedApplicGroup|//inlineapplics");
 
 				if (referencedApplicGroup) {
 					strip_applic(referencedApplicGroup, root);
@@ -2791,6 +2816,10 @@ int main(int argc, char **argv)
 
 				if (flat_alts) {
 					flatten_alts(doc);
+				}
+
+				if (clean_ents) {
+					clean_entities(doc);
 				}
 
 				if (autoname && !auto_name(out, src, doc, dir, no_issue)) {

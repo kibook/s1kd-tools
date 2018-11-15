@@ -97,6 +97,10 @@ be used.
 -i &lt;infoName&gt;  
 Give the data module instance a different infoName.
 
+-j  
+After filtering, remove external entities (such as ICNs) which are no
+longer used from the resulting instances.
+
 -K &lt;levels&gt;  
 Filter the object on the specified skill levels. Elements which are
 marked with skill levels not contained in the string &lt;levels&gt; are
