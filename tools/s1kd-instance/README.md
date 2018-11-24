@@ -362,7 +362,7 @@ For example, given the following input:
     applicPropertyType="condition"
     applicPropertyValues="normal"/>
     </evaluate>
-    <evaluate andOr"and">
+    <evaluate andOr="and">
     <assert
     applicPropertyIdent="version"
     applicPropertyType="prodattr"
@@ -412,7 +412,7 @@ be the result:
     applicPropertyType="condition"
     applicPropertyValues="normal"/>
     </evaluate>
-    <evaluate andOr"and">
+    <evaluate andOr="and">
     <assert
     applicPropertyIdent="version"
     applicPropertyType="prodattr"
@@ -449,7 +449,7 @@ If the -a option is used, the following would be the result:
     applicPropertyType="condition"
     applicPropertyValues="normal"/>
     </evaluate>
-    <evaluate andOr"and">
+    <evaluate andOr="and">
     <assert
     applicPropertyIdent="version"
     applicPropertyType="prodattr"

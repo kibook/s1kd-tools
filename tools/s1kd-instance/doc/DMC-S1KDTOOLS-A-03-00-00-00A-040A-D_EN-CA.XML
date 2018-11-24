@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="01"/>
+        <issueInfo issueNumber="029" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="11" day="15"/>
+        <issueDate year="2018" month="11" day="24"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add -j option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
+        <simplePara>Fix XML in examples.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -455,7 +458,7 @@
           <para>The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.</para>
           <para>For example, given the following input:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
+            <verbatimText verbatimStyle="vs11" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<referencedApplicGroup>
 <applic id="app-0001">
 <assert
 applicPropertyIdent="version"
@@ -480,7 +483,7 @@ applicPropertyIdent="weather"
 applicPropertyType="condition"
 applicPropertyValues="normal"/>
 </evaluate>
-<evaluate andOr"and">
+<evaluate andOr="and">
 <assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
@@ -503,7 +506,7 @@ the weather is icy.
           </para>
           <para>If this data is filtered for version A, without specifying a value for the weather, and neither the -a or -A option is used, the following will be the result:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
+            <verbatimText verbatimStyle="vs11" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<referencedApplicGroup>
 <applic id="app-0001">
 <assert
 applicPropertyIdent="version"
@@ -528,7 +531,7 @@ applicPropertyIdent="weather"
 applicPropertyType="condition"
 applicPropertyValues="normal"/>
 </evaluate>
-<evaluate andOr"and">
+<evaluate andOr="and">
 <assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
@@ -551,7 +554,7 @@ the weather is icy.
           <para>The second paragraph is removed, because it only applies to version B.</para>
           <para>If the -a option is used, the following would be the result:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
+            <verbatimText verbatimStyle="vs11" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<referencedApplicGroup>
 <applic id="app-0003">
 <evaluate andOr="or">
 <evaluate andOr="and">
@@ -564,7 +567,7 @@ applicPropertyIdent="weather"
 applicPropertyType="condition"
 applicPropertyValues="normal"/>
 </evaluate>
-<evaluate andOr"and">
+<evaluate andOr="and">
 <assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
