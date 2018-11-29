@@ -99,8 +99,8 @@ In additions to this, the following common variables can be used:
 
 -   `$pi`
 
-EXAMPLE
-=======
+EXAMPLES
+========
 
 Common units of measure
 -----------------------
