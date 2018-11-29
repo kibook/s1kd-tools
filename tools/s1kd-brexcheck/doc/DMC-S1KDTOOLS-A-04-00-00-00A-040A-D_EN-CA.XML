@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="023" inWork="01"/>
+        <issueInfo issueNumber="023" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="11" day="13"/>
+        <issueDate year="2018" month="11" day="29"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -72,7 +72,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList>
+          <definitionList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0004">
             <definitionListItem>
               <listItemTerm>-B</listItemTerm>
               <listItemDefinition>
@@ -134,7 +134,7 @@
                 <para>Display a progress bar.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+            <definitionListItem>
               <listItemTerm>-q</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. No output is given, errors are only indicated via the return code.</para>
@@ -152,7 +152,7 @@
                 <para>Use shortened, single-line messages to report BREX errors instead of multiline indented messages.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+            <definitionListItem>
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>Verbose mode. The success or failure of each test is printed explicitly.</para>
