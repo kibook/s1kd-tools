@@ -14,6 +14,7 @@ Options:
   -h -?         Show this help/usage message.
   -I <date>     Set the issue date of the instance (- for current date).
   -i <infoName> Give the data module instance a different infoName.
+  -j            Remove unused external entities (such as ICNs)
   -k <level>    Set the skill level of the instance.
   -K <levels>   Filter on the specified skill levels.
   -L            Source (-s/stdin) is a list of files instead of a DM.
