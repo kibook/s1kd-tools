@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.12.0"
+#define VERSION "1.13.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2067,6 +2067,12 @@ void remove_empty_pmentries(xmlDocPtr doc)
 	transform_doc(doc, xsl_remove_empty_pmentries_xsl, xsl_remove_empty_pmentries_xsl_len, NULL);
 }
 
+/* Fix certain elements automatically after filtering. */
+void autocomplete(xmlDocPtr doc)
+{
+	transform_doc(doc, xsl_autocomplete_xsl, xsl_autocomplete_xsl_len, NULL);
+}
+
 /* Insert a custom comment. */
 void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 {
@@ -2512,10 +2518,11 @@ int main(int argc, char **argv)
 	char *skill = NULL;
 	bool combine_applic = true;
 	bool clean_ents = false;
+	bool autocomp = false;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:r:Ss:t:U:u:vWwX:x:Y:y";
+	const char *sopts = "AaC:c:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:r:Ss:t:U:u:vWwX:x:Y:yz";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2576,6 +2583,7 @@ int main(int argc, char **argv)
 			case 'X': strncpy(comment_path, optarg, 255); break;
 			case 'y': new_applic = true; break;
 			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
+			case 'z': autocomp = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2820,6 +2828,10 @@ int main(int argc, char **argv)
 
 				if (clean_ents) {
 					clean_entities(doc);
+				}
+
+				if (autocomp) {
+					autocomplete(doc);
 				}
 
 				if (autoname && !auto_name(out, src, doc, dir, no_issue)) {

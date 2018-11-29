@@ -291,6 +291,11 @@ applicability values, and using &lt;text&gt; as the new display text.
 Update the applicability for the whole object using the user-defined
 applicability values.
 
+-z  
+Fix certain elements automatically after filtering. For example, if all
+support equipment is removed due to filtering, a `<noSupportEquips>`
+element will be inserted automatically.
+
 --version  
 Show version information.
 

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="02"/>
+        <issueInfo issueNumber="029" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="11" day="24"/>
+        <issueDate year="2018" month="11" day="29"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -j option.</simplePara>
+        <simplePara>Add -j and -z options.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
         <simplePara>Fix XML in examples.</simplePara>
@@ -429,6 +429,12 @@
               <listItemTerm>-y</listItemTerm>
               <listItemDefinition>
                 <para>Update the applicability for the whole object using the user-defined applicability values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-z</listItemTerm>
+              <listItemDefinition>
+                <para>Fix certain elements automatically after filtering. For example, if all support equipment is removed due to filtering, a <verbatimText verbatimStyle="vs12">&lt;noSupportEquips&gt;</verbatimText> element will be inserted automatically.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
