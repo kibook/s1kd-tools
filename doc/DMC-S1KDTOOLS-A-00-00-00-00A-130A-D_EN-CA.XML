@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="26"/>
+        <issueDate year="2018" month="11" day="29"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -42,9 +42,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01" updateHighlight="1">
-        <simplePara>Add example of s1kd-refls for delivering publications.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -451,12 +448,12 @@ This information only applies to version B.
             <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
           </para>
           <para>The newly created <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory will contain the filtered versions of these data modules.</para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">If your CSDB contains multiple, separate publications, the <emphasis>s1kd-refls</emphasis> tool can be used to select only those data modules which apply to a particular publication module:</para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>If your CSDB contains multiple, separate publications, the <emphasis>s1kd-refls</emphasis> tool can be used to select only those data modules which apply to a particular publication module:</para>
+          <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-refls -s &lt;PM&gt; |
 &gt; xargs s1kd-instance -s version:prodattr=B -O customerB</verbatimText>
           </para>
-          <para changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>
             <para>The above command will filter the publication module and all included data modules, and output the resulting objects to the <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory.</para>
           </para>
         </levelledPara>
