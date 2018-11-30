@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.3.3"
+#define VERSION "1.3.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

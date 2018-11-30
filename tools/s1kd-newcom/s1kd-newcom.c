@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.4.6"
+#define VERSION "1.4.7"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

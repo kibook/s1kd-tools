@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.4.8"
+#define VERSION "1.4.9"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

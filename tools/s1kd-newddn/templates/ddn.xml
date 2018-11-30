@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ddn>
 <ddn xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:link="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/ddn.xsd">
   <identAndStatusSection>
@@ -45,5 +45,7 @@
       <remarks/>
     </ddnStatus>
   </identAndStatusSection>
-  <ddnContent><deliveryList></deliveryList></ddnContent>
+  <ddnContent>
+    <deliveryList/>
+  </ddnContent>
 </ddn>

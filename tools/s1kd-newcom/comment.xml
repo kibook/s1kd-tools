@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comment>
 <comment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/comment.xsd">
   <identAndStatusSection>
     <commentAddress>
@@ -11,11 +12,11 @@
         <commentOriginator>
           <dispatchAddress>
             <enterprise>
-              <enterpriseName></enterpriseName>
+              <enterpriseName/>
             </enterprise>
             <address>
-              <city></city>
-              <country></country>
+              <city/>
+              <country/>
             </address>
           </dispatchAddress>
         </commentOriginator>
@@ -39,6 +40,6 @@
     </commentStatus>
   </identAndStatusSection>
   <commentContent>
-    <simplePara></simplePara>
+    <simplePara/>
   </commentContent>
 </comment>

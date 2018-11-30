@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newsmc"
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 
 #define ERR_PREFIX PROG_NAME " ERROR: "
 
