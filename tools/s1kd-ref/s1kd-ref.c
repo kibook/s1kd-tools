@@ -11,7 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.1.3"
+#define VERSION "1.1.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
