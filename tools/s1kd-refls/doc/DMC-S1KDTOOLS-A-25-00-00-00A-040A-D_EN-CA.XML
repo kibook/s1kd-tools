@@ -39,9 +39,9 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -R option.</simplePara>
+        <simplePara>Add -F, -R, -U, and -X options.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
         <simplePara>Improve description of -a option behaviour.</simplePara>
       </reasonForUpdate>
     </dmStatus>
@@ -55,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refls [-aCcDEfGilNnPqRrsuxh?] [-d <dir>] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refls [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -88,6 +88,12 @@
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Directory to search for matches to references in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-F</listItemTerm>
+              <listItemDefinition>
+                <para>When using the -U or -X options, overwrite the input objects that have been updated or tagged.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -150,10 +156,22 @@
                 <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-U</listItemTerm>
+              <listItemDefinition>
+                <para>Update the address items (such as titles) of matched references from the corresponding object.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-u</listItemTerm>
               <listItemDefinition>
                 <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-X</listItemTerm>
+              <listItemDefinition>
+                <para>Tag unmatched references with the processing instruction <verbatimText>&lt;?untagged?&gt;</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

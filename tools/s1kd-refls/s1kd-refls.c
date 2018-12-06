@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refls"
-#define VERSION "1.12.0"
+#define VERSION "1.13.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -24,24 +24,42 @@
 
 /* List only references found in the content section. */
 bool contentOnly = false;
+
 /* Do not display errors. */
 bool quiet = false;
+
 /* Assume objects were created with the -N option. */
 bool noIssue = false;
+
 /* Show unmatched references instead of an error. */
 bool showUnmatched = false;
+
 /* Show references which are matched in the filesystem. */
 bool showMatched = true;
+
 /* Recurse in to child directories. */
 bool recursive = false;
+
 /* Directory to start search in. */
 char *directory;
+
 /* Only match against code, ignore language/issue info even if present. */
 bool fullMatch = true;
+
 /* Include the source object as a reference. */
 bool listSrc = false;
+
 /* List references in matched objects recursively. */
 bool listRecursively = false;
+
+/* Update the address information of references. */
+bool updateRefs = false;
+
+/* Overwrite updated input objects. */
+bool overwriteUpdated = false;
+
+/* Remove unmatched references from the input objects. */
+bool tagUnmatched = false;
 
 /* When listing references recursively, keep track of files which have already 
  * been listed to avoid loops.
@@ -70,7 +88,7 @@ int showObjects = 0;
 #endif
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr firstXPathNode(const char *path, xmlDocPtr doc, xmlNodePtr root)
+xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
 	xmlNodePtr node;
 
@@ -103,9 +121,9 @@ xmlNodePtr firstXPathNode(const char *path, xmlDocPtr doc, xmlNodePtr root)
 }
 
 /* Return the value of the first node matching an XPath expression. */
-char *firstXPathValue(const char *path, xmlDocPtr doc, xmlNodePtr root)
+xmlChar *firstXPathValue(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
-	return (char *) xmlNodeGetContent(firstXPathNode(path, doc, root));
+	return xmlNodeGetContent(firstXPathNode(doc, root, path));
 }
 
 /* Convert string to uppercase. */
@@ -225,12 +243,12 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 
 	xmlNodePtr identExtension, dmCode, issueInfo, language;
 
-	identExtension = firstXPathNode("dmRefIdent/identExtension|dmcextension", NULL, dmRef);
-	dmCode = firstXPathNode("dmRefIdent/dmCode|dmc/avee|avee", NULL, dmRef);
+	identExtension = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/identExtension|dmcextension");
+	dmCode = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/dmCode|dmc/avee|avee");
 
 	if (fullMatch) {
-		issueInfo = firstXPathNode("dmRefIdent/issueInfo|issno", NULL, dmRef);
-		language  = firstXPathNode("dmRefIdent/language|language", NULL, dmRef);
+		issueInfo = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/issueInfo|issno");
+		language  = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/language|language");
 	} else {
 		issueInfo = NULL;
 		language = NULL;
@@ -241,8 +259,8 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 	if (identExtension) {
 		char *extensionProducer, *extensionCode;
 
-		extensionProducer = firstXPathValue("@extensionProducer|dmeproducer", NULL, identExtension);
-		extensionCode     = firstXPathValue("@extensionCode|dmecode", NULL, identExtension);
+		extensionProducer = (char *) firstXPathValue(NULL, identExtension, BAD_CAST "@extensionProducer|dmeproducer");
+		extensionCode     = (char *) firstXPathValue(NULL, identExtension, BAD_CAST "@extensionCode|dmecode");
 
 		strcat(dst, "DME-");
 
@@ -257,19 +275,19 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 		strcat(dst, "DMC-");
 	}
 
-	modelIdentCode     = firstXPathValue("@modelIdentCode|modelic", NULL, dmCode);
-	systemDiffCode     = firstXPathValue("@systemDiffCode|sdc", NULL, dmCode);
-	systemCode         = firstXPathValue("@systemCode|chapnum", NULL, dmCode);
-	subSystemCode      = firstXPathValue("@subSystemCode|section", NULL, dmCode);
-	subSubSystemCode   = firstXPathValue("@subSubSystemCode|subsect", NULL, dmCode);
-	assyCode           = firstXPathValue("@assyCode|subject", NULL, dmCode);
-	disassyCode        = firstXPathValue("@disassyCode|discode", NULL, dmCode);
-	disassyCodeVariant = firstXPathValue("@disassyCodeVariant|discodev", NULL, dmCode);
-	infoCode           = firstXPathValue("@infoCode|incode", NULL, dmCode);
-	infoCodeVariant    = firstXPathValue("@infoCodeVariant|incodev", NULL, dmCode);
-	itemLocationCode   = firstXPathValue("@itemLocationCode|itemloc", NULL, dmCode);
-	learnCode          = firstXPathValue("@learnCode", NULL, dmCode);
-	learnEventCode     = firstXPathValue("@learnEventCode", NULL, dmCode);
+	modelIdentCode     = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@modelIdentCode|modelic");
+	systemDiffCode     = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@systemDiffCode|sdc");
+	systemCode         = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@systemCode|chapnum");
+	subSystemCode      = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@subSystemCode|section");
+	subSubSystemCode   = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@subSubSystemCode|subsect");
+	assyCode           = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@assyCode|subject");
+	disassyCode        = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@disassyCode|discode");
+	disassyCodeVariant = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@disassyCodeVariant|discodev");
+	infoCode           = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@infoCode|incode");
+	infoCodeVariant    = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@infoCodeVariant|incodev");
+	itemLocationCode   = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@itemLocationCode|itemloc");
+	learnCode          = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@learnCode");
+	learnEventCode     = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@learnEventCode");
 
 	strcat(dst, modelIdentCode);
 	strcat(dst, "-");
@@ -314,8 +332,8 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 		if (issueInfo && !noIssue) {
 			char *issueNumber, *inWork;
 
-			issueNumber = firstXPathValue("@issueNumber|@issno", NULL, issueInfo);
-			inWork      = firstXPathValue("@inWork|@inwork", NULL, issueInfo);
+			issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
+			inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
 
 			if (!inWork) {
 				inWork = strdup("00");
@@ -333,8 +351,8 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 		if (language) {
 			char *languageIsoCode, *countryIsoCode;
 
-			languageIsoCode = firstXPathValue("@languageIsoCode|@language", NULL, language);
-			countryIsoCode  = firstXPathValue("@countryIsoCode|@country", NULL, language);
+			languageIsoCode = (char *) firstXPathValue(NULL, language, BAD_CAST "@languageIsoCode|@language");
+			countryIsoCode  = (char *) firstXPathValue(NULL, language, BAD_CAST "@countryIsoCode|@country");
 
 			uppercase(languageIsoCode);
 
@@ -359,12 +377,12 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 	char *pmNumber;
 	char *pmVolume;
 
-	identExtension = firstXPathNode("pmRefIdent/identExtension", NULL, pmRef);
-	pmCode         = firstXPathNode("pmRefIdent/pmCode|pmc", NULL, pmRef);
+	identExtension = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/identExtension");
+	pmCode         = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/pmCode|pmc");
 
 	if (fullMatch) {
-		issueInfo = firstXPathNode("pmRefIdent/issueInfo|issno", NULL, pmRef);
-		language  = firstXPathNode("pmRefIdent/language|language", NULL, pmRef);
+		issueInfo = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/issueInfo|issno");
+		language  = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/language|language");
 	} else {
 		issueInfo = NULL;
 		language = NULL;
@@ -391,10 +409,10 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 		strcat(dst, "PMC-");
 	}
 
-	modelIdentCode = firstXPathValue("@modelIdentCode|modelic", NULL, pmCode);
-	pmIssuer       = firstXPathValue("@pmIssuer|pmissuer", NULL, pmCode);
-	pmNumber       = firstXPathValue("@pmNumber|pmnumber", NULL, pmCode);
-	pmVolume       = firstXPathValue("@pmVolume|pmvolume", NULL, pmCode);
+	modelIdentCode = (char *) firstXPathValue(NULL, pmCode, BAD_CAST "@modelIdentCode|modelic");
+	pmIssuer       = (char *) firstXPathValue(NULL, pmCode, BAD_CAST "@pmIssuer|pmissuer");
+	pmNumber       = (char *) firstXPathValue(NULL, pmCode, BAD_CAST "@pmNumber|pmnumber");
+	pmVolume       = (char *) firstXPathValue(NULL, pmCode, BAD_CAST "@pmVolume|pmvolume");
 
 	strcat(dst, modelIdentCode);
 	strcat(dst, "-");
@@ -413,8 +431,8 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 		if (issueInfo && !noIssue) {
 			char *issueNumber, *inWork;
 
-			issueNumber = firstXPathValue("@issueNumber|@issno", NULL, issueInfo);
-			inWork      = firstXPathValue("@inWork|@inwork", NULL, issueInfo);
+			issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
+			inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
 
 			strcat(dst, "_");
 			strcat(dst, issueNumber);
@@ -428,8 +446,8 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 		if (language) {
 			char *languageIsoCode, *countryIsoCode;
 
-			languageIsoCode = firstXPathValue("@languageIsoCode|@language", NULL, language);
-			countryIsoCode  = firstXPathValue("@countryIsoCode|@country", NULL, language);
+			languageIsoCode = (char *) firstXPathValue(NULL, language, BAD_CAST "@languageIsoCode|@language");
+			countryIsoCode  = (char *) firstXPathValue(NULL, language, BAD_CAST "@countryIsoCode|@country");
 
 			uppercase(languageIsoCode);
 
@@ -481,10 +499,10 @@ void getComCode(char *dst, xmlNodePtr ref)
 	char *seqNumber;
 	char *commentType;
 
-	commentCode = firstXPathNode("commentRefIdent/commentCode", NULL, ref);
+	commentCode = firstXPathNode(NULL, ref, BAD_CAST "commentRefIdent/commentCode");
 
 	if (fullMatch) {
-		language = firstXPathNode("commentRefIdent/language", NULL, ref);
+		language = firstXPathNode(NULL, ref, BAD_CAST "commentRefIdent/language");
 	} else {
 		language = NULL;
 	}
@@ -538,7 +556,8 @@ void getExternalPubCode(char *dst, xmlNodePtr ref)
 	xmlNodePtr externalPubCode;
 	char *code;
 
-	externalPubCode = firstXPathNode("externalPubRefIdent/externalPubCode|externalPubRefIdent/externalPubTitle|pubcode", NULL, ref);
+	externalPubCode = firstXPathNode(NULL, ref,
+		BAD_CAST "externalPubRefIdent/externalPubCode|externalPubRefIdent/externalPubTitle|pubcode");
 
 	if (externalPubCode) {
 		code = (char *) xmlNodeGetContent(externalPubCode);
@@ -621,6 +640,85 @@ bool getFileName(char *dst, char *code, char *path)
 	return found;
 }
 
+/* Update address items using the matched referenced object. */
+void updateRef(xmlNodePtr ref, const char *src, const char *fname)
+{
+	xmlDocPtr doc;
+
+	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+
+	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0) {
+		xmlNodePtr dmRefAddressItems, dmTitle;
+		xmlChar *techName, *infoName;
+
+		if ((dmRefAddressItems = firstXPathNode(NULL, ref, BAD_CAST "dmRefAddressItems"))) {
+			xmlUnlinkNode(dmRefAddressItems);
+			xmlFreeNode(dmRefAddressItems);
+		}
+		dmRefAddressItems = xmlNewChild(ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
+
+		techName = firstXPathValue(doc, NULL, BAD_CAST "//techName|//techname");
+		infoName = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
+
+		dmTitle = xmlNewChild(dmRefAddressItems, NULL, BAD_CAST "dmTitle", NULL);
+		xmlNewChild(dmTitle, NULL, BAD_CAST "techName", techName);
+		if (infoName) {
+			xmlNewChild(dmTitle, NULL, BAD_CAST "infoName", infoName);
+		}
+
+		xmlFree(techName);
+		xmlFree(infoName);
+	} else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0) {
+		xmlNodePtr pmRefAddressItems;
+		xmlChar *pmTitle;
+
+		if ((pmRefAddressItems = firstXPathNode(NULL, ref, BAD_CAST "pmRefAddressItems"))) {
+			xmlUnlinkNode(pmRefAddressItems);
+			xmlFreeNode(pmRefAddressItems);
+		}
+		pmRefAddressItems = xmlNewChild(ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
+
+		pmTitle = firstXPathValue(doc, NULL, BAD_CAST "//pmTitle|//pmtitle");
+
+		xmlNewChild(pmRefAddressItems, NULL, BAD_CAST "pmTitle", pmTitle);
+
+		xmlFree(pmTitle);
+	} else if (xmlStrcmp(ref->name, BAD_CAST "refdm") == 0) {
+		xmlNodePtr oldtitle, newtitle;
+		xmlChar *techname, *infoname;
+
+		techname = firstXPathValue(doc, NULL, BAD_CAST "//techName|//techname");
+		infoname = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
+
+		newtitle = xmlNewNode(NULL, BAD_CAST "dmtitle");
+
+		if ((oldtitle = firstXPathNode(NULL, ref, BAD_CAST "dmtitle"))) {
+			newtitle = xmlAddNextSibling(oldtitle, newtitle);
+		} else {
+			newtitle = xmlAddNextSibling(firstXPathNode(NULL, ref, BAD_CAST "(avee|issno)[last()]"), newtitle);
+		}
+
+		xmlNewChild(newtitle, NULL, BAD_CAST "techname", techname);
+		if (infoname) {
+			xmlNewChild(newtitle, NULL, BAD_CAST "infoname", infoname);
+		}
+
+		xmlFree(techname);
+		xmlFree(infoname);
+
+		xmlUnlinkNode(oldtitle);
+		xmlFreeNode(oldtitle);
+	}
+
+	xmlFreeDoc(doc);
+}
+
+/* Tag unmatched references in the source object. */
+void tagUnmatchedRef(xmlNodePtr ref, const char *src, const char *code)
+{
+	xmlAddChild(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
+}
+
 void listReferences(const char *path);
 
 /* Print a reference found in an object. */
@@ -658,12 +756,19 @@ void printReference(xmlNodePtr ref, const char *src)
 		return;
 
 	if (getFileName(fname, code, directory)) {
-		if (showMatched) {
-			printMatchedFn(ref, src, fname);
+		if (updateRefs) {
+			updateRef(ref, src, fname);
+		} else {
+			if (showMatched) {
+				printMatchedFn(ref, src, fname);
+			}
+
+			if (listRecursively) {
+				listReferences(fname);
+			}
 		}
-		if (listRecursively) {
-			listReferences(fname);
-		}
+	} else if (tagUnmatched) {
+		tagUnmatchedRef(ref, src, code);
 	} else if (showUnmatched) {
 		printMatchedFn(ref, src, code);
 	} else if (!quiet) {
@@ -722,7 +827,8 @@ void listReferences(const char *path)
 	ctx = xmlXPathNewContext(doc);
 
 	if (contentOnly)
-		ctx->node = firstXPathNode("//content|//dmlContent|//dml|//ddnContent|//delivlst", doc, NULL);
+		ctx->node = firstXPathNode(doc, NULL,
+			BAD_CAST "//content|//dmlContent|//dml|//ddnContent|//delivlst");
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
@@ -733,6 +839,17 @@ void listReferences(const char *path)
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			printReference(obj->nodesetval->nodeTab[i], path);
+		}
+	}
+
+	/* If the given object was modified by updating matched refs or
+	 * tagging unmatched refs, write the changes.
+	 */
+	if (updateRefs || tagUnmatched) {
+		if (overwriteUpdated) {
+			xmlSaveFile(path, doc);
+		} else {
+			xmlSaveFile("-", doc);
 		}
 	}
 
@@ -769,7 +886,7 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDEfGilNnPqrsuxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refls [-aCcDEFfGilNnPqrsUuXxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -778,6 +895,7 @@ void showHelp(void)
 	puts("  -D         List data module references.");
 	puts("  -d         Directory to search for matches in.");
 	puts("  -E         List external pub refs.");
+	puts("  -F         Overwrite updated (-U) or tagged (-X) objects.");
 	puts("  -f         Print the source filename for each reference.");
 	puts("  -G         List ICN references.");
 	puts("  -i         Ignore issue info/language when matching.");
@@ -789,7 +907,9 @@ void showHelp(void)
 	puts("  -R         List references in matched objects recursively.");
 	puts("  -r         Search for matches in directories recursively.");
 	puts("  -s         Include the source object as a reference.");
+	puts("  -U         Update address items in matched references.");
 	puts("  -u         Show only unmatched references.");
+	puts("  -X         Tag unmatched references.");
 	puts("  -x         Output XML report.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
@@ -812,7 +932,7 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 
-	const char *sopts = "qcNafluCDGPRrd:inExsh?";
+	const char *sopts = "qcNaFflUuCDGPRrd:inEXxsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -841,11 +961,17 @@ int main(int argc, char **argv)
 			case 'a':
 				showUnmatched = true;
 				break;
+			case 'F':
+				overwriteUpdated = true;
+				break;
 			case 'f':
 				inclSrcFname = true;
 				break;
 			case 'l':
 				isList = true;
+				break;
+			case 'U':
+				updateRefs = true;
 				break;
 			case 'u':
 				showMatched = false;
@@ -881,6 +1007,9 @@ int main(int argc, char **argv)
 				break;
 			case 'E':
 				showObjects |= SHOW_EPR;
+				break;
+			case 'X':
+				tagUnmatched = true;
 				break;
 			case 'x':
 				xmlOutput = true;

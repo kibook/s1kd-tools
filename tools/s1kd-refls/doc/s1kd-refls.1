@@ -9,7 +9,7 @@ s1kd\-refls \- List references in CSDB objects
 .IP
 .nf
 \f[C]
-s1kd\-refls\ [\-aCcDEfGilNnPqRrsuxh?]\ [\-d\ <dir>]\ [<object>...]
+s1kd\-refls\ [\-aCcDEFfGilNnPqRrsUuXxh?]\ [\-d\ <dir>]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -41,6 +41,12 @@ List references in the \f[C]content\f[] section of a CSDB object only.
 .B \-d <dir>
 Directory to search for matches to references in.
 By default, the current directory is used.
+.RS
+.RE
+.TP
+.B \-F
+When using the \-U or \-X options, overwrite the input objects that have
+been updated or tagged.
 .RS
 .RE
 .TP
@@ -102,9 +108,21 @@ operation to a source object and all its dependencies together.
 .RS
 .RE
 .TP
+.B \-U
+Update the address items (such as titles) of matched references from the
+corresponding object.
+.RS
+.RE
+.TP
 .B \-u
 Show only unmatched reference errors, or unmatched codes if combined
 with the \-a option.
+.RS
+.RE
+.TP
+.B \-X
+Tag unmatched references with the processing instruction
+\f[C]<?untagged?>\f[].
 .RS
 .RE
 .TP

@@ -6,7 +6,7 @@ s1kd-refls - List references in CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refls [-aCcDEfGilNnPqRrsuxh?] [-d <dir>] [<object>...]
+    s1kd-refls [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -34,6 +34,10 @@ List references in the `content` section of a CSDB object only.
 -d &lt;dir&gt;  
 Directory to search for matches to references in. By default, the
 current directory is used.
+
+-F  
+When using the -U or -X options, overwrite the input objects that have
+been updated or tagged.
 
 -f  
 Include the filename of the source object where each reference was found
@@ -72,9 +76,16 @@ Include the source object as a reference. This is helpful when the
 output of this tool is used to apply some operation to a source object
 and all its dependencies together.
 
+-U  
+Update the address items (such as titles) of matched references from the
+corresponding object.
+
 -u  
 Show only unmatched reference errors, or unmatched codes if combined
 with the -a option.
+
+-X  
+Tag unmatched references with the processing instruction `<?untagged?>`.
 
 -x  
 Output a detailed XML report instead of plain text messages.
