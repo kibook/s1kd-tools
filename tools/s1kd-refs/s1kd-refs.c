@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "1.13.0"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -901,7 +901,7 @@ void showHelp(void)
 	puts("  -i         Ignore issue info/language when matching.");
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -N         Assume filenames omit issue info.");
-	puts("  -n         Show line number of reference with source filename.");
+	puts("  -n         Print the source filename and line number for each reference.");
 	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
 	puts("  -R         List references in matched objects recursively.");
