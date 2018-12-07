@@ -1,17 +1,17 @@
 NAME
 ====
 
-s1kd-refls - List references in CSDB objects
+s1kd-refs - Manage references between CSDB objects
 
 SYNOPSIS
 ========
 
-    s1kd-refls [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]
+    s1kd-refs [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
 
-The *s1kd-refls* tool lists external references in CSDB objects,
+The *s1kd-refs* tool lists external references in CSDB objects,
 optionally matching them to a filename in the CSDB directory hierarchy.
 This makes it easy to obtain a list of dependencies for CSDB objects,
 such as ICNs, to ensure they are delivered together, or to check for
@@ -100,7 +100,7 @@ will read from stdin.
 EXAMPLE
 =======
 
-    $ s1kd-refls DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+    $ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
     DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
     DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
     ICN-12345-00001-001-01.JPG

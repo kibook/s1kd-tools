@@ -88,8 +88,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     business rules exchange (BREX) data module, which contains the
     project-defined computable business rules.
 
-    The **s1kd-refls** tool lists references in a CSDB object to
-    generate a list of dependencies on other CSDB objects.
+    The **s1kd-refs** tool lists references in a CSDB object to generate
+    a list of dependencies on other CSDB objects.
 
     The **s1kd-checkrefs** tool validates references between CSDB
     objects.
@@ -185,7 +185,7 @@ Manpages for each tool:
 
 -   s1kd-ref(1)
 
--   s1kd-refls(1)
+-   s1kd-refs(1)
 
 -   s1kd-sns(1)
 

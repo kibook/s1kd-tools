@@ -12,7 +12,7 @@
 #include <libxml/debugXML.h>
 #include "s1kd_tools.h"
 
-#define PROG_NAME "s1kd-refls"
+#define PROG_NAME "s1kd-refs"
 #define VERSION "1.13.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -886,7 +886,7 @@ void listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refls [-aCcDEFfGilNnPqrsUuXxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGilNnPqrsUuXxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");

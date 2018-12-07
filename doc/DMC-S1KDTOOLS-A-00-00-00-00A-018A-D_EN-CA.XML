@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add s1kd-uom tool.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -86,7 +89,7 @@
                 <para><emphasis>Validation:</emphasis> These tools all validate different aspects of CSDB objects.</para>
                 <para>The <emphasis>s1kd-validate</emphasis> tool validates CSDB objects according to their S1000D schema and general correctness as XML documents.</para>
                 <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.</para>
-                <para>The <emphasis>s1kd-refls</emphasis> tool lists references in a CSDB object to generate a list of dependencies on other CSDB objects.</para>
+                <para>The <emphasis>s1kd-refs</emphasis> tool lists references in a CSDB object to generate a list of dependencies on other CSDB objects.</para>
                 <para>The <emphasis>s1kd-checkrefs</emphasis> tool validates references between CSDB objects.</para>
               </listItem>
               <listItem>
@@ -185,7 +188,7 @@
               <para>s1kd-ref(1)</para>
             </listItem>
             <listItem>
-              <para>s1kd-refls(1)</para>
+              <para>s1kd-refs(1)</para>
             </listItem>
             <listItem>
               <para>s1kd-sns(1)</para>

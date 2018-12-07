@@ -1,5 +1,5 @@
-SOURCE=s1kd-refls.c ../common/s1kd_tools.c
-OUTPUT=s1kd-refls
+SOURCE=s1kd-refs.c ../common/s1kd_tools.c
+OUTPUT=s1kd-refs
 
 CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0`
 

@@ -516,11 +516,11 @@ tool to output multiple filtered objects into a directory:
 The newly created `customerB` directory will contain the filtered
 versions of these data modules.
 
-If your CSDB contains multiple, separate publications, the
-**s1kd-refls** tool can be used to select only those data modules which
-apply to a particular publication module:
+If your CSDB contains multiple, separate publications, the **s1kd-refs**
+tool can be used to select only those data modules which apply to a
+particular publication module:
 
-    $ s1kd-refls -s <PM> |
+    $ s1kd-refs -s <PM> |
     > xargs s1kd-instance -s version:prodattr=B -O customerB
 
 The above command will filter the publication module and all included

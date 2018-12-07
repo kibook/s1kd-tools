@@ -42,6 +42,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -448,9 +451,9 @@ This information only applies to version B.
             <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
           </para>
           <para>The newly created <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory will contain the filtered versions of these data modules.</para>
-          <para>If your CSDB contains multiple, separate publications, the <emphasis>s1kd-refls</emphasis> tool can be used to select only those data modules which apply to a particular publication module:</para>
-          <para>
-            <verbatimText verbatimStyle="vs23">$ s1kd-refls -s &lt;PM&gt; |
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">If your CSDB contains multiple, separate publications, the <emphasis>s1kd-refs</emphasis> tool can be used to select only those data modules which apply to a particular publication module:</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs23">$ s1kd-refs -s &lt;PM&gt; |
 &gt; xargs s1kd-instance -s version:prodattr=B -O customerB</verbatimText>
           </para>
           <para>
