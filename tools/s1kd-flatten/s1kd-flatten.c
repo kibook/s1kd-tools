@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.1"
+#define VERSION "2.1.2"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -138,7 +138,7 @@ bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool 
 	int len = strlen(path);
 	char fpath[PATH_MAX], cpath[PATH_MAX];
 
-	if (!isdir(path, true)) {
+	if (!isdir(path, false)) {
 		return false;
 	}
 
