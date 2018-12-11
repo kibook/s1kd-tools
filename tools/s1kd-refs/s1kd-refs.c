@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -758,7 +758,7 @@ void printReference(xmlNodePtr ref, const char *src)
 	if (getFileName(fname, code, directory)) {
 		if (updateRefs) {
 			updateRef(ref, src, fname);
-		} else {
+		} else if (!tagUnmatched) {
 			if (showMatched) {
 				printMatchedFn(ref, src, fname);
 			}
