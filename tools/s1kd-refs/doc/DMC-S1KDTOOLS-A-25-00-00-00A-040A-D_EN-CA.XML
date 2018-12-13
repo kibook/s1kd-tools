@@ -174,7 +174,7 @@
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-X</listItemTerm>
               <listItemDefinition>
-                <para>Tag unmatched references with the processing instruction <verbatimText>&lt;?untagged?&gt;</verbatimText>.</para>
+                <para>Tag unmatched references with the processing instruction <verbatimText>&lt;?unmatched?&gt;</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

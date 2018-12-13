@@ -85,7 +85,8 @@ Show only unmatched reference errors, or unmatched codes if combined
 with the -a option.
 
 -X  
-Tag unmatched references with the processing instruction `<?untagged?>`.
+Tag unmatched references with the processing instruction
+`<?unmatched?>`.
 
 -x  
 Output a detailed XML report instead of plain text messages.
