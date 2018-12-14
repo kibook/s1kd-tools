@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.5.6"
+#define VERSION "1.5.7"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -563,7 +563,7 @@ void show_help(void)
 	puts("  -d <defaults>  Specify .defaults file name.");
 	puts("  -f             Overwrite existing file.");
 	puts("  -h -?          Show usage message.");
-	puts("  -i <codes>     Specify info codes for SNS-generated DMRL.");
+	puts("  -i <code>      Specify info code for SNS-generated DMRL.");
 	puts("  -N             Omit issue/inwork from filename.");
 	puts("  -p             Prompt the user for each value.");
 	puts("  -q             Don't report an error if file exists.");
@@ -706,7 +706,7 @@ int main(int argc, char **argv)
 	bool custom_defaults = false;
 
 	bool showprompts = false;
-	char code[256];
+	char code[256] = "";
 	bool skipcode = false;
 	bool noissue = false;
 	bool verbose = false;
