@@ -369,7 +369,7 @@
               </randomList>
             </para>
             <para>The secondary code and tertiary codes break down these categories further in to more specific kinds of information. For example, 040 represents various kinds of descriptions, while 041 specifically deals with descriptions of how a component is made, and 042 specifically deals with the function of a component.</para>
-            <para>All purely numeric codes are reserved by the specification, but projects can create their own information codes using alphabetic characters for the tertiary code. For example, if a project wants to include a specific kinds of description which does not fall under any of the available 040-049 codes, the project can allocate 04A-04Z. The project must then document the definitions for these information codes in their business rules. Projects may also translate the definitions of existing codes to better fit their project, as long as the original meaning is preserved.</para>
+            <para>All purely numeric codes are reserved by the specification, but projects can create their own information codes using alphabetic characters for the tertiary code. For example, if a project wants to include a specific kind of description which does not fall under any of the available 040-049 codes, the project can allocate 04A-04Z. The project must then document the definitions for these information codes in their business rules. Projects may also translate the definitions of existing codes to better fit their project, as long as the original meaning is preserved.</para>
             <para>The information code variant is a single alphanumeric character after the information code. This usually identifies alternative ways to perform procedures, with A being the default variant. For example, if 258A means "Other procedure to clean", 258B could mean "Other procedure to clean, Clean with water" and 258C could mean "Other procedure to clean, Clean with air". Both provide a way to clean a component, but in two alternative ways.</para>
           </levelledPara>
           <levelledPara>
@@ -414,7 +414,7 @@
         <levelledPara>
           <title>Data module content</title>
           <para>S1000D provides a number of different schemas for different kinds of content within a data module. The schema dictates what elements can be used within that data module's contents. This limits the author of a data module to only using the appropriate elements for a particular context, and helps keep data consistent.</para>
-          <para>For example, the data module BIKE-DA0-20-00-00A-040A-D, which will contain the description of the rear wheel of the bicycle, might use the <emphasis>descriptive</emphasis> schema. Another data module, BIKE-DA0-20-00-00A-520A-A, which is titled "Rear wheel - Remove procedure" and enumerates the steps to remove the rear wheel from the bicycle, might use the <emphasis>procedural</emphasis> schema.</para>
+          <para>For example, the data module BIKE-DA0-20-00-00A-040A-D, which is titled "Rear wheel - Description" and will contain the description of the rear wheel of the bicycle, might use the <emphasis>descriptive</emphasis> schema. Another data module, BIKE-DA0-20-00-00A-520A-A, which is titled "Rear wheel - Remove procedure" and enumerates the steps to remove the rear wheel from the bicycle, might use the <emphasis>procedural</emphasis> schema.</para>
           <para>Example of descriptive data module contents:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>

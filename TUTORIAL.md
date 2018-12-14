@@ -223,7 +223,7 @@ with the function of a component.
 All purely numeric codes are reserved by the specification, but projects
 can create their own information codes using alphabetic characters for
 the tertiary code. For example, if a project wants to include a specific
-kinds of description which does not fall under any of the available
+kind of description which does not fall under any of the available
 040-049 codes, the project can allocate 04A-04Z. The project must then
 document the definitions for these information codes in their business
 rules. Projects may also translate the definitions of existing codes to
@@ -278,12 +278,12 @@ used within that data module's contents. This limits the author of a
 data module to only using the appropriate elements for a particular
 context, and helps keep data consistent.
 
-For example, the data module BIKE-DA0-20-00-00A-040A-D, which will
-contain the description of the rear wheel of the bicycle, might use the
-**descriptive** schema. Another data module, BIKE-DA0-20-00-00A-520A-A,
-which is titled "Rear wheel - Remove procedure" and enumerates the steps
-to remove the rear wheel from the bicycle, might use the **procedural**
-schema.
+For example, the data module BIKE-DA0-20-00-00A-040A-D, which is titled
+"Rear wheel - Description" and will contain the description of the rear
+wheel of the bicycle, might use the **descriptive** schema. Another data
+module, BIKE-DA0-20-00-00A-520A-A, which is titled "Rear wheel - Remove
+procedure" and enumerates the steps to remove the rear wheel from the
+bicycle, might use the **procedural** schema.
 
 Example of descriptive data module contents:
 
