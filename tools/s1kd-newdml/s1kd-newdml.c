@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.5.7"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -502,22 +502,51 @@ void add_sns(xmlNodePtr content, const char *path, const char *incode)
 {
 	xmlDocPtr doc;
 	xmlNodePtr new_content, cur;
-	const char *params[3];
-	char *s;
+	const char *params[7];
+	char infocode[4], variant[2], itemloc[2];
+	int n;
+	char *is = NULL, *vs = NULL, *ls = NULL;
 
 	params[0] = "infoCode";
 
-	s = malloc(strlen(incode) + 3);
-	sprintf(s, "\"%s\"", incode);
-	params[1] = s;
+	if ((n = sscanf(incode, "%3s%1s-%1s", infocode, variant, itemloc)) < 1) {
+		fprintf(stderr, ERR_PREFIX "Bad info code: %s\n", incode);
+		exit(EXIT_BAD_INPUT);
+	}
 
-	params[2] = NULL;
+	is = malloc(7);
+	sprintf(is, "\"%s\"", infocode);
+	params[1] = is;
+
+	if (n > 1) {
+		params[2] = "infoCodeVariant";
+
+		vs = malloc(4);
+		sprintf(vs, "\"%s\"", variant);
+		params[3] = vs;
+
+		if (n > 2) {
+			params[4] = "itemLocationCode";
+
+			ls = malloc(4);
+			sprintf(ls, "\"%s\"", itemloc);
+			params[5] = ls;
+
+			params[6] = NULL;
+		} else {
+			params[4] = NULL;
+		}
+	} else {
+		params[2] = NULL;
+	}
 
 	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 
 	transform_doc(doc, sns2dmrl_xsl, sns2dmrl_xsl_len, params);
 
-	free(s);
+	free(is);
+	free(vs);
+	free(ls);
 
 	new_content = xmlDocGetRootElement(doc);
 
@@ -1014,6 +1043,7 @@ int main(int argc, char **argv)
 	free(defaultRpcCode);
 	free(template_dir);
 	free(remarks);
+	free(sns);
 	xmlFreeDoc(dml_doc);
 	xmlFreeNode(sns_incodes);
 

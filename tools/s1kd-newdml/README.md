@@ -72,7 +72,13 @@ The issue date of the new DML in the form of YYYY-MM-DD.
 -i &lt;info code&gt;  
 When creating a DMRL from SNS rules (-S), use the specified info code
 for each entry. Specify this option multiple times to create multiple
-data modules for each part of the SNS.
+data modules for each part of the SNS. &lt;info code&gt; can specify:
+
+-   the base info code (e.g., 520)
+
+-   the info code variant (e.g., 520B)
+
+-   the item location code (e.g., 520B-C)
 
 -m &lt;remarks&gt;  
 Set the remarks for the new data management list.

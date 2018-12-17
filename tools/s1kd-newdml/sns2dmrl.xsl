@@ -2,6 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:param name="infoCode"/>
+  <xsl:param name="infoCodeVariant">A</xsl:param>
+  <xsl:param name="itemLocationCode">D</xsl:param>
   
   <xsl:variable name="modelIdentCode" select="//@modelIdentCode[1]"/>
   <xsl:variable name="responsiblePartnerCompany" select="//responsiblePartnerCompany[1]"/>
@@ -52,8 +54,12 @@
             <xsl:attribute name="infoCode">
               <xsl:value-of select="$infoCode"/>
             </xsl:attribute>
-            <xsl:attribute name="infoCodeVariant">A</xsl:attribute>
-            <xsl:attribute name="itemLocationCode">D</xsl:attribute>
+            <xsl:attribute name="infoCodeVariant">
+              <xsl:value-of select="$infoCodeVariant"/>
+            </xsl:attribute>
+            <xsl:attribute name="itemLocationCode">
+              <xsl:value-of select="$itemLocationCode"/>
+            </xsl:attribute>
           </dmCode>
         </dmRefIdent>
       </dmRef>
