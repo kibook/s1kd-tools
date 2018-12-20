@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -151,6 +151,7 @@ void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
 void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 {
 	xmlChar *s, *r, *xpath;
+	xmlDocPtr doc;
 
 	if (!node) {
 		return;
@@ -163,11 +164,14 @@ void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	printf("<found>");
 
 	printf("<ref>");
+	doc = xmlNewDoc(BAD_CAST "1.0");
 	if (node->type == XML_ATTRIBUTE_NODE) {
-		xmlShellPrintNode(node->parent);
+		xmlDocSetRootElement(doc, xmlCopyNode(node->parent, 1));
 	} else {
-		xmlShellPrintNode(node);
+		xmlDocSetRootElement(doc, xmlCopyNode(node, 1));
 	}
+	xmlShellPrintNode(xmlDocGetRootElement(doc));
+	xmlFreeDoc(doc);
 	printf("</ref>");
 
 	printf("<source line=\"%ld\" xpath=\"%s\">%s</source>", xmlGetLineNo(node), xpath, s);
@@ -196,6 +200,7 @@ void printUnmatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
 void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 {
 	xmlChar *s, *r, *xpath;
+	xmlDocPtr doc;
 
 	s = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST src);
 	r = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST ref);
@@ -204,11 +209,14 @@ void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	printf("<missing>");
 
 	printf("<ref>");
+	doc = xmlNewDoc(BAD_CAST "1.0");
 	if (node->type == XML_ATTRIBUTE_NODE) {
-		xmlShellPrintNode(node->parent);
+		xmlDocSetRootElement(doc, xmlCopyNode(node->parent, 1));
 	} else {
-		xmlShellPrintNode(node);
+		xmlDocSetRootElement(doc, xmlCopyNode(node, 1));
 	}
+	xmlShellPrintNode(xmlDocGetRootElement(doc));
+	xmlFreeDoc(doc);
 	printf("</ref>");
 
 	printf("<source line=\"%ld\" xpath=\"%s\">%s</source>", xmlGetLineNo(node), xpath, s);
