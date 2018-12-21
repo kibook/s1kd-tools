@@ -7,23 +7,18 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
-#define PROG_NAME "s1kd-checkrefs"
-#define VERSION "1.2.3"
+#define PROG_NAME "s1kd-mvref"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
-#define EXIT_VALIDITY_ERR 1
 #define EXIT_NO_FILE 2
 
 #define ADDR_PATH     "//dmAddress|//dmaddres|//pmAddress|//pmaddres"
-#define ADDR_PATH_EXT "//dmAddress|//dmaddres|//pmAddress|//pmaddres|//externalPubAddress"
-
 #define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content/refpm"
-#define REFS_PATH_CONTENT_EXT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content//refpm|//content//externalPubRef"
 #define REFS_PATH BAD_CAST "//dmRef|//pmRef|//refdm[*]|//refpm"
-#define REFS_PATH_EXT BAD_CAST "//dmRef|//refdm[*]|//pmRef|//refpm|//externalPubRef"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -35,12 +30,6 @@
 #endif
 
 bool verbose = false;
-bool validateOnly = true;
-bool failOnInvalid = false;
-bool checkExtPubRefs = false;
-enum list {OFF, REFS, DMS} listInvalid = OFF;
-bool inclFname = false;
-bool quiet = false;
 
 xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -291,33 +280,6 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	}
 }
 
-void getExtPubCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
-{
-	xmlNodePtr externalPubCode;
-	char *scheme;
-	char *code;
-
-	externalPubCode = findChild(ident, "externalPubCode");
-
-	if (!externalPubCode) {
-		externalPubCode = findChild(ident, "externalPubTitle");
-	}
-
-	scheme = (char *) xmlGetProp(externalPubCode, BAD_CAST "pubCodingScheme");
-	code = (char *) xmlNodeGetContent(externalPubCode);
-
-	if (scheme) {
-		strcpy(dst, scheme);
-		strcat(dst, " ");
-		strcat(dst, code);
-	} else {
-		strcpy(dst, code);
-	}
-
-	xmlFree(scheme);
-	xmlFree(code);
-}
-
 bool isDmRef(xmlNodePtr ref)
 {
 	return xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "refdm") == 0;
@@ -348,7 +310,7 @@ bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 	getDmCode(refcode, ref_dmIdent, withIssue, withLang);
 	getDmCode(addcode, add_dmIdent, withIssue, withLang);
 
-	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
+	if (verbose && strcmp(refcode, addcode) == 0) {
 		fprintf(stderr, "    Updating reference to data module %s...\n", addcode);
 	}
 
@@ -385,203 +347,96 @@ bool samePm(xmlNodePtr ref, xmlNodePtr address)
 	getPmCode(refcode, ref_pmIdent, withIssue, withLang);
 	getPmCode(addcode, add_pmIdent, withIssue, withLang);
 
-	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
+	if (verbose && strcmp(refcode, addcode) == 0) {
 		fprintf(stderr, "    Updating reference to pub module %s...\n", addcode);
 	}
 
 	return strcmp(refcode, addcode) == 0;
 }
 
-bool isExtPubRef(xmlNodePtr ref)
-{
-	return strcmp((char *) ref->name, "externalPubRef") == 0;
-}
-
-bool sameExtPubRef(xmlNodePtr ref, xmlNodePtr address)
-{
-	char refcode[256], addcode[256];
-	bool withIssue;
-
-	xmlNodePtr ref_extPubIdent;
-	xmlNodePtr add_extPubIdent;
-
-	if (!isExtPubRef(ref) || strcmp((char *) address->name, "externalPubAddress") != 0)
-		return false;
-
-	ref_extPubIdent = findChild(ref, "externalPubRefIdent");
-	add_extPubIdent = findChild(address, "externalPubIdent");
-
-	withIssue = findChild(ref_extPubIdent, "externalPubIssueInfo");
-
-	getExtPubCode(refcode, ref_extPubIdent, withIssue, false);
-	getExtPubCode(addcode, add_extPubIdent, withIssue, false);
-
-	if (verbose && !validateOnly && strcmp(refcode, addcode) == 0) {
-		fprintf(stderr, "    Updating reference to external pub %s...\n", addcode);
-	}
-
-	return strcmp(refcode, addcode) == 0;
-}
-
-void validityError(xmlNodePtr ref, const char *fname)
-{
-	char *prefix = "";
-	char code[256];
-
-	if (isDmRef(ref)) {
-		prefix = "data module";
-		getDmCode(code, firstXPathNode("dmRefIdent|self::refdm", ref->doc, ref), false, false);
-	} else if (isPmRef(ref)) {
-		prefix = "pub module";
-		getPmCode(code, firstXPathNode("pmRefIdent|self::refpm", ref->doc, ref), false, false);
-	} else if (isExtPubRef(ref)) {
-		prefix = "external pub";
-		getExtPubCode(code, firstXPathNode("externalPubRefIdent", ref->doc, ref), false, false);
-	}
-
-	if (listInvalid == REFS) {
-		if (inclFname) {
-			printf("%s: %s\n", fname, code);
-		} else {
-			printf("%s\n", code);
-		}
-	} else if (listInvalid == DMS) {
-		printf("%s\n", fname);
-	} else if (!quiet) {
-		fprintf(stderr, ERR_PREFIX "%s (Line %d): invalid reference to %s %s.\n", fname, ref->line, prefix, code);
-	}
-
-	if (failOnInvalid)
-		exit(EXIT_VALIDITY_ERR);
-}
-
-bool updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
+void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	xmlNodePtr cur;
-	bool isValid = false;
 
 	for (cur = addresses->children; cur; cur = cur->next) {
 		if (sameDm(ref, cur)) {
-			isValid = true;
+			xmlNodePtr dmAddressItems, issueDate, dmTitle,
+			           dmRefAddressItems, dmRefIssueDate,
+				   dmRefTitle, dmIdent, dmCode, dmRefIdent,
+				   dmRefCode, issueInfo, refIssueInfo,
+				   language, refLanguage;
 
-			if (!validateOnly) {
-				xmlNodePtr dmAddressItems, issueDate, dmTitle, dmRefAddressItems, dmRefIssueDate, dmRefTitle;
+			dmIdent = firstXPathNode("dmIdent|self::dmaddres", NULL, recode);
+			dmCode = firstXPathNode("dmCode|.//avee", NULL, dmIdent);
+			issueInfo = firstXPathNode("issueInfo|issno", NULL, dmIdent);
+			language = findChild(dmIdent, "language");
 
-				if (recode) {
-					xmlNodePtr dmIdent, dmCode, dmRefIdent, dmRefCode, issueInfo, refIssueInfo, language, refLanguage;
+			dmRefIdent = firstXPathNode("dmRefIdent|self::refdm", NULL, ref);
+			dmRefCode  = firstXPathNode("dmCode|.//avee", NULL, dmRefIdent);
+			refIssueInfo = firstXPathNode("issueInfo|issno", NULL, dmRefIdent);
+			refLanguage = findChild(dmRefIdent, "language");
 
-					dmIdent = firstXPathNode("dmIdent|self::dmaddres", NULL, recode);
-					dmCode = firstXPathNode("dmCode|.//avee", NULL, dmIdent);
-					issueInfo = firstXPathNode("issueInfo|issno", NULL, dmIdent);
-					language = findChild(dmIdent, "language");
-
-					dmRefIdent = firstXPathNode("dmRefIdent|self::refdm", NULL, ref);
-					dmRefCode  = firstXPathNode("dmCode|.//avee", NULL, dmRefIdent);
-					refIssueInfo = firstXPathNode("issueInfo|issno", NULL, dmRefIdent);
-					refLanguage = findChild(dmRefIdent, "language");
-
-					if (verbose) {
-						char code[256];
-						getDmCode(code, dmIdent, refIssueInfo, refLanguage);
-						fprintf(stderr, "      Recoding to %s...\n", code);
-					}
-
-					replaceNode(dmRefCode, dmCode);
-					if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
-					if (refLanguage) replaceNode(refLanguage, language);
-
-					dmAddressItems = firstXPathNode("dmAddressItems|self::dmaddres", NULL, recode);
-				} else {
-					dmAddressItems = firstXPathNode("dmAddressItems|self::dmaddres", NULL, cur);
-				}
-
-				issueDate           = findChild(dmAddressItems, "issueDate");
-				dmTitle             = firstXPathNode("dmTitle|dmtitle", NULL, dmAddressItems);
-
-				dmRefAddressItems   = firstXPathNode("dmRefAddressItems|self::refdm", NULL, ref);
-				dmRefIssueDate      = findChild(dmRefAddressItems, "issueDate");
-				dmRefTitle          = firstXPathNode("dmTitle|dmtitle", NULL, dmRefAddressItems);
-
-				if (dmRefIssueDate) replaceNode(dmRefIssueDate, issueDate);
-				if (dmRefTitle)     replaceNode(dmRefTitle, dmTitle);
+			if (verbose) {
+				char code[256];
+				getDmCode(code, dmIdent, refIssueInfo, refLanguage);
+				fprintf(stderr, "      Recoding to %s...\n", code);
 			}
+
+			replaceNode(dmRefCode, dmCode);
+			if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
+			if (refLanguage) replaceNode(refLanguage, language);
+
+			dmAddressItems = firstXPathNode("dmAddressItems|self::dmaddres", NULL, recode);
+
+			issueDate           = findChild(dmAddressItems, "issueDate");
+			dmTitle             = firstXPathNode("dmTitle|dmtitle", NULL, dmAddressItems);
+
+			dmRefAddressItems   = firstXPathNode("dmRefAddressItems|self::refdm", NULL, ref);
+			dmRefIssueDate      = findChild(dmRefAddressItems, "issueDate");
+			dmRefTitle          = firstXPathNode("dmTitle|dmtitle", NULL, dmRefAddressItems);
+
+			if (dmRefIssueDate) replaceNode(dmRefIssueDate, issueDate);
+			if (dmRefTitle)     replaceNode(dmRefTitle, dmTitle);
 		} else if (samePm(ref, cur)) {
-			isValid = true;
+			xmlNodePtr pmAddressItems, issueDate, pmTitle,
+			           pmRefAddressItems, pmRefIssueDate,
+				   pmRefTitle, pmIdent, pmCode, pmRefIdent,
+				   pmRefCode, issueInfo, refIssueInfo,
+				   language, refLanguage;
 
-			if (!validateOnly) {
-				xmlNodePtr pmAddressItems, issueDate, pmTitle, pmRefAddressItems, pmRefIssueDate, pmRefTitle;
+			pmIdent = firstXPathNode("pmIdent|self::pmaddres", NULL, recode);
+			pmCode  = firstXPathNode("pmCode|pmc", NULL, pmIdent);
+			issueInfo = firstXPathNode("issueInfo|issno", NULL, pmIdent);
+			language = findChild(pmIdent, "language");
 
-				if (recode) {
-					xmlNodePtr pmIdent, pmCode, pmRefIdent, pmRefCode, issueInfo, refIssueInfo, language, refLanguage;
+			pmRefIdent = firstXPathNode("pmRefIdent|self::refpm", NULL, ref);
+			pmRefCode  = firstXPathNode("pmCode|pmc", NULL, pmRefIdent);
+			refIssueInfo = firstXPathNode("issueInfo|issno", NULL, pmRefIdent);
+			refLanguage = findChild(pmRefIdent, "language");
 
-					pmIdent = firstXPathNode("pmIdent|self::pmaddres", NULL, recode);
-					pmCode  = firstXPathNode("pmCode|pmc", NULL, pmIdent);
-					issueInfo = firstXPathNode("issueInfo|issno", NULL, pmIdent);
-					language = findChild(pmIdent, "language");
-
-					pmRefIdent = firstXPathNode("pmRefIdent|self::refpm", NULL, ref);
-					pmRefCode  = firstXPathNode("pmCode|pmc", NULL, pmRefIdent);
-					refIssueInfo = firstXPathNode("issueInfo|issno", NULL, pmRefIdent);
-					refLanguage = findChild(pmRefIdent, "language");
-
-					if (verbose) {
-						char code[256];
-						getPmCode(code, pmIdent, refIssueInfo, refLanguage);
-						fprintf(stderr, "      Recoding to %s...\n", code);
-					}
-
-					replaceNode(pmRefCode, pmCode);
-					if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
-					if (refLanguage) replaceNode(refLanguage, language);
-
-					pmAddressItems = firstXPathNode("pmAddressItems|self::pmaddres", NULL, recode);
-				} else {
-					pmAddressItems = firstXPathNode("pmAddressItems|self::pmaddres", NULL, recode);
-				}
-
-				issueDate           = firstXPathNode("issueDate|issdate", NULL, pmAddressItems);
-				pmTitle             = firstXPathNode("pmTitle|pmtitle", NULL, pmAddressItems);
-
-				pmRefAddressItems   = firstXPathNode("pmRefAddressItems|self::refpm", NULL, ref);
-				pmRefIssueDate      = firstXPathNode("issueDate|issdate", NULL, pmRefAddressItems);
-				pmRefTitle          = firstXPathNode("pmTitle|pmtitle", NULL, pmRefAddressItems);
-
-				if (pmRefIssueDate) replaceNode(pmRefIssueDate, issueDate);
-				if (pmRefTitle)     replaceNode(pmRefTitle, pmTitle);
-			}
-		} else if (checkExtPubRefs && sameExtPubRef(ref, cur)) {
-			isValid = true;
-
-			if (!validateOnly) {
-				xmlNodePtr extPubIdent = findChild(cur, "externalPubIdent");
-				xmlNodePtr extPubTitle = findChild(extPubIdent, "externalPubTitle");
-				xmlNodePtr extPubAddressItems = findChild(cur, "externalPubAddressItems");
-				xmlNodePtr extPubIssueDate = findChild(extPubAddressItems, "externalPubIssueDate");
-				xmlNodePtr extPubSecurity = findChild(extPubAddressItems, "security");
-				xmlNodePtr extPubRPC = findChild(extPubAddressItems, "responsiblePartnerCompany");
-				xmlNodePtr extPubShortTitle = findChild(extPubAddressItems, "shortExternalPubTitle");
-				xmlNodePtr extPubRefIdent = findChild(ref, "externalPubRefIdent");
-				xmlNodePtr extPubRefTitle = findChild(extPubRefIdent, "externalPubTitle");
-				xmlNodePtr extPubRefAddressItems = findChild(ref, "externalPubRefAddressItems");
-				xmlNodePtr extPubRefIssueDate = findChild(extPubRefAddressItems, "externalPubIssueDate");
-				xmlNodePtr extPubRefSecurity = findChild(extPubRefAddressItems, "security");
-				xmlNodePtr extPubRefRPC = findChild(extPubRefAddressItems, "responsiblePartnerCompany");
-				xmlNodePtr extPubRefShortTitle = findChild(extPubRefAddressItems, "shortExternalPubTitle");
-
-				if (extPubRefIssueDate)  replaceNode(extPubRefIssueDate, extPubIssueDate);
-				if (extPubRefTitle)      replaceNode(extPubRefTitle, extPubTitle);
-				if (extPubRefSecurity)   replaceNode(extPubRefSecurity, extPubSecurity);
-				if (extPubRefRPC)        replaceNode(extPubRefRPC, extPubRPC);
-				if (extPubRefShortTitle) replaceNode(extPubRefShortTitle, extPubShortTitle);
+			if (verbose) {
+				char code[256];
+				getPmCode(code, pmIdent, refIssueInfo, refLanguage);
+				fprintf(stderr, "      Recoding to %s...\n", code);
 			}
 
+			replaceNode(pmRefCode, pmCode);
+			if (refIssueInfo) replaceNode(refIssueInfo, issueInfo);
+			if (refLanguage) replaceNode(refLanguage, language);
+
+			pmAddressItems = firstXPathNode("pmAddressItems|self::pmaddres", NULL, recode);
+
+			issueDate           = firstXPathNode("issueDate|issdate", NULL, pmAddressItems);
+			pmTitle             = firstXPathNode("pmTitle|pmtitle", NULL, pmAddressItems);
+
+			pmRefAddressItems   = firstXPathNode("pmRefAddressItems|self::refpm", NULL, ref);
+			pmRefIssueDate      = firstXPathNode("issueDate|issdate", NULL, pmRefAddressItems);
+			pmRefTitle          = firstXPathNode("pmTitle|pmtitle", NULL, pmRefAddressItems);
+
+			if (pmRefIssueDate) replaceNode(pmRefIssueDate, issueDate);
+			if (pmRefTitle)     replaceNode(pmRefTitle, pmTitle);
 		}
 	}
-
-	if (!isValid)
-		validityError(ref, fname);
-
-	return isValid;
 }
 
 void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
@@ -589,33 +444,25 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xml
 	int i;
 
 	for (i = 0; i < refs->nodeNr; ++i) {
-		if (!updateRef(refs->nodeTab[i], addresses, fname, recode) && listInvalid == DMS) {
-			break;
-		}
+		updateRef(refs->nodeTab[i], addresses, fname, recode);
 	}
 }
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-m <object>] [-s <source>] [-t <target>] [-ceFLlnquvh?]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-s <source>] [-t <target>] [-clvh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?          Show help/usage message.");
-	puts("  -c             Only check references in content section of targets.");
-	puts("  -d <dir>       Check data modules in directory <dir>.");
-	puts("  -e             Check externalPubRefs.");
-	puts("  -F             Fail on first invalid reference, returning error code.");
-	puts("  -f             List files containing invalid references.");
-	puts("  -L             Input is a list of data module filenames.");
-	puts("  -l             List invalid references.");
-	puts("  -m <object>    Change refs to <source> into refs to <object>.");
-	puts("  -n             Include filename in list of invalid references.");
-	puts("  -q             Do not show an error on invalid references.");
-	puts("  -s <source>    Use only <source> as source.");
-	puts("  -t <target>    Only check references in <target>.");
-	puts("  -u             Update address items of references.");
+	puts("  -c             Only move references in content section of targets.");
+	puts("  -d <dir>       Update data modules in directory <dir>.");
+	puts("  -f             Overwrite input objects.");
+	puts("  -l             Input is a list of data module filenames.");
+	puts("  -s <source>    Source object.");
+	puts("  -t <target>    Change refs to <source> into refs to <target>.");
 	puts("  -v             Verbose output.");
 	puts("  --version      Show version information.");
+	puts("  <object>...    Objects to change refs in.");
 }
 
 void show_version(void)
@@ -643,44 +490,26 @@ bool isS1000D(const char *fname)
 void addAddress(const char *fname, xmlNodePtr addresses)
 {
 	xmlDocPtr doc;
-	xmlNodePtr root;
+	xmlNodePtr address;
 
 	doc = xmlReadFile(fname, NULL, PARSE_OPTS|XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
 
 	if (!doc)
 		return;
 
-	root = xmlDocGetRootElement(doc);
-
 	if (verbose)
 		fprintf(stderr, "Registering %s...\n", fname);
 
-	if (checkExtPubRefs && strcmp((char *) root->name, "externalPubs") == 0) {
-		xmlXPathContextPtr ctx;
-		xmlXPathObjectPtr obj;
+	address = firstXPathNode(ADDR_PATH, doc, NULL);
 
-		ctx = xmlXPathNewContext(doc);
-		obj = xmlXPathEvalExpression(BAD_CAST "//externalPubAddress", ctx);
-
-		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			int i;
-
-			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-				xmlAddChild(addresses, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
-			}
-		}
-	} else {
-		xmlNodePtr address = firstXPathNode(ADDR_PATH, doc, NULL);
-
-		if (address) {
-			xmlAddChild(addresses, xmlCopyNode(address, 1));
-		}
+	if (address) {
+		xmlAddChild(addresses, xmlCopyNode(address, 1));
 	}
 
 	xmlFreeDoc(doc);
 }
 
-void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, const char *recode)
+void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, const char *recode, bool overwrite)
 {
 	xmlDocPtr doc, recodeDoc;
 	xmlXPathContextPtr ctx;
@@ -705,17 +534,9 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	ctx = xmlXPathNewContext(doc);
 
 	if (contentOnly) {
-		if (checkExtPubRefs) {
-			obj = xmlXPathEvalExpression(REFS_PATH_CONTENT_EXT, ctx);
-		} else {
-			obj = xmlXPathEvalExpression(REFS_PATH_CONTENT, ctx);
-		}
+		obj = xmlXPathEvalExpression(REFS_PATH_CONTENT, ctx);
 	} else {
-		if (checkExtPubRefs) {
-			obj = xmlXPathEvalExpression(REFS_PATH_EXT, ctx);
-		} else {
-			obj = xmlXPathEvalExpression(REFS_PATH, ctx);
-		}
+		obj = xmlXPathEvalExpression(REFS_PATH, ctx);
 	}
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval))
@@ -724,8 +545,11 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 
-	if (!validateOnly)
+	if (overwrite) {
 		xmlSaveFile(fname, doc);
+	} else {
+		xmlSaveFile("-", doc);
+	}
 
 	xmlFreeDoc(doc);
 }
@@ -753,7 +577,7 @@ void addDirectory(const char *path, xmlNodePtr addresses)
 	closedir(dir);
 }
 
-void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly, const char *recode)
+void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly, const char *recode, bool overwrite)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -764,7 +588,7 @@ void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnl
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
 			sprintf(fname, "%s/%s", path, cur->d_name);
-			updateRefsFile(fname, addresses, contentOnly, recode);
+			updateRefsFile(fname, addresses, contentOnly, recode, overwrite);
 		}
 	}
 
@@ -798,13 +622,13 @@ xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr pa
 	return paths;
 }
 
-void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly, const char *recode)
+void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly, const char *recode, bool overwrite)
 {
 	xmlNodePtr cur;
 	for (cur = paths->children; cur; cur = cur->next) {
 		char *path;
 		path = (char *) xmlNodeGetContent(cur);
-		updateRefsFile(path, addresses, contentOnly, recode);
+		updateRefsFile(path, addresses, contentOnly, recode, overwrite);
 		xmlFree(path);
 	}
 }
@@ -817,12 +641,12 @@ int main(int argc, char **argv)
 
 	bool contentOnly = false;
 	char *source = NULL;
-	char *target = NULL;
 	char *directory = NULL;
 	bool isList = false;
 	char *recode = NULL;
+	bool overwrite = false;
 
-	const char *sopts = "s:t:cuFfveld:Lm:nqh?";
+	const char *sopts = "s:cfvd:lt:qh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -840,45 +664,23 @@ int main(int argc, char **argv)
 			case 's':
 				if (!source) source = strdup(optarg);
 				break;
-			case 't':
-				if (!target) target = strdup(optarg);
-				break;
 			case 'c':
 				contentOnly = true;
 				break;
-			case 'u':
-				validateOnly = false;
-				break;
-			case 'F':
-				failOnInvalid = true;
-				break;
 			case 'f':
-				listInvalid = DMS;
+				overwrite = true;
 				break;
 			case 'v':
 				verbose = true;
 				break;
-			case 'e':
-				checkExtPubRefs = true;
-				break;
-			case 'l':
-				listInvalid = REFS;
-				break;
 			case 'd':
 				if (!directory) directory = strdup(optarg);
 				break;
-			case 'L':
+			case 'l':
 				isList = true;
 				break;
-			case 'm':
+			case 't':
 				if (!recode) recode = strdup(optarg);
-				validateOnly = false;
-				break;
-			case 'n':
-				inclFname = true;
-				break;
-			case 'q':
-				quiet = true;
 				break;
 			case 'h':
 			case '?':
@@ -913,24 +715,21 @@ int main(int argc, char **argv)
 		addAddressList(NULL, addresses, paths);
 	}
 
-	if (target) {
-		updateRefsFile(target, addresses, contentOnly, recode);
-	} else if (directory) {
-		updateRefsDirectory(directory, addresses, contentOnly, recode);
+	if (directory) {
+		updateRefsDirectory(directory, addresses, contentOnly, recode, overwrite);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (isList) {
-				updateRefsList(addresses, paths, contentOnly, recode);
+				updateRefsList(addresses, paths, contentOnly, recode, overwrite);
 			} else {
-				updateRefsFile(argv[i], addresses, contentOnly, recode);
+				updateRefsFile(argv[i], addresses, contentOnly, recode, overwrite);
 			}
 		}
 	} else if (isList) {
-		updateRefsList(addresses, paths, contentOnly, recode);
+		updateRefsList(addresses, paths, contentOnly, recode, overwrite);
 	}
 
 	free(source);
-	free(target);
 	free(directory);
 	free(recode);
 

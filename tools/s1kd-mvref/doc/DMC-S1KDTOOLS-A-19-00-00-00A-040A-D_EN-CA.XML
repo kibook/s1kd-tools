@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="19" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="012" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="12" day="21"/>
+        <dmTitle>
+          <techName>s1kd-mvref(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Rename to s1kd-mvref, change function.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-mvref - Change one reference in to another in S1000D CSDB objects</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-mvref [-d <dir>] [-s <source>] [-t <target>] [-cflvh?]
+           [<object>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-mvref</emphasis> tool changes all references to one object (the source object) into references to another object (the target object) in a specified set of objects.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-c</listItemTerm>
+              <listItemDefinition>
+                <para>Only move references within the content section of objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Move references in all objects in the specified directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite updated input objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of data module filenames, rather than a data module itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s &lt;source&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The source object.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t &lt;target&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Change all references to the source object specified with -s into references that point to &lt;target&gt;.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Objects to move references in.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-mvref -f -s &lt;old DM&gt; -t &lt;new DM&gt; DMC-*.XML</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

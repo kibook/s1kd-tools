@@ -66,6 +66,9 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     The **s1kd-metadata** tool lists and edits S1000D metadata on CSDB
     objects.
 
+    The **s1kd-mvref** tool changes references to one object into
+    references to another.
+
     The **s1kd-ref** tool can be used to quickly insert references to
     other CSDB objects.
 
@@ -90,9 +93,6 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
     The **s1kd-refs** tool lists references in a CSDB object to generate
     a list of dependencies on other CSDB objects.
-
-    The **s1kd-checkrefs** tool validates references between CSDB
-    objects.
 
 4.  **Publication:** These tools support the production of publications
     from a CSDB.
@@ -145,8 +145,6 @@ Manpages for each tool:
 
 -   s1kd-brexcheck(1)
 
--   s1kd-checkrefs(1)
-
 -   s1kd-ls(1)
 
 -   s1kd-defaults(1)
@@ -164,6 +162,8 @@ Manpages for each tool:
 -   s1kd-instance(1)
 
 -   s1kd-metadata(1)
+
+-   s1kd-mvref(1)
 
 -   s1kd-neutralize(1)
 

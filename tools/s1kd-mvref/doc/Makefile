@@ -1,5 +1,5 @@
 SOURCE=DMC-S1KDTOOLS-A-19-00-00-00A-040A-D_EN-CA.XML
-OUTPUT=s1kd-checkrefs.1
+OUTPUT=s1kd-mvref.1
 README=../README.md
 
 PREFIX=/usr/local

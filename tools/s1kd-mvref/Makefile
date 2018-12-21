@@ -1,5 +1,5 @@
-SOURCE=s1kd-checkrefs.c
-OUTPUT=s1kd-checkrefs
+SOURCE=s1kd-mvref.c
+OUTPUT=s1kd-mvref
 
 CFLAGS=-Wall -Werror -pedantic-errors `pkg-config --cflags libxml-2.0`
 

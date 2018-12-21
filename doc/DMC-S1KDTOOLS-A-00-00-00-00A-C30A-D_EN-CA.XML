@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="01"/>
+        <issueInfo issueNumber="011" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="11" day="04"/>
+        <issueDate year="2018" month="12" day="21"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -44,6 +44,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Rename s1kd-checkrefs to s1kd-mvref.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -229,35 +232,6 @@
               </entry>
               <entry>
                 <para>~</para>
-              </entry>
-            </row>
-            <row>
-              <entry>
-                <para>s1kd-checkrefs</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
-              </entry>
-              <entry>
-                <para>X</para>
               </entry>
             </row>
             <row>
@@ -495,6 +469,35 @@
             <row>
               <entry>
                 <para>s1kd-metadata</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+            </row>
+            <row changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+              <entry>
+                <para>s1kd-mvref</para>
               </entry>
               <entry>
                 <para>X</para>

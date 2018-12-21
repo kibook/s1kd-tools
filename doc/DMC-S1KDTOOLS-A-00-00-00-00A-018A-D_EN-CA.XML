@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="01"/>
+        <issueInfo issueNumber="015" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="11" day="04"/>
+        <issueDate year="2018" month="12" day="21"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Rename s1kd-checkrefs to s1kd-mvref and change its function.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -80,6 +83,7 @@
                 <para>The <emphasis>s1kd-addicn</emphasis> tool creates the notation and entity elements to reference an ICN in a data module.</para>
                 <para>The <emphasis>s1kd-ls</emphasis> tool lists data modules within a directory.</para>
                 <para>The <emphasis>s1kd-metadata</emphasis> tool lists and edits S1000D metadata on CSDB objects.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">The <emphasis>s1kd-mvref</emphasis> tool changes references to one object into references to another.</para>
                 <para>The <emphasis>s1kd-ref</emphasis> tool can be used to quickly insert references to other CSDB objects.</para>
                 <para>The <emphasis>s1kd-sns</emphasis> tool can be used to organize the CSDB using a given SNS structure.</para>
                 <para>The <emphasis>s1kd-transform</emphasis> tool applies XSLT transformations to CSDB objects.</para>
@@ -90,7 +94,6 @@
                 <para>The <emphasis>s1kd-validate</emphasis> tool validates CSDB objects according to their S1000D schema and general correctness as XML documents.</para>
                 <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates CSDB objects against a business rules exchange (BREX) data module, which contains the project-defined computable business rules.</para>
                 <para>The <emphasis>s1kd-refs</emphasis> tool lists references in a CSDB object to generate a list of dependencies on other CSDB objects.</para>
-                <para>The <emphasis>s1kd-checkrefs</emphasis> tool validates references between CSDB objects.</para>
               </listItem>
               <listItem>
                 <para><emphasis>Publication:</emphasis> These tools support the production of publications from a CSDB.</para>
@@ -128,9 +131,6 @@
               <para>s1kd-brexcheck(1)</para>
             </listItem>
             <listItem>
-              <para>s1kd-checkrefs(1)</para>
-            </listItem>
-            <listItem>
               <para>s1kd-ls(1)</para>
             </listItem>
             <listItem>
@@ -156,6 +156,9 @@
             </listItem>
             <listItem>
               <para>s1kd-metadata(1)</para>
+            </listItem>
+            <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+              <para>s1kd-mvref(1)</para>
             </listItem>
             <listItem>
               <para>s1kd-neutralize(1)</para>

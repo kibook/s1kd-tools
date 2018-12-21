@@ -23,7 +23,6 @@ Support is planned but not yet implemented.
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-aspp       | X   | X   | X   | X   | \~  | \~  | \~  | \~  |
 | s1kd-brexcheck  | X   | X   | X   | X   | X   | X   | \~  | \~  |
-| s1kd-checkrefs  | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-defaults   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-dmrl       | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-flatten    | X   | X   | X   | X   | X   | X   | X   | X   |
@@ -33,6 +32,7 @@ Support is planned but not yet implemented.
 | s1kd-instance   | X   | X   | X   | /   | \~  | \~  | \~  | \~  |
 | s1kd-ls         | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-metadata   | X   | X   | X   | X   | X   | X   | X   | X   |
+| s1kd-mvref      | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-neutralize | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newcom     | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-newddn     | X   | X   | X   | X   | X   | X   | X   | X   |
