@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="001" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="12" day="21"/>
+        <issueDate year="2018" month="12" day="25"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>New tool for converting units of measure.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt01">
+        <simplePara>Improve section on conversion formula variables.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -148,21 +148,32 @@
           </para>
           <para>This will generate a <verbatimText verbatimStyle="vs02">.uom</verbatimText> file containing rules to convert inches to centimetres, and degrees Fahrenheit to degrees Celsius.</para>
         </levelledPara>
-        <levelledPara>
+        <levelledPara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
           <title>Conversion formula variables (-e)</title>
-          <para>When specifying a formula for conversion, the variable <verbatimText>$value</verbatimText> represents the original quantity value. For example, the formula to convert between degrees Fahrenheit and degrees Celsius can be given as follows:</para>
+          <para>When specifying a formula for conversion, the following variables can be used:</para>
           <para>
-            <verbatimText verbatimStyle="vs14">($value - 32) * (5 div 9)</verbatimText>
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>
+                  <verbatimText>$pi</verbatimText>
+                </listItemTerm>
+                <listItemDefinition>
+                  <para>The constant π</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>
+                  <verbatimText>$value</verbatimText>
+                </listItemTerm>
+                <listItemDefinition>
+                  <para>The original quantity value</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
           </para>
-          <para>In additions to this, the following common variables can be used:</para>
+          <para>For example, the formula to convert degrees to radians can be given as follows:</para>
           <para>
-            <randomList>
-              <listItem>
-                <para>
-                  <verbatimText verbatimStyle="vs02">$pi</verbatimText>
-                </para>
-              </listItem>
-            </randomList>
+            <verbatimText verbatimStyle="vs14">$value * ($pi div 180)</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

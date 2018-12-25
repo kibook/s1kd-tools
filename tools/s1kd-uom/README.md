@@ -88,16 +88,19 @@ centimetres, and degrees Fahrenheit to degrees Celsius.
 Conversion formula variables (-e)
 ---------------------------------
 
-When specifying a formula for conversion, the variable `$value`
-represents the original quantity value. For example, the formula to
-convert between degrees Fahrenheit and degrees Celsius can be given as
+When specifying a formula for conversion, the following variables can be
+used:
+
+`$pi`  
+The constant π
+
+`$value`  
+The original quantity value
+
+For example, the formula to convert degrees to radians can be given as
 follows:
 
-`($value - 32) * (5 div 9)`
-
-In additions to this, the following common variables can be used:
-
--   `$pi`
+`$value * ($pi div 180)`
 
 EXAMPLES
 ========
