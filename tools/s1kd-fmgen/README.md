@@ -94,7 +94,7 @@ Example of simple text format:
     00S    LOEDM
     00U    HIGH
 
-Example of XML format
+Example of XML format:
 
     <fmtypes>
     <fm infoCode="001" type="TP"/>
