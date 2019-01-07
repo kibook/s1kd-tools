@@ -48,10 +48,11 @@
 /* General errors get negative exit codes to distinguish them from
  * BREX error-related exit statuses.
  */
-#define ERR_MISSING_BREX_FILE -1
-#define ERR_MISSING_DMODULE -3
-#define ERR_INVALID_OBJ_PATH -4
-#define ERR_MAX_OBJS -5
+#define EXIT_BREX_ERROR 1
+#define EXIT_MISSING_BREX_FILE 2
+#define EXIT_MISSING_DMODULE 3
+#define EXIT_INVALID_OBJ_PATH 4
+#define EXIT_MAX_OBJS 5
 
 /* Initial maximum numbers of CSDB objects/search paths. */
 unsigned BREX_MAX = 1;
@@ -658,7 +659,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 			if (verbose > SILENT) {
 				fprintf(stderr, E_INVOBJPATH);
 			}
-			exit(ERR_INVALID_OBJ_PATH);
+			exit(EXIT_INVALID_OBJ_PATH);
 		}
 
 		if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object)) {
@@ -988,7 +989,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 			if (verbose > SILENT) {
 				fprintf(stderr, E_MISSBREX, brex_fnames[i]);
 			}
-			exit(ERR_MISSING_BREX_FILE);
+			exit(EXIT_MISSING_BREX_FILE);
 		}
 
 		context = xmlXPathNewContext(brex_doc);
@@ -1167,7 +1168,7 @@ void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s)
 			if (verbose > SILENT) {
 				fprintf(stderr, E_MAXOBJS);
 			}
-			exit(ERR_MAX_OBJS);
+			exit(EXIT_MAX_OBJS);
 		}
 	}
 
@@ -1426,7 +1427,7 @@ int main(int argc, char *argv[])
 			} else {
 				if (verbose > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
 			}
-			exit(ERR_MISSING_DMODULE);
+			exit(EXIT_MISSING_DMODULE);
 		}
 
 		if (num_brex_fnames == 0) {
@@ -1509,5 +1510,9 @@ int main(int argc, char *argv[])
 	free(brex_search_paths);
 	free(dmod_fnames);
 
-	return status;
+	if (status > 0) {
+		return EXIT_BREX_ERROR;
+	} else {
+		return EXIT_SUCCESS;
+	}
 }

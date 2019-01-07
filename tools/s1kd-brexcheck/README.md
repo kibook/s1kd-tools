@@ -217,11 +217,27 @@ The s1kd-brexcheck tool supports all three types. If the `valueForm`
 attribute is omitted, it will assume the value is in the `"single"`
 notation.
 
-RETURN VALUE
-============
+EXIT STATUS
+===========
 
-The number of BREX errors encountered is returned in the exit status
-code.
+0  
+Check completed successfully, and no CSDB objects had BREX errors.
+
+1  
+Check completed successfully, but some CSDB objects had BREX errors.
+
+2  
+One or more BREX data modules could not be found.
+
+3  
+One or more CSDB objects specified could not be found.
+
+4  
+An XPath expression given for a BREX rule was invalid.
+
+5  
+The number of paths or CSDB objects specified exceeded the available
+memory.
 
 EXAMPLE
 =======

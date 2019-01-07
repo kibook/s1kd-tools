@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="024" inWork="00"/>
+        <issueInfo issueNumber="024" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="12" day="21"/>
+        <issueDate year="2019" month="01" day="07"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,17 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Change format of XML report.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
-        <simplePara>Markup attribute names/values consistently.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Remove -D option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateReasonType="urt01" updateHighlight="0">
-        <simplePara>Separate -q and -v option descriptions.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change and document exit codes.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -61,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
                [-BcfLlpqS[tu]svxh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -72,7 +63,7 @@
       <levelledPara>
         <title>OPTIONS</title>
         <para>
-          <definitionList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0004">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>-B</listItemTerm>
               <listItemDefinition>
@@ -180,7 +171,7 @@
         </para>
         <levelledPara>
           <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
-          <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">The attribute <verbatimText verbatimStyle="vs13">brSeverityLevel</verbatimText> on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
+          <para>The attribute <verbatimText verbatimStyle="vs13">brSeverityLevel</verbatimText> on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
           <para>By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
@@ -190,7 +181,7 @@
 <brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
 </brSeverityLevels>]]></verbatimText>
           </para>
-          <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of <verbatimText verbatimStyle="vs14">"yes"</verbatimText> (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is <verbatimText verbatimStyle="vs14">"no"</verbatimText>, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
+          <para>When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of <verbatimText verbatimStyle="vs14">"yes"</verbatimText> (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is <verbatimText verbatimStyle="vs14">"no"</verbatimText>, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
         </levelledPara>
         <levelledPara>
           <title>Normal, strict and unstrict SNS check (-S, -St, -Su)</title>
@@ -269,9 +260,48 @@
           <para>The s1kd-brexcheck tool supports all three types. If the <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute is omitted, it will assume the value is in the <verbatimText verbatimStyle="vs14">"single"</verbatimText> notation.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara>
-        <title>RETURN VALUE</title>
-        <para>The number of BREX errors encountered is returned in the exit status code.</para>
+      <levelledPara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>Check completed successfully, and no CSDB objects had BREX errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>Check completed successfully, but some CSDB objects had BREX errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>One or more BREX data modules could not be found.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>One or more CSDB objects specified could not be found.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>4</listItemTerm>
+              <listItemDefinition>
+                <para>An XPath expression given for a BREX rule was invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>5</listItemTerm>
+              <listItemDefinition>
+                <para>The number of paths or CSDB objects specified exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLE</title>
@@ -303,8 +333,8 @@ internalRef[1]):
         TEXT
           content=stp-0001]]></verbatimText>
         </para>
-        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Example of XML report format for the above:</para>
-        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <para>Example of XML report format for the above:</para>
+        <para>
           <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
 <brexCheck>
 <document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML">
