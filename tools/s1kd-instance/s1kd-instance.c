@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.13.1"
+#define VERSION "1.14.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2837,6 +2837,8 @@ int main(int argc, char **argv)
 				if (autoname && !auto_name(out, src, doc, dir, no_issue)) {
 					fprintf(stderr, S_BAD_TYPE);
 					exit(EXIT_BAD_XML);
+				} else if (force_overwrite) {
+					strcpy(out, src);
 				}
 
 				if (access(out, F_OK) == 0 && !force_overwrite) {

@@ -8,7 +8,7 @@ Options:
   -E            Remove extension from instance.
   -e <ext>      Specify an extension on the instance code (DME/PME).
   -F            Flatten alts elements.
-  -f            When using -O, overwrite file with same name if it exists.
+  -f            Force overwriting of files.
   -G            Use custom NCAGE/name for originator.
   -g            Set originator of the instance to identify this tool.
   -h -?         Show this help/usage message.
