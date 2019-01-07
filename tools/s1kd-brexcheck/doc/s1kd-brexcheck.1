@@ -11,7 +11,7 @@ modules
 .nf
 \f[C]
 s1kd\-brexcheck\ [\-b\ <brex>]\ [\-I\ <path>]\ [\-w\ <severities>]
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-BcfLlpqS[tu]svxh?]\ [<object>...]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-BcfLlpqS[tu]sTvxh?]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -112,6 +112,12 @@ of all SNS rules of all specified BREX data modules.
 .B \-s
 Use shortened, single\-line messages to report BREX errors instead of
 multiline indented messages.
+.RS
+.RE
+.TP
+.B \-T
+Print a summary of the check after it completes, including statistics on
+the number of documents that passed/failed the check.
 .RS
 .RE
 .TP

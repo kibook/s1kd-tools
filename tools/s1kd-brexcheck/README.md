@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-                   [-BcfLlpqS[tu]svxh?] [<object>...]
+                   [-BcfLlpqS[tu]sTvxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -81,6 +81,10 @@ specified BREX data modules.
 -s  
 Use shortened, single-line messages to report BREX errors instead of
 multiline indented messages.
+
+-T  
+Print a summary of the check after it completes, including statistics on
+the number of documents that passed/failed the check.
 
 -v  
 Verbose mode. The success or failure of each test is printed explicitly.

@@ -1,7 +1,7 @@
 SOURCE=s1kd-brexcheck.c ../common/s1kd_tools.c
 OUTPUT=s1kd-brexcheck
 
-CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0`
+CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g
@@ -9,7 +9,7 @@ else
 	CFLAGS+=-O3
 endif
 
-LDFLAGS=`pkg-config --libs libxml-2.0`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
@@ -20,9 +20,10 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) brex.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-brex.h: brex/DMC-*.XML
+brex.h: brex/DMC-*.XML stats.xsl
 	> brex.h
 	for f in brex/DMC-*.XML; do xxd -i "$$f" >> brex.h; done
+	xxd -i stats.xsl >> brex.h
 
 .PHONY: docs clean maintainer-clean install uninstall
 

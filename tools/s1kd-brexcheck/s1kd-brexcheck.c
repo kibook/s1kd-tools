@@ -13,6 +13,8 @@
 #include <libxml/debugXML.h>
 #include <libxml/xmlregexp.h>
 
+#include <libxslt/transform.h>
+
 #include "brex.h"
 #include "s1kd_tools.h"
 
@@ -24,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.3.0"
+#define VERSION "2.4.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1273,10 +1275,27 @@ const char *default_brex_dmc(xmlDocPtr doc)
 	return code;
 }
 
+void print_stats(xmlDocPtr doc)
+{
+	xmlDocPtr styledoc;
+	xsltStylesheetPtr style;
+	xmlDocPtr res;
+
+	styledoc = xmlReadMemory((const char *) stats_xsl, stats_xsl_len, NULL, NULL, 0);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	fprintf(stderr, "%s", (char *) res->children->content);
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-I <path>] [-w <sev>] [-BcfLlnpqS[tu]svxh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-I <path>] [-w <sev>] [-BcfLlnpqS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?        Show this help message.");
@@ -1292,6 +1311,7 @@ void show_help(void)
 	puts("  -q           Quiet mode.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict).");
 	puts("  -s           Short messages.");
+	puts("  -T           Print a summary of the check.");
 	puts("  -v           Verbose mode.");
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -x           XML output.");
@@ -1330,11 +1350,12 @@ int main(int argc, char *argv[])
 	bool only_fnames = false;
 	bool is_list = false;
 	bool use_default_brex = false;
+	bool show_stats = false;
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:I:xvqslw:StupfncLh?";
+	const char *sopts = "Bb:I:xvqslw:StupfncLTh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1372,6 +1393,7 @@ int main(int argc, char *argv[])
 			case 'n': check_notation = true; break;
 			case 'c': check_values = true; break;
 			case 'L': is_list = true; break;
+			case 'T': show_stats = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1497,6 +1519,10 @@ int main(int argc, char *argv[])
 		xmlSaveFile("-", outdoc);
 	}
 
+	if (show_stats) {
+		print_stats(outdoc);
+	}
+
 	xmlFreeDoc(outdoc);
 
 	if (brsl_fname) {
@@ -1504,6 +1530,7 @@ int main(int argc, char *argv[])
 		free(brsl_fname);
 	}
 
+	xsltCleanupGlobals();
 	xmlCleanupParser();
 
 	free(brex_fnames);
