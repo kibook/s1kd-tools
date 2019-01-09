@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.14.0"
+#define VERSION "1.14.1"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -111,10 +111,14 @@ xmlNodePtr applicability;
 int napplics = 0;
 
 /* Define a value for a product attribute or condition. */
-void define_applic(char *ident, char *type, char *value, bool pct)
+void define_applic(const char *ident, const char *type, const char *value, bool pct)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
+
+	if (!(ident && type && value)) {
+		return;
+	}
 
 	/* Check if an assert has already been created for this property. */
 	for (cur = applicability->children; cur; cur = cur->next) {
@@ -609,7 +613,7 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 
 	bool result = assume;
 
-	if (!(ident || type || value)) {
+	if (!(ident && type && value)) {
 		return assume;
 	}
 
