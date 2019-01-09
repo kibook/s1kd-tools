@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Change behaviour of -f option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
+        <simplePara>Add EXIT STATUS section.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -815,6 +818,55 @@ is an item in the system.
           <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.</para>
         </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>No errors</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>Missing or incomplete argument</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>Specified file does not exist</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>4</listItemTerm>
+              <listItemDefinition>
+                <para>Malformed applicability definition</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>6</listItemTerm>
+              <listItemDefinition>
+                <para>XML was invalid or does not conform to S1000D</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>7</listItemTerm>
+              <listItemDefinition>
+                <para>Value given for an argument was malformed</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>8</listItemTerm>
+              <listItemDefinition>
+                <para>Issue date specified with -I is invalid</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLES</title>

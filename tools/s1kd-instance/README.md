@@ -750,6 +750,30 @@ specific template in the custom XSLT script are automatically copied.
 The set of built-in XSLT scripts used to resolve dependencies can be
 dumped using the -x option.
 
+EXIT STATUS
+===========
+
+0  
+No errors
+
+1  
+Missing or incomplete argument
+
+2  
+Specified file does not exist
+
+4  
+Malformed applicability definition
+
+6  
+XML was invalid or does not conform to S1000D
+
+7  
+Value given for an argument was malformed
+
+8  
+Issue date specified with -I is invalid
+
 EXAMPLES
 ========
 

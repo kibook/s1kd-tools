@@ -920,6 +920,42 @@ specific template in the custom XSLT script are automatically copied.
 .PP
 The set of built\-in XSLT scripts used to resolve dependencies can be
 dumped using the \-x option.
+.SH EXIT STATUS
+.TP
+.B 0
+No errors
+.RS
+.RE
+.TP
+.B 1
+Missing or incomplete argument
+.RS
+.RE
+.TP
+.B 2
+Specified file does not exist
+.RS
+.RE
+.TP
+.B 4
+Malformed applicability definition
+.RS
+.RE
+.TP
+.B 6
+XML was invalid or does not conform to S1000D
+.RS
+.RE
+.TP
+.B 7
+Value given for an argument was malformed
+.RS
+.RE
+.TP
+.B 8
+Issue date specified with \-I is invalid
+.RS
+.RE
 .SH EXAMPLES
 .PP
 Filtering a data module on specified applicability and writing to
