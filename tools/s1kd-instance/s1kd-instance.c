@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.14.1"
+#define VERSION "1.14.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2523,6 +2523,7 @@ int main(int argc, char **argv)
 	bool combine_applic = true;
 	bool clean_ents = false;
 	bool autocomp = false;
+	bool use_stdout = true;
 
 	xmlNodePtr cirs, cir;
 
@@ -2569,8 +2570,8 @@ int main(int argc, char **argv)
 			case 'm': remarks = strdup(optarg); break;
 			case 'N': no_issue = true; break;
 			case 'n': strncpy(issinfo, optarg, 6); break;
-			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); break;
-			case 'o': strncpy(out, optarg, PATH_MAX - 1); break;
+			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); use_stdout = false; break;
+			case 'o': strncpy(out, optarg, PATH_MAX - 1); use_stdout = false; break;
 			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
 			case 'p': strncpy(product, optarg, 63); break;
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
@@ -2838,11 +2839,11 @@ int main(int argc, char **argv)
 					autocomplete(doc);
 				}
 
-				if (autoname && !auto_name(out, src, doc, dir, no_issue)) {
+				if (use_stdout && force_overwrite) {
+					strcpy(out, src);
+				} else if (autoname && !auto_name(out, src, doc, dir, no_issue)) {
 					fprintf(stderr, S_BAD_TYPE);
 					exit(EXIT_BAD_XML);
-				} else if (force_overwrite) {
-					strcpy(out, src);
 				}
 
 				if (access(out, F_OK) == 0 && !force_overwrite) {
