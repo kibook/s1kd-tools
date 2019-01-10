@@ -14,7 +14,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.3.2"
+#define VERSION "1.3.3"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
@@ -128,7 +128,9 @@ int main(int argc, char **argv)
 		char iss[8];
 		char *templs = NULL;
 
-		in = xmlReadFile(argv[i], NULL, PARSE_OPTS);
+		if (!(in = xmlReadFile(argv[i], NULL, PARSE_OPTS))) {
+			continue;
+		}
 
 		params[0] = "no-issue";
 		params[1] = noIssue ? "true()" : "false()";
