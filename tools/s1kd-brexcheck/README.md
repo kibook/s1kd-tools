@@ -231,10 +231,10 @@ Check completed successfully, and no CSDB objects had BREX errors.
 Check completed successfully, but some CSDB objects had BREX errors.
 
 2  
-One or more BREX data modules could not be found.
+One or more BREX data modules could not be read.
 
 3  
-One or more CSDB objects specified could not be found.
+One or more CSDB objects specified could not be read.
 
 4  
 An XPath expression given for a BREX rule was invalid.

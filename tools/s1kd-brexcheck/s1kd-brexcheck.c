@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.4.0"
+#define VERSION "2.4.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -35,12 +35,12 @@
 #define I_PREFIX PROG_NAME ": INFO: "
 
 /* Error message templates. */
-#define E_NODMOD E_PREFIX "Data module %s not found.\n"
+#define E_NODMOD E_PREFIX "Could not read file \"%s\".\n"
 #define E_NODMOD_STDIN E_PREFIX "stdin does not contain valid XML.\n"
 #define E_NOBREX E_PREFIX "No BREX data module found for %s.\n"
 #define E_NOBREX_STDIN E_PREFIX "No BREX found for data module on stdin.\n"
 #define E_INVOBJPATH E_PREFIX "Invalid object path.\n"
-#define E_MISSBREX E_PREFIX "Could not find BREX file \"%s\".\n"
+#define E_MISSBREX E_PREFIX "Could not read BREX file \"%s\".\n"
 #define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
 #define E_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
 #define E_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
@@ -52,7 +52,7 @@
  */
 #define EXIT_BREX_ERROR 1
 #define EXIT_MISSING_BREX_FILE 2
-#define EXIT_MISSING_DMODULE 3
+#define EXIT_BAD_DMODULE 3
 #define EXIT_INVALID_OBJ_PATH 4
 #define EXIT_MAX_OBJS 5
 
@@ -1449,7 +1449,7 @@ int main(int argc, char *argv[])
 			} else {
 				if (verbose > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
 			}
-			exit(EXIT_MISSING_DMODULE);
+			exit(EXIT_BAD_DMODULE);
 		}
 
 		if (num_brex_fnames == 0) {

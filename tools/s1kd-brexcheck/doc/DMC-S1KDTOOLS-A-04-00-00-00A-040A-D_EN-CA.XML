@@ -288,13 +288,13 @@
             <definitionListItem>
               <listItemTerm>2</listItemTerm>
               <listItemDefinition>
-                <para>One or more BREX data modules could not be found.</para>
+                <para>One or more BREX data modules could not be read.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>3</listItemTerm>
               <listItemDefinition>
-                <para>One or more CSDB objects specified could not be found.</para>
+                <para>One or more CSDB objects specified could not be read.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
