@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.14.3"
+#define VERSION "1.14.4"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1708,7 +1708,7 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
-void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl)
+xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl)
 {
 	xmlDocPtr cir;
 	xmlXPathContextPtr ctxt;
@@ -1812,6 +1812,8 @@ void undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const cha
 	}
 
 	xmlFreeDoc(cir);
+
+	return xmlDocGetRootElement(dm);
 }
 
 /* Set the issue and inwork numbers of the instance. */
@@ -2721,9 +2723,9 @@ int main(int argc, char **argv)
 					}
 
 					if (ispm) {
-						undepend_cir(doc, cirdocfname, false, cirxsl);
+						root = undepend_cir(doc, cirdocfname, false, cirxsl);
 					} else {
-						undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
+						root = undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
 					}
 
 					xmlFree(cirdocfname);
