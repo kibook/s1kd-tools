@@ -18,7 +18,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.14.2"
+#define VERSION "1.14.3"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1689,7 +1689,7 @@ void dump_cir_xsl(const char *repo)
 void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 {
 	xmlDocPtr res, muxdoc;
-	xmlNodePtr mux;
+	xmlNodePtr mux, old;
 
 	muxdoc = xmlNewDoc(BAD_CAST "1.0");
 	mux = xmlNewNode(NULL, BAD_CAST "mux");
@@ -1699,7 +1699,9 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 
 	res = xsltApplyStylesheet(style, muxdoc, NULL);
 
-	xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, BAD_CAST "/mux/dmodule[1]"), 1));
+	old = xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, BAD_CAST "/mux/dmodule[1]"), 1));
+	xmlFreeNode(old);
+
 	xmlFreeDoc(res);
 	xmlFreeDoc(muxdoc);
 }
