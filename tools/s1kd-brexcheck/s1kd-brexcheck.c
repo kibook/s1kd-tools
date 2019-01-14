@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.4.3"
+#define VERSION "2.5.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -107,6 +107,9 @@ bool check_notation = false;
 
 /* Whether to check object values. */
 bool check_values = false;
+
+/* Print the filenames of invalid objects. */
+bool show_fnames = false;
 
 /* Return the first node in a set matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -629,6 +632,112 @@ void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Print the XML report as plain text messages */
+void print_node(xmlNodePtr node)
+{
+	xmlNodePtr cur;
+
+	if (strcmp((char *) node->name, "error") == 0) {
+		char *dpath = (char *) xmlGetProp(node->parent->parent, BAD_CAST "path");
+		char *bpath = (char *) xmlGetProp(node->parent, BAD_CAST "path");
+		if (xmlStrcmp(node->parent->name, BAD_CAST "sns") == 0) {
+			if (shortmsg) {
+				fprintf(stderr, "SNS ERROR: %s: ", dpath);
+			} else {
+				fprintf(stderr, "SNS ERROR: %s\n", dpath);
+			}
+		} else if (xmlStrcmp(node->parent->name, BAD_CAST "notations") == 0) {
+			if (shortmsg) {
+				fprintf(stderr, "NOTATION ERROR: %s: ", dpath);
+			} else {
+				fprintf(stderr, "NOTATION ERROR: %s\n", dpath);
+			}
+		} else {
+			if (shortmsg) {
+				fprintf(stderr, "BREX ERROR: %s: ", dpath);
+			} else {
+				fprintf(stderr, "BREX ERROR: %s\n", dpath);
+				fprintf(stderr, "  BREX: %s\n", bpath);
+			}
+		}
+		xmlFree(dpath);
+		xmlFree(bpath);
+	} else if (strcmp((char *) node->name, "type") == 0 && !shortmsg) {
+		char *type = (char *) xmlNodeGetContent(node);
+		fprintf(stderr, "  TYPE: %s\n", type);
+		xmlFree(type);
+	} else if (strcmp((char *) node->name, "objectUse") == 0) {
+		char *use = (char *) xmlNodeGetContent(node);
+		if (shortmsg) {
+			fprintf(stderr, "%s", use);
+		} else {
+			fprintf(stderr, "  %s\n", use);
+		}
+		xmlFree(use);
+	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
+		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
+		char *content = (char *) xmlNodeGetContent(node);
+		fprintf(stderr, "  VALUE ALLOWED:");
+		if (allowed)
+			fprintf(stderr, " %s", allowed);
+		if (content && strcmp(content, "") != 0)
+			fprintf(stderr, " (%s)", content);
+		fputc('\n', stderr);
+		xmlFree(content);
+		xmlFree(allowed);
+	} else if (strcmp((char *) node->name, "objval") == 0 && !shortmsg) {
+		char *allowed = (char *) xmlGetProp(node, BAD_CAST "val1");
+		char *content = (char *) xmlNodeGetContent(node);
+		fprintf(stderr, "  VALUE ALLOWED:");
+		if (allowed)
+			fprintf(stderr, " %s", allowed);
+		if (content && strcmp(content, "") != 0)
+			fprintf(stderr, " (%s)", content);
+		fputc('\n', stderr);
+		xmlFree(content);
+		xmlFree(allowed);
+	} else if (strcmp((char *) node->name, "object") == 0 && !shortmsg) {
+		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
+		char *path = (char *) xmlGetProp(node, BAD_CAST "xpath");
+		fprintf(stderr, "  line %s (%s):\n", line, path);
+		xmlDebugDumpOneNode(stdout, node->children, 2);
+		xmlFree(line);
+		xmlFree(path);
+	} else if (strcmp((char *) node->name, "snsError") == 0) {
+		fprintf(stderr, "SNS ERROR: ");
+	} else if (strcmp((char *) node->name, "code") == 0) {
+		char *code = (char *) xmlNodeGetContent(node);
+		if (!shortmsg) fprintf(stderr, "  ");
+		fprintf(stderr, "Value of %s does not conform to SNS: ", code);
+		xmlFree(code);
+	} else if (strcmp((char *) node->name, "invalidValue") == 0) {
+		char *value = (char *) xmlNodeGetContent(node);
+		if (shortmsg) {
+			fprintf(stderr, "%s", value);
+		} else {
+			fprintf(stderr, "%s\n", value);
+		}
+		xmlFree(value);
+	} else if (strcmp((char *) node->name, "invalidNotation") == 0) {
+		char *value = (char *) xmlNodeGetContent(node);
+		if (!shortmsg) fprintf(stderr, "  ");
+		fprintf(stderr, "Notation %s is not allowed", value);
+		if (shortmsg)
+			fprintf(stderr, ": ");
+		else
+			fprintf(stderr, ".\n");
+		xmlFree(value);
+	}
+
+	for (cur = node->children; cur; cur = cur->next) {
+		print_node(cur);
+	}
+
+	if (shortmsg && xmlStrcmp(node->name, BAD_CAST "error") == 0) {
+		fputc('\n', stderr);
+	}
+}
+
 /* Check the context rules of a BREX DM against a CSDB object. */
 int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr documentNode)
@@ -712,6 +821,10 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 			}
 
 			xmlFree(severity);
+
+			if (verbose > SILENT) {
+				print_node(brexError);
+			}
 		}
 
 		xmlXPathFreeObject(object);
@@ -953,6 +1066,23 @@ int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDoc
 	return invalid;
 }
 
+/* Print the filenames of CSDB objects with BREX errors. */
+void print_fnames(xmlNodePtr node)
+{
+	xmlNodePtr cur;
+
+	if (xmlStrcmp(node->name, BAD_CAST "document") == 0 && firstXPathNode(NULL, node, "brex/error")) {
+		xmlChar *fname;
+		fname = xmlGetProp(node, BAD_CAST "path");
+		puts((char *) fname);
+		xmlFree(fname);
+	}
+
+	for (cur = node->children; cur; cur = cur->next) {
+		print_fnames(cur);
+	}
+}
+
 /* Check context, SNS, and notation rules of BREX DMs against a CSDB object. */
 int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
@@ -1021,134 +1151,11 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlFreeDoc(brex_doc);
 	}
 
+	if (show_fnames) {
+		print_fnames(documentNode);
+	}
+
 	return total;
-}
-
-/* Print the XML report as plain text messages */
-void print_node(xmlNodePtr node)
-{
-	xmlNodePtr cur;
-
-	if (strcmp((char *) node->name, "error") == 0) {
-		char *dpath = (char *) xmlGetProp(node->parent->parent, BAD_CAST "path");
-		char *bpath = (char *) xmlGetProp(node->parent, BAD_CAST "path");
-		if (xmlStrcmp(node->parent->name, BAD_CAST "sns") == 0) {
-			if (shortmsg) {
-				printf("SNS ERROR: %s: ", dpath);
-			} else {
-				printf("SNS ERROR: %s\n", dpath);
-			}
-		} else if (xmlStrcmp(node->parent->name, BAD_CAST "notations") == 0) {
-			if (shortmsg) {
-				printf("NOTATION ERROR: %s: ", dpath);
-			} else {
-				printf("NOTATION ERROR: %s\n", dpath);
-			}
-		} else {
-			if (shortmsg) {
-				printf("BREX ERROR: %s: ", dpath);
-			} else {
-				printf("BREX ERROR: %s\n", dpath);
-				printf("  BREX: %s\n", bpath);
-			}
-		}
-		xmlFree(dpath);
-		xmlFree(bpath);
-	} else if (strcmp((char *) node->name, "type") == 0 && !shortmsg) {
-		char *type = (char *) xmlNodeGetContent(node);
-		printf("  TYPE: %s\n", type);
-		xmlFree(type);
-	} else if (strcmp((char *) node->name, "objectUse") == 0) {
-		char *use = (char *) xmlNodeGetContent(node);
-		if (shortmsg) {
-			printf("%s", use);
-		} else {
-			printf("  %s\n", use);
-		}
-		xmlFree(use);
-	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
-		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
-		char *content = (char *) xmlNodeGetContent(node);
-		printf("  VALUE ALLOWED:");
-		if (allowed)
-			printf(" %s", allowed);
-		if (content && strcmp(content, "") != 0)
-			printf(" (%s)", content);
-		putchar('\n');
-		xmlFree(content);
-		xmlFree(allowed);
-	} else if (strcmp((char *) node->name, "objval") == 0 && !shortmsg) {
-		char *allowed = (char *) xmlGetProp(node, BAD_CAST "val1");
-		char *content = (char *) xmlNodeGetContent(node);
-		printf("  VALUE ALLOWED:");
-		if (allowed)
-			printf(" %s", allowed);
-		if (content && strcmp(content, "") != 0)
-			printf(" (%s)", content);
-		putchar('\n');
-		xmlFree(content);
-		xmlFree(allowed);
-	} else if (strcmp((char *) node->name, "object") == 0) {
-		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
-		char *path = (char *) xmlGetProp(node, BAD_CAST "xpath");
-		if (shortmsg) {
-			printf(" (line %s)", line);
-		} else {
-			printf("  line %s (%s):\n", line, path);
-			xmlDebugDumpOneNode(stdout, node->children, 2);
-		}
-		xmlFree(line);
-		xmlFree(path);
-	} else if (strcmp((char *) node->name, "snsError") == 0) {
-		printf("SNS ERROR: ");
-	} else if (strcmp((char *) node->name, "code") == 0) {
-		char *code = (char *) xmlNodeGetContent(node);
-		if (!shortmsg) printf("  ");
-		printf("Value of %s does not conform to SNS: ", code);
-		xmlFree(code);
-	} else if (strcmp((char *) node->name, "invalidValue") == 0) {
-		char *value = (char *) xmlNodeGetContent(node);
-		if (shortmsg) {
-			printf("%s", value);
-		} else {
-			printf("%s\n", value);
-		}
-		xmlFree(value);
-	} else if (strcmp((char *) node->name, "invalidNotation") == 0) {
-		char *value = (char *) xmlNodeGetContent(node);
-		if (!shortmsg) printf("  ");
-		printf("Notation %s is not allowed", value);
-		if (shortmsg)
-			printf(": ");
-		else
-			printf(".\n");
-		xmlFree(value);
-	}
-
-	for (cur = node->children; cur; cur = cur->next) {
-		print_node(cur);
-	}
-
-	if (shortmsg && xmlStrcmp(node->name, BAD_CAST "error") == 0) {
-		putchar('\n');
-	}
-}
-
-/* Print the filenames of CSDB objects with BREX errors. */
-void print_fnames(xmlNodePtr node)
-{
-	xmlNodePtr cur;
-
-	if (xmlStrcmp(node->name, BAD_CAST "document") == 0 && firstXPathNode(NULL, node, "brex/error")) {
-		xmlChar *fname;
-		fname = xmlGetProp(node, BAD_CAST "path");
-		puts((char *) fname);
-		xmlFree(fname);
-	}
-
-	for (cur = node->children; cur; cur = cur->next) {
-		print_fnames(cur);
-	}
 }
 
 /* Determine if a BREX exists in the given search paths. */
@@ -1305,13 +1312,13 @@ void show_help(void)
 	puts("  -B           Use the default BREX.");
 	puts("  -b <brex>    Use <brex> as the BREX data module.");
 	puts("  -c           Check object values.");
-	puts("  -f           Output only filenames of invalid modules.");
+	puts("  -f           Print the filenames of invalid objects.");
 	puts("  -I <path>    Add <path> to search path for BREX data module.");
 	puts("  -L           Input is a list of data module filenames.");
 	puts("  -l           Check BREX referenced by other BREX.");
 	puts("  -n           Check notation rules.");
 	puts("  -p           Display progress bar.");
-	puts("  -q           Quiet mode.");
+	puts("  -q           Quiet mode. Do not print errors.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict).");
 	puts("  -s           Short messages.");
 	puts("  -T           Print a summary of the check.");
@@ -1350,7 +1357,6 @@ int main(int argc, char *argv[])
 	bool xmlout = false;
 	bool layered = false;
 	bool progress = false;
-	bool only_fnames = false;
 	bool is_list = false;
 	bool use_default_brex = false;
 	bool show_stats = false;
@@ -1392,7 +1398,7 @@ int main(int argc, char *argv[])
 			case 't': strict_sns = true; break;
 			case 'u': unstrict_sns = true; break;
 			case 'p': progress = true; break;
-			case 'f': only_fnames = true; break;
+			case 'f': show_fnames = true; break;
 			case 'n': check_notation = true; break;
 			case 'c': check_values = true; break;
 			case 'L': is_list = true; break;
@@ -1510,15 +1516,7 @@ int main(int argc, char *argv[])
 	if (progress)
 		show_progress(i, num_dmod_fnames);
 
-	if (!xmlout) {
-		if (verbose > SILENT) {
-			if (only_fnames) {
-				print_fnames(brexCheck);
-			} else {
-				print_node(brexCheck);
-			}
-		}
-	} else {
+	if (xmlout) {
 		xmlSaveFile("-", outdoc);
 	}
 

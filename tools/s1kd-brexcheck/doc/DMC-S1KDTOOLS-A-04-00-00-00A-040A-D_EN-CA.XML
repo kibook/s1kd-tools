@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -T option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of -f, -q and -x options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -88,7 +91,7 @@
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para>Output only the filenames of CSDB objects with BREX/SNS errors.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Print the filenames of CSDB objects with BREX/SNS errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -131,7 +134,7 @@
             <definitionListItem>
               <listItemTerm>-q</listItemTerm>
               <listItemDefinition>
-                <para>Quiet mode. No output is given, errors are only indicated via the return code.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Quiet mode. No errors are printed, they are only indicated via the exit status.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -167,7 +170,7 @@
             <definitionListItem>
               <listItemTerm>-x</listItemTerm>
               <listItemDefinition>
-                <para>Output an XML report instead of a plain-text one.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Output an XML report.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

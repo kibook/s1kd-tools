@@ -36,7 +36,7 @@ When a context rule defines values for an object (objectValue), check if
 the value of each object is within the allowed set of values.
 
 -f  
-Output only the filenames of CSDB objects with BREX/SNS errors.
+Print the filenames of CSDB objects with BREX/SNS errors.
 
 -h -?  
 Show the help/usage message.
@@ -70,8 +70,8 @@ rule is returned.
 Display a progress bar.
 
 -q  
-Quiet mode. No output is given, errors are only indicated via the return
-code.
+Quiet mode. No errors are printed, they are only indicated via the exit
+status.
 
 -S\[tu\]  
 Check SNS (Standard Numbering System) rules. The SNS of each specified
@@ -93,7 +93,7 @@ Verbose mode. The success or failure of each test is printed explicitly.
 Specify a list of severity levels for business rules.
 
 -x  
-Output an XML report instead of a plain-text one.
+Output an XML report.
 
 --version  
 Show version information.
