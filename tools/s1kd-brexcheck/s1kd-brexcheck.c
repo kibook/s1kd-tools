@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.4.1"
+#define VERSION "2.4.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -634,7 +634,6 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 	int i;
 	int nerr = 0;
 	xmlNodePtr brexNode, brexError;
-	char rpath[PATH_MAX];
 
 	context = xmlXPathNewContext(doc);
 	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
@@ -642,7 +641,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 	defaultBrSeverityLevel = xmlGetProp(firstXPathNode(brex_doc, NULL, "//brex"), BAD_CAST "defaultBrSeverityLevel");
 
 	brexNode = xmlNewChild(documentNode, NULL, BAD_CAST "brex", NULL);
-	xmlSetProp(brexNode, BAD_CAST "path", BAD_CAST real_path(brexfname, rpath));
+	xmlSetProp(brexNode, BAD_CAST "path", BAD_CAST brexfname);
 
 	for (i = 0; i < rules->nodeNr; ++i) {
 		xmlNodePtr objectPath, objectUse;
@@ -964,14 +963,13 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 	char *schema;
 	char xpath[512];
-	char rpath[PATH_MAX];
 
 	schema = (char *) xmlGetProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation");
 	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema, schema);
 	xmlFree(schema);
 
 	documentNode = xmlNewChild(brexCheck, NULL, BAD_CAST "document", NULL);
-	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST real_path(docname, rpath));
+	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST docname);
 
 	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, documentNode)))
 		++total;
