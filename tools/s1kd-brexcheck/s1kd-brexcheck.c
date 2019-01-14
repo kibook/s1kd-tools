@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.5.0"
+#define VERSION "2.5.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -700,7 +700,7 @@ void print_node(xmlNodePtr node)
 		char *line = (char *) xmlGetProp(node, BAD_CAST "line");
 		char *path = (char *) xmlGetProp(node, BAD_CAST "xpath");
 		fprintf(stderr, "  line %s (%s):\n", line, path);
-		xmlDebugDumpOneNode(stdout, node->children, 2);
+		xmlDebugDumpOneNode(stderr, node->children, 2);
 		xmlFree(line);
 		xmlFree(path);
 	} else if (strcmp((char *) node->name, "snsError") == 0) {
