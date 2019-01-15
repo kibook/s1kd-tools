@@ -13,7 +13,7 @@
     <xsl:value-of select="count(document)"/>
     <xsl:text>&#10;</xsl:text>
     <xsl:text>Total BREX errors: </xsl:text>
-    <xsl:value-of select="count(//error)"/>
+    <xsl:value-of select="count(//error/object|//error[not(object)])"/>
     <xsl:text>&#10;</xsl:text>
     <xsl:text>Total documents that pass the check: </xsl:text>
     <xsl:value-of select="$pass"/>

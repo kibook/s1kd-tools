@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.1"
+#define VERSION "2.6.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
