@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.2"
+#define VERSION "2.1.3"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -559,7 +559,7 @@ int main(int argc, char **argv)
 				break;
 			case 'c': flatten_container = 1; break;
 			case 'D': flatten_ref = 0; break;
-			case 'd': search_dir = strdup(optarg); break;
+			case 'd': free(search_dir); search_dir = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'x': xinclude = 1; break;
 			case 'N': no_issue = 1; break;
