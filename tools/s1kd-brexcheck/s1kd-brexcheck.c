@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.2"
+#define VERSION "2.6.3"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -674,8 +674,6 @@ void print_node(xmlNodePtr node)
 		xmlDebugDumpOneNode(stderr, node->children, 2);
 		xmlFree(line);
 		xmlFree(path);
-	} else if (strcmp((char *) node->name, "snsError") == 0) {
-		fprintf(stderr, "SNS ERROR: ");
 	} else if (strcmp((char *) node->name, "code") == 0) {
 		char *code = (char *) xmlNodeGetContent(node);
 		if (!shortmsg) fprintf(stderr, "  ");
