@@ -4,6 +4,9 @@ General
 This document summarizes the compatibility between the s1kd-tools and
 each issue of the S1000D specification for which support is planned.
 
+\[empty\]  
+Support is planned but not yet implemented.
+
 X  
 Support is implemented.
 
@@ -14,8 +17,15 @@ Support is partially implemented.
 Support is not planned. Usually this is because older issues of the
 specification did not cover the function of the tool.
 
-\[empty\]  
-Support is planned but not yet implemented.
+> **Note**
+>
+> Although a tool may not directly support an issue of S1000D, it may
+> still be possible to use with that issue.
+>
+> For example, the s1kd-brexcheck tool is said not to support Issue 2.0
+> or Issue 2.1, because the BREX data module schema was not introduced
+> until Issue 2.2. However, an Issue 2.2 or greater BREX data module can
+> still be used to check Issue 2.0 or Issue 2.1 CSDB objects.
 
 | Tool            | 4.2 | 4.1 | 4.0 | 3.0 | 2.3 | 2.2 | 2.1 | 2.0 |
 |-----------------|-----|-----|-----|-----|-----|-----|-----|-----|

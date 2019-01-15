@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="12" day="21"/>
+        <issueDate year="2019" month="01" day="14"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -39,15 +39,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add s1kd-uom tool.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Rename s1kd-checkrefs to s1kd-mvref.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -57,6 +48,12 @@
         <para>This document summarizes the compatibility between the s1kd-tools and each issue of the S1000D specification for which support is planned.</para>
         <para>
           <definitionList>
+            <definitionListItem>
+              <listItemTerm>[empty]</listItemTerm>
+              <listItemDefinition>
+                <para>Support is planned but not yet implemented.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>X</listItemTerm>
               <listItemDefinition>
@@ -75,17 +72,15 @@
                 <para>Support is not planned. Usually this is because older issues of the specification did not cover the function of the tool.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>[empty]</listItemTerm>
-              <listItemDefinition>
-                <para>Support is planned but not yet implemented.</para>
-              </listItemDefinition>
-            </definitionListItem>
           </definitionList>
         </para>
+        <note>
+          <notePara>Although a tool may not directly support an issue of S1000D, it may still be possible to use with that issue.</notePara>
+          <notePara>For example, the s1kd-brexcheck tool is said not to support Issue 2.0 or Issue 2.1, because the BREX data module schema was not introduced until Issue 2.2. However, an Issue 2.2 or greater BREX data module can still be used to check Issue 2.0 or Issue 2.1 CSDB objects.</notePara>
+        </note>
       </levelledPara>
       <table pgwide="1">
-        <tgroup cols="3">
+        <tgroup cols="9">
           <thead>
             <row>
               <entry>
@@ -495,7 +490,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+            <row>
               <entry>
                 <para>s1kd-mvref</para>
               </entry>
@@ -816,7 +811,7 @@
             </row>
             <row>
               <entry>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-refs</para>
+                <para>s1kd-refs</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -930,7 +925,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-uom</para>
               </entry>
