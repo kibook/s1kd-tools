@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.0.3"
+#define VERSION "2.0.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -587,67 +587,6 @@ void getDispatchFileName(char *dst, xmlNodePtr ref)
 	xmlFree(fname);
 }
 
-/* Compare the codes of two paths. */
-int codecmp(const char *p1, const char *p2)
-{
-	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
-
-	strcpy(s1, p1);
-	strcpy(s2, p2);
-
-	b1 = basename(s1);
-	b2 = basename(s2);
-
-	return strcasecmp(b1, b2);
-}
-
-/* Find the filename of a referenced object by its code. */
-bool getFileName(char *dst, char *code, char *path)
-{
-	DIR *dir;
-	struct dirent *cur;
-	int n;
-	bool found = false;
-	int len = strlen(path);
-	char fpath[PATH_MAX], cpath[PATH_MAX];
-
-	n = strlen(code);
-
-	if (strcmp(path, ".") == 0) {
-		strcpy(fpath, "");
-	} else if (path[len - 1] != '/') {
-		strcpy(fpath, path);
-		strcat(fpath, "/");
-	} else {
-		strcpy(fpath, path);
-	}
-
-	dir = opendir(path);
-
-	while ((cur = readdir(dir))) {
-		strcpy(cpath, fpath);
-		strcat(cpath, cur->d_name);
-
-		if (recursive && isdir(cpath, recursive)) {
-			char tmp[PATH_MAX];
-
-			if (getFileName(tmp, code, cpath) && (!found || codecmp(tmp, dst) > 0)) {
-				strcpy(dst, tmp);
-				found = true;
-			}
-		} else if (strncasecmp(code, cur->d_name, n) == 0) {
-			if (!found || codecmp(cpath, dst) > 0) {
-				strcpy(dst, cpath);
-				found = true;
-			}
-		}
-	}
-
-	closedir(dir);
-
-	return found;
-}
-
 /* Update address items using the matched referenced object. */
 void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 {
@@ -763,7 +702,7 @@ void printReference(xmlNodePtr ref, const char *src)
 	else
 		return;
 
-	if (getFileName(fname, code, directory)) {
+	if (find_csdb_object(fname, directory, code, NULL, recursive)) {
 		if (updateRefs) {
 			updateRef(ref, src, fname);
 		} else if (!tagUnmatched) {

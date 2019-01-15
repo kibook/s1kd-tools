@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.0"
+#define VERSION "2.6.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -360,70 +360,6 @@ bool is_xml_file(const char *fname)
 	return strcasecmp(fname + (strlen(fname) - 4), ".XML") == 0;
 }
 
-/* Compare two filenames of S1000D CSDB objects. */
-int codecmp(const char *p1, const char *p2)
-{
-	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
-
-	strcpy(s1, p1);
-	strcpy(s2, p2);
-
-	b1 = basename(s1);
-	b2 = basename(s2);
-
-	return strcasecmp(b1, b2);
-}
-
-/* Search for the BREX in a specified directory. */
-bool search_brex_fname(char *fs_fname, const char *path, const char *fname, int fname_len)
-{
-	DIR *dir;
-	struct dirent *cur;
-	bool found = false;
-	int len = strlen(path);
-	char fpath[PATH_MAX], cpath[PATH_MAX];
-
-	if (!isdir(path, false)) {
-		return false;
-	}
-
-	if (strcmp(path, ".") == 0) {
-		strcpy(fpath, "");
-	} else if (path[len - 1] != '/') {
-		strcpy(fpath, path);
-		strcat(fpath, "/");
-	} else {
-		strcpy(fpath, path);
-	}
-
-	if (!(dir = opendir(path))) {
-		return false;
-	}
-
-	while ((cur = readdir(dir))) {
-		strcpy(cpath, fpath);
-		strcat(cpath, cur->d_name);
-
-		if (recursive_search && isdir(cpath, true)) {
-			char tmp[PATH_MAX];
-
-			if (search_brex_fname(tmp, cpath, fname, fname_len) && (!found || codecmp(tmp, fs_fname) > 0)) {
-				strcpy(fs_fname, tmp);
-				found = true;
-			}
-		} else if (is_xml_file(cur->d_name) && strncmp(cur->d_name, fname, fname_len) == 0) {
-			if (!found || codecmp(cpath, fs_fname) > 0) {
-				strcpy(fs_fname, cpath);
-				found = true;
-			}
-		}
-	}
-
-	closedir(dir);
-
-	return found;
-}
-
 /* Search for the BREX in the list of CSDB objects to be checked. */
 bool search_brex_fname_from_dmods(char *fname,
 	char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames,
@@ -555,14 +491,14 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MA
 	len = strlen(dmcode);
 
 	/* Look for the BREX in the current directory. */
-	found = search_brex_fname(fname, search_dir, dmcode, len);
+	found = find_csdb_object(fname, search_dir, dmcode, is_xml_file, recursive_search);
 
 	/* Look for the BREX in any of the specified search paths. */
 	if (!found) {
 		int i;
 
 		for (i = 0; i < nspaths; ++i) {
-			found = search_brex_fname(fname, spaths[i], dmcode, len);
+			found = find_csdb_object(fname, spaths[i], dmcode, is_xml_file, recursive_search);
 		}
 	}
 

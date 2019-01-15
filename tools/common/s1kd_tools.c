@@ -1,5 +1,6 @@
 #include "s1kd_tools.h"
 
+/* Return the full path name from a relative path. */
 char *real_path(const char *path, char *real)
 {
 	#ifdef _WIN32
@@ -215,4 +216,69 @@ void xmlFreeEntity(xmlEntityPtr entity)
             xmlFree((char *) entity->orig);
     }
     xmlFree(entity);
+}
+
+int codecmp(const char *p1, const char *p2)
+{
+	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
+
+	strcpy(s1, p1);
+	strcpy(s2, p2);
+
+	b1 = basename(s1);
+	b2 = basename(s2);
+
+	return strcasecmp(b1, b2);
+}
+
+bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive)
+{
+	DIR *dir;
+	struct dirent *cur;
+	int n;
+	bool found = false;
+	int len = strlen(path);
+	char fpath[PATH_MAX], cpath[PATH_MAX];
+
+	if (!isdir(path, false)) {
+		return false;
+	}
+
+	if (!(dir = opendir(path))) {
+		return false;
+	}
+
+	if (strcmp(path, ".") == 0) {
+		strcpy(fpath, "");
+	} else if (path[len - 1] != '/') {
+		strcpy(fpath, path);
+		strcat(fpath, "/");
+	} else {
+		strcpy(fpath, path);
+	}
+
+	n = strlen(code);
+
+	while ((cur = readdir(dir))) {
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
+
+		if (recursive && isdir(cpath, true)) {
+			char tmp[PATH_MAX];
+
+			if (find_csdb_object(tmp, cpath, code, is, true) && (!found || codecmp(tmp, dst) > 0)) {
+				strcpy(dst, tmp);
+				found = true;
+			}
+		} else if ((!is || is(cur->d_name)) && strncmp(cur->d_name, code, n) == 0) {
+			if (!found || codecmp(cpath, dst) > 0) {
+				strcpy(dst, cpath);
+				found = true;
+			}
+		}
+	}
+
+	closedir(dir);
+
+	return found;
 }

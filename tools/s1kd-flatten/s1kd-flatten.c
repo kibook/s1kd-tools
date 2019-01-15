@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.3"
+#define VERSION "2.1.4"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -116,71 +116,6 @@ bool is_pm(const char *fname)
 	return strncmp(fname, "PMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
-int codecmp(const char *p1, const char *p2)
-{
-	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
-
-	strcpy(s1, p1);
-	strcpy(s2, p2);
-
-	b1 = basename(s1);
-	b2 = basename(s2);
-
-	return strcasecmp(b1, b2);
-}
-
-bool filesystem_fname(char *fs_fname, const char *fname, const char *path, bool (*is)(const char *))
-{
-	DIR *dir;
-	struct dirent *cur;
-	int fname_len;
-	bool found = false;
-	int len = strlen(path);
-	char fpath[PATH_MAX], cpath[PATH_MAX];
-
-	if (!isdir(path, false)) {
-		return false;
-	}
-
-	if (strcmp(path, ".") == 0) {
-		strcpy(fpath, "");
-	} else if (path[len - 1] != '/') {
-		strcpy(fpath, path);
-		strcat(fpath, "/");
-	} else {
-		strcpy(fpath, path);
-	}
-
-	fname_len = strlen(fname);
-
-	if (!(dir = opendir(path))) {
-		return false;
-	}
-
-	while ((cur = readdir(dir))) {
-		strcpy(cpath, fpath);
-		strcat(cpath, cur->d_name);
-
-		if (recursive_search && isdir(cpath, true)) {
-			char tmp[PATH_MAX];
-
-			if (filesystem_fname(tmp, fname, cpath, is) && (!found || codecmp(tmp, fs_fname) > 0)) {
-				strcpy(fs_fname, tmp);
-				found = true;
-			}
-		} else if (is(cur->d_name) && strncmp(cur->d_name, fname, fname_len) == 0) {
-			if (!found || codecmp(cpath, fs_fname) > 0) {
-				strcpy(fs_fname, cpath);
-				found = true;
-			}
-		}
-	}
-
-	closedir(dir);
-
-	return found;
-}
-
 void flatten_pm_entry(xmlNodePtr pm_entry);
 
 void flatten_pm_ref(xmlNodePtr pm_ref)
@@ -266,7 +201,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 
 		path = (char *) xmlNodeGetContent(cur);
 
-		if (filesystem_fname(fs_pm_fname, pm_fname, path, is_pm)) {
+		if (find_csdb_object(fs_pm_fname, path, pm_fname, is_pm, recursive_search)) {
 			found = true;
 
 			if (recursive) {
@@ -429,7 +364,7 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 
 		path = (char *) xmlNodeGetContent(cur);
 
-		if (filesystem_fname(fs_dm_fname, dm_fname, path, is_dm)) {
+		if (find_csdb_object(fs_dm_fname, path, dm_fname, is_dm, recursive_search)) {
 			found = true;
 
 			/* Flatten a container data module by copying the
