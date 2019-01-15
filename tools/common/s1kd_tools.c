@@ -159,10 +159,13 @@ bool isdir(const char *path, bool recursive)
 	b = basename(s);
 
 	if (recursive && (strcmp(b, ".") == 0 || strcmp(b, "..") == 0)) {
-		return 0;
+		return false;
 	}
 
-	stat(path, &st);
+	if (stat(path, &st) != 0) {
+		return false;
+	}
+
 	return S_ISDIR(st.st_mode);
 }
 

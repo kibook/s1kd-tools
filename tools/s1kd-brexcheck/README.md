@@ -6,8 +6,8 @@ s1kd-brexcheck - Validate S1000D CSDB objects against BREX data modules
 SYNOPSIS
 ========
 
-    s1kd-brexcheck [-b <brex>] [-I <path>] [-w <severities>]
-                   [-BcfLlpqS[tu]sTvxh?] [<object>...]
+    s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
+                   [-BcfLlpqrS[tu]sTvxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -34,6 +34,10 @@ modules are specified, the BREX data module referenced in
 -c  
 When a context rule defines values for an object (objectValue), check if
 the value of each object is within the allowed set of values.
+
+-d &lt;dir&gt;  
+Directory to start searching for BREX data modules in. By default, the
+current directory is used.
 
 -f  
 Print the filenames of CSDB objects with BREX/SNS errors.
@@ -72,6 +76,9 @@ Display a progress bar.
 -q  
 Quiet mode. No errors are printed, they are only indicated via the exit
 status.
+
+-r  
+Search for BREX data modules recursively.
 
 -S\[tu\]  
 Check SNS (Standard Numbering System) rules. The SNS of each specified

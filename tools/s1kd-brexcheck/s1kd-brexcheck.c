@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.5.1"
+#define VERSION "2.6.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -110,6 +110,12 @@ bool check_values = false;
 
 /* Print the filenames of invalid objects. */
 bool show_fnames = false;
+
+/* Search for BREX data modules recursively. */
+bool recursive_search = false;
+
+/* Directory to start search for BREX data modules in. */
+char *search_dir = NULL;
 
 /* Return the first node in a set matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -354,33 +360,62 @@ bool is_xml_file(const char *fname)
 	return strcasecmp(fname + (strlen(fname) - 4), ".XML") == 0;
 }
 
+/* Compare two filenames of S1000D CSDB objects. */
+int codecmp(const char *p1, const char *p2)
+{
+	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
+
+	strcpy(s1, p1);
+	strcpy(s2, p2);
+
+	b1 = basename(s1);
+	b2 = basename(s2);
+
+	return strcasecmp(b1, b2);
+}
+
 /* Search for the BREX in a specified directory. */
-bool search_brex_fname(char *fname, const char *dpath, const char *dmcode, int len)
+bool search_brex_fname(char *fs_fname, const char *path, const char *fname, int fname_len)
 {
 	DIR *dir;
 	struct dirent *cur;
-
 	bool found = false;
+	int len = strlen(path);
+	char fpath[PATH_MAX], cpath[PATH_MAX];
 
-	char tmp_fname[PATH_MAX] = "";
+	if (!isdir(path, false)) {
+		return false;
+	}
 
-	dir = opendir(dpath);
+	if (strcmp(path, ".") == 0) {
+		strcpy(fpath, "");
+	} else if (path[len - 1] != '/') {
+		strcpy(fpath, path);
+		strcat(fpath, "/");
+	} else {
+		strcpy(fpath, path);
+	}
+
+	if (!(dir = opendir(path))) {
+		return false;
+	}
 
 	while ((cur = readdir(dir))) {
-		if (strncmp(cur->d_name, dmcode, len) == 0) {
-			if (strcmp(dpath, ".") == 0) {
-				strncpy(tmp_fname, cur->d_name, PATH_MAX - 1);
-			} else {
-				strncpy(tmp_fname, dpath, PATH_MAX - 1);
-				strncat(tmp_fname, "/", 1);
-				strncat(tmp_fname, cur->d_name, PATH_MAX - 1);
-			}
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
 
-			if (is_xml_file(tmp_fname) && (!found || strcmp(tmp_fname, fname) > 0)) {
-				strcpy(fname, tmp_fname);
+		if (recursive_search && isdir(cpath, true)) {
+			char tmp[PATH_MAX];
+
+			if (search_brex_fname(tmp, cpath, fname, fname_len) && (!found || codecmp(tmp, fs_fname) > 0)) {
+				strcpy(fs_fname, tmp);
+				found = true;
 			}
-			
-			found = true;
+		} else if (is_xml_file(cur->d_name) && strncmp(cur->d_name, fname, fname_len) == 0) {
+			if (!found || codecmp(cpath, fs_fname) > 0) {
+				strcpy(fs_fname, cpath);
+				found = true;
+			}
 		}
 	}
 
@@ -520,7 +555,7 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MA
 	len = strlen(dmcode);
 
 	/* Look for the BREX in the current directory. */
-	found = search_brex_fname(fname, ".", dmcode, len);
+	found = search_brex_fname(fname, search_dir, dmcode, len);
 
 	/* Look for the BREX in any of the specified search paths. */
 	if (!found) {
@@ -1305,13 +1340,14 @@ void print_stats(xmlDocPtr doc)
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-I <path>] [-w <sev>] [-BcfLlnpqS[tu]sTvxh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <sev>] [-BcfLlnpqrS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?        Show this help message.");
 	puts("  -B           Use the default BREX.");
 	puts("  -b <brex>    Use <brex> as the BREX data module.");
 	puts("  -c           Check object values.");
+	puts("  -d <dir>     Directory to start search for BREX in.");
 	puts("  -f           Print the filenames of invalid objects.");
 	puts("  -I <path>    Add <path> to search path for BREX data module.");
 	puts("  -L           Input is a list of data module filenames.");
@@ -1319,6 +1355,7 @@ void show_help(void)
 	puts("  -n           Check notation rules.");
 	puts("  -p           Display progress bar.");
 	puts("  -q           Quiet mode. Do not print errors.");
+	puts("  -r           Search for BREX recursively.");
 	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict).");
 	puts("  -s           Short messages.");
 	puts("  -T           Print a summary of the check.");
@@ -1364,12 +1401,14 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:I:xvqslw:StupfncLTh?";
+	const char *sopts = "Bb:I:xvqslw:StupfncLTrd:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	search_dir = strdup(".");
 
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
@@ -1384,6 +1423,10 @@ int main(int argc, char *argv[])
 				break;
 			case 'b':
 				add_path(&brex_fnames, &num_brex_fnames, &BREX_MAX, optarg);
+				break;
+			case 'd':
+				free(search_dir);
+				search_dir = strdup(optarg);
 				break;
 			case 'I':
 				add_path(&brex_search_paths, &num_brex_search_paths, &BREX_PATH_MAX, optarg);
@@ -1403,6 +1446,7 @@ int main(int argc, char *argv[])
 			case 'c': check_values = true; break;
 			case 'L': is_list = true; break;
 			case 'T': show_stats = true; break;
+			case 'r': recursive_search = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1478,6 +1522,7 @@ int main(int argc, char *argv[])
 					if (verbose > SILENT) fprintf(stderr, E_NOBREX,
 						dmod_fnames[i]);
 				}
+				xmlFreeDoc(dmod_doc);
 				continue;
 			}
 
@@ -1537,6 +1582,7 @@ int main(int argc, char *argv[])
 	free(brex_fnames);
 	free(brex_search_paths);
 	free(dmod_fnames);
+	free(search_dir);
 
 	if (status > 0) {
 		return EXIT_BREX_ERROR;
