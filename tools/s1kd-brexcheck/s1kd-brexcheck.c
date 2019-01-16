@@ -26,7 +26,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.4"
+#define VERSION "2.6.5"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1190,12 +1190,7 @@ void show_progress(float cur, float total)
 	float p;
 	int i, b;
 
-	if (total) {
-		p = cur / total;
-	} else {
-		p = 1.0;
-	}
-
+	p = cur / total;
 	b = PROGRESS_BAR_WIDTH * p;
 
 	fprintf(stderr, "\r[");
@@ -1497,7 +1492,7 @@ int main(int argc, char *argv[])
 			num_brex_fnames = 0;
 	}
 
-	if (progress)
+	if (progress && num_dmod_fnames)
 		show_progress(i, num_dmod_fnames);
 
 	if (xmlout) {

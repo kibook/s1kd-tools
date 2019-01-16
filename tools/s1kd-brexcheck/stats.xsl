@@ -12,21 +12,23 @@
     <xsl:text>Total documents checked: </xsl:text>
     <xsl:value-of select="count(document)"/>
     <xsl:text>&#10;</xsl:text>
-    <xsl:text>Total BREX errors: </xsl:text>
-    <xsl:value-of select="count(//error/object|//error[not(object)])"/>
-    <xsl:text>&#10;</xsl:text>
-    <xsl:text>Total documents that pass the check: </xsl:text>
-    <xsl:value-of select="$pass"/>
-    <xsl:text>&#10;</xsl:text>
-    <xsl:text>Total documents that fail the check: </xsl:text>
-    <xsl:value-of select="$fail"/>
-    <xsl:text>&#10;</xsl:text>
-    <xsl:text>Percentage passed: </xsl:text>
-    <xsl:value-of select="format-number($pass div $total * 100, '0.##')"/>
-    <xsl:text>%&#10;</xsl:text>
-    <xsl:text>Percentage failed: </xsl:text>
-    <xsl:value-of select="format-number($fail div $total * 100, '0.##')"/>
-    <xsl:text>%&#10;</xsl:text>
+    <xsl:if test="$total &gt; 0">
+      <xsl:text>Total BREX errors: </xsl:text>
+      <xsl:value-of select="count(//error/object|//error[not(object)])"/>
+      <xsl:text>&#10;</xsl:text>
+      <xsl:text>Total documents that pass the check: </xsl:text>
+      <xsl:value-of select="$pass"/>
+      <xsl:text>&#10;</xsl:text>
+      <xsl:text>Total documents that fail the check: </xsl:text>
+      <xsl:value-of select="$fail"/>
+      <xsl:text>&#10;</xsl:text>
+      <xsl:text>Percentage passed: </xsl:text>
+      <xsl:value-of select="format-number($pass div $total * 100, '0')"/>
+      <xsl:text>%&#10;</xsl:text>
+      <xsl:text>Percentage failed: </xsl:text>
+      <xsl:value-of select="format-number($fail div $total * 100, '0')"/>
+      <xsl:text>%&#10;</xsl:text>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>
