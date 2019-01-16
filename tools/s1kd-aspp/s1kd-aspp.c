@@ -10,18 +10,18 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
-#include <dirent.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xinclude.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
+#include "s1kd_tools.h"
 #include "elements_list.h"
 #include "generateDisplayText.h"
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "1.2.4"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -46,7 +46,14 @@ xmlChar *applicElemsXPath;
 #define PARSE_OPTS 0
 #endif
 
+/* Custom XSL for generating display text. */
 char *customGenDispTextXsl = NULL;
+
+/* Search for ACTs/CCTs recursively. */
+bool recursive_search = false;
+
+/* Directory to start search for ACTs/CCTs in. */
+char *search_dir;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -110,6 +117,7 @@ xmlNodePtr lastXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	return last;
 }
 
+/* Return the value of the first node matching an XPath expression. */
 xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	return xmlNodeGetContent(firstXPathNode(doc, node, xpath));
@@ -320,10 +328,6 @@ bool is_dm(const char *name)
  * element. */
 bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 {
-	DIR *dir;
-	struct dirent *cur;
-	int len;
-	bool found = false;
 	char *model_ident_code;
 	char *system_diff_code;
 	char *system_code;
@@ -422,23 +426,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		xmlFree(country_iso_code);
 	}
 
-	len = strlen(code);
-
-	dir = opendir(".");
-
-	while ((cur = readdir(dir))) {
-		if (strncmp(cur->d_name, code, len) == 0) {
-			if (is_dm(cur->d_name) && (!found || strcmp(cur->d_name, dst) > 0)) {
-				strcpy(dst, cur->d_name);
-			}
-
-			found = true;
-		}
-	}
-
-	closedir(dir);
-
-	return found;
+	return find_csdb_object(dst, search_dir, code, is_dm, recursive_search);
 }
 
 /* Find the filename of a referenced ACT data module. */
@@ -559,21 +547,29 @@ void process_list(const char *path, bool overwrite, bool xincl, bool process,
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-g [-A <ACT>] [-C <CCT>]] [-p [-a <ID>]] [-cdfxh?] [<modules>]");
+	puts("Usage:");
+	puts("  " PROG_NAME " -h?");
+	puts("  " PROG_NAME " -D");
+	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cflrx] [<object>...]");
+	puts("  " PROG_NAME " -p [-a <ID>] [-flx] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A <ACT>   Use <ACT> when generating display text.");
-	puts("  -a <ID>    Use <ID> for DM-level applic.");
-	puts("  -C <CCT>   Use <CCT> when generating display text.");
-	puts("  -c         Search for ACT/CCT data modules.");
-	puts("  -d         Dump built-in XSLT for generating display text.");
-	puts("  -f         Overwrite input file(s).");
-	puts("  -G <XSL>   Use custom XSLT script to generate display text.");
-	puts("  -g         Generate display text for applicability statements.");
-	puts("  -l         Treat input as list of modules.");
-	puts("  -p         Convert semantic applicability to presentation applicability.");
-	puts("  -h -?      Show help/usage message.");
-	puts("  --version  Show version information.");
+	puts("  -A <ACT>      Use <ACT> when generating display text.");
+	puts("  -a <ID>       Use <ID> for DM-level applic.");
+	puts("  -C <CCT>      Use <CCT> when generating display text.");
+	puts("  -c            Search for ACT/CCT data modules.");
+	puts("  -D            Dump built-in XSLT for generating display text.");
+	puts("  -d <dir>      Directory to start search for ACT/CCT in.");
+	puts("  -f            Overwrite input file(s).");
+	puts("  -G <XSL>      Use custom XSLT script to generate display text.");
+	puts("  -g            Generate display text for applicability statements.");
+	puts("  -l            Treat input as list of modules.");
+	puts("  -p            Convert semantic applicability to presentation applicability.");
+	puts("  -r            Search for ACT/CCT recursively.");
+	puts("  -x            Perform XInclude processing.");
+	puts("  -h -?         Show help/usage message.");
+	puts("  --version     Show version information.");
+	puts("  <object>...   CSDB objects to process.");
 }
 
 void show_version(void)
@@ -595,7 +591,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cdfG:glpxh?";
+	const char *sopts = "A:a:C:cDd:fG:glprxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -610,6 +606,8 @@ int main(int argc, char **argv)
 
 	acts = xmlNewNode(NULL, BAD_CAST "acts");
 	ccts = xmlNewNode(NULL, BAD_CAST "ccts");
+
+	search_dir = strdup(".");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -634,9 +632,13 @@ int main(int argc, char **argv)
 			case 'c':
 				findcts = true;
 				break;
-			case 'd':
+			case 'D':
 				dumpGenDispTextXsl();
 				exit(0);
+			case 'd':
+				free(search_dir);
+				search_dir = strdup(optarg);
+				break;
 			case 'f':
 				overwrite = true;
 				break;
@@ -651,6 +653,9 @@ int main(int argc, char **argv)
 				break;
 			case 'p':
 				process = true;
+				break;
+			case 'r':
+				recursive_search = true;
 				break;
 			case 'x':
 				xincl = true;
@@ -688,6 +693,7 @@ int main(int argc, char **argv)
 	xmlFreeNode(ccts);
 
 	free(customGenDispTextXsl);
+	free(search_dir);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

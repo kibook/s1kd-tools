@@ -1,7 +1,7 @@
-SOURCE=s1kd-aspp.c
+SOURCE=s1kd-aspp.c ../common/s1kd_tools.c
 OUTPUT=s1kd-aspp
 
-CFLAGS=-Wall -pedantic-errors `pkg-config --cflags libxml-2.0 libxslt libexslt`
+CFLAGS=-Wall -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

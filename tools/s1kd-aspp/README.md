@@ -6,8 +6,11 @@ s1kd-aspp - Applicability statement preprocessor
 SYNOPSIS
 ========
 
-    s1kd-aspp [-g [-A <ACT>]... [-C <CCT>]... [-G <XSL>]]
-              [-p [-a <ID>]] [-cdflxh?] [<modules>...]
+    s1kd-aspp -h?
+    s1kd-aspp -D
+    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cflrx]
+                 [<object>...]
+    s1kd-aspp -p [-a <ID>] [-flx] [<object>...]
 
 DESCRIPTION
 ===========
@@ -54,9 +57,13 @@ Search for the ACT and CCT referenced by each data module, and add them
 to the list of ACTs/CCTs to use when generating display text for that
 data module.
 
--d  
+-D  
 Dump the built-in XSLT used to generate display text for applicability
 statements.
+
+-d &lt;dir&gt;  
+Directory to start searching for ACT/CCT data modules in. By default,
+the current directory is used.
 
 -f  
 Overwrite input data module(s) rather than outputting to stdout.
@@ -68,8 +75,8 @@ Use custom XSLT to generate display text for applicability statements.
 Generate display text for applicability statements.
 
 -l  
-Treat input (stdin or arguments) as lists of filenames of modules,
-rather than modules themselves.
+Treat input (stdin or arguments) as lists of filenames of objects,
+rather than objects themselves.
 
 -p  
 Preprocess applicability statements to produce "presentation"
@@ -77,14 +84,17 @@ applicability statements which are simpler to parse in an XSLT
 stylesheet. The applicability in the resulting XML is no longer
 semantically correct.
 
+-r  
+Search for ACT/CCT data modules recursively.
+
 -x  
-Process the modules using the XInclude specification.
+Process the objects using the XInclude specification.
 
 --version  
 Show version information.
 
-&lt;modules&gt;...  
-The module(s) to preprocess. This can include both individual modules
+&lt;object&gt;...  
+The object(s) to preprocess. This can include both individual objects
 and combined files such as those produced by s1kd-flatten(1).
 
 EXAMPLES
