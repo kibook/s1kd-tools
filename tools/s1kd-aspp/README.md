@@ -148,7 +148,7 @@ The resulting XML would instead contain:
     </applic>
 
 The methods for generating display text can be changed by supplying a
-custom XSLT script with the -G option. The -d option can be used to dump
+custom XSLT script with the -G option. The -D option can be used to dump
 the built-in XSLT as a starting point for a custom script. An identity
 template is automatically added to the script, equivalent to the
 following:

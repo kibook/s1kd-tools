@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="01"/>
+        <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="01" day="16"/>
@@ -222,7 +222,7 @@ applicPropertyValues="A"/>
 </displayText>
 </applic>]]></verbatimText>
           </para>
-          <para>The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -d option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -D option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="@*|node()">
 <xsl:copy>
