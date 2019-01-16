@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
-#include <dirent.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
@@ -13,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.0.4"
+#define VERSION "2.0.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

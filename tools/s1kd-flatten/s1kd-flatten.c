@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
-#include <dirent.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
@@ -13,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.4"
+#define VERSION "2.1.5"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.

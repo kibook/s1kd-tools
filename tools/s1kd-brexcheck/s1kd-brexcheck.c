@@ -4,7 +4,6 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
-#include <dirent.h>
 #include <libgen.h>
 
 #include <libxml/tree.h>
@@ -26,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.5"
+#define VERSION "2.6.6"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
