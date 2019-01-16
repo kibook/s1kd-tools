@@ -7,14 +7,15 @@
  
   <xsl:template match="brexCheck">
     <xsl:variable name="total" select="count(document)"/>
-    <xsl:variable name="fail" select="count(document[brex/error[@fail != 'no']])"/>
-    <xsl:variable name="pass" select="count(document[not(brex/error) or brex/error/@fail = 'no'])"/>
     <xsl:text>Total documents checked: </xsl:text>
-    <xsl:value-of select="count(document)"/>
+    <xsl:value-of select="$total"/>
     <xsl:text>&#10;</xsl:text>
     <xsl:if test="$total &gt; 0">
+      <xsl:variable name="errors" select="count(//error/object|//error[not(object)])"/>
+      <xsl:variable name="fail" select="count(document[brex/error[@fail != 'no']])"/>
+      <xsl:variable name="pass" select="count(document[not(brex/error) or brex/error/@fail = 'no'])"/>
       <xsl:text>Total BREX errors: </xsl:text>
-      <xsl:value-of select="count(//error/object|//error[not(object)])"/>
+      <xsl:value-of select="$errors"/>
       <xsl:text>&#10;</xsl:text>
       <xsl:text>Total documents that pass the check: </xsl:text>
       <xsl:value-of select="$pass"/>
