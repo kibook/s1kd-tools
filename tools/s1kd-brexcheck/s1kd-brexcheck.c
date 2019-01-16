@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.7"
+#define VERSION "2.6.8"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -713,7 +713,6 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
 	xmlChar *defaultBrSeverityLevel;
-	int i;
 	int nerr = 0;
 	xmlNodePtr brexNode, brexError;
 
@@ -725,80 +724,84 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 	brexNode = xmlNewChild(documentNode, NULL, BAD_CAST "brex", NULL);
 	xmlSetProp(brexNode, BAD_CAST "path", BAD_CAST brexfname);
 
-	for (i = 0; i < rules->nodeNr; ++i) {
-		xmlNodePtr objectPath, objectUse;
-		xmlChar *allowedObjectFlag, *path, *use;
+	if (!xmlXPathNodeSetIsEmpty(rules)) {
+		int i;
 
-		objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
-		objectUse  = firstXPathNode(brex_doc, rules->nodeTab[i], "objectUse|objuse");
+		for (i = 0; i < rules->nodeNr; ++i) {
+			xmlNodePtr objectPath, objectUse;
+			xmlChar *allowedObjectFlag, *path, *use;
 
-		allowedObjectFlag = firstXPathValue(objectPath, "@allowedObjectFlag|@objappl");
-		path = xmlNodeGetContent(objectPath);
-		use  = xmlNodeGetContent(objectUse);
+			objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
+			objectUse  = firstXPathNode(brex_doc, rules->nodeTab[i], "objectUse|objuse");
 
-		object = xmlXPathEvalExpression(BAD_CAST path, context);
+			allowedObjectFlag = firstXPathValue(objectPath, "@allowedObjectFlag|@objappl");
+			path = xmlNodeGetContent(objectPath);
+			use  = xmlNodeGetContent(objectUse);
 
-		if (!object) {
-			if (verbose > SILENT) {
-				fprintf(stderr, E_INVOBJPATH);
-			}
-			exit(EXIT_INVALID_OBJ_PATH);
-		}
+			object = xmlXPathEvalExpression(BAD_CAST path, context);
 
-		if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object)) {
-			xmlChar *severity;
-			xmlNodePtr err_path;
-
-			if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
-				severity = xmlStrdup(defaultBrSeverityLevel);
-			}
-
-			brexError = xmlNewChild(brexNode, NULL, BAD_CAST "error", NULL);
-
-			if (severity) {
-				xmlSetProp(brexError, BAD_CAST "brSeverityLevel", severity);
-
-				if (brsl_fname) {
-					xmlChar *type = brsl_type(severity);
-					xmlNewChild(brexError, NULL, BAD_CAST "type", type);
-					xmlFree(type);
+			if (!object) {
+				if (verbose > SILENT) {
+					fprintf(stderr, E_INVOBJPATH);
 				}
-			} else {
-				xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "yes");
+				exit(EXIT_INVALID_OBJ_PATH);
 			}
 
-			err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
-			xmlSetProp(err_path, BAD_CAST "allowedObjectFlag", allowedObjectFlag);
-			xmlNewChild(brexError, NULL, BAD_CAST "objectUse", use);
+			if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object)) {
+				xmlChar *severity;
+				xmlNodePtr err_path;
 
-			add_object_values(brexError, rules->nodeTab[i]);
+				if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
+					severity = xmlStrdup(defaultBrSeverityLevel);
+				}
 
-			if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
-				dump_nodes_xml(object->nodesetval, fname,
-					brexError, rules->nodeTab[i]);
-			}
-			
-			if (severity) {
-				if (is_failure(severity)) {
-					++nerr;
+				brexError = xmlNewChild(brexNode, NULL, BAD_CAST "error", NULL);
+
+				if (severity) {
+					xmlSetProp(brexError, BAD_CAST "brSeverityLevel", severity);
+
+					if (brsl_fname) {
+						xmlChar *type = brsl_type(severity);
+						xmlNewChild(brexError, NULL, BAD_CAST "type", type);
+						xmlFree(type);
+					}
 				} else {
-					xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "no");
+					xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "yes");
 				}
-			} else {
-				++nerr;
+
+				err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
+				xmlSetProp(err_path, BAD_CAST "allowedObjectFlag", allowedObjectFlag);
+				xmlNewChild(brexError, NULL, BAD_CAST "objectUse", use);
+
+				add_object_values(brexError, rules->nodeTab[i]);
+
+				if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
+					dump_nodes_xml(object->nodesetval, fname,
+						brexError, rules->nodeTab[i]);
+				}
+
+				if (severity) {
+					if (is_failure(severity)) {
+						++nerr;
+					} else {
+						xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "no");
+					}
+				} else {
+					++nerr;
+				}
+
+				xmlFree(severity);
+
+				if (verbose > SILENT) {
+					print_node(brexError);
+				}
 			}
 
-			xmlFree(severity);
-
-			if (verbose > SILENT) {
-				print_node(brexError);
-			}
+			xmlXPathFreeObject(object);
+			xmlFree(allowedObjectFlag);
+			xmlFree(path);
+			xmlFree(use);
 		}
-
-		xmlXPathFreeObject(object);
-		xmlFree(allowedObjectFlag);
-		xmlFree(path);
-		xmlFree(use);
 	}
 
 	if (!brexNode->children) {
@@ -1099,23 +1102,20 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
 
-		if (!xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-			status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
-				brex_fnames[i], documentNode);
+		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
+			brex_fnames[i], documentNode);
 
-			if (verbose >= VERBOSE) {
-				fprintf(stderr, status || !valid_sns || invalid_notations ? E_INVALIDDOC : E_VALIDDOC, docname, brex_fnames[i]);
-			}
-
-			total += status;
-		} else if (verbose >= VERBOSE) {
-			fprintf(stderr, valid_sns && !invalid_notations ? E_VALIDDOC : E_INVALIDDOC, docname, brex_fnames[i]);
+		if (verbose >= VERBOSE) {
+			fprintf(stderr,
+				status || !valid_sns || invalid_notations ?
+				E_INVALIDDOC :
+				E_VALIDDOC, docname, brex_fnames[i]);
 		}
 
+		total += status;
+
 		xmlXPathFreeObject(result);
-
 		xmlXPathFreeContext(context);
-
 		xmlFreeDoc(brex_doc);
 	}
 
