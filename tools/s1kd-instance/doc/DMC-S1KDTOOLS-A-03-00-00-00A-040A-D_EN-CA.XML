@@ -41,7 +41,7 @@
       <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Change behaviour of -f option.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="1">
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add EXIT STATUS section.</simplePara>
       </reasonForUpdate>
     </dmStatus>
@@ -819,7 +819,7 @@ is an item in the system.
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara>
+      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
         <title>EXIT STATUS</title>
         <para>
           <definitionList>
