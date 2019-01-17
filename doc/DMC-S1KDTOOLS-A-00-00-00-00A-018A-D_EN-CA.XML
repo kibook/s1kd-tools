@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="12" day="21"/>
+        <issueDate year="2019" month="01" day="17"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,15 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add s1kd-uom tool.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Rename s1kd-checkrefs to s1kd-mvref and change its function.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -83,7 +74,7 @@
                 <para>The <emphasis>s1kd-addicn</emphasis> tool creates the notation and entity elements to reference an ICN in a data module.</para>
                 <para>The <emphasis>s1kd-ls</emphasis> tool lists data modules within a directory.</para>
                 <para>The <emphasis>s1kd-metadata</emphasis> tool lists and edits S1000D metadata on CSDB objects.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">The <emphasis>s1kd-mvref</emphasis> tool changes references to one object into references to another.</para>
+                <para>The <emphasis>s1kd-mvref</emphasis> tool changes references to one object into references to another.</para>
                 <para>The <emphasis>s1kd-ref</emphasis> tool can be used to quickly insert references to other CSDB objects.</para>
                 <para>The <emphasis>s1kd-sns</emphasis> tool can be used to organize the CSDB using a given SNS structure.</para>
                 <para>The <emphasis>s1kd-transform</emphasis> tool applies XSLT transformations to CSDB objects.</para>
@@ -106,7 +97,7 @@
                 <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of CSDB objects using applicability filtering and/or common information repositories (CIRs).</para>
                 <para>The <emphasis>s1kd-neutralize</emphasis> tool generates IETP neutral metadata for CSDB objects.</para>
                 <para>The <emphasis>s1kd-syncrefs</emphasis> tool generates the References table within data modules.</para>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The <emphasis>s1kd-uom</emphasis> tool converts units of measure used in data modules.</para>
+                <para>The <emphasis>s1kd-uom</emphasis> tool converts units of measure used in data modules.</para>
               </listItem>
             </sequentialList>
           </para>
@@ -157,7 +148,7 @@
             <listItem>
               <para>s1kd-metadata(1)</para>
             </listItem>
-            <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+            <listItem>
               <para>s1kd-mvref(1)</para>
             </listItem>
             <listItem>
@@ -202,7 +193,7 @@
             <listItem>
               <para>s1kd-transform(1)</para>
             </listItem>
-            <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <listItem>
               <para>s1kd-uom(1)</para>
             </listItem>
             <listItem>
