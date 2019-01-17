@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="12" day="21"/>
+        <issueDate year="2019" month="01" day="17"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,32 +38,23 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0003" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Rename s1kd-refls to s1kd-refs.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add -F, -R, -U, and -X options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt01" updateHighlight="0">
-        <simplePara>Improve description of -a option behaviour.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara>
         <title>NAME</title>
-        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">s1kd-refs - Manage references between CSDB objects</para>
+        <para>s1kd-refs - Manage references between CSDB objects</para>
       </levelledPara>
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003"><![CDATA[s1kd-refs [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">The <emphasis>s1kd-refs</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.</para>
+        <para>The <emphasis>s1kd-refs</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy. This makes it easy to obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together, or to check for references to CSDB objects which do not exist in the current CSDB.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -72,7 +63,7 @@
             <definitionListItem>
               <listItemTerm>-a</listItemTerm>
               <listItemDefinition>
-                <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">List all references, both matched and unmatched.</para>
+                <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -93,7 +84,7 @@
                 <para>Directory to search for matches to references in. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-F</listItemTerm>
               <listItemDefinition>
                 <para>When using the -U or -X options, overwrite the input objects that have been updated or tagged.</para>
@@ -141,7 +132,7 @@
                 <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-R</listItemTerm>
               <listItemDefinition>
                 <para>List references in matched objects recursively.</para>
@@ -159,7 +150,7 @@
                 <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-U</listItemTerm>
               <listItemDefinition>
                 <para>Update the address items (such as titles) of matched references from the corresponding object.</para>
@@ -171,7 +162,7 @@
                 <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-X</listItemTerm>
               <listItemDefinition>
                 <para>Tag unmatched references with the processing instruction <verbatimText>&lt;?unmatched?&gt;</verbatimText>.</para>
@@ -201,7 +192,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">$ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs24">$ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
 DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
 ICN-12345-00001-001-01.JPG</verbatimText>
