@@ -24,10 +24,10 @@
       <xsl:value-of select="$fail"/>
       <xsl:text>&#10;</xsl:text>
       <xsl:text>Percentage passed: </xsl:text>
-      <xsl:value-of select="format-number($pass div $total * 100, '0')"/>
+      <xsl:value-of select="floor($pass div $total * 100)"/>
       <xsl:text>%&#10;</xsl:text>
       <xsl:text>Percentage failed: </xsl:text>
-      <xsl:value-of select="format-number($fail div $total * 100, '0')"/>
+      <xsl:value-of select="ceiling($fail div $total * 100)"/>
       <xsl:text>%&#10;</xsl:text>
     </xsl:if>
   </xsl:template>
