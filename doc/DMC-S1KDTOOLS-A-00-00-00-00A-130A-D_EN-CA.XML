@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="01"/>
+        <issueInfo issueNumber="016" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="01" day="17"/>
+        <issueDate year="2019" month="01" day="18"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -453,9 +453,7 @@ This information only applies to version B.
             <verbatimText verbatimStyle="vs23">$ s1kd-refs -s &lt;PM&gt; |
 &gt; xargs s1kd-instance -s version:prodattr=B -O customerB</verbatimText>
           </para>
-          <para>
-            <para>The above command will filter the publication module and all included data modules, and output the resulting objects to the <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory.</para>
-          </para>
+          <para>The above command will filter the publication module and all included data modules, and output the resulting objects to the <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
