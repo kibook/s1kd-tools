@@ -11,12 +11,13 @@
 
   <xsl:template match="dmRef">
     <xsl:copy>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:actuate">onRequest</xsl:attribute>
       <xsl:attribute name="xlink:href">
         <xsl:apply-templates select="dmRefIdent" mode="xlink"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:title">
-        <xsl:apply-templates select="dmRefAddressItems/dmTitle" mode="xlink"/>
+        <xsl:if test="@referredFragment">
+          <xsl:text>#</xsl:text>
+          <xsl:value-of select="@referredFragment"/>
+        </xsl:if>
       </xsl:attribute>
       <xsl:attribute name="xlink:show">
         <xsl:choose>
@@ -26,13 +27,19 @@
           <xsl:otherwise>replace</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      <xsl:if test="dmRefAddressItems/dmTitle">
+        <xsl:attribute name="xlink:title">
+          <xsl:apply-templates select="dmRefAddressItems/dmTitle" mode="xlink"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="refdm">
     <xsl:copy>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:actuate">onRequest</xsl:attribute>
       <xsl:attribute name="xlink:href">
         <xsl:choose>
           <xsl:when test="dmcextension">DME-</xsl:when>
@@ -44,10 +51,211 @@
         </xsl:if>
         <xsl:apply-templates select="avee" mode="xlink"/>
       </xsl:attribute>
-      <xsl:attribute name="xlink:title">
-        <xsl:apply-templates select="dmtitle" mode="xlink"/>
+      <xsl:attribute name="xlink:show">replace</xsl:attribute>
+      <xsl:if test="dmtitle">
+        <xsl:attribute name="xlink:title">
+          <xsl:apply-templates select="dmtitle" mode="xlink"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="pmRef">
+    <xsl:copy>
+      <xsl:attribute name="xlink:actuate">onRequest</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:apply-templates select="pmRefIdent" mode="xlink"/>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:show">
+        <xsl:choose>
+          <xsl:when test="behavior">
+            <xsl:apply-templates select="behavior" mode="xlink"/>
+          </xsl:when>
+          <xsl:otherwise>replace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:if test="pmRefAddressItems/pmTitle">
+        <xsl:attribute name="xlink:title">
+          <xsl:apply-templates select="pmRefAddressItems/pmTitle" mode="xlink"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="refpm">
+    <xsl:copy>
+      <xsl:attribute name="xlink:actuate">onRequest</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:text>URN:S1000D:PMC-</xsl:text>
+        <xsl:apply-templates select="pmc" mode="xlink"/>
       </xsl:attribute>
       <xsl:attribute name="xlink:show">replace</xsl:attribute>
+      <xsl:if test="pmtitle">
+        <xsl:attribute name="xlink:title">
+          <xsl:apply-templates select="pmtitle" mode="xlink"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="graphic">
+    <xsl:copy>
+      <xsl:attribute name="xlink:actuate">onRequest</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:text>URN:S1000D:</xsl:text>
+        <xsl:value-of select="@infoEntityIdent|@boardno"/>
+      </xsl:attribute>
+      <xsl:if test="parent::figure/title">
+        <xsl:attribute name="xlink:title">
+          <xsl:apply-templates select="parent::figure/title" mode="xlink"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:show">new</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="symbol">
+    <xsl:copy>
+      <xsl:attribute name="xlink:actuate">onLoad</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:text>URN:S1000D:</xsl:text>
+        <xsl:value-of select="@infoEntityIdent|@boardno"/>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:show">embed</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="internalRef">
+    <xsl:variable name="title">
+      <xsl:choose>
+        <xsl:when test="@targetTitle">
+          <xsl:value-of select="@targetTitle"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="."/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:copy>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="@internalRefId"/>
+      </xsl:attribute>
+      <xsl:if test="$title != ''">
+        <xsl:attribute name="xlink:title">
+          <xsl:value-of select="$title"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xlink:show">replace</xsl:attribute>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="catalogSeqNumberRef">
+    <xsl:copy>
+      <xsl:attribute name="xlink:actuate">onRequest</xsl:attribute>
+      <xsl:attribute name="xlink:href">
+        <xsl:variable name="dmc" select="ancestor::dmodule//dmIdent/dmCode"/>
+        <xsl:variable name="csn">
+          <xsl:choose>
+            <xsl:when test="@systemCode">
+              <xsl:value-of select="@systemCode"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$dmc/@systemCode"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>-</xsl:text>
+          <xsl:choose>
+            <xsl:when test="@subSystemCode">
+              <xsl:value-of select="@subSystemCode"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$dmc/@subSystemCode"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="@subSubSystemCode">
+              <xsl:value-of select="@subSubSystemCode"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$dmc/@subSystemCode"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>-</xsl:text>
+          <xsl:choose>
+            <xsl:when test="@assyCode">
+              <xsl:value-of select="@assyCode"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$dmc/@assyCode"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>-</xsl:text>
+          <xsl:value-of select="@figureNumber"/>
+          <xsl:choose>
+            <xsl:when test="@figureNumberVariant">
+              <xsl:value-of select="@figureNumberVariant"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>A</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:text>URN:S1000D:DMC-</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@modelIdentCode">
+            <xsl:value-of select="@modelIdentCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$dmc/@modelIdentCode"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>-</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@systemDiffCode">
+            <xsl:value-of select="@systemDiffCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$dmc/@systemDiffCode"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>-</xsl:text>
+        <xsl:value-of select="$csn"/>
+        <xsl:text>-941A-</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@itemLocationCode">
+            <xsl:value-of select="@itemLocationCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>D</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>#csn-</xsl:text>
+        <xsl:value-of select="$csn"/>
+        <xsl:text>-</xsl:text>
+        <xsl:value-of select="@item"/>
+        <xsl:choose>
+          <xsl:when test="@itemVariant">
+            <xsl:value-of select="@itemVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>A</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="xlink:show">replace</xsl:attribute>
+      <xsl:attribute name="xlink:type">simple</xsl:attribute>
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
@@ -152,41 +360,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="pmRef">
-    <xsl:copy>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
-      <xsl:attribute name="xlink:href">
-        <xsl:apply-templates select="pmRefIdent" mode="xlink"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:title">
-        <xsl:apply-templates select="pmRefAddressItems/pmTitle" mode="xlink"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:show">
-        <xsl:choose>
-          <xsl:when test="behavior">
-            <xsl:apply-templates select="behavior" mode="xlink"/>
-          </xsl:when>
-          <xsl:otherwise>replace</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:apply-templates select="@*|node()"/>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="refpm">
-    <xsl:copy>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
-      <xsl:attribute name="xlink:href">
-        <xsl:text>URN:S1000D:PMC-</xsl:text>
-        <xsl:apply-templates select="pmc" mode="xlink"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:title">
-        <xsl:apply-templates select="pmtitle" mode="xlink"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:show">replace</xsl:attribute>
-    </xsl:copy>
-  </xsl:template>
-
   <xsl:template match="pmCode" mode="xlink">
     <xsl:value-of select="@modelIdentCode"/>
     <xsl:text>-</xsl:text>
@@ -222,139 +395,6 @@
       <xsl:text>-</xsl:text>
     </xsl:if>
     <xsl:apply-templates select="pmCode" mode="xlink"/>
-  </xsl:template>
-
-  <xsl:template match="graphic">
-    <xsl:copy>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
-      <xsl:attribute name="xlink:href">
-        <xsl:text>URN:S1000D:</xsl:text>
-        <xsl:value-of select="@infoEntityIdent|@boardno"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:title">
-        <xsl:apply-templates select="parent::figure/title" mode="xlink"/>
-      </xsl:attribute>
-      <xsl:apply-templates select="@*|node()"/>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="internalRef">
-    <xsl:copy>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
-      <xsl:attribute name="xlink:href">
-        <xsl:text>#</xsl:text>
-        <xsl:value-of select="@internalRefId"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:title">
-        <xsl:choose>
-          <xsl:when test="@targetTitle">
-            <xsl:value-of select="@targetTitle"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="."/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:show">replace</xsl:attribute>
-      <xsl:apply-templates select="@*|node()"/>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="catalogSeqNumberRef">
-    <xsl:copy>
-      <xsl:apply-templates select="@*"/>
-      <xsl:attribute name="xlink:type">simple</xsl:attribute>
-      <xsl:attribute name="xlink:href">
-        <xsl:variable name="dmc" select="ancestor::dmodule//dmIdent/dmCode"/>
-        <xsl:variable name="csn">
-          <xsl:choose>
-            <xsl:when test="@systemCode">
-              <xsl:value-of select="@systemCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@systemCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>-</xsl:text>
-          <xsl:choose>
-            <xsl:when test="@subSystemCode">
-              <xsl:value-of select="@subSystemCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@subSystemCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:choose>
-            <xsl:when test="@subSubSystemCode">
-              <xsl:value-of select="@subSubSystemCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@subSystemCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>-</xsl:text>
-          <xsl:choose>
-            <xsl:when test="@assyCode">
-              <xsl:value-of select="@assyCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@assyCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>-</xsl:text>
-          <xsl:value-of select="@figureNumber"/>
-          <xsl:choose>
-            <xsl:when test="@figureNumberVariant">
-              <xsl:value-of select="@figureNumberVariant"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>A</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:text>URN:S1000D:DMC-</xsl:text>
-        <xsl:choose>
-          <xsl:when test="@modelIdentCode">
-            <xsl:value-of select="@modelIdentCode"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$dmc/@modelIdentCode"/>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:text>-</xsl:text>
-        <xsl:choose>
-          <xsl:when test="@systemDiffCode">
-            <xsl:value-of select="@systemDiffCode"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$dmc/@systemDiffCode"/>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:text>-</xsl:text>
-        <xsl:value-of select="$csn"/>
-        <xsl:text>-941A-</xsl:text>
-        <xsl:choose>
-          <xsl:when test="@itemLocationCode">
-            <xsl:value-of select="@itemLocationCode"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>D</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:text>#csn-</xsl:text>
-        <xsl:value-of select="$csn"/>
-        <xsl:text>-</xsl:text>
-        <xsl:value-of select="@item"/>
-        <xsl:choose>
-          <xsl:when test="@itemVariant">
-            <xsl:value-of select="@itemVariant"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>A</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:copy>
   </xsl:template>
 
 </xsl:stylesheet>
