@@ -168,37 +168,51 @@
         <xsl:variable name="dmc" select="ancestor::dmodule//dmIdent/dmCode"/>
         <xsl:variable name="csn">
           <xsl:choose>
-            <xsl:when test="@systemCode">
-              <xsl:value-of select="@systemCode"/>
+            <xsl:when test="@responsiblePartnerCompanyCode">
+              <xsl:variable name="ipp" select="@initialProvisioningProjectNumber"/>
+              <xsl:variable name="len" select="string-length($ipp)"/>
+              <xsl:text>Z</xsl:text>
+              <xsl:value-of select="@responsiblePartnerCompanyCode"/>
+              <xsl:text>-</xsl:text>
+              <xsl:value-of select="substring($ipp, $len - 3, 2)"/>
+              <xsl:text>-</xsl:text>
+              <xsl:value-of select="substring($ipp, $len - 1, 2)"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$dmc/@systemCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>-</xsl:text>
-          <xsl:choose>
-            <xsl:when test="@subSystemCode">
-              <xsl:value-of select="@subSystemCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@subSystemCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:choose>
-            <xsl:when test="@subSubSystemCode">
-              <xsl:value-of select="@subSubSystemCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@subSystemCode"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>-</xsl:text>
-          <xsl:choose>
-            <xsl:when test="@assyCode">
-              <xsl:value-of select="@assyCode"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$dmc/@assyCode"/>
+              <xsl:choose>
+                <xsl:when test="@systemCode">
+                  <xsl:value-of select="@systemCode"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$dmc/@systemCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:text>-</xsl:text>
+              <xsl:choose>
+                <xsl:when test="@subSystemCode">
+                  <xsl:value-of select="@subSystemCode"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$dmc/@subSystemCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:choose>
+                <xsl:when test="@subSubSystemCode">
+                  <xsl:value-of select="@subSubSystemCode"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$dmc/@subSystemCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:text>-</xsl:text>
+              <xsl:choose>
+                <xsl:when test="@assyCode">
+                  <xsl:value-of select="@assyCode"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$dmc/@assyCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
           <xsl:text>-</xsl:text>
@@ -208,7 +222,7 @@
               <xsl:value-of select="@figureNumberVariant"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>A</xsl:text>
+              <xsl:text>0</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
