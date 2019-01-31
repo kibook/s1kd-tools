@@ -270,7 +270,7 @@ bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(
 				strcpy(dst, tmp);
 				found = true;
 			}
-		} else if ((!is || is(cur->d_name)) && strncmp(cur->d_name, code, n) == 0) {
+		} else if ((!is || is(cur->d_name)) && strncasecmp(cur->d_name, code, n) == 0) {
 			if (!found || codecmp(cpath, dst) > 0) {
 				strcpy(dst, cpath);
 				found = true;
