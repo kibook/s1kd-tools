@@ -89,6 +89,55 @@
         <title>Data modules</title>
         <para>The data module is the smallest self-contained unit of information in S1000D. This could be, for example, a description of how a piece of equipment was made, or a procedure to remove it from the system for maintenance.</para>
         <levelledPara>
+          <title>Structure of a data module</title>
+          <para>Every data module has the same basic structure, consisting of:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>an identification and status section</para>
+              </listItem>
+              <listItem>
+                <para>a content section</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The identification and status section of a data module contains metadata about the data module.</para>
+          <para>The first part uniquely identifies the data module. The unique identifier for a data module is composed of:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>a unique data module code</para>
+              </listItem>
+              <listItem>
+                <para>the issue of the data module</para>
+              </listItem>
+              <listItem>
+                <para>the language of the data module</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The second part gives the status of the data module, including:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>the security classification of the data module</para>
+              </listItem>
+              <listItem>
+                <para>who is responsible for the data module</para>
+              </listItem>
+              <listItem>
+                <para>restrictions on how the data module may be distributed</para>
+              </listItem>
+              <listItem>
+                <para>what changes have been made to the data module</para>
+              </listItem>
+              <listItem>
+                <para>whether the data module has been quality assurance tested</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
           <title>Data module code</title>
           <para>Each data module is given a unique data module code, which identifies:</para>
           <para>

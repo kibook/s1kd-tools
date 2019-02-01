@@ -2,6 +2,7 @@
 -   [The CSDB](#the-csdb)
     -   [CSDB objects](#csdb-objects)
 -   [Data modules](#data-modules)
+    -   [Structure of a data module](#structure-of-a-data-module)
     -   [Data module code](#data-module-code)
         -   [Model identification code](#model-identification-code)
         -   [System difference code](#system-difference-code)
@@ -84,6 +85,39 @@ The data module is the smallest self-contained unit of information in
 S1000D. This could be, for example, a description of how a piece of
 equipment was made, or a procedure to remove it from the system for
 maintenance.
+
+Structure of a data module
+--------------------------
+
+Every data module has the same basic structure, consisting of:
+
+-   an identification and status section
+
+-   a content section
+
+The identification and status section of a data module contains metadata
+about the data module.
+
+The first part uniquely identifies the data module. The unique
+identifier for a data module is composed of:
+
+-   a unique data module code
+
+-   the issue of the data module
+
+-   the language of the data module
+
+The second part gives the status of the data module, including:
+
+-   the security classification of the data module
+
+-   who is responsible for the data module
+
+-   restrictions on how the data module may be distributed
+
+-   what changes have been made to the data module
+
+-   whether the data module has been quality assurance tested
 
 Data module code
 ----------------
