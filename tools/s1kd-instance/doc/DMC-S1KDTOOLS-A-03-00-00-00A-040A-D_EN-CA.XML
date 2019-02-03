@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="031" inWork="00"/>
+        <issueInfo issueNumber="031" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="01" day="18"/>
+        <issueDate year="2019" month="02" day="01"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,11 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Change behaviour of -f option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change -r to -x, -x to -D, and add new -r and -d options.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add EXIT STATUS section.</simplePara>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Fix custom CIR XSL example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -118,6 +118,62 @@
                 <para>Specify a new data module code (DMC) or publication module code (PMC) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-D &lt;CIR&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -x option.</para>
+                <para>The following types currently have built-in XSLT and can therefore be used as values for &lt;CIR&gt;:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>accessPointRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>applicRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>cautionRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>circuitBreakerRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>controlIndicatorRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>enterpriseRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>functionalItemRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>illustratedPartsCatalog</para>
+                    </listItem>
+                    <listItem>
+                      <para>partRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>supplyRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>toolRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>warningRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>zoneRepository</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Directory to start searching for ACT and PCT data modules in when a product is specified (-p) without specifying the PCT explicitly (-P). By default, the current directory will be searched.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-E</listItemTerm>
               <listItemDefinition>
@@ -139,9 +195,9 @@
             <definitionListItem>
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Force overwriting of files.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">By itself, this will cause the source object(s) to be overwritten instead of being printed to stdout.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">When used with the -o or -O options, if a file exists with the same name as the one specified (-o) or automatically generated by the tool (-O), this will force it to be overwritten. Otherwise, a warning will be printed and the existing file will not be overwritten.</para>
+                <para>Force overwriting of files.</para>
+                <para>By itself, this will cause the source object(s) to be overwritten instead of being printed to stdout.</para>
+                <para>When used with the -o or -O options, if a file exists with the same name as the one specified (-o) or automatically generated by the tool (-O), this will force it to be overwritten. Otherwise, a warning will be printed and the existing file will not be overwritten.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -308,13 +364,13 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para>The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -r option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -x option.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -x option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -D option.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-r &lt;XSL&gt;</listItemTerm>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
-                <para>Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.</para>
+                <para>Search for ACT and PCT data modules recursively when a product is specified (-p) without specifying the PCT explicitly (-P).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -371,54 +427,10 @@
                 <para>The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-x &lt;CIR&gt;</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-x &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -r option.</para>
-                <para>The following types currently have built-in XSLT and can therefore be used as values for &lt;CIR&gt;:</para>
-                <para>
-                  <randomList>
-                    <listItem>
-                      <para>accessPointRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>applicRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>cautionRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>circuitBreakerRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>controlIndicatorRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>enterpriseRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>functionalItemRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>illustratedPartsCatalog</para>
-                    </listItem>
-                    <listItem>
-                      <para>partRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>supplyRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>toolRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>warningRepository</para>
-                    </listItem>
-                    <listItem>
-                      <para>zoneRepository</para>
-                    </listItem>
-                  </randomList>
-                </para>
+                <para>Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -753,7 +765,7 @@ applicPropertyValues="C"/>
           </para>
         </levelledPara>
         <levelledPara>
-          <title>Resolving CIR dependencies with a custom XSLT script (-r)</title>
+          <title changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Resolving CIR dependencies with a custom XSLT script (-x)</title>
           <para>A CIR contains more information about an item than can be captured in a data module's reference to it. If this additional information is required, there are two methods to include it:</para>
           <para>
             <randomList>
@@ -765,14 +777,14 @@ applicPropertyValues="C"/>
               </listItem>
             </randomList>
           </para>
-          <para>A custom XSLT script can be supplied with the -r option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">A custom XSLT script can be supplied with the -x option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:stylesheet
+            <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<xsl:stylesheet
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0">
 <xsl:template match="functionalItemRef">
 <xsl:variable name="fin" select"@functionalItemNumber"/>
-<xsl:variable name="spec" select="$cir//functionalItemSpec[
+<xsl:variable name="spec" select="//functionalItemSpec[
 functionalItemIdent/@functionalItemNumber = $fin]"/>
 <xsl:value-of select="$spec/name"/>
 </xsl:template>
@@ -800,7 +812,7 @@ is an item in the system.
           </para>
           <para>The command would resemble:</para>
           <para>
-            <verbatimText verbatimStyle="vs24">$ s1kd-instance -R &lt;CIR&gt; -r &lt;custom XSLT&gt; &lt;src&gt;</verbatimText>
+            <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-instance -R &lt;CIR&gt; -x &lt;custom XSLT&gt; &lt;src&gt;</verbatimText>
           </para>
           <para>And the resulting XML would be:</para>
           <para>
@@ -816,10 +828,10 @@ is an item in the system.
 </xsl:template>]]></verbatimText>
           </para>
           <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
-          <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -x option.</para>
+          <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -D option.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+      <levelledPara>
         <title>EXIT STATUS</title>
         <para>
           <definitionList>

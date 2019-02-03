@@ -60,6 +60,45 @@ can be customized with the -X option.
 Specify a new data module code (DMC) or publication module code (PMC)
 for the instance.
 
+-D &lt;CIR&gt;  
+Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR
+type to stdout. This can be used as a starting point for a custom XSLT
+script to be specified with the -x option.
+
+The following types currently have built-in XSLT and can therefore be
+used as values for &lt;CIR&gt;:
+
+-   accessPointRepository
+
+-   applicRepository
+
+-   cautionRepository
+
+-   circuitBreakerRepository
+
+-   controlIndicatorRepository
+
+-   enterpriseRepository
+
+-   functionalItemRepository
+
+-   illustratedPartsCatalog
+
+-   partRepository
+
+-   supplyRepository
+
+-   toolRepository
+
+-   warningRepository
+
+-   zoneRepository
+
+-d &lt;dir&gt;  
+Directory to start searching for ACT and PCT data modules in when a
+product is specified (-p) without specifying the PCT explicitly (-P). By
+default, the current directory will be searched.
+
 -E  
 Remove the extension from an instance produced from an already extended
 object.
@@ -206,12 +245,12 @@ The following CIRs have some built-in support:
 -   Zones
 
 The methods of resolving the dependencies for a CIR can be changed by
-specifying a custom XSLT script with the -r option. The built-in XSLT
-used for the above CIR data modules can be dumped with the -x option.
+specifying a custom XSLT script with the -x option. The built-in XSLT
+used for the above CIR data modules can be dumped with the -D option.
 
--r &lt;XSL&gt;  
-Use a custom XSLT script to resolve CIR dependencies for the last
-specified CIR.
+-r  
+Search for ACT and PCT data modules recursively when a product is
+specified (-p) without specifying the PCT explicitly (-P).
 
 -S  
 Do not include
@@ -256,39 +295,9 @@ be inserted. This should be the path to an element where the comment
 will be inserted as the first child node. By default, this is the top of
 the document.
 
--x &lt;CIR&gt;  
-Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR
-type to stdout. This can be used as a starting point for a custom XSLT
-script to be specified with the -r option.
-
-The following types currently have built-in XSLT and can therefore be
-used as values for &lt;CIR&gt;:
-
--   accessPointRepository
-
--   applicRepository
-
--   cautionRepository
-
--   circuitBreakerRepository
-
--   controlIndicatorRepository
-
--   enterpriseRepository
-
--   functionalItemRepository
-
--   illustratedPartsCatalog
-
--   partRepository
-
--   supplyRepository
-
--   toolRepository
-
--   warningRepository
-
--   zoneRepository
+-x &lt;XSL&gt;  
+Use a custom XSLT script to resolve CIR dependencies for the last
+specified CIR.
 
 -Y &lt;text&gt;  
 Update the applicability for the whole object using the user-defined
@@ -671,7 +680,7 @@ This would produce the following in the instance:
     <para applicRefId="apA">Applies to A</para>
     <para applicRefId="apC">Applies to C</para>
 
-Resolving CIR dependencies with a custom XSLT script (-r)
+Resolving CIR dependencies with a custom XSLT script (-x)
 ---------------------------------------------------------
 
 A CIR contains more information about an item than can be captured in a
@@ -683,7 +692,7 @@ required, there are two methods to include it:
 
 -   "Flatten" the information to fit in the data module's schema.
 
-A custom XSLT script can be supplied with the -r option, which is then
+A custom XSLT script can be supplied with the -x option, which is then
 used to resolve the CIR dependencies of the last CIR specified with -R.
 For example:
 
@@ -692,7 +701,7 @@ For example:
     version="1.0">
     <xsl:template match="functionalItemRef">
     <xsl:variable name="fin" select"@functionalItemNumber"/>
-    <xsl:variable name="spec" select="$cir//functionalItemSpec[
+    <xsl:variable name="spec" select="//functionalItemSpec[
     functionalItemIdent/@functionalItemNumber = $fin]"/>
     <xsl:value-of select="$spec/name"/>
     </xsl:template>
@@ -722,7 +731,7 @@ The source data module would contain a reference:
 
 The command would resemble:
 
-    $ s1kd-instance -R <CIR> -r <custom XSLT> <src>
+    $ s1kd-instance -R <CIR> -x <custom XSLT> <src>
 
 And the resulting XML would be:
 
@@ -748,7 +757,7 @@ This means any elements or attributes which are not matched with a more
 specific template in the custom XSLT script are automatically copied.
 
 The set of built-in XSLT scripts used to resolve dependencies can be
-dumped using the -x option.
+dumped using the -D option.
 
 EXIT STATUS
 ===========

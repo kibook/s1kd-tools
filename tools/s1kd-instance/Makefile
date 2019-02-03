@@ -17,14 +17,11 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-strings.h: help.msg
-	xxd -i help.msg > strings.h
-
 xsl.h: xsl/*.xsl cirxsl/*.xsl
 	> xsl.h
 	for f in xsl/*.xsl cirxsl/*.xsl ../common/identity.xsl; do xxd -i "$$f" >> xsl.h; done
 
-$(OUTPUT): $(SOURCE) strings.h xsl.h
+$(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
 
 .PHONY: docs clean maintainer-clean install uninstall
@@ -33,7 +30,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) strings.h xsl.h
+	rm -f $(OUTPUT) xsl.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean

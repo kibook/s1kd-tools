@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <ctype.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <libgen.h>
@@ -14,11 +13,10 @@
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 #include "s1kd_tools.h"
-#include "strings.h"
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "1.14.4"
+#define VERSION "2.0.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -39,19 +37,19 @@
 #define S_BAD_XML ERR_PREFIX "%s does not contain valid XML. If it is a list, specify the -L option.\n"
 #define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
 #define S_BAD_CODE ERR_PREFIX "Bad %s code: %s.\n"
-#define S_NO_XSLT ERR_PREFIX "No built-in XSLT for CIR type: %s\n"
 #define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
 #define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
-#define S_NO_PRODUCT ERR_PREFIX "No product matching '%s' in PCT '%s'.\n"
 #define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s.\n"
-#define S_MISSING_REF_DM ERR_PREFIX "Could not read referenced ACT/PCT: %s\n"
 #define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
-#define S_MISSING_CIR ERR_PREFIX "Could not find CIR %s."
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
 
 /* Warning messages */
 #define S_FILE_EXISTS WRN_PREFIX "%s already exists. Use -f to overwrite.\n"
+#define S_NO_PRODUCT WRN_PREFIX "No product matching '%s' in PCT '%s'.\n"
+#define S_NO_XSLT WRN_PREFIX "No built-in XSLT for CIR type: %s\n"
+#define S_MISSING_REF_DM WRN_PREFIX "Could not read referenced ACT/PCT: %s\n"
+#define S_MISSING_CIR WRN_PREFIX "Could not find CIR %s."
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -67,6 +65,12 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+/* Search for ACT/PCT recursively. */
+bool recursive_search = false;
+
+/* Directory to start searching for ACT/PCT in. */
+char *search_dir;
 
 /* Convenient structure for all strings related to uniquely identifying a
  * CSDB object.
@@ -1968,7 +1972,6 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	char xpath[512];
-	int i;
 
 	pct = xmlReadFile(pctfname, NULL, PARSE_OPTS);
 	ctx = xmlXPathNewContext(pct);
@@ -2003,24 +2006,25 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		fprintf(stderr, S_NO_PRODUCT, product, pctfname);
-		exit(EXIT_BAD_APPLIC);
-	}
+	} else {
+		int i;
 
-	for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-		char *ident, *type, *value;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char *ident, *type, *value;
 
-		ident = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
-			BAD_CAST "applicPropertyIdent");
-		type  = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
-			BAD_CAST "applicPropertyType");
-		value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
-			BAD_CAST "applicPropertyValue");
+			ident = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+				BAD_CAST "applicPropertyIdent");
+			type  = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+				BAD_CAST "applicPropertyType");
+			value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+				BAD_CAST "applicPropertyValue");
 
-		define_applic(ident, type, value, true);
+			define_applic(ident, type, value, true);
 
-		xmlFree(ident);
-		xmlFree(type);
-		xmlFree(value);
+			xmlFree(ident);
+			xmlFree(type);
+			xmlFree(value);
+		}
 	}
 
 	xmlXPathFreeObject(obj);
@@ -2267,9 +2271,6 @@ bool is_dm(const char *name)
  * element. */
 bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 {
-	DIR *dir;
-	struct dirent *cur;
-	int len;
 	bool found = false;
 	char *model_ident_code;
 	char *system_diff_code;
@@ -2369,21 +2370,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		xmlFree(country_iso_code);
 	}
 
-	len = strlen(code);
-
-	dir = opendir(".");
-
-	while ((cur = readdir(dir))) {
-		if (strncmp(cur->d_name, code, len) == 0) {
-			if (is_dm(cur->d_name) && (!found || strcmp(cur->d_name, dst) > 0)) {
-				strcpy(dst, cur->d_name);
-			}
-
-			found = true;
-		}
-	}
-
-	closedir(dir);
+	found = find_csdb_object(dst, search_dir, code, is_dm, recursive_search);
 
 	if (!found) {
 		fprintf(stderr, S_MISSING_REF_DM, code);
@@ -2465,7 +2452,53 @@ void clean_entities(xmlDocPtr doc)
 /* Print a usage message */
 void show_help(void)
 {
-	printf("%.*s", help_msg_len, help_msg);
+	puts("Usage: " PROG_NAME " [options] [<object>...]");
+	puts("");
+	puts("Options:");
+	puts("  -A            Simplify and remove unused applicability annotations.");
+	puts("  -a            Remove unused applicability annotations.");
+	puts("  -C <comment>  Add an XML comment to the top of the instance.");
+	puts("  -c <DMC>      The new code of the instance.");
+	puts("  -D <CIR>      Dump default XSLT for resolving CIR references.");
+	puts("  -d <dir>      Directory to start searching for ACT and PCT data modules in.");
+	puts("  -E            Remove extension from instance.");
+	puts("  -e <ext>      Specify an extension on the instance code (DME/PME).");
+	puts("  -F            Flatten alts elements.");
+	puts("  -f            Force overwriting of files.");
+	puts("  -G            Use custom NCAGE/name for originator.");
+	puts("  -g            Set originator of the instance to identify this tool.");
+	puts("  -h -?         Show this help/usage message.");
+	puts("  -I <date>     Set the issue date of the instance (- for current date).");
+	puts("  -i <infoName> Give the data module instance a different infoName.");
+	puts("  -j            Remove unused external entities (such as ICNs)");
+	puts("  -k <level>    Set the skill level of the instance.");
+	puts("  -K <levels>   Filter on the specified skill levels.");
+	puts("  -L            Source (-s/stdin) is a list of files instead of a DM.");
+	puts("  -l <lang>     Specify the language of the instance.");
+	puts("  -m <remarks>  Set the remarks for the instance.");
+	puts("  -N            Omit issue/inwork numbers from automatic filename.");
+	puts("  -n <iss>      Set the issue and inwork numbers of the instance.");
+	puts("  -O <dir>      Output instance in dir, automatically named.");
+	puts("  -o <file>     Output instance to file instead of stdout.");
+	puts("  -P <PCT>      PCT file to read products from.");
+	puts("  -p <product>  ID/primary key of a product in the PCT to filter on.");
+	puts("  -R <CIR>      Resolve externalized items using the given CIR.");
+	puts("  -r            Search for ACT and PCT data modules recursively.");
+	puts("  -S            Do not include <sourceDmIdent> or <repositorySourceDmIdent>.");
+	puts("  -s <applic>   An assign in the form of <ident>:<type>=<value>");
+	puts("  -t <techName> Give the instance a different techName/pmTitle.");
+	puts("  -U <classes>  Filter on the specified security classes.");
+	puts("  -u <sec>      Set the security classification of the instance.");
+	puts("  -v            Print the file name of the instance when -O is used.");
+	puts("  -W            Overwrite whole object applicability.");
+	puts("  -w            Check the status of the whole object.");
+	puts("  -X            XPath where the -C comment will be inserted.");
+	puts("  -x <XSL>      Use custom XSLT to resolve CIR references.");
+	puts("  -Y <text>     Set applic for DM with text as the display text.");
+	puts("  -y            Set applic for DM based on the user-defined defs.");
+	puts("  -z            Fix certain elements automatically after filtering.");
+	puts("  --version     Show version information.");
+	puts("  <object>...   Source CSDB object(s)");
 }
 
 /* Print version information */
@@ -2531,7 +2564,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:r:Ss:t:U:u:vWwX:x:Y:yz";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:t:U:u:vWwX:x:Y:yz";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2546,6 +2579,8 @@ int main(int argc, char **argv)
 
 	applicability = xmlNewNode(NULL, BAD_CAST "applic");
 
+	search_dir = strdup(".");
+
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
 			case 0:
@@ -2558,6 +2593,8 @@ int main(int argc, char **argv)
 			case 'A': simpl = true; break;
 			case 'c': strncpy(code, optarg, 255); break;
 			case 'C': strncpy(comment_text, optarg, 255); break;
+			case 'D': dump_cir_xsl(optarg); exit(0);
+			case 'd': free(search_dir); search_dir = strdup(optarg); break;
 			case 'E': stripext = true; break;
 			case 'e': strncpy(extension, optarg, 255); break;
 			case 'F': flat_alts = true; break;
@@ -2579,7 +2616,7 @@ int main(int argc, char **argv)
 			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
 			case 'p': strncpy(product, optarg, 63); break;
 			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
-			case 'r': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
+			case 'r': recursive_search = true; break;
 			case 'S': add_source_ident = false; break;
 			case 's': read_applic(optarg); break;
 			case 't': strncpy(tech, optarg, 255); break;
@@ -2588,8 +2625,8 @@ int main(int argc, char **argv)
 			case 'v': verbose = true; break;
 			case 'W': new_applic = true; combine_applic = false; break;
 			case 'w': wholedm = true; break;
-			case 'x': dump_cir_xsl(optarg); exit(0);
 			case 'X': strncpy(comment_path, optarg, 255); break;
+			case 'x': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
 			case 'y': new_applic = true; break;
 			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
 			case 'z': autocomp = true; break;
@@ -2901,6 +2938,7 @@ int main(int argc, char **argv)
 	free(skill);
 	free(skill_codes);
 	free(sec_classes);
+	free(search_dir);
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();
