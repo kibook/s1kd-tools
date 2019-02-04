@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.11"
+#define VERSION "2.6.12"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -143,59 +143,6 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
 {
 	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
-}
-
-/* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
-bool is_in_range(const char *value, const char *range)
-{
-	char *ran;
-	char *first;
-	char *last;
-	bool ret;
-
-	if (!strchr(range, '~')) {
-		return strcmp(value, range) == 0;
-	}
-
-	ran = malloc(strlen(range) + 1);
-
-	strcpy(ran, range);
-
-	first = strtok(ran, "~");
-	last = strtok(NULL, "~");
-
-	ret = strcmp(value, first) >= 0 && strcmp(value, last) <= 0;
-
-	free(ran);
-
-	return ret;
-}
-
-/* Tests whether a value is in an S1000D set (a|b|c) */
-bool is_in_set(const char *value, const char *set)
-{
-	char *s;
-	char *val = NULL;
-	bool ret = false;
-
-	if (!strchr(set, '|')) {
-		return is_in_range(value, set);
-	}
-
-	s = malloc(strlen(set) + 1);
-
-	strcpy(s, set);
-
-	while ((val = strtok(val ? NULL : s, "|"))) {
-		if (is_in_range(value, val)) {
-			ret = true;
-			break;
-		}
-	}
-
-	free(s);
-
-	return ret;
 }
 
 /* Test whether an object value matches a regex pattern. */

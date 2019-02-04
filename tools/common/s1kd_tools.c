@@ -218,6 +218,7 @@ void xmlFreeEntity(xmlEntityPtr entity)
     xmlFree(entity);
 }
 
+/* Compare the codes of two CSDB objects. */
 int codecmp(const char *p1, const char *p2)
 {
 	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
@@ -231,6 +232,7 @@ int codecmp(const char *p1, const char *p2)
 	return strcasecmp(b1, b2);
 }
 
+/* Find a CSDB object in a directory hierarchy based on its code. */
 bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive)
 {
 	DIR *dir;
@@ -281,4 +283,74 @@ bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(
 	closedir(dir);
 
 	return found;
+}
+
+/* Convert string to double. Returns true if the string contained only a
+ * correct double value or false if it contained extra content. */
+bool strtodbl(double *d, const char *s)
+{
+	char *e;
+	*d = strtod(s, &e);
+	return e != s && *e == 0;
+}
+
+/* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
+bool is_in_range(const char *value, const char *range)
+{
+	char *ran, *first, *last;
+	bool ret;
+	double f, l, v;
+
+	if (!strchr(range, '~')) {
+		return strcmp(value, range) == 0;
+	}
+
+	ran = malloc(strlen(range) + 1);
+
+	strcpy(ran, range);
+
+	first = strtok(ran, "~");
+	last = strtok(NULL, "~");
+
+	/* Attempt to compare the values numerically. If any of the values are
+	 * non-numeric, fall back to lexicographic comparison.
+	 *
+	 * For example, if the range is 20~100, 30 falls in this range
+	 * numerically but not lexicographically.
+	 */
+	if (strtodbl(&f, first) && strtodbl(&l, last) && strtodbl(&v, value)) {
+		ret = v - f >= 0 && v - l <= 0;
+	} else {
+		ret = strcmp(value, first) >= 0 && strcmp(value, last) <= 0;
+	}
+
+	free(ran);
+
+	return ret;
+}
+
+/* Tests whether a value is in an S1000D set (a|b|c) */
+bool is_in_set(const char *value, const char *set)
+{
+	char *s, *val = NULL;
+	bool ret = false;
+
+	if (!strchr(set, '|')) {
+		return is_in_range(value, set);
+	}
+
+	s = malloc(strlen(set) + 1);
+
+	strcpy(s, set);
+
+	while ((val = strtok(val ? NULL : s, "|"))) {
+		if (is_in_range(value, val)) {
+			ret = true;
+			break;
+		}
+	}
+
+	free(s);
+
+	return ret;
 }
