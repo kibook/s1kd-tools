@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.4.4"
+#define VERSION "1.4.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -467,8 +467,8 @@ void upissue(const char *path)
 		char *i;
 
 		if ((i = strchr(dmfile, '_'))) {
-			strncpy(i + 1, upissued_issueNumber, 3);
-			strncpy(i + 5, upissued_inWork, 2);
+			memcpy(i + 1, upissued_issueNumber, 3);
+			memcpy(i + 5, upissued_inWork, 2);
 		}
 	}
 
