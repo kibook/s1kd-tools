@@ -12,15 +12,18 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.3.8"
+#define VERSION "1.3.9"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_ENCODING_ERROR "Error encoding path name.\n"
 
 #define EXIT_IMF_EXISTS 1
 #define EXIT_BAD_BREX_DMC 2
 #define EXIT_BAD_DATE 3
 #define EXIT_BAD_TEMPLATE 4
 #define EXIT_BAD_TEMPL_DIR 5
+#define EXIT_ENCODING_ERROR 6
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
@@ -483,9 +486,15 @@ int main(int argc, char **argv)
 		set_remarks(template, remarks);
 
 		if (no_issue) {
-			snprintf(fname, PATH_MAX, "IMF-%s.XML", icn);
+			if (snprintf(fname, PATH_MAX, "IMF-%s.XML", icn) < 0) {
+				fprintf(stderr, E_ENCODING_ERROR);
+				exit(EXIT_ENCODING_ERROR);
+			}
 		} else {
-			snprintf(fname, PATH_MAX, "IMF-%s_%s-%s.XML", icn, issue_number, in_work);
+			if (snprintf(fname, PATH_MAX, "IMF-%s_%s-%s.XML", icn, issue_number, in_work) < 0) {
+				fprintf(stderr, E_ENCODING_ERROR);
+				exit(EXIT_ENCODING_ERROR);
+			}
 		}
 
 		if (!overwrite && access(fname, F_OK) != -1) {
