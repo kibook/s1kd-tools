@@ -14,9 +14,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+
+#define E_ENCODING_ERROR "Error encoding path name.\n"
+
+#define EXIT_ENCODING_ERROR 1
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -145,12 +149,18 @@ void setup_sns(xmlNodePtr node, const char *snsdname)
 
 			if (only_numb) continue;
 
-			sprintf(oldname, "../%s", code);
+			if (snprintf(oldname, PATH_MAX, "../%s", code) < 0) {
+				fprintf(stderr, E_ENCODING_ERROR);
+				exit(EXIT_ENCODING_ERROR);
+			}
 
 			content = (char *) xmlNodeGetContent(cur);
 			cleanstr(content);
 
-			sprintf(newname, "../%s - %s", code, content);
+			if (snprintf(newname, PATH_MAX, "../%s - %s", code, content) < 0) {
+				fprintf(stderr, E_ENCODING_ERROR);
+				exit(EXIT_ENCODING_ERROR);
+			}
 
 			xmlFree(content);
 
