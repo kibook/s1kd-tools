@@ -8,7 +8,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -111,7 +111,7 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
 		extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
 
-		sprintf(cat, "%s-%s-", extensionProducer, extensionCode);
+		snprintf(cat, 256, "%s-%s-", extensionProducer, extensionCode);
 
 		xmlFree(extensionProducer);
 		xmlFree(extensionCode);
@@ -124,7 +124,7 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	pmNumber       = firstXPathString("@pmNumber|pmnumber", NULL, pmCode);
 	pmVolume       = firstXPathString("@pmVolume|pmvolume", NULL, pmCode);
 
-	sprintf(cat, "%s-%s-%s-%s", modelIdentCode, pmIssuer, pmNumber, pmVolume);
+	snprintf(cat, 256, "%s-%s-%s-%s", modelIdentCode, pmIssuer, pmNumber, pmVolume);
 
 	xmlFree(modelIdentCode);
 	xmlFree(pmIssuer);
@@ -139,7 +139,7 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		issueNumber = firstXPathString("@issueNumber|@issno", NULL, issueInfo);
 		inWork      = firstXPathString("@inWork|@inwork", NULL, issueInfo);
 
-		sprintf(cat, "_%s-%s", issueNumber, inWork ? inWork : "00");
+		snprintf(cat, 256, "_%s-%s", issueNumber, inWork ? inWork : "00");
 
 		xmlFree(issueNumber);
 		xmlFree(inWork);
@@ -153,7 +153,7 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		languageIsoCode = firstXPathString("@languageIsoCode|@language", NULL, language);
 		countryIsoCode  = firstXPathString("@countryIsoCode|@country", NULL, language);
 
-		sprintf(cat, "_%s-%s", languageIsoCode, countryIsoCode);
+		snprintf(cat, 256, "_%s-%s", languageIsoCode, countryIsoCode);
 
 		xmlFree(languageIsoCode);
 		xmlFree(countryIsoCode);
@@ -194,7 +194,7 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		extensionProducer = firstXPathString("@extensionProducer|dmeproducer", NULL, identExtension);
 		extensionCode     = firstXPathString("@extensionCode|dmecode", NULL, identExtension);
 
-		sprintf(cat, "%s-%s-", extensionProducer, extensionCode);
+		snprintf(cat, 256, "%s-%s-", extensionProducer, extensionCode);
 
 		xmlFree(extensionProducer);
 		xmlFree(extensionCode);
@@ -216,7 +216,7 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	learnCode          = firstXPathString("@learnCode", NULL, dmCode);
 	learnEventCode     = firstXPathString("@learnEventCode", NULL, dmCode);
 
-	sprintf(cat, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
+	snprintf(cat, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
 		modelIdentCode,
 		systemDiffCode,
 		systemCode,
@@ -244,7 +244,7 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	strcat(dst, cat);
 
 	if (learnCode && learnEventCode) {
-		sprintf(cat, "-%s%s", learnCode, learnEventCode);
+		snprintf(cat, 256, "-%s%s", learnCode, learnEventCode);
 		strcat(dst, cat);
 	}
 
@@ -257,7 +257,7 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		issueNumber = firstXPathString("@issueNumber|@issno", NULL, issueInfo);
 		inWork      = firstXPathString("@inWork|@inwork", NULL, issueInfo);
 
-		sprintf(cat, "_%s-%s", issueNumber, inWork ? inWork : "00");
+		snprintf(cat, 256, "_%s-%s", issueNumber, inWork ? inWork : "00");
 
 		xmlFree(issueNumber);
 		xmlFree(inWork);
@@ -271,7 +271,7 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 		languageIsoCode = firstXPathString("@languageIsoCode|@language", NULL, language);
 		countryIsoCode  = firstXPathString("@countryIsoCode|@country", NULL, language);
 
-		sprintf(cat, "_%s-%s", languageIsoCode, countryIsoCode);
+		snprintf(cat, 256, "_%s-%s", languageIsoCode, countryIsoCode);
 
 		xmlFree(languageIsoCode);
 		xmlFree(countryIsoCode);
@@ -569,7 +569,7 @@ void addDirectory(const char *path, xmlNodePtr addresses)
 	while ((cur = readdir(dir))) {
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
-			sprintf(fname, "%s/%s", path, cur->d_name);
+			snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name);
 			addAddress(fname, addresses);
 		}
 	}
@@ -587,7 +587,7 @@ void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnl
 	while ((cur = readdir(dir))) {
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
-			sprintf(fname, "%s/%s", path, cur->d_name);
+			snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name);
 			updateRefsFile(fname, addresses, contentOnly, recode, overwrite);
 		}
 	}
