@@ -8,12 +8,14 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.0.1"
+#define VERSION "2.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
+#define E_ENCODING_ERROR "Error encoding path name.\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
+#define EXIT_ENCODING_ERROR 1
 #define EXIT_NO_FILE 2
 
 #define ADDR_PATH     "//dmAddress|//dmaddres|//pmAddress|//pmaddres"
@@ -569,7 +571,10 @@ void addDirectory(const char *path, xmlNodePtr addresses)
 	while ((cur = readdir(dir))) {
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
-			snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name);
+			if (snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name) < 0) {
+				fprintf(stderr, E_ENCODING_ERROR);
+				exit(EXIT_ENCODING_ERROR);
+			}
 			addAddress(fname, addresses);
 		}
 	}
@@ -587,7 +592,10 @@ void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnl
 	while ((cur = readdir(dir))) {
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
-			snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name);
+			if (snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name) < 0) {
+				fprintf(stderr, E_ENCODING_ERROR);
+				exit(EXIT_ENCODING_ERROR);
+			}
 			updateRefsFile(fname, addresses, contentOnly, recode, overwrite);
 		}
 	}
