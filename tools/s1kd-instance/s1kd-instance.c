@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.0.1"
+#define VERSION "2.0.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2558,7 +2558,7 @@ int main(int argc, char **argv)
 			case 'm': remarks = strdup(optarg); break;
 			case 'N': no_issue = true; break;
 			case 'n': strncpy(issinfo, optarg, 6); break;
-			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX); use_stdout = false; break;
+			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX - 1); use_stdout = false; break;
 			case 'o': strncpy(out, optarg, PATH_MAX - 1); use_stdout = false; break;
 			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
 			case 'p': strncpy(product, optarg, 63); break;
