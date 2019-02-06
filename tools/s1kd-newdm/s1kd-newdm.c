@@ -20,7 +20,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.10"
+#define VERSION "1.7.11"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -329,7 +329,7 @@ void copy_default_value(const char *key, const char *val)
 	else if (strcmp(key, "infoName") == 0 && strcmp(infoName_content, "") == 0 && !no_info_name)
 		strncpy(infoName_content, val, MAX_INFO_CODE - 2);
 	else if (strcmp(key, "schema") == 0 && strcmp(schema, "") == 0)
-		strncpy(schema, val, 1023);
+		strncpy(schema, val, PATH_MAX - 1);
 	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
 		strncpy(brex_dmcode, val, 255);
 	else if (strcmp(key, "sns") == 0 && !sns_fname)
