@@ -11,10 +11,9 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.5.3"
+#define VERSION "1.5.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
-#define EXIT_NO_OVERWRITE 1
 #define EXIT_NO_FILE 2
 #define S_DMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_DMTYPES_FNAME " file.\n"
 #define S_FMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_FMTYPES_FNAME " file.\n"
