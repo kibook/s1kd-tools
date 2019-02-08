@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="01" day="18"/>
+        <issueDate year="2019" month="02" day="08"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,15 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Reformat SYNOPSIS.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -d option to -D.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -d and -r options.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -58,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003"><![CDATA[s1kd-aspp -h?
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-aspp -h?
 s1kd-aspp -D
 s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cflrx]
              [<object>...]
@@ -110,12 +101,12 @@ s1kd-aspp -p [-a <ID>] [-flx] [<object>...]]]></verbatimText>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">-D</listItemTerm>
+              <listItemTerm>-D</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Directory to start searching for ACT/CCT data modules in. By default, the current directory is used.</para>
@@ -151,7 +142,7 @@ s1kd-aspp -p [-a <ID>] [-flx] [<object>...]]]></verbatimText>
                 <para>Preprocess applicability statements to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet. The applicability in the resulting XML is no longer semantically correct.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
                 <para>Search for ACT/CCT data modules recursively.</para>
@@ -222,7 +213,7 @@ applicPropertyValues="A"/>
 </displayText>
 </applic>]]></verbatimText>
           </para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -D option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para>The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -D option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="@*|node()">
 <xsl:copy>

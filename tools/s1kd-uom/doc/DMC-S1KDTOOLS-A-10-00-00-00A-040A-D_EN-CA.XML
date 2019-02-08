@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="01" day="18"/>
+        <issueDate year="2019" month="02" day="08"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt01">
-        <simplePara>Improve section on conversion formula variables.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -148,7 +145,7 @@
           </para>
           <para>This will generate a <verbatimText verbatimStyle="vs02">.uom</verbatimText> file containing rules to convert inches to centimetres, and degrees Fahrenheit to degrees Celsius.</para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Conversion formula variables (-e)</title>
           <para>When specifying a formula for conversion, the following variables can be used:</para>
           <para>
