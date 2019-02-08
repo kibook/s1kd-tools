@@ -13,11 +13,10 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.4.3"
+#define VERSION "1.4.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
-#define EXIT_NO_PM 1
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
 #define EXIT_NO_INFOCODE 4
