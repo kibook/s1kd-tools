@@ -6,17 +6,17 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="01" day="18"/>
+        <issueDate year="2019" month="02" day="08"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -39,70 +39,127 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt01">
+        <simplePara>Add instructions for installing the pre-compiled packages.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt01">
+        <simplePara>Add link to xmlsoft.org.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
     <description>
       <levelledPara>
-        <title>Requirements</title>
-        <para>To build the executables:</para>
+        <title>General</title>
+        <para>There are multiple ways to install the s1kd-tools:</para>
         <para>
           <randomList>
             <listItem>
-              <para>coreutils and binutils</para>
+              <para>using a package manager and the pre-compiled Debian (.deb) or Red Hat (.rpm) packages</para>
             </listItem>
             <listItem>
-              <para>xxd</para>
-            </listItem>
-            <listItem>
-              <para>libxml2, libxslt, libexslt</para>
-            </listItem>
-          </randomList>
-        </para>
-        <para>To build the documentation from source:</para>
-        <para>
-          <randomList>
-            <listItem>
-              <para>
-                <externalPubRef xlink:href="http://github.com/kibook/s1kd2db">
-                  <externalPubRefIdent>
-                    <externalPubTitle>s1kd2db</externalPubTitle>
-                  </externalPubRefIdent>
-                </externalPubRef>
-              </para>
-            </listItem>
-            <listItem>
-              <para>
-                <externalPubRef xlink:href="https://pandoc.org/">
-                  <externalPubRefIdent>
-                    <externalPubTitle>pandoc</externalPubTitle>
-                  </externalPubRefIdent>
-                </externalPubRef>
-              </para>
+              <para>building from source</para>
             </listItem>
           </randomList>
         </para>
       </levelledPara>
       <levelledPara>
-        <title>Building the executables</title>
-        <para>Run the following commands to build the executables, and install both the executables and documentation:</para>
-        <para>
-          <verbatimText verbatimStyle="vs24">$ make
+        <title>Using a package manager</title>
+        <para>Debian (.deb) and Red Hat (.rpm) packages are provided to easily install, upgrade or uninstall the s1kd-tools on Linux systems using a package manager. The examples below focus on the standard <verbatimText>dpkg</verbatimText> (for Debian-based distributions) and <verbatimText>rpm</verbatimText> (for Red Hat-based distributions).</para>
+        <levelledPara>
+          <title>Installing</title>
+          <para>You can download the latest release of the s1kd-tools from <externalPubRef xlink:href="http://khzae.net/1/s1000d/s1kd-tools/releases/latest"><externalPubRefIdent><externalPubCode>http://khzae.net/1/s1000d/s1kd-tools/releases/latest</externalPubCode></externalPubRefIdent></externalPubRef>. Then use one of the following commands to install it:</para>
+          <para>
+            <emphasis>Debian:</emphasis>
+            <verbatimText verbatimStyle="vs24"># dpkg -i s1kd-tools_[version]_[arch].deb</verbatimText>
+          </para>
+          <para>
+            <emphasis>Red Hat:</emphasis>
+            <verbatimText verbatimStyle="vs24"># rpm -i s1kd-tools.[version].[arch].rpm</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Uninstalling</title>
+          <para>To uninstall using the package manager, use one of the following commands:</para>
+          <para>
+            <emphasis>Debian:</emphasis>
+            <verbatimText verbatimStyle="vs24"># dpkg -r s1kd-tools</verbatimText>
+          </para>
+          <para>
+            <emphasis>Red Hat:</emphasis>
+            <verbatimText verbatimStyle="vs24"># rpm -e s1kd-tools</verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>Building from source</title>
+        <levelledPara>
+          <title>Requirements</title>
+          <para>To build the executables:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>coreutils and binutils</para>
+              </listItem>
+              <listItem>
+                <para>xxd</para>
+              </listItem>
+              <listItem>
+                <para>
+                  <externalPubRef xlink:href="http://xmlsoft.org">
+                    <externalPubRefIdent>
+                      <externalPubTitle>libxml2, libxslt, libexslt</externalPubTitle>
+                    </externalPubRefIdent>
+                  </externalPubRef>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>To build the documentation from source:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <externalPubRef xlink:href="http://github.com/kibook/s1kd2db">
+                    <externalPubRefIdent>
+                      <externalPubTitle>s1kd2db</externalPubTitle>
+                    </externalPubRefIdent>
+                  </externalPubRef>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <externalPubRef xlink:href="https://pandoc.org/">
+                    <externalPubRefIdent>
+                      <externalPubTitle>pandoc</externalPubTitle>
+                    </externalPubRefIdent>
+                  </externalPubRef>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Building and installing</title>
+          <para>Run the following commands to build the executables, and install both the executables and documentation:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ make
 # make install</verbatimText>
-        </para>
-        <para>To change where these are installed, specify the PREFIX make variable. The default value of this variable is /usr/local.</para>
-        <para>For example:</para>
-        <para>
-          <verbatimText verbatimStyle="vs24"># make PREFIX=/usr install</verbatimText>
-        </para>
-      </levelledPara>
-      <levelledPara>
-        <title>Uninstalling</title>
-        <para>To uninstall the executables and documentation:</para>
-        <para>
-          <verbatimText verbatimStyle="vs24"># make uninstall</verbatimText>
-        </para>
-        <para>Remember to specify the PREFIX make variable if a different prefix was used during installation.</para>
+          </para>
+          <para>To change where these are installed, specify the PREFIX make variable. The default value of this variable is /usr/local.</para>
+          <para>For example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"># make PREFIX=/usr install</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Uninstalling</title>
+          <para>To uninstall the executables and documentation:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"># make uninstall</verbatimText>
+          </para>
+          <para>Remember to specify the PREFIX make variable if a different prefix was used during installation.</para>
+        </levelledPara>
       </levelledPara>
     </description>
   </content>
