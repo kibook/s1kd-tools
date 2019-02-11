@@ -1,7 +1,8 @@
 SOURCE=s1kd-transform.c
 OUTPUT=s1kd-transform
 
-CFLAGS=-Wall -Werror -pedantic-errors `pkg-config --cflags libxml-2.0 libxslt libexslt`
+WARNING_FLAGS=-Wall -Werror -pedantic-errors
+CFLAGS=$(WARNING_FLAGS) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

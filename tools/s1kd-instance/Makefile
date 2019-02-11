@@ -1,7 +1,8 @@
 SOURCE=s1kd-instance.c ../common/s1kd_tools.c
 OUTPUT=s1kd-instance
 
-CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0 libxslt libexslt`
+WARNING_FLAGS=-Wall -Werror -pedantic-errors
+CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

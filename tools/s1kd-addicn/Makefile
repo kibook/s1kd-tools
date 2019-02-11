@@ -1,7 +1,8 @@
 SOURCE=s1kd-addicn.c
 OUTPUT=s1kd-addicn
 
-CFLAGS=-Wall -Werror -pedantic-errors `pkg-config --cflags libxml-2.0`
+WARNING_FLAGS=-Wall -Werror -pedantic-errors
+CFLAGS=$(WARNING_FLAGS) `pkg-config --cflags libxml-2.0`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

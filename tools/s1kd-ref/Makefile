@@ -1,7 +1,8 @@
 SOURCE=s1kd-ref.c
 OUTPUT=s1kd-ref
 
-CFLAGS=-Wall -Werror -pedantic-errors `pkg-config --cflags libxml-2.0 libxslt`
+WARNING_FLAGS=-Wall -Werror -pedantic-errors
+CFLAGS=$(WARNING_FLAGS) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

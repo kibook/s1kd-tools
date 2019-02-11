@@ -1,7 +1,8 @@
 SOURCE=s1kd-newdml.c ../common/s1kd_tools.c
 OUTPUT=s1kd-newdml
 
-CFLAGS=-Wall -Werror -pedantic-errors -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+WARNING_FLAGS=-Wall -Werror -pedantic-errors
+CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g
