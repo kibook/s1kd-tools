@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="21"/>
+        <issueDate year="2019" month="02" day="11"/>
         <dmTitle>
           <techName>S1000D tools</techName>
           <infoName>Description</infoName>
@@ -42,9 +42,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt01">
-        <simplePara>Add link to basic S1000D tutorial.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -74,7 +71,7 @@
               </externalPubRef>
             </para>
           </listItem>
-          <listItem changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <listItem>
             <para>
               <externalPubRef xlink:href="TUTORIAL.md">
                 <externalPubRefIdent>
@@ -172,7 +169,7 @@
           </listItem>
           <listItem>
             <para>
-              <externalPubRef xlink:href="http://khzae.net/1/s1kd/s1kd-tools">
+              <externalPubRef xlink:href="http://khzae.net/1/s1000d/s1kd-tools">
                 <externalPubRefIdent>
                   <externalPubTitle>s1kd-tools on khzae.net</externalPubTitle>
                 </externalPubRefIdent>

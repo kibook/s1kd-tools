@@ -36,4 +36,4 @@ Additional links:
 
 -   [s1kd-tools GitHub Pages site](http://kibook.github.io/s1kd-tools)
 
--   [s1kd-tools on khzae.net](http://khzae.net/1/s1kd/s1kd-tools)
+-   [s1kd-tools on khzae.net](http://khzae.net/1/s1000d/s1kd-tools)
