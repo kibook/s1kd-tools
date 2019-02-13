@@ -98,6 +98,19 @@ Show version information.
 CSDB object(s) to list references in. If none are specified, the tool
 will read from stdin.
 
+EXIT STATUS
+===========
+
+0  
+No errors, all references were matched.
+
+1  
+Some references were unmatched.
+
+2  
+The number of objects found in a recursive check (-R) exceeded the
+available memory.
+
 EXAMPLE
 =======
 

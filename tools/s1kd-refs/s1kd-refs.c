@@ -12,14 +12,15 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.0.6"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_OUT_OF_MEMORY "Too many files in recursive listing.\n"
 
-#define EXIT_OUT_OF_MEMORY 1
+#define EXIT_UNMATCHED_REF 1
+#define EXIT_OUT_OF_MEMORY 2
 
 /* List only references found in the content section. */
 bool contentOnly = false;
@@ -665,10 +666,10 @@ void tagUnmatchedRef(xmlNodePtr ref)
 	xmlAddChild(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
 }
 
-void listReferences(const char *path);
+int listReferences(const char *path);
 
 /* Print a reference found in an object. */
-void printReference(xmlNodePtr ref, const char *src)
+int printReference(xmlNodePtr ref, const char *src)
 {
 	char code[PATH_MAX];
 	char fname[PATH_MAX];
@@ -699,7 +700,7 @@ void printReference(xmlNodePtr ref, const char *src)
 	         xmlStrcmp(ref->name, BAD_CAST "ddnfilen") == 0)
 		getDispatchFileName(code, ref);
 	else
-		return;
+		return 0;
 
 	if (find_csdb_object(fname, directory, code, NULL, recursive)) {
 		if (updateRefs) {
@@ -713,6 +714,7 @@ void printReference(xmlNodePtr ref, const char *src)
 				listReferences(fname);
 			}
 		}
+		return 0;
 	} else if (tagUnmatched) {
 		tagUnmatchedRef(ref);
 	} else if (showUnmatched) {
@@ -720,6 +722,8 @@ void printReference(xmlNodePtr ref, const char *src)
 	} else if (!quiet) {
 		printUnmatchedFn(ref, src, code);
 	}
+
+	return 1;
 }
 
 /* Check if a file has already been listed when listing recursively. */
@@ -748,15 +752,16 @@ void addFile(const char *path)
 }
 
 /* List all references in the given object. */
-void listReferences(const char *path)
+int listReferences(const char *path)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+	int unmatched = 0;
 
 	if (listRecursively) {
 		if (listedFile(path)) {
-			return;
+			return 0;
 		}
 
 		addFile(path);
@@ -767,7 +772,7 @@ void listReferences(const char *path)
 	}
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
-		return;
+		return 0;
 	}
 
 	ctx = xmlXPathNewContext(doc);
@@ -784,7 +789,7 @@ void listReferences(const char *path)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			printReference(obj->nodesetval->nodeTab[i], path);
+			unmatched += printReference(obj->nodesetval->nodeTab[i], path);
 		}
 	}
 
@@ -802,18 +807,21 @@ void listReferences(const char *path)
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 	xmlFreeDoc(doc);
+
+	return unmatched;
 }
 
 /* Parse a list of filenames as input. */
-void listReferencesInList(const char *path)
+int listReferencesInList(const char *path)
 {
 	FILE *f;
 	char line[PATH_MAX];
+	int unmatched = 0;
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
 			fprintf(stderr, E_BAD_LIST, path);
-			return;
+			return 0;
 		}
 	} else {
 		f = stdin;
@@ -821,12 +829,14 @@ void listReferencesInList(const char *path)
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		listReferences(line);
+		unmatched += listReferences(line);
 	}
 
 	if (path) {
 		fclose(f);
 	}
+
+	return unmatched;
 }
 
 /* Display the usage message. */
@@ -871,7 +881,7 @@ void show_version(void)
 
 int main(int argc, char **argv)
 {
-	int i;
+	int i, unmatched;
 
 	bool isList = false;
 	bool xmlOutput = false;
@@ -994,15 +1004,15 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (isList) {
-				listReferencesInList(argv[i]);
+				unmatched = listReferencesInList(argv[i]);
 			} else {
-				listReferences(argv[i]);
+				unmatched = listReferences(argv[i]);
 			}
 		}
 	} else if (isList) {
-		listReferencesInList(NULL);
+		unmatched = listReferencesInList(NULL);
 	} else {
-		listReferences("-");
+		unmatched = listReferences("-");
 	}
 
 	if (xmlOutput) {
@@ -1012,5 +1022,5 @@ int main(int argc, char **argv)
 	free(directory);
 	xmlCleanupParser();
 
-	return 0;
+	return unmatched > 0 ? EXIT_UNMATCHED_REF : EXIT_SUCCESS;
 }
