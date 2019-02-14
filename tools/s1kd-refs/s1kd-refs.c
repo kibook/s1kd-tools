@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.2.0"
+#define VERSION "2.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -658,9 +658,9 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		infoName = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
 
 		dmTitle = xmlNewChild(dmRefAddressItems, NULL, BAD_CAST "dmTitle", NULL);
-		xmlNewChild(dmTitle, NULL, BAD_CAST "techName", techName);
+		xmlNewTextChild(dmTitle, NULL, BAD_CAST "techName", techName);
 		if (infoName) {
-			xmlNewChild(dmTitle, NULL, BAD_CAST "infoName", infoName);
+			xmlNewTextChild(dmTitle, NULL, BAD_CAST "infoName", infoName);
 		}
 
 		xmlFree(techName);
@@ -733,7 +733,7 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 
 		pmTitle = firstXPathValue(doc, NULL, BAD_CAST "//pmTitle|//pmtitle");
 
-		xmlNewChild(pmRefAddressItems, NULL, BAD_CAST "pmTitle", pmTitle);
+		xmlNewTextChild(pmRefAddressItems, NULL, BAD_CAST "pmTitle", pmTitle);
 
 		xmlFree(pmTitle);
 
@@ -803,9 +803,9 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 			newtitle = xmlAddNextSibling(firstXPathNode(NULL, ref, BAD_CAST "(avee|issno)[last()]"), newtitle);
 		}
 
-		xmlNewChild(newtitle, NULL, BAD_CAST "techname", techname);
+		xmlNewTextChild(newtitle, NULL, BAD_CAST "techname", techname);
 		if (infoname) {
-			xmlNewChild(newtitle, NULL, BAD_CAST "infoname", infoname);
+			xmlNewTextChild(newtitle, NULL, BAD_CAST "infoname", infoname);
 		}
 
 		xmlFree(techname);
