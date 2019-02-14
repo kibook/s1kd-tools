@@ -9,16 +9,22 @@ s1kd\-refs \- Manage references between CSDB objects
 .IP
 .nf
 \f[C]
-s1kd\-refs\ [\-aCcDEFfGilNnPqRrsUuXxh?]\ [\-d\ <dir>]\ [<object>...]
+s1kd\-refs\ [\-aCcDEFfGIilNnPqRrsUuXxh?]\ [\-d\ <dir>]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
 .PP
 The \f[I]s1kd\-refs\f[] tool lists external references in CSDB objects,
 optionally matching them to a filename in the CSDB directory hierarchy.
-This makes it easy to obtain a list of dependencies for CSDB objects,
-such as ICNs, to ensure they are delivered together, or to check for
-references to CSDB objects which do not exist in the current CSDB.
+.PP
+This allows you to:
+.IP \[bu] 2
+obtain a list of dependencies for CSDB objects, such as ICNs, to ensure
+they are delivered together
+.IP \[bu] 2
+check for references to objects which do not exist in the current CSDB
+.IP \[bu] 2
+update reference metadata, such as titles, from the matched objects
 .SH OPTIONS
 .TP
 .B \-a
@@ -61,8 +67,16 @@ Show help/usage message.
 .RS
 .RE
 .TP
+.B \-I
+Update the issue number, issue date, language, and title of references
+to that of the latest matched object.
+This option implies the \-U and \-i options.
+.RS
+.RE
+.TP
 .B \-i
-Ignore issue and language info when matching references.
+Always match the latest issue of an object found, regardless of the
+issue and language specified in the reference.
 .RS
 .RE
 .TP
@@ -109,8 +123,7 @@ operation to a source object and all its dependencies together.
 .RE
 .TP
 .B \-U
-Update the address items (such as titles) of matched references from the
-corresponding object.
+Update the title of matched references from the corresponding object.
 .RS
 .RE
 .TP

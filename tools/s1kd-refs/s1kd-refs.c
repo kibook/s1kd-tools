@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.1.0"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -54,6 +54,9 @@ bool listRecursively = false;
 
 /* Update the address information of references. */
 bool updateRefs = false;
+
+/* Update the ident and address info from the latest matched issue. */
+bool updateRefIdent = false;
 
 /* Overwrite updated input objects. */
 bool overwriteUpdated = false;
@@ -297,29 +300,31 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 	learnCode          = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@learnCode");
 	learnEventCode     = (char *) firstXPathValue(NULL, dmCode, BAD_CAST "@learnEventCode");
 
-	strcat(dst, modelIdentCode);
-	strcat(dst, "-");
-	strcat(dst, systemDiffCode);
-	strcat(dst, "-");
-	strcat(dst, systemCode);
-	strcat(dst, "-");
-	strcat(dst, subSystemCode);
-	strcat(dst, subSubSystemCode);
-	strcat(dst, "-");
-	strcat(dst, assyCode);
-	strcat(dst, "-");
-	strcat(dst, disassyCode);
-	strcat(dst, disassyCodeVariant);
-	strcat(dst, "-");
-	strcat(dst, infoCode);
-	strcat(dst, infoCodeVariant);
-	strcat(dst, "-");
-	strcat(dst, itemLocationCode);
-
-	if (learnCode) {
+	if (modelIdentCode) {
+		strcat(dst, modelIdentCode);
 		strcat(dst, "-");
-		strcat(dst, learnCode);
-		strcat(dst, learnEventCode);
+		strcat(dst, systemDiffCode);
+		strcat(dst, "-");
+		strcat(dst, systemCode);
+		strcat(dst, "-");
+		strcat(dst, subSystemCode);
+		strcat(dst, subSubSystemCode);
+		strcat(dst, "-");
+		strcat(dst, assyCode);
+		strcat(dst, "-");
+		strcat(dst, disassyCode);
+		strcat(dst, disassyCodeVariant);
+		strcat(dst, "-");
+		strcat(dst, infoCode);
+		strcat(dst, infoCodeVariant);
+		strcat(dst, "-");
+		strcat(dst, itemLocationCode);
+
+		if (learnCode) {
+			strcat(dst, "-");
+			strcat(dst, learnCode);
+			strcat(dst, learnEventCode);
+		}
 	}
 
 	xmlFree(modelIdentCode);
@@ -598,6 +603,51 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		xmlNodePtr dmRefAddressItems, dmTitle;
 		xmlChar *techName, *infoName;
 
+		if (updateRefIdent) {
+			xmlNodePtr dmRefIdent, refIssueInfo, refLanguage, issueInfo, language;
+
+			dmRefIdent   = firstXPathNode(NULL, ref, BAD_CAST "dmRefIdent");
+			refIssueInfo = firstXPathNode(NULL, dmRefIdent, BAD_CAST "issueInfo");
+			refLanguage  = firstXPathNode(NULL, dmRefIdent, BAD_CAST "language");
+
+			issueInfo = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//issueInfo|//issno"), 1);
+			language  = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//language"), 1);
+
+			/* 4.x references a 3.0 DM */
+			if (xmlStrcmp(issueInfo->name, BAD_CAST "issno") == 0) {
+				xmlNodeSetName(issueInfo, BAD_CAST "issueInfo");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(issueInfo,
+					BAD_CAST "issno"),
+					BAD_CAST "issueNumber");
+				if (xmlHasProp(issueInfo, BAD_CAST "inwork")) {
+					xmlNodeSetName((xmlNodePtr) xmlHasProp(issueInfo,
+						BAD_CAST "inwork"),
+						BAD_CAST "inWork");
+				} else {
+					xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST "00");
+				}
+				xmlUnsetProp(issueInfo, BAD_CAST "type");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(language,
+					BAD_CAST "language"),
+					BAD_CAST "languageIsoCode");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(language,
+					BAD_CAST "country"),
+					BAD_CAST "countryIsoCode");
+			}
+
+			if (refIssueInfo) {
+				xmlUnlinkNode(refIssueInfo);
+				xmlFreeNode(refIssueInfo);
+			}
+			if (refLanguage) {
+				xmlUnlinkNode(refLanguage);
+				xmlFreeNode(refLanguage);
+			}
+
+			xmlAddChild(dmRefIdent, issueInfo);
+			xmlAddChild(dmRefIdent, language);
+		}
+
 		if ((dmRefAddressItems = firstXPathNode(NULL, ref, BAD_CAST "dmRefAddressItems"))) {
 			xmlUnlinkNode(dmRefAddressItems);
 			xmlFreeNode(dmRefAddressItems);
@@ -615,9 +665,65 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 
 		xmlFree(techName);
 		xmlFree(infoName);
+
+		if (updateRefIdent) {
+			xmlNodePtr issueDate;
+
+			issueDate = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//issueDate|//issdate"), 1);
+
+			if (xmlStrcmp(issueDate->name, BAD_CAST "issdate")) {
+				xmlNodeSetName(issueDate, BAD_CAST "issueDate");
+			}
+
+			xmlAddChild(dmRefAddressItems, issueDate);
+		}
 	} else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0) {
 		xmlNodePtr pmRefAddressItems;
 		xmlChar *pmTitle;
+
+		if (updateRefIdent) {
+			xmlNodePtr pmRefIdent, refIssueInfo, refLanguage, issueInfo, language;
+
+			pmRefIdent   = firstXPathNode(NULL, ref, BAD_CAST "pmRefIdent");
+			refIssueInfo = firstXPathNode(NULL, pmRefIdent, BAD_CAST "issueInfo");
+			refLanguage  = firstXPathNode(NULL, pmRefIdent, BAD_CAST "language");
+			issueInfo    = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//issueInfo|//issno"), 1);
+			language     = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//language"), 1);
+
+			/* 4.x references a 3.0 DM */
+			if (xmlStrcmp(issueInfo->name, BAD_CAST "issno") == 0) {
+				xmlNodeSetName(issueInfo, BAD_CAST "issueInfo");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(issueInfo,
+					BAD_CAST "issno"),
+					BAD_CAST "issueNumber");
+				if (xmlHasProp(issueInfo, BAD_CAST "inwork")) {
+					xmlNodeSetName((xmlNodePtr) xmlHasProp(issueInfo,
+						BAD_CAST "inwork"),
+						BAD_CAST "inWork");
+				} else {
+					xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST "00");
+				}
+				xmlUnsetProp(issueInfo, BAD_CAST "type");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(language,
+					BAD_CAST "language"),
+					BAD_CAST "languageIsoCode");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(language,
+					BAD_CAST "country"),
+					BAD_CAST "countryIsoCode");
+			}
+
+			if (refIssueInfo) {
+				xmlUnlinkNode(refIssueInfo);
+				xmlFreeNode(refIssueInfo);
+			}
+			if (refLanguage) {
+				xmlUnlinkNode(refLanguage);
+				xmlFreeNode(refLanguage);
+			}
+
+			xmlAddChild(pmRefIdent, issueInfo);
+			xmlAddChild(pmRefIdent, language);
+		}
 
 		if ((pmRefAddressItems = firstXPathNode(NULL, ref, BAD_CAST "pmRefAddressItems"))) {
 			xmlUnlinkNode(pmRefAddressItems);
@@ -630,9 +736,61 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		xmlNewChild(pmRefAddressItems, NULL, BAD_CAST "pmTitle", pmTitle);
 
 		xmlFree(pmTitle);
+
+		if (updateRefIdent) {
+			xmlNodePtr issueDate;
+
+			issueDate = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//issueDate|//issdate"), 1);
+
+			if (xmlStrcmp(issueDate->name, BAD_CAST "issdate")) {
+				xmlNodeSetName(issueDate, BAD_CAST "issueDate");
+			}
+
+			xmlAddChild(pmRefAddressItems, issueDate);
+		}
 	} else if (xmlStrcmp(ref->name, BAD_CAST "refdm") == 0) {
 		xmlNodePtr oldtitle, newtitle;
 		xmlChar *techname, *infoname;
+
+		if (updateRefIdent) {
+			xmlNodePtr oldissno, newissno, oldlanguage, newlanguage;
+
+			newissno    = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//issueInfo|//issno"), 1);
+			newlanguage = xmlCopyNode(firstXPathNode(doc, NULL, BAD_CAST "//language"), 1);
+
+			/* 3.0 references a 4.x DM */
+			if (xmlStrcmp(newissno->name, BAD_CAST "issueInfo") == 0) {
+				xmlNodeSetName(newissno, BAD_CAST "issno");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(newissno,
+					BAD_CAST "issueNumber"),
+					BAD_CAST "issno");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(newissno,
+					BAD_CAST "inWork"),
+					BAD_CAST "inwork");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(newlanguage,
+					BAD_CAST "languageIsoCode"),
+					BAD_CAST "language");
+				xmlNodeSetName((xmlNodePtr) xmlHasProp(newlanguage,
+					BAD_CAST "countryIsoCode"),
+					BAD_CAST "country");
+			}
+
+			if ((oldissno = firstXPathNode(NULL, ref, BAD_CAST "issno"))) {
+				newissno = xmlAddNextSibling(oldissno, newissno);
+			} else {
+				newissno = xmlAddNextSibling(firstXPathNode(NULL, ref, BAD_CAST "avee"), newissno);
+			}
+			xmlUnlinkNode(oldissno);
+			xmlFreeNode(oldissno);
+
+			if ((oldlanguage = firstXPathNode(NULL, ref, BAD_CAST "language"))) {
+				newlanguage = xmlAddNextSibling(oldlanguage, newlanguage);
+			} else {
+				newlanguage = xmlAddNextSibling(firstXPathNode(NULL, ref, BAD_CAST "issno"), newlanguage);
+			}
+			xmlUnlinkNode(oldlanguage);
+			xmlFreeNode(oldlanguage);
+		}
 
 		techname = firstXPathValue(doc, NULL, BAD_CAST "//techName|//techname");
 		infoname = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
@@ -842,7 +1000,7 @@ int listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGilNnPqrsUuXxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGIilNnPqrsUuXxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -854,6 +1012,7 @@ void showHelp(void)
 	puts("  -F         Overwrite updated (-U) or tagged (-X) objects.");
 	puts("  -f         Print the source filename for each reference.");
 	puts("  -G         List ICN references.");
+	puts("  -I         Update references to point to the latest matched object.");
 	puts("  -i         Ignore issue info/language when matching.");
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -N         Assume filenames omit issue info.");
@@ -888,7 +1047,7 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 
-	const char *sopts = "qcNaFflUuCDGPRrd:inEXxsh?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -953,6 +1112,11 @@ int main(int argc, char **argv)
 			case 'd':
 				free(directory);
 				directory = strdup(optarg);
+				break;
+			case 'I':
+				updateRefs = true;
+				fullMatch = false;
+				updateRefIdent = true;
 				break;
 			case 'i':
 				fullMatch = false;
@@ -1020,6 +1184,7 @@ int main(int argc, char **argv)
 	}
 
 	free(directory);
+	free(listedFiles);
 	xmlCleanupParser();
 
 	return unmatched > 0 ? EXIT_UNMATCHED_REF : EXIT_SUCCESS;

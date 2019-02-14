@@ -6,16 +6,23 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGilNnPqRrsUuXxh?] [-d <dir>] [<object>...]
+    s1kd-refs [-aCcDEFfGIilNnPqRrsUuXxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
 
 The *s1kd-refs* tool lists external references in CSDB objects,
 optionally matching them to a filename in the CSDB directory hierarchy.
-This makes it easy to obtain a list of dependencies for CSDB objects,
-such as ICNs, to ensure they are delivered together, or to check for
-references to CSDB objects which do not exist in the current CSDB.
+
+This allows you to:
+
+-   obtain a list of dependencies for CSDB objects, such as ICNs, to
+    ensure they are delivered together
+
+-   check for references to objects which do not exist in the current
+    CSDB
+
+-   update reference metadata, such as titles, from the matched objects
 
 OPTIONS
 =======
@@ -46,8 +53,14 @@ in the output.
 -h -?  
 Show help/usage message.
 
+-I  
+Update the issue number, issue date, language, and title of references
+to that of the latest matched object. This option implies the -U and -i
+options.
+
 -i  
-Ignore issue and language info when matching references.
+Always match the latest issue of an object found, regardless of the
+issue and language specified in the reference.
 
 -l  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
@@ -77,8 +90,7 @@ output of this tool is used to apply some operation to a source object
 and all its dependencies together.
 
 -U  
-Update the address items (such as titles) of matched references from the
-corresponding object.
+Update the title of matched references from the corresponding object.
 
 -u  
 Show only unmatched reference errors, or unmatched codes if combined
