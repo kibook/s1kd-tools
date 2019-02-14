@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.2.1"
+#define VERSION "2.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -595,13 +595,14 @@ void getDispatchFileName(char *dst, xmlNodePtr ref)
 /* Update address items using the matched referenced object. */
 void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 {
-	xmlDocPtr doc;
-
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
-
 	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0) {
+		xmlDocPtr doc;
 		xmlNodePtr dmRefAddressItems, dmTitle;
 		xmlChar *techName, *infoName;
+
+		if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+			return;
+		}
 
 		if (updateRefIdent) {
 			xmlNodePtr dmRefIdent, refIssueInfo, refLanguage, issueInfo, language;
@@ -677,9 +678,16 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 
 			xmlAddChild(dmRefAddressItems, issueDate);
 		}
+
+		xmlFreeDoc(doc);
 	} else if (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0) {
+		xmlDocPtr doc;
 		xmlNodePtr pmRefAddressItems;
 		xmlChar *pmTitle;
+
+		if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+			return;
+		}
 
 		if (updateRefIdent) {
 			xmlNodePtr pmRefIdent, refIssueInfo, refLanguage, issueInfo, language;
@@ -748,9 +756,16 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 
 			xmlAddChild(pmRefAddressItems, issueDate);
 		}
+
+		xmlFreeDoc(doc);
 	} else if (xmlStrcmp(ref->name, BAD_CAST "refdm") == 0) {
+		xmlDocPtr doc;
 		xmlNodePtr oldtitle, newtitle;
 		xmlChar *techname, *infoname;
+
+		if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+			return;
+		}
 
 		if (updateRefIdent) {
 			xmlNodePtr oldissno, newissno, oldlanguage, newlanguage;
@@ -813,9 +828,8 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 
 		xmlUnlinkNode(oldtitle);
 		xmlFreeNode(oldtitle);
+		xmlFreeDoc(doc);
 	}
-
-	xmlFreeDoc(doc);
 }
 
 /* Tag unmatched references in the source object. */
