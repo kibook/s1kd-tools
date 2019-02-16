@@ -354,3 +354,19 @@ bool is_in_set(const char *value, const char *set)
 
 	return ret;
 }
+
+/* Add a NOTATION to the DTD. */
+void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, const xmlChar *sysId)
+{
+	xmlValidCtxtPtr valid;
+
+	if (!doc->intSubset) {
+		xmlCreateIntSubset(doc, BAD_CAST "dmodule", NULL, NULL);
+	}
+
+	if (!xmlHashLookup(doc->intSubset->notations, BAD_CAST name)) {
+		valid = xmlNewValidCtxt();
+		xmlAddNotationDecl(valid, doc->intSubset, name, pubId, sysId);
+		xmlFreeValidCtxt(valid);
+	}
+}

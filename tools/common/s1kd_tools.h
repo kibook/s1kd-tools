@@ -59,4 +59,7 @@ bool is_in_range(const char *value, const char *range);
 /* Tests whether a value is in an S1000D set (a|b|c) */
 bool is_in_set(const char *value, const char *set);
 
+/* Add a NOTATION to the DTD. */
+void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, const xmlChar *sysId);
+
 #endif

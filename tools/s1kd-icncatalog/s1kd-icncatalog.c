@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.2.5"
+#define VERSION "1.2.6"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -28,22 +28,6 @@
 #else
 #define PARSE_OPTS 0
 #endif
-
-/* Add a NOTATION */
-void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, const xmlChar *sysId)
-{
-	xmlValidCtxtPtr valid;
-
-	if (!doc->intSubset) {
-		return;
-	}
-
-	if (!xmlHashLookup(doc->intSubset->notations, BAD_CAST name)) {
-		valid = xmlNewValidCtxt();
-		xmlAddNotationDecl(valid, doc->intSubset, name, pubId, sysId);
-		xmlFreeValidCtxt(valid);
-	}
-}
 
 /* Add a notation by its reference in the catalog file. */
 void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)

@@ -7,8 +7,10 @@
 #include <libxml/tree.h>
 #include <libxml/valid.h>
 
+#include "s1kd_tools.h"
+
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -39,17 +41,6 @@ void show_version(void)
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-void addNotation(xmlDocPtr doc, const char *name, const char *sysId)
-{
-	xmlValidCtxtPtr valid;
-
-	if (!xmlHashLookup(doc->intSubset->notations, BAD_CAST name)) {
-		valid = xmlNewValidCtxt();
-		xmlAddNotationDecl(valid, doc->intSubset, BAD_CAST name, NULL, BAD_CAST sysId);
-		xmlFreeValidCtxt(valid);
-	}
-}
-
 void addIcn(xmlDocPtr doc, const char *path, bool fullpath)
 {
 	char *full, *base, *name;
@@ -63,10 +54,10 @@ void addIcn(xmlDocPtr doc, const char *path, bool fullpath)
 	infoEntityIdent = strtok(name, ".");
 	notation = strtok(NULL, "");
 
+	add_notation(doc, BAD_CAST notation, NULL, BAD_CAST notation);
 	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
 		XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL,
 		BAD_CAST (fullpath ? path : base), BAD_CAST notation);
-	addNotation(doc, notation, notation);
 
 	free(name);
 	free(full);
