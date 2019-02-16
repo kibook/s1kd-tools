@@ -13,7 +13,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.4.4"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -36,7 +36,7 @@
 #define PARSE_OPTS 0
 #endif
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -55,7 +55,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 	return first;
 }
 
-char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
@@ -143,9 +143,65 @@ xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const ch
 
 char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 {
-	char xpath[256];
-	snprintf(xpath, 256, "//fm[@infoCode='%s']/@type", incode);
+	xmlChar xpath[256];
+	xmlStrPrintf(xpath, 256, "//fm[@infoCode='%s']/@type", incode);
 	return first_xpath_string(fmtypes, NULL, xpath);
+}
+
+/* Copy elements from the source TP DM that can't be derived from the PM. */
+void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
+{
+	xmlNodePtr fmtp, node;
+
+	fmtp = first_xpath_node(res, NULL, BAD_CAST "//frontMatterTitlePage");
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//productIntroName"))) {
+		xmlAddPrevSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "pmTitle"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//externalPubCode"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "issueDate"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//productAndModel"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "(issueDate|externalPubCode)[last()]"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//productIllustration"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "(security|derivativeClassification|dataRestrictions)[last()]"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//enterpriseSpec"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "(security|derivativeClassification|dataRestrictions|productIllustration)[last()]"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//enterpriseLogo"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "(security|derivativeClassification|dataRestrictions|productIllustration|enterpriseSpec)[last()]"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//barCode"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "(responsiblePartnerCompany|publisherLogo)[last()]"),
+			xmlCopyNode(node, 1));
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//frontMatterInfo"))) {
+		xmlAddNextSibling(first_xpath_node(res, fmtp,
+			BAD_CAST "(responsiblePartnerCompany|publisherLogo|barCode)[last()]"),
+			xmlCopyNode(node, 1));
+	}
 }
 
 void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
@@ -161,7 +217,7 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 	} else {
 		char *incode;
 
-		incode = first_xpath_string(doc, NULL, "//@infoCode|//incode");
+		incode = first_xpath_string(doc, NULL, BAD_CAST "//@infoCode|//incode");
 
 		type = find_fmtype(fmtypes, incode);
 
@@ -175,9 +231,13 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 
 	res = generate_fm_content_for_type(pm, type, xslpath, params);
 
+	if (strcmp(type, "TP") == 0) {
+		copy_tp_elems(res, doc);
+	}
+
 	xmlFree(type);
 
-	content = first_xpath_node(doc, NULL, "//content");
+	content = first_xpath_node(doc, NULL, BAD_CAST "//content");
 	xmlAddNextSibling(content, xmlCopyNode(xmlDocGetRootElement(res), 1));
 	xmlUnlinkNode(content);
 	xmlFreeNode(content);

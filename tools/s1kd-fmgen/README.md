@@ -102,6 +102,14 @@ Example of XML format:
     <fm infoCode="00S" type="LOEDM"/>
     </fmtypes>
 
+Optional title page elements
+----------------------------
+
+When re-generating the front matter content for a title page data
+module, optional elements which cannot be derived from the publication
+module (such as the product illustration or bar code) will be copied
+from the source data module when updating it.
+
 EXAMPLE
 =======
 

@@ -23,6 +23,8 @@
       <xsl:apply-templates select=".//issueInfo"/>
       <xsl:apply-templates select=".//issueDate"/>
       <xsl:apply-templates select=".//security"/>
+      <xsl:apply-templates select=".//derivativeClassification"/>
+      <xsl:apply-templates select=".//dataRestrictions"/>
       <xsl:apply-templates select=".//responsiblePartnerCompany"/>
     </frontMatterTitlePage>
   </xsl:template>
