@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
 <!NOTATION png SYSTEM "png" >
-<!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.PNG" NDATA png>
-<!ENTITY ICN-TEST-00002-001-01 SYSTEM "ICN-TEST-00002-001-01.PNG" NDATA png>
+<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG" NDATA png>
+<!ENTITY ICN-12345-00002-001-01 SYSTEM "ICN-12345-00002-001-01.PNG" NDATA png>
 ]>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fo="http://www.w3.org/1999/XSL/Format" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
@@ -51,11 +51,11 @@
         <title>General</title>
         <figure>
           <title>Example 1</title>
-          <graphic infoEntityIdent="ICN-TEST-00001-001-01"/>
+          <graphic infoEntityIdent="ICN-12345-00001-001-01"/>
         </figure>
         <figure>
           <title>Example 2</title>
-          <graphic infoEntityIdent="ICN-TEST-00002-001-01"/>
+          <graphic infoEntityIdent="ICN-12345-00002-001-01"/>
         </figure>
       </levelledPara>
     </description>

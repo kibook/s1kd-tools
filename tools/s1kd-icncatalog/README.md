@@ -71,7 +71,7 @@ Resolving ICNs to filenames
 A CSDB object may reference an ICN as follows:
 
     <!NOTATION png SYSTEM "png">
-    <!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.PNG"
+    <!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
     NDATA png>
 
 The SYSTEM ID of this ENTITY indicates that the ICN file will be in the
@@ -81,8 +81,8 @@ than manually updating every ENTITY declaration in every CSDB object, a
 catalog file can be used to map ICNs to actual filenames:
 
     <icnCatalog>
-    <icn infoEntityIdent="ICN-TEST-00001-001-01"
-    uri="graphics/ICN-TEST-00001-001-01.PNG"/>
+    <icn infoEntityIdent="ICN-12345-00001-001-01"
+    uri="graphics/ICN-12345-00001-001-01.PNG"/>
     </icnCatalog>
 
 Then, using this tool, the ICN can be resolved against the catalog:
@@ -92,8 +92,8 @@ Then, using this tool, the ICN can be resolved against the catalog:
 Producing the following output:
 
     <!NOTATION png SYSTEM "png">
-    <!ENTITY ICN-TEST-00001-001-01 SYSTEM
-    "graphics/ICN-TEST-00001-001-01.PNG" NDATA png>
+    <!ENTITY ICN-12345-00001-001-01 SYSTEM
+    "graphics/ICN-12345-00001-001-01.PNG" NDATA png>
 
 Alternative ICN formats
 -----------------------
@@ -105,34 +105,67 @@ ICN depending on the intended output media. For example:
     <notation name="jpg" systemId="jpg"/>
     <notation name="svg" systemId="svg"/>
     <media name="pdf">
-    <icn infoEntityIdent="ICN-TEST-00001-001-01"
-    uri="ICN-TEST-00001-001-01.JPG" notation="jpg"/>
+    <icn infoEntityIdent="ICN-12345-00001-001-01"
+    uri="ICN-12345-00001-001-01.JPG" notation="jpg"/>
     </media>
     <media name="web">
-    <icn infoEntityIdent="ICN-TEST-00001-001-01"
-    uri="ICN-TEST-00001-001-01.SVG" notation="svg"/>
+    <icn infoEntityIdent="ICN-12345-00001-001-01"
+    uri="ICN-12345-00001-001-01.SVG" notation="svg"/>
     </media>
     </icnCatalog>
 
 The -m option allows for specifying which type of media to resolve for:
 
     <!NOTATION png SYSTEM "png">
-    <!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.PNG"
+    <!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
     NDATA png>
 
     $ s1kd-icncatalog -c <catalog> -m pdf <object>
 
     <!NOTATION png SYSTEM "png">
     <!NOTATION jpg SYSTEM "jpg">
-    <!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.JPG"
+    <!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.JPG"
     NDATA jpg>
 
     $ s1kd-icncatalog -c <catalog> -m web <object>
 
     <!NOTATION png SYSTEM "png">
     <!NOTATION svg SYSTEM "svg">
-    <!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.SVG"
+    <!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.SVG"
     NDATA svg>
+
+Reconstructing ICN entity declarations
+--------------------------------------
+
+Some processing, such as XSL transformations, may remove the DTD and
+external entity declarations as part of parsing an XML CSDB object. A
+catalog can be used to restore the necessary external entity
+declarations afterwards. For example:
+
+    $ xsltproc ex.xsl <object>
+
+The resulting XML will not include a DTD or the external entity
+declarations for the ICNs referenced in the object, so it will not be
+valid according to the S1000D schema:
+
+    $ xsltproc ex.xsl <object> | s1kd-validate
+    -:49:element graphic: Schemas validity error: Element 'graphic',
+    attribute 'infoEntityIdent': 'ICN-12345-00001-001-01' is not a valid
+    value of the atomic type 'xs:ENTITY'.
+
+Passing the result to this tool, with a catalog containing all the ICNs
+used by the project:
+
+    $ xsltproc ex.xsl <object> | s1kd-icncatalog -c <catalog>
+
+will reconstruct the required external entity declarations in the DTD.
+
+> **Note**
+>
+> The s1kd-tools will copy the DTD and external entity declarations
+> automatically when performing transformations (such as with the
+> s1kd-transform tool), so this is only necessary when using more
+> generic XML tools.
 
 CATALOG SCHEMA
 ==============
@@ -223,13 +256,13 @@ Example ICN catalog
     <notation name="png" systemId="png"/>
     <notation name="svg" systemId="svg"/>
     <media name="pdf">
-    <icn infoEntityIdent="ICN-TEST-00001-001-01"
-    uri="ICN-TEST-00001-001-01.JPG" notation="jpg"/>
+    <icn infoEntityIdent="ICN-12345-00001-001-01"
+    uri="ICN-12345-00001-001-01.JPG" notation="jpg"/>
     </media>
     <media name="web">
-    <icn infoEntityIdent="ICN-TEST-00001-001-01"
-    uri="ICN-TEST-00001-001-01.SVG" notation="svg"/>
+    <icn infoEntityIdent="ICN-12345-00001-001-01"
+    uri="ICN-12345-00001-001-01.SVG" notation="svg"/>
     </media>
-    <icn infoEntityIdent="ICN-TEST-00001-001-01"
-    uri="ICN-TEST-00001-001-01.PNG" notation="png"/>
+    <icn infoEntityIdent="ICN-12345-00001-001-01"
+    uri="ICN-12345-00001-001-01.PNG" notation="png"/>
     </icnCatalog>

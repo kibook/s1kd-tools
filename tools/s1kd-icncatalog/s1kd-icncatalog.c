@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.2.6"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -28,6 +28,26 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+/* Return the first node matching an XPath expression. */
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	ctx = xmlXPathNewContext(doc ? doc : node->doc);
+	ctx->node = node;
+
+	obj = xmlXPathEvalExpression(expr, ctx);
+
+	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
+}
 
 /* Add a notation by its reference in the catalog file. */
 void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
@@ -69,8 +89,16 @@ void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Check whether an ICN is used in an object. */
+bool icn_is_used(xmlDocPtr doc, const xmlChar *ident)
+{
+	xmlChar xpath[256];
+	xmlStrPrintf(xpath, 256, "//@*[.='%s']", ident);
+	return first_xpath_node(doc, NULL, xpath) != NULL;
+}
+
 /* Resolve the ICNs in a document against the ICN catalog. */
-void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, xmlChar *ident, xmlChar *uri, xmlChar *notation)
+void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, const xmlChar *uri, const xmlChar *notation)
 {
 	xmlEntityPtr e;
 
@@ -96,6 +124,13 @@ void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, xmlChar *ident, xmlChar *uri, xm
 			add_notation_ref(doc, icns, notation);
 		} else {
 			xmlFree(ndata);
+		}
+	} else if (icn_is_used(doc, ident)) {
+		if (notation) {
+			add_notation_ref(doc, icns, notation);
+			xmlAddDocEntity(doc, ident, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, uri, notation);
+		} else {
+			add_icn(doc, (char *) uri, true);
 		}
 	}
 }
@@ -154,6 +189,7 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 	xmlFreeDoc(doc);
 }
 
+/* Resolve ICNs in objects in a list of file names. */
 void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, bool xinclude, const char *media)
 {
 	FILE *f;
@@ -178,25 +214,7 @@ void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, bool
 	}
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	xmlNodePtr first;
-
-	ctx = xmlXPathNewContext(doc ? doc : node->doc);
-	ctx->node = node;
-
-	obj = xmlXPathEvalExpression(expr, ctx);
-
-	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return first;
-}
-
+/* Add ICNs to a catalog. */
 void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
 {
 	xmlNodePtr root, cur;
@@ -215,6 +233,7 @@ void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
 	}
 }
 
+/* Remove ICNs from a catalog. */
 void del_icns(xmlDocPtr icns, xmlNodePtr del, const char *media)
 {
 	xmlNodePtr cur;
@@ -259,6 +278,7 @@ void show_help(void)
 	puts("  --version      Show version information.");
 }
 
+/* Show version information. */
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);

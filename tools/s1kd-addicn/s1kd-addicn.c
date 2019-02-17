@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -39,28 +39,6 @@ void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
-}
-
-void addIcn(xmlDocPtr doc, const char *path, bool fullpath)
-{
-	char *full, *base, *name;
-	char *infoEntityIdent;
-	char *notation;
-
-	full = strdup(path);
-	base = basename(full);
-	name = strdup(base);
-
-	infoEntityIdent = strtok(name, ".");
-	notation = strtok(NULL, "");
-
-	add_notation(doc, BAD_CAST notation, NULL, BAD_CAST notation);
-	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
-		XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL,
-		BAD_CAST (fullpath ? path : base), BAD_CAST notation);
-
-	free(name);
-	free(full);
 }
 
 int main(int argc, char **argv)
@@ -114,7 +92,7 @@ int main(int argc, char **argv)
 	doc = xmlReadFile(src, NULL, PARSE_OPTS);
 
 	for (i = optind; i < argc; ++i) {
-		addIcn(doc, argv[i], fullpath);
+		add_icn(doc, argv[i], fullpath);
 	}
 
 	if (overwrite) {

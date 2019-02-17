@@ -361,7 +361,7 @@ void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, cons
 	xmlValidCtxtPtr valid;
 
 	if (!doc->intSubset) {
-		xmlCreateIntSubset(doc, BAD_CAST "dmodule", NULL, NULL);
+		xmlCreateIntSubset(doc, xmlDocGetRootElement(doc)->name, NULL, NULL);
 	}
 
 	if (!xmlHashLookup(doc->intSubset->notations, BAD_CAST name)) {
@@ -369,4 +369,27 @@ void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, cons
 		xmlAddNotationDecl(valid, doc->intSubset, name, pubId, sysId);
 		xmlFreeValidCtxt(valid);
 	}
+}
+
+/* Add an ICN entity from a file path. */
+void add_icn(xmlDocPtr doc, const char *path, bool fullpath)
+{
+	char *full, *base, *name;
+	char *infoEntityIdent;
+	char *notation;
+
+	full = strdup(path);
+	base = basename(full);
+	name = strdup(base);
+
+	infoEntityIdent = strtok(name, ".");
+	notation = strtok(NULL, "");
+
+	add_notation(doc, BAD_CAST notation, NULL, BAD_CAST notation);
+	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
+		XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL,
+		BAD_CAST (fullpath ? path : base), BAD_CAST notation);
+
+	free(name);
+	free(full);
 }

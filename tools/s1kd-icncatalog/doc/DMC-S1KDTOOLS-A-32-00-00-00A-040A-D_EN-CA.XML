@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="32" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2019" month="02" day="16"/>
         <dmTitle>
           <techName>s1kd-icncatalog(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add functionality to add missing ICN entities using the catalog.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -136,14 +139,14 @@
           <para>A CSDB object may reference an ICN as follows:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.PNG"
+<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
 NDATA png>]]></verbatimText>
           </para>
           <para>The SYSTEM ID of this ENTITY indicates that the ICN file will be in the same directory relative to the CSDB object. However, the ICN files in this example are located in a separate folder called 'graphics'. Rather than manually updating every ENTITY declaration in every CSDB object, a catalog file can be used to map ICNs to actual filenames:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<icnCatalog>
-<icn infoEntityIdent="ICN-TEST-00001-001-01"
-uri="graphics/ICN-TEST-00001-001-01.PNG"/>
+<icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="graphics/ICN-12345-00001-001-01.PNG"/>
 </icnCatalog>]]></verbatimText>
           </para>
           <para>Then, using this tool, the ICN can be resolved against the catalog:</para>
@@ -153,8 +156,8 @@ uri="graphics/ICN-TEST-00001-001-01.PNG"/>
           <para>Producing the following output:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!ENTITY ICN-TEST-00001-001-01 SYSTEM
-"graphics/ICN-TEST-00001-001-01.PNG" NDATA png>]]></verbatimText>
+<!ENTITY ICN-12345-00001-001-01 SYSTEM
+"graphics/ICN-12345-00001-001-01.PNG" NDATA png>]]></verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
@@ -165,19 +168,19 @@ uri="graphics/ICN-TEST-00001-001-01.PNG"/>
 <notation name="jpg" systemId="jpg"/>
 <notation name="svg" systemId="svg"/>
 <media name="pdf">
-<icn infoEntityIdent="ICN-TEST-00001-001-01"
-uri="ICN-TEST-00001-001-01.JPG" notation="jpg"/>
+<icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.JPG" notation="jpg"/>
 </media>
 <media name="web">
-<icn infoEntityIdent="ICN-TEST-00001-001-01"
-uri="ICN-TEST-00001-001-01.SVG" notation="svg"/>
+<icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.SVG" notation="svg"/>
 </media>
 </icnCatalog>]]></verbatimText>
           </para>
           <para>The -m option allows for specifying which type of media to resolve for:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.PNG"
+<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
 NDATA png>]]></verbatimText>
           </para>
           <para>
@@ -186,7 +189,7 @@ NDATA png>]]></verbatimText>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
 <!NOTATION jpg SYSTEM "jpg">
-<!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.JPG"
+<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.JPG"
 NDATA jpg>]]></verbatimText>
           </para>
           <para>
@@ -195,9 +198,31 @@ NDATA jpg>]]></verbatimText>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
 <!NOTATION svg SYSTEM "svg">
-<!ENTITY ICN-TEST-00001-001-01 SYSTEM "ICN-TEST-00001-001-01.SVG"
+<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.SVG"
 NDATA svg>]]></verbatimText>
           </para>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Reconstructing ICN entity declarations</title>
+          <para>Some processing, such as XSL transformations, may remove the DTD and external entity declarations as part of parsing an XML CSDB object. A catalog can be used to restore the necessary external entity declarations afterwards. For example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ xsltproc ex.xsl &lt;object&gt;</verbatimText>
+          </para>
+          <para>The resulting XML will not include a DTD or the external entity declarations for the ICNs referenced in the object, so it will not be valid according to the S1000D schema:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ xsltproc ex.xsl &lt;object&gt; | s1kd-validate
+-:49:element graphic: Schemas validity error: Element 'graphic',
+attribute 'infoEntityIdent': 'ICN-12345-00001-001-01' is not a valid
+value of the atomic type 'xs:ENTITY'.</verbatimText>
+          </para>
+          <para>Passing the result to this tool, with a catalog containing all the ICNs used by the project:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ xsltproc ex.xsl &lt;object&gt; | s1kd-icncatalog -c &lt;catalog&gt;</verbatimText>
+          </para>
+          <para>will reconstruct the required external entity declarations in the DTD.</para>
+          <note>
+            <notePara>The s1kd-tools will copy the DTD and external entity declarations automatically when performing transformations (such as with the s1kd-transform tool), so this is only necessary when using more generic XML tools.</notePara>
+          </note>
         </levelledPara>
       </levelledPara>
       <levelledPara>
@@ -348,15 +373,15 @@ NDATA svg>]]></verbatimText>
 <notation name="png" systemId="png"/>
 <notation name="svg" systemId="svg"/>
 <media name="pdf">
-<icn infoEntityIdent="ICN-TEST-00001-001-01"
-uri="ICN-TEST-00001-001-01.JPG" notation="jpg"/>
+<icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.JPG" notation="jpg"/>
 </media>
 <media name="web">
-<icn infoEntityIdent="ICN-TEST-00001-001-01"
-uri="ICN-TEST-00001-001-01.SVG" notation="svg"/>
+<icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.SVG" notation="svg"/>
 </media>
-<icn infoEntityIdent="ICN-TEST-00001-001-01"
-uri="ICN-TEST-00001-001-01.PNG" notation="png"/>
+<icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.PNG" notation="png"/>
 </icnCatalog>]]></verbatimText>
           </para>
         </levelledPara>
