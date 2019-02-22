@@ -18,13 +18,13 @@ methods of instantiating objects:
 -   Filtering on user-supplied applicability definitions, so that
     non-applicable elements and (optionally) unused applicability
     annotations are removed in the instance. The definitions can be
-    supplied directly or read from a PCT (Product Cross-reference
-    Table).
+    supplied directly or read from a Product Cross-reference Table
+    (PCT).
 
 -   Filtering on skill levels and security classifications to remove
     sensitive data.
 
--   Using a CIR (Common Information Repository) to produce a standalone
+-   Using a Common Information Repository (CIR) to produce a standalone
     instance from a CIR-dependent master.
 
 Any combination of these methods can be used when producing an instance.

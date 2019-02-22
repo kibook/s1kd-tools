@@ -1,7 +1,7 @@
 NAME
 ====
 
-s1kd-newddn - Create an S1000D DDN (Data Dispatch Note).
+s1kd-newddn - Create an S1000D Data Dispatch Note (DDN).
 
 SYNOPSIS
 ========
