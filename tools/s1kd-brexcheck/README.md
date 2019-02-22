@@ -13,8 +13,8 @@ DESCRIPTION
 ===========
 
 The *s1kd-brexcheck* tool validates S1000D CSDB objects using the
-context, SNS, and/or notation rules of one or multiple BREX (Business
-Rules EXchange) data modules. All errors are displayed with the
+context, SNS, and/or notation rules of one or multiple Business Rules
+EXchange (BREX) data modules. All errors are displayed with the
 &lt;objectUse&gt; message, the line number, and a representation of the
 invalid XML tree.
 
@@ -81,7 +81,7 @@ status.
 Search for BREX data modules recursively.
 
 -S\[tu\]  
-Check SNS (Standard Numbering System) rules. The SNS of each specified
+Check Standard Numbering System (SNS) rules. The SNS of each specified
 data module is checked against the combination of all SNS rules of all
 specified BREX data modules.
 
@@ -238,10 +238,10 @@ Check completed successfully, and no CSDB objects had BREX errors.
 Check completed successfully, but some CSDB objects had BREX errors.
 
 2  
-One or more BREX data modules could not be read.
+One or more CSDB objects specified could not be read.
 
 3  
-One or more CSDB objects specified could not be read.
+A referenced BREX data module could not be found.
 
 4  
 An XPath expression given for a BREX rule was invalid.

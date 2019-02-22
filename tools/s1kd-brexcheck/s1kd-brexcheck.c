@@ -25,10 +25,11 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.6.12"
+#define VERSION "2.7.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
+#define W_PREFIX PROG_NAME ": WARNING: "
 #define F_PREFIX PROG_NAME ": FAILED: "
 #define S_PREFIX PROG_NAME ": SUCCESS: "
 #define I_PREFIX PROG_NAME ": INFO: "
@@ -36,22 +37,22 @@
 /* Error message templates. */
 #define E_NODMOD E_PREFIX "Could not read file \"%s\".\n"
 #define E_NODMOD_STDIN E_PREFIX "stdin does not contain valid XML.\n"
-#define E_NOBREX E_PREFIX "No BREX data module found for %s.\n"
-#define E_NOBREX_STDIN E_PREFIX "No BREX found for data module on stdin.\n"
 #define E_INVOBJPATH E_PREFIX "Invalid object path.\n"
-#define E_MISSBREX E_PREFIX "Could not read BREX file \"%s\".\n"
-#define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
-#define E_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
-#define E_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
 #define E_BAD_LIST E_PREFIX "Could not read list: %s\n"
 #define E_MAXOBJS E_PREFIX "Out of memory\n"
+#define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
+#define E_BREX_NOT_FOUND E_PREFIX "Could not find BREX data module: %s\n"
+#define E_NOBREX E_PREFIX "No BREX data module found for %s.\n"
+#define E_NOBREX_STDIN E_PREFIX "No BREX data module found for object on stdin.\n"
+#define W_NOBREX W_PREFIX "%s does not reference a BREX data module.\n"
+#define W_NOBREX_STDIN W_PREFIX "Object on stdin does not reference a BREX data module.\n"
+#define F_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
+#define S_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
 
-/* General errors get negative exit codes to distinguish them from
- * BREX error-related exit statuses.
- */
+/* Exit status codes. */
 #define EXIT_BREX_ERROR 1
-#define EXIT_MISSING_BREX_FILE 2
-#define EXIT_BAD_DMODULE 3
+#define EXIT_BAD_DMODULE 2
+#define EXIT_BREX_NOT_FOUND 3
 #define EXIT_INVALID_OBJ_PATH 4
 #define EXIT_MAX_OBJS 5
 
@@ -342,8 +343,12 @@ bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 		strcpy(fname, dmcode);
 }
 
-/* Find the filename of a BREX data module referenced by a CSDB object. */
-bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MAX],
+/* Find the filename of a BREX data module referenced by a CSDB object.
+ * -1  Object does not reference a BREX DM.
+ *  0  Object references a BREX DM, and it was found.
+ *  1  Object references a BREX DM, but it couldn't be found.
+ */
+int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MAX],
 	int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames)
 {
 	xmlXPathContextPtr context;
@@ -375,7 +380,7 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MA
 	if (xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 		xmlXPathFreeObject(object);
 		xmlXPathFreeContext(context);
-		return false;
+		return -1;
 	}
 
 	dmCode = object->nodesetval->nodeTab[0];
@@ -458,7 +463,11 @@ bool find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MA
 		found = search_brex_fname_from_default_brex(fname, dmcode, len);
 	}
 
-	return found;
+	if (verbose > SILENT && !found) {
+		fprintf(stderr, E_BREX_NOT_FOUND, dmcode);
+	}
+
+	return !found;
 }
 
 /* Determine whether a violated rule counts as a failure, based on its
@@ -1009,7 +1018,6 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	xmlNodePtr documentNode;
 
 	int i;
-	int status;
 	int total = 0;
 	bool valid_sns = true;
 	int invalid_notations = 0;
@@ -1035,14 +1043,15 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	for (i = 0; i < num_brex_fnames; ++i) {
 		xmlXPathContextPtr context;
 		xmlXPathObjectPtr result;
+		int status;
 
 		brex_doc = load_brex(brex_fnames[i]);
 
 		if (!brex_doc) {
 			if (verbose > SILENT) {
-				fprintf(stderr, E_MISSBREX, brex_fnames[i]);
+				fprintf(stderr, E_NODMOD, brex_fnames[i]);
 			}
-			exit(EXIT_MISSING_BREX_FILE);
+			exit(EXIT_BAD_DMODULE);
 		}
 
 		context = xmlXPathNewContext(brex_doc);
@@ -1055,8 +1064,8 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		if (verbose >= VERBOSE) {
 			fprintf(stderr,
 				status || !valid_sns || invalid_notations ?
-				E_INVALIDDOC :
-				E_VALIDDOC, docname, brex_fnames[i]);
+				F_INVALIDDOC :
+				S_VALIDDOC, docname, brex_fnames[i]);
 		}
 
 		total += status;
@@ -1111,14 +1120,15 @@ int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH
 	for (i = 0; i < nfnames; ++i) {
 		xmlDocPtr doc;
 		char fname[PATH_MAX];
-		bool found;
+		int err;
 
 		doc = load_brex((*fnames)[i]);
 
-		found = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
+		err = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
 
-		if (!found) {
+		if (err) {
 			fprintf(stderr, E_NOBREX_LAYER, (*fnames)[i]);
+			exit(EXIT_BREX_NOT_FOUND);
 		} else if (!brex_exists(fname, (*fnames), nfnames, spaths, nspaths)) {
 			add_path(fnames, &total, &BREX_MAX, fname);
 			total = add_layered_brex(fnames, total, spaths, nspaths, dmod_fnames, num_dmod_fnames);
@@ -1386,6 +1396,8 @@ int main(int argc, char *argv[])
 		}
 
 		if (num_brex_fnames == 0) {
+			int err;
+
 			strcpy(brex_fnames[0], "");
 
 			/* Override the referenced BREX with a default BREX
@@ -1394,14 +1406,32 @@ int main(int argc, char *argv[])
 			 */
 			if (use_default_brex) {
 				strcpy(brex_fnames[0], default_brex_dmc(dmod_doc));
-			} else if (!find_brex_fname_from_doc(brex_fnames[0], dmod_doc,
-				brex_search_paths, num_brex_search_paths, dmod_fnames, num_dmod_fnames)) {
+			/* Find BREX file from the brexDmRef and store it in the
+			 * list of BREX.
+			 *
+			 * If the object has no brexDmRef or the BREX is not
+			 * found, skip it.
+			 *
+			 * Indicate a BREX error in the exit status code if the
+			 * object references a BREX but it couldn't be located.
+			 */
+			} else if ((err = find_brex_fname_from_doc(
+					brex_fnames[0], dmod_doc,
+					brex_search_paths,
+					num_brex_search_paths,
+					dmod_fnames,
+					num_dmod_fnames))) {
 				if (use_stdin) {
-					if (verbose > SILENT) fprintf(stderr, E_NOBREX_STDIN);
+					if (verbose > SILENT) fprintf(stderr, err == 1 ? E_NOBREX_STDIN : W_NOBREX_STDIN);
 				} else {
-					if (verbose > SILENT) fprintf(stderr, E_NOBREX,
-						dmod_fnames[i]);
+					if (verbose > SILENT) fprintf(stderr, err == 1 ? E_NOBREX : W_NOBREX, dmod_fnames[i]);
 				}
+
+				/* BREX DM was referenced but not found. */
+				if (err == 1) {
+					exit(EXIT_BREX_NOT_FOUND);
+				}
+
 				xmlFreeDoc(dmod_doc);
 				continue;
 			}
