@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.3.6"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1173,6 +1173,21 @@ int edit_receiver_ident(xmlNodePtr node, const char *val)
 	}
 }
 
+void show_source(xmlNodePtr node, int endl)
+{
+	xmlNodePtr dmc, issno, lang;
+
+	dmc = first_xpath_node_local(node, "dmCode|dmc/avee");
+	issno = first_xpath_node_local(node, "issueInfo|issno");
+	lang = first_xpath_node_local(node, "language");
+
+	show_dmcode(dmc, '_');
+	show_issue_number(issno, '-');
+	show_in_work(issno, '_');
+	show_language_iso_code(lang, '-');
+	show_country_iso_code(lang, endl);
+}
+
 struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -1456,6 +1471,12 @@ struct metadata metadata[] = {
 		edit_skill_level,
 		create_skill_level,
 		"Skill level code of the data module"},
+	{"source",
+		"//sourceDmIdent|//sourcePmIdent|//srcdmaddres",
+		show_source,
+		NULL,
+		NULL,
+		"Source DM or PM identification of the object"},
 	{"subSubSystemCode",
 		"//@subSubSystemCode|//subsect",
 		show_sub_sub_system_code,
