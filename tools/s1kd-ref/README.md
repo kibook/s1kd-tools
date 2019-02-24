@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-filrtdh?] [-$ <issue>] [-s <src>] [-o <dst>]
+    s1kd-ref [-filRrStdh?] [-$ <issue>] [-s <src>] [-o <dst>]
              [<code>|<filename>]...
 
 DESCRIPTION
@@ -42,9 +42,16 @@ file)
 -o &lt;dst&gt;  
 Output to &lt;dst&gt; instead of stdout.
 
+-R  
+Generate a `<repositorySourceDmIdent>` for a data module.
+
 -r  
 Add the generated reference to the source data module's `refs` table and
 output the modified data module to stdout.
+
+-S  
+Generate a `<sourceDmIdent>` (for data modules) or `<sourcePmIdent>`
+(for publication modules).
 
 -s &lt;src&gt;  
 Specify a source data module &lt;src&gt; to add references to when using
@@ -152,3 +159,37 @@ Reference to a publication module:
     pmVolume="00"/>
     </pmRefIdent>
     </pmRef>
+
+Source identification for a data module:
+
+    $ s1kd-ref -S DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+    <sourceDmIdent>
+    <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+    subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+    disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+    itemLocationCode="D"/>
+    <language languageIsoCode="en" countryIsoCode="CA"/>
+    <issueInfo issueNumber="001" inWork="00"/>
+    </sourceDmIdent>
+
+Source identification for a publication module:
+
+    $ s1kd-ref -S PMC-EX-12345-00001-00_001-00_EN-CA.XML
+    <sourcePmIdent>
+    <pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
+    pmVolume="00"/>
+    <language languageIsoCode="en" countryIsoCode="CA"/>
+    <issueInfo issueNumber="001" inWork="00"/>
+    </sourcePmIdent>
+
+Repository source identification for a CIR data module:
+
+    $ s1kd-ref -R DMC-EX-A-00-00-00-00A-00GA-D_001-00_EN-CA.XML
+    <repositorySourceDmIdent>
+    <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+    subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+    disassyCodeVariant="A" infoCode="00G" infoCodeVariant="A"
+    itemLocationCode="D"/>
+    <language languageIsoCode="en" countryIsoCode="CA"/>
+    <issueInfo issueNumber="001" inWork="00"/>
+    </repositorySourceDmIdent>

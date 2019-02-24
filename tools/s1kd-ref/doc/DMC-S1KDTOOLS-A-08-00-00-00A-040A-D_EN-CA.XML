@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="10" day="12"/>
+        <issueDate year="2019" month="02" day="24"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add -R and -S options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-ref [-filrtdh?] [-$ &lt;issue&gt;] [-s &lt;src&gt;] [-o &lt;dst&gt;]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ref [-filRrStdh?] [-$ &lt;issue&gt;] [-s &lt;src&gt;] [-o &lt;dst&gt;]
          [&lt;code&gt;|&lt;filename&gt;]...</verbatimText>
         </para>
       </levelledPara>
@@ -103,10 +106,22 @@
                 <para>Output to &lt;dst&gt; instead of stdout.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-R</listItemTerm>
+              <listItemDefinition>
+                <para>Generate a <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> for a data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
                 <para>Add the generated reference to the source data module's <verbatimText verbatimStyle="vs12">refs</verbatimText> table and output the modified data module to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-S</listItemTerm>
+              <listItemDefinition>
+                <para>Generate a <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText> (for data modules) or <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> (for publication modules).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -227,6 +242,40 @@ yearOfDataIssue="2018" seqNumber="00001"/>
 pmVolume="00"/>
 </pmRefIdent>
 </pmRef>]]></verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Source identification for a data module:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -S DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+<sourceDmIdent>
+<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/>
+<language languageIsoCode="en" countryIsoCode="CA"/>
+<issueInfo issueNumber="001" inWork="00"/>
+</sourceDmIdent>]]></verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Source identification for a publication module:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -S PMC-EX-12345-00001-00_001-00_EN-CA.XML
+<sourcePmIdent>
+<pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
+pmVolume="00"/>
+<language languageIsoCode="en" countryIsoCode="CA"/>
+<issueInfo issueNumber="001" inWork="00"/>
+</sourcePmIdent>]]></verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Repository source identification for a CIR data module:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -R DMC-EX-A-00-00-00-00A-00GA-D_001-00_EN-CA.XML
+<repositorySourceDmIdent>
+<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="00G" infoCodeVariant="A"
+itemLocationCode="D"/>
+<language languageIsoCode="en" countryIsoCode="CA"/>
+<issueInfo issueNumber="001" inWork="00"/>
+</repositorySourceDmIdent>]]></verbatimText>
         </para>
       </levelledPara>
     </description>

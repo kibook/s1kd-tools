@@ -11,7 +11,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.1.4"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -23,6 +23,8 @@
 #define OPT_ISSUE (int) 0x02
 #define OPT_LANG  (int) 0x04
 #define OPT_DATE  (int) 0x08
+#define OPT_SRCID (int) 0x10
+#define OPT_CIRID (int) 0x20
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -219,6 +221,8 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_pm_address_items = NULL;
 		xmlNodePtr ref_pm_title = NULL;
 		xmlNodePtr ref_pm_issue_date = NULL;
+		xmlNodePtr issue_info = NULL;
+		xmlNodePtr language = NULL;
 		char *s;
 
 		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
@@ -232,8 +236,6 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		s = strchr(ref, '_');
 
 		if (hasopt(opts, OPT_ISSUE)) {
-			xmlNodePtr issue_info;
-
 			if (doc) {
 				issue_info = xmlCopyNode(find_child(ref_pm_ident, "issueInfo"), 1);
 			} else if (s && isdigit(s[1])) {
@@ -247,8 +249,6 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		if (hasopt(opts, OPT_LANG)) {
-			xmlNodePtr language;
-
 			if (doc) {
 				language = xmlCopyNode(find_child(ref_pm_ident, "language"), 1);
 			} else if (s && (s = strchr(s + 1, '_'))) {
@@ -290,6 +290,22 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		xmlFreeDoc(doc);
+
+		if (hasopt(opts, OPT_SRCID)) {
+			xmlNodePtr pmc, issno, lang, src;
+
+			pmc   = xmlCopyNode(pm_code, 1);
+			issno = xmlCopyNode(issue_info, 1);
+			lang  = xmlCopyNode(language, 1);
+
+			src = xmlNewNode(NULL, BAD_CAST "sourcePmIdent");
+			xmlAddChild(src, pmc);
+			xmlAddChild(src, lang);
+			xmlAddChild(src, issno);
+
+			xmlFreeNode(pm_ref);
+			pm_ref = src;
+		}
 	}
 
 	return pm_ref;
@@ -403,6 +419,8 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dm_address_items = NULL;
 		xmlNodePtr ref_dm_title = NULL;
 		xmlNodePtr ref_dm_issue_date = NULL;
+		xmlNodePtr issue_info = NULL;
+		xmlNodePtr language = NULL;
 		char *s;
 
 		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
@@ -416,8 +434,6 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		s = strchr(ref, '_');
 
 		if (hasopt(opts, OPT_ISSUE)) {
-			xmlNodePtr issue_info;
-
 			if (doc) {
 				issue_info = xmlCopyNode(find_child(ref_dm_ident, "issueInfo"), 1);
 			} else if (s && isdigit(s[1])) {
@@ -431,8 +447,6 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		if (hasopt(opts, OPT_LANG)) {
-			xmlNodePtr language;
-
 			if (doc) {
 				language = xmlCopyNode(find_child(ref_dm_ident, "language"), 1);
 			} else if (s && (s = strchr(s + 1, '_'))) {
@@ -474,6 +488,22 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		xmlFreeDoc(doc);
+
+		if (hasopt(opts, OPT_SRCID)) {
+			xmlNodePtr dmc, issno, lang, src;
+
+			dmc   = xmlCopyNode(dm_code, 1);
+			issno = xmlCopyNode(issue_info, 1);
+			lang  = xmlCopyNode(language, 1);
+
+			src = xmlNewNode(NULL, BAD_CAST (hasopt(opts, OPT_CIRID) ? "repositorySourceDmIdent" : "sourceDmIdent"));
+			xmlAddChild(src, dmc);
+			xmlAddChild(src, lang);
+			xmlAddChild(src, issno);
+
+			xmlFreeNode(dm_ref);
+			dm_ref = src;
+		}
 	}
 
 	return dm_ref;
@@ -885,14 +915,16 @@ enum issue spec_issue(const char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-filrth?] [-s <src>] [-o <dst>] [<code>|<file>]");
+	puts("Usage: " PROG_NAME " [-filRrSth?] [-s <src>] [-o <dst>] [<code>|<file>]");
 	puts("");
 	puts("Options:");
 	puts("  -f         Overwrite source data module instead of writing to stdout.");
 	puts("  -i         Include issue info (target must be file)");
 	puts("  -l         Include language (target must be file)");
 	puts("  -o <dst>   Output to <dst> instead of stdout.");
+	puts("  -R         Generate a <repositorySourceDmIdent>.");
 	puts("  -r         Add reference to data module's <refs> table.");
+	puts("  -S         Generate a <sourceDmIdent> or <sourcePmIdent>.");
 	puts("  -s <src>   Source data module to add references to.");
 	puts("  -t         Include title (target must be file)");
 	puts("  -d         Include issue date (target must be file)");
@@ -920,7 +952,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	enum issue iss = DEFAULT_S1000D_ISSUE;
 
-	const char *sopts = "filo:rs:td$:h?";
+	const char *sopts = "filo:RrSs:td$:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -940,6 +972,8 @@ int main(int argc, char **argv)
 			case 'l': opts |= OPT_LANG; break;
 			case 'o': strcpy(dst, optarg); break;
 			case 'r': insert_refs = true; break;
+			case 'R': opts |= OPT_CIRID;
+			case 'S': opts |= OPT_SRCID; opts |= OPT_ISSUE; opts |= OPT_LANG; break;
 			case 's': strcpy(src, optarg); break;
 			case 't': opts |= OPT_TITLE; break;
 			case 'd': opts |= OPT_DATE; break;
