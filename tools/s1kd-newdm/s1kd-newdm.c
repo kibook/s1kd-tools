@@ -20,7 +20,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.11"
+#define VERSION "1.7.12"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

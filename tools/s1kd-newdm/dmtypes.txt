@@ -341,7 +341,7 @@
 506  descript             List of software associated with removal
 507  descript             Parts list associated with removal
 510  proced               Disconnect procedure
-520  proced               Removal procedure
+520  proced               Remove procedure
 521  proced               Return to basic configuration
 522  proced               Remove support equipment/Remove from support equipment
 523  proced               Preparation before removal

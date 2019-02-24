@@ -388,7 +388,7 @@
   <!-- 508 thru 509 not available for projects -->
   <type infoCode="510" schema="proced" infoName="Disconnect procedure"/>
   <!-- 511 thru 519 not available for projects -->
-  <type infoCode="520" schema="proced" infoName="Removal procedure"/>
+  <type infoCode="520" schema="proced" infoName="Remove procedure"/>
   <type infoCode="521" schema="proced" infoName="Return to basic configuration"/>
   <type infoCode="522" schema="proced" infoName="Remove support equipment/Remove from support equipment"/>
   <type infoCode="523" schema="proced" infoName="Preparation before removal"/>
