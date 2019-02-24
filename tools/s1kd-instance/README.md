@@ -43,6 +43,10 @@ The applications for this tool include:
 OPTIONS
 =======
 
+-@  
+Rather than source objects, the objects specified are existing instances
+that will be updated.
+
 -A  
 Simplify inline applicability annotations and remove unused ones.
 
@@ -95,9 +99,10 @@ used as values for &lt;CIR&gt;:
 -   zoneRepository
 
 -d &lt;dir&gt;  
-Directory to start searching for ACT and PCT data modules in when a
-product is specified (-p) without specifying the PCT explicitly (-P). By
-default, the current directory will be searched.
+Directory to start searching for referenced objects in. By default, the
+current directory will be searched. This applies for the ACT and PCT
+data modules when a product is specified (-p) without specifying the PCT
+explicitly (-P), or when searching for source objects (-@).
 
 -E  
 Remove the extension from an instance produced from an already extended
@@ -172,6 +177,10 @@ Omit issue/inwork numbers from automatically generated filenames.
 -n &lt;iss&gt;  
 Set the issue and inwork numbers of the instance. By default, the issue
 and inwork number are taken from the source.
+
+When updating instance (-@), if + is given for &lt;iss&gt;, the updated
+instance will have the same issue number with an inwork number
+incremented by one.
 
 -O &lt;dir&gt;  
 Output instance(s) in &lt;dir&gt;, automatically naming them based on:
@@ -249,8 +258,9 @@ specifying a custom XSLT script with the -x option. The built-in XSLT
 used for the above CIR data modules can be dumped with the -D option.
 
 -r  
-Search for ACT and PCT data modules recursively when a product is
-specified (-p) without specifying the PCT explicitly (-P).
+Search for referenced objects recursively. This applies for the ACT and
+PCT data modules when a product is specified (-p) without specifying the
+PCT explicitly (-P), or when searching for source objects (-@).
 
 -S  
 Do not include
@@ -322,19 +332,18 @@ Identifying the source of an instance
 -------------------------------------
 
 The resulting data module instances will contain the element
-&lt;sourceDmIdent&gt;, which will contain the identification elements of
-the source data modules used to instantiate them. Publication module
-instances will contain the element &lt;sourcePmIdent&gt; instead.
+`<sourceDmIdent>`, which will contain the identification elements of the
+source data modules used to instantiate them. Publication module
+instances will contain the element `<sourcePmIdent>` instead.
 
 Additionally, the data module instance will contain an element
-&lt;repositorySourceDmIdent&gt; for each CIR specified with the -R
-option.
+`<repositorySourceDmIdent>` for each CIR specified with the -R option.
 
 If the -S option is used, neither the
-&lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or
-&lt;repositorySourceDmIdent&gt; elements are added. This can be useful
-when this tool is not used to make an "instance" per se, but more
-generally to make a module based on an existing module.
+`<sourceDmIdent>`/`<sourcePmIdent>` elements or
+`<repositorySourceDmIdent>` elements are added. This can be useful when
+this tool is not used to make an "instance" per se, but more generally
+to make a module based on an existing module.
 
 Removing/simplifying applicability annotations (-a vs -A)
 ---------------------------------------------------------
@@ -351,10 +360,10 @@ occurrences of the corresponding applic elements are removed as well.
 
 The -A option will do the same as the -a option, but will also attempt
 to simplify unused parts of applicability annotations. It simplifies an
-annotation by removing &lt;assert&gt; elements determined to be either
+annotation by removing `<assert>` elements determined to be either
 unambiguously valid or invalid given the user-defined values, and
-removing unneeded &lt;evaluate&gt; elements when they contain only one
-remaining &lt;assert&gt;.
+removing unneeded `<evaluate>` elements when they contain only one
+remaining `<assert>`.
 
 For example, given the following input:
 
@@ -759,29 +768,60 @@ specific template in the custom XSLT script are automatically copied.
 The set of built-in XSLT scripts used to resolve dependencies can be
 dumped using the -D option.
 
+Updating instances (-@)
+-----------------------
+
+The -@ option is used to automatically update instance objects from
+their source objects.
+
+The tool will use the source identication in each instance to find the
+source object they were derived from, and filter it based on the
+instance's metadata, such as:
+
+-   applicability
+
+-   security classification
+
+-   skill level
+
+in order to produce an updated version of the instance. CIRs identified
+as sources in the instance will also be used to update it.
+
+The latest issues found of the source object and repositories will be
+used.
+
+Only objects which identify a source object will be processed in this
+mode. All other non-instance objects specified are ignored.
+
 EXIT STATUS
 ===========
 
 0  
-No errors
+No errors.
 
 1  
-Missing or incomplete argument
+Missing or incomplete argument.
 
 2  
-Specified file does not exist
+Specified file does not exist.
+
+3  
+Source object for an instance could not be found.
 
 4  
-Malformed applicability definition
+Malformed applicability definition.
+
+5  
+Could not find a PCT for an object when -p was given.
 
 6  
-XML was invalid or does not conform to S1000D
+XML was invalid or does not conform to S1000D.
 
 7  
-Value given for an argument was malformed
+Value given for an argument was malformed.
 
 8  
-Issue date specified with -I is invalid
+Issue date specified with -I is invalid.
 
 EXAMPLES
 ========
@@ -809,3 +849,7 @@ Writing out a data module from stdin to a directory with automatic
 naming:
 
     $ s1kd-transform -s <xsl> <DM> | s1kd-instance -SO <dir>
+
+Update all instance data modules in-place:
+
+    $ s1kd-instance -@ -f DMC-*.XML

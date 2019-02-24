@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="032" inWork="00"/>
+        <issueInfo issueNumber="032" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="02" day="08"/>
+        <issueDate year="2019" month="02" day="23"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,14 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -r to -x, -x to -D, and add new -r and -d options.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add -@ option.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Fix custom CIR XSL example.</simplePara>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add + as value for -n option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1">
+        <simplePara>Add error when PCT cannot be found.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -94,6 +97,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-@</listItemTerm>
+              <listItemDefinition>
+                <para>Rather than source objects, the objects specified are existing instances that will be updated.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-A</listItemTerm>
               <listItemDefinition>
@@ -118,7 +127,7 @@
                 <para>Specify a new data module code (DMC) or publication module code (PMC) for the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-D &lt;CIR&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -x option.</para>
@@ -168,10 +177,10 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Directory to start searching for ACT and PCT data modules in when a product is specified (-p) without specifying the PCT explicitly (-P). By default, the current directory will be searched.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Directory to start searching for referenced objects in. By default, the current directory will be searched. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -270,6 +279,7 @@
               <listItemTerm>-n &lt;iss&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">When updating instance (-@), if + is given for &lt;iss&gt;, the updated instance will have the same issue number with an inwork number incremented by one.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -364,13 +374,13 @@
                     </listItem>
                   </randomList>
                 </para>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -x option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -D option.</para>
+                <para>The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -x option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -D option.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
-                <para>Search for ACT and PCT data modules recursively when a product is specified (-p) without specifying the PCT explicitly (-P).</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -427,7 +437,7 @@
                 <para>The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-x &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom XSLT script to resolve CIR dependencies for the last specified CIR.</para>
@@ -467,15 +477,15 @@
         </para>
         <levelledPara>
           <title>Identifying the source of an instance</title>
-          <para>The resulting data module instances will contain the element &lt;sourceDmIdent&gt;, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element &lt;sourcePmIdent&gt; instead.</para>
-          <para>Additionally, the data module instance will contain an element &lt;repositorySourceDmIdent&gt; for each CIR specified with the -R option.</para>
-          <para>If the -S option is used, neither the &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; elements or &lt;repositorySourceDmIdent&gt; elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
+          <para>The resulting data module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>
+          <para>Additionally, the data module instance will contain an element <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> for each CIR specified with the -R option.</para>
+          <para>If the -S option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>/<verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements or <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
         </levelledPara>
         <levelledPara>
           <title>Removing/simplifying applicability annotations (-a vs -A)</title>
           <para>By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a and -A options provide two methods of doing this.</para>
           <para>The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). Unused occurrences of the corresponding applic elements are removed as well.</para>
-          <para>The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing &lt;assert&gt; elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded &lt;evaluate&gt; elements when they contain only one remaining &lt;assert&gt;.</para>
+          <para>The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded <verbatimText verbatimStyle="vs12">&lt;evaluate&gt;</verbatimText> elements when they contain only one remaining <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText>.</para>
           <para>For example, given the following input:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
@@ -765,7 +775,7 @@ applicPropertyValues="C"/>
           </para>
         </levelledPara>
         <levelledPara>
-          <title changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Resolving CIR dependencies with a custom XSLT script (-x)</title>
+          <title>Resolving CIR dependencies with a custom XSLT script (-x)</title>
           <para>A CIR contains more information about an item than can be captured in a data module's reference to it. If this additional information is required, there are two methods to include it:</para>
           <para>
             <randomList>
@@ -777,9 +787,9 @@ applicPropertyValues="C"/>
               </listItem>
             </randomList>
           </para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">A custom XSLT script can be supplied with the -x option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
+          <para>A custom XSLT script can be supplied with the -x option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<xsl:stylesheet
+            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:stylesheet
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0">
 <xsl:template match="functionalItemRef">
@@ -812,7 +822,7 @@ is an item in the system.
           </para>
           <para>The command would resemble:</para>
           <para>
-            <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-instance -R &lt;CIR&gt; -x &lt;custom XSLT&gt; &lt;src&gt;</verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-instance -R &lt;CIR&gt; -x &lt;custom XSLT&gt; &lt;src&gt;</verbatimText>
           </para>
           <para>And the resulting XML would be:</para>
           <para>
@@ -830,6 +840,27 @@ is an item in the system.
           <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -D option.</para>
         </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Updating instances (-@)</title>
+          <para>The -@ option is used to automatically update instance objects from their source objects.</para>
+          <para>The tool will use the source identication in each instance to find the source object they were derived from, and filter it based on the instance's metadata, such as:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>applicability</para>
+              </listItem>
+              <listItem>
+                <para>security classification</para>
+              </listItem>
+              <listItem>
+                <para>skill level</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>in order to produce an updated version of the instance. CIRs identified as sources in the instance will also be used to update it.</para>
+          <para>The latest issues found of the source object and repositories will be used.</para>
+          <para>Only objects which identify a source object will be processed in this mode. All other non-instance objects specified are ignored.</para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXIT STATUS</title>
@@ -838,43 +869,55 @@ is an item in the system.
             <definitionListItem>
               <listItemTerm>0</listItemTerm>
               <listItemDefinition>
-                <para>No errors</para>
+                <para>No errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>1</listItemTerm>
               <listItemDefinition>
-                <para>Missing or incomplete argument</para>
+                <para>Missing or incomplete argument.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>2</listItemTerm>
               <listItemDefinition>
-                <para>Specified file does not exist</para>
+                <para>Specified file does not exist.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>Source object for an instance could not be found.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>4</listItemTerm>
               <listItemDefinition>
-                <para>Malformed applicability definition</para>
+                <para>Malformed applicability definition.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>5</listItemTerm>
+              <listItemDefinition>
+                <para>Could not find a PCT for an object when -p was given.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>6</listItemTerm>
               <listItemDefinition>
-                <para>XML was invalid or does not conform to S1000D</para>
+                <para>XML was invalid or does not conform to S1000D.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>7</listItemTerm>
               <listItemDefinition>
-                <para>Value given for an argument was malformed</para>
+                <para>Value given for an argument was malformed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>8</listItemTerm>
               <listItemDefinition>
-                <para>Issue date specified with -I is invalid</para>
+                <para>Issue date specified with -I is invalid.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -901,6 +944,10 @@ is an item in the system.
         <para>Writing out a data module from stdin to a directory with automatic naming:</para>
         <para>
           <verbatimText verbatimStyle="vs24">$ s1kd-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Update all instance data modules in-place:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs24">$ s1kd-instance -@ -f DMC-*.XML</verbatimText>
         </para>
       </levelledPara>
     </description>

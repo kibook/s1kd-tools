@@ -16,19 +16,21 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.0.2"
+#define VERSION "2.1.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
 
 /* Error codes */
-#define EXIT_MISSING_ARGS 1 /* Option or parameter missing */
-#define EXIT_MISSING_FILE 2 /* File does not exist */
-#define EXIT_BAD_APPLIC 4 /* Malformed applic definitions */
-#define EXIT_BAD_XML 6 /* Invalid XML/S1000D */
-#define EXIT_BAD_ARG 7 /* Malformed argument */
-#define EXIT_BAD_DATE 8 /* Malformed issue date */
+#define EXIT_MISSING_ARGS 1	/* Option or parameter missing */
+#define EXIT_MISSING_FILE 2	/* File does not exist */
+#define EXIT_MISSING_SOURCE 3	/* Source object could not be found */
+#define EXIT_BAD_APPLIC 4	/* Malformed applic definitions */
+#define EXIT_NO_PCT 5		/* PCT could not be found */
+#define EXIT_BAD_XML 6		/* Invalid XML/S1000D */
+#define EXIT_BAD_ARG 7		/* Malformed argument */
+#define EXIT_BAD_DATE 8		/* Malformed issue date */
 
 /* Error messages */
 #define S_MISSING_OBJECT ERR_PREFIX "Could not read source object: %s\n"
@@ -40,15 +42,17 @@
 #define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
 #define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
-#define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s.\n"
+#define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s\n"
 #define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
+#define S_MISSING_SOURCE ERR_PREFIX "Could not find source object for instance %s\n"
+#define S_NO_PCT ERR_PREFIX "No PCT data module could be found for %s\n"
 
 /* Warning messages */
 #define S_FILE_EXISTS WRN_PREFIX "%s already exists. Use -f to overwrite.\n"
 #define S_NO_PRODUCT WRN_PREFIX "No product matching '%s' in PCT '%s'.\n"
 #define S_NO_XSLT WRN_PREFIX "No built-in XSLT for CIR type: %s\n"
-#define S_MISSING_REF_DM WRN_PREFIX "Could not read referenced ACT/PCT: %s\n"
+#define S_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
 #define S_MISSING_CIR WRN_PREFIX "Could not find CIR %s."
 
 /* When using the -g option, these are set as the values for the
@@ -114,8 +118,11 @@ struct ident {
 xmlNodePtr applicability;
 int napplics = 0;
 
+/* Assume objects were created with -N. */
+bool no_issue = false;
+
 /* Define a value for a product attribute or condition. */
-void define_applic(const char *ident, const char *type, const char *value, bool pct)
+void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
@@ -126,10 +133,10 @@ void define_applic(const char *ident, const char *type, const char *value, bool 
 
 	/* Check if an assert has already been created for this property. */
 	for (cur = applicability->children; cur; cur = cur->next) {
-		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
-		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		xmlChar *cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		xmlChar *cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
 
-		if (strcmp(cur_ident, ident) == 0 && strcmp(cur_type, type) == 0) {
+		if (xmlStrcmp(cur_ident, ident) == 0 && xmlStrcmp(cur_type, type) == 0) {
 			assert = cur;
 		}
 
@@ -140,9 +147,9 @@ void define_applic(const char *ident, const char *type, const char *value, bool 
 	/* If no assert exists, add a new one. */
 	if (!assert) {
 		assert = xmlNewChild(applicability, NULL, BAD_CAST "assert", NULL);
-		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", BAD_CAST ident);
-		xmlSetProp(assert, BAD_CAST "applicPropertyType",  BAD_CAST type);
-		xmlSetProp(assert, BAD_CAST "applicPropertyValues", BAD_CAST value);
+		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", ident);
+		xmlSetProp(assert, BAD_CAST "applicPropertyType",  type);
+		xmlSetProp(assert, BAD_CAST "applicPropertyValues", value);
 		++napplics;
 	/* Or, if an assert already exists... */
 	} else {
@@ -156,7 +163,7 @@ void define_applic(const char *ident, const char *type, const char *value, bool 
 			 * add the original and new values. */
 			if (xmlStrcmp(first_value, BAD_CAST value) != 0) {
 				xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
-				xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
+				xmlNewChild(assert, NULL, BAD_CAST "value", value);
 				xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
 			}
 
@@ -168,20 +175,20 @@ void define_applic(const char *ident, const char *type, const char *value, bool 
 			for (cur = assert->children; cur && !dup; cur = cur->next) {
 				xmlChar *cur_value;
 				cur_value = xmlNodeGetContent(cur);
-				dup = xmlStrcmp(cur_value, BAD_CAST value) == 0;
+				dup = xmlStrcmp(cur_value, value) == 0;
 				xmlFree(cur_value);
 			}
 
 			/* If not a duplicate, add the new value to the
 			 * multi-assert. */
 			if (!dup) {
-				xmlNewChild(assert, NULL, BAD_CAST "value", BAD_CAST value);
+				xmlNewChild(assert, NULL, BAD_CAST "value", value);
 			}
 		}
 	}
 
-	if (pct) {
-		xmlSetProp(assert, BAD_CAST "fromPct", BAD_CAST "true");
+	if (perdm) {
+		xmlSetProp(assert, BAD_CAST "perDm", BAD_CAST "true");
 	}
 }
 
@@ -936,15 +943,19 @@ xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
 	return applic;
 }
 
-/* Add metadata linking the data module instance with the master data module */
-void add_source(xmlDocPtr doc)
+/* Add metadata linking the data module instance with the source data module */
+void add_source(xmlDocPtr source, xmlDocPtr inst)
 {
 	xmlNodePtr ident, sourceIdent, node, cur;
 	const xmlChar *type;
 
-	ident       = first_xpath_node(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//dmaddres");
-	sourceIdent = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
-	node        = first_xpath_node(doc, NULL, BAD_CAST "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
+	if (!inst) {
+		inst = source;
+	}
+
+	ident       = first_xpath_node(source, NULL, BAD_CAST "//dmIdent|//pmIdent|//dmaddres");
+	sourceIdent = first_xpath_node(inst, NULL, BAD_CAST "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
+	node        = first_xpath_node(inst, NULL, BAD_CAST "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
 
 	if (!node) {
 		return;
@@ -1770,33 +1781,44 @@ xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, con
 /* Set the issue and inwork numbers of the instance. */
 void set_issue(xmlDocPtr dm, char *issinfo)
 {
-	char issue[4], inwork[3];
+	char issue[32], inwork[32];
 	xmlNodePtr issueInfo;
-	enum issue iss;
 
-	if (sscanf(issinfo, "%3s-%2s", issue, inwork) != 2) {
+	if (!(issueInfo = first_xpath_node(dm, NULL, ISSUE_INFO_XPATH))) {
+		return;
+	}
+
+	if (strcmp(issinfo, "+") == 0) {
+		xmlChar *issue_s, *inwork_s;
+		int inwork_i;
+
+		issue_s  = first_xpath_value(dm, issueInfo, BAD_CAST "@issueNumber|@issno");
+		inwork_s = first_xpath_value(dm, issueInfo, BAD_CAST "@inWork|@inwork");
+
+		strcpy(issue, (char *) issue_s);
+		if (inwork_s) {
+			strcpy(inwork, (char *) inwork_s);
+		} else {
+			strcpy(inwork, "00");
+		}
+
+		xmlFree(issue_s);
+		xmlFree(inwork_s);
+
+		inwork_i = atoi(inwork);
+
+		snprintf(inwork, 32, "%.2d", inwork_i + 1);
+	} else if (sscanf(issinfo, "%3s-%2s", issue, inwork) != 2) {
 		fprintf(stderr, ERR_PREFIX S_INVALID_ISSFMT);
 		exit(EXIT_MISSING_ARGS);
 	}
 
-	issueInfo = first_xpath_node(dm, NULL, ISSUE_INFO_XPATH);
-
-	if (!issueInfo) {
-		return;
-	}
-
 	if (xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") == 0) {
-		iss = ISS_4X;
-	} else {
-		iss = ISS_30;
-	}
-
-	if (iss == ISS_30) {
-		xmlSetProp(issueInfo, BAD_CAST "issno", BAD_CAST issue);
-		xmlSetProp(issueInfo, BAD_CAST "inwork", BAD_CAST inwork);
-	} else {
 		xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
 		xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
+	} else {
+		xmlSetProp(issueInfo, BAD_CAST "issno", BAD_CAST issue);
+		xmlSetProp(issueInfo, BAD_CAST "inwork", BAD_CAST inwork);
 	}
 }
 
@@ -1831,7 +1853,7 @@ void set_security(xmlDocPtr dm, char *sec)
 	xmlSetProp(security, BAD_CAST (iss == ISS_30 ? "class" : "securityClassification"), BAD_CAST sec);
 }
 
-/* Get the originator of the master. If it has no originator
+/* Get the originator of the source. If it has no originator
  * (e.g. pub modules do not require one) then create one in the
  * instance.
  */
@@ -1957,13 +1979,13 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			char *ident, *type, *value;
+			xmlChar *ident, *type, *value;
 
-			ident = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+			ident = xmlGetProp(obj->nodesetval->nodeTab[i],
 				BAD_CAST "applicPropertyIdent");
-			type  = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+			type  = xmlGetProp(obj->nodesetval->nodeTab[i],
 				BAD_CAST "applicPropertyType");
-			value = (char *) xmlGetProp(obj->nodesetval->nodeTab[i],
+			value = xmlGetProp(obj->nodesetval->nodeTab[i],
 				BAD_CAST "applicPropertyValue");
 
 			define_applic(ident, type, value, true);
@@ -2065,7 +2087,7 @@ void read_applic(char *s)
 	type  = strtok(NULL, "=");
 	value = strtok(NULL, "");
 
-	define_applic(ident, type, value, false);
+	define_applic(BAD_CAST ident, BAD_CAST type, BAD_CAST value, false);
 }
 
 /* Set the remarks for the object */
@@ -2216,7 +2238,7 @@ bool is_dm(const char *name)
 
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
-bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
+bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 {
 	bool found = false;
 	char *model_ident_code;
@@ -2287,7 +2309,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 	xmlFree(learn_code);
 	xmlFree(learn_event_code);
 
-	if (issueInfo) {
+	if (issueInfo && !(no_issue || ignore_iss)) {
 		char *issue_number;
 		char *in_work;
 		char iss[8];
@@ -2302,7 +2324,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		xmlFree(in_work);
 	}
 
-	if (language) {
+	if (language && !ignore_iss) {
 		char *language_iso_code;
 		char *country_iso_code;
 		char lang[8];
@@ -2326,12 +2348,89 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 	return found;
 }
 
+/* Determine if the file is a publication module. */
+bool is_pm(const char *name)
+{
+	return strncmp(name, "PMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
+}
+
+/* Find a PM filename in the current directory based on the pmRefIdent
+ * element. */
+bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
+{
+	bool found = false;
+	char *model_ident_code;
+	char *pm_issuer;
+	char *pm_number;
+	char *pm_volume;
+	char code[64];
+	xmlNodePtr pmCode, issueInfo, language;
+
+	pmCode = first_xpath_node(NULL, pmRefIdent, BAD_CAST "pmCode|pmc");
+	issueInfo = first_xpath_node(NULL, pmRefIdent, BAD_CAST "issueInfo|issno");
+	language = first_xpath_node(NULL, pmRefIdent, BAD_CAST "language");
+
+	model_ident_code = (char *) first_xpath_value(NULL, pmCode, BAD_CAST "modelic|@modelIdentCode");
+	pm_issuer        = (char *) first_xpath_value(NULL, pmCode, BAD_CAST "pmissuer|@pmIssuer");
+	pm_number        = (char *) first_xpath_value(NULL, pmCode, BAD_CAST "pmnumber|@pmNumber");
+	pm_volume        = (char *) first_xpath_value(NULL, pmCode, BAD_CAST "pmvolume|@pmVolume");
+
+	snprintf(code, 64, "PMC-%s-%s-%s-%s",
+		model_ident_code,
+		pm_issuer,
+		pm_number,
+		pm_volume);
+
+	xmlFree(model_ident_code);
+	xmlFree(pm_issuer);
+	xmlFree(pm_number);
+	xmlFree(pm_volume);
+
+	if (issueInfo && !(no_issue || ignore_iss)) {
+		char *issue_number;
+		char *in_work;
+		char iss[8];
+
+		issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
+		in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
+
+		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
+		strcat(code, iss);
+
+		xmlFree(issue_number);
+		xmlFree(in_work);
+	}
+
+	if (language && !ignore_iss) {
+		char *language_iso_code;
+		char *country_iso_code;
+		char lang[8];
+
+		language_iso_code = (char *) first_xpath_value(NULL, language, BAD_CAST "@language|@languageIsoCode");
+		country_iso_code  = (char *) first_xpath_value(NULL, language, BAD_CAST "@country|@countryIsoCode");
+
+		snprintf(lang, 8, "_%s-%s", language_iso_code, country_iso_code);
+		strcat(code, lang);
+
+		xmlFree(language_iso_code);
+		xmlFree(country_iso_code);
+	}
+
+	found = find_csdb_object(dst, search_dir, code, is_pm, recursive_search);
+
+	if (!found) {
+		fprintf(stderr, S_MISSING_REF_DM, code);
+	}
+
+	return found;
+}
+
 /* Find the filename of a referenced ACT data module. */
 bool find_act_fname(char *dst, xmlDocPtr doc)
 {
 	xmlNodePtr actref;
 	actref = first_xpath_node(doc, NULL, BAD_CAST "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
-	return actref && find_dmod_fname(dst, actref);
+	return actref && find_dmod_fname(dst, actref, false);
 }
 
 /* Find the filename of a referenced PCT data module via the ACT. */
@@ -2351,21 +2450,21 @@ bool find_pct_fname(char *dst, xmlDocPtr doc)
 	}
 
 	pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
-	found = pctref && find_dmod_fname(dst, pctref);
+	found = pctref && find_dmod_fname(dst, pctref, false);
 	xmlFreeDoc(act);
 
 	return found;
 }
 
-/* Unset all applicability assigned by a PCT. */
-void clear_pct_applic(void)
+/* Unset all applicability assigned on a per-DM basis. */
+void clear_perdm_applic(void)
 {
 	xmlNodePtr cur;
 	cur = applicability->children;
 	while (cur) {
 		xmlNodePtr next;
 		next = cur->next;
-		if (xmlHasProp(cur, BAD_CAST "fromPct")) {
+		if (xmlHasProp(cur, BAD_CAST "perDm")) {
 			xmlUnlinkNode(cur);
 			xmlFreeNode(cur);
 			--napplics;
@@ -2396,6 +2495,111 @@ void clean_entities(xmlDocPtr doc)
 	xmlHashScan(doc->intSubset->entities, clean_entities_callback, NULL);
 }
 
+/* Find the source object for an instance.
+ * -1  Object does not identify a source.
+ *  0  Object identifies a source and it was found.
+ *  1  Object identifies a source but it couldn't be found.
+ */
+int find_source(char *src, xmlDocPtr *doc)
+{
+	xmlNodePtr sdi;
+	bool found = false;
+
+	if (!(*doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		return -1;
+	}
+
+	if (!(sdi = first_xpath_node(*doc, NULL, BAD_CAST "//sourceDmIdent|//sourcePmIdent|//srcdmaddres"))) {
+		return -1;
+	}
+
+	if (xmlStrcmp(sdi->name, BAD_CAST "sourceDmIdent") == 0 || xmlStrcmp(sdi->name, BAD_CAST "srcdmaddres") == 0) {
+		found = find_dmod_fname(src, sdi, true);
+	} else if (xmlStrcmp(sdi->name, BAD_CAST "sourcePmIdent") == 0) {
+		found = find_pm_fname(src, sdi, true);
+	}
+
+	return !found;
+}
+
+void load_applic_from_inst(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//identAndStatusSection//applic[1]//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *ident, *type, *value;
+
+			ident = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyIdent");
+			type  = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType");
+			value = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyValues");
+
+			define_applic(ident, type, value, true);
+
+			xmlFree(ident);
+			xmlFree(type);
+			xmlFree(value);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+void load_skill_from_inst(xmlDocPtr doc, char **skill_codes)
+{
+	char *skill;
+
+	if ((skill = (char *) first_xpath_value(doc, NULL, BAD_CAST "//skillLevel/@skillLevelCode|//skill/@skill"))) {
+		free(*skill_codes);
+		*skill_codes = skill;
+	}
+}
+
+void load_sec_from_inst(xmlDocPtr doc, char **sec_classes)
+{
+	char *sec;
+
+	if ((sec = (char *) first_xpath_value(doc, NULL, BAD_CAST "//security/@securityClassification|//security/@class"))) {
+		free(*sec_classes);
+		*sec_classes = sec;
+	}
+}
+
+void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//repositorySourceDmIdent", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char path[PATH_MAX];
+
+			if (find_dmod_fname(path, obj->nodesetval->nodeTab[i], true)) {
+				xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST path);
+			}
+
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -2407,7 +2611,7 @@ void show_help(void)
 	puts("  -C <comment>  Add an XML comment to the top of the instance.");
 	puts("  -c <DMC>      The new code of the instance.");
 	puts("  -D <CIR>      Dump default XSLT for resolving CIR references.");
-	puts("  -d <dir>      Directory to start searching for ACT and PCT data modules in.");
+	puts("  -d <dir>      Directory to start searching for referenced data modules in.");
 	puts("  -E            Remove extension from instance.");
 	puts("  -e <ext>      Specify an extension on the instance code (DME/PME).");
 	puts("  -F            Flatten alts elements.");
@@ -2430,7 +2634,7 @@ void show_help(void)
 	puts("  -P <PCT>      PCT file to read products from.");
 	puts("  -p <product>  ID/primary key of a product in the PCT to filter on.");
 	puts("  -R <CIR>      Resolve externalized items using the given CIR.");
-	puts("  -r            Search for ACT and PCT data modules recursively.");
+	puts("  -r            Search for referenced data modules recursively.");
 	puts("  -S            Do not include <sourceDmIdent> or <repositorySourceDmIdent>.");
 	puts("  -s <applic>   An assign in the form of <ident>:<type>=<value>");
 	puts("  -t <techName> Give the instance a different techName/pmTitle.");
@@ -2458,12 +2662,9 @@ void show_version(void)
 
 int main(int argc, char **argv)
 {
-	xmlDocPtr doc;
-	xmlNodePtr root;
 	xmlNodePtr referencedApplicGroup;
 
-	int i;
-	int c;
+	int i, c;
 
 	char code[256] = "";
 	char out[PATH_MAX] = "-";
@@ -2485,10 +2686,9 @@ int main(int argc, char **argv)
 	char issinfo[8] = "";
 	char secu[4] = "";
 	bool wholedm = false;
-	bool no_issue = false;
 	char pctfname[PATH_MAX] = "";
 	char product[64] = "";
-	bool load_pct_per_dm = false;
+	bool load_applic_per_dm = false;
 	bool dmlist = false;
 	FILE *list = NULL;
 	char issdate[16] = "";
@@ -2508,15 +2708,18 @@ int main(int argc, char **argv)
 	bool clean_ents = false;
 	bool autocomp = false;
 	bool use_stdout = true;
+	bool update_inst = false;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:t:U:u:vWwX:x:Y:yz";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:t:U:u:vWwX:x:Y:yz@";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	int err = 0;
 
 	exsltRegisterAll();
 
@@ -2536,47 +2739,135 @@ int main(int argc, char **argv)
 					return EXIT_SUCCESS;
 				}
 				break;
-			case 'a': clean = true; break;
-			case 'A': simpl = true; break;
-			case 'c': strncpy(code, optarg, 255); break;
-			case 'C': strncpy(comment_text, optarg, 255); break;
-			case 'D': dump_cir_xsl(optarg); exit(0);
-			case 'd': free(search_dir); search_dir = strdup(optarg); break;
-			case 'E': stripext = true; break;
-			case 'e': strncpy(extension, optarg, 255); break;
-			case 'F': flat_alts = true; break;
-			case 'f': force_overwrite = true; break;
-			case 'g': setorig = true; break;
-			case 'G': setorig = true; origspec = strdup(optarg); break;
-			case 'i': strncpy(info, optarg, 255); break;
-			case 'I': strncpy(issdate, optarg, 15); break;
-			case 'j': clean_ents = true; break;
-			case 'K': skill_codes = strdup(optarg); break;
-			case 'k': skill = strdup(optarg); break;
-			case 'L': dmlist = true; break;
-			case 'l': strncpy(language, optarg, 255); break;
-			case 'm': remarks = strdup(optarg); break;
-			case 'N': no_issue = true; break;
-			case 'n': strncpy(issinfo, optarg, 6); break;
-			case 'O': autoname = true; strncpy(dir, optarg, PATH_MAX - 1); use_stdout = false; break;
-			case 'o': strncpy(out, optarg, PATH_MAX - 1); use_stdout = false; break;
-			case 'P': strncpy(pctfname, optarg, PATH_MAX - 1); break;
-			case 'p': strncpy(product, optarg, 63); break;
-			case 'R': xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg); break;
-			case 'r': recursive_search = true; break;
-			case 'S': add_source_ident = false; break;
-			case 's': read_applic(optarg); break;
-			case 't': strncpy(tech, optarg, 255); break;
-			case 'U': sec_classes = strdup(optarg); break;
-			case 'u': strncpy(secu, optarg, 2); break;
-			case 'v': verbose = true; break;
-			case 'W': new_applic = true; combine_applic = false; break;
-			case 'w': wholedm = true; break;
-			case 'X': strncpy(comment_path, optarg, 255); break;
-			case 'x': xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg); break;
-			case 'y': new_applic = true; break;
-			case 'Y': new_applic = true; strncpy(new_display_text, optarg, 255); break;
-			case 'z': autocomp = true; break;
+			case 'a':
+				clean = true;
+				break;
+			case 'A':
+				simpl = true;
+				break;
+			case 'c':
+				strncpy(code, optarg, 255);
+				break;
+			case 'C':
+				strncpy(comment_text, optarg, 255);
+				break;
+			case 'D':
+				dump_cir_xsl(optarg);
+				return EXIT_SUCCESS;
+			case 'd':
+				free(search_dir); search_dir = strdup(optarg);
+				break;
+			case 'E':
+				stripext = true;
+				break;
+			case 'e':
+				strncpy(extension, optarg, 255);
+				break;
+			case 'F':
+				flat_alts = true;
+				break;
+			case 'f':
+				force_overwrite = true;
+				break;
+			case 'g':
+				setorig = true;
+				break;
+			case 'G':
+				setorig = true; origspec = strdup(optarg);
+				break;
+			case 'i':
+				strncpy(info, optarg, 255);
+				break;
+			case 'I':
+				strncpy(issdate, optarg, 15);
+				break;
+			case 'j':
+				clean_ents = true;
+				break;
+			case 'K':
+				skill_codes = strdup(optarg);
+				break;
+			case 'k':
+				skill = strdup(optarg);
+				break;
+			case 'L':
+				dmlist = true;
+				break;
+			case 'l':
+				strncpy(language, optarg, 255);
+				break;
+			case 'm':
+				remarks = strdup(optarg);
+				break;
+			case 'N':
+				no_issue = true;
+				break;
+			case 'n':
+				strncpy(issinfo, optarg, 6);
+				break;
+			case 'O':
+				autoname = true; strncpy(dir, optarg, PATH_MAX - 1);
+				use_stdout = false;
+				break;
+			case 'o':
+				strncpy(out, optarg, PATH_MAX - 1);
+				use_stdout = false;
+				break;
+			case 'P':
+				strncpy(pctfname, optarg, PATH_MAX - 1);
+				break;
+			case 'p':
+				strncpy(product, optarg, 63);
+				break;
+			case 'R':
+				xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg);
+				break;
+			case 'r':
+				recursive_search = true;
+				break;
+			case 'S':
+				add_source_ident = false;
+				break;
+			case 's':
+				read_applic(optarg);
+				break;
+			case 't':
+				strncpy(tech, optarg, 255);
+				break;
+			case 'U':
+				sec_classes = strdup(optarg);
+				break;
+			case 'u':
+				strncpy(secu, optarg, 2);
+				break;
+			case 'v':
+				verbose = true;
+				break;
+			case 'W':
+				new_applic = true; combine_applic = false;
+				break;
+			case 'w':
+				wholedm = true;
+				break;
+			case 'X':
+				strncpy(comment_path, optarg, 255);
+				break;
+			case 'x':
+				xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg);
+				break;
+			case 'y':
+				new_applic = true;
+				break;
+			case 'Y':
+				new_applic = true; strncpy(new_display_text, optarg, 255);
+				break;
+			case 'z':
+				autocomp = true;
+				break;
+			case '@':
+				update_inst = true;
+				load_applic_per_dm = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2617,7 +2908,7 @@ int main(int argc, char **argv)
 		/* Otherwise the PCT must be loaded separately for each data
 		 * module, since they may reference different ones. */
 		} else {
-			load_pct_per_dm = true;
+			load_applic_per_dm = true;
 		}
 	}
 
@@ -2643,7 +2934,14 @@ int main(int argc, char **argv)
 	i = optind;
 
 	while (1) {
+		xmlDocPtr doc;
 		char src[PATH_MAX] = "";
+		xmlDocPtr inst = NULL;
+		char *inst_src = NULL;
+
+		if (!dmlist && (use_stdin || i >= argc)) {
+			break;
+		}
 
 		if (dmlist) {
 			if (!list && !(list = fopen(argv[i++], "r"))) {
@@ -2674,28 +2972,73 @@ int main(int argc, char **argv)
 			exit(EXIT_MISSING_FILE);
 		}
 
-		doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
+		/* Get the source from the sourceDmIdent/sourcePmIdent of the object. */
+		if (update_inst) {
+			int e;
 
-		if (doc) {
-			bool ispm;
+			inst_src = strdup(src);
 
-			root = xmlDocGetRootElement(doc);
-			ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
+			if ((e = find_source(src, &inst))) {
+				if (e == 1) {
+					fprintf(stderr, S_MISSING_SOURCE, src);
+					err = EXIT_MISSING_SOURCE;
+				}
+				xmlFreeDoc(inst);
+				free(inst_src);
+				continue;
+			}
 
+			load_applic_from_inst(inst);
+			load_skill_from_inst(inst, &skill_codes);
+			load_sec_from_inst(inst, &sec_classes);
+			add_cirs_from_inst(inst, cirs);
+		}
+
+		if ((doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR))) {
 			/* Load the applic assigns from the PCT data module referenced
 			 * by the ACT data module referenced by this data module. */
-			if (load_pct_per_dm) {
-				char pct_fname[PATH_MAX];
+			if (strcmp(product, "") != 0 && strcmp(pctfname, "") == 0) {
+				char fname[PATH_MAX];
 
-				if (find_pct_fname(pct_fname, doc)) {
-					load_applic_from_pct(pct_fname, product);
+				if (find_pct_fname(fname, doc)) {
+					load_applic_from_pct(fname, product);
+				} else {
+					fprintf(stderr, S_NO_PCT, src);
+					err = EXIT_NO_PCT;
 				}
 			}
 
 			if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
+				bool ispm;
+				xmlNodePtr root;
+
 				if (add_source_ident) {
-					add_source(doc);
+					add_source(doc, inst);
 				}
+
+				/* Updating an instance, so use the metadata section of
+				 * the instance instead of the source as a base. Then,
+				 * reset the source to the instance in case we want to
+				 * overwrite it.*/
+				if (update_inst) {
+					xmlNodePtr src_content, dst_content;
+
+					src_content = first_xpath_node(doc, NULL, BAD_CAST "//content");
+					dst_content = first_xpath_node(inst, NULL, BAD_CAST "//content");
+
+					xmlAddNextSibling(dst_content, xmlCopyNode(src_content, 1));
+					xmlUnlinkNode(dst_content);
+					xmlFreeNode(dst_content);
+
+					xmlFreeDoc(doc);
+
+					doc = inst;
+					strcpy(src, inst_src);
+					free(inst_src);
+				}
+
+				root = xmlDocGetRootElement(doc);
+				ispm = xmlStrcmp(root->name, BAD_CAST "pm") == 0;
 
 				for (cir = cirs->children; cir; cir = cir->next) {
 					char *cirdocfname = (char *) xmlNodeGetContent(cir);
@@ -2848,8 +3191,8 @@ int main(int argc, char **argv)
 			/* The ACT/PCT may be different for the next DM, so these
 			 * assigns must be cleared. Those directly set with -s will
 			 * carry over. */
-			if (load_pct_per_dm) {
-				clear_pct_applic();
+			if (load_applic_per_dm) {
+				clear_perdm_applic();
 			}
 
 			xmlFreeDoc(doc);
@@ -2874,10 +3217,6 @@ int main(int argc, char **argv)
 			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
 			exit(EXIT_BAD_XML);
 		}
-
-		if (!dmlist && (use_stdin || i >= argc)) {
-			break;
-		}
 	}
 
 	free(origspec);
@@ -2891,5 +3230,5 @@ int main(int argc, char **argv)
 	xsltCleanupGlobals();
 	xmlCleanupParser();
 
-	return 0;
+	return err;
 }
