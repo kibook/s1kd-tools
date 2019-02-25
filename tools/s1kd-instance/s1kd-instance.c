@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.1"
+#define VERSION "2.1.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2875,8 +2875,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (optind >= argc) {
-		use_stdin = true;
+	if (dmlist && optind >= argc) {
 		list = stdin;
 	}
 
