@@ -774,24 +774,58 @@ Updating instances (-@)
 The -@ option is used to automatically update instance objects from
 their source objects.
 
-The tool will use the source identication in each instance to find the
-source object they were derived from, and filter it based on the
-instance's metadata, such as:
-
--   applicability
-
--   security classification
-
--   skill level
-
-in order to produce an updated version of the instance. CIRs identified
-as sources in the instance will also be used to update it.
-
-The latest issues found of the source object and repositories will be
-used.
+The tool will use the `<sourceDmIdent>`/`<sourcePmIdent>` in each
+instance to find the source object they were derived from, and filter it
+based on the instance's metadata in order to produce an updated version
+of the instance. CIRs identified by `<repositorySourceDmIdent>` elements
+in the instance will also be used to update it.
 
 Only objects which identify a source object will be processed in this
-mode. All other non-instance objects specified are ignored.
+mode. All other non-instance objects specified are ignored. The elements
+`<sourceDmIdent>`, `<sourcePmIdent>` and `<repositorySourceDmIdent>`
+identify a specific issue of an object that the instance was last
+updated from, but this is ignored and the latest issue found of a source
+object will be used instead.
+
+This feature is primarily useful when instances of objects are stored in
+the CSDB, rather than only being generated during publication or
+dynamically in a viewer. For example, imagine you have a descriptive
+data module:
+
+    DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+
+and you deliver to two customers, C1 and C2. The data module contains
+information for both:
+
+    <description>
+    <para>This text applies to all customers.</para>
+    <para applicRefId="app-C1">This only applies to Customer 1.</para>
+    <para applicRefId="app-C2">This only applies to Customer 2.</para>
+    </description>
+
+Neither customer wants to see information that applies only to the
+other, so you can create two customized instances of this data module,
+identified with the extended code:
+
+    DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+    DME-12345-C1-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+    DME-12345-C2-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+
+Each instance data module is set to apply only to the correct customer:
+
+    <dmStatus>
+    ...
+    <applic>
+    <assert applicPropertyIdent="customer" applicPropertyType="prodattr"
+    applicPropertyValues="1"/>
+    </applic>
+    ...
+    </dmStatus>
+
+Now, when a change is made to the master data module, this tool can be
+used to update these instances automatically:
+
+    $ s1kd-instance -@ -f DME-*.XML
 
 EXIT STATUS
 ===========
@@ -849,7 +883,3 @@ Writing out a data module from stdin to a directory with automatic
 naming:
 
     $ s1kd-transform -s <xsl> <DM> | s1kd-instance -SO <dir>
-
-Update all instance data modules in-place:
-
-    $ s1kd-instance -@ -f DMC-*.XML

@@ -954,26 +954,80 @@ dumped using the \-D option.
 The \-\@ option is used to automatically update instance objects from
 their source objects.
 .PP
-The tool will use the source identication in each instance to find the
-source object they were derived from, and filter it based on the
-instance\[aq]s metadata, such as:
-.IP \[bu] 2
-applicability
-.IP \[bu] 2
-security classification
-.IP \[bu] 2
-skill level
-.PP
-in order to produce an updated version of the instance.
-CIRs identified as sources in the instance will also be used to update
-it.
-.PP
-The latest issues found of the source object and repositories will be
-used.
+The tool will use the \f[C]<sourceDmIdent>\f[]/\f[C]<sourcePmIdent>\f[]
+in each instance to find the source object they were derived from, and
+filter it based on the instance\[aq]s metadata in order to produce an
+updated version of the instance.
+CIRs identified by \f[C]<repositorySourceDmIdent>\f[] elements in the
+instance will also be used to update it.
 .PP
 Only objects which identify a source object will be processed in this
 mode.
 All other non\-instance objects specified are ignored.
+The elements \f[C]<sourceDmIdent>\f[], \f[C]<sourcePmIdent>\f[] and
+\f[C]<repositorySourceDmIdent>\f[] identify a specific issue of an
+object that the instance was last updated from, but this is ignored and
+the latest issue found of a source object will be used instead.
+.PP
+This feature is primarily useful when instances of objects are stored in
+the CSDB, rather than only being generated during publication or
+dynamically in a viewer.
+For example, imagine you have a descriptive data module:
+.IP
+.nf
+\f[C]
+DMC\-EX\-A\-00\-00\-00\-00A\-040A\-D_001\-00_EN\-CA.XML
+\f[]
+.fi
+.PP
+and you deliver to two customers, C1 and C2.
+The data module contains information for both:
+.IP
+.nf
+\f[C]
+<description>
+<para>This\ text\ applies\ to\ all\ customers.</para>
+<para\ applicRefId="app\-C1">This\ only\ applies\ to\ Customer\ 1.</para>
+<para\ applicRefId="app\-C2">This\ only\ applies\ to\ Customer\ 2.</para>
+</description>
+\f[]
+.fi
+.PP
+Neither customer wants to see information that applies only to the
+other, so you can create two customized instances of this data module,
+identified with the extended code:
+.IP
+.nf
+\f[C]
+DMC\-EX\-A\-00\-00\-00\-00A\-040A\-D_001\-00_EN\-CA.XML
+DME\-12345\-C1\-EX\-A\-00\-00\-00\-00A\-040A\-D_001\-00_EN\-CA.XML
+DME\-12345\-C2\-EX\-A\-00\-00\-00\-00A\-040A\-D_001\-00_EN\-CA.XML
+\f[]
+.fi
+.PP
+Each instance data module is set to apply only to the correct customer:
+.IP
+.nf
+\f[C]
+<dmStatus>
+\&...
+<applic>
+<assert\ applicPropertyIdent="customer"\ applicPropertyType="prodattr"
+applicPropertyValues="1"/>
+</applic>
+\&...
+</dmStatus>
+\f[]
+.fi
+.PP
+Now, when a change is made to the master data module, this tool can be
+used to update these instances automatically:
+.IP
+.nf
+\f[C]
+$\ s1kd\-instance\ \-\@\ \-f\ DME\-*.XML
+\f[]
+.fi
 .SH EXIT STATUS
 .TP
 .B 0
@@ -1063,14 +1117,6 @@ naming:
 .nf
 \f[C]
 $\ s1kd\-transform\ \-s\ <xsl>\ <DM>\ |\ s1kd\-instance\ \-SO\ <dir>
-\f[]
-.fi
-.PP
-Update all instance data modules in\-place:
-.IP
-.nf
-\f[C]
-$\ s1kd\-instance\ \-\@\ \-f\ DMC\-*.XML
 \f[]
 .fi
 .SH AUTHORS
