@@ -811,7 +811,19 @@ identified with the extended code:
     DME-12345-C1-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
     DME-12345-C2-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
 
-Each instance data module is set to apply only to the correct customer:
+Each instance data module identifies the original data module as its
+source:
+
+    <sourceDmIdent>
+    <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+    subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+    disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+    itemLocationCode="D"/>
+    <language languageIsoCode="en" countryIsoCode="CA"/>
+    <issueInfo issueNumber="001" inWork="00"/>
+    </sourceDmIdent>
+
+and is set to apply only to the correct customer:
 
     <dmStatus>
     ...
