@@ -78,11 +78,15 @@ multiple pieces of metadata.
 
 -W &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is
-not equal to the value specified in the following -v option.
+not equal to the value specified in the following -v option. If no -v
+option follows, this will show objects which do not have metadata
+&lt;name&gt; of any value.
 
 -w &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is
-equal to the value specified in the following -v option.
+equal to the value specified in the following -v option. If no -v option
+follows, this will show objects which have metadata &lt;name&gt; with
+any value.
 
 --version  
 Show version information.

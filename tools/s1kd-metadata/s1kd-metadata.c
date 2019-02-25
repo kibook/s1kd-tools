@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1816,8 +1816,8 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 			content = xmlNodeGetContent(node);
 
 			switch (op[0]) {
-				case '=': cmp = xmlStrcmp(content, val) == 0; break;
-				case '~': cmp = xmlStrcmp(content, val) != 0; break;
+				case '=': cmp = val == NULL ? node != NULL : xmlStrcmp(content, val) == 0; break;
+				case '~': cmp = val == NULL ? node == NULL : xmlStrcmp(content, val) != 0; break;
 				default: break;
 			}
 
