@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2939,10 +2939,6 @@ int main(int argc, char **argv)
 		xmlDocPtr inst = NULL;
 		char *inst_src = NULL;
 
-		if (!dmlist && (use_stdin || i >= argc)) {
-			break;
-		}
-
 		if (dmlist) {
 			if (!list && !(list = fopen(argv[i++], "r"))) {
 				fprintf(stderr, S_MISSING_LIST, argv[i - 1]);
@@ -2965,6 +2961,8 @@ int main(int argc, char **argv)
 			strcpy(src, argv[i++]);
 		} else if (use_stdin) {
 			strcpy(src, "-");
+		} else {
+			break;
 		}
 
 		if (!use_stdin && access(src, F_OK) == -1) {
@@ -3216,6 +3214,10 @@ int main(int argc, char **argv)
 		} else {
 			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
 			exit(EXIT_BAD_XML);
+		}
+
+		if (use_stdin) {
+			break;
 		}
 	}
 
