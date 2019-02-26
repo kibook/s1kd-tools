@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.3"
+#define VERSION "2.1.4"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3178,7 +3178,7 @@ int main(int argc, char **argv)
 					exit(EXIT_BAD_XML);
 				}
 
-				if (access(out, F_OK) == 0 && !force_overwrite) {
+				if (!use_stdout && access(out, F_OK) == 0 && !force_overwrite) {
 					fprintf(stderr, S_FILE_EXISTS, out);
 				} else {
 					xmlSaveFile(out, doc);
