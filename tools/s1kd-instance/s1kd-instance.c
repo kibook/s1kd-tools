@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.4"
+#define VERSION "2.1.5"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2986,7 +2986,12 @@ int main(int argc, char **argv)
 				}
 				xmlFreeDoc(inst);
 				free(inst_src);
-				continue;
+
+				if (use_stdin) {
+					break;
+				} else {
+					continue;
+				}
 			}
 
 			load_applic_from_inst(inst);
