@@ -18,6 +18,8 @@ available here:
 
 -   [s1kd-tools-doc](http://github.com/kibook/s1kd-tools-doc)
 
+-   [FOSSIG](http://github.com/kibook/FOSSIG)
+
 -   [S1000D spec sample](http://github.com/kibook/S1000D)
 
 These tools have been primarily developed around Issue 4.2 of the

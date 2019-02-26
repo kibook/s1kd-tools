@@ -114,6 +114,15 @@
           </listItem>
           <listItem>
             <para>
+              <externalPubRef xlink:href="http://github.com/kibook/FOSSIG">
+                <externalPubRefIdent>
+                  <externalPubTitle>FOSSIG</externalPubTitle>
+                </externalPubRefIdent>
+              </externalPubRef>
+            </para>
+          </listItem>
+          <listItem>
+            <para>
               <externalPubRef xlink:href="http://github.com/kibook/S1000D">
                 <externalPubRefIdent>
                   <externalPubTitle>S1000D spec sample</externalPubTitle>
