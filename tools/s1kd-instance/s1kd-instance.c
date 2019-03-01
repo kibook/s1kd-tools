@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.5"
+#define VERSION "2.1.6"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2606,6 +2606,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
+	puts("  -@            Update existing instance objects from their source.");
 	puts("  -A            Simplify and remove unused applicability annotations.");
 	puts("  -a            Remove unused applicability annotations.");
 	puts("  -C <comment>  Add an XML comment to the top of the instance.");
