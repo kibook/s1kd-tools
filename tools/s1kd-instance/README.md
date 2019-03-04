@@ -834,6 +834,12 @@ and is set to apply only to the correct customer:
     ...
     </dmStatus>
 
+> **Note**
+>
+> The assertions in the applicability of an instance must use single
+> values in order to work in this mode. Ranges (\~) and sets (\|) are
+> not supported.
+
 Now, when a change is made to the master data module, this tool can be
 used to update these instances automatically:
 

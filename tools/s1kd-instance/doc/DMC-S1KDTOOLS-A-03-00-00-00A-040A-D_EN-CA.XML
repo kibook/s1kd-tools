@@ -885,6 +885,9 @@ applicPropertyValues="1"/>
 ...
 </dmStatus>]]></verbatimText>
           </para>
+          <note>
+            <notePara>The assertions in the applicability of an instance must use single values in order to work in this mode. Ranges (~) and sets (|) are not supported.</notePara>
+          </note>
           <para>Now, when a change is made to the master data module, this tool can be used to update these instances automatically:</para>
           <para>
             <verbatimText verbatimStyle="vs24">$ s1kd-instance -@ -f DME-*.XML</verbatimText>
