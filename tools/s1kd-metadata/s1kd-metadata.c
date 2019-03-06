@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -515,6 +515,41 @@ void show_pmcode(xmlNodePtr node, int endl)
 	xmlFree(pmissuer);
 	xmlFree(pmnumber);
 	xmlFree(pmvolume);
+}
+
+int edit_pmcode(xmlNodePtr node, const char *val)
+{
+	char model_ident_code[15];
+	char pm_issuer[6];
+	char pm_number[6];
+	char pm_volume[3];
+	int n, offset;
+
+	offset = strncmp(val, "PMC-", 4) == 0 ? 4 : 0;
+
+	n = sscanf(val + offset, "%14[^-]-%5[^-]-%5[^-]-%2s",
+		model_ident_code,
+		pm_issuer,
+		pm_number,
+		pm_volume);
+
+	if (n != 4) {
+		return EXIT_INVALID_VALUE;
+	}
+
+	if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0) {
+		edit_simple_attr(node, "modelIdentCode", model_ident_code);
+		edit_simple_attr(node, "pmIssuer", pm_issuer);
+		edit_simple_attr(node, "pmNumber", pm_number);
+		edit_simple_attr(node, "pmVolume", pm_volume);
+	} else {
+		edit_simple_node(first_xpath_node_local(node, "modelic"), model_ident_code);
+		edit_simple_node(first_xpath_node_local(node, "pmissuer"), pm_issuer);
+		edit_simple_node(first_xpath_node_local(node, "pmnumber"), pm_number);
+		edit_simple_node(first_xpath_node_local(node, "pmvolume"), pm_volume);
+	}
+
+	return 0;
 }
 
 void show_pm_issuer(xmlNodePtr node, int endl)
@@ -1177,11 +1212,17 @@ void show_source(xmlNodePtr node, int endl)
 {
 	xmlNodePtr dmc, issno, lang;
 
-	dmc = first_xpath_node_local(node, "dmCode|dmc/avee");
+	dmc = first_xpath_node_local(node, "dmCode|pmCode|dmc/avee");
 	issno = first_xpath_node_local(node, "issueInfo|issno");
 	lang = first_xpath_node_local(node, "language");
 
-	show_dmcode(dmc, '_');
+	if (xmlStrcmp(dmc->name, BAD_CAST "pmCode") == 0) {
+		printf("PMC-");
+		show_pmcode(dmc, '_');
+	} else {
+		printf("DMC-");
+		show_dmcode(dmc, '_');
+	}
 	show_issue_number(issno, '-');
 	show_in_work(issno, '_');
 	show_language_iso_code(lang, '-');
@@ -1476,7 +1517,43 @@ struct metadata metadata[] = {
 		show_source,
 		NULL,
 		NULL,
-		"Source DM or PM identification of the object"},
+		"Full source DM or PM identification"},
+	{"sourceDmCode",
+		"//sourceDmIdent/dmCode|//srcdmaddres/dmc/avee",
+		show_dmcode,
+		edit_dmcode,
+		NULL,
+		"Source DM code"},
+	{"sourcePmCode",
+		"//sourcePmIdent/pmCode",
+		show_pmcode,
+		edit_pmcode,
+		NULL,
+		"Source PM code"},
+	{"sourceIssueNumber",
+		"//sourceDmIdent/issueInfo/@issueNumber|//sourcePmIdent/issueInfo/@issueNumber|//srcdmaddres/issno/@issno",
+		show_issue_number,
+		edit_issue_number,
+		NULL,
+		"Source DM or PM issue number"},
+	{"sourceInWork",
+		"//sourceDmIdent/issueInfo/@inWork|//sourcePmIdent/issueInfo/@inWork|//srcdmaddres/issno",
+		show_in_work,
+		edit_in_work,
+		NULL,
+		"Source DM or PM inwork issue number"},
+	{"sourceLanguageIsoCode",
+		"//sourceDmIdent/language/@languageIsoCode|//sourcePmIdent/language/@languageIsoCode|//srcdmaddres/language/@language",
+		show_language_iso_code,
+		edit_language_iso_code,
+		NULL,
+		"Source DM or PM language ISO code"},
+	{"sourceCountryIsoCode",
+		"//sourceDmIdent/language/@countryIsoCode|//sourcePmIdent/language/@countryIsoCode|//srcdmaddres/language/@country",
+		show_country_iso_code,
+		edit_country_iso_code,
+		NULL,
+		"Source DM or PM country ISO code"},
 	{"subSubSystemCode",
 		"//@subSubSystemCode|//subsect",
 		show_sub_sub_system_code,
