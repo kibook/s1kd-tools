@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -294,7 +294,7 @@ void show_type(xmlNodePtr node, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-void show_dmcode(xmlNodePtr node, int endl)
+char *get_dmcode(xmlNodePtr node)
 {
 	char *model_ident_code;
 	char *system_diff_code;
@@ -310,6 +310,7 @@ void show_dmcode(xmlNodePtr node, int endl)
 	char *learn_code;
 	char *learn_event_code;
 	char learn[6] = "";
+	char *code;
 
 	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0) {
 		model_ident_code      = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
@@ -343,7 +344,9 @@ void show_dmcode(xmlNodePtr node, int endl)
 		learn_event_code = NULL;
 	}
 
-	printf("%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
+	code = malloc(256);
+
+	snprintf(code, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
@@ -356,7 +359,6 @@ void show_dmcode(xmlNodePtr node, int endl)
 		info_code_variant,
 		item_location_code,
 		learn);
-	if (endl > -1) putchar(endl);
 
 	xmlFree(model_ident_code);
 	xmlFree(system_diff_code);
@@ -371,6 +373,17 @@ void show_dmcode(xmlNodePtr node, int endl)
 	xmlFree(item_location_code);
 	xmlFree(learn_code);
 	xmlFree(learn_event_code);
+
+	return code;
+}
+
+void show_dmcode(xmlNodePtr node, int endl)
+{
+	char *code;
+	code = get_dmcode(node);
+	printf("%s", code);
+	if (endl > -1) putchar(endl);
+	free(code);
 }
 
 int edit_dmcode(xmlNodePtr node, const char *val)
@@ -1875,6 +1888,21 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 	return 0;
 }
 
+xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx)
+{
+	xmlNodePtr node;
+
+	if ((node = first_xpath_node(metadata[i].path, ctx))) {
+		if (metadata[i].show == show_dmcode) {
+			return BAD_CAST get_dmcode(node);
+		} else {
+			return xmlNodeGetContent(node);
+		}
+	}
+
+	return NULL;
+}
+
 int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 {
 	xmlChar *key, *val, *op;
@@ -1886,15 +1914,13 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 
 	for (i = 0; metadata[i].key; ++i) {
 		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
-			xmlNodePtr node;
 			xmlChar *content;
 
-			node = first_xpath_node(metadata[i].path, ctx);
-			content = xmlNodeGetContent(node);
+			content = get_cond_content(i, ctx);
 
 			switch (op[0]) {
-				case '=': cmp = val == NULL ? node != NULL : xmlStrcmp(content, val) == 0; break;
-				case '~': cmp = val == NULL ? node == NULL : xmlStrcmp(content, val) != 0; break;
+				case '=': cmp = val == NULL ? content != NULL : xmlStrcmp(content, val) == 0; break;
+				case '~': cmp = val == NULL ? content == NULL : xmlStrcmp(content, val) != 0; break;
 				default: break;
 			}
 
@@ -1902,6 +1928,10 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 			break;
 		}
 	}
+
+	free(key);
+	free(val);
+	free(op);
 
 	return cmp;
 }
