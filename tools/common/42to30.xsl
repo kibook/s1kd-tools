@@ -210,6 +210,16 @@
     </status>
   </xsl:template>
 
+  <xsl:template match="sourceDmIdent">
+    <srcdmaddres>
+      <dmc>
+        <xsl:apply-templates select="dmCode"/>
+      </dmc>
+      <xsl:apply-templates select="issueInfo"/>
+      <xsl:apply-templates select="language"/>
+    </srcdmaddres>
+  </xsl:template>
+
   <xsl:template match="qualityAssurance">
     <qa>
       <xsl:apply-templates select="@*|node()"/>
