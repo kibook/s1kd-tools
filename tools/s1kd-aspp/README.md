@@ -8,7 +8,7 @@ SYNOPSIS
 
     s1kd-aspp -h?
     s1kd-aspp -D
-    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cflrx]
+    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrx]
                  [<object>...]
     s1kd-aspp -p [-a <ID>] [-flx] [<object>...]
 
@@ -73,6 +73,10 @@ Use custom XSLT to generate display text for applicability statements.
 
 -g  
 Generate display text for applicability statements.
+
+-k  
+When generating display text, do not overwrite existing display text on
+statements, only generate display text for statements which have none.
 
 -l  
 Treat input (stdin or arguments) as lists of filenames of objects,

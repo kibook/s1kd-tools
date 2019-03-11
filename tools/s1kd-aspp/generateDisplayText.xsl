@@ -5,6 +5,8 @@
   xmlns:str="http://exslt.org/strings"
   extension-element-prefixes="str">
 
+  <xsl:param name="overwrite-display-text" select="true()"/>
+
   <xsl:template match="applic">
     <xsl:variable name="disp-name">
       <xsl:choose>
@@ -18,16 +20,24 @@
         <xsl:otherwise>simplePara</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="disp-elem" select="displayText|displaytext"/>
     <applic>
       <xsl:apply-templates select="@*"/>
-      <xsl:element name="{$disp-name}">
-        <xsl:element name="{$para-name}">
-          <xsl:if test="not(assert|evaluate|expression)">
-            <xsl:text>All</xsl:text>
-          </xsl:if>
-          <xsl:apply-templates select="assert|evaluate|expression" mode="text"/>
-        </xsl:element>
-      </xsl:element>
+      <xsl:choose>
+        <xsl:when test="$disp-elem and not($overwrite-display-text)">
+          <xsl:apply-templates select="$disp-elem"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:element name="{$disp-name}">
+            <xsl:element name="{$para-name}">
+              <xsl:if test="not(assert|evaluate|expression)">
+                <xsl:text>All</xsl:text>
+              </xsl:if>
+              <xsl:apply-templates select="assert|evaluate|expression" mode="text"/>
+            </xsl:element>
+          </xsl:element>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:apply-templates select="assert|evaluate|expression"/>
     </applic>
   </xsl:template>

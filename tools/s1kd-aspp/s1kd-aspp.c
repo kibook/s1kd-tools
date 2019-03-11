@@ -1,6 +1,6 @@
 /* Applicability Preprocessor
  *
- * Preprocesses a data module's applicability statements (@applicRefId) in to a
+ * Preprocesses a data module's applicability annotations (@applicRefId) in to a
  * simpler format which is easier for an XSL stylesheet to process.
  *
  * The applicability in the resulting output will not be semantically correct. */
@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.0.1"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -54,6 +54,9 @@ bool recursive_search = false;
 
 /* Directory to start search for ACTs/CCTs in. */
 char *search_dir;
+
+/* Overwrite existing display text in annotations. */
+bool overwriteDispText = true;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -123,12 +126,12 @@ xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	return xmlNodeGetContent(firstXPathNode(doc, node, xpath));
 }
 
-/* Set an explicit applicability statement on a node.
+/* Set an explicit applicability annotation on a node.
  *
- * Nodes with the attribute @applicRefId already have an explicit statement.
+ * Nodes with the attribute @applicRefId already have an explicit annotation.
  *
- * Nodes without @applicRefId have an implicit statement inherited from their
- * parent/ancestor which does have an explicit statement, or ultimately from
+ * Nodes without @applicRefId have an implicit annotation inherited from their
+ * parent/ancestor which does have an explicit annotation, or ultimately from
  * the applicability of the whole data module. */
 void processNode(xmlNodePtr node)
 {
@@ -167,8 +170,8 @@ void processNodeSet(xmlNodeSetPtr nodes)
 	}
 }
 
-/* Remove duplicate applicability statements in document-order so that a
- * statement is only shown when applicability changes. */
+/* Remove duplicate applicability annotations in document-order so that an
+ * annotation is only shown when applicability changes. */
 void removeDuplicates(xmlNodeSetPtr nodes)
 {
 	int i;
@@ -243,6 +246,7 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 	xmlDocPtr styledoc, res, muxdoc;
 	xsltStylesheetPtr style;
 	xmlNodePtr mux, cur, muxacts, muxccts, new, old;
+	const char *params[3];
 
 	muxdoc = xmlNewDoc(BAD_CAST "1.0");
 	mux = xmlNewNode(NULL, BAD_CAST "mux");
@@ -281,7 +285,11 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 
 	style = xsltParseStylesheetDoc(styledoc);
 
-	res = xsltApplyStylesheet(style, muxdoc, NULL);
+	params[0] = "overwrite-display-text";
+	params[1] = overwriteDispText ? "true()" : "false()";
+	params[2] = NULL;
+
+	res = xsltApplyStylesheet(style, muxdoc, params);
 
 	new = xmlCopyNode(firstXPathNode(res, NULL, "/mux/dmodule"), 1);
 	old = xmlDocSetRootElement(doc, new);
@@ -550,7 +558,7 @@ void showHelp(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " -D");
-	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cflrx] [<object>...]");
+	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrx] [<object>...]");
 	puts("  " PROG_NAME " -p [-a <ID>] [-flx] [<object>...]");
 	puts("");
 	puts("Options:");
@@ -562,7 +570,8 @@ void showHelp(void)
 	puts("  -d <dir>      Directory to start search for ACT/CCT in.");
 	puts("  -f            Overwrite input file(s).");
 	puts("  -G <XSL>      Use custom XSLT script to generate display text.");
-	puts("  -g            Generate display text for applicability statements.");
+	puts("  -g            Generate display text for applicability annotations.");
+	puts("  -k            Do not overwrite existing display text.");
 	puts("  -l            Treat input as list of modules.");
 	puts("  -p            Convert semantic applicability to presentation applicability.");
 	puts("  -r            Search for ACT/CCT recursively.");
@@ -591,7 +600,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:fG:glprxh?";
+	const char *sopts = "A:a:C:cDd:fG:gklprxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -647,6 +656,9 @@ int main(int argc, char **argv)
 				break;
 			case 'g':
 				genDispText = true;
+				break;
+			case 'k':
+				overwriteDispText = false;
 				break;
 			case 'l':
 				islist = true;
