@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="01"/>
+        <issueInfo issueNumber="012" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="10"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
         <simplePara>Add -k option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Change default applic ID.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -88,7 +91,7 @@ s1kd-aspp -p [-a <ID>] [-flx] [<object>...]]]></verbatimText>
             <definitionListItem>
               <listItemTerm>-a &lt;ID&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The ID to use for the inline applicability annotation representing the whole data module's applicability. Default is "applic-0000".</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">The ID to use for the inline applicability annotation representing the whole data module's applicability. Default is "app-0000".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -251,7 +254,7 @@ applicPropertyValues="A"/>
 </identAndStatusSection>
 <content>
 <referencedApplicGroup>
-<applic id="applic-B">
+<applic id="app-B">
 <displayText>
 <simplePara>B</simplePara>
 </displayText>
@@ -263,10 +266,10 @@ applicPropertyValues="A"/>
 <proceduralStep>
 <para>This step is applicable to A or B.</para>
 </proceduralStep>
-<proceduralStep applicRefId="applic-B">
+<proceduralStep applicRefId="app-B">
 <para>This step is applicable to B only.</para>
 </proceduralStep>
-<proceduralStep applicRefId="applic-B">
+<proceduralStep applicRefId="app-B">
 <para>This step is also applicable to B only.</para>
 </proceduralStep>
 <proceduralStep>
@@ -329,12 +332,12 @@ applicPropertyValues="A"/>
 </identAndStatusSection>
 <content>
 <referencedApplicGroup>
-<applic id="applic-B">
+<applic id="app-B">
 <displayText>
 <simplePara>B</simplePara>
 </displayText>
 </applic>
-<applic id="applic-0000">
+<applic id="app-0000">
 <displayText>
 <simplePara>A or B</simplePara>
 </displayText>
@@ -346,13 +349,13 @@ applicPropertyValues="A"/>
 <proceduralStep>
 <para>This step is applicable to A or B.</para>
 </proceduralStep>
-<proceduralStep applicRefId="applic-B">
+<proceduralStep applicRefId="app-B">
 <para>This step is applicable to B only.</para>
 </proceduralStep>
 <proceduralStep>
 <para>This step is also applicable to B only.</para>
 </proceduralStep>
-<proceduralStep applicRefId="applic-0000">
+<proceduralStep applicRefId="app-0000">
 <para>This step is also applicable to A or B.</para>
 </proceduralStep>
 </mainProcedure>

@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
-#define DEFAULT_DM_APPLIC_ID BAD_CAST "applic-0000"
+#define DEFAULT_DM_APPLIC_ID BAD_CAST "app-0000"
 xmlChar *dmApplicId;
 
 /* XPath to select all elements which may have applicability annotations.

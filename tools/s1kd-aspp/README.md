@@ -46,7 +46,7 @@ times.
 
 -a &lt;ID&gt;  
 The ID to use for the inline applicability annotation representing the
-whole data module's applicability. Default is "applic-0000".
+whole data module's applicability. Default is "app-0000".
 
 -C &lt;CCT&gt;  
 Add a CCT to use when generating display text for conditions. Multiple
@@ -186,7 +186,7 @@ Given the following:
     </identAndStatusSection>
     <content>
     <referencedApplicGroup>
-    <applic id="applic-B">
+    <applic id="app-B">
     <displayText>
     <simplePara>B</simplePara>
     </displayText>
@@ -198,10 +198,10 @@ Given the following:
     <proceduralStep>
     <para>This step is applicable to A or B.</para>
     </proceduralStep>
-    <proceduralStep applicRefId="applic-B">
+    <proceduralStep applicRefId="app-B">
     <para>This step is applicable to B only.</para>
     </proceduralStep>
-    <proceduralStep applicRefId="applic-B">
+    <proceduralStep applicRefId="app-B">
     <para>This step is also applicable to B only.</para>
     </proceduralStep>
     <proceduralStep>
@@ -256,12 +256,12 @@ output:
     </identAndStatusSection>
     <content>
     <referencedApplicGroup>
-    <applic id="applic-B">
+    <applic id="app-B">
     <displayText>
     <simplePara>B</simplePara>
     </displayText>
     </applic>
-    <applic id="applic-0000">
+    <applic id="app-0000">
     <displayText>
     <simplePara>A or B</simplePara>
     </displayText>
@@ -273,13 +273,13 @@ output:
     <proceduralStep>
     <para>This step is applicable to A or B.</para>
     </proceduralStep>
-    <proceduralStep applicRefId="applic-B">
+    <proceduralStep applicRefId="app-B">
     <para>This step is applicable to B only.</para>
     </proceduralStep>
     <proceduralStep>
     <para>This step is also applicable to B only.</para>
     </proceduralStep>
-    <proceduralStep applicRefId="applic-0000">
+    <proceduralStep applicRefId="app-0000">
     <para>This step is also applicable to A or B.</para>
     </proceduralStep>
     </mainProcedure>
