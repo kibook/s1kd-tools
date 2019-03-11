@@ -4,12 +4,16 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <time.h>
+#include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.4.5"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -31,7 +35,7 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfHIilNqRrv] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-dfHIilNqRrvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1 <type>    Set first verification type.");
@@ -50,6 +54,7 @@ void show_help(void)
 	puts("  -t <urt>     Set the updateReasonType of the last RFU.");
 	puts("  -H           Highlight the last RFU.");
 	puts("  -v           Print filename of upissued objects.");
+	puts("  -w           Make old issue read-only.");
 	puts("  --version    Show version information");
 }
 
@@ -299,6 +304,17 @@ void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 	}
 }
 
+void mkreadonly(const char *path)
+{
+	#ifdef _WIN32
+	SetFileAttributesA(path, FILE_ATTRIBUTE_READONLY);
+	#else
+	struct stat st;
+	stat(path, &st);
+	chmod(path, (st.st_mode & 07777) & ~(S_IWUSR | S_IWGRP | S_IWOTH));
+	#endif
+}
+
 /* Upissue options */
 bool verbose = false;
 bool newissue = false;
@@ -313,6 +329,7 @@ bool dry_run = false;
 char *firstver = NULL;
 char *secondver = NULL;
 xmlNodePtr rfus = NULL;
+bool lock = false;
 
 void upissue(const char *path)
 {
@@ -466,6 +483,10 @@ void upissue(const char *path)
 	if (!no_issue) {
 		char *i;
 
+		if (lock) { /* Remove write permission from previous issue. */
+			mkreadonly(dmfile);
+		}
+
 		if ((i = strchr(dmfile, '_'))) {
 			memcpy(i + 1, upissued_issueNumber, 3);
 			memcpy(i + 5, upissued_inWork, 2);
@@ -523,7 +544,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:dlc:t:Hh?";
+	const char *sopts = "ivs:NfrRIq1:2:dlc:t:Hwh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -589,6 +610,9 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				verbose = true;
+				break;
+			case 'w':
+				lock = true;
 				break;
 			case 'h':
 			case '?':

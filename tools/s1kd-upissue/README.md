@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-dfHIilNqRrv] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-dfHIilNqRrvw] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
 
 DESCRIPTION
@@ -86,6 +86,9 @@ Set the updateReasonType of the last specified reason for update (-c).
 
 -v  
 Print the file name of the upissued CSDB object.
+
+-w  
+Make the old issue file read-only after upissuing.
 
 --version  
 Show version information.
