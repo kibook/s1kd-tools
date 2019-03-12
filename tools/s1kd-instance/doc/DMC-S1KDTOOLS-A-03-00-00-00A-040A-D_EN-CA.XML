@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="033" inWork="00"/>
+        <issueInfo issueNumber="033" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="12"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,14 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Add -@ option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1">
-        <simplePara>Add + as value for -n option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1">
-        <simplePara>Add error when PCT cannot be found.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt01">
+        <simplePara>Fix grammatical error.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -97,7 +91,7 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-@</listItemTerm>
               <listItemDefinition>
                 <para>Rather than source objects, the objects specified are existing instances that will be updated.</para>
@@ -180,7 +174,7 @@
             <definitionListItem>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Directory to start searching for referenced objects in. By default, the current directory will be searched. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
+                <para>Directory to start searching for referenced objects in. By default, the current directory will be searched. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -279,7 +273,7 @@
               <listItemTerm>-n &lt;iss&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">When updating instance (-@), if + is given for &lt;iss&gt;, the updated instance will have the same issue number with an inwork number incremented by one.</para>
+                <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">When updating an instance (-@), if + is given for &lt;iss&gt;, the updated instance will have the same issue number with an inwork number incremented by one.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -380,7 +374,7 @@
             <definitionListItem>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
+                <para>Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -840,7 +834,7 @@ is an item in the system.
           <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -D option.</para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Updating instances (-@)</title>
           <para>The -@ option is used to automatically update instance objects from their source objects.</para>
           <para>The tool will use the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>/<verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> in each instance to find the source object they were derived from, and filter it based on the instance's metadata in order to produce an updated version of the instance. CIRs identified by <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements in the instance will also be used to update it.</para>
@@ -916,7 +910,7 @@ applicPropertyValues="1"/>
                 <para>Specified file does not exist.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>3</listItemTerm>
               <listItemDefinition>
                 <para>Source object for an instance could not be found.</para>
@@ -928,7 +922,7 @@ applicPropertyValues="1"/>
                 <para>Malformed applicability definition.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>5</listItemTerm>
               <listItemDefinition>
                 <para>Could not find a PCT for an object when -p was given.</para>

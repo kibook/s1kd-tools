@@ -178,8 +178,8 @@ Omit issue/inwork numbers from automatically generated filenames.
 Set the issue and inwork numbers of the instance. By default, the issue
 and inwork number are taken from the source.
 
-When updating instance (-@), if + is given for &lt;iss&gt;, the updated
-instance will have the same issue number with an inwork number
+When updating an instance (-@), if + is given for &lt;iss&gt;, the
+updated instance will have the same issue number with an inwork number
 incremented by one.
 
 -O &lt;dir&gt;  
