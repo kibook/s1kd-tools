@@ -11,13 +11,17 @@
 #include "identity.h"
 
 bool includeIdentity = false;
+bool verbose = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.1.2"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+
+#define I_TRANSFORM INF_PREFIX "Transforming %s...\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -121,6 +125,10 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 {
 	xmlDocPtr doc;
 
+	if (verbose) {
+		fprintf(stderr, I_TRANSFORM, path);
+	}
+
 	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 
 	doc = transformDoc(doc, stylesheets);
@@ -173,7 +181,7 @@ void addParam(xmlNodePtr stylesheet, char *s)
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-filh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-filvh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?              Show usage message.");
@@ -183,6 +191,7 @@ void showHelp(void)
 	puts("  -o <file>          Output result of transformation to <path>.");
 	puts("  -p <name>=<value>  Pass parameters to stylesheets.");
 	puts("  -s <stylesheet>    Apply XSLT stylesheet to CSDB objects.");
+	puts("  -v                 Verbose output.");
 	puts("  --version          Show version information.");
 	puts("  <object>           CSDB objects to apply transformations to.");
 }
@@ -204,7 +213,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool islist = false;
 
-	const char *sopts = "s:ilo:p:fh?";
+	const char *sopts = "s:ilo:p:fvh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -242,6 +251,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':

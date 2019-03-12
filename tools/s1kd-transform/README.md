@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
-                   [-o <file>] [-filh?] [<object> ...]
+                   [-o <file>] [-filvh?] [<object> ...]
 
 DESCRIPTION
 ===========
@@ -43,6 +43,9 @@ Pass a parameter to the last specified stylesheet.
 An XSLT stylesheet file to apply to each CSDB object. Multiple
 stylesheets can be specified by supplying this argument multiple times.
 The stylesheets will be applied in the order they are listed.
+
+-v  
+Verbose output.
 
 --version  
 Show version information.
