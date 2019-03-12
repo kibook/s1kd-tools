@@ -152,8 +152,7 @@ Adding DMRL entries
 -------------------
 
 Each entry in the DMRL describes a data module that is planned to be
-created, giving the data module code, title, security classification and
-responsible entity:
+created:
 
     <dmlContent>
     <dmlEntry>
@@ -411,10 +410,10 @@ type is set to "`deleted`".
 
 Deleted data modules may be reinstated later in a similar way:
 
-    $ s1kd-upissue -is rinstate-status ...
+    $ s1kd-upissue -s rinstate-status ...
 
-The data module is once again upissued to the next official issue, and
-the issue type is set to one of the "`rinstate-x"` types.
+The data module is upissued to the next inwork issue, and the issue type
+is set to one of the "`rinstate-x"` types.
 
 Building publications
 =====================
@@ -544,21 +543,21 @@ files represent different versions of the same object:
 
 However, if you prefer to use an existing version control system such as
 Git or SVN, it is often more useful for each file to represent a whole
-object, since these systems typically track changes based on filenames.
+object.
 
 The s1kd-tools support an alternate naming convention for this case.
 Specifying the -N option to certain tools will omit the issue and inwork
 numbers from filenames of CSDB objects. Taking the s1kd-newdm tool
 example from above, but adding the -N option as follows:
 
-    $ s1kd-newdm -N# MYPRJ-A-00-00-00-00A-040A-D
+    $ s1kd-newdm -N -# MYPRJ-A-00-00-00-00A-040A-D
 
 would create the file `DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML` in
 your CSDB folder. The s1kd-upissue tool works similarly:
 
-    $ s1kd-upissue -Ni DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML
+    $ s1kd-upissue -N -i DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML
 
 The issue and inwork numbers are updated in the XML metadata, but
 instead of creating a new file, the original is overwritten. The
 previous inwork issues are therefore stored as part of the external
-version control's history, rather than as individual files.
+version control system's history, rather than as individual files.
