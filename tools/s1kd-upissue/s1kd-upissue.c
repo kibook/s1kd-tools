@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -483,7 +483,7 @@ void upissue(const char *path)
 	if (!no_issue) {
 		char *i;
 
-		if (lock) { /* Remove write permission from previous issue. */
+		if (lock && !dry_run) { /* Remove write permission from previous issue. */
 			mkreadonly(dmfile);
 		}
 
