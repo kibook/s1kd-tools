@@ -12,11 +12,14 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.2.5"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+
+#define I_NEUTRALIZE INF_PREFIX "Adding neutral metadata to %s...\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -27,11 +30,17 @@
 #define PARSE_OPTS 0
 #endif
 
+bool verbose = false;
+
 void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool namesp)
 {
 	xmlDocPtr doc, res, styledoc, orig;
 	xsltStylesheetPtr style;
 	xmlNodePtr oldroot;
+
+	if (verbose) {
+		fprintf(stderr, I_NEUTRALIZE, fname);
+	}
 
 	orig = xmlReadFile(fname, NULL, PARSE_OPTS);
 
@@ -104,7 +113,7 @@ void neutralizeList(const char *path, const char *outfile, bool overwrite, bool 
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-o <file>] [-flh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-o <file>] [-flnvh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -f         Overwrite CSDB objects automatically.");
@@ -112,6 +121,7 @@ void show_help(void)
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -n         Include IETP namespaces on elements.");
 	puts("  -o <file>  Output to <file> instead of stdout.");
+	puts("  -v         Verbose output.");
 	puts("  --version  Show version information.");
 }
 
@@ -129,7 +139,7 @@ int main(int argc, char **argv)
 	bool islist = false;
 	bool namesp = false;
 
-	const char *sopts = "flno:h?";
+	const char *sopts = "flno:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -156,6 +166,9 @@ int main(int argc, char **argv)
 			case 'o':
 				free(outfile);
 				outfile = strdup(optarg);
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':
