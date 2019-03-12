@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
                [-o <file>] [-filvh?] [<object> ...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -106,7 +106,7 @@
                 <para>An XSLT stylesheet file to apply to each CSDB object. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
