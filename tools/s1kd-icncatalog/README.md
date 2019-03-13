@@ -56,6 +56,9 @@ Create a new empty catalog.
 -u &lt;URI&gt;  
 Specify the URI when adding an ICN with the -a option.
 
+-v  
+Verbose output.
+
 -x  
 Process input CSDB objects using the XInclude specification.
 

@@ -14,11 +14,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define I_RESOLVE INF_PREFIX "Resolving ICN references in %s...\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -28,6 +30,8 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+bool verbose = false;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
@@ -142,6 +146,10 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlChar xpath[256];
+
+	if (verbose) {
+		fprintf(stderr, I_RESOLVE, fname);
+	}
 
 	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
 
@@ -274,6 +282,7 @@ void show_help(void)
 	puts("  -n <notation>  Set the notation of the new ICN.");
 	puts("  -t             Create new ICN catalog.");
 	puts("  -u <uri>       Set the URI of the new ICN.");
+	puts("  -v             Verbose output.");
 	puts("  -x             Process XInclude elements.");
 	puts("  --version      Show version information.");
 }
@@ -297,7 +306,7 @@ int main(int argc, char **argv)
 	xmlNodePtr add, del, cur = NULL;
 	bool islist = false;
 
-	const char *sopts = "a:c:d:flm:n:tu:xh?";
+	const char *sopts = "a:c:d:flm:n:tu:vxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -351,6 +360,9 @@ int main(int argc, char **argv)
 				if (cur) {
 					xmlSetProp(cur, BAD_CAST "uri", BAD_CAST optarg);
 				}
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'x':
 				xinclude = true;

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="32" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="009" inWork="00"/>
+        <issueInfo issueNumber="009" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="13"/>
         <dmTitle>
           <techName>s1kd-icncatalog(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Add functionality to add missing ICN entities using the catalog.</simplePara>
+        <simplePara>Add -v option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -115,6 +115,12 @@
               <listItemTerm>-u &lt;URI&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the URI when adding an ICN with the -a option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -202,7 +208,7 @@ NDATA jpg>]]></verbatimText>
 NDATA svg>]]></verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Reconstructing ICN entity declarations</title>
           <para>Some processing, such as XSL transformations, may remove the DTD and external entity declarations as part of parsing an XML CSDB object. A catalog can be used to restore the necessary external entity declarations afterwards. For example:</para>
           <para>
