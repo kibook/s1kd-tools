@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="02"/>
+        <issueInfo issueNumber="012" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="10"/>
+        <issueDate year="2019" month="03" day="13"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Add -k option.</simplePara>
+        <simplePara>Add -k and -v options.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1">
         <simplePara>Change default applic ID.</simplePara>
@@ -57,9 +57,9 @@
         <para>
           <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-aspp -h?
 s1kd-aspp -D
-s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrx]
+s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrvx]
              [<object>...]
-s1kd-aspp -p [-a <ID>] [-flx] [<object>...]]]></verbatimText>
+s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -158,6 +158,12 @@ s1kd-aspp -p [-a <ID>] [-flx] [<object>...]]]></verbatimText>
               <listItemTerm>-r</listItemTerm>
               <listItemDefinition>
                 <para>Search for ACT/CCT data modules recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

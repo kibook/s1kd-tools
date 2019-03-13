@@ -21,11 +21,14 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.1.1"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+
+#define I_PROCESS INF_PREFIX "Processing %s...\n"
 
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
@@ -57,6 +60,9 @@ char *search_dir;
 
 /* Overwrite existing display text in annotations. */
 bool overwriteDispText = true;
+
+/* Verbose output. */
+bool verbose = false;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -484,6 +490,10 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	xmlXPathObjectPtr obj;
 	xmlNodePtr all_acts, all_ccts;
 
+	if (verbose) {
+		fprintf(stderr, I_PROCESS, in);
+	}
+
 	doc = xmlReadFile(in, NULL, PARSE_OPTS);
 
 	if (xincl) {
@@ -558,8 +568,8 @@ void showHelp(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " -D");
-	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrx] [<object>...]");
-	puts("  " PROG_NAME " -p [-a <ID>] [-flx] [<object>...]");
+	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrvx] [<object>...]");
+	puts("  " PROG_NAME " -p [-a <ID>] [-flvx] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -A <ACT>      Use <ACT> when generating display text.");
@@ -575,6 +585,7 @@ void showHelp(void)
 	puts("  -l            Treat input as list of modules.");
 	puts("  -p            Convert semantic applicability to presentation applicability.");
 	puts("  -r            Search for ACT/CCT recursively.");
+	puts("  -v            Verbose output.");
 	puts("  -x            Perform XInclude processing.");
 	puts("  -h -?         Show help/usage message.");
 	puts("  --version     Show version information.");
@@ -600,7 +611,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:fG:gklprxh?";
+	const char *sopts = "A:a:C:cDd:fG:gklprvxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -668,6 +679,9 @@ int main(int argc, char **argv)
 				break;
 			case 'r':
 				recursive_search = true;
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'x':
 				xincl = true;

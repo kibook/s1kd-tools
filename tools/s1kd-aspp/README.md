@@ -8,9 +8,9 @@ SYNOPSIS
 
     s1kd-aspp -h?
     s1kd-aspp -D
-    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrx]
+    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrvx]
                  [<object>...]
-    s1kd-aspp -p [-a <ID>] [-flx] [<object>...]
+    s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]
 
 DESCRIPTION
 ===========
@@ -90,6 +90,9 @@ semantically correct.
 
 -r  
 Search for ACT/CCT data modules recursively.
+
+-v  
+Verbose output.
 
 -x  
 Process the objects using the XInclude specification.
