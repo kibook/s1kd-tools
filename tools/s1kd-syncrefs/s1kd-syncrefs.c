@@ -13,11 +13,13 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define I_SYNCREFS INF_PREFIX "Synchronizing references in %s...\n"
 
 #define EXIT_INVALID_DM 1
 
@@ -27,6 +29,7 @@ struct ref {
 };
 
 bool only_delete = false;
+bool verbose = false;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -326,6 +329,10 @@ void sync_refs_file(const char *path, const char *out, bool overwrite)
 	xmlDocPtr dm;
 	xmlNodePtr dmodule;
 
+	if (verbose) {
+		fprintf(stderr, I_SYNCREFS, path);
+	}
+
 	if (!(dm = xmlReadFile(path, NULL, PARSE_OPTS))) {
 		return;
 	}
@@ -369,14 +376,17 @@ void sync_refs_list(const char *path, const char *out, bool overwrite)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-o <out>] <dms>");
+	puts("Usage: " PROG_NAME " [-dflvh?] [-o <out>] [<dms>]");
 	puts("");
 	puts("Options:");
-	puts("  -o <out>	Output to <out> instead of stdout");
-	puts("  -f              Overwrite the data modules automatically");
-	puts("  -d              Delete the references table");
-	puts("  --version       Show version information");
-	puts("  <dms>		Any number of data modules");
+	puts("  -d         Delete the references table.");
+	puts("  -f         Overwrite the data modules automatically.");
+	puts("  -l         Treat input as list of CSDB objects.");
+	puts("  -h -?      Show help/usage message.");
+	puts("  -o <out>   Output to <out> instead of stdout.");
+	puts("  -v         Verbose output.");
+	puts("  --version  Show version information.");
+	puts("  <dms>      Any number of data modules. Otherwise, read from stdin.");
 }
 
 void show_version(void)
@@ -394,7 +404,7 @@ int main(int argc, char *argv[])
 	bool overwrite = false;
 	bool islist = false;
 
-	const char *sopts = "dflo:h?";
+	const char *sopts = "dflo:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -420,6 +430,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'o':
 				strcpy(out, optarg);
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':
