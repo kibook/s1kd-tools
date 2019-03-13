@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="02" day="08"/>
+        <issueDate year="2019" month="03" day="13"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add -v option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0">
+        <simplePara>Add missing -, option description.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-uom [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
-         [-U <path>] [-fl,h?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-uom [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
+         [-U <path>] [-flv,h?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -107,6 +113,18 @@
               <listItemTerm>-u &lt;uom&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Unit of measure to convert from.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="0" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-,</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the default .uom file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

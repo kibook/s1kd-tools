@@ -9,14 +9,16 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 #define E_NO_UOM ERR_PREFIX "%s: Unit conversions must be specified as: -u <uom> -t <uom> [-e <expr>] [-F <fmt>]\n"
 #define W_BAD_LIST WRN_PREFIX "Could not read list: %s\n"
 #define W_NO_CONV WRN_PREFIX "No conversion defined for %s -> %s.\n"
 #define W_NO_CONV_TO WRN_PREFIX "No target UOM given for %s.\n"
+#define I_CONVERT INF_PREFIX "Converting units in %s...\n"
 #define EXIT_NO_CONV 1
 #define EXIT_NO_UOM 2
 
@@ -26,10 +28,12 @@
 #define PARSE_OPTS 0
 #endif
 
+bool verbose = false;
+
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-U <path>] [-l,h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-U <path>] [-lv,h?] [<object>...]");
 	puts("");
 	puts("  -e <expr>  Specify formula for a conversion.");
 	puts("  -F <fmt>   Number format for converted values.");
@@ -38,6 +42,7 @@ void show_help(void)
 	puts("  -t <uom>   UOM to convert to.");
 	puts("  -U <path>  Use custom .uom file.");
 	puts("  -u <uom>   UOM to convert from.");
+	puts("  -v         Verbose output.");
 	puts("  -,         Dump default .uom file.");
 	puts("  --version  Show version information.");
 	puts("  <object>   CSDB object to convert quantities in.");
@@ -194,6 +199,10 @@ void convert_uoms(const char *path, xmlDocPtr uom, const char *format, bool over
 	xmlDocPtr doc;
 	char *params[3];
 
+	if (verbose) {
+		fprintf(stderr, I_CONVERT, path ? path : "-");
+	}
+
 	if (path) {
 		doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
 	} else {
@@ -258,7 +267,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "e:F:flt:U:u:,h?";
+	const char *sopts = "e:F:flt:U:u:v,h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -318,6 +327,9 @@ int main(int argc, char **argv)
 			case 'u':
 				cur = xmlNewChild(conversions, NULL, BAD_CAST "convert", NULL);
 				xmlSetProp(cur, BAD_CAST "from", BAD_CAST optarg);
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case ',':
 				dump_uom = true;

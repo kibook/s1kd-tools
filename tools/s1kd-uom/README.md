@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-uom [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
-             [-U <path>] [-fl,h?] [<object>...]
+             [-U <path>] [-flv,h?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -45,6 +45,12 @@ Use a custom `.uom` file.
 
 -u &lt;uom&gt;  
 Unit of measure to convert from.
+
+-v  
+Verbose output.
+
+-,  
+Dump the default .uom file.
 
 --version  
 Show version information.
