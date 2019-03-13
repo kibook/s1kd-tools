@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="011" inWork="00"/>
+        <issueInfo issueNumber="011" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="13"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Copy optional title page elements.</simplePara>
+        <simplePara>Add -v option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Add missing options to SYNOPSIS.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]]
-           [-,.fhx?] (-t <TYPE>|<DM>...)]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]]
+           [-,.flvxh?] (-t <TYPE>|<DM>...)]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -134,6 +137,12 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-X &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
@@ -179,7 +188,7 @@
 </fmtypes>]]></verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Optional title page elements</title>
           <para>When re-generating the front matter content for a title page data module, optional elements which cannot be derived from the publication module (such as the product illustration or bar code) will be copied from the source data module when updating it.</para>
         </levelledPara>

@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]]
-               [-,.fhx?] (-t <TYPE>|<DM>...)
+               [-,.flvxh?] (-t <TYPE>|<DM>...)
 
 DESCRIPTION
 ===========
@@ -62,6 +62,9 @@ specified. Supported types are:
 -   TOC - Table of contents
 
 -   TP - Title page
+
+-v  
+Verbose output.
 
 -X &lt;XSL&gt;  
 Transform the front matter contents after generating them using the

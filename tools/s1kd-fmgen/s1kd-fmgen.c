@@ -13,9 +13,10 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
@@ -26,6 +27,7 @@
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
 #define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -35,6 +37,8 @@
 #else
 #define PARSE_OPTS 0
 #endif
+
+bool verbose = false;
 
 xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
@@ -229,6 +233,10 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 		xmlFree(incode);
 	}
 
+	if (verbose) {
+		fprintf(stderr, I_GENERATE, dmpath, type);
+	}
+
 	res = generate_fm_content_for_type(pm, type, xslpath, params);
 
 	if (strcmp(type, "TP") == 0) {
@@ -337,7 +345,7 @@ void add_param(xmlNodePtr params, char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,flxh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,flvxh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
 	puts("  -,                 Dump the built-in .fmtypes file in XML format.");
@@ -349,6 +357,7 @@ void show_help(void)
 	puts("  -P <PM>            Generate front matter from the specified PM.");
 	puts("  -p <name>=<value>  Pass parameters to the XSLT specified with -X.");
 	puts("  -t <TYPE>          Generate the specified type of front matter.");
+	puts("  -v                 Verbose output.");
 	puts("  -X <XSL>           Transform generated contents.");
 	puts("  -x                 Do XInclude processing.");
 	puts("  --version          Show version information.");
@@ -365,7 +374,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.F:flP:p:t:X:xh?";
+	const char *sopts = ",.F:flP:p:t:vX:xh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -421,6 +430,9 @@ int main(int argc, char **argv)
 				break;
 			case 't':
 				fmtype = strdup(optarg);
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'X':
 				xslpath = strdup(optarg);
