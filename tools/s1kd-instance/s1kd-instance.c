@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.7"
+#define VERSION "2.1.8"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2473,8 +2473,18 @@ void clear_perdm_applic(void)
 	}
 }
 
-/* Callback for clean_entities. */
+/* Callback for clean_entities.
+ *
+ * The name parameter of the xmlHashScanner type was changed to be const in
+ * newer versions of libxml2.
+ *
+ * Older versions, and the publically documented API, have it as non-const.
+ */
+#if LIBXML_VERSION < 20907
+void clean_entities_callback(void *payload, void *data, xmlChar *name)
+#else
 void clean_entities_callback(void *payload, void *data, const xmlChar *name)
+#endif
 {
 	xmlEntityPtr e = (xmlEntityPtr) payload;
 	xmlChar *xpath;
