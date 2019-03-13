@@ -37,9 +37,13 @@ xmlChar *acro_markup_xpath = NULL;
 #endif
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 #define E_NO_LIST ERR_PREFIX "Could not read acronyms list: %s\n"
 #define E_NO_FILE ERR_PREFIX "Could not read file: %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
+#define I_FIND INF_PREFIX "Searching for acronyms in %s...\n"
+#define I_MARKUP INF_PREFIX "Marking up acronyms in %s...\n"
+#define I_DELETE INF_PREFIX "Deleting acronym markup in %s...\n"
 #define EXIT_NO_LIST 1
 
 bool prettyPrint = false;
@@ -48,6 +52,7 @@ enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
 bool interactive = false;
 bool alwaysAsk = false;
 bool deferChoice = false;
+bool verbose = false;
 
 xsltStylesheetPtr termStylesheet, idStylesheet;
 
@@ -66,6 +71,10 @@ void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 {
 	xmlDocPtr doc, styleDoc, result;
 	xsltStylesheetPtr style;
+
+	if (verbose) {
+		fprintf(stderr, I_FIND, path);
+	}
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
 		fprintf(stderr, E_NO_FILE, path);
@@ -137,9 +146,7 @@ int longestAcronymTerm(xmlNodePtr acronyms)
 void printAcronyms(xmlNodePtr acronyms, const char *path)
 {
 	xmlNodePtr cur;
-
 	int longest = 0;
-
 	FILE *out;
 
 	if (strcmp(path, "-") == 0)
@@ -467,6 +474,10 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 {
 	xmlDocPtr doc;
 
+	if (verbose) {
+		fprintf(stderr, I_MARKUP, path);
+	}
+
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
 		fprintf(stderr, E_NO_FILE, path);
 		return;
@@ -557,6 +568,10 @@ void deleteAcronymsInFile(const char *fname, const char *out)
 {
 	xmlDocPtr doc;
 
+	if (verbose) {
+		fprintf(stderr, I_DELETE, fname);
+	}
+
 	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
 	
 	deleteAcronyms(doc);
@@ -597,9 +612,9 @@ void showHelp(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-dlptx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
-	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-fl] [-o <file>] [-X <xpath>] [<dmodules>]");
-	puts("  " PROG_NAME " -D [-fl] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " [-dlptvx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
+	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-flv] [-o <file>] [-X <xpath>] [<dmodules>]");
+	puts("  " PROG_NAME " -D [-flv] [-o <file>] [<dmodules>]");
 	puts("");
 	puts("Options:");
 	puts("  -D          Remove acronym markup.");
@@ -614,6 +629,7 @@ void showHelp(void)
 	puts("  -p          Pretty print text/XML output.");
 	puts("  -T <types>  Only search for acronyms of these types.");
 	puts("  -t          Format XML output as table.");
+	puts("  -v          Verbose output.");
 	puts("  -X <xpath>  Use custom XPath to markup elements.");
 	puts("  -x          Output XML instead of text.");
 	puts("  -h -?       Show usage message.");
@@ -641,7 +657,7 @@ int main(int argc, char **argv)
 	bool list = false;
 	bool delete = false;
 
-	const char *sopts = "pn:xDdtT:o:M:miIfl!X:h?";
+	const char *sopts = "pn:xDdtT:o:M:miIfl!X:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -709,6 +725,9 @@ int main(int argc, char **argv)
 				if (!acro_markup_xpath) {
 					acro_markup_xpath = xmlStrdup(BAD_CAST optarg);
 				}
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':

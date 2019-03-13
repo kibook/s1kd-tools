@@ -7,11 +7,11 @@ SYNOPSIS
 ========
 
     s1kd-acronyms -h?
-    s1kd-acronyms [-dlptx] [-n <#>] [-o <file>] [-T <types>]
+    s1kd-acronyms [-dlptvx] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
-    s1kd-acronyms [-fl] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
+    s1kd-acronyms [-flv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
                   [<dmodule>...]
-    s1kd-acronyms -D [-fl] [-o <file>] [<dmodule>...]
+    s1kd-acronyms -D [-flv] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
 ===========
@@ -86,6 +86,9 @@ contained within the string &lt;types&gt;.
 
 -t  
 Format XML output as an S1000D `<table>`.
+
+-v  
+Verbose output.
 
 -X &lt;xpath&gt;  
 When marking up acronyms with -m/-M, use a custom XPath expression to
