@@ -13,15 +13,19 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_MAX_REFS ERR_PREFIX "Maximum references reached: %d\n"
 #define I_SYNCREFS INF_PREFIX "Synchronizing references in %s...\n"
 
 #define EXIT_INVALID_DM 1
+#define EXIT_MAX_REFS 2
+
+unsigned MAX_REFS = 1;
 
 struct ref {
 	char code[256];
@@ -40,11 +44,14 @@ bool verbose = false;
 #define PARSE_OPTS 0
 #endif
 
-bool contains_code(struct ref refs[256], int n, const char *code)
+struct ref *refs;
+int nrefs;
+
+bool contains_code(const char *code)
 {
 	int i;
 
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < nrefs; ++i) {
 		if (strcmp(refs[i].code, code) == 0) {
 			return true;
 		}
@@ -214,7 +221,15 @@ void copy_code(char *dst, xmlNodePtr ref)
 	}
 }
 
-void find_refs(struct ref refs[256], int *n, xmlNodePtr node)
+void resize(void)
+{
+	if (!(refs = realloc(refs, (MAX_REFS *= 2) * sizeof(struct ref)))) {
+		fprintf(stderr, E_MAX_REFS, nrefs);
+		exit(EXIT_MAX_REFS);
+	}
+}
+
+void find_refs(xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
@@ -223,14 +238,18 @@ void find_refs(struct ref refs[256], int *n, xmlNodePtr node)
 
 		copy_code(code, node);
 
-		if (!contains_code(refs, *n, code)) {
-			strcpy(refs[*n].code, code);
-			refs[*n].ref = node;
-			++(*n);
+		if (!contains_code(code)) {
+			if (nrefs == MAX_REFS) {
+				resize();
+			}
+
+			strcpy(refs[nrefs].code, code);
+			refs[nrefs].ref = node;
+			++nrefs;
 		}
 	} else {
 		for (cur = node->children; cur; cur = cur->next) {
-			find_refs(refs, n, cur);
+			find_refs(cur);
 		}
 	}
 }
@@ -245,11 +264,12 @@ int compare_refs(const void *a, const void *b)
 
 void sync_refs(xmlNodePtr dmodule)
 {
-	struct ref refs[256];
-	int n = 0, i;
+	int i;
 
 	xmlNodePtr content, old_refs, new_refs, searchable, new_node,
 		refgrp = NULL, refdms = NULL, reftp = NULL, rdandrt = NULL;
+
+	nrefs = 0;
 
 	content = find_child(dmodule, "content");
 
@@ -271,13 +291,15 @@ void sync_refs(xmlNodePtr dmodule)
 		exit(EXIT_INVALID_DM);
 	}
 
-	find_refs(refs, &n, searchable);
+	find_refs(searchable);
+
+	if (nrefs < 1) {
+		return;
+	}
 
 	new_refs = xmlNewNode(NULL, BAD_CAST "refs");
 
-	if (n > 0) {
-		xmlAddPrevSibling(content->children, new_refs);
-	}
+	xmlAddPrevSibling(content->children, new_refs);
 
 	if (refgrp) {
 		refdms  = xmlNewChild(new_refs, NULL, BAD_CAST "refdms", NULL);
@@ -285,9 +307,9 @@ void sync_refs(xmlNodePtr dmodule)
 		rdandrt = xmlNewChild(new_refs, NULL, BAD_CAST "rdandrt", NULL);
 	}
 
-	qsort(refs, n, sizeof(struct ref), compare_refs);
+	qsort(refs, nrefs, sizeof(struct ref), compare_refs);
 
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < nrefs; ++i) {
 		if (refgrp) {
 			if (xmlStrcmp(refs[i].ref->name, BAD_CAST "refdm") == 0) {
 				new_node = xmlAddChild(refdms, xmlCopyNode(refs[i].ref, 1));
@@ -411,6 +433,8 @@ int main(int argc, char *argv[])
 	};
 	int loptind = 0;
 
+	refs = malloc(MAX_REFS * sizeof(struct ref));
+
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
 			case 0:
@@ -454,6 +478,8 @@ int main(int argc, char *argv[])
 	} else {
 		sync_refs_file("-", out, false);
 	}
+
+	free(refs);
 
 	xmlCleanupParser();
 

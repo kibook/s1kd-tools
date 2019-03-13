@@ -54,6 +54,22 @@ The data module(s) to synchronize references in.
 Default is to read from stdin.
 .RS
 .RE
+.SH EXIT STATUS
+.TP
+.B 0
+No errors.
+.RS
+.RE
+.TP
+.B 1
+Invalid data module.
+.RS
+.RE
+.TP
+.B 2
+Number of references in a data module exceeded the available memory.
+.RS
+.RE
 .SH EXAMPLE
 .IP
 .nf

@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
         <simplePara>Add -v option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add EXIT STATUS section.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -103,6 +106,31 @@
               <listItemTerm>&lt;data module&gt;...</listItemTerm>
               <listItemDefinition>
                 <para>The data module(s) to synchronize references in. Default is to read from stdin.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>No errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>Invalid data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>Number of references in a data module exceeded the available memory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

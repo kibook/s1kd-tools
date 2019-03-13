@@ -43,6 +43,18 @@ Show version information.
 The data module(s) to synchronize references in. Default is to read from
 stdin.
 
+EXIT STATUS
+===========
+
+0  
+No errors.
+
+1  
+Invalid data module.
+
+2  
+Number of references in a data module exceeded the available memory.
+
 EXAMPLE
 =======
 
