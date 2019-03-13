@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.3.3"
+#define VERSION "1.4.0"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -30,24 +30,31 @@
 #endif
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 #define E_NO_LIST ERR_PREFIX "Could not read index flags from %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_NO_FILE ERR_PREFIX "Could not read file: %s\n"
+#define I_MARKUP INF_PREFIX "Adding index flags to %s...\n"
+#define I_DELETE INF_PREFIX "Deleting index flags from %s...\n"
 #define EXIT_NO_LIST 1
+
+bool verbose = false;
 
 /* Help/usage message */
 void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-I <index>] [-fi] [<module>...]");
-	puts("  " PROG_NAME " -D [-fi] [<module>...]");
+	puts("  " PROG_NAME " [-I <index>] [-filv] [<module>...]");
+	puts("  " PROG_NAME " -D [-filv] [<module>...]");
 	puts("");
 	puts("Options:");
 	puts("  -D          Delete current index flags.");
 	puts("  -f          Overwrite input module(s).");
 	puts("  -I <index>  Specify a custom .indexflags file");
 	puts("  -i          Ignore case when flagging terms.");
+	puts("  -l          Input is a list of file names.");
+	puts("  -v          Verbose output.");
 	puts("  -h -?       Show help/usage message.");
 	puts("  --version   Show version information.");
 }
@@ -196,6 +203,10 @@ void delete_index_flags(const char *path, bool overwrite)
 {
 	xmlDocPtr doc;
 
+	if (verbose) {
+		fprintf(stderr, I_DELETE, path);
+	}
+
 	doc = xmlReadFile(path, NULL, PARSE_OPTS);
 
 	transform_doc(doc, delete_xsl, delete_xsl_len);
@@ -214,6 +225,10 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	xmlXPathContextPtr doc_ctx, index_ctx;
 	xmlXPathObjectPtr index_obj;
 	xmlNodeSetPtr flags;
+
+	if (verbose) {
+		fprintf(stderr, I_MARKUP, path);
+	}
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
 		fprintf(stderr, E_NO_FILE, path);
@@ -298,7 +313,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr index_doc = NULL;
 
-	const char *sopts = "DfI:lih?";
+	const char *sopts = "DfI:livh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -330,6 +345,9 @@ int main(int argc, char **argv)
 			case 'l':
 				list = true;
 				break;
+			case 'v':
+				verbose = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -337,7 +355,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (!index_doc) {
+	if (!index_doc && !delflags) {
 		char fname[PATH_MAX];
 		find_config(fname, DEFAULT_INDEXFLAGS_FNAME);
 		index_doc = read_index_flags(fname);
