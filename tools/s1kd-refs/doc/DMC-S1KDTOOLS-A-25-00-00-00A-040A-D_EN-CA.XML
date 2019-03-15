@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="15"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,16 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Add EXIT STATUS section.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1">
-        <simplePara>Add -I option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Improve descriptions of the -i and -U options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Improve DESCRIPTION section.</simplePara>
+        <simplePara>Add -o option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -61,10 +52,10 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-refs [-aCcDEFfGIilNnPqRrsUuXxh?] [-d <dir>] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGIilNnoPqRrsUuXxh?] [-d <dir>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
-      <levelledPara changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+      <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-refs</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy.</para>
         <para>This allows you to:</para>
@@ -128,7 +119,7 @@
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-I</listItemTerm>
               <listItemDefinition>
                 <para>Update the issue number, issue date, language, and title of references to that of the latest matched object. This option implies the -U and -i options.</para>
@@ -137,7 +128,7 @@
             <definitionListItem>
               <listItemTerm>-i</listItemTerm>
               <listItemDefinition>
-                <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0003">Always match the latest issue of an object found, regardless of the issue and language specified in the reference.</para>
+                <para>Always match the latest issue of an object found, regardless of the issue and language specified in the reference.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -156,6 +147,12 @@
               <listItemTerm>-n</listItemTerm>
               <listItemDefinition>
                 <para>Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-o</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -185,7 +182,7 @@
             <definitionListItem>
               <listItemTerm>-U</listItemTerm>
               <listItemDefinition>
-                <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0003">Update the title of matched references from the corresponding object.</para>
+                <para>Update the title of matched references from the corresponding object.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -221,7 +218,7 @@
           </definitionList>
         </para>
       </levelledPara>
-      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>EXIT STATUS</title>
         <para>
           <definitionList>
@@ -241,6 +238,12 @@
               <listItemTerm>2</listItemTerm>
               <listItemDefinition>
                 <para>The number of objects found in a recursive check (-R) exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>stdin did not contain valid XML and not in list mode (-l).</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

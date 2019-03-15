@@ -12,15 +12,17 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.2.2"
+#define VERSION "2.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
-#define E_OUT_OF_MEMORY "Too many files in recursive listing.\n"
+#define E_OUT_OF_MEMORY ERR_PREFIX "Too many files in recursive listing.\n"
+#define E_BAD_STDIN ERR_PREFIX "stdin does not contain valid XML.\n"
 
 #define EXIT_UNMATCHED_REF 1
 #define EXIT_OUT_OF_MEMORY 2
+#define EXIT_BAD_STDIN 3
 
 /* List only references found in the content section. */
 bool contentOnly = false;
@@ -80,6 +82,9 @@ long unsigned maxListedFiles = 1;
 
 /* Which types of object references will be listed. */
 int showObjects = 0;
+
+/* Write valid CSDB objects to stdout. */
+bool outputTree = false;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -944,6 +949,11 @@ int listReferences(const char *path)
 	}
 
 	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if (strcmp(path, "-") == 0) {
+			fprintf(stderr, E_BAD_STDIN);
+			exit(EXIT_BAD_STDIN);
+		}
+
 		return 0;
 	}
 
@@ -963,6 +973,11 @@ int listReferences(const char *path)
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			unmatched += printReference(obj->nodesetval->nodeTab[i], path);
 		}
+	}
+
+	/* Write valid CSDB object to stdout. */
+	if (outputTree && !unmatched) {
+		xmlSaveFile("-", doc);
 	}
 
 	/* If the given object was modified by updating matched refs or
@@ -1014,7 +1029,7 @@ int listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGIilNnPqrsUuXxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuXxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -1031,6 +1046,7 @@ void showHelp(void)
 	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -N         Assume filenames omit issue info.");
 	puts("  -n         Print the source filename and line number for each reference.");
+	puts("  -o         Output valid CSDB objects to stdout.");
 	puts("  -P         List publication module references.");
 	puts("  -q         Quiet mode.");
 	puts("  -R         List references in matched objects recursively.");
@@ -1061,7 +1077,7 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsh?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsoh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1150,6 +1166,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				listSrc = true;
+				break;
+			case 'o':
+				outputTree = true;
 				break;
 			case 'h':
 			case '?':

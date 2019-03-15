@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGIilNnPqRrsUuXxh?] [-d <dir>] [<object>...]
+    s1kd-refs [-aCcDEFfGIilNnoPqRrsUuXxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -75,6 +75,9 @@ Include the filename of the source object where each reference was
 found, and display the line number where the reference occurs in the
 source file after its filename.
 
+-o  
+Output valid CSDB objects to stdout.
+
 -q  
 Quiet mode. Errors are not printed.
 
@@ -122,6 +125,9 @@ Some references were unmatched.
 2  
 The number of objects found in a recursive check (-R) exceeded the
 available memory.
+
+3  
+stdin did not contain valid XML and not in list mode (-l).
 
 EXAMPLE
 =======
