@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="21"/>
+        <issueDate year="2019" month="03" day="15"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add -o option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-validate [-d &lt;dir&gt;] [-X &lt;URI&gt;] [-flqvx] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-validate [-d <dir>] [-X <URI>] [-floqvx] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -77,6 +80,12 @@
               <listItemTerm>-l</listItemTerm>
               <listItemDefinition>
                 <para>Treat input as a list of object names to validate, rather than an object itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-o</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

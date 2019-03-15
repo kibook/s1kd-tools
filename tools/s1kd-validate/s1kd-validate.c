@@ -8,7 +8,7 @@
 #include <libxml/xinclude.h>
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.0.4"
+#define VERSION "1.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -16,9 +16,9 @@
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
 
-#define EXIT_MAX_SCHEMAS 1
-#define EXIT_MISSING_SCHEMA 2
-#define EXIT_BAD_IDREF 3
+#define EXIT_MAX_SCHEMAS 2
+#define EXIT_MISSING_SCHEMA 3
+#define EXIT_BAD_IDREF 4
 
 #define S_BAD_IDREF ERR_PREFIX "No matching ID for '%s' (%s line %u).\n"
 
@@ -70,6 +70,9 @@ int schema_parser_count = 0;
 xmlSchemaValidityErrorFunc schema_efunc = (xmlSchemaValidityErrorFunc) fprintf;
 xmlSchemaValidityWarningFunc schema_wfunc = (xmlSchemaValidityWarningFunc) fprintf;
 
+/* Print the XML tree to stdout if it is valid. */
+int output_tree = 0;
+
 struct s1kd_schema_parser *get_schema_parser(const char *url)
 {
 	int i;
@@ -116,13 +119,14 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-X <URI>] [-Dflqvx] [<object>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-X <URI>] [-Dfloqvx] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -D         Debug output.");
 	puts("  -d <dir>   Search for schemas in <dir> instead of using the URL.");
 	puts("  -f         List invalid files.");
 	puts("  -l         Treat input as list of filenames.");
+	puts("  -o         Output valid CSDB objects to stdout.");
 	puts("  -q         Silent (not output).");
 	puts("  -v         Verbose output.");
 	puts("  -X <URI>   Exclude namespace from validation by URI.");
@@ -250,12 +254,21 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list, int xinclude)
 {
 	xmlDocPtr doc;
+	xmlDocPtr validtree = NULL;
 	xmlNodePtr dmodule;
 	char *url;
 	struct s1kd_schema_parser *parser;
 	int err = 0;
 
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+	if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+		return 1;
+	}
+
+	/* Make a copy of the original XML tree before performing extra
+	 * processing on it. */
+	if (output_tree) {
+		validtree = xmlCopyDoc(doc, 1);
+	}
 
 	if (xinclude) {
 		xmlXIncludeProcess(doc);
@@ -308,7 +321,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 
 		if (access(schema_file, F_OK) == -1) {
 			if (verbosity > SILENT) {
-				fprintf(stderr, ERR_PREFIX "Schema %s not found in %s.\n", schema_name, schema_dir);
+				fprintf(stderr, ERR_PREFIX "Schema %s not found in %s\n", schema_name, schema_dir);
 			}
 			exit(EXIT_MISSING_SCHEMA);
 		}
@@ -330,11 +343,17 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 
 	err += xmlSchemaValidateDoc(parser->valid_ctxt, doc);
 
+	/* Write the original XML tree to stdout if determined to be valid. */
+	if (output_tree && !err) {
+		xmlSaveFile("-", validtree);
+		xmlFreeDoc(validtree);
+	}
+
 	if (verbosity >= VERBOSE) {
 		if (err) {
-			printf(FAILED_PREFIX "%s fails to validate against schema %s\n", fname, url);
+			fprintf(stderr, FAILED_PREFIX "%s fails to validate against schema %s\n", fname, url);
 		} else {
-			printf(SUCCESS_PREFIX "%s validates against schema %s\n", fname, url);
+			fprintf(stderr, SUCCESS_PREFIX "%s validates against schema %s\n", fname, url);
 		}
 	}
 
@@ -387,7 +406,7 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqd:X:xflh?";
+	const char *sopts = "vqd:X:xfloh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -401,7 +420,7 @@ int main(int argc, char *argv[])
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
-					return 0;
+					return EXIT_SUCCESS;
 				}
 				break;
 			case 'q': verbosity = SILENT; break;
@@ -411,8 +430,9 @@ int main(int argc, char *argv[])
 			case 'x': xinclude = 1; break;
 			case 'f': list_invalid = 1; break;
 			case 'l': is_list = 1; break;
+			case 'o': output_tree = 1; break;
 			case 'h': 
-			case '?': show_help(); return 0;
+			case '?': show_help(); return EXIT_SUCCESS;
 		}
 	}
 
@@ -446,5 +466,5 @@ int main(int argc, char *argv[])
 
 	xmlCleanupParser();
 
-	return err;
+	return err ? EXIT_FAILURE : EXIT_SUCCESS;
 }
