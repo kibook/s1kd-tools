@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.7.0"
+#define VERSION "2.8.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -116,6 +116,9 @@ bool recursive_search = false;
 
 /* Directory to start search for BREX data modules in. */
 char *search_dir = NULL;
+
+/* Output XML tree if it passes the BREX check. */
+bool output_tree = false;
 
 /* Return the first node in a set matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -762,6 +765,10 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 
 	if (!brexNode->children) {
 		xmlNewChild(brexNode, NULL, BAD_CAST "noErrors", NULL);
+
+		if (output_tree) {
+			xmlSaveFile("-", doc);
+		}
 	}
 
 	xmlFree(defaultBrSeverityLevel);
@@ -1230,7 +1237,7 @@ void print_stats(xmlDocPtr doc)
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <sev>] [-BcfLlnpqrS[tu]sTvxh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <sev>] [-BcfLlnopqrS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -h -?        Show this help message.");
@@ -1243,6 +1250,7 @@ void show_help(void)
 	puts("  -L           Input is a list of data module filenames.");
 	puts("  -l           Check BREX referenced by other BREX.");
 	puts("  -n           Check notation rules.");
+	puts("  -o           Output valid CSDB objects to stdout.");
 	puts("  -p           Display progress bar.");
 	puts("  -q           Quiet mode. Do not print errors.");
 	puts("  -r           Search for BREX recursively.");
@@ -1291,7 +1299,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:I:xvqslw:StupfncLTrd:h?";
+	const char *sopts = "Bb:I:xvqslw:StupfncLTrd:oh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1337,6 +1345,7 @@ int main(int argc, char *argv[])
 			case 'L': is_list = true; break;
 			case 'T': show_stats = true; break;
 			case 'r': recursive_search = true; break;
+			case 'o': output_tree = true; break;
 			case 'h':
 			case '?':
 				show_help();

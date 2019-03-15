@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-BcfLlpqrS[tu]sTvxh?] [<object>...]
+                   [-BcfLlnopqrS[tu]sTvxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -69,6 +69,9 @@ For notations not included but not explicitly excluded, the `objectUse`
 of the first inclusion rule will be returned with the error. For
 explicitly excluded notations, the `objectUse` of the explicit exclusion
 rule is returned.
+
+-o  
+Output valid CSDB objects to stdout.
 
 -p  
 Display a progress bar.

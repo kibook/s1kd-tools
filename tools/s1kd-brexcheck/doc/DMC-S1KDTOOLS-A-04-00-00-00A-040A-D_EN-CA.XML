@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="00"/>
+        <issueInfo issueNumber="027" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="15"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Combine exit status codes 2 and 3 and add new code 3.</simplePara>
+        <simplePara>Add -o option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Add missing -n option to SYNOPSIS.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-               [-BcfLlpqrS[tu]sTvxh?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
+               [-BcfLlnopqrS[tu]sTvxh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -123,6 +126,12 @@
               <listItemDefinition>
                 <para>Check notation rules. Any notation names listed in any of the BREX data modules with attribute <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "1" or omitted are considered valid notations. If a notation in a CSDB object is not present or has <verbatimText verbatimStyle="vs13">allowedNotationFlag</verbatimText> set to "0", an error will be returned.</para>
                 <para>For notations not included but not explicitly excluded, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the first inclusion rule will be returned with the error. For explicitly excluded notations, the <verbatimText verbatimStyle="vs12">objectUse</verbatimText> of the explicit exclusion rule is returned.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-o</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -281,7 +290,7 @@
       <levelledPara>
         <title>EXIT STATUS</title>
         <para>
-          <definitionList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>0</listItemTerm>
               <listItemDefinition>
