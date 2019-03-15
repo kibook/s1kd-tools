@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGIilNnoPqRrsUuXxh?] [-d <dir>] [<object>...]
+    s1kd-refs [-aCcDEFfGIilNnoPqRrsUuvXxh?] [-d <dir>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -98,6 +98,9 @@ Update the title of matched references from the corresponding object.
 -u  
 Show only unmatched reference errors, or unmatched codes if combined
 with the -a option.
+
+-v  
+Verbose output.
 
 -X  
 Tag unmatched references with the processing instruction

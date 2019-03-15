@@ -12,13 +12,18 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.3.0"
+#define VERSION "2.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define SUCC_PREFIX PROG_NAME ": SUCCESS: "
+#define FAIL_PREFIX PROG_NAME ": FAILURE: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_OUT_OF_MEMORY ERR_PREFIX "Too many files in recursive listing.\n"
 #define E_BAD_STDIN ERR_PREFIX "stdin does not contain valid XML.\n"
+
+#define S_UNMATCHED SUCC_PREFIX "No unmatched references in %s\n"
+#define F_UNMATCHED FAIL_PREFIX "Unmatched references in %s\n"
 
 #define EXIT_UNMATCHED_REF 1
 #define EXIT_OUT_OF_MEMORY 2
@@ -85,6 +90,9 @@ int showObjects = 0;
 
 /* Write valid CSDB objects to stdout. */
 bool outputTree = false;
+
+/* Verbose output. */
+bool verbose = false;
 
 /* Bug in libxml < 2.9.2 where parameter entities are resolved even when
  * XML_PARSE_NOENT is not specified.
@@ -995,6 +1003,10 @@ int listReferences(const char *path)
 	xmlXPathFreeContext(ctx);
 	xmlFreeDoc(doc);
 
+	if (verbose) {
+		fprintf(stderr, unmatched ? F_UNMATCHED : S_UNMATCHED, path);
+	}
+
 	return unmatched;
 }
 
@@ -1029,7 +1041,7 @@ int listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuXxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuvXxh?] [-d <dir>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -1054,6 +1066,7 @@ void showHelp(void)
 	puts("  -s         Include the source object as a reference.");
 	puts("  -U         Update address items in matched references.");
 	puts("  -u         Show only unmatched references.");
+	puts("  -v         Verbose output.");
 	puts("  -X         Tag unmatched references.");
 	puts("  -x         Output XML report.");
 	puts("  -h -?      Show help/usage message.");
@@ -1077,7 +1090,7 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsoh?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsovh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -1169,6 +1182,9 @@ int main(int argc, char **argv)
 				break;
 			case 'o':
 				outputTree = true;
+				break;
+			case 'v':
+				verbose = true;
 				break;
 			case 'h':
 			case '?':

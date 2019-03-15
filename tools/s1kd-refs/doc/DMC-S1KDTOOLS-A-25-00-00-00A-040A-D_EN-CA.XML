@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="01"/>
+        <issueInfo issueNumber="014" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="03" day="15"/>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>Add -o option.</simplePara>
+        <simplePara>Add -o and -v options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGIilNnoPqRrsUuXxh?] [-d <dir>] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGIilNnoPqRrsUuvXxh?] [-d <dir>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -189,6 +189,12 @@
               <listItemTerm>-u</listItemTerm>
               <listItemDefinition>
                 <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-v</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
