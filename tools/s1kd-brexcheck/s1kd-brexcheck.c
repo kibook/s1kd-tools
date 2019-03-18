@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.8.0"
+#define VERSION "2.8.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -765,10 +765,6 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 
 	if (!brexNode->children) {
 		xmlNewChild(brexNode, NULL, BAD_CAST "noErrors", NULL);
-
-		if (output_tree) {
-			xmlSaveFile("-", doc);
-		}
 	}
 
 	xmlFree(defaultBrSeverityLevel);
@@ -1084,6 +1080,10 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 	if (show_fnames) {
 		print_fnames(documentNode);
+	}
+
+	if (output_tree && !total) {
+		xmlSaveFile("-", dmod_doc);
 	}
 
 	return total;
