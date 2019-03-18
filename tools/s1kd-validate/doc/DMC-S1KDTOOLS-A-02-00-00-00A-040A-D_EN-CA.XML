@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="01"/>
+        <issueInfo issueNumber="012" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="15"/>
+        <issueDate year="2019" month="03" day="18"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
         <simplePara>Add -o option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add EXIT STATUS section.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -145,6 +148,37 @@ rewritePrefix="/usr/share/s1kd/schemas/"/>
           </para>
           <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>) to remove the need to use the -d option.</para>
         </levelledPara>
+      </levelledPara>
+      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>No errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>Some CSDB objects are not well-formed or valid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>The number of schemas cached exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>A specified schema could not be read.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLE</title>

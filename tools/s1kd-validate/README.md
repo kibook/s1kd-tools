@@ -92,6 +92,21 @@ This can be placed in a catalog file automatically loaded by libxml2
 an environment variable used by libxml2 (e.g., `XML_CATALOG_FILES`) to
 remove the need to use the -d option.
 
+EXIT STATUS
+===========
+
+0  
+No errors.
+
+1  
+Some CSDB objects are not well-formed or valid.
+
+2  
+The number of schemas cached exceeded the available memory.
+
+3  
+A specified schema could not be read.
+
 EXAMPLE
 =======
 
