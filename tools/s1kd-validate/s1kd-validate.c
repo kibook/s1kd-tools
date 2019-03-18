@@ -8,7 +8,7 @@
 #include <libxml/xinclude.h>
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -69,8 +69,16 @@ struct s1kd_schema_parser *schema_parsers;
 
 int schema_parser_count = 0;
 
-xmlSchemaValidityErrorFunc schema_efunc = (xmlSchemaValidityErrorFunc) fprintf;
-xmlSchemaValidityWarningFunc schema_wfunc = (xmlSchemaValidityWarningFunc) fprintf;
+void print_error(void *userData, xmlErrorPtr error)
+{
+	fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
+}
+
+void suppress_error(void *userData, xmlErrorPtr error)
+{
+}
+
+xmlStructuredErrorFunc schema_errfunc = print_error;
 
 /* Print the XML tree to stdout if it is valid. */
 int output_tree = 0;
@@ -88,10 +96,6 @@ struct s1kd_schema_parser *get_schema_parser(const char *url)
 	return NULL;
 }
 
-void suppress_err(void *ctx, const char *msg)
-{
-}
-
 struct s1kd_schema_parser *add_schema_parser(char *url)
 {
 	struct s1kd_schema_parser *parser;
@@ -104,8 +108,8 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 	schema = xmlSchemaParse(ctxt);
 	valid_ctxt = xmlSchemaNewValidCtxt(schema);
 
-	xmlSchemaSetParserErrors(ctxt, schema_efunc, schema_wfunc, stderr);
-	xmlSchemaSetValidErrors(valid_ctxt, schema_efunc, schema_wfunc, stderr);
+	xmlSchemaSetParserStructuredErrors(ctxt, schema_errfunc, stderr);
+	xmlSchemaSetValidStructuredErrors(valid_ctxt, schema_errfunc, stderr);
 
 	schema_parsers[schema_parser_count].url = url;
 	schema_parsers[schema_parser_count].ctxt = ctxt;
@@ -448,8 +452,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (verbosity == SILENT) {
-		schema_efunc = (xmlSchemaValidityErrorFunc) suppress_err;
-		schema_wfunc = (xmlSchemaValidityWarningFunc) suppress_err;
+		schema_errfunc = suppress_error;
 	}
 
 	if (optind < argc) {
