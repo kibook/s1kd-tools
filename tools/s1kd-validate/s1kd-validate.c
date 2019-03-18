@@ -8,13 +8,14 @@
 #include <libxml/xinclude.h>
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
 #define FAILED_PREFIX PROG_NAME ": FAILED: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
+#define E_MAX_SCHEMA_PARSERS ERR_PREFIX "Maximum number of schemas reached: %d\n"
 
 #define EXIT_MAX_SCHEMAS 2
 #define EXIT_MISSING_SCHEMA 3
@@ -61,9 +62,10 @@ struct s1kd_schema_parser {
 	xmlSchemaValidCtxtPtr valid_ctxt;
 };
 
-#define SCHEMA_PARSERS_MAX 32
+/* Initial max schema parsers. */
+unsigned SCHEMA_PARSERS_MAX = 1;
 
-struct s1kd_schema_parser schema_parsers[SCHEMA_PARSERS_MAX];
+struct s1kd_schema_parser *schema_parsers;
 
 int schema_parser_count = 0;
 
@@ -251,6 +253,14 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 	return err;
 }
 
+void resize_schema_parsers(void)
+{
+	if (!(schema_parsers = realloc(schema_parsers, (SCHEMA_PARSERS_MAX *= 2) * sizeof(struct s1kd_schema_parser)))) {
+		fprintf(stderr, E_MAX_SCHEMA_PARSERS, schema_parser_count);
+		exit(EXIT_MAX_SCHEMAS);
+	}
+}
+
 int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list, int xinclude)
 {
 	xmlDocPtr doc;
@@ -330,12 +340,11 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		url = (char *) xmlStrdup((xmlChar *) schema_file);
 	}
 
-	if (!(parser = get_schema_parser(url))) {
+	if ((parser = get_schema_parser(url))) {
+		xmlFree(url);
+	} else {
 		if (schema_parser_count == SCHEMA_PARSERS_MAX) {
-			if (verbosity > SILENT) {
-				fprintf(stderr, ERR_PREFIX "Maximum number of schemas reached.\n");
-			}
-			exit(EXIT_MAX_SCHEMAS);
+			resize_schema_parsers();
 		}
 
 		parser = add_schema_parser(url);
@@ -351,9 +360,9 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 
 	if (verbosity >= VERBOSE) {
 		if (err) {
-			fprintf(stderr, FAILED_PREFIX "%s fails to validate against schema %s\n", fname, url);
+			fprintf(stderr, FAILED_PREFIX "%s fails to validate against schema %s\n", fname, parser->url);
 		} else {
-			fprintf(stderr, SUCCESS_PREFIX "%s validates against schema %s\n", fname, url);
+			fprintf(stderr, SUCCESS_PREFIX "%s validates against schema %s\n", fname, parser->url);
 		}
 	}
 
@@ -413,6 +422,8 @@ int main(int argc, char *argv[])
 	};
 	int loptind = 0;
 
+	schema_parsers = malloc(SCHEMA_PARSERS_MAX * sizeof(struct s1kd_schema_parser));
+
 	ignore_ns = xmlNewNode(NULL, BAD_CAST "ignorens");
 
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
@@ -462,8 +473,8 @@ int main(int argc, char *argv[])
 		xmlSchemaFreeParserCtxt(schema_parsers[i].ctxt);
 	}
 
+	free(schema_parsers);
 	xmlFreeNode(ignore_ns);
-
 	xmlCleanupParser();
 
 	return err ? EXIT_FAILURE : EXIT_SUCCESS;
