@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.4.0"
+#define VERSION "2.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -848,7 +848,7 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 /* Tag unmatched references in the source object. */
 void tagUnmatchedRef(xmlNodePtr ref)
 {
-	xmlAddChild(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
+	add_first_child(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
 }
 
 int listReferences(const char *path);
