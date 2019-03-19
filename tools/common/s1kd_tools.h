@@ -68,4 +68,7 @@ void add_icn(xmlDocPtr doc, const char *path, bool fullpath);
 /* Make a file read-only. */
 void mkreadonly(const char *path);
 
+/* Insert a child node instead of appending one. */
+xmlNodePtr add_first_child(xmlNodePtr parent, xmlNodePtr child);
+
 #endif

@@ -268,6 +268,10 @@ An applicability definition in the form of "`<ident>:<type>=<value>`".
 Any number of values can be defined by specifying this option multiple
 times.
 
+-T  
+Tag non-applicable elements with the processing instruction
+&lt;?notApplicable?&gt; instead of removing them.
+
 -t &lt;techName&gt;  
 Give the instance a different techName/pmTitle.
 

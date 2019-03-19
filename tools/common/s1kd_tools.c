@@ -405,3 +405,13 @@ void mkreadonly(const char *path)
 	chmod(path, (st.st_mode & 07777) & ~(S_IWUSR | S_IWGRP | S_IWOTH));
 	#endif
 }
+
+/* Insert a child node instead of appending one. */
+xmlNodePtr add_first_child(xmlNodePtr parent, xmlNodePtr child)
+{
+	if (parent->children) {
+		return xmlAddPrevSibling(parent->children, child);
+	} else {
+		return xmlAddChild(parent, child);
+	}
+}

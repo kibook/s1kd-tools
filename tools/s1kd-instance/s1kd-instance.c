@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.2.0"
+#define VERSION "2.3.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -75,6 +75,9 @@ bool recursive_search = false;
 
 /* Directory to start searching for ACT/PCT in. */
 char *search_dir;
+
+/* Tag non-applicable elements instead of deleting them. */
+bool tag_non_applic = false;
 
 /* Convenient structure for all strings related to uniquely identifying a
  * CSDB object.
@@ -738,8 +741,12 @@ void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 		xmlFree(applicRefId);
 
 		if (applic && !eval_applic_stmt(applic, true)) {
-			xmlUnlinkNode(node);
-			xmlFreeNode(node);
+			if (tag_non_applic) {
+				add_first_child(node, xmlNewPI(BAD_CAST "notApplicable", NULL));
+			} else {
+				xmlUnlinkNode(node);
+				xmlFreeNode(node);
+			}
 			return;
 		}
 	}
@@ -2647,6 +2654,7 @@ void show_help(void)
 	puts("  -r            Search for referenced data modules recursively.");
 	puts("  -S            Do not include <sourceDmIdent> or <repositorySourceDmIdent>.");
 	puts("  -s <applic>   An assign in the form of <ident>:<type>=<value>");
+	puts("  -T            Tag non-applicable elements instead of removing them.");
 	puts("  -t <techName> Give the instance a different techName/pmTitle.");
 	puts("  -U <classes>  Filter on the specified security classes.");
 	puts("  -u <sec>      Set the security classification of the instance.");
@@ -2725,7 +2733,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:t:U:u:vWwX:x:Y:yz@%";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yz@%";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2843,6 +2851,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				read_applic(optarg);
+				break;
+			case 'T':
+				tag_non_applic = true;
 				break;
 			case 't':
 				strncpy(tech, optarg, 255);
