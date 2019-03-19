@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.5.1"
+#define VERSION "1.5.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -302,17 +302,6 @@ void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 
 		xmlAddNextSibling(node, rfu);
 	}
-}
-
-void mkreadonly(const char *path)
-{
-	#ifdef _WIN32
-	SetFileAttributesA(path, FILE_ATTRIBUTE_READONLY);
-	#else
-	struct stat st;
-	stat(path, &st);
-	chmod(path, (st.st_mode & 07777) & ~(S_IWUSR | S_IWGRP | S_IWOTH));
-	#endif
 }
 
 /* Upissue options */

@@ -393,3 +393,15 @@ void add_icn(xmlDocPtr doc, const char *path, bool fullpath)
 	free(name);
 	free(full);
 }
+
+/* Make a file read-only. */
+void mkreadonly(const char *path)
+{
+	#ifdef _WIN32
+	SetFileAttributesA(path, FILE_ATTRIBUTE_READONLY);
+	#else
+	struct stat st;
+	stat(path, &st);
+	chmod(path, (st.st_mode & 07777) & ~(S_IWUSR | S_IWGRP | S_IWOTH));
+	#endif
+}

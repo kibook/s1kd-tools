@@ -43,10 +43,6 @@ The applications for this tool include:
 OPTIONS
 =======
 
--@  
-Rather than source objects, the objects specified are existing instances
-that will be updated.
-
 -A  
 Simplify inline applicability annotations and remove unused ones.
 
@@ -321,6 +317,13 @@ applicability values.
 Fix certain elements automatically after filtering. For example, if all
 support equipment is removed due to filtering, a `<noSupportEquips>`
 element will be inserted automatically.
+
+-@  
+Rather than source objects, the objects specified are existing instances
+that will be updated.
+
+-%  
+Make instance objects read-only.
 
 --version  
 Show version information.

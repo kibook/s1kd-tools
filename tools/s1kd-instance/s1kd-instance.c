@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.1.8"
+#define VERSION "2.2.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2616,7 +2616,6 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -@            Update existing instance objects from their source.");
 	puts("  -A            Simplify and remove unused applicability annotations.");
 	puts("  -a            Remove unused applicability annotations.");
 	puts("  -C <comment>  Add an XML comment to the top of the instance.");
@@ -2659,6 +2658,8 @@ void show_help(void)
 	puts("  -Y <text>     Set applic for DM with text as the display text.");
 	puts("  -y            Set applic for DM based on the user-defined defs.");
 	puts("  -z            Fix certain elements automatically after filtering.");
+	puts("  -@            Update existing instance objects from their source.");
+	puts("  -%            Make instances read-only.");
 	puts("  --version     Show version information.");
 	puts("  <object>...   Source CSDB object(s)");
 }
@@ -2720,10 +2721,11 @@ int main(int argc, char **argv)
 	bool autocomp = false;
 	bool use_stdout = true;
 	bool update_inst = false;
+	bool lock = false;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:t:U:u:vWwX:x:Y:yz@";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:t:U:u:vWwX:x:Y:yz@%";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -2878,6 +2880,9 @@ int main(int argc, char **argv)
 			case '@':
 				update_inst = true;
 				load_applic_per_dm = true;
+				break;
+			case '%':
+				lock = true;
 				break;
 			case 'h':
 			case '?':
@@ -3199,6 +3204,10 @@ int main(int argc, char **argv)
 				} else {
 					xmlSaveFile(out, doc);
 
+					if (lock) {
+						mkreadonly(out);
+					}
+
 					if (verbose) {
 						puts(out);
 					}
@@ -3225,6 +3234,10 @@ int main(int argc, char **argv)
 				fprintf(stderr, S_FILE_EXISTS, out);
 			} else {
 				copy(src, out);
+
+				if (lock) {
+					mkreadonly(out);
+				}
 
 				if (verbose) {
 					puts(out);

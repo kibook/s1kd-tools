@@ -65,4 +65,7 @@ void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, cons
 /* Add an ICN entity from a file path. */
 void add_icn(xmlDocPtr doc, const char *path, bool fullpath);
 
+/* Make a file read-only. */
+void mkreadonly(const char *path);
+
 #endif
