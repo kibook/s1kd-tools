@@ -4,16 +4,12 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <time.h>
-#include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
-#ifdef _WIN32
-#include <windows.h>
-#endif
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.5.2"
+#define VERSION "1.5.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
