@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="02"/>
+        <issueInfo issueNumber="003" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="03" day="20"/>
@@ -247,8 +247,7 @@ bolt.</para>]]></verbatimText>
           <para>Custom formats for values or UOMs can be defined in the <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file. By default, the tool will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText>, but any file can be specified by using the -P option.</para>
           <para>Example of a <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[
-<uomDisplay>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<uomDisplay>
 <format name="custom" decimalSeparator="," groupingSeparator="."/>
 <wrapInto>
 <inlineSignificantData significantParaDataType="psd51"/>
