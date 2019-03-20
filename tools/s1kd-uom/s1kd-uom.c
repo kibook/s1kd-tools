@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -33,17 +33,20 @@ bool verbose = false;
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-U <path>] [-lv,h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [-lv,h?] [<object>...]");
 	puts("");
 	puts("  -e <expr>  Specify formula for a conversion.");
 	puts("  -F <fmt>   Number format for converted values.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  -l         Treat input as list of CSDB objects.");
+	puts("  -P <path>  Use custom UOM display file.");
+	puts("  -p <fmt>   Preformat quantity data.");
 	puts("  -t <uom>   UOM to convert to.");
 	puts("  -U <path>  Use custom .uom file.");
 	puts("  -u <uom>   UOM to convert from.");
 	puts("  -v         Verbose output.");
 	puts("  -,         Dump default .uom file.");
+	puts("  -.         Dump default UOM preformatting file.");
 	puts("  --version  Show version information.");
 	puts("  <object>   CSDB object to convert quantities in.");
 }
@@ -194,7 +197,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const ch
 }
 
 /* Convert UOM for a single data module. */
-void convert_uoms(const char *path, xmlDocPtr uom, const char *format, bool overwrite)
+void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
 {
 	xmlDocPtr doc;
 	char *params[3];
@@ -229,6 +232,18 @@ void convert_uoms(const char *path, xmlDocPtr uom, const char *format, bool over
 		free(params[1]);
 	}
 
+	if (dispfmt) {
+		params[0] = "format";
+		params[1] = malloc(strlen(dispfmt) + 3);
+		sprintf(params[1], "\"%s\"", dispfmt);
+		params[2] = NULL;
+
+		transform_doc(uomdisp, uomdisplay_xsl, uomdisplay_xsl_len, (const char **) params);
+		transform_doc_with(doc, uomdisp, NULL);
+
+		free(params[1]);
+	}
+
 	if (overwrite) {
 		xmlSaveFile(path, doc);
 	} else {
@@ -239,7 +254,7 @@ void convert_uoms(const char *path, xmlDocPtr uom, const char *format, bool over
 }
 
 /* Convert UOM for data modules given in a list. */
-void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, bool overwrite)
+void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -255,7 +270,7 @@ void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, bool
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		convert_uoms(line, uom, format, overwrite);
+		convert_uoms(line, uom, format, uomdisp, dispfmt, overwrite);
 	}
 
 	if (path) {
@@ -267,7 +282,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "e:F:flt:U:u:v,h?";
+	const char *sopts = "e:F:flP:p:t:U:u:v,.h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		{0, 0, 0, 0}
@@ -283,6 +298,11 @@ int main(int argc, char **argv)
 
 	char *format = NULL;
 	char uom_fname[PATH_MAX] = "";
+
+	xmlDocPtr uomdisp = NULL;
+	char uomdisp_fname[PATH_MAX] = "";
+	char *dispfmt = NULL;
+	bool dump_uomdisp = false;
 
 	conversions = xmlNewNode(NULL, BAD_CAST "conversions");
 
@@ -314,6 +334,12 @@ int main(int argc, char **argv)
 			case 'l':
 				list = true;
 				break;
+			case 'P':
+				strncpy(uomdisp_fname, optarg, PATH_MAX - 1);
+				break;
+			case 'p':
+				dispfmt = strdup(optarg);
+				break;
 			case 't':
 				if (!cur) {
 					fprintf(stderr, E_NO_UOM, "-t");
@@ -334,6 +360,9 @@ int main(int argc, char **argv)
 			case ',':
 				dump_uom = true;
 				break;
+			case '.':
+				dump_uomdisp = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -341,11 +370,20 @@ int main(int argc, char **argv)
 		}
 	}
 
+	/* Load .uom configuration file (or built-in copy). */
 	if (!dump_uom && (strcmp(uom_fname, "") != 0 || find_config(uom_fname, DEFAULT_UOM_FNAME))) {
 		uom = xmlReadFile(uom_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
 	}
 	if (!uom) {
 		uom = xmlReadMemory((const char *) uom_xml, uom_xml_len, NULL, NULL, PARSE_OPTS);
+	}
+
+	/* Load .uomdisplay configuration file (or built-in copy). */
+	if (!dump_uomdisp && (strcmp(uomdisp_fname, "") != 0 || find_config(uomdisp_fname, DEFAULT_UOMDISP_FNAME))) {
+		uomdisp = xmlReadFile(uomdisp_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+	}
+	if (!uomdisp) {
+		uomdisp = xmlReadMemory((const char *) uomdisplay_xml, uomdisplay_xml_len, NULL, NULL, PARSE_OPTS);
 	}
 
 	if (conversions->children) {
@@ -354,24 +392,28 @@ int main(int argc, char **argv)
 
 	if (dump_uom) {
 		xmlSaveFile("-", uom);
+	} else if (dump_uomdisp) {
+		xmlSaveFile("-", uomdisp);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (list) {
-				convert_uoms_list(argv[i], uom, format, overwrite);
+				convert_uoms_list(argv[i], uom, format, uomdisp, dispfmt, overwrite);
 			} else {
-				convert_uoms(argv[i], uom, format, overwrite);
+				convert_uoms(argv[i], uom, format, uomdisp, dispfmt, overwrite);
 			}
 		}
 	} else if (list) {
-		convert_uoms_list(NULL, uom, format, overwrite);
+		convert_uoms_list(NULL, uom, format, uomdisp, dispfmt, overwrite);
 	} else {
-		convert_uoms(NULL, uom, format, false);
+		convert_uoms(NULL, uom, format, uomdisp, dispfmt, false);
 	}
 	
 	free(format);
+	free(dispfmt);
 
 	xmlFreeDoc(uom);
 	xmlFreeNode(conversions);
+	xmlFreeDoc(uomdisp);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

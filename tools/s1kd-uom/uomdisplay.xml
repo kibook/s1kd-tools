@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<uomDisplay>
+  <format name="SI" decimalSeparator="," groupingSeparator=" "/>
+  <format name="imperial" decimalSeparator="." groupingSeparator=","/>
+  <uoms>
+    <uom name="%">%</uom>
+    <uom name="cm2"> cm<superScript>2</superScript></uom>
+    <uom name="cm3"> cm<superScript>3</superScript></uom>
+    <uom name="dega">°</uom>
+    <uom name="degC"> °C</uom>
+    <uom name="degF"> °F</uom>
+    <uom name="degR"> °R</uom>
+    <uom name="in2"> in<superScript>2</superScript></uom>
+    <uom name="in3"> in<superScript>3</superScript></uom>
+    <uom name="in4"> in<superScript>4</superScript></uom>
+    <uom name="km2"> km<superScript>2</superScript></uom>
+    <uom name="km3"> km<superScript>3</superScript></uom>
+    <uom name="m2"> m<superScript>2</superScript></uom>
+    <uom name="m3"> m<superScript>3</superScript></uom>
+    <uom name="mina">′</uom>
+    <uom name="N.m"> Nm</uom>
+  </uoms>
+</uomDisplay>

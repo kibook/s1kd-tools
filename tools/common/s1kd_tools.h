@@ -24,6 +24,7 @@
 #define DEFAULT_BREXMAP_FNAME ".brexmap"
 #define DEFAULT_BRSL_FNAME ".brseveritylevels"
 #define DEFAULT_UOM_FNAME ".uom"
+#define DEFAULT_UOMDISP_FNAME ".uomdisplay"
 
 /* Return the full path name from a relative path. */
 char *real_path(const char *path, char *real);

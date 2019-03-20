@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-uom [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
-             [-U <path>] [-flv,h?] [<object>...]
+             [-U <path>] [-p <fmt> [-P <path>]] [-flv,.h?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -37,6 +37,17 @@ Show help/usage message.
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
 to list references in, rather than CSDB objects themselves.
 
+-P &lt;path&gt;  
+Use a custom `.uomdisplay` file.
+
+-p &lt;fmt&gt;  
+Preformat quantity data to the specified decimal format. The built-in
+formats are:
+
+-   SI
+
+-   imperial
+
 -t &lt;uom&gt;  
 Unit of measure to convert to.
 
@@ -50,7 +61,10 @@ Unit of measure to convert from.
 Verbose output.
 
 -,  
-Dump the default .uom file.
+Dump the default `.uom` file.
+
+-.  
+Dump the default `.uomdisplay` file.
 
 --version  
 Show version information.
@@ -107,6 +121,57 @@ For example, the formula to convert degrees to radians can be given as
 follows:
 
 `$value * ($pi div 180)`
+
+Preformatting UOMs (-p) and the `.uomdisplay` file
+--------------------------------------------------
+
+The tool can also convert semantic quantity data to presentation
+quantity data. The -p option specifies which conventions to use for
+formatting quantity values, either SI or imperial. For example:
+
+    <para>Tighten the
+    <quantity>
+    <quantityGroup>
+    <quantityValue quantityUnitOfMeasure="cm">6.35</quantityValue>
+    </quantityGroup>
+    </quantity>
+    bolt.</para>
+
+    $ s1kd-uom -p SI <DM>
+
+    <para>Tighten the 6,35 cm bolt.</para>
+
+This can also be combined with UOM conversions:
+
+    $ s1kd-uom -u cm -t in -p imperial <DM>
+
+    <para>Tighten the 2.5 in bolt.</para>
+
+Custom formats for values or UOMs can be defined in the `.uomdisplay`
+file. By default, the tool will search the current directory and parent
+directories for a file named `.uomdisplay`, but any file can be
+specified by using the -P option.
+
+Example of a `.uomdisplay` file:
+
+    <uomDisplay>
+    <format name="custom" decimalSeparator="," groupingSeparator="."/>
+    <wrapInto>
+    <inlineSignificantData significantParaDataType="psd51"/>
+    </wrapInto>
+    <uoms>
+    <uom name="cm"> cm</uom>
+    <uom name="cm2"> cm<superScript>2</superScript></uom>
+    </uoms>
+    </uomDisplay>
+
+Units of measure that are not defined will be presented as their name
+(e.g., "cm2") separated from the value by a space.
+
+The tool contains a default set of formats and displays. These can be
+used to create a default `.uomdisplay` file by use of the -. option:
+
+    $ s1kd-uom -. > .uomdisplay
 
 EXAMPLES
 ========
@@ -190,3 +255,81 @@ another.
 *Child elements:*
 
 -   None
+
+UOMDISPLAY FILE SCHEMA
+======================
+
+UOM display
+-----------
+
+*Markup element:* `<uomDisplay>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<format>`
+
+-   `<wrapInto>`
+
+-   `<uoms>`
+
+Quantity value format
+---------------------
+
+*Markup element:* `<format>`
+
+*Attributes:*
+
+-   `name` (M), the name of the format
+
+-   `decimalSeparator` (M), the decimal separator
+
+-   `groupingSeparator` (M), the grouping separator
+
+*Child elements:*
+
+-   None
+
+Wrap into element
+-----------------
+
+*Markup element:* `<wrapInto>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+The element `<wrapInto>` contains one child element of any type, which
+quantities will be wrapped in to after formatting.
+
+Units of measure
+----------------
+
+*Markup element:* `<uoms>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<uom>`
+
+Display of a unit of measure
+----------------------------
+
+*Markup element:* `<uom>`
+
+*Attributes:*
+
+-   `name` (M), the name of the UOM.
+
+*Child elements:*
+
+The element &lt;uom&gt; may contain mixed content, which will be used
+for the display of the unit of measure.
