@@ -1,39 +1,39 @@
 <?xml version="1.0"?>
 <uom>
-  <convert from="L" to="L" formula="$value"/>
-  <convert from="cm" to="cm" formula="$value"/>
-  <convert from="cm2" to="cm2" formula="$value"/>
-  <convert from="cm3" to="cm3" formula="$value"/>
-  <convert from="ddegC" to="ddegC" formula="$value"/>
-  <convert from="ddegF" to="ddegF" formula="$value"/>
-  <convert from="ddegK" to="ddegK" formula="$value"/>
-  <convert from="degC" to="degC" formula="$value"/>
-  <convert from="degF" to="degF" formula="$value"/>
-  <convert from="dega" to="dega" formula="$value"/>
-  <convert from="flozUS" to="flozUS" formula="$value"/>
-  <convert from="ft" to="ft" formula="$value"/>
-  <convert from="ft2" to="ft2" formula="$value"/>
-  <convert from="ft3" to="ft3" formula="$value"/>
-  <convert from="g" to="g" formula="$value"/>
-  <convert from="galUS" to="galUS" formula="$value"/>
-  <convert from="in" to="in" formula="$value"/>
-  <convert from="in2" to="in2" formula="$value"/>
-  <convert from="in3" to="in3" formula="$value"/>
-  <convert from="kg" to="kg" formula="$value"/>
-  <convert from="lbm" to="lbm" formula="$value"/>
-  <convert from="m" to="m" formula="$value"/>
-  <convert from="m2" to="m2" formula="$value"/>
-  <convert from="m3" to="m3" formula="$value"/>
-  <convert from="mL" to="mL" formula="$value"/>
-  <convert from="mg" to="mg" formula="$value"/>
-  <convert from="mm" to="mm" formula="$value"/>
-  <convert from="mm2" to="mm2" formula="$value"/>
-  <convert from="mm3" to="mm3" formula="$value"/>
-  <convert from="rad" to="rad" formula="$value"/>
-  <convert from="tonUS" to="tonUS" formula="$value"/>
-  <convert from="yd" to="yd" formula="$value"/>
-  <convert from="yd2" to="yd2" formula="$value"/>
-  <convert from="yd3" to="yd3" formula="$value"/>
+  <convert from="L" to="L"/>
+  <convert from="cm" to="cm"/>
+  <convert from="cm2" to="cm2"/>
+  <convert from="cm3" to="cm3"/>
+  <convert from="ddegC" to="ddegC"/>
+  <convert from="ddegF" to="ddegF"/>
+  <convert from="ddegK" to="ddegK"/>
+  <convert from="degC" to="degC"/>
+  <convert from="degF" to="degF"/>
+  <convert from="dega" to="dega"/>
+  <convert from="flozUS" to="flozUS"/>
+  <convert from="ft" to="ft"/>
+  <convert from="ft2" to="ft2"/>
+  <convert from="ft3" to="ft3"/>
+  <convert from="g" to="g"/>
+  <convert from="galUS" to="galUS"/>
+  <convert from="in" to="in"/>
+  <convert from="in2" to="in2"/>
+  <convert from="in3" to="in3"/>
+  <convert from="kg" to="kg"/>
+  <convert from="lbm" to="lbm"/>
+  <convert from="m" to="m"/>
+  <convert from="m2" to="m2"/>
+  <convert from="m3" to="m3"/>
+  <convert from="mL" to="mL"/>
+  <convert from="mg" to="mg"/>
+  <convert from="mm" to="mm"/>
+  <convert from="mm2" to="mm2"/>
+  <convert from="mm3" to="mm3"/>
+  <convert from="rad" to="rad"/>
+  <convert from="tonUS" to="tonUS"/>
+  <convert from="yd" to="yd"/>
+  <convert from="yd2" to="yd2"/>
+  <convert from="yd3" to="yd3"/>
   <convert from="L" to="flozUS" formula="$value * 33.814"/>
   <convert from="L" to="galUS" formula="$value div 3.785"/>
   <convert from="L" to="mL" formula="$value * 1000"/>

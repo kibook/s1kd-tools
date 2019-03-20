@@ -112,8 +112,8 @@
         </xsl:element>
       </xsl:element>
       <xsl:element name="xsl:variable">
-        <xsl:attribute name="name">before-decimal</xsl:attribute>
-        <xsl:attribute name="select">substring-before($abs, '.')</xsl:attribute>
+        <xsl:attribute name="name">has-decimal</xsl:attribute>
+        <xsl:attribute name="select">contains($abs, '.')</xsl:attribute>
       </xsl:element>
       <xsl:element name="xsl:call-template">
         <xsl:attribute name="name">repeat-string</xsl:attribute>
@@ -125,9 +125,9 @@
           <xsl:attribute name="name">count</xsl:attribute>
           <xsl:element name="xsl:choose">
             <xsl:element name="xsl:when">
-              <xsl:attribute name="test">$before-decimal != ''</xsl:attribute>
+              <xsl:attribute name="test">$has-decimal</xsl:attribute>
               <xsl:element name="xsl:value-of">
-                <xsl:attribute name="select">string-length($before-decimal)</xsl:attribute>
+                <xsl:attribute name="select">string-length(substring-before($abs, '.'))</xsl:attribute>
               </xsl:element>
             </xsl:element>
             <xsl:element name="xsl:otherwise">
@@ -149,7 +149,7 @@
         </xsl:element>
       </xsl:element>
       <xsl:element name="xsl:if">
-        <xsl:attribute name="test">$before-decimal != ''</xsl:attribute>
+        <xsl:attribute name="test">$has-decimal</xsl:attribute>
         <xsl:element name="xsl:value-of">
           <xsl:attribute name="select">$decimal-separator</xsl:attribute>
         </xsl:element>

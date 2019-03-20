@@ -102,11 +102,18 @@
       </xsl:attribute>
       <xsl:element name="xsl:value-of">
         <xsl:attribute name="select">
-          <xsl:text>format-number(</xsl:text>
-          <xsl:value-of select="@formula"/>
-          <xsl:text>, '</xsl:text>
-          <xsl:value-of select="$format"/>
-          <xsl:text>')</xsl:text>
+          <xsl:choose>
+            <xsl:when test="@formula">
+              <xsl:text>format-number(</xsl:text>
+              <xsl:value-of select="@formula"/>
+              <xsl:text>, '</xsl:text>
+              <xsl:value-of select="$format"/>
+              <xsl:text>')</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>$value</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:element>
     </xsl:element>
