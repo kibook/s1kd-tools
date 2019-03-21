@@ -156,9 +156,6 @@ Example of a `.uomdisplay` file:
 
     <uomDisplay>
     <format name="custom" decimalSeparator="," groupingSeparator="."/>
-    <wrapInto>
-    <inlineSignificantData significantParaDataType="psd51"/>
-    </wrapInto>
     <uoms>
     <uom name="cm"> cm</uom>
     <uom name="cm2"> cm<superScript>2</superScript></uom>
