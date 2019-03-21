@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="03"/>
+        <issueInfo issueNumber="003" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="20"/>
+        <issueDate year="2019" month="03" day="21"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -406,6 +406,11 @@ quantityTypeSpecifics="USD">7.36</quantity>]]></verbatimText>
               </listItem>
               <listItem>
                 <para>
+                  <verbatimText verbatimStyle="vs12">&lt;groupTypePrefixes&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
                   <verbatimText verbatimStyle="vs12">&lt;wrapInto&gt;</verbatimText>
                 </para>
               </listItem>
@@ -446,6 +451,56 @@ quantityTypeSpecifics="USD">7.36</quantity>]]></verbatimText>
             <randomList>
               <listItem>
                 <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Group type prefixes</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;groupTypePrefixes&gt;</verbatimText> specifies prefixes which are added for specific group types.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;groupTypePrefixes&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;nominal&gt;, text placed before a nominal group.</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;minimum&gt;, text placed before a minimum group.</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;minimumRange&gt;, text placed before a minimum group that is followed by a maximum group to specify a range.</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;maximum&gt;, text placed before a maximum group.</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;maximumRange&gt;, text placed before a maximum group that is preceded by a minimum group to specify a range.</verbatimText>
+                </para>
               </listItem>
             </randomList>
           </para>

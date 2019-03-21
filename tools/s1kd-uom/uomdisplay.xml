@@ -2,6 +2,12 @@
 <uomDisplay>
   <format name="SI" decimalSeparator="," groupingSeparator=" "/>
   <format name="imperial" decimalSeparator="." groupingSeparator=","/>
+  <groupTypePrefixes>
+    <minimum>at least </minimum>
+    <maximum>at most </maximum>
+    <minimumRange>from </minimumRange>
+    <maximumRange> to </maximumRange>
+  </groupTypePrefixes>
   <uoms>
     <uom name="%">%</uom>
     <uom name="cm2"> cm<superScript>2</superScript></uom>
