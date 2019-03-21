@@ -3,8 +3,8 @@
   <format name="SI" decimalSeparator="," groupingSeparator=" "/>
   <format name="imperial" decimalSeparator="." groupingSeparator=","/>
   <groupTypePrefixes>
-    <minimum>at least </minimum>
-    <maximum>at most </maximum>
+    <minimum>a minimum of </minimum>
+    <maximum>a maximum of </maximum>
     <minimumRange>from </minimumRange>
     <maximumRange> to </maximumRange>
   </groupTypePrefixes>
