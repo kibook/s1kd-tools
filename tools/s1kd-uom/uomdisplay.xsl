@@ -202,11 +202,27 @@
       <xsl:element name="xsl:choose">
         <xsl:element name="xsl:when">
           <xsl:attribute name="test">@quantityGroupType = 'minimum'</xsl:attribute>
-          <xsl:text>from </xsl:text>
+          <xsl:element name="xsl:choose">
+            <xsl:element name="xsl:when">
+              <xsl:attribute name="test">following-sibling::quantityGroup</xsl:attribute>
+              <xsl:text>from </xsl:text>
+            </xsl:element>
+            <xsl:element name="xsl:otherwise">
+              <xsl:text>at least </xsl:text>
+            </xsl:element>
+          </xsl:element>
         </xsl:element>
         <xsl:element name="xsl:when">
           <xsl:attribute name="test">@quantityGroupType = 'maximum'</xsl:attribute>
-          <xsl:text> to </xsl:text>
+          <xsl:element name="xsl:choose">
+            <xsl:element name="xsl:when">
+              <xsl:attribute name="test">preceding-sibling::quantityGroup</xsl:attribute>
+              <xsl:text> to </xsl:text>
+            </xsl:element>
+            <xsl:element name="xsl:otherwise">
+              <xsl:text>up to </xsl:text>
+            </xsl:element>
+          </xsl:element>
         </xsl:element>
       </xsl:element>
       <xsl:element name="xsl:for-each">
