@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <uomDisplay>
   <format name="SI" decimalSeparator="," groupingSeparator=" "/>
+  <format name="euro" decimalSeparator="," groupingSeparator="."/>
   <format name="imperial" decimalSeparator="." groupingSeparator=","/>
   <groupTypePrefixes>
     <minimum>a minimum of </minimum>

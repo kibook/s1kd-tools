@@ -44,9 +44,11 @@ Use a custom `.uomdisplay` file.
 Preformat quantity data to the specified decimal format. The built-in
 formats are:
 
--   SI
+-   SI - comma for decimal separator, space for grouping
 
--   imperial
+-   euro - comma for decimal separator, full-stop for grouping
+
+-   imperial - full-stop for decimal separator, comma for grouping
 
 -t &lt;uom&gt;  
 Unit of measure to convert to.
@@ -127,7 +129,7 @@ Preformatting UOMs (-p) and the `.uomdisplay` file
 
 The tool can also convert semantic quantity data to presentation
 quantity data. The -p option specifies which conventions to use for
-formatting quantity values, either SI or imperial. For example:
+formatting quantity values. For example:
 
     <para>Tighten the
     <quantity>

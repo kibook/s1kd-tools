@@ -110,10 +110,13 @@
                 <para>
                   <randomList>
                     <listItem>
-                      <para>SI</para>
+                      <para>SI - comma for decimal separator, space for grouping</para>
                     </listItem>
                     <listItem>
-                      <para>imperial</para>
+                      <para>euro - comma for decimal separator, full-stop for grouping</para>
+                    </listItem>
+                    <listItem>
+                      <para>imperial - full-stop for decimal separator, comma for grouping</para>
                     </listItem>
                   </randomList>
                 </para>
@@ -221,7 +224,7 @@
         </levelledPara>
         <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
           <title>Preformatting UOMs (-p) and the <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file</title>
-          <para>The tool can also convert semantic quantity data to presentation quantity data. The -p option specifies which conventions to use for formatting quantity values, either SI or imperial. For example:</para>
+          <para>The tool can also convert semantic quantity data to presentation quantity data. The -p option specifies which conventions to use for formatting quantity values. For example:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<para>Tighten the
 <quantity>
