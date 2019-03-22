@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="01" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="01"/>
+        <issueInfo issueNumber="007" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="13"/>
+        <issueDate year="2019" month="03" day="22"/>
         <dmTitle>
           <techName>s1kd-syncrefs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -55,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-syncrefs [-dflv] [-o <out>] [<data module>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs23" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-syncrefs [-dflv] [-o <out>] [<data module>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -90,7 +90,7 @@
                 <para>The resulting XML is written to &lt;out&gt; instead of stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-v</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
