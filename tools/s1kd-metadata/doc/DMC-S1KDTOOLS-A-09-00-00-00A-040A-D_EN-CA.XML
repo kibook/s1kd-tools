@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="09" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="08"/>
+        <issueDate year="2019" month="03" day="22"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1">
-        <simplePara>The -w and -W options with no proceeding -v option now check whether a piece of metadata exists/does not exist at all, regardless of value.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -140,13 +137,13 @@
             <definitionListItem>
               <listItemTerm>-W &lt;name&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Show or edit metadata only on objects where the value of &lt;name&gt; is not equal to the value specified in the following -v option. If no -v option follows, this will show objects which do not have metadata &lt;name&gt; of any value.</para>
+                <para>Show or edit metadata only on objects where the value of &lt;name&gt; is not equal to the value specified in the following -v option. If no -v option follows, this will show objects which do not have metadata &lt;name&gt; of any value.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-w &lt;name&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Show or edit metadata only on objects where the value of &lt;name&gt; is equal to the value specified in the following -v option. If no -v option follows, this will show objects which have metadata &lt;name&gt; with any value.</para>
+                <para>Show or edit metadata only on objects where the value of &lt;name&gt; is equal to the value specified in the following -v option. If no -v option follows, this will show objects which have metadata &lt;name&gt; with any value.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
