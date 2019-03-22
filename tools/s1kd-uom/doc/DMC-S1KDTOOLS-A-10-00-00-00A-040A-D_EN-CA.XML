@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="04"/>
+        <issueInfo issueNumber="004" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="21"/>
+        <issueDate year="2019" month="03" day="22"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -481,29 +481,19 @@ quantityTypeSpecifics="USD">7.36</quantity>]]></verbatimText>
           <para>
             <randomList>
               <listItem>
-                <para>
-                  <verbatimText verbatimStyle="vs12">&lt;nominal&gt;, text placed before a nominal group.</verbatimText>
-                </para>
+                <para><verbatimText verbatimStyle="vs12">&lt;nominal&gt;</verbatimText>, text placed before a nominal group.</para>
               </listItem>
               <listItem>
-                <para>
-                  <verbatimText verbatimStyle="vs12">&lt;minimum&gt;, text placed before a minimum group.</verbatimText>
-                </para>
+                <para><verbatimText verbatimStyle="vs12">&lt;minimum&gt;</verbatimText>, text placed before a minimum group.</para>
               </listItem>
               <listItem>
-                <para>
-                  <verbatimText verbatimStyle="vs12">&lt;minimumRange&gt;, text placed before a minimum group that is followed by a maximum group to specify a range.</verbatimText>
-                </para>
+                <para><verbatimText verbatimStyle="vs12">&lt;minimumRange&gt;</verbatimText>, text placed before a minimum group that is followed by a maximum group to specify a range.</para>
               </listItem>
               <listItem>
-                <para>
-                  <verbatimText verbatimStyle="vs12">&lt;maximum&gt;, text placed before a maximum group.</verbatimText>
-                </para>
+                <para><verbatimText verbatimStyle="vs12">&lt;maximum&gt;</verbatimText>, text placed before a maximum group.</para>
               </listItem>
               <listItem>
-                <para>
-                  <verbatimText verbatimStyle="vs12">&lt;maximumRange&gt;, text placed before a maximum group that is preceded by a minimum group to specify a range.</verbatimText>
-                </para>
+                <para><verbatimText verbatimStyle="vs12">&lt;maximumRange&gt;</verbatimText>, text placed before a maximum group that is preceded by a minimum group to specify a range.</para>
               </listItem>
             </randomList>
           </para>

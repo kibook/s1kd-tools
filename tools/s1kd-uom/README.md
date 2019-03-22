@@ -308,15 +308,17 @@ specific group types.
 
 *Child elements:*
 
--   `<nominal>, text placed before a nominal group.`
+-   `<nominal>`, text placed before a nominal group.
 
--   `<minimum>, text placed before a minimum group.`
+-   `<minimum>`, text placed before a minimum group.
 
--   `<minimumRange>, text placed before a minimum group that is followed by a maximum group to specify a range.`
+-   `<minimumRange>`, text placed before a minimum group that is
+    followed by a maximum group to specify a range.
 
--   `<maximum>, text placed before a maximum group.`
+-   `<maximum>`, text placed before a maximum group.
 
--   `<maximumRange>, text placed before a maximum group that is preceded by a minimum group to specify a range.`
+-   `<maximumRange>`, text placed before a maximum group that is
+    preceded by a minimum group to specify a range.
 
 Wrap into element
 -----------------
