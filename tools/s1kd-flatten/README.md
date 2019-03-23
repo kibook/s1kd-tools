@@ -25,7 +25,7 @@ OPTIONS
 -c  
 Flatten referenced container data modules by copying the references
 inside the container directly in to the publication module. The copied
-references will also be flattened, unless the -d option is specified.
+references will also be flattened, unless the -D option is specified.
 
 -D  
 Remove unresolved references, but do not flatten resolved ones.
