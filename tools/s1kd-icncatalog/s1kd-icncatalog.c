@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -142,7 +142,9 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 		fprintf(stderr, I_RESOLVE, fname);
 	}
 
-	doc = read_xml_doc(fname);
+	if (!(doc = read_xml_doc(fname))) {
+		return;
+	}
 
 	if (xinclude) {
 		xmlXIncludeProcess(doc);
