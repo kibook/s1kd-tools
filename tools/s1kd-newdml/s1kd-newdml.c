@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -74,15 +74,6 @@ char *defaultRpcCode = NULL;
 
 char *template_dir = NULL;
 
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
-
 xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
@@ -94,9 +85,9 @@ xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return xmlReadFile(src, NULL, PARSE_OPTS);
+		return read_xml_doc(src);
 	} else {
-		return xmlReadMemory((const char *) dml_xml, dml_xml_len, NULL, NULL, 0);
+		return read_xml_mem((const char *) dml_xml, dml_xml_len);
 	}
 }
 
@@ -148,7 +139,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const ch
 
 	src = xmlCopyDoc(doc, 1);
 
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xsl, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, src, params);
@@ -540,7 +531,7 @@ void add_sns(xmlNodePtr content, const char *path, const char *incode)
 		params[2] = NULL;
 	}
 
-	doc = xmlReadFile(path, NULL, PARSE_OPTS);
+	doc = read_xml_doc(path);
 
 	transform_doc(doc, sns2dmrl_xsl, sns2dmrl_xsl_len, params);
 
@@ -800,7 +791,7 @@ int main(int argc, char **argv)
 		xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST "000");
 	}
 
-	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if ((defaults_xml = read_xml_doc(defaults_fname))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
@@ -980,7 +971,7 @@ int main(int argc, char **argv)
 	}
 
 	for (c = optind; c < argc; ++c) {
-		xmlDocPtr doc = xmlReadFile(argv[c], NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
+		xmlDocPtr doc = read_xml_doc(argv[c]);
 
 		if (doc) {
 			if (isdm(doc)) {
@@ -1033,7 +1024,7 @@ int main(int argc, char **argv)
 		dml_doc = toissue(dml_doc, issue);
 	}
 
-	xmlSaveFile(out, dml_doc);
+	save_xml_doc(dml_doc, out);
 
 	if (verbose)
 		puts(out);

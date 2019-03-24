@@ -12,16 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.6"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
+#define VERSION "2.1.7"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
@@ -207,7 +198,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 				xmlDocPtr subpm;
 				xmlNodePtr content;
 
-				subpm = xmlReadFile(fs_pm_fname, NULL, PARSE_OPTS);
+				subpm = read_xml_doc(fs_pm_fname);
 				content = first_xpath_node(subpm, NULL, "//content");
 
 				if (content) {
@@ -235,7 +226,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 						xi = xmlAddPrevSibling(pm_ref, xi);
 					}
 				} else {
-					doc = xmlReadFile(fs_pm_fname, NULL, PARSE_OPTS);
+					doc = read_xml_doc(fs_pm_fname);
 					pm = xmlDocGetRootElement(doc);
 					xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
 					xmlFreeDoc(doc);
@@ -374,7 +365,7 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 				xmlDocPtr doc;
 				xmlNodePtr refs;
 
-				doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
+				doc = read_xml_doc(fs_dm_fname);
 				refs = first_xpath_node(doc, NULL, "//container/refs");
 
 				if (refs) {
@@ -409,7 +400,7 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 					}
 				} else {
 					xmlChar *app;
-					doc = xmlReadFile(fs_dm_fname, NULL, PARSE_OPTS);
+					doc = read_xml_doc(fs_dm_fname);
 					dmodule = xmlDocGetRootElement(doc);
 					if ((app = xmlGetProp(dm_ref, BAD_CAST "applicRefId"))) {
 						xmlSetProp(dmodule, BAD_CAST "applicRefId", app);
@@ -515,7 +506,7 @@ int main(int argc, char **argv)
 		pm_fname = "-";
 	}
 
-	pm_doc = xmlReadFile(pm_fname, NULL, PARSE_OPTS);
+	pm_doc = read_xml_doc(pm_fname);
 
 	pm = xmlDocGetRootElement(pm_doc);
 
@@ -537,7 +528,7 @@ int main(int argc, char **argv)
 			xmlSetProp(xi, BAD_CAST "href", BAD_CAST pm_fname);
 		} else {
 			xmlDocPtr doc;
-			doc = xmlReadFile(pm_fname, NULL, PARSE_OPTS);
+			doc = read_xml_doc(pm_fname);
 			xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
 			xmlFreeDoc(doc);
 		}
@@ -570,14 +561,14 @@ int main(int argc, char **argv)
 				xmlSetProp(xi, BAD_CAST "href", BAD_CAST argv[i]);
 			} else {
 				xmlDocPtr doc;
-				doc = xmlReadFile(argv[i], NULL, PARSE_OPTS);
+				doc = read_xml_doc(argv[i]);
 				xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
 				xmlFreeDoc(doc);
 			}
 		}
 	}
 
-	xmlSaveFile(overwrite ? pm_fname : "-", use_pub_fmt ? pub_doc : pm_doc);
+	save_xml_doc(use_pub_fmt ? pub_doc : pm_doc, overwrite ? pm_fname : "-");
 
 	xmlFreeDoc(pm_doc);
 	xmlFreeNode(search_paths);

@@ -26,6 +26,18 @@
 #define DEFAULT_UOM_FNAME ".uom"
 #define DEFAULT_UOMDISP_FNAME ".uomdisplay"
 
+/* Default XML parsing options:
+ * - Disable the built-in parser error and warning messages. The tools will
+ *   handle the reporting of errors.
+ * - Disable network access as a precaution.
+ */
+#define DEFAULT_PARSE_OPTS XML_PARSE_NOERROR | XML_PARSE_NOWARNING | XML_PARSE_NONET
+
+/* Common read/write macros that use the default options. */
+#define read_xml_doc(path) xmlReadFile(path, NULL, DEFAULT_PARSE_OPTS)
+#define read_xml_mem(buffer, size) xmlReadMemory(buffer, size, NULL, NULL, DEFAULT_PARSE_OPTS)
+#define save_xml_doc(doc, path) xmlSaveFile(path, doc)
+
 /* Return the full path name from a relative path. */
 char *real_path(const char *path, char *real);
 

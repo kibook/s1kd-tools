@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.2.0"
+#define VERSION "2.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -39,15 +39,6 @@ xmlChar *dmApplicId;
  *
  * Read from elements_list.h*/
 xmlChar *applicElemsXPath;
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 /* Custom XSL for generating display text. */
 char *customGenDispTextXsl = NULL;
@@ -231,7 +222,7 @@ void addIdentity(xmlDocPtr style)
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
 
-	identity = xmlReadMemory((const char *) ___common_identity_xsl, ___common_identity_xsl_len, NULL, NULL, 0);
+	identity = read_xml_mem((const char *) ___common_identity_xsl, ___common_identity_xsl_len);
 	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
 
 	stylesheet = xmlDocGetRootElement(style);
@@ -265,7 +256,7 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 		xmlDocPtr act;
 		xmlChar *path;
 		path = xmlNodeGetContent(cur);
-		act = xmlReadFile((char *) path, NULL, PARSE_OPTS);
+		act = read_xml_doc((char *) path);
 		xmlAddChild(muxacts, xmlCopyNode(xmlDocGetRootElement(act), 1));
 		xmlFreeDoc(act);
 		xmlFree(path);
@@ -274,17 +265,17 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 		xmlDocPtr cct;
 		xmlChar *path;
 		path = xmlNodeGetContent(cur);
-		cct = xmlReadFile((char *) path, NULL, PARSE_OPTS);
+		cct = read_xml_doc((char *) path);
 		xmlAddChild(muxccts, xmlCopyNode(xmlDocGetRootElement(cct), 1));
 		xmlFreeDoc(cct);
 		xmlFree(path);
 	}
 
 	if (customGenDispTextXsl) {
-		styledoc = xmlReadFile(customGenDispTextXsl, NULL, PARSE_OPTS);
+		styledoc = read_xml_doc(customGenDispTextXsl);
 	} else {
-		styledoc = xmlReadMemory((const char *) generateDisplayText_xsl,
-			generateDisplayText_xsl_len, NULL, NULL, 0);
+		styledoc = read_xml_mem((const char *) generateDisplayText_xsl,
+			generateDisplayText_xsl_len);
 	}
 
 	addIdentity(styledoc);
@@ -469,7 +460,7 @@ void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 	char act_fname[PATH_MAX];
 	xmlDocPtr act = NULL;
 
-	if (find_act_fname(act_fname, doc) && (act = xmlReadFile(act_fname, NULL, PARSE_OPTS))) {
+	if (find_act_fname(act_fname, doc) && (act = read_xml_doc(act_fname))) {
 		char cct_fname[PATH_MAX];
 
 		xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST act_fname);
@@ -494,7 +485,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 		fprintf(stderr, I_PROCESS, in);
 	}
 
-	doc = xmlReadFile(in, NULL, PARSE_OPTS);
+	doc = read_xml_doc(in);
 
 	if (xincl) {
 		xmlXIncludeProcess(doc);
@@ -526,7 +517,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 		generateDisplayText(doc, all_acts, all_ccts);
 	}
 
-	xmlSaveFile(out, doc);
+	save_xml_doc(doc, out);
 
 	/* The next data module could reference a different ACT/CCT, so
 	 * the list must be cleared. */

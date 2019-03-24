@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.8.1"
+#define VERSION "2.8.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -63,15 +63,6 @@ unsigned BREX_PATH_MAX = 1;
 
 /* The total width of the progress bar displayed by the -p option. */
 #define PROGRESS_BAR_WIDTH 60
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 /* Verbosity of the tool's output. */
 enum verbosity {SILENT, NORMAL, VERBOSE} verbose = NORMAL;
@@ -777,7 +768,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 xmlDocPtr load_brex(const char *name)
 {
 	if (access(name, F_OK) != -1) {
-		return xmlReadFile(name, NULL, PARSE_OPTS);
+		return read_xml_doc(name);
 	} else {
 		unsigned char *xml = NULL;
 		unsigned int len = 0;
@@ -796,7 +787,7 @@ xmlDocPtr load_brex(const char *name)
 			len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
 		}
 
-		return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+		return read_xml_mem((const char *) xml, len);
 	}
 }
 
@@ -1083,7 +1074,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	}
 
 	if (output_tree && !total) {
-		xmlSaveFile("-", dmod_doc);
+		save_xml_doc(dmod_doc, "-");
 	}
 
 	return total;
@@ -1223,7 +1214,7 @@ void print_stats(xmlDocPtr doc)
 	xsltStylesheetPtr style;
 	xmlDocPtr res;
 
-	styledoc = xmlReadMemory((const char *) stats_xsl, stats_xsl_len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) stats_xsl, stats_xsl_len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, doc, NULL);
@@ -1376,7 +1367,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (brsl_fname) {
-		brsl = xmlReadFile(brsl_fname, NULL, PARSE_OPTS);
+		brsl = read_xml_doc(brsl_fname);
 	}
 
 	outdoc = xmlNewDoc(BAD_CAST "1.0");
@@ -1393,7 +1384,7 @@ int main(int argc, char *argv[])
 		 * module which referenced it. */
 		bool ref_brex = false;
 
-		dmod_doc = xmlReadFile(dmod_fnames[i], NULL, PARSE_OPTS);
+		dmod_doc = read_xml_doc(dmod_fnames[i]);
 
 		if (!dmod_doc) {
 			if (use_stdin) {
@@ -1481,7 +1472,7 @@ int main(int argc, char *argv[])
 		show_progress(i, num_dmod_fnames);
 
 	if (xmlout) {
-		xmlSaveFile("-", outdoc);
+		save_xml_doc(outdoc, "-");
 	}
 
 	if (show_stats) {

@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.3.0"
+#define VERSION "2.3.1"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -60,15 +60,6 @@
  */
 #define DEFAULT_ORIG_CODE "S1KDI"
 #define DEFAULT_ORIG_NAME "s1kd-instance tool"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 /* Search for ACT/PCT recursively. */
 bool recursive_search = false;
@@ -1572,7 +1563,7 @@ void add_identity(xmlDocPtr style)
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
 
-	identity = xmlReadMemory((const char *) ___common_identity_xsl, ___common_identity_xsl_len, NULL, NULL, 0);
+	identity = read_xml_mem((const char *) ___common_identity_xsl, ___common_identity_xsl_len);
 	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
 
 	stylesheet = xmlDocGetRootElement(style);
@@ -1691,7 +1682,7 @@ xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, con
 
 	xmlDocPtr styledoc = NULL;
 
-	cir = xmlReadFile(cirdocfname, NULL, PARSE_OPTS);
+	cir = read_xml_doc(cirdocfname);
 
 	if (!cir) {
 		fprintf(stderr, S_INVALID_CIR, cirdocfname);
@@ -1731,7 +1722,7 @@ xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, con
 	cirtype = (char *) cirnode->name;
 
 	if (cir_xsl) {
-		styledoc = xmlReadFile(cir_xsl, NULL, PARSE_OPTS);
+		styledoc = read_xml_doc(cir_xsl);
 	} else {
 		unsigned char *xsl = NULL;
 		unsigned int len = 0;
@@ -1740,7 +1731,7 @@ xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, con
 			add_src = false;
 		}
 
-		styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+		styledoc = read_xml_mem((const char *) xsl, len);
 	}
 
 	if (styledoc) {
@@ -1949,7 +1940,7 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 	xmlXPathObjectPtr obj;
 	char xpath[512];
 
-	pct = xmlReadFile(pctfname, NULL, PARSE_OPTS);
+	pct = read_xml_doc(pctfname);
 	ctx = xmlXPathNewContext(pct);
 
 	/* If the product is in the form of IDENT:TYPE:VALUE, it identifies the
@@ -2026,7 +2017,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const ch
 	xsltStylesheetPtr style;
 	xmlNodePtr old;
 
-	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xml, len);
 	add_identity(styledoc);
 	style = xsltParseStylesheetDoc(styledoc);
 
@@ -2452,7 +2443,7 @@ bool find_pct_fname(char *dst, xmlDocPtr doc)
 		return false;
 	}
 
-	if (!(act = xmlReadFile(act_fname, NULL, PARSE_OPTS))) {
+	if (!(act = read_xml_doc(act_fname))) {
 		return false;
 	}
 
@@ -2522,7 +2513,7 @@ int find_source(char *src, xmlDocPtr *doc)
 	xmlNodePtr sdi;
 	bool found = false;
 
-	if (!(*doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if (!(*doc = read_xml_doc(src))) {
 		return -1;
 	}
 
@@ -3027,7 +3018,7 @@ int main(int argc, char **argv)
 			add_cirs_from_inst(inst, cirs);
 		}
 
-		if ((doc = xmlReadFile(src, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR))) {
+		if ((doc = read_xml_doc(src))) {
 			/* Load the applic assigns from the PCT data module referenced
 			 * by the ACT data module referenced by this data module. */
 			if (strcmp(product, "") != 0 && strcmp(pctfname, "") == 0) {
@@ -3213,7 +3204,7 @@ int main(int argc, char **argv)
 				if (!use_stdout && access(out, F_OK) == 0 && !force_overwrite) {
 					fprintf(stderr, S_FILE_EXISTS, out);
 				} else {
-					xmlSaveFile(out, doc);
+					save_xml_doc(doc, out);
 
 					if (lock) {
 						mkreadonly(out);

@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.4.1"
+#define VERSION "2.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -93,15 +93,6 @@ bool outputTree = false;
 
 /* Verbose output. */
 bool verbose = false;
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
@@ -613,7 +604,7 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		xmlNodePtr dmRefAddressItems, dmTitle;
 		xmlChar *techName, *infoName;
 
-		if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+		if (!(doc = read_xml_doc(fname))) {
 			return;
 		}
 
@@ -698,7 +689,7 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		xmlNodePtr pmRefAddressItems;
 		xmlChar *pmTitle;
 
-		if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+		if (!(doc = read_xml_doc(fname))) {
 			return;
 		}
 
@@ -776,7 +767,7 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		xmlNodePtr oldtitle, newtitle;
 		xmlChar *techname, *infoname;
 
-		if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+		if (!(doc = read_xml_doc(fname))) {
 			return;
 		}
 
@@ -956,7 +947,7 @@ int listReferences(const char *path)
 		printMatched(NULL, path, path);
 	}
 
-	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if (!(doc = read_xml_doc(path))) {
 		if (strcmp(path, "-") == 0) {
 			fprintf(stderr, E_BAD_STDIN);
 			exit(EXIT_BAD_STDIN);
@@ -985,7 +976,7 @@ int listReferences(const char *path)
 
 	/* Write valid CSDB object to stdout. */
 	if (outputTree && !unmatched) {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	/* If the given object was modified by updating matched refs or
@@ -993,9 +984,9 @@ int listReferences(const char *path)
 	 */
 	if (updateRefs || tagUnmatched) {
 		if (overwriteUpdated) {
-			xmlSaveFile(path, doc);
+			save_xml_doc(doc, path);
 		} else {
-			xmlSaveFile("-", doc);
+			save_xml_doc(doc, "-");
 		}
 	}
 

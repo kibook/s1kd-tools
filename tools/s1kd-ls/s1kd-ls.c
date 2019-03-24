@@ -23,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -39,15 +39,6 @@ unsigned ICN_MAX = OBJECT_MAX;
 #define SHOW_DDN 0x10
 #define SHOW_DML 0x20
 #define SHOW_ICN 0x40
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 /* Lists of CSDB objects. */
 char (*dms)[PATH_MAX] = NULL;
@@ -287,7 +278,7 @@ int is_official_issue(const char *fname, const char *path)
 		xmlChar *inwork;
 		int official;
 
-		doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+		doc = read_xml_doc(path);
 
 		if (!doc) {
 			return 1;

@@ -14,22 +14,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_ENCODING_ERROR "Error encoding path name.\n"
 
 #define EXIT_ENCODING_ERROR 1
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 #define DEFAULT_SNS_DNAME "SNS"
 
@@ -315,7 +306,7 @@ void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdn
 	xmlXPathObjectPtr results;
 	xmlNodePtr sns_descr;
 
-	if (!(brex = xmlReadFile(brex_fname, NULL, PARSE_OPTS))) {
+	if (!(brex = read_xml_doc(brex_fname))) {
 		fprintf(stderr, ERR_PREFIX "Could not read BREX data module: %s\n", brex_fname);
 		exit(1);
 	}

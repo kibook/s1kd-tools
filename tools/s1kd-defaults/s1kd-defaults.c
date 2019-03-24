@@ -11,22 +11,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.5.4"
+#define VERSION "1.5.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
 #define S_DMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_DMTYPES_FNAME " file.\n"
 #define S_FMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_FMTYPES_FNAME " file.\n"
 #define S_NO_FILE_ERR ERR_PREFIX "Could not open file: %s\n"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 enum format {TEXT, XML};
 enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
@@ -72,7 +63,7 @@ xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 {
 	xmlDocPtr styledoc, res;
 
-	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xml, len);
 	res = transform_doc_with(doc, styledoc);
 
 	return res;
@@ -114,7 +105,7 @@ xmlDocPtr text_defaults_to_xml(const char *path)
 		return NULL;
 	}
 
-	if ((doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if ((doc = read_xml_doc(path))) {
 		return doc;
 	}
 
@@ -153,7 +144,7 @@ xmlDocPtr text_dmtypes_to_xml(const char *path)
 	xmlDocPtr doc;
 	xmlNodePtr dmtypes;
 
-	if ((doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if ((doc = read_xml_doc(path))) {
 		return doc;
 	}
 
@@ -199,7 +190,7 @@ xmlDocPtr text_fmtypes_to_xml(const char *path)
 	xmlDocPtr doc;
 	xmlNodePtr fmtypes;
 
-	if ((doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if ((doc = read_xml_doc(path))) {
 		return doc;
 	}
 
@@ -334,14 +325,14 @@ void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDoc
 	if (brex) {
 		doc = new_defaults_from_brex(brex, brexmap);
 	} else {
-		doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
+		doc = read_xml_mem((const char *) defaults_xml, defaults_xml_len);
 		set_defaults(doc);
 	}
 
 	if (overwrite) {
-		xmlSaveFile(fname, doc);
+		save_xml_doc(doc, fname);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);
@@ -356,7 +347,7 @@ void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDo
 	if (brex) {
 		doc = new_defaults_from_brex(brex, brexmap);
 	} else {
-		doc = xmlReadMemory((const char *) defaults_xml, defaults_xml_len, NULL, NULL, 0);
+		doc = read_xml_mem((const char *) defaults_xml, defaults_xml_len);
 		set_defaults(doc);
 	}
 
@@ -410,7 +401,7 @@ void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDo
 {
 	xmlDocPtr doc, res = NULL;
 
-	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING))) {
+	if (!(doc = read_xml_doc(path))) {
 		doc = simple_text_to_xml(path, f, sort, brex, brexmap);
 	}
 
@@ -460,9 +451,9 @@ void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDo
 	}
 
 	if (overwrite) {
-		xmlSaveFile(path, doc);
+		save_xml_doc(doc, path);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);
@@ -495,9 +486,9 @@ xmlDocPtr read_default_brexmap(void)
 	char fname[PATH_MAX];
 
 	if (find_config(fname, DEFAULT_BREXMAP_FNAME)) {
-		return xmlReadFile(fname, NULL, PARSE_OPTS);
+		return read_xml_doc(fname);
 	} else {
-		return xmlReadMemory((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len, NULL, NULL, PARSE_OPTS);
+		return read_xml_mem((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len);
 	}
 }
 
@@ -534,7 +525,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'b':
-				if (!brex) brex = xmlReadFile(optarg, NULL, PARSE_OPTS);
+				if (!brex) brex = read_xml_doc(optarg);
 				break;
 			case 'D':
 				f = DMTYPES;
@@ -558,7 +549,7 @@ int main(int argc, char **argv)
 				dump_brexmap();
 				return 0;
 			case 'j':
-				if (!brexmap) brexmap = xmlReadFile(optarg, NULL, PARSE_OPTS);
+				if (!brexmap) brexmap = read_xml_doc(optarg);
 				break;
 			case 's':
 				sort = true;
@@ -614,7 +605,7 @@ int main(int argc, char **argv)
 					fclose(f);
 					xmlFreeDoc(res);
 				} else {
-					xmlSaveFile(DEFAULT_DMTYPES_FNAME, dmtypes);
+					save_xml_doc(dmtypes, DEFAULT_DMTYPES_FNAME);
 				}
 
 				xmlFreeDoc(dmtypes);

@@ -20,7 +20,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.7.12"
+#define VERSION "1.7.13"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -129,15 +129,6 @@ bool sns_prev_title = false;
 bool sns_prev_title_set = false;
 
 bool no_info_name = false;
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 #define BREX_INFOCODE_USE BAD_CAST "The information code used is not in the allowed set."
 
@@ -548,7 +539,7 @@ xmlDocPtr maint_sns_doc(void)
 
 	xml = maint_sns_xml();
 
-	return xmlReadMemory((const char *) xml.xml, xml.len, NULL, NULL, 0);
+	return read_xml_mem((const char *) xml.xml, xml.len);
 }
 
 xmlDocPtr set_tech_from_sns(void)
@@ -561,9 +552,9 @@ xmlDocPtr set_tech_from_sns(void)
 	if (maint_sns) {
 		brex = maint_sns_doc();
 	} else if (sns_fname && find_brex_file(fname, sns_fname)) {
-		brex = xmlReadFile(fname, NULL, PARSE_OPTS);
+		brex = read_xml_doc(fname);
 	} else if (strcmp(brex_dmcode, "") != 0 && find_brex_file(fname, brex_dmcode)) {
-		brex = xmlReadFile(fname, NULL, PARSE_OPTS);
+		brex = read_xml_doc(fname);
 	}
 
 	if (!brex) {
@@ -646,7 +637,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			exit(EXIT_UNKNOWN_DMTYPE);
 		}
 
-		return xmlReadFile(src, NULL, PARSE_OPTS);
+		return read_xml_doc(src);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
 			case ISS_20:
@@ -953,7 +944,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		exit(EXIT_UNKNOWN_DMTYPE);
 	}
 
-	return xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	return read_xml_mem((const char *) xml, len);
 }
 
 xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
@@ -999,7 +990,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 
 	orig = xmlCopyDoc(doc, 1);
 			
-	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xml, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, doc, NULL);
@@ -1176,9 +1167,9 @@ xmlDocPtr read_default_brexmap(void)
 	char fname[PATH_MAX];
 
 	if (find_config(fname, DEFAULT_BREXMAP_FNAME)) {
-		return xmlReadFile(fname, NULL, PARSE_OPTS);
+		return read_xml_doc(fname);
 	} else {
-		return xmlReadMemory((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len, NULL, NULL, PARSE_OPTS);
+		return read_xml_mem((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len);
 	}
 }
 
@@ -1361,7 +1352,7 @@ int main(int argc, char **argv)
 			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
 			case '!': no_info_name = true; break;
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
-			case 'j': if (!brexmap) brexmap = xmlReadFile(optarg, NULL, PARSE_OPTS); break;
+			case 'j': if (!brexmap) brexmap = read_xml_doc(optarg); break;
 			case '~': dump_templates(optarg); return 0;
 			case 'h':
 			case '?': show_help(); return 0;
@@ -1395,7 +1386,7 @@ int main(int argc, char **argv)
 		xmlFree(path);
 	}
 
-	if ((defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if ((defaults_xml = read_xml_doc(defaults_fname))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
@@ -1465,7 +1456,7 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(dmtype, "") == 0 || (strcmp(infoName_content, "") == 0 && !no_info_name)) {
-		if ((defaults_xml = xmlReadFile(dmtypes_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((defaults_xml = read_xml_doc(dmtypes_fname))) {
 			process_dmtypes_xml(defaults_xml, brex_rules);
 			xmlFreeDoc(defaults_xml);
 		} else if ((defaults = fopen(dmtypes_fname, "r"))) {
@@ -1501,7 +1492,7 @@ int main(int argc, char **argv)
 
 			fclose(defaults);
 		} else {
-			defaults_xml = xmlReadMemory((const char *) dmtypes_xml, dmtypes_xml_len, NULL, NULL, 0);
+			defaults_xml = read_xml_mem((const char *) dmtypes_xml, dmtypes_xml_len);
 			process_dmtypes_xml(defaults_xml, brex_rules);
 			xmlFreeDoc(defaults_xml);
 		}
@@ -1747,7 +1738,7 @@ int main(int argc, char **argv)
 		exit(EXIT_DM_EXISTS);
 	}
 
-	xmlSaveFile(out, dm);
+	save_xml_doc(dm, out);
 
 	if (verbose)
 		puts(out);

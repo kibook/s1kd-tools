@@ -11,21 +11,13 @@
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#include "s1kd_tools.h"
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.3.3"
+#define VERSION "1.3.4"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 void showHelp(void)
 {
@@ -76,7 +68,7 @@ int main(int argc, char **argv)
 	};
 	int loptind = 0;
 
-	dmrl = xmlReadMemory((const char *) dmrl_xsl, dmrl_xsl_len, NULL, NULL, 0);
+	dmrl = read_xml_mem((const char *) dmrl_xsl, dmrl_xsl_len);
 	dmrlStylesheet = xsltParseStylesheetDoc(dmrl);
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
@@ -128,7 +120,7 @@ int main(int argc, char **argv)
 		char iss[8];
 		char *templs = NULL;
 
-		if (!(in = xmlReadFile(argv[i], NULL, PARSE_OPTS))) {
+		if (!(in = read_xml_doc(argv[i]))) {
 			continue;
 		}
 

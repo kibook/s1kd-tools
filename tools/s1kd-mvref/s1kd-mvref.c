@@ -6,9 +6,10 @@
 #include <dirent.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -21,15 +22,6 @@
 #define ADDR_PATH     "//dmAddress|//dmaddres|//pmAddress|//pmaddres"
 #define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content/refpm"
 #define REFS_PATH BAD_CAST "//dmRef|//pmRef|//refdm[*]|//refpm"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 bool verbose = false;
 
@@ -494,7 +486,7 @@ void addAddress(const char *fname, xmlNodePtr addresses)
 	xmlDocPtr doc;
 	xmlNodePtr address;
 
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS|XML_PARSE_NOWARNING|XML_PARSE_NOERROR);
+	doc = read_xml_doc(fname);
 
 	if (!doc)
 		return;
@@ -518,12 +510,12 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	xmlXPathObjectPtr obj;
 	xmlNodePtr recodeIdent;
 
-	if (!(doc = xmlReadFile(fname, NULL, PARSE_OPTS|XML_PARSE_NOWARNING|XML_PARSE_NOERROR))) {
+	if (!(doc = read_xml_doc(fname))) {
 		return;
 	}
 
 	if (recode) {
-		recodeDoc = xmlReadFile(recode, NULL, PARSE_OPTS);
+		recodeDoc = read_xml_doc(recode);
 		recodeIdent = firstXPathNode(ADDR_PATH, recodeDoc, NULL);
 	} else {
 		recodeIdent = NULL;
@@ -548,9 +540,9 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	xmlXPathFreeContext(ctx);
 
 	if (overwrite) {
-		xmlSaveFile(fname, doc);
+		save_xml_doc(doc, fname);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);

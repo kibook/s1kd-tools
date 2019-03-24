@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.3.4"
+#define VERSION "1.3.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -60,15 +60,6 @@ typedef enum {
 } cirType;
 
 char *templateDir = NULL;
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 enum issue getIssue(const char *iss)
 {
@@ -544,7 +535,7 @@ xmlDocPtr toIssue(xmlDocPtr doc, enum issue iss)
 
 	orig = xmlCopyDoc(doc, 1);
 
-	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xml, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, doc, NULL);
@@ -570,9 +561,9 @@ xmlDocPtr xmlSkeleton(const char *templateDir)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return xmlReadFile(src, NULL, PARSE_OPTS);
+		return read_xml_doc(src);
 	} else {
-		return xmlReadMemory((const char *) update_xml, update_xml_len, NULL, NULL, 0);
+		return read_xml_mem((const char *) update_xml, update_xml_len);
 	}
 }
 
@@ -692,14 +683,14 @@ int main(int argc, char **argv)
 	source = argv[optind];
 	target = argv[optind + 1];
 
-	sourceDoc = xmlReadFile(source, NULL, PARSE_OPTS);
-	targetDoc = xmlReadFile(target, NULL, PARSE_OPTS);
+	sourceDoc = read_xml_doc(source);
+	targetDoc = read_xml_doc(target);
 
 	if (!custom_defaults) {
 		find_config(defaultsFname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	if ((defaultsXml = xmlReadFile(defaultsFname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+	if ((defaultsXml = read_xml_doc(defaultsFname))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaultsXml)->children; cur; cur = cur->next) {
@@ -774,7 +765,7 @@ int main(int argc, char **argv)
 	}
 
 	if (out) {
-		xmlSaveFile(out, updateFile);
+		save_xml_doc(updateFile, out);
 
 		if (verbose) {
 			puts(out);
@@ -789,7 +780,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, ERR_PREFIX "'%s' already exists.\n", upfname);
 			exit(EXIT_UPF_EXISTS);
 		} else {
-			xmlSaveFile(upfname, updateFile);
+			save_xml_doc(updateFile, upfname);
 
 			if (verbose) {
 				puts(upfname);

@@ -9,10 +9,11 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
+#include "s1kd_tools.h"
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -20,15 +21,6 @@
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 #define I_NEUTRALIZE INF_PREFIX "Adding neutral metadata to %s...\n"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 bool verbose = false;
 
@@ -42,11 +34,11 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool
 		fprintf(stderr, I_NEUTRALIZE, fname);
 	}
 
-	orig = xmlReadFile(fname, NULL, PARSE_OPTS);
+	orig = read_xml_doc(fname);
 
 	doc = xmlCopyDoc(orig, 1);
 
-	styledoc = xmlReadMemory((const char *) stylesheets_xlink_xsl, stylesheets_xlink_xsl_len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) stylesheets_xlink_xsl, stylesheets_xlink_xsl_len);
 	style = xsltParseStylesheetDoc(styledoc);
 	res = xsltApplyStylesheet(style, doc, NULL);
 	xmlFreeDoc(doc);
@@ -54,7 +46,7 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool
 
 	doc = res;
 
-	styledoc = xmlReadMemory((const char *) stylesheets_rdf_xsl, stylesheets_rdf_xsl_len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) stylesheets_rdf_xsl, stylesheets_rdf_xsl_len);
 	style = xsltParseStylesheetDoc(styledoc);
 	res = xsltApplyStylesheet(style, doc, NULL);
 	xmlFreeDoc(doc);
@@ -62,9 +54,9 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool
 
 	if (namesp) {
 		doc = res;
-		styledoc = xmlReadMemory((const char *)
+		styledoc = read_xml_mem((const char *)
 			stylesheets_namespace_xsl,
-			stylesheets_namespace_xsl_len, NULL, NULL, 0);
+			stylesheets_namespace_xsl_len);
 		style = xsltParseStylesheetDoc(styledoc);
 		res = xsltApplyStylesheet(style, doc, NULL);
 		xmlFreeDoc(doc);
@@ -78,9 +70,9 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool
 	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
 
 	if (overwrite) {
-		xmlSaveFile(fname, orig);
+		save_xml_doc(orig, fname);
 	} else {
-		xmlSaveFile(outfile, orig);
+		save_xml_doc(orig, outfile);
 	}
 
 	xmlFreeDoc(res);

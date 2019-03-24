@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include "s1kd_tools.h"
 
 /* Order of references */
 #define DM "0" /* dmRef */
@@ -13,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -34,15 +35,6 @@ struct ref {
 
 bool only_delete = false;
 bool verbose = false;
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 struct ref *refs;
 int nrefs;
@@ -355,7 +347,7 @@ void sync_refs_file(const char *path, const char *out, bool overwrite)
 		fprintf(stderr, I_SYNCREFS, path);
 	}
 
-	if (!(dm = xmlReadFile(path, NULL, PARSE_OPTS))) {
+	if (!(dm = read_xml_doc(path))) {
 		return;
 	}
 
@@ -364,9 +356,9 @@ void sync_refs_file(const char *path, const char *out, bool overwrite)
 	sync_refs(dmodule);
 
 	if (overwrite) {
-		xmlSaveFile(path, dm);
+		save_xml_doc(dm, path);
 	} else {
-		xmlSaveFile(out, dm);
+		save_xml_doc(dm, out);
 	}
 
 	xmlFreeDoc(dm);

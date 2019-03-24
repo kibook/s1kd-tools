@@ -6,8 +6,10 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include "s1kd_tools.h"
+
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -23,15 +25,6 @@
 #define KEY_COLUMN_WIDTH 31
 
 #define FMTSTR_DELIM '%'
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
 
@@ -1946,7 +1939,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	int edit = 0;
 	xmlNodePtr cond;
 
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+	doc = read_xml_doc(fname);
 
 	ctxt = xmlXPathNewContext(doc);
 
@@ -2005,13 +1998,13 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	if (edit && !err) {
 		if (overwrite) {
 			if (access(fname, W_OK) != -1) {
-				xmlSaveFile(fname, doc);
+				save_xml_doc(doc, fname);
 			} else {
 				fprintf(stderr, ERR_PREFIX "%s does not have write permission.\n", fname);
 				exit(EXIT_NO_WRITE);
 			}
 		} else {
-			xmlSaveFile("-", doc);
+			save_xml_doc(doc, "-");
 		}
 	} else if (endl != '\n' && err != EXIT_CONDITION_UNMET) {
 		putchar('\n');

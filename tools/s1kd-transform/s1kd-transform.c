@@ -8,13 +8,14 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 #include <libexslt/exslt.h>
+#include "s1kd_tools.h"
 #include "identity.h"
 
 bool includeIdentity = false;
 bool verbose = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -23,21 +24,12 @@ bool verbose = false;
 
 #define I_TRANSFORM INF_PREFIX "Transforming %s...\n"
 
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
-
 void addIdentity(xmlDocPtr style)
 {
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
 
-	identity = xmlReadMemory((const char *) ___common_identity_xsl, ___common_identity_xsl_len, NULL, NULL, 0);
+	identity = read_xml_mem((const char *) ___common_identity_xsl, ___common_identity_xsl_len);
 	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
 
 	stylesheet = xmlDocGetRootElement(style);
@@ -89,7 +81,7 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 			params[n] = NULL;
 		}
 
-		styledoc = xmlReadFile((char *) path, NULL, PARSE_OPTS);
+		styledoc = read_xml_doc((char *) path);
 
 		if (includeIdentity) {
 			addIdentity(styledoc);
@@ -129,14 +121,14 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 		fprintf(stderr, I_TRANSFORM, path);
 	}
 
-	doc = xmlReadFile(path, NULL, PARSE_OPTS);
+	doc = read_xml_doc(path);
 
 	doc = transformDoc(doc, stylesheets);
 
 	if (overwrite) {
-		xmlSaveFile(path, doc);
+		save_xml_doc(doc, path);
 	} else {
-		xmlSaveFile(out, doc);
+		save_xml_doc(doc, out);
 	}
 
 	xmlFreeDoc(doc);

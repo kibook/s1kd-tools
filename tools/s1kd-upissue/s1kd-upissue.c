@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.5.3"
+#define VERSION "1.5.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -19,15 +19,6 @@
 #define EXIT_NO_OVERWRITE 2
 #define EXIT_BAD_FILENAME 3
 #define EXIT_BAD_DATE 4
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 void show_help(void)
 {
@@ -339,7 +330,7 @@ void upissue(const char *path)
 		exit(EXIT_NO_FILE);
 	}
 
-	dmdoc = xmlReadFile(dmfile, NULL, PARSE_OPTS | XML_PARSE_NONET | XML_PARSE_NOERROR);
+	dmdoc = read_xml_doc(dmfile);
 
 	if (dmdoc) {
 		issueInfo = firstXPathNode("//issueInfo|//issno", dmdoc);
@@ -485,7 +476,7 @@ void upissue(const char *path)
 		}
 
 		if (dmdoc) {
-			xmlSaveFormatFile(dmfile, dmdoc, 1);
+			save_xml_doc(dmdoc, dmfile);
 		} else { /* Copy non-XML file */
 			copy(cpfile, dmfile);
 		}

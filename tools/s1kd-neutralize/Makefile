@@ -1,8 +1,8 @@
-SOURCE=s1kd-neutralize.c
+SOURCE=s1kd-neutralize.c ../common/s1kd_tools.c
 OUTPUT=s1kd-neutralize
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g

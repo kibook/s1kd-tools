@@ -10,16 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.0.4"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
+#define VERSION "1.0.5"
 
 void showHelp(void)
 {
@@ -89,16 +80,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	doc = xmlReadFile(src, NULL, PARSE_OPTS);
+	doc = read_xml_doc(src);
 
 	for (i = optind; i < argc; ++i) {
 		add_icn(doc, argv[i], fullpath);
 	}
 
 	if (overwrite) {
-		xmlSaveFile(src, doc);
+		save_xml_doc(doc, src);
 	} else {
-		xmlSaveFile(out, doc);
+		save_xml_doc(doc, out);
 	}
 
 	xmlFreeDoc(doc);

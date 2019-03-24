@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.5.0"
+#define VERSION "1.5.2"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -26,15 +26,6 @@ xmlChar *acro_markup_xpath = NULL;
  * set to be considered a valid acronym. */
 #define PRE_ACRONYM_DELIM BAD_CAST " (/\n"
 #define POST_ACRONYM_DELIM BAD_CAST " .,)/\n"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -76,12 +67,12 @@ void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 		fprintf(stderr, I_FIND, path);
 	}
 
-	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
+	if (!(doc = read_xml_doc(path))) {
 		fprintf(stderr, E_NO_FILE, path);
 		return;
 	}
 
-	styleDoc = xmlReadMemory((const char *) stylesheets_acronyms_xsl, stylesheets_acronyms_xsl_len, NULL, NULL, 0);
+	styleDoc = read_xml_mem((const char *) stylesheets_acronyms_xsl, stylesheets_acronyms_xsl_len);
 
 	style = xsltParseStylesheetDoc(styleDoc);
 
@@ -100,7 +91,7 @@ xmlDocPtr removeNonUniqueAcronyms(xmlDocPtr doc)
 	xmlDocPtr styleDoc, result;
 	xsltStylesheetPtr style;
 
-	styleDoc = xmlReadMemory((const char *) stylesheets_unique_xsl, stylesheets_unique_xsl_len, NULL, NULL, 0);
+	styleDoc = read_xml_mem((const char *) stylesheets_unique_xsl, stylesheets_unique_xsl_len);
 	style = xsltParseStylesheetDoc(styleDoc);
 	result = xsltApplyStylesheet(style, doc, NULL);
 	xmlFreeDoc(doc);
@@ -209,7 +200,7 @@ xmlDocPtr formatXmlAs(xmlDocPtr doc, unsigned char *src, unsigned int len)
 	xmlDocPtr styleDoc, result;
 	xsltStylesheetPtr style;
 
-	styleDoc = xmlReadMemory((const char *) src, len, NULL, NULL, 0);
+	styleDoc = read_xml_mem((const char *) src, len);
 
 	style = xsltParseStylesheetDoc(styleDoc);
 
@@ -235,7 +226,7 @@ xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 	params[1] = typesParam;
 	params[2] = NULL;
 
-	styleDoc = xmlReadMemory((const char *) stylesheets_types_xsl, stylesheets_types_xsl_len, NULL, NULL, 0);
+	styleDoc = read_xml_mem((const char *) stylesheets_types_xsl, stylesheets_types_xsl_len);
 
 	style = xsltParseStylesheetDoc(styleDoc);
 
@@ -452,7 +443,7 @@ void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 
 	src = xmlCopyDoc(doc, 1);
 
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xsl, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, src, NULL);
@@ -478,7 +469,7 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 		fprintf(stderr, I_MARKUP, path);
 	}
 
-	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
+	if (!(doc = read_xml_doc(path))) {
 		fprintf(stderr, E_NO_FILE, path);
 		return;
 	}
@@ -491,7 +482,7 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 		convertToIssue30(doc);
 	}
 
-	xmlSaveFile(out, doc);
+	save_xml_doc(doc, out);
 
 	xmlFreeDoc(doc);
 }
@@ -502,7 +493,7 @@ xmlDocPtr sortAcronyms(xmlDocPtr doc)
 	xsltStylesheetPtr sort;
 	xmlDocPtr sorted;
 
-	sortdoc = xmlReadMemory((const char *) stylesheets_sort_xsl, stylesheets_sort_xsl_len, NULL, NULL, 0);
+	sortdoc = read_xml_mem((const char *) stylesheets_sort_xsl, stylesheets_sort_xsl_len);
 	sort = xsltParseStylesheetDoc(sortdoc);
 	sorted = xsltApplyStylesheet(sort, doc, NULL);
 	xmlFreeDoc(doc);
@@ -572,11 +563,11 @@ void deleteAcronymsInFile(const char *fname, const char *out)
 		fprintf(stderr, I_DELETE, fname);
 	}
 
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+	doc = read_xml_doc(fname);
 	
 	deleteAcronyms(doc);
 
-	xmlSaveFile(out, doc);
+	save_xml_doc(doc, out);
 
 	xmlFreeDoc(doc);
 }
@@ -761,7 +752,7 @@ int main(int argc, char **argv)
 	} else if (markup) {
 		xmlDocPtr termStylesheetDoc, idStylesheetDoc;
 
-		if (!(doc = xmlReadFile(markup, NULL, PARSE_OPTS))) {
+		if (!(doc = read_xml_doc(markup))) {
 			fprintf(stderr, E_NO_LIST, markup);
 			exit(EXIT_NO_LIST);
 		}
@@ -769,10 +760,10 @@ int main(int argc, char **argv)
 		doc = sortAcronyms(doc);
 		acronyms = xmlDocGetRootElement(doc);
 
-		termStylesheetDoc = xmlReadMemory((const char *) stylesheets_term_xsl,
-			stylesheets_term_xsl_len, NULL, NULL, 0);
-		idStylesheetDoc = xmlReadMemory((const char *) stylesheets_id_xsl,
-			stylesheets_id_xsl_len, NULL, NULL, 0);
+		termStylesheetDoc = read_xml_mem((const char *) stylesheets_term_xsl,
+			stylesheets_term_xsl_len);
+		idStylesheetDoc = read_xml_mem((const char *) stylesheets_id_xsl,
+			stylesheets_id_xsl_len);
 
 		termStylesheet = xsltParseStylesheetDoc(termStylesheetDoc);
 		idStylesheet = xsltParseStylesheetDoc(idStylesheetDoc);
@@ -838,7 +829,7 @@ int main(int argc, char **argv)
 			if (prettyPrint) {
 				xmlSaveFormatFile(out, doc, 1);
 			} else {
-				xmlSaveFile(out, doc);
+				save_xml_doc(doc, out);
 			}
 		} else {
 			printAcronyms(xmlDocGetRootElement(doc), out);

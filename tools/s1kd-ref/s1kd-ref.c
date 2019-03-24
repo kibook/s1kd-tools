@@ -8,10 +8,11 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/transform.h>
+#include "s1kd_tools.h"
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -25,15 +26,6 @@
 #define OPT_DATE  (int) 0x08
 #define OPT_SRCID (int) 0x10
 #define OPT_CIRID (int) 0x20
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
@@ -225,7 +217,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr language = NULL;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = read_xml_doc(fname))) {
 			ref_pm_address = first_xpath_node(doc, NULL, "//pmAddress");
 			ref_pm_ident = find_child(ref_pm_address, "pmIdent");
 			ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
@@ -423,7 +415,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr language = NULL;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = read_xml_doc(fname))) {
 			ref_dm_address = first_xpath_node(doc, NULL, "//dmAddress");
 			ref_dm_ident = find_child(ref_dm_address, "dmIdent");
 			ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
@@ -552,7 +544,7 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_comment_ident;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = read_xml_doc(fname))) {
 			ref_comment_address = first_xpath_node(doc, NULL, "//commentAddress");
 			ref_comment_ident = find_child(ref_comment_address, "commentIdent");
 		}
@@ -623,7 +615,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dml_ident;
 		char *s;
 
-		if ((doc = xmlReadFile(fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING))) {
+		if ((doc = read_xml_doc(fname))) {
 			ref_dml_address = first_xpath_node(doc, NULL, "//dmlAddress");
 			ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
 		}
@@ -749,7 +741,7 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 	xmlDocPtr doc;
 	xmlNodePtr refs;
 
-	if (!(doc = xmlReadFile(src, NULL, PARSE_OPTS))) {
+	if (!(doc = read_xml_doc(src))) {
 		fprintf(stderr, ERR_PREFIX "Could not read source data module: %s\n", src);
 		exit(EXIT_MISSING_FILE);
 	}
@@ -757,7 +749,7 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 	refs = find_or_create_refs(doc);
 	xmlAddChild(refs, xmlCopyNode(ref, 1));
 
-	xmlSaveFile(dst, doc);
+	save_xml_doc(doc, dst);
 
 	xmlFreeDoc(doc);
 }
@@ -771,7 +763,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 
 	src = xmlCopyDoc(doc, 1);
 
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xsl, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, src, NULL);

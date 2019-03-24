@@ -14,22 +14,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define I_RESOLVE INF_PREFIX "Resolving ICN references in %s...\n"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 bool verbose = false;
 
@@ -151,7 +142,7 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 		fprintf(stderr, I_RESOLVE, fname);
 	}
 
-	doc = xmlReadFile(fname, NULL, PARSE_OPTS);
+	doc = read_xml_doc(fname);
 
 	if (xinclude) {
 		xmlXIncludeProcess(doc);
@@ -189,9 +180,9 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 	xmlXPathFreeContext(ctx);
 
 	if (overwrite) {
-		xmlSaveFile(fname, doc);
+		save_xml_doc(doc, fname);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);
@@ -380,9 +371,9 @@ int main(int argc, char **argv)
 	}
 
 	if (createnew || access(icns_fname, F_OK) == -1) {
-		icns = xmlReadMemory((const char *) icncatalog_xml, icncatalog_xml_len, NULL, NULL, 0);
+		icns = read_xml_mem((const char *) icncatalog_xml, icncatalog_xml_len);
 	} else {
-		icns = xmlReadFile(icns_fname, NULL, PARSE_OPTS);
+		icns = read_xml_doc(icns_fname);
 	}
 
 	if (add->children || del->children) {
@@ -393,9 +384,9 @@ int main(int argc, char **argv)
 			del_icns(icns, del, media);
 		}
 		if (overwrite) {
-			xmlSaveFile(icns_fname, icns);
+			save_xml_doc(icns, icns_fname);
 		} else {
-			xmlSaveFile("-", icns);
+			save_xml_doc(icns, "-");
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
@@ -407,9 +398,9 @@ int main(int argc, char **argv)
 		}
 	} else if (createnew) {
 		if (overwrite) {
-			xmlSaveFile(icns_fname, icns);
+			save_xml_doc(icns, icns_fname);
 		} else {
-			xmlSaveFile("-", icns);
+			save_xml_doc(icns, "-");
 		}
 	} else if (islist) {
 		resolve_icns_in_list(NULL, icns, overwrite, xinclude, media);

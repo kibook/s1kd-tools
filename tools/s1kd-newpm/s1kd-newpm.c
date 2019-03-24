@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.4.9"
+#define VERSION "1.4.10"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -80,15 +80,6 @@ enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS
 
 char *template_dir = NULL;
 
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
-
 xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
@@ -100,9 +91,9 @@ xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return xmlReadFile(src, NULL, PARSE_OPTS);
+		return read_xml_doc(src);
 	} else {
-		return xmlReadMemory((const char *) pm_xml, pm_xml_len, NULL, NULL, 0);
+		return read_xml_mem((const char *) pm_xml, pm_xml_len);
 	}
 }
 
@@ -188,7 +179,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 
 	orig = xmlCopyDoc(doc, 1);
 			
-	styledoc = xmlReadMemory((const char *) xml, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xml, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, doc, NULL);
@@ -277,7 +268,7 @@ void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool in
 		return;
 	}
 
-	dmodule = xmlReadFile(path, NULL, PARSE_OPTS);
+	dmodule = read_xml_doc(path);
 	ctx = xmlXPathNewContext(dmodule);
 
 	ident_extension = first_xpath_node("//dmIdent/identExtension", ctx);
@@ -668,7 +659,7 @@ int main(int argc, char **argv)
 		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	defaults_xml = xmlReadFile(defaults_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+	defaults_xml = read_xml_doc(defaults_fname);
 
 	if (defaults_xml) {
 		xmlNodePtr cur;
@@ -879,7 +870,7 @@ int main(int argc, char **argv)
 		exit(EXIT_PM_EXISTS);
 	}
 
-	xmlSaveFormatFile(out, pm_doc, 1);
+	save_xml_doc(pm_doc, out);
 
 	if (verbose)
 		puts(out);

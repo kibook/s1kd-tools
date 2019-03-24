@@ -12,22 +12,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
 
 #define PRE_TERM_DELIM BAD_CAST " "
 #define POST_TERM_DELIM BAD_CAST " .,"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -180,7 +171,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 
 	src = xmlCopyDoc(doc, 1);
 
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xsl, len);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	res = xsltApplyStylesheet(style, src, NULL);
@@ -207,14 +198,14 @@ void delete_index_flags(const char *path, bool overwrite)
 		fprintf(stderr, I_DELETE, path);
 	}
 
-	doc = xmlReadFile(path, NULL, PARSE_OPTS);
+	doc = read_xml_doc(path);
 
 	transform_doc(doc, delete_xsl, delete_xsl_len);
 
 	if (overwrite) {
-		xmlSaveFile(path, doc);
+		save_xml_doc(doc, path);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 }
 
@@ -230,7 +221,7 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 		fprintf(stderr, I_MARKUP, path);
 	}
 
-	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS))) {
+	if (!(doc = read_xml_doc(path))) {
 		fprintf(stderr, E_NO_FILE, path);
 		return;
 	}
@@ -254,9 +245,9 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	}
 
 	if (overwrite) {
-		xmlSaveFile(path, doc);
+		save_xml_doc(doc, path);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);
@@ -266,7 +257,7 @@ xmlDocPtr read_index_flags(const char *fname)
 {
 	xmlDocPtr index_doc;
 
-	if (!(index_doc = xmlReadFile(fname, NULL, PARSE_OPTS))) {
+	if (!(index_doc = read_xml_doc(fname))) {
 		fprintf(stderr, E_NO_LIST, fname);
 		exit(EXIT_NO_LIST);
 	}

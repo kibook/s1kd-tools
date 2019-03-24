@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -21,12 +21,6 @@
 #define I_CONVERT INF_PREFIX "Converting units in %s...\n"
 #define EXIT_NO_CONV 1
 #define EXIT_NO_UOM 2
-
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 bool verbose = false;
 
@@ -191,7 +185,7 @@ void transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc, const char **params)
 void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc;
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, 0);
+	styledoc = read_xml_mem((const char *) xsl, len);
 	transform_doc_with(doc, styledoc, params);
 	xmlFreeDoc(styledoc);
 }
@@ -207,9 +201,9 @@ void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr
 	}
 
 	if (path) {
-		doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+		doc = read_xml_doc(path);
 	} else {
-		doc = xmlReadFile("-", NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+		doc = read_xml_doc("-");
 	}
 
 	if (!doc) {
@@ -245,9 +239,9 @@ void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr
 	}
 
 	if (overwrite) {
-		xmlSaveFile(path, doc);
+		save_xml_doc(doc, path);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);
@@ -372,18 +366,18 @@ int main(int argc, char **argv)
 
 	/* Load .uom configuration file (or built-in copy). */
 	if (!dump_uom && (strcmp(uom_fname, "") != 0 || find_config(uom_fname, DEFAULT_UOM_FNAME))) {
-		uom = xmlReadFile(uom_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+		uom = read_xml_doc(uom_fname);
 	}
 	if (!uom) {
-		uom = xmlReadMemory((const char *) uom_xml, uom_xml_len, NULL, NULL, PARSE_OPTS);
+		uom = read_xml_mem((const char *) uom_xml, uom_xml_len);
 	}
 
 	/* Load .uomdisplay configuration file (or built-in copy). */
 	if (!dump_uomdisp && (strcmp(uomdisp_fname, "") != 0 || find_config(uomdisp_fname, DEFAULT_UOMDISP_FNAME))) {
-		uomdisp = xmlReadFile(uomdisp_fname, NULL, PARSE_OPTS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING);
+		uomdisp = read_xml_doc(uomdisp_fname);
 	}
 	if (!uomdisp) {
-		uomdisp = xmlReadMemory((const char *) uomdisplay_xml, uomdisplay_xml_len, NULL, NULL, PARSE_OPTS);
+		uomdisp = read_xml_mem((const char *) uomdisplay_xml, uomdisplay_xml_len);
 	}
 
 	if (conversions->children) {
@@ -391,9 +385,9 @@ int main(int argc, char **argv)
 	}
 
 	if (dump_uom) {
-		xmlSaveFile("-", uom);
+		save_xml_doc(uom, "-");
 	} else if (dump_uomdisp) {
-		xmlSaveFile("-", uomdisp);
+		save_xml_doc(uomdisp, "-");
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (list) {

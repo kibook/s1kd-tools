@@ -13,7 +13,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -28,15 +28,6 @@
 #define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
-
-/* Bug in libxml < 2.9.2 where parameter entities are resolved even when
- * XML_PARSE_NOENT is not specified.
- */
-#if LIBXML_VERSION < 20902
-#define PARSE_OPTS XML_PARSE_NONET
-#else
-#define PARSE_OPTS 0
-#endif
 
 bool verbose = false;
 
@@ -69,7 +60,7 @@ xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
 
-	styledoc = xmlReadFile(xslpath, NULL, PARSE_OPTS);
+	styledoc = read_xml_doc(xslpath);
 
 	style = xsltParseStylesheetDoc(styledoc);
 
@@ -85,7 +76,7 @@ xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int 
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
 
-	styledoc = xmlReadMemory((const char *) xsl, len, NULL, NULL, PARSE_OPTS);
+	styledoc = read_xml_mem((const char *) xsl, len);
 
 	style = xsltParseStylesheetDoc(styledoc);
 
@@ -214,7 +205,7 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 	char *type;
 	xmlNodePtr content;
 
-	doc = xmlReadFile(dmpath, NULL, PARSE_OPTS);
+	doc = read_xml_doc(dmpath);
 
 	if (fmtype) {
 		type = strdup(fmtype);
@@ -251,9 +242,9 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 	xmlFreeNode(content);
 
 	if (overwrite) {
-		xmlSaveFile(dmpath, doc);
+		save_xml_doc(doc, dmpath);
 	} else {
-		xmlSaveFile("-", doc);
+		save_xml_doc(doc, "-");
 	}
 
 	xmlFreeDoc(doc);
@@ -287,8 +278,8 @@ void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocPtr fmty
 void dump_fmtypes_xml(void)
 {
 	xmlDocPtr doc;
-	doc = xmlReadMemory((const char *) fmtypes_xml, fmtypes_xml_len, NULL, NULL, PARSE_OPTS);
-	xmlSaveFile("-", doc);
+	doc = read_xml_mem((const char *) fmtypes_xml, fmtypes_xml_len);
+	save_xml_doc(doc, "-");
 	xmlFreeDoc(doc);
 }
 
@@ -301,7 +292,7 @@ xmlDocPtr read_fmtypes(const char *path)
 {
 	xmlDocPtr doc;
 
-	if (!(doc = xmlReadFile(path, NULL, PARSE_OPTS | XML_PARSE_NOWARNING | XML_PARSE_NOERROR))) {
+	if (!(doc = read_xml_doc(path))) {
 		FILE *f;
 		char line[256];
 		xmlNodePtr root;
@@ -473,7 +464,7 @@ int main(int argc, char **argv)
 		if (find_config(fmtypes_fname, DEFAULT_FMTYPES_FNAME)) {
 			fmtypes = read_fmtypes(fmtypes_fname);
 		} else {
-			fmtypes = xmlReadMemory((const char *) fmtypes_xml, fmtypes_xml_len, NULL, NULL, 0);
+			fmtypes = read_xml_mem((const char *) fmtypes_xml, fmtypes_xml_len);
 		}
 	}
 
@@ -481,7 +472,7 @@ int main(int argc, char **argv)
 		pmpath = strdup("-");
 	}
 
-	pm = xmlReadFile(pmpath, NULL, PARSE_OPTS);
+	pm = read_xml_doc(pmpath);
 
 	if (xincl) {
 		xmlXIncludeProcess(pm);
@@ -503,7 +494,7 @@ int main(int argc, char **argv)
 	} else if (fmtype) {
 		xmlDocPtr res;
 		res = generate_fm_content_for_type(pm, fmtype, xslpath, params);
-		xmlSaveFile("-", res);
+		save_xml_doc(res, "-");
 		xmlFreeDoc(res);
 	} else if (islist) {
 		generate_fm_content_for_list(pm, NULL, fmtypes, fmtype, overwrite, xslpath, params);
