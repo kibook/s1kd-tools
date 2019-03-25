@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,7 +32,7 @@ void show_help(void)
 	puts("  -d           Do not write anything, only print new filename.");
 	puts("  -f           Overwrite existing upissued object.");
 	puts("  -I           Do not change issue date.");
-	puts("  -i           Create a new issue of the object.");
+	puts("  -i           Increase issue number instead of inwork.");
 	puts("  -l           Treat input as list of objects.");
 	puts("  -N           Omit issue/inwork numbers from filename.");
 	puts("  -q           Keep quality assurance from old issue.");
@@ -42,7 +42,7 @@ void show_help(void)
 	puts("  -t <urt>     Set the updateReasonType of the last RFU.");
 	puts("  -H           Highlight the last RFU.");
 	puts("  -v           Print filename of upissued objects.");
-	puts("  -w           Make old issue read-only.");
+	puts("  -w           Make old and official issues read-only.");
 	puts("  --version    Show version information");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -513,6 +513,11 @@ void upissue(const char *path)
 			save_xml_doc(dmdoc, dmfile);
 		} else { /* Copy non-XML file */
 			copy(cpfile, dmfile);
+		}
+
+		/* Lock official issues. */
+		if (lock && newissue) {
+			mkreadonly(dmfile);
 		}
 	}
 

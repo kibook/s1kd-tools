@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="02"/>
+        <issueInfo issueNumber="015" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="03" day="25"/>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -D option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Lock official issues with -w option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -173,7 +176,7 @@
             <definitionListItem>
               <listItemTerm>-w</listItemTerm>
               <listItemDefinition>
-                <para>Make the old issue file read-only after upissuing.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Make the old issue file read-only after upissuing. Official issues (-i) will also be made read-only when they are created.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

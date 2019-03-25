@@ -95,7 +95,8 @@ Set the updateReasonType of the last specified reason for update (-c).
 Print the file name of the upissued CSDB object.
 
 -w  
-Make the old issue file read-only after upissuing.
+Make the old issue file read-only after upissuing. Official issues (-i)
+will also be made read-only when they are created.
 
 --version  
 Show version information.
