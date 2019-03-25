@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -22,7 +22,7 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfHIilNqRrvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-DdefHIilNqRrvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1 <type>    Set first verification type.");
@@ -30,6 +30,7 @@ void show_help(void)
 	puts("  -c <reason>  Add an RFU to the upissued object.");
 	puts("  -D           Remove \"delete\"d elements.");
 	puts("  -d           Do not write anything, only print new filename.");
+	puts("  -e           Remove old issue.");
 	puts("  -f           Overwrite existing upissued object.");
 	puts("  -I           Do not change issue date.");
 	puts("  -i           Increase issue number instead of inwork.");
@@ -337,6 +338,7 @@ char *secondver = NULL;
 xmlNodePtr rfus = NULL;
 bool lock = false;
 bool remdel= false;
+bool remold = false;
 
 void upissue(const char *path)
 {
@@ -493,8 +495,12 @@ void upissue(const char *path)
 	if (!no_issue) {
 		char *i;
 
-		if (lock && !dry_run) { /* Remove write permission from previous issue. */
-			mkreadonly(dmfile);
+		if (!dry_run) {
+			if (remold) { /* Delete previous issue. */
+				remove(dmfile);
+			} else if (lock) { /* Remove write permission from previous issue. */
+				mkreadonly(dmfile);
+			}
 		}
 
 		if ((i = strchr(dmfile, '_'))) {
@@ -559,7 +565,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:Ddlc:t:Hwh?";
+	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -593,6 +599,9 @@ int main(int argc, char **argv)
 			case 'd':
 				dry_run = true;
 				verbose = true;
+				break;
+			case 'e':
+				remold = true;
 				break;
 			case 'f':
 				overwrite = true;

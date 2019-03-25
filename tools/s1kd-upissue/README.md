@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-DdfHIilNqRrvw] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-DdefHIilNqRrvw] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
 
 DESCRIPTION
@@ -43,6 +43,9 @@ the object official.
 -d  
 Do not actually create or modify any files, only print the name of the
 file that would be created or modified.
+
+-e  
+Remove old issue file after upissuing.
 
 -f  
 Overwrite existing upissued CSDB objects.
