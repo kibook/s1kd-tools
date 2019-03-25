@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.4.2"
+#define VERSION "2.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1063,6 +1063,7 @@ void showHelp(void)
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
 	puts("  <object>   CSDB object to list references in.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 /* Display version information. */
@@ -1084,6 +1085,7 @@ int main(int argc, char **argv)
 	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsovh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -1097,6 +1099,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'q':
 				quiet = true;

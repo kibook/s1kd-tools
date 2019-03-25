@@ -116,6 +116,18 @@ Show version information.
 CSDB object(s) to list references in. If none are specified, the tool
 will read from stdin.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 EXIT STATUS
 ===========
 

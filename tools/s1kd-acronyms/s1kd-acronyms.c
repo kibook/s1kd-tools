@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.5.2"
+#define VERSION "1.6.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -625,6 +625,7 @@ void showHelp(void)
 	puts("  -x          Output XML instead of text.");
 	puts("  -h -?       Show usage message.");
 	puts("  --version   Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -651,6 +652,7 @@ int main(int argc, char **argv)
 	const char *sopts = "pn:xDdtT:o:M:miIfl!X:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -662,6 +664,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'p':
 				prettyPrint = true;

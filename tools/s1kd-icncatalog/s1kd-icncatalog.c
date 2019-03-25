@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.4.2"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -278,6 +278,7 @@ void show_help(void)
 	puts("  -v             Verbose output.");
 	puts("  -x             Process XInclude elements.");
 	puts("  --version      Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 /* Show version information. */
@@ -302,6 +303,7 @@ int main(int argc, char **argv)
 	const char *sopts = "a:c:d:flm:n:tu:vxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -316,6 +318,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'a':
 				cur = xmlNewChild(add, NULL, BAD_CAST "icn", NULL);

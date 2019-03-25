@@ -67,6 +67,18 @@ An optional list of CSDB objects to list or directories to search for
 CSDB objects in. If none are specified, CSDB objects in the current
 directory are listed by default.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 EXAMPLE
 =======
 

@@ -104,6 +104,18 @@ Show version information.
 The object(s) to preprocess. This can include both individual objects
 and combined files such as those produced by s1kd-flatten(1).
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 EXAMPLES
 ========
 

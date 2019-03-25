@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -63,7 +63,11 @@ int schema_parser_count = 0;
 
 void print_error(void *userData, xmlErrorPtr error)
 {
-	fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
+	if (error->file) {
+		fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
+	} else {
+		fprintf(userData, ERR_PREFIX "%s\n", error->message);
+	}
 }
 
 void suppress_error(void *userData, xmlErrorPtr error)
@@ -131,6 +135,7 @@ void show_help(void)
 	puts("  -x         Do XInclude processing before validation.");
 	puts("  --version  Show version information.");
 	puts("  <object>   Any number of CSDB objects to validate.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -346,7 +351,9 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 		parser = add_schema_parser(url);
 	}
 
-	err += xmlSchemaValidateDoc(parser->valid_ctxt, doc);
+	if (xmlSchemaValidateDoc(parser->valid_ctxt, doc)) {
+		++err;
+	}
 
 	/* Write the original XML tree to stdout if determined to be valid. */
 	if (output_tree && !err) {
@@ -414,6 +421,7 @@ int main(int argc, char *argv[])
 	const char *sopts = "vqd:X:xfloh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -429,6 +437,7 @@ int main(int argc, char *argv[])
 					show_version();
 					return EXIT_SUCCESS;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;

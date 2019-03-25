@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -925,6 +925,7 @@ void show_help(void)
 	puts("  <code>     The code of the reference (must include prefix DMC/PMC/etc.).");
 	puts("  <file>     A file to reference.");
 	puts("             -t/-i/-l can then be used to include the title, issue, and language.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -947,6 +948,7 @@ int main(int argc, char **argv)
 	const char *sopts = "filo:RrSs:td$:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -958,6 +960,7 @@ int main(int argc, char **argv)
 					show_version();
 					return EXIT_SUCCESS;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;

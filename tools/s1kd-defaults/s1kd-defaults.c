@@ -11,7 +11,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.5.5"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
@@ -40,6 +40,7 @@ void show_help(void)
 	puts("  -s         Sort entries.");
 	puts("  -t         Output in the simple text format.");
 	puts("  --version  Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -512,6 +513,7 @@ int main(int argc, char **argv)
 	const char *sopts = "b:DdFfiJj:sth?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -523,6 +525,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'b':
 				if (!brex) brex = read_xml_doc(optarg);

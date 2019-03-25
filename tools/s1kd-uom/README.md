@@ -74,6 +74,18 @@ Show version information.
 &lt;object&gt;  
 CSDB objects to convert quantities in.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 `.uom` file
 -----------
 

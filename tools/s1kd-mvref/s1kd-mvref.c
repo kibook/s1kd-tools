@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.0.3"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -457,6 +457,7 @@ void showHelp(void)
 	puts("  -v             Verbose output.");
 	puts("  --version      Show version information.");
 	puts("  <object>...    Objects to change refs in.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -649,6 +650,7 @@ int main(int argc, char **argv)
 	const char *sopts = "s:cfvd:lt:qh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -660,6 +662,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 's':
 				if (!source) source = strdup(optarg);

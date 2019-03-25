@@ -15,7 +15,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.3.4"
+#define VERSION "1.4.0"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
@@ -36,6 +36,7 @@ void showHelp(void)
 	puts("  -s         Output s1kd-new* commands only.");
 	puts("  -v         Print the names of newly created objects.");
 	puts("  --version  Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -64,6 +65,7 @@ int main(int argc, char **argv)
 	const char *sopts = "sNfFq$:%:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -78,6 +80,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 's':
 				execute = false;

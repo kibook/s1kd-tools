@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1771,6 +1771,7 @@ void show_help(void)
 	puts("  -w <name>    Only list/edit when metadata <name> equals a value.");
 	puts("  --version    Show version information.");
 	puts("  <module>     S1000D module to view/edit metadata on.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -2092,6 +2093,7 @@ int main(int argc, char **argv)
 	const char *sopts = "0c:eF:fHln:Ttv:qW:w:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -2106,6 +2108,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;

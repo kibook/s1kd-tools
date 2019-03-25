@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.8.2"
+#define VERSION "2.9.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1252,6 +1252,7 @@ void show_help(void)
 	puts("  -w <sev>     List of severity levels.");
 	puts("  -x           XML output.");
 	puts("  --version    Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 /* Show version information. */
@@ -1293,6 +1294,7 @@ int main(int argc, char *argv[])
 	const char *sopts = "Bb:I:xvqslw:StupfncLTrd:oh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -1306,6 +1308,7 @@ int main(int argc, char *argv[])
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'B':
 				use_default_brex = true;

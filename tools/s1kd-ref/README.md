@@ -67,6 +67,18 @@ Show version information.
 Either a code, including the prefix (DMC, PMC, etc.), or the filename of
 a CSDB object.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 EXAMPLES
 ========
 

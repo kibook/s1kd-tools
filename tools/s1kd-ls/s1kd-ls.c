@@ -23,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.4.1"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -141,6 +141,7 @@ void show_help(void)
 	puts("  -X         List DDNs.");
 	puts("  -h -?      Show this help message.");
 	puts("  --version  Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 /* Show version information. */
@@ -425,6 +426,7 @@ int main(int argc, char **argv)
 	const char *sopts = "0CDGiLlMPRrwXoINh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -436,6 +438,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;

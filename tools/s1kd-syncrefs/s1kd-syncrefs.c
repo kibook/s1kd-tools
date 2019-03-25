@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.3.2"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -401,6 +401,7 @@ void show_help(void)
 	puts("  -v         Verbose output.");
 	puts("  --version  Show version information.");
 	puts("  <dms>      Any number of data modules. Otherwise, read from stdin.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -421,6 +422,7 @@ int main(int argc, char *argv[])
 	const char *sopts = "dflo:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -434,6 +436,7 @@ int main(int argc, char *argv[])
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'd':
 				only_delete = true;

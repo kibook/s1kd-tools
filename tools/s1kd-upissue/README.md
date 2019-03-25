@@ -98,6 +98,18 @@ Any number of CSDB objects or other files to upissue. If none are
 specified, the object will be read from stdin and the upissued object
 will be written to stdout.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 EXAMPLES
 ========
 

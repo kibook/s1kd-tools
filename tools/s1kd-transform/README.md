@@ -53,6 +53,18 @@ Show version information.
 &lt;object&gt; ...  
 Any number of CSDB objects to apply all specified stylesheets to.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 Identity template
 -----------------
 

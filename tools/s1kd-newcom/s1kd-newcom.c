@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.4.8"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -476,6 +476,7 @@ void show_help(void)
 	puts("  -o <orig>      Originator");
 	puts("  -r <type>      Response type");
 	puts("  -t <title>     Comment title");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -530,6 +531,7 @@ int main(int argc, char **argv)
 	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -541,6 +543,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'd':
 				strncpy(defaults_fname, optarg, PATH_MAX - 1);

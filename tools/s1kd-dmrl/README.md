@@ -54,6 +54,18 @@ Show version information.
 &lt;DML&gt;...  
 One or more S1000D data management lists.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Resolve entities.
+
 EXAMPLE
 =======
 

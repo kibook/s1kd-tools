@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.0.5"
+#define VERSION "1.1.0"
 
 void showHelp(void)
 {
@@ -24,6 +24,7 @@ void showHelp(void)
 	puts("  -h -?      Show help/usage message.");
 	puts("  <ICN>...   ICNs to add.");
 	puts("  --version  Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -44,6 +45,7 @@ int main(int argc, char **argv)
 	const char *sopts = "s:o:fFh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -58,6 +60,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 's':
 				free(src);

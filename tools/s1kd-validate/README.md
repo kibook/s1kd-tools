@@ -54,6 +54,18 @@ Show version information.
 Any number of CSDB objects to validate. If none are specified, input is
 read from stdin.
 
+In addition, the following options enable features of the XML parser
+that are disabled as a precaution by default:
+
+--dtdload  
+Load the external DTD.
+
+--net  
+Allow network access to load external DTD and entities.
+
+--noent  
+Substitute entities.
+
 Multi-spec directory with -d option
 -----------------------------------
 

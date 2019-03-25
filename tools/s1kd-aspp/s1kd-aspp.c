@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.2.1"
+#define VERSION "2.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -581,6 +581,7 @@ void showHelp(void)
 	puts("  -h -?         Show help/usage message.");
 	puts("  --version     Show version information.");
 	puts("  <object>...   CSDB objects to process.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -605,6 +606,7 @@ int main(int argc, char **argv)
 	const char *sopts = "A:a:C:cDd:fG:gklprvxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -627,6 +629,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'A':
 				xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST optarg);

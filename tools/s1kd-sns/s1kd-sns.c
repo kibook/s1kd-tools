@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.1.2"
+#define VERSION "1.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -346,6 +346,7 @@ void show_help(void)
 	puts("  -s         Use symbolic links.");
 	puts("  --version  Show version information.");
 	puts("  <BREX>     BREX data module to read SNS structure from.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -363,6 +364,7 @@ int main(int argc, char **argv)
 	const char *sopts = "cd:mnpsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -374,6 +376,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'c': linkfn = copy; break;
 			case 'd': snsdname = strdup(optarg); break;

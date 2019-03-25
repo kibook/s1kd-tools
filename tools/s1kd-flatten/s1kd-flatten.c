@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.1.7"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
@@ -51,6 +51,7 @@ void show_help(void)
 	puts("  -x         Use XInclude references.");
 	puts("  -h -?      Show help/usage message.");
 	puts("  --version  Show version information.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 void show_version(void)
@@ -465,6 +466,7 @@ int main(int argc, char **argv)
 	const char *sopts = "cDd:fxNpRrI:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -481,6 +483,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'c': flatten_container = 1; break;
 			case 'D': flatten_ref = 0; break;

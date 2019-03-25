@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.4.1"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -43,6 +43,7 @@ void show_help(void)
 	puts("  -.         Dump default UOM preformatting file.");
 	puts("  --version  Show version information.");
 	puts("  <object>   CSDB object to convert quantities in.");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 /* Show version information. */
@@ -279,6 +280,7 @@ int main(int argc, char **argv)
 	const char *sopts = "e:F:flP:p:t:U:u:v,.h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -307,6 +309,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'e':
 				if (!cur) {

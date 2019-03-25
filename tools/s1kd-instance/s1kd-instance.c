@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.3.1"
+#define VERSION "2.4.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2661,6 +2661,7 @@ void show_help(void)
 	puts("  -%            Make instances read-only.");
 	puts("  --version     Show version information.");
 	puts("  <object>...   Source CSDB object(s)");
+	LIBXML2_PARSE_LONGOPT_HELP
 }
 
 /* Print version information */
@@ -2727,6 +2728,7 @@ int main(int argc, char **argv)
 	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yz@%";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -2750,6 +2752,7 @@ int main(int argc, char **argv)
 					show_version();
 					return EXIT_SUCCESS;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'a':
 				clean = true;
