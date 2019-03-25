@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-dfHIilNqRrvw] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-DdfHIilNqRrvw] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
 
 DESCRIPTION
@@ -32,6 +32,13 @@ Set second verification type (tabtop, onobject, ttandoo).
 -c &lt;reason&gt;  
 Add a reason for update to the upissued objects. Multiple RFUs can be
 added by specifying this option multiple times.
+
+-D  
+Remove elements with change type of "delete". These elements are
+automatically removed along with all change marks and RFUs when an
+object is upissued from official to the next inwork issue. This option
+will remove them when upissuing between inwork issues, or when making
+the object official.
 
 -d  
 Do not actually create or modify any files, only print the name of the

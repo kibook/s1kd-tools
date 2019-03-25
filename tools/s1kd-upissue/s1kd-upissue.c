@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -28,6 +28,7 @@ void show_help(void)
 	puts("  -1 <type>    Set first verification type.");
 	puts("  -2 <type>    Set second verification type.");
 	puts("  -c <reason>  Add an RFU to the upissued object.");
+	puts("  -D           Remove \"delete\"d elements.");
 	puts("  -d           Do not write anything, only print new filename.");
 	puts("  -f           Overwrite existing upissued object.");
 	puts("  -I           Do not change issue date.");
@@ -145,6 +146,34 @@ void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
 	}
 
 	xmlXPathFreeObject(obj);
+}
+
+/* Remove elements marked as "delete". */
+void rem_delete(xmlDocPtr doc, bool iss30)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+
+	if (iss30) {
+		obj = xmlXPathEvalExpression(BAD_CAST "//*[@change='delete']", ctx);
+	} else {
+		obj = xmlXPathEvalExpression(BAD_CAST "//*[@changeType='delete']", ctx);
+	}
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
 }
 
 /* Delete old RFUs */
@@ -307,6 +336,7 @@ char *firstver = NULL;
 char *secondver = NULL;
 xmlNodePtr rfus = NULL;
 bool lock = false;
+bool remdel= false;
 
 void upissue(const char *path)
 {
@@ -404,6 +434,9 @@ void upissue(const char *path)
 				if (set_unverif) {
 					set_unverified(dmdoc, iss30);
 				}
+		/* Or, remove "delete"d elements any time. */
+		} else if (remdel) {
+			rem_delete(dmdoc, iss30);
 		}
 
 		if (set_date) {
@@ -521,7 +554,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:dlc:t:Hwh?";
+	const char *sopts = "ivs:NfrRIq1:2:Ddlc:t:Hwh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -548,6 +581,9 @@ int main(int argc, char **argv)
 				break;
 			case 'c':
 				xmlNewChild(rfus, NULL, BAD_CAST "reasonForUpdate", BAD_CAST optarg);
+				break;
+			case 'D':
+				remdel = true;
 				break;
 			case 'd':
 				dry_run = true;

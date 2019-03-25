@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="01"/>
+        <issueInfo issueNumber="015" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="03" day="25"/>
@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add standard libxml2 parser options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-upissue [-dfHIilNqRrvw] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-upissue [-DdfHIilNqRrvw] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
              [-c &lt;reason&gt;] [-s &lt;status&gt;] [-t &lt;urt&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
@@ -81,6 +84,12 @@
               <listItemTerm>-c &lt;reason&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add a reason for update to the upissued objects. Multiple RFUs can be added by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-D</listItemTerm>
+              <listItemDefinition>
+                <para>Remove elements with change type of "delete". These elements are automatically removed along with all change marks and RFUs when an object is upissued from official to the next inwork issue. This option will remove them when upissuing between inwork issues, or when making the object official.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
