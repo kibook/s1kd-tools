@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.4.0"
+#define VERSION "2.4.1"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1920,12 +1920,16 @@ void set_orig(xmlDocPtr doc, char *origspec)
 	}
 }
 
-/* Determine if the whole data module is applicable. */
+/* Determine if the whole object is applicable. */
 bool check_wholedm_applic(xmlDocPtr dm)
 {
 	xmlNodePtr applic;
 
 	applic = first_xpath_node(dm, NULL, BAD_CAST "//dmStatus/applic|//pmStatus/applic");
+
+	if (!applic) {
+		return true;
+	}
 
 	return eval_applic_stmt(applic, true);
 }
