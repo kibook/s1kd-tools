@@ -93,7 +93,7 @@ bool is_in_set(const char *value, const char *set);
 void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, const xmlChar *sysId);
 
 /* Add an ICN entity from a file path. */
-void add_icn(xmlDocPtr doc, const char *path, bool fullpath);
+xmlEntityPtr add_icn(xmlDocPtr doc, const char *path, bool fullpath);
 
 /* Make a file read-only. */
 void mkreadonly(const char *path);

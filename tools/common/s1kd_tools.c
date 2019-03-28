@@ -383,11 +383,12 @@ void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, cons
 }
 
 /* Add an ICN entity from a file path. */
-void add_icn(xmlDocPtr doc, const char *path, bool fullpath)
+xmlEntityPtr add_icn(xmlDocPtr doc, const char *path, bool fullpath)
 {
 	char *full, *base, *name;
 	char *infoEntityIdent;
 	char *notation;
+	xmlEntityPtr e;
 
 	full = strdup(path);
 	base = basename(full);
@@ -397,12 +398,14 @@ void add_icn(xmlDocPtr doc, const char *path, bool fullpath)
 	notation = strtok(NULL, "");
 
 	add_notation(doc, BAD_CAST notation, NULL, BAD_CAST notation);
-	xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
+	e = xmlAddDocEntity(doc, BAD_CAST infoEntityIdent,
 		XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL,
 		BAD_CAST (fullpath ? path : base), BAD_CAST notation);
 
 	free(name);
 	free(full);
+
+	return e;
 }
 
 /* Make a file read-only. */

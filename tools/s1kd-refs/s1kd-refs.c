@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.5.0"
+#define VERSION "2.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -502,6 +502,12 @@ void getICNAttr(char *dst, xmlNodePtr ref)
 	} else {
 		strcpy(dst, (char *) icn);
 	}
+
+	/* Remove issue number when not doing a full match. */
+	if (!fullMatch) {
+		*(strrchr(dst, '-') - 3) = 0;
+	}
+
 	xmlFree(icn);
 }
 
@@ -833,6 +839,21 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		xmlUnlinkNode(oldtitle);
 		xmlFreeNode(oldtitle);
 		xmlFreeDoc(doc);
+	} else if (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0) {
+		xmlChar *icn;
+		xmlEntityPtr e;
+
+		/* Remove old ICN entity. */
+		icn = xmlNodeGetContent(ref);
+		if ((e = xmlGetDocEntity(ref->doc, icn))) {
+			xmlUnlinkNode((xmlNodePtr) e);
+			xmlFreeEntity(e);
+		}
+		xmlFree(icn);
+
+		/* Add new ICN entity. */
+		e = add_icn(ref->doc, fname, false);
+		xmlNodeSetContent(ref, e->name);
 	}
 }
 
