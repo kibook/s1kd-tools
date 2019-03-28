@@ -9,16 +9,23 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
-#define E_BAD_LIST "Could not read list: %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_ICN_INWORK ERR_PREFIX "ICNs cannot have inwork issues.\n"
+#define E_BAD_FILENAME ERR_PREFIX "Filename does not contain issue info and -N not specified.\n"
+#define E_ISSUE_TOO_LARGE ERR_PREFIX "%s is at the max issue number.\n"
+#define E_INWORK_TOO_LARGE ERR_PREFIX "%s is at the max inwork number.\n"
+#define E_NON_XML_STDIN ERR_PREFIX "Cannot use -N or read from stdin when file does not contain issue info metadata.\n"
 
 #define EXIT_NO_FILE 1
 #define EXIT_NO_OVERWRITE 2
 #define EXIT_BAD_FILENAME 3
 #define EXIT_BAD_DATE 4
+#define EXIT_ICN_INWORK 5
+#define EXIT_ISSUE_TOO_LARGE 6
 
 void show_help(void)
 {
@@ -342,8 +349,8 @@ bool remold = false;
 
 void upissue(const char *path)
 {
-	char *issueNumber;
-	char *inWork;
+	char *issueNumber = NULL;
+	char *inWork = NULL;
 	int issueNumber_int;
 	int inWork_int;
 	char dmfile[PATH_MAX], cpfile[PATH_MAX];
@@ -355,6 +362,7 @@ void upissue(const char *path)
 	bool iss30 = false;
 	char upissued_issueNumber[32];
 	char upissued_inWork[32];
+	char *p, *i = NULL;
 
 	strcpy(dmfile, path);
 
@@ -372,11 +380,16 @@ void upissue(const char *path)
 	}
 
 	if (!issueInfo && no_issue) {
-		fprintf(stderr, ERR_PREFIX "Cannot use -N or read from stdin when file does not contain issue info metadata.\n");
+		fprintf(stderr, E_NON_XML_STDIN);
 		exit(EXIT_NO_OVERWRITE);
 	}
 
+	p = strchr(dmfile, '_');
+
+	/* Issue info from XML */
 	if (issueInfo) {
+		i = p + 1;
+
 		iss30 = strcmp((char *) issueInfo->name, "issueInfo") != 0;
 
 		if (iss30) {
@@ -393,13 +406,12 @@ void upissue(const char *path)
 		if (!inWork) {
 			inWork = strdup("00");
 		}
-	} else { /* Get issue/inwork from filename only */
-		char *i;
+	/* Get issue/inwork from filename only */
+	} else if (p) {
+		i = p + 1;
 
-		i = strchr(dmfile, '_') + 1;
-
-		if (i < dmfile || i > dmfile + strlen(dmfile) - 6) {
-			fprintf(stderr, ERR_PREFIX "Filename does not contain issue info and -N not specified.\n");
+		if (i > dmfile + strlen(dmfile) - 6) {
+			fprintf(stderr, E_BAD_FILENAME);
 			exit(EXIT_BAD_FILENAME);
 		}
 
@@ -408,17 +420,64 @@ void upissue(const char *path)
 
 		strncpy(issueNumber, i, 3);
 		strncpy(inWork, i + 4, 2);
+	/* Get issue from ICN */
+	} else if ((p = strchr(dmfile, '-'))) {
+		int n, c = 0;
+		int l;
+
+		if (!newissue) {
+			fprintf(stderr, E_ICN_INWORK);
+			exit(EXIT_ICN_INWORK);
+		}
+
+		l = strlen(dmfile);
+
+		/* Get second-to-last '-' */
+		for (n = l; n >= 0; --n) {
+			if (dmfile[n] == '-') {
+				if (c == 1) {
+					break;
+				} else {
+					++c;
+				}
+			}
+		}
+
+		i = dmfile + n + 1;
+
+		if (n == -1 || i > dmfile + l - 6) {
+			fprintf(stderr, E_BAD_FILENAME);
+			exit(EXIT_BAD_FILENAME);
+		}
+
+		issueNumber = calloc(4, 1);
+		strncpy(issueNumber, i, 3);
+	} else {
+		fprintf(stderr, E_BAD_FILENAME);
+		exit(EXIT_BAD_FILENAME);
 	}
 
-	issueNumber_int = atoi(issueNumber);
-	inWork_int = atoi(inWork);
+	if ((issueNumber_int = atoi(issueNumber)) >= 999) {
+		fprintf(stderr, E_ISSUE_TOO_LARGE, dmfile);
+		exit(EXIT_ISSUE_TOO_LARGE);
+	}
+	if (inWork) {
+		if ((inWork_int = atoi(inWork)) >= 99) {
+			fprintf(stderr, E_INWORK_TOO_LARGE, dmfile);
+			exit(EXIT_ISSUE_TOO_LARGE);
+		}
+	}
 
 	if (newissue) {
 		snprintf(upissued_issueNumber, 32, "%.3d", issueNumber_int + 1);
-		snprintf(upissued_inWork, 32, "%.2d", 0);
+		if (inWork) {
+			snprintf(upissued_inWork, 32, "%.2d", 0);
+		}
 	} else {
 		snprintf(upissued_issueNumber, 32, "%.3d", issueNumber_int);
-		snprintf(upissued_inWork, 32, "%.2d", inWork_int + 1);
+		if (inWork) {
+			snprintf(upissued_inWork, 32, "%.2d", inWork_int + 1);
+		}
 	}
 
 	if (issueInfo) {
@@ -493,19 +552,19 @@ void upissue(const char *path)
 	}
 
 	if (!no_issue) {
-		char *i;
-
 		if (!dry_run) {
-			if (remold) { /* Delete previous issue. */
+			if (remold && dmdoc) { /* Delete previous issue (XML file) */
 				remove(dmfile);
 			} else if (lock) { /* Remove write permission from previous issue. */
 				mkreadonly(dmfile);
 			}
 		}
 
-		if ((i = strchr(dmfile, '_'))) {
-			memcpy(i + 1, upissued_issueNumber, 3);
-			memcpy(i + 5, upissued_inWork, 2);
+		if (p) {
+			memcpy(i, upissued_issueNumber, 3);
+			if (inWork) {
+				memcpy(i + 4, upissued_inWork, 2);
+			}
 		}
 	}
 
@@ -519,6 +578,10 @@ void upissue(const char *path)
 			save_xml_doc(dmdoc, dmfile);
 		} else { /* Copy non-XML file */
 			copy(cpfile, dmfile);
+
+			if (remold) { /* Delete previous issue (non-XML file) */
+				remove(cpfile);
+			}
 		}
 
 		/* Lock official issues. */
