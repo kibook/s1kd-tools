@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="06" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="01"/>
+        <issueInfo issueNumber="014" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="25"/>
+        <issueDate year="2019" month="03" day="27"/>
         <dmTitle>
           <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add standard libxml2 parser options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Add ICN example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -171,19 +174,23 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-ls
+          <verbatimText verbatimStyle="vs24" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[$ s1kd-ls
 DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
 DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-001-01.JPG
+ICN-12345-00001-002-01.JPG
 PMC-EX-12345-00001-00_000-01_EN-CA.XML
 
 $ s1kd-ls -l
 DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
 DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-002-01.JPG
 PMC-EX-12345-00001-00_000-01_EN-CA.XML
 
 $ s1kd-ls -o
 DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-001-01.JPG
 
 $ s1kd-ls -D | s1kd-metadata -lt -ntechName -ninfoName -nissueDate
 Example A    Description    2018-03-20

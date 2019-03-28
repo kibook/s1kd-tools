@@ -23,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -328,6 +328,32 @@ int extract_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles
 	}
 	return nlatest;
 }
+int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+{
+	int i, nlatest = 0;
+	for (i = 0; i < nfiles; ++i) {
+		char *name1, *name2, *base1, *base2;
+
+		name1 = strdup(files[i]);
+		base1 = basename(name1);
+		if (i > 0) {
+			name2 = strdup(files[i - 1]);
+			base2 = basename(name2);
+		} else {
+			name2 = NULL;
+		}
+
+		if (i == 0 || strncmp(base1, base2, strrchr(base1, '-') - 3 - base1) != 0) {
+			strcpy(latest[nlatest++], files[i]);
+		} else {
+			strcpy(latest[nlatest - 1], files[i]);
+		}
+
+		free(name1);
+		free(name2);
+	}
+	return nlatest;
+}
 
 /* Copy only old issues of CSDB objects. */
 int remove_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
@@ -353,6 +379,37 @@ int remove_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 		}
 
 		if (name3 && strncmp(base1, base3, s - base1) == 0) {
+			strcpy(latest[nlatest++], files[i]);
+		}
+
+		free(name1);
+		free(name3);
+	}
+	return nlatest;
+}
+int remove_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+{
+	int i, nlatest = 0;
+	for (i = 0; i < nfiles; ++i) {
+		char *name1, *name3, *base1, *base3, *s;
+
+		name1 = strdup(files[i]);
+		base1 = basename(name1);
+
+		s = strrchr(base1, '-');
+		if (!s) {
+			free(name1);
+			continue;
+		}
+
+		if (i < nfiles - 1) {
+			name3 = strdup(files[i + 1]);
+			base3 = basename(name3);
+		} else {
+			name3 = NULL;
+		}
+
+		if (name3 && strncmp(base1, base3, s - 3 - base1) == 0) {
 			strcpy(latest[nlatest++], files[i]);
 		}
 
@@ -404,7 +461,8 @@ int main(int argc, char **argv)
 	char (*latest_pms)[PATH_MAX] = NULL;
 	char (*latest_imfs)[PATH_MAX] = NULL;
 	char (*latest_dmls)[PATH_MAX] = NULL;
-	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0;
+	char (*latest_icns)[PATH_MAX] = NULL;
+	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0, nlatest_icns = 0;
 
 	char (*issue_dms)[PATH_MAX] = NULL;
 	char (*issue_pms)[PATH_MAX] = NULL;
@@ -573,12 +631,15 @@ int main(int argc, char **argv)
 	} else {
 		free(dmls);
 	}
+	if (nicns) {
+		qsort(icns, nicns, PATH_MAX, compare);
+		if (only_latest || only_old) latest_icns = malloc(nicns * PATH_MAX);
+	} else {
+		free(icns);
+	}
 
 	if (!ncoms) {
 		free(coms);
-	}
-	if (!nicns) {
-		free(icns);
 	}
 	if (!nddns) {
 		free(ddns);
@@ -603,6 +664,10 @@ int main(int argc, char **argv)
 			if (ndmls) {
 				nissue_dmls = remove_latest(issue_dmls, dmls, ndmls);
 				free(dmls);
+			}
+			if (nicns) {
+				nlatest_icns = remove_latest_icns(latest_icns, icns, nicns);
+				free(icns);
 			}
 
 			if (only_official_issue) {
@@ -667,20 +732,27 @@ int main(int argc, char **argv)
 				if (nissue_dmls) {
 					nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
 				}
+				if (nicns) {
+					nlatest_icns = extract_latest_icns(latest_icns, icns, nicns);
+				}
 
 				free(issue_dms);
 				free(issue_pms);
 				free(issue_imfs);
 				free(issue_dmls);
+				free(icns);
 			}
 		}
 	} else if (only_latest || only_old) {
 		int (*f)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
+		int (*icnf)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
 
 		if (only_latest) {
 			f = extract_latest;
+			icnf = extract_latest_icns;
 		} else {
 			f = remove_latest;
+			icnf = remove_latest_icns;
 		}
 		if (ndms) {
 			nlatest_dms = f(latest_dms, dms, ndms);
@@ -697,6 +769,10 @@ int main(int argc, char **argv)
 		if (ndmls) {
 			nlatest_dmls = f(latest_dmls, dmls, ndmls);
 			free(dmls);
+		}
+		if (nicns) {
+			nlatest_icns = icnf(latest_icns, icns, nicns);
+			free(icns);
 		}
 	}
 
@@ -734,10 +810,17 @@ int main(int argc, char **argv)
 	}
 
 	if (nicns) {
-		if (!only_old) {
-			printfiles(icns, nicns);
+		if (only_inwork) {
+			free(icns);
+		} else {
+			if (only_latest || only_old) {
+				printfiles(latest_icns, nlatest_icns);
+				free(latest_icns);
+			} else {
+				printfiles(icns, nicns);
+				free(icns);
+			}
 		}
-		free(icns);
 	}
 
 	if (nimfs) {
