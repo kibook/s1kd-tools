@@ -587,11 +587,11 @@
   <type infoCode="921" schema="proced" infoName="Change = Remove and install a new item"/>
   <type infoCode="922" schema="proced" infoName="Change = Remove and install the removed item"/>
   <!-- 924 thru 929 not available for projects -->
-  <type infoCode="930" schema="descript" infoName="Service bulletin"/>
+  <type infoCode="930" schema="sb" infoName="Service bulletin"/>
   <type infoCode="931" schema="descript" infoName="Service bulletin data"/>
   <type infoCode="932" schema="descript" infoName="Planning information"/>
   <type infoCode="933" schema="proced" infoName="Accomplishment procedure - Task set"/>
-  <type infoCode="934" schema="descript" infoName="Material information"/>
+  <type infoCode="934" schema="sb" infoName="Material information"/>
   <!-- 935 thru 939 not available for projects -->
   <type infoCode="940" schema="descript" infoName="Provisioning data"/>
   <type infoCode="941" schema="ipd" infoName="Illustrated parts data"/>

@@ -20,7 +20,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1621,6 +1621,13 @@ int main(int argc, char **argv)
 	xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inWork);
 
 	set_issue_date(issueDate);
+
+	/* SB DMs also contain an "original issue date" */
+	if (strcmp(dmtype, "sb") == 0) {
+		xmlNodePtr sbissdate;
+		sbissdate = firstXPathNode(dm, NULL, "//sbOriginalIssueDate/issueDate");
+		if (sbissdate) set_issue_date(sbissdate);
+	}
 
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST securityClassification);
 

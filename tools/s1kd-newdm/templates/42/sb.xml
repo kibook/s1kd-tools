@@ -41,23 +41,31 @@
   </identAndStatusSection>
   <content>
     <sb>
-      <sbMaterialInfoContent>
-        <sbMaterialSetList>
-          <noInfo/>
-        </sbMaterialSetList>
-        <sbSupportEquipsList>
-          <noInfo/>
-        </sbSupportEquipsList>
-        <sbSuppliesList>
-          <noInfo/>
-        </sbSuppliesList>
-        <sbSparesList>
-          <noInfo/>
-        </sbSparesList>
-        <sbRemovedSparesList>
-          <noInfo/>
-        </sbRemovedSparesList>
-      </sbMaterialInfoContent>
+      <sbManagementInfo>
+        <sbCompliance sbComplianceCategory="sbcc01"/>
+        <sbTaskType sbTaskCategory="sbtc01"/>
+        <sbOriginalIssueDate>
+          <issueDate/>
+        </sbOriginalIssueDate>
+      </sbManagementInfo>
+      <sbRevisionInfo>
+        <noInfo/>
+      </sbRevisionInfo>
+      <sbSummary>
+        <noInfo/>
+      </sbSummary>
+      <sbPlanningInfo>
+        <noInfo/>
+      </sbPlanningInfo>
+      <sbMaterialInfo>
+        <noInfo/>
+      </sbMaterialInfo>
+      <sbAccomplishmentInstructions>
+        <noInfo/>
+      </sbAccomplishmentInstructions>
+      <sbAdditionalInfo>
+        <noInfo/>
+      </sbAdditionalInfo>
     </sb>
   </content>
 </dmodule>
