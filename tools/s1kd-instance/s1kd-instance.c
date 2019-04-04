@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.4.1"
+#define VERSION "2.4.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -231,22 +231,6 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	return xmlNodeGetContent(first_xpath_node(doc, node, path));
-}
-
-void lowercase(char *s)
-{
-	int i;
-	for (i = 0; s[i]; ++i) {
-		s[i] = tolower(s[i]);
-	}
-}
-
-void uppercase(char *s)
-{
-	int i;
-	for (i = 0; s[i]; ++i) {
-		s[i] = toupper(s[i]);
-	}
 }
 
 /* Copy strings related to uniquely identifying a CSDB object. The strings are

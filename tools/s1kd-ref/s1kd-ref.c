@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -39,12 +39,6 @@ enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 bool hasopt(int opts, int opt)
 {
 	return (opts & opt) == opt;
-}
-
-void lowercase(char *s)
-{
-	int i;
-	for (i = 0; s[i]; ++i) s[i] = tolower(s[i]);
 }
 
 xmlNode *find_child(xmlNode *parent, char *name)

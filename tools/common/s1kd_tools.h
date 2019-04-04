@@ -2,6 +2,7 @@
 #define S1KD_H
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -100,5 +101,11 @@ void mkreadonly(const char *path);
 
 /* Insert a child node instead of appending one. */
 xmlNodePtr add_first_child(xmlNodePtr parent, xmlNodePtr child);
+
+/* Convert string to lowercase. */
+void lowercase(char *s);
+
+/* Convert string to uppercase. */
+void uppercase(char *s);
 
 #endif

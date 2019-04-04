@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.6.0"
+#define VERSION "2.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -131,15 +131,6 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 xmlChar *firstXPathValue(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
 	return xmlNodeGetContent(firstXPathNode(doc, root, path));
-}
-
-/* Convert string to uppercase. */
-void uppercase(char *s)
-{
-	int i;
-	for (i = 0; s[i]; ++i) {
-		s[i] = toupper(s[i]);
-	}
 }
 
 /* Print a reference which is matched in the filesystem. */

@@ -429,3 +429,19 @@ xmlNodePtr add_first_child(xmlNodePtr parent, xmlNodePtr child)
 		return xmlAddChild(parent, child);
 	}
 }
+
+void lowercase(char *s)
+{
+	int i;
+	for (i = 0; s[i]; ++i) {
+		s[i] = tolower(s[i]);
+	}
+}
+
+void uppercase(char *s)
+{
+	int i;
+	for (i = 0; s[i]; ++i) {
+		s[i] = toupper(s[i]);
+	}
+}
