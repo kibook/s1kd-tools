@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="02"/>
+        <issueInfo issueNumber="014" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="04" day="04"/>
@@ -42,7 +42,7 @@
         <simplePara>Add standard libxml2 parser options.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -q option.</simplePara>
+        <simplePara>Add -q and -v options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-ref [-filqRrStdh?] [-$ &lt;issue&gt;] [-s &lt;src&gt;] [-o &lt;dst&gt;]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-ref [-dfilqRrStvh?] [-$ &lt;issue&gt;] [-s &lt;src&gt;] [-o &lt;dst&gt;]
          [&lt;code&gt;|&lt;filename&gt;]...</verbatimText>
         </para>
       </levelledPara>

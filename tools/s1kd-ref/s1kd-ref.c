@@ -12,10 +12,11 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define EXIT_MISSING_FILE 1
 #define EXIT_BAD_INPUT 2
@@ -33,7 +34,7 @@ enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
-enum verbosity { QUIET, NORMAL } verbosity = NORMAL;
+enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 bool hasopt(int opts, int opt)
 {
@@ -908,6 +909,10 @@ void print_ref(const char *src, const char *dst, const char *ref,
 	}
 
 	if (hasopt(opts, OPT_INS)) {
+		if (verbosity >= VERBOSE) {
+			fprintf(stderr, INF_PREFIX "Adding reference %s to %s...\n", ref, src);
+		}
+
 		if (overwrite) {
 			add_ref(src, src, node, opts);
 		} else {
@@ -964,9 +969,10 @@ enum issue spec_issue(const char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-filqRrSth?] [-s <src>] [-o <dst>] [<code>|<file>]");
+	puts("Usage: " PROG_NAME " [-dfilqRrStvh?] [-s <src>] [-o <dst>] [<code>|<file>]");
 	puts("");
 	puts("Options:");
+	puts("  -d         Include issue date (target must be file)");
 	puts("  -f         Overwrite source data module instead of writing to stdout.");
 	puts("  -i         Include issue info (target must be file)");
 	puts("  -l         Include language (target must be file)");
@@ -977,7 +983,7 @@ void show_help(void)
 	puts("  -S         Generate a <sourceDmIdent> or <sourcePmIdent>.");
 	puts("  -s <src>   Source data module to add references to.");
 	puts("  -t         Include title (target must be file)");
-	puts("  -d         Include issue date (target must be file)");
+	puts("  -v         Verbose output.");
 	puts("  -h -?      Show this help message.");
 	puts("  --version  Show version information.");
 	puts("  <code>     The code of the reference (must include prefix DMC/PMC/etc.).");
@@ -1002,7 +1008,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	enum issue iss = DEFAULT_S1000D_ISSUE;
 
-	const char *sopts = "filo:qRrSs:td$:h?";
+	const char *sopts = "filo:qRrSs:tvd$:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1029,6 +1035,7 @@ int main(int argc, char **argv)
 			case 'S': opts |= OPT_SRCID; opts |= OPT_ISSUE; opts |= OPT_LANG; break;
 			case 's': strcpy(src, optarg); break;
 			case 't': opts |= OPT_TITLE; break;
+			case 'v': verbosity = VERBOSE; break;
 			case 'd': opts |= OPT_DATE; break;
 			case '$': iss = spec_issue(optarg); break;
 			case '?':
