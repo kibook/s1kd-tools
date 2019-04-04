@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-filRrStdh?] [-$ <issue>] [-s <src>] [-o <dst>]
+    s1kd-ref [-filqRrStdh?] [-$ <issue>] [-s <src>] [-o <dst>]
              [<code>|<filename>]...
 
 DESCRIPTION
@@ -41,6 +41,9 @@ file)
 
 -o &lt;dst&gt;  
 Output to &lt;dst&gt; instead of stdout.
+
+-q  
+Quiet mode. Do not print errors.
 
 -R  
 Generate a `<repositorySourceDmIdent>` for a data module.

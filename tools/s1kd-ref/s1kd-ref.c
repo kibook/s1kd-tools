@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -32,6 +32,8 @@
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
 #define DEFAULT_S1000D_ISSUE ISS_42
+
+enum verbosity { QUIET, NORMAL } verbosity = NORMAL;
 
 bool hasopt(int opts, int opt)
 {
@@ -176,7 +178,9 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			pm_number,
 			pm_volume);
 		if (n != 6) {
-			fprintf(stderr, ERR_PREFIX "Publication module extended code invalid: %s\n", ref);
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Publication module extended code invalid: %s\n", ref);
+			}
 			exit(EXIT_BAD_INPUT);
 		}
 	} else {
@@ -186,7 +190,9 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			pm_number,
 			pm_volume);
 		if (n != 4) {
-			fprintf(stderr, ERR_PREFIX "Publication module code invalid: %s\n", ref);
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Publication module code invalid: %s\n", ref);
+			}
 			exit(EXIT_BAD_INPUT);
 		}
 	}
@@ -235,7 +241,9 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
-				fprintf(stderr, WRN_PREFIX "Could not read issue info from publication module: %s\n", ref);
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read issue info from publication module: %s\n", ref);
+				}
 				issue_info = NULL;
 			}
 
@@ -248,7 +256,9 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
-				fprintf(stderr, WRN_PREFIX "Could not read language from publication module: %s\n", ref);
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read language from publication module: %s\n", ref);
+				}
 				language = NULL;
 			}
 
@@ -271,14 +281,18 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 				if (pm_title) {
 					xmlAddChild(pm_ref_address_items, pm_title);
 				} else {
-					fprintf(stderr, WRN_PREFIX "Could not read title from publication module: %s\n", ref);
+					if (verbosity > QUIET) {
+						fprintf(stderr, WRN_PREFIX "Could not read title from publication module: %s\n", ref);
+					}
 				}
 			}
 			if (hasopt(opts, OPT_DATE)) {
 				if (issue_date) {
 					xmlAddChild(pm_ref_address_items, issue_date);
 				} else {
-					fprintf(stderr, WRN_PREFIX "Could not read date from publication module: %s\n", ref);
+					if (verbosity > QUIET) {
+						fprintf(stderr, WRN_PREFIX "Could not read date from publication module: %s\n", ref);
+					}
 				}
 			}
 		}
@@ -352,7 +366,9 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			learn_code,
 			learn_event_code);
 		if (n != 15 && n != 13) {
-			fprintf(stderr, ERR_PREFIX "Data module extended code invalid: %s\n", ref);
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Data module extended code invalid: %s\n", ref);
+			}
 			exit(EXIT_BAD_INPUT);
 		}
 		has_learn = n == 15;
@@ -372,7 +388,9 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			learn_code,
 			learn_event_code);
 		if (n != 13 && n != 11) {
-			fprintf(stderr, ERR_PREFIX "Data module code invalid: %s\n", ref);
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Data module code invalid: %s\n", ref);
+			}
 			exit(EXIT_BAD_INPUT);
 		}
 		has_learn = n == 13;
@@ -433,7 +451,9 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
-				fprintf(stderr, WRN_PREFIX "Could not read issue info from data module: %s\n", ref);
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read issue info from data module: %s\n", ref);
+				}
 				issue_info = NULL;
 			}
 
@@ -446,7 +466,9 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
-				fprintf(stderr, WRN_PREFIX "Could not read language from data module: %s\n", ref);
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read language from data module: %s\n", ref);
+				}
 				language = NULL;
 			}
 
@@ -469,14 +491,18 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 				if (dm_title) {
 					xmlAddChild(dm_ref_address_items, dm_title);
 				} else {
-					fprintf(stderr, WRN_PREFIX "Could not read title from data module: %s\n", ref);
+					if (verbosity > QUIET) {
+						fprintf(stderr, WRN_PREFIX "Could not read title from data module: %s\n", ref);
+					}
 				}
 			}
 			if (hasopt(opts, OPT_DATE)) {
 				if (issue_date) {
 					xmlAddChild(dm_ref_address_items, issue_date);
 				} else {
-					fprintf(stderr, WRN_PREFIX "Could not read issue date from data module: %s\n", ref);
+					if (verbosity > QUIET) {
+						fprintf(stderr, WRN_PREFIX "Could not read issue date from data module: %s\n", ref);
+					}
 				}
 			}
 		}
@@ -524,7 +550,9 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		seq_number,
 		comment_type);
 	if (n != 5) {
-		fprintf(stderr, ERR_PREFIX "Comment code invalid: %s\n", ref);
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX "Comment code invalid: %s\n", ref);
+		}
 		exit(EXIT_BAD_INPUT);
 	}
 
@@ -561,7 +589,9 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
-				fprintf(stderr, WRN_PREFIX "Could not read language from comment: %s\n", ref);
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read language from comment: %s\n", ref);
+				}
 				language = NULL;
 			}
 
@@ -595,7 +625,9 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		year_of_data_issue,
 		seq_number);
 	if (n != 5) {
-		fprintf(stderr, ERR_PREFIX "DML code invalid: %s\n", ref);
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX "DML code invalid: %s\n", ref);
+		}
 		exit(EXIT_BAD_INPUT);
 	}
 
@@ -632,7 +664,9 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
-				fprintf(stderr, WRN_PREFIX "Could not read issue info from DML: %s\n", ref);
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read issue info from DML: %s\n", ref);
+				}
 				issue_info = NULL;
 			}
 
@@ -687,7 +721,9 @@ xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 		item_variant,
 		item_location_code);
 	if (n != 11) {
-		fprintf(stderr, ERR_PREFIX "CSN invalid: %s\n", ref);
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX "CSN invalid: %s\n", ref);
+		}
 		exit(EXIT_BAD_INPUT);
 	}
 
@@ -744,7 +780,9 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 	xmlNodePtr refs;
 
 	if (!(doc = read_xml_doc(src))) {
-		fprintf(stderr, ERR_PREFIX "Could not read source data module: %s\n", src);
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX "Could not read source data module: %s\n", src);
+		}
 		exit(EXIT_MISSING_FILE);
 	}
 
@@ -811,7 +849,9 @@ void print_ref(const char *src, const char *dst, const char *ref,
 	} else if (is_csn(ref)) {
 		f = new_csn_ref;
 	} else {
-		fprintf(stderr, ERR_PREFIX "Unknown reference type: %s\n", ref);
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX "Unknown reference type: %s\n", ref);
+		}
 		exit(EXIT_BAD_INPUT);
 	}
 
@@ -916,19 +956,22 @@ enum issue spec_issue(const char *s)
 		return ISS_42;
 	}
 
-	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", s);
+	if (verbosity > QUIET) {
+		fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", s);
+	}
 	exit(EXIT_BAD_ISSUE);
 }
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-filRrSth?] [-s <src>] [-o <dst>] [<code>|<file>]");
+	puts("Usage: " PROG_NAME " [-filqRrSth?] [-s <src>] [-o <dst>] [<code>|<file>]");
 	puts("");
 	puts("Options:");
 	puts("  -f         Overwrite source data module instead of writing to stdout.");
 	puts("  -i         Include issue info (target must be file)");
 	puts("  -l         Include language (target must be file)");
 	puts("  -o <dst>   Output to <dst> instead of stdout.");
+	puts("  -q         Quiet mode. Do not print errors.");
 	puts("  -R         Generate a <repositorySourceDmIdent>.");
 	puts("  -r         Add reference to data module's <refs> table.");
 	puts("  -S         Generate a <sourceDmIdent> or <sourcePmIdent>.");
@@ -959,7 +1002,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	enum issue iss = DEFAULT_S1000D_ISSUE;
 
-	const char *sopts = "filo:RrSs:td$:h?";
+	const char *sopts = "filo:qRrSs:td$:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -980,6 +1023,7 @@ int main(int argc, char **argv)
 			case 'i': opts |= OPT_ISSUE; break;
 			case 'l': opts |= OPT_LANG; break;
 			case 'o': strcpy(dst, optarg); break;
+			case 'q': verbosity = QUIET; break;
 			case 'r': opts |= OPT_INS; break;
 			case 'R': opts |= OPT_CIRID;
 			case 'S': opts |= OPT_SRCID; opts |= OPT_ISSUE; opts |= OPT_LANG; break;
