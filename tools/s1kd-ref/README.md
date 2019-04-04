@@ -63,6 +63,9 @@ the -r option.
 -t  
 Include the title in the reference (target must be a file).
 
+-v  
+Verbose output.
+
 --version  
 Show version information.
 
