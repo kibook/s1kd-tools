@@ -12,9 +12,10 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define WRN_PREFIX PROG_NAME ": WARNING: "
 
 #define EXIT_MISSING_FILE 1
 #define EXIT_BAD_INPUT 2
@@ -26,6 +27,7 @@
 #define OPT_DATE  (int) 0x08
 #define OPT_SRCID (int) 0x10
 #define OPT_CIRID (int) 0x20
+#define OPT_INS   (int) 0x40
 
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
@@ -233,7 +235,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
-				fprintf(stderr, ERR_PREFIX "Could not read issue info from publication module: %s\n", ref);
+				fprintf(stderr, WRN_PREFIX "Could not read issue info from publication module: %s\n", ref);
 				issue_info = NULL;
 			}
 
@@ -246,7 +248,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
-				fprintf(stderr, ERR_PREFIX "Could not read language from publication module: %s\n", ref);
+				fprintf(stderr, WRN_PREFIX "Could not read language from publication module: %s\n", ref);
 				language = NULL;
 			}
 
@@ -269,14 +271,14 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 				if (pm_title) {
 					xmlAddChild(pm_ref_address_items, pm_title);
 				} else {
-					fprintf(stderr, ERR_PREFIX "Could not read title from publication module: %s\n", ref);
+					fprintf(stderr, WRN_PREFIX "Could not read title from publication module: %s\n", ref);
 				}
 			}
 			if (hasopt(opts, OPT_DATE)) {
 				if (issue_date) {
 					xmlAddChild(pm_ref_address_items, issue_date);
 				} else {
-					fprintf(stderr, ERR_PREFIX "Could not read date from publication module: %s\n", ref);
+					fprintf(stderr, WRN_PREFIX "Could not read date from publication module: %s\n", ref);
 				}
 			}
 		}
@@ -431,7 +433,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
-				fprintf(stderr, ERR_PREFIX "Could not read issue info from data module: %s\n", ref);
+				fprintf(stderr, WRN_PREFIX "Could not read issue info from data module: %s\n", ref);
 				issue_info = NULL;
 			}
 
@@ -444,7 +446,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
-				fprintf(stderr, ERR_PREFIX "Could not read language from data module: %s\n", ref);
+				fprintf(stderr, WRN_PREFIX "Could not read language from data module: %s\n", ref);
 				language = NULL;
 			}
 
@@ -467,14 +469,14 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 				if (dm_title) {
 					xmlAddChild(dm_ref_address_items, dm_title);
 				} else {
-					fprintf(stderr, ERR_PREFIX "Could not read title from data module: %s\n", ref);
+					fprintf(stderr, WRN_PREFIX "Could not read title from data module: %s\n", ref);
 				}
 			}
 			if (hasopt(opts, OPT_DATE)) {
 				if (issue_date) {
 					xmlAddChild(dm_ref_address_items, issue_date);
 				} else {
-					fprintf(stderr, ERR_PREFIX "Could not read issue date from data module: %s\n", ref);
+					fprintf(stderr, WRN_PREFIX "Could not read issue date from data module: %s\n", ref);
 				}
 			}
 		}
@@ -559,7 +561,7 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
-				fprintf(stderr, ERR_PREFIX "Could not read language from comment: %s\n", ref);
+				fprintf(stderr, WRN_PREFIX "Could not read language from comment: %s\n", ref);
 				language = NULL;
 			}
 
@@ -630,7 +632,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
-				fprintf(stderr, ERR_PREFIX "Could not read issue info from DML: %s\n", ref);
+				fprintf(stderr, WRN_PREFIX "Could not read issue info from DML: %s\n", ref);
 				issue_info = NULL;
 			}
 
@@ -736,7 +738,7 @@ bool is_csn(const char *ref)
 	return strncmp(ref, "CSN-", 4) == 0;
 }
 
-void add_ref(const char *src, const char *dst, xmlNodePtr ref)
+void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 {
 	xmlDocPtr doc;
 	xmlNodePtr refs;
@@ -746,8 +748,22 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref)
 		exit(EXIT_MISSING_FILE);
 	}
 
-	refs = find_or_create_refs(doc);
-	xmlAddChild(refs, xmlCopyNode(ref, 1));
+	if (hasopt(opts, OPT_SRCID)) {
+		xmlNodePtr src, node;
+
+		src  = first_xpath_node(doc, NULL, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
+		node = first_xpath_node(doc, NULL, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
+		if (node) {
+			if (src) {
+				xmlUnlinkNode(src);
+				xmlFreeNode(src);
+			}
+			xmlAddPrevSibling(node, xmlCopyNode(ref, 1));
+		}
+	} else {
+		refs = find_or_create_refs(doc);
+		xmlAddChild(refs, xmlCopyNode(ref, 1));
+	}
 
 	save_xml_doc(doc, dst);
 
@@ -777,8 +793,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 }
 
 void print_ref(const char *src, const char *dst, const char *ref,
-	const char *fname, int opts, bool insert_refs, bool overwrite,
-	enum issue iss)
+	const char *fname, int opts, bool overwrite, enum issue iss)
 {
 	xmlNodePtr node;
 	xmlNodePtr (*f)(const char *, const char *, int);
@@ -852,11 +867,11 @@ void print_ref(const char *src, const char *dst, const char *ref,
 		xmlFreeDoc(doc);
 	}
 
-	if (insert_refs) {
+	if (hasopt(opts, OPT_INS)) {
 		if (overwrite) {
-			add_ref(src, src, node);
+			add_ref(src, src, node, opts);
 		} else {
-			add_ref(src, dst, node);
+			add_ref(src, dst, node, opts);
 		}
 	} else {
 		dump_node(node, dst);
@@ -939,7 +954,6 @@ int main(int argc, char **argv)
 	char scratch[PATH_MAX];
 	int i;
 	int opts = 0;
-	bool insert_refs = false;
 	char src[PATH_MAX] = "-";
 	char dst[PATH_MAX] = "-";
 	bool overwrite = false;
@@ -966,7 +980,7 @@ int main(int argc, char **argv)
 			case 'i': opts |= OPT_ISSUE; break;
 			case 'l': opts |= OPT_LANG; break;
 			case 'o': strcpy(dst, optarg); break;
-			case 'r': insert_refs = true; break;
+			case 'r': opts |= OPT_INS; break;
 			case 'R': opts |= OPT_CIRID;
 			case 'S': opts |= OPT_SRCID; opts |= OPT_ISSUE; opts |= OPT_LANG; break;
 			case 's': strcpy(src, optarg); break;
@@ -987,11 +1001,11 @@ int main(int argc, char **argv)
 			strcpy(scratch, fname);
 			base = basename(scratch);
 
-			print_ref(src, dst, base, fname, opts, insert_refs, overwrite, iss);
+			print_ref(src, dst, base, fname, opts, overwrite, iss);
 		}
 	} else {
 		while (fgets(scratch, PATH_MAX, stdin)) {
-			print_ref(src, dst, trim(scratch), NULL, opts, insert_refs, overwrite, iss);
+			print_ref(src, dst, trim(scratch), NULL, opts, overwrite, iss);
 		}
 	}
 
