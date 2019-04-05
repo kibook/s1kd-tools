@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="14" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="01"/>
+        <issueInfo issueNumber="013" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="25"/>
+        <issueDate year="2019" month="04" day="05"/>
         <dmTitle>
           <techName>s1kd-neutralize(1) | s1kd-tools</techName>
         </dmTitle>
