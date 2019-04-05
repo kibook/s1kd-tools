@@ -23,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -149,12 +149,6 @@ void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
-}
-
-/* Determine whether a bitset contains a value. */
-int hasopt(int opts, int opt)
-{
-	return ((opts & opt) == opt);
 }
 
 /* Resize CSDB object lists when it is full. */
@@ -522,25 +516,25 @@ int main(int argc, char **argv)
 
 	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML;
 
-	if (hasopt(show, SHOW_DM)) {
+	if (optset(show, SHOW_DM)) {
 		dms = malloc(DM_MAX * PATH_MAX);
 	}
-	if (hasopt(show, SHOW_PM)) {
+	if (optset(show, SHOW_PM)) {
 		pms = malloc(PM_MAX * PATH_MAX);
 	}
-	if (hasopt(show, SHOW_COM)) {
+	if (optset(show, SHOW_COM)) {
 		coms = malloc(COM_MAX * PATH_MAX);
 	}
-	if (hasopt(show, SHOW_ICN)) {
+	if (optset(show, SHOW_ICN)) {
 		icns = malloc(ICN_MAX * PATH_MAX);
 	}
-	if (hasopt(show, SHOW_IMF)) {
+	if (optset(show, SHOW_IMF)) {
 		imfs = malloc(IMF_MAX * PATH_MAX);
 	}
-	if (hasopt(show, SHOW_DDN)) {
+	if (optset(show, SHOW_DDN)) {
 		ddns = malloc(DDN_MAX * PATH_MAX);
 	}
-	if (hasopt(show, SHOW_DML)) {
+	if (optset(show, SHOW_DML)) {
 		dmls = malloc(DML_MAX * PATH_MAX);
 	}
 

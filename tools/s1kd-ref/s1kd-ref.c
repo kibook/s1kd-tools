@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.5.1"
+#define VERSION "1.5.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -35,11 +35,6 @@ enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 #define DEFAULT_S1000D_ISSUE ISS_42
 
 enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
-
-bool hasopt(int opts, int opt)
-{
-	return (opts & opt) == opt;
-}
 
 xmlNode *find_child(xmlNode *parent, char *name)
 {
@@ -230,7 +225,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 		s = strchr(ref, '_');
 
-		if (hasopt(opts, OPT_ISSUE)) {
+		if (optset(opts, OPT_ISSUE)) {
 			if (doc) {
 				issue_info = xmlCopyNode(find_child(ref_pm_ident, "issueInfo"), 1);
 			} else if (s && isdigit(s[1])) {
@@ -245,7 +240,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			xmlAddChild(pm_ref_ident, issue_info);
 		}
 
-		if (hasopt(opts, OPT_LANG)) {
+		if (optset(opts, OPT_LANG)) {
 			if (doc) {
 				language = xmlCopyNode(find_child(ref_pm_ident, "language"), 1);
 			} else if (s && (s = strchr(s + 1, '_'))) {
@@ -260,7 +255,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			xmlAddChild(pm_ref_ident, language);
 		}
 
-		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
+		if (optset(opts, OPT_TITLE) || optset(opts, OPT_DATE)) {
 			xmlNodePtr pm_ref_address_items = NULL, pm_title, issue_date;
 
 			if (doc) {
@@ -272,7 +267,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 				issue_date = NULL;
 			}
 
-			if (hasopt(opts, OPT_TITLE)) {
+			if (optset(opts, OPT_TITLE)) {
 				if (pm_title) {
 					xmlAddChild(pm_ref_address_items, pm_title);
 				} else {
@@ -281,7 +276,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 					}
 				}
 			}
-			if (hasopt(opts, OPT_DATE)) {
+			if (optset(opts, OPT_DATE)) {
 				if (issue_date) {
 					xmlAddChild(pm_ref_address_items, issue_date);
 				} else {
@@ -294,7 +289,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 		xmlFreeDoc(doc);
 
-		if (hasopt(opts, OPT_SRCID)) {
+		if (optset(opts, OPT_SRCID)) {
 			xmlNodePtr pmc, issno, lang, src;
 
 			pmc   = xmlCopyNode(pm_code, 1);
@@ -440,7 +435,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 
 		s = strchr(ref, '_');
 
-		if (hasopt(opts, OPT_ISSUE)) {
+		if (optset(opts, OPT_ISSUE)) {
 			if (doc) {
 				issue_info = xmlCopyNode(find_child(ref_dm_ident, "issueInfo"), 1);
 			} else if (s && isdigit(s[1])) {
@@ -455,7 +450,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			xmlAddChild(dm_ref_ident, issue_info);
 		}
 
-		if (hasopt(opts, OPT_LANG)) {
+		if (optset(opts, OPT_LANG)) {
 			if (doc) {
 				language = xmlCopyNode(find_child(ref_dm_ident, "language"), 1);
 			} else if (s && (s = strchr(s + 1, '_'))) {
@@ -470,7 +465,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			xmlAddChild(dm_ref_ident, language);
 		}
 
-		if (hasopt(opts, OPT_TITLE) || hasopt(opts, OPT_DATE)) {
+		if (optset(opts, OPT_TITLE) || optset(opts, OPT_DATE)) {
 			xmlNodePtr dm_ref_address_items = NULL, dm_title, issue_date;
 
 			if (doc) {
@@ -482,7 +477,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 				issue_date = NULL;
 			}
 
-			if (hasopt(opts, OPT_TITLE)) {
+			if (optset(opts, OPT_TITLE)) {
 				if (dm_title) {
 					xmlAddChild(dm_ref_address_items, dm_title);
 				} else {
@@ -491,7 +486,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 					}
 				}
 			}
-			if (hasopt(opts, OPT_DATE)) {
+			if (optset(opts, OPT_DATE)) {
 				if (issue_date) {
 					xmlAddChild(dm_ref_address_items, issue_date);
 				} else {
@@ -504,14 +499,14 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 
 		xmlFreeDoc(doc);
 
-		if (hasopt(opts, OPT_SRCID)) {
+		if (optset(opts, OPT_SRCID)) {
 			xmlNodePtr dmc, issno, lang, src;
 
 			dmc   = xmlCopyNode(dm_code, 1);
 			issno = xmlCopyNode(issue_info, 1);
 			lang  = xmlCopyNode(language, 1);
 
-			src = xmlNewNode(NULL, BAD_CAST (hasopt(opts, OPT_CIRID) ? "repositorySourceDmIdent" : "sourceDmIdent"));
+			src = xmlNewNode(NULL, BAD_CAST (optset(opts, OPT_CIRID) ? "repositorySourceDmIdent" : "sourceDmIdent"));
 			xmlAddChild(src, dmc);
 			xmlAddChild(src, lang);
 			xmlAddChild(src, issno);
@@ -576,7 +571,7 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 
 		s = strchr(ref, '_');
 
-		if (hasopt(opts, OPT_LANG)) {
+		if (optset(opts, OPT_LANG)) {
 			xmlNodePtr language;
 
 			if (doc) {
@@ -651,7 +646,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 
 		s = strchr(ref, '_');
 
-		if (hasopt(opts, OPT_ISSUE)) {
+		if (optset(opts, OPT_ISSUE)) {
 			xmlNodePtr issue_info;
 
 			if (doc) {
@@ -781,7 +776,7 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 		exit(EXIT_MISSING_FILE);
 	}
 
-	if (hasopt(opts, OPT_SRCID)) {
+	if (optset(opts, OPT_SRCID)) {
 		xmlNodePtr src, node;
 
 		src  = first_xpath_node(doc, NULL, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
@@ -902,7 +897,7 @@ void print_ref(const char *src, const char *dst, const char *ref,
 		xmlFreeDoc(doc);
 	}
 
-	if (hasopt(opts, OPT_INS)) {
+	if (optset(opts, OPT_INS)) {
 		if (verbosity >= VERBOSE) {
 			fprintf(stderr, INF_PREFIX "Adding reference %s to %s...\n", ref, src);
 		}

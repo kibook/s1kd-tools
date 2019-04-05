@@ -445,3 +445,8 @@ void uppercase(char *s)
 		s[i] = toupper(s[i]);
 	}
 }
+
+bool optset(int opts, int opt)
+{
+	return ((opts & opt) == opt);
+}

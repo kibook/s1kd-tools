@@ -108,4 +108,7 @@ void lowercase(char *s);
 /* Convert string to uppercase. */
 void uppercase(char *s);
 
+/* Return whether a bitset contains an option. */
+bool optset(int opts, int opt);
+
 #endif
