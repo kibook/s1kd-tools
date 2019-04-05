@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="00"/>
+        <issueInfo issueNumber="018" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="03" day="22"/>
+        <issueDate year="2019" month="04" day="05"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -42,9 +42,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt01">
-        <simplePara>Minor improvements to descriptions and examples.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -147,7 +144,7 @@ schema="proced"/&gt;
         <para>This would create the file <verbatimText verbatimStyle="vs02">DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText> in your CSDB folder.</para>
         <levelledPara>
           <title>Adding DMRL entries</title>
-          <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">Each entry in the DMRL describes a data module that is planned to be created:</para>
+          <para>Each entry in the DMRL describes a data module that is planned to be created:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<dmlContent>
 <dmlEntry>
@@ -358,9 +355,9 @@ S1000D and s1kd-tools.&lt;/para&gt;
           <para>The data module is upissued to the next official issue, and it's issue type is set to "<verbatimText verbatimStyle="vs14">deleted</verbatimText>".</para>
           <para>Deleted data modules may be reinstated later in a similar way:</para>
           <para>
-            <verbatimText verbatimStyle="vs23" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ s1kd-upissue -s rinstate-status ...</verbatimText>
+            <verbatimText verbatimStyle="vs23">$ s1kd-upissue -s rinstate-status ...</verbatimText>
           </para>
-          <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">The data module is upissued to the next inwork issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-x"</verbatimText> types.</para>
+          <para>The data module is upissued to the next inwork issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-x"</verbatimText> types.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
@@ -481,16 +478,16 @@ This information only applies to version B.
             </listItem>
           </randomList>
         </para>
-        <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">However, if you prefer to use an existing version control system such as Git or SVN, it is often more useful for each file to represent a whole object.</para>
+        <para>However, if you prefer to use an existing version control system such as Git or SVN, it is often more useful for each file to represent a whole object.</para>
         <para>The s1kd-tools support an alternate naming convention for this case. Specifying the -N option to certain tools will omit the issue and inwork numbers from filenames of CSDB objects. Taking the s1kd-newdm tool example from above, but adding the -N option as follows:</para>
-        <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-newdm -N -# MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
         </para>
         <para>would create the file <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText> in your CSDB folder. The s1kd-upissue tool works similarly:</para>
-        <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+        <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-upissue -N -i DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
         </para>
-        <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001">The issue and inwork numbers are updated in the XML metadata, but instead of creating a new file, the original is overwritten. The previous inwork issues are therefore stored as part of the external version control system's history, rather than as individual files.</para>
+        <para>The issue and inwork numbers are updated in the XML metadata, but instead of creating a new file, the original is overwritten. The previous inwork issues are therefore stored as part of the external version control system's history, rather than as individual files.</para>
       </levelledPara>
     </description>
   </content>
