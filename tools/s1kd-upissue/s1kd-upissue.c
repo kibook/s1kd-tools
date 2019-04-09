@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-DdefHIilmNqRrvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1 <type>    Set first verification type.");
@@ -49,6 +49,7 @@ void show_help(void)
 	puts("  -r           Keep RFUs from old issue.");
 	puts("  -s <status>  Set change status type.");
 	puts("  -t <urt>     Set the updateReasonType of the last RFU.");
+	puts("  -u           Remove unassociated RFUs.");
 	puts("  -H           Highlight the last RFU.");
 	puts("  -v           Print filename of upissued objects.");
 	puts("  -w           Make old and official issues read-only.");
@@ -83,7 +84,7 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 }
 
 /* Remove change markup attributes from elements referencing old RFUs */
-void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx, bool iss30)
+void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 {
 	char xpath[256];
 	xmlXPathObjectPtr obj;
@@ -108,6 +109,69 @@ void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx, bool iss30)
 	}
 
 	xmlXPathFreeObject(obj);
+}
+
+bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
+{
+	xmlXPathObjectPtr obj;
+	bool ret = false;
+	char *rfuid;
+
+	rfuid = (char *) xmlGetProp(rfu, BAD_CAST "id");
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//@reasonForUpdateRefIds", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char *ids, *id;
+
+			ids = (char *) xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+
+			while ((id = strtok(id ? NULL : ids, " "))) {
+				if (strcmp(id, rfuid) == 0) {
+					ret = true;
+					break;
+				}
+			}
+
+			free(ids);
+
+			if (ret) {
+				break;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	free(rfuid);
+
+	return ret;
+}
+
+void rem_unassoc_rfus(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//reasonForUpdate", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			if (!rfu_used(obj->nodesetval->nodeTab[i], ctx)) {
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
 }
 
 /* Remove all change markup attributes */
@@ -192,18 +256,14 @@ void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 	xmlXPathObjectPtr obj;
 
 	ctx = xmlXPathNewContext(doc);
-	if (iss30) {
-		obj = xmlXPathEvalExpression(BAD_CAST "//rfu", ctx);
-	} else {
-		obj = xmlXPathEvalExpression(BAD_CAST "//reasonForUpdate", ctx);
-	}
+	obj = xmlXPathEvalExpression(BAD_CAST "//reasonForUpdate", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 
 		if (only_assoc) {
 			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-				del_assoc_rfu_attrs(obj->nodesetval->nodeTab[i], ctx, iss30);
+				del_assoc_rfu_attrs(obj->nodesetval->nodeTab[i], ctx);
 				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 				xmlFreeNode(obj->nodesetval->nodeTab[i]);
 				obj->nodesetval->nodeTab[i] = NULL;
@@ -388,6 +448,7 @@ bool lock = false;
 bool remdel= false;
 bool remold = false;
 bool only_mod = false;
+bool clean_rfus = false;
 
 void upissue(const char *path)
 {
@@ -428,6 +489,10 @@ void upissue(const char *path)
 	if (only_mod) {
 		iss30 = xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") != 0;
 
+		if (clean_rfus && !iss30) {
+			rem_unassoc_rfus(dmdoc);
+		}
+
 		if (remdel) {
 			rem_delete(dmdoc, iss30);
 		}
@@ -458,6 +523,8 @@ void upissue(const char *path)
 		} else {
 			save_xml_doc(dmdoc, "-");
 		}
+
+		xmlFreeDoc(dmdoc);
 
 		return;
 	}
@@ -561,6 +628,11 @@ void upissue(const char *path)
 	if (issueInfo) {
 		xmlSetProp(issueInfo, issno_name, BAD_CAST upissued_issueNumber);
 		xmlSetProp(issueInfo, inwork_name, BAD_CAST upissued_inWork);
+
+		/* Optionally cleanup unused RFUs */
+		if (clean_rfus && !iss30) {
+			rem_unassoc_rfus(dmdoc);
+		}
 
 		/* When upissuing an official module to first inwork issue... */
 		if (strcmp(inWork, "00") == 0) {
@@ -679,7 +751,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmh?";
+	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmuh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -751,6 +823,9 @@ int main(int argc, char **argv)
 				break;
 			case 't':
 				xmlSetProp(rfus->last, BAD_CAST "updateReasonType", BAD_CAST optarg);
+				break;
+			case 'u':
+				clean_rfus = true;
 				break;
 			case 'H':
 				xmlSetProp(rfus->last, BAD_CAST "updateHighlight", BAD_CAST "1");

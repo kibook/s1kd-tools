@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="01"/>
+        <issueInfo issueNumber="016" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="04" day="09"/>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -m option.</simplePara>
+        <simplePara>Add -m and -u options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -152,7 +152,7 @@
             <definitionListItem>
               <listItemTerm>-R</listItemTerm>
               <listItemDefinition>
-                <para>Delete only change markup on elements associated with an RFU (by use of the attribute <verbatimText verbatimStyle="vs13">reasonForUpdateRefIds</verbatimText>. Change markup on other elements is ignored.</para>
+                <para>Delete only change markup on elements associated with an RFU (by use of the attribute <verbatimText verbatimStyle="vs13">reasonForUpdateRefIds</verbatimText>). Change markup on other elements is ignored.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -171,6 +171,12 @@
               <listItemTerm>-t &lt;urt&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the updateReasonType of the last specified reason for update (-c).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-u</listItemTerm>
+              <listItemDefinition>
+                <para>Remove RFUs which are not associated with any change markup (by use of the attribute <verbatimText verbatimStyle="vs13">reasonForUpdateRefIds</verbatimText>).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

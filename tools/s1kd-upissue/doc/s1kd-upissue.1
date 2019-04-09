@@ -116,7 +116,7 @@ of the CSDB object, and so does not require it to be re\-verified.
 .TP
 .B \-R
 Delete only change markup on elements associated with an RFU (by use of
-the attribute \f[C]reasonForUpdateRefIds\f[].
+the attribute \f[C]reasonForUpdateRefIds\f[]).
 Change markup on other elements is ignored.
 .RS
 .RE
@@ -139,6 +139,12 @@ Default is \[aq]changed\[aq].
 .TP
 .B \-t <urt>
 Set the updateReasonType of the last specified reason for update (\-c).
+.RS
+.RE
+.TP
+.B \-u
+Remove RFUs which are not associated with any change markup (by use of
+the attribute \f[C]reasonForUpdateRefIds\f[]).
 .RS
 .RE
 .TP

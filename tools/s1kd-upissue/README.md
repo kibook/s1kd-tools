@@ -84,7 +84,7 @@ and so does not require it to be re-verified.
 
 -R  
 Delete only change markup on elements associated with an RFU (by use of
-the attribute `reasonForUpdateRefIds`. Change markup on other elements
+the attribute `reasonForUpdateRefIds`). Change markup on other elements
 is ignored.
 
 -r  
@@ -99,6 +99,10 @@ Set the status of the new issue. Default is 'changed'.
 
 -t &lt;urt&gt;  
 Set the updateReasonType of the last specified reason for update (-c).
+
+-u  
+Remove RFUs which are not associated with any change markup (by use of
+the attribute `reasonForUpdateRefIds`).
 
 -v  
 Print the file name of the upissued CSDB object.
