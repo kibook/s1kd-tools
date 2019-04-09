@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.4.2"
+#define VERSION "2.4.3"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -27,7 +27,6 @@
 #define EXIT_MISSING_FILE 2	/* File does not exist */
 #define EXIT_MISSING_SOURCE 3	/* Source object could not be found */
 #define EXIT_BAD_APPLIC 4	/* Malformed applic definitions */
-#define EXIT_NO_PCT 5		/* PCT could not be found */
 #define EXIT_BAD_XML 6		/* Invalid XML/S1000D */
 #define EXIT_BAD_ARG 7		/* Malformed argument */
 #define EXIT_BAD_DATE 8		/* Malformed issue date */
@@ -46,7 +45,6 @@
 #define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
 #define S_MISSING_SOURCE ERR_PREFIX "Could not find source object for instance %s\n"
-#define S_NO_PCT ERR_PREFIX "No PCT data module could be found for %s\n"
 
 /* Warning messages */
 #define S_FILE_EXISTS WRN_PREFIX "%s already exists. Use -f to overwrite.\n"
@@ -3017,9 +3015,6 @@ int main(int argc, char **argv)
 
 				if (find_pct_fname(fname, doc)) {
 					load_applic_from_pct(fname, product);
-				} else {
-					fprintf(stderr, S_NO_PCT, src);
-					err = EXIT_NO_PCT;
 				}
 			}
 

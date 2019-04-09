@@ -882,9 +882,6 @@ Source object for an instance could not be found.
 4  
 Malformed applicability definition.
 
-5  
-Could not find a PCT for an object when -p was given.
-
 6  
 XML was invalid or does not conform to S1000D.
 

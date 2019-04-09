@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="035" inWork="00"/>
+        <issueInfo issueNumber="035" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="05"/>
+        <issueDate year="2019" month="04" day="09"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add standard libxml2 parser options.</simplePara>
+        <simplePara>Do not show an error if a PCT cannot be found for an XML object.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -481,8 +481,8 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
-        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
           <definitionList>
             <definitionListItem>
               <listItemTerm>--dtdload</listItemTerm>
@@ -926,7 +926,7 @@ applicPropertyValues="1"/>
       <levelledPara>
         <title>EXIT STATUS</title>
         <para>
-          <definitionList>
+          <definitionList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>0</listItemTerm>
               <listItemDefinition>
@@ -955,12 +955,6 @@ applicPropertyValues="1"/>
               <listItemTerm>4</listItemTerm>
               <listItemDefinition>
                 <para>Malformed applicability definition.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>5</listItemTerm>
-              <listItemDefinition>
-                <para>Could not find a PCT for an object when -p was given.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
