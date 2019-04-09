@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.9.0"
+#define VERSION "1.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -18,7 +18,7 @@
 #define E_BAD_FILENAME ERR_PREFIX "Filename does not contain issue info and -N not specified.\n"
 #define E_ISSUE_TOO_LARGE ERR_PREFIX "%s is at the max issue number.\n"
 #define E_INWORK_TOO_LARGE ERR_PREFIX "%s is at the max inwork number.\n"
-#define E_NON_XML_STDIN ERR_PREFIX "Cannot use -N or read from stdin when file does not contain issue info metadata.\n"
+#define E_NON_XML_STDIN ERR_PREFIX "Cannot use -m, -N or read from stdin when file does not contain issue info metadata.\n"
 
 #define EXIT_NO_FILE 1
 #define EXIT_NO_OVERWRITE 2
@@ -29,7 +29,7 @@
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-DdefHIilNqRrvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-DdefHIilmNqRrvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1 <type>    Set first verification type.");
@@ -42,6 +42,7 @@ void show_help(void)
 	puts("  -I           Do not change issue date.");
 	puts("  -i           Increase issue number instead of inwork.");
 	puts("  -l           Treat input as list of objects.");
+	puts("  -m           Modify metadata without upissuing.");
 	puts("  -N           Omit issue/inwork numbers from filename.");
 	puts("  -q           Keep quality assurance from old issue.");
 	puts("  -R           Only delete change marks associated with an RFU.");
@@ -329,6 +330,46 @@ void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 	}
 }
 
+void set_iss_date(xmlDocPtr dmdoc)
+{
+	time_t now;
+	struct tm *local;
+	unsigned short year, month, day;
+	char year_s[5], month_s[3], day_s[3];
+	xmlNodePtr issueDate;
+
+	issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
+
+	time(&now);
+	local = localtime(&now);
+
+	year = local->tm_year + 1900;
+	month = local->tm_mon + 1;
+	day = local->tm_mday;
+
+	if (snprintf(year_s, 5, "%u", year) < 0 ||
+	    snprintf(month_s, 3, "%.2u", month) < 0 ||
+	    snprintf(day_s, 3, "%.2u", day) < 0)
+		exit(EXIT_BAD_DATE);
+
+	xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
+	xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
+	xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
+}
+
+void set_status(xmlDocPtr dmdoc, const char *status, bool iss30, xmlNodePtr issueInfo)
+{
+	xmlNodePtr dmStatus;
+
+	if (iss30) {
+		xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
+	} else {
+		if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
+			xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
+		}
+	}
+}
+
 /* Upissue options */
 bool verbose = false;
 bool newissue = false;
@@ -346,6 +387,7 @@ xmlNodePtr rfus = NULL;
 bool lock = false;
 bool remdel= false;
 bool remold = false;
+bool only_mod = false;
 
 void upissue(const char *path)
 {
@@ -356,8 +398,6 @@ void upissue(const char *path)
 	char dmfile[PATH_MAX], cpfile[PATH_MAX];
 	xmlDocPtr dmdoc;
 	xmlNodePtr issueInfo;
-	xmlNodePtr issueDate;
-	xmlNodePtr dmStatus;
 	xmlChar *issno_name, *inwork_name;
 	bool iss30 = false;
 	char upissued_issueNumber[32];
@@ -382,6 +422,44 @@ void upissue(const char *path)
 	if (!issueInfo && no_issue) {
 		fprintf(stderr, E_NON_XML_STDIN);
 		exit(EXIT_NO_OVERWRITE);
+	}
+
+	/* Apply modifications without actually upissuing. */
+	if (only_mod) {
+		iss30 = xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") != 0;
+
+		if (remdel) {
+			rem_delete(dmdoc, iss30);
+		}
+
+		add_rfus(dmdoc, rfus, iss30);
+		set_qa(dmdoc, firstver, secondver, iss30);
+		if (status) {
+			set_status(dmdoc, status, iss30, issueInfo);
+		}
+
+		/* The following options have the opposite effect in -k mode:
+		 * -I sets the date
+		 * -r removes RFUs
+		 * -q sets the QA status to unverified
+		 */
+		if (!set_date) {
+			set_iss_date(dmdoc);
+		}
+		if (keep_rfus) {
+			del_rfus(dmdoc, only_assoc_rfus, iss30);
+		}
+		if (!set_unverif) {
+			set_unverified(dmdoc, iss30);
+		}
+
+		if (overwrite) {
+			save_xml_doc(dmdoc, dmfile);
+		} else {
+			save_xml_doc(dmdoc, "-");
+		}
+
+		return;
 	}
 
 	p = strchr(dmfile, '_');
@@ -501,28 +579,7 @@ void upissue(const char *path)
 		}
 
 		if (set_date) {
-			time_t now;
-			struct tm *local;
-			unsigned short year, month, day;
-			char year_s[5], month_s[3], day_s[3];
-
-			issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
-
-			time(&now);
-			local = localtime(&now);
-
-			year = local->tm_year + 1900;
-			month = local->tm_mon + 1;
-			day = local->tm_mday;
-
-			if (snprintf(year_s, 5, "%u", year) < 0 ||
-			    snprintf(month_s, 3, "%.2u", month) < 0 ||
-			    snprintf(day_s, 3, "%.2u", day) < 0)
-				exit(EXIT_BAD_DATE);
-
-			xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
-			xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
-			xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
+			set_iss_date(dmdoc);
 		}
 
 		set_qa(dmdoc, firstver, secondver, iss30);
@@ -535,13 +592,7 @@ void upissue(const char *path)
 			status = strdup("changed");
 		}
 
-		if (iss30) {
-			xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
-		} else {
-			if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
-				xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
-			}
-		}
+		set_status(dmdoc, status, iss30, issueInfo);
 	}
 
 	xmlFree(issueNumber);
@@ -628,7 +679,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwh?";
+	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -677,6 +728,10 @@ int main(int argc, char **argv)
 				break;
 			case 'l':
 				islist = true;
+				break;
+			case 'm':
+				only_mod = true;
+				no_issue = true;
 				break;
 			case 'N':
 				no_issue = true;

@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-DdefHIilNqRrvw] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-DdefHIilmNqRrvw] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
 
 DESCRIPTION
@@ -65,6 +65,12 @@ issue is increased.
 -l  
 Treat input (stdin or arguments) as lists of CSDB objects to upissue,
 rather than CSDB objects themselves.
+
+-m  
+Modify issue-related metadata on objects without incrementing the issue
+or inwork numbers. The -I, -q, and -r options have the opposite effect
+in this mode. The modified objects are written to stdout by default, and
+the -f option can be used to change them in-place.
 
 -N  
 Omit issue/inwork numbers from filename.
