@@ -6,12 +6,16 @@
 #include <libxml/tree.h>
 #include <libxslt/transform.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "xsl.h"
 #include "defaults.h"
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
@@ -591,6 +595,10 @@ int main(int argc, char **argv)
 
 		if (overwrite || access(DEFAULT_DEFAULTS_FNAME, F_OK) == -1) {
 			fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap);
+
+			#ifdef _WIN32
+			SetFileAttributes(DEFAULT_DEFAULTS_FNAME, FILE_ATTRIBUTE_HIDDEN);
+			#endif
 		}
 
 		if (overwrite || access(DEFAULT_DMTYPES_FNAME, F_OK) == -1) {
@@ -619,6 +627,10 @@ int main(int argc, char **argv)
 					fprintf(stderr, S_DMTYPES_ERR);
 				}
 			}
+
+			#ifdef _WIN32
+			SetFileAttributes(DEFAULT_DMTYPES_FNAME, FILE_ATTRIBUTE_HIDDEN);
+			#endif
 		}
 
 		if (overwrite || access(DEFAULT_FMTYPES_FNAME, F_OK) == -1) {
@@ -627,6 +639,10 @@ int main(int argc, char **argv)
 			if (system(sys) != 0) {
 				fprintf(stderr, S_FMTYPES_ERR);
 			}
+
+			#ifdef _WIN32
+			SetFileAttributes(DEFAULT_FMTYPES_FNAME, FILE_ATTRIBUTE_HIDDEN);
+			#endif
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
