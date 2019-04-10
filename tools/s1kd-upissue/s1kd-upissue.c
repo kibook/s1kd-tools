@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.11.0"
+#define VERSION "1.11.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -86,31 +86,44 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 /* Remove change markup attributes from elements referencing old RFUs */
 void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 {
-	char xpath[256];
 	xmlXPathObjectPtr obj;
-	char *id;
+	char *rfuid;
 
-	id = (char *) xmlGetProp(rfu, BAD_CAST "id");
+	rfuid = (char *) xmlGetProp(rfu, BAD_CAST "id");
 
-	sprintf(xpath, "//*[contains(@reasonForUpdateRefIds, '%s')]", id);
-
-	xmlFree(id);
-
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST "//*[@reasonForUpdateRefIds]", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeType");
-			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeMark");
-			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "reasonForUpdateRefIds");
+			char *ids, *id = NULL;
+			bool used = false;
+
+			ids = (char *) xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "reasonForUpdateRefIds");
+
+			while ((id = strtok(id ? NULL : ids, " "))) {
+				if (strcmp(id, rfuid) == 0) {
+					used = true;
+					break;
+				}
+			}
+
+			xmlFree(ids);
+
+			if (used) {
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeType");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "changeMark");
+				xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "reasonForUpdateRefIds");
+			}
 		}
 	}
 
 	xmlXPathFreeObject(obj);
+	xmlFree(rfuid);
 }
 
+/* Determine if an RFU is ever referenced */
 bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
@@ -125,7 +138,7 @@ bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			char *ids, *id;
+			char *ids, *id = NULL;
 
 			ids = (char *) xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
 
@@ -136,7 +149,7 @@ bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 				}
 			}
 
-			free(ids);
+			xmlFree(ids);
 
 			if (ret) {
 				break;
@@ -145,11 +158,12 @@ bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 	}
 
 	xmlXPathFreeObject(obj);
-	free(rfuid);
+	xmlFree(rfuid);
 
 	return ret;
 }
 
+/* Remove RFUs which are never referenced */
 void rem_unassoc_rfus(xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
