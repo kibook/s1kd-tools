@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.9.0"
+#define VERSION "2.9.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -906,6 +906,8 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 	if (correct) {
 		xmlFreeNode(snsError);
 		xmlNewChild(snsCheck, NULL, BAD_CAST "noErrors", NULL);
+	} else {
+		print_node(snsError);
 	}
 
 	xmlFree(systemCode);
@@ -937,6 +939,8 @@ int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 	notationError = xmlNewChild(notationCheck, NULL, BAD_CAST "error", NULL);
 	xmlNewChild(notationError, NULL, BAD_CAST "invalidNotation", entity->content);
 	xmlAddChild(notationError, xmlCopyNode(firstXPathNode(notationRuleDoc, rule, "objectUse"), 1));
+
+	print_node(notationError);
 
 	return 1;
 }
