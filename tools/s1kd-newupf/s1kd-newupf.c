@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -24,8 +24,10 @@
 #define EXIT_BAD_ISSUE 4
 #define EXIT_BAD_TEMPLATE 5
 #define EXIT_BAD_TEMPL_DIR 6
+#define EXIT_BAD_CSDB 7
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
+#define E_BAD_CSDB ERR_PREFIX "Directory not found: %s\n"
 
 enum issue { NO_ISS, ISS_41, ISS_42 } issue = NO_ISS;
 
@@ -599,6 +601,7 @@ void showHelp(void)
 	puts("  -@ <file>   Output to <file>.");
 	puts("  -% <dir>    Use templates in specified directory.");
 	puts("  -~ <dir>    Dump built-in template to directory.");
+	puts("  -/ <dir>    Create new update file in <dir>.");
 	puts("  -d <file>   Specify the .defaults file name.");
 	puts("  -f          Overwrite existing file.");
 	puts("  -h -?       Show help/usage message.");
@@ -628,9 +631,10 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	char defaultsFname[PATH_MAX];
 	bool custom_defaults = false;
+	char *csdbdir = NULL;
 	xmlDocPtr defaultsXml;
 
-	const char *sopts = "@:$:%:d:fqv~:h?";
+	const char *sopts = "@:$:%:d:fqv~:/:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -672,6 +676,9 @@ int main(int argc, char **argv)
 			case '~':
 				dump_template(optarg);
 				return 0;
+			case '/':
+				csdbdir = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -688,6 +695,14 @@ int main(int argc, char **argv)
 
 	sourceDoc = read_xml_doc(source);
 	targetDoc = read_xml_doc(target);
+
+	/* Switch to the specified CSDB directory. */
+	if (csdbdir) {
+		if (chdir(csdbdir) != 0) {
+			fprintf(stderr, E_BAD_CSDB, csdbdir);
+			exit(EXIT_BAD_CSDB);
+		}
+	}
 
 	if (!custom_defaults) {
 		find_config(defaultsFname, DEFAULT_DEFAULTS_FNAME);
@@ -793,6 +808,7 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(templateDir);
+	free(csdbdir);
 
 	xmlXPathFreeContext(sourceContext);
 	xmlXPathFreeContext(targetContext);
