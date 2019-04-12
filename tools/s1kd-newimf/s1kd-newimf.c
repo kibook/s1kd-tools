@@ -12,11 +12,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_ENCODING_ERROR "Error encoding path name.\n"
+#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
+#define E_BAD_CSDB ERR_PREFIX "Directory not found: %s\n"
 
 #define EXIT_IMF_EXISTS 1
 #define EXIT_BAD_BREX_DMC 2
@@ -24,8 +26,7 @@
 #define EXIT_BAD_TEMPLATE 4
 #define EXIT_BAD_TEMPL_DIR 5
 #define EXIT_ENCODING_ERROR 6
-
-#define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
+#define EXIT_BAD_CSDB 7
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -152,6 +153,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -% <dir>      Use template in specified directory.");
 	puts("  -~ <dir>      Dump built-in template to directory.");
+	puts("  -/ <dir>      Create new IMF in <dir>.");
 	puts("  -d <path>     Specify .defaults file path.");
 	puts("  -f            Overwrite existing file.");
 	puts("  -N            Omit issue/inwork numbers from filename.");
@@ -326,10 +328,11 @@ int main(int argc, char **argv)
 	FILE *defaults;
 	char defaults_fname[PATH_MAX];
 	bool custom_defaults = false;
+	char *csdbdir = NULL;
 
 	xmlDocPtr defaults_xml;
 
-	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:h?";
+	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:/:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -365,8 +368,17 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = true; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
+			case '/': csdbdir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
+		}
+	}
+
+	/* Switch to the specified CSDB directory. */
+	if (csdbdir) {
+		if (chdir(csdbdir) != 0) {
+			fprintf(stderr, E_BAD_CSDB, csdbdir);
+			exit(EXIT_BAD_CSDB);
 		}
 	}
 
@@ -508,6 +520,7 @@ int main(int argc, char **argv)
 	}
 
 	free(template_dir);
+	free(csdbdir);
 	xmlFree(remarks);
 
 	xmlCleanupParser();
