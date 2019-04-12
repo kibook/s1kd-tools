@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,8 +32,10 @@
 #define EXIT_BAD_ISSUE 5
 #define EXIT_BAD_TEMPLATE 6
 #define EXIT_BAD_TEMPL_DIR 7
+#define EXIT_BAD_CSDB 8
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template to directory: %s\n"
+#define E_BAD_CSDB "Directory not found: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -234,6 +236,7 @@ void show_help(void)
 	puts("  -@ <file>        Output to specified file.");
 	puts("  -% <dir>         Use templates in specified directory.");
 	puts("  -~ <dir>         Dump built-in XML template to directory.");
+	puts("  -/ <dir>         Create new DDN in <dir>.");
 	puts("  -d <defaults>    Specify the .defaults file name.");
 	puts("  -f               Overwrite existing file.");
 	puts("  -p               Prompt user for values.");
@@ -488,8 +491,9 @@ int main(int argc, char **argv)
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
+	char *csdbdir = NULL;
 
-	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:~:h?";
+	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:~:/:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -526,8 +530,17 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = 1; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
+			case '/': csdbdir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
+		}
+	}
+
+	/* Switch to the specified CSDB directory. */
+	if (csdbdir) {
+		if (chdir(csdbdir) != 0) {
+			fprintf(stderr, E_BAD_CSDB, csdbdir);
+			exit(EXIT_BAD_CSDB);
 		}
 	}
 
@@ -737,6 +750,7 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(template_dir);
+	free(csdbdir);
 	xmlFree(remarks);
 	xmlFreeDoc(ddn);
 
