@@ -15,13 +15,15 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.6.1"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
+#define EXIT_NO_CSDB 3
 #define S_DMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_DMTYPES_FNAME " file.\n"
 #define S_FMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_FMTYPES_FNAME " file.\n"
 #define S_NO_FILE_ERR ERR_PREFIX "Could not open file: %s\n"
+#define S_NO_CSDB_ERR ERR_PREFIX "Directory not found: %s\n"
 
 enum format {TEXT, XML};
 enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
@@ -33,6 +35,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
+	puts("  -/ <dir>   Create or convert files in <dir>.");
 	puts("  -b <BREX>  Create from a BREX DM.");
 	puts("  -D         Convert a .dmtypes file.");
 	puts("  -d         Convert a .defaults file.");
@@ -513,8 +516,9 @@ int main(int argc, char **argv)
 	bool sort = false;
 	xmlDocPtr brex = NULL;
 	xmlDocPtr brexmap = NULL;
+	char *csdbdir = NULL;
 
-	const char *sopts = "b:DdFfiJj:sth?";
+	const char *sopts = "b:DdFfiJj:st/:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -564,10 +568,21 @@ int main(int argc, char **argv)
 			case 't':
 				fmt = TEXT;
 				break;
+			case '/':
+				csdbdir = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
 				exit(0);
+		}
+	}
+
+	/* Switch to the specified CSDB directory. */
+	if (csdbdir) {
+		if (chdir(csdbdir) != 0) {
+			fprintf(stderr, S_NO_CSDB_ERR, csdbdir);
+			exit(EXIT_NO_CSDB);
 		}
 	}
 
@@ -653,6 +668,7 @@ int main(int argc, char **argv)
 	}
 
 	free(fname);
+	free(csdbdir);
 	xmlFreeDoc(brex);
 	xmlFreeDoc(brexmap);
 
