@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -31,7 +31,7 @@
 #define EXIT_BAD_CSDB 9
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
-#define E_BAD_CSDB "Directory not found: %s\n"
+#define E_BAD_CSDB ERR_PREFIX "Directory not found: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
