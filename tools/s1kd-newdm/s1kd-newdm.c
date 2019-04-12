@@ -1373,7 +1373,6 @@ int main(int argc, char **argv)
 			fprintf(stderr, E_BAD_CSDB, csdbdir);
 			exit(EXIT_BAD_CSDB);
 		}
-		free(csdbdir);
 	}
 
 	if (!custom_defaults) {
@@ -1769,6 +1768,7 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(template_dir);
+	free(csdbdir);
 	free(sns_fname);
 	free(maint_sns);
 	free(skill_level_code);
