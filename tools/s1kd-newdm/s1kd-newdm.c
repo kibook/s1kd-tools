@@ -20,7 +20,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -456,38 +456,18 @@ void set_sns_title(xmlNodePtr snsTitle)
 	xmlFree(title);
 }
 
-/* Find the filename of the latest version of a BREX DM in the current directory
- * by its code.
- */
-bool find_brex_file(char *dst, const char *code)
+/* Find the filename of the latest version of a BREX DM by its code. */
+bool find_brex_file(char *dst, const char *dir, const char *code)
 {
-	DIR *dir;
-	struct dirent *cur;
-	int n = strlen(code);
-	bool found = false;
-	int offset;
+	char s[256];
 
-	if (access(code, F_OK) != -1) {
-		strcpy(dst, code);
-		return true;
+	if (strncmp(code, "DMC-", 4) == 0) {
+		snprintf(s, 256, "%s", code);
+	} else {
+		snprintf(s, 256, "DMC-%s", code);
 	}
 
-	dir = opendir(".");
-
-	strcpy(dst, "");
-
-	offset = strncmp(code, "DMC-", 4) == 0 ? 4 : 0;
-
-	while ((cur = readdir(dir))) {
-		if (strncmp(code + offset, cur->d_name + 4, n) == 0 && strcmp(cur->d_name, dst) > 0) {
-			strcpy(dst, cur->d_name);
-			found = true;
-		}
-	}
-
-	closedir(dir);
-
-	return found;
+	return find_csdb_object(dst, dir, s, NULL, true);
 }
 
 struct inmem_xml {
@@ -543,7 +523,7 @@ xmlDocPtr maint_sns_doc(void)
 	return read_xml_mem((const char *) xml.xml, xml.len);
 }
 
-xmlDocPtr set_tech_from_sns(void)
+xmlDocPtr set_tech_from_sns(const char *dir)
 {
 	xmlDocPtr brex = NULL;
 	char xpath[256];
@@ -552,9 +532,9 @@ xmlDocPtr set_tech_from_sns(void)
 
 	if (maint_sns) {
 		brex = maint_sns_doc();
-	} else if (sns_fname && find_brex_file(fname, sns_fname)) {
+	} else if (sns_fname && find_brex_file(fname, dir, sns_fname)) {
 		brex = read_xml_doc(fname);
-	} else if (strcmp(brex_dmcode, "") != 0 && find_brex_file(fname, brex_dmcode)) {
+	} else if (strcmp(brex_dmcode, "") != 0 && find_brex_file(fname, dir, brex_dmcode)) {
 		brex = read_xml_doc(fname);
 	}
 
@@ -1303,6 +1283,9 @@ int main(int argc, char **argv)
 	xmlNodePtr brex_rules = NULL;
 	xmlDocPtr brexmap = NULL;
 
+	char *defaults_dir_str;
+	char *defaults_dir;
+
 	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
@@ -1368,6 +1351,9 @@ int main(int argc, char **argv)
 	if (!custom_dmtypes) {
 		find_config(dmtypes_fname, DEFAULT_DMTYPES_FNAME);
 	}
+
+	defaults_dir_str = strdup(defaults_fname);
+	defaults_dir = dirname(defaults_dir_str);
 
 	if (!brexmap) {
 		brexmap = read_default_brexmap();
@@ -1561,7 +1547,7 @@ int main(int argc, char **argv)
 
 	if (!tech_name_flag && (maint_sns || sns_fname || strcmp(brex_dmcode, "") != 0)) {
 		xmlDocPtr brex;
-		brex = set_tech_from_sns();
+		brex = set_tech_from_sns(defaults_dir);
 		xmlFreeDoc(brex);
 	}
 
@@ -1758,6 +1744,7 @@ int main(int argc, char **argv)
 	free(sns_fname);
 	free(maint_sns);
 	free(skill_level_code);
+	free(defaults_dir_str);
 
 	xmlFree(remarks);
 
