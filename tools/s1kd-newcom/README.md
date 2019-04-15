@@ -52,9 +52,6 @@ and must conform to the default S1000D issue (4.2).
 -\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
--/ &lt;dir&gt;  
-Create new comment in &lt;dir&gt;.
-
 -b &lt;BREX&gt;  
 BREX data module code.
 

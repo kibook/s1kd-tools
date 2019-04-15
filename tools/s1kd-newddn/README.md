@@ -52,9 +52,6 @@ must conform to the default S1000D issue (4.2).
 -\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
--/ &lt;dir&gt;  
-Create new DDN in &lt;dir&gt;.
-
 -a &lt;auth&gt;  
 Specify the authorization.
 

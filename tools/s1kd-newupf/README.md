@@ -39,9 +39,6 @@ template. The template must be named `update.xml` in the directory
 -\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
--/ &lt;dir&gt;  
-Create new update file in &lt;dir&gt;.
-
 -d &lt;defaults&gt;  
 Specify the `.defaults` file name.
 

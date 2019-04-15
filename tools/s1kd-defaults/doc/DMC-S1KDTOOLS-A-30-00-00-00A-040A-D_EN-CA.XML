@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="30" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="01"/>
+        <issueInfo issueNumber="012" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="12"/>
+        <issueDate year="2019" month="04" day="05"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -/ option.</simplePara>
+        <simplePara>Add standard libxml2 parser options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,8 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-defaults [-DdFfisth?] [-/ <dir>] [-b <BREX>] [-j <map>]
-              [<file>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-defaults [-DdFfisth?] [-b &lt;BREX&gt;] [-j &lt;map&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -64,12 +63,6 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-/ &lt;dir&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Create or convert files in &lt;dir&gt;.</para>
-              </listItemDefinition>
-            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
@@ -150,8 +143,8 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
-        <para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
           <definitionList>
             <definitionListItem>
               <listItemTerm>--dtdload</listItemTerm>

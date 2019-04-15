@@ -20,13 +20,12 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.10.1"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump templates in directory: %s\n"
-#define E_BAD_CSDB ERR_PREFIX "Directory not found: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -62,7 +61,6 @@
 #define EXIT_BAD_DATE 5
 #define EXIT_BAD_ISSUE 6
 #define EXIT_BAD_TEMPL_DIR 7
-#define EXIT_BAD_CSDB 8
 
 char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -227,7 +225,6 @@ void show_help(void)
 	puts("  -@ <file>      Output to specified file.");
 	puts("  -% <dir>       Use templates in specified directory.");
 	puts("  -~ <dir>       Dump default templates to a directory.");
-	puts("  -/ <dir>       Create new data module in <dir>.");
 	puts("  -,             Dump default dmtypes XML.");
 	puts("  -.             Dump default dmtypes text file.");
 	puts("  -!             Do not include an info name.");
@@ -1301,13 +1298,12 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	bool tech_name_flag = false;
 	bool no_overwrite_error = false;
-	char *csdbdir = NULL;
 
 	xmlDocPtr defaults_xml;
 	xmlNodePtr brex_rules = NULL;
 	xmlDocPtr brexmap = NULL;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:/:h?";
+	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1361,17 +1357,8 @@ int main(int argc, char **argv)
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
 			case 'j': if (!brexmap) brexmap = read_xml_doc(optarg); break;
 			case '~': dump_templates(optarg); return 0;
-			case '/': csdbdir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
-		}
-	}
-
-	/* Switch to the specified CSDB directory. */
-	if (csdbdir) {
-		if (chdir(csdbdir) != 0) {
-			fprintf(stderr, E_BAD_CSDB, csdbdir);
-			exit(EXIT_BAD_CSDB);
 		}
 	}
 
@@ -1768,7 +1755,6 @@ int main(int argc, char **argv)
 
 	free(out);
 	free(template_dir);
-	free(csdbdir);
 	free(sns_fname);
 	free(maint_sns);
 	free(skill_level_code);

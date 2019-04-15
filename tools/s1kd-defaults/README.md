@@ -7,8 +7,7 @@ tool
 SYNOPSIS
 ========
 
-    s1kd-defaults [-DdFfisth?] [-/ <dir>] [-b <BREX>] [-j <map>]
-                  [<file>...]
+    s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>] [<file>...]
 
 DESCRIPTION
 ===========
@@ -21,9 +20,6 @@ and `.fmtypes` files.
 
 OPTIONS
 =======
-
--/ &lt;dir&gt;  
-Create or convert files in &lt;dir&gt;.
 
 -b &lt;BREX&gt;  
 Use the specified BREX data module to build the `.defaults` and

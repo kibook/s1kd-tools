@@ -50,9 +50,6 @@ templates.
 -\~ &lt;dir&gt;  
 Dump the built-in XML templates to the specified directory.
 
--/ &lt;dir&gt;  
-Create new data module in &lt;dir&gt;.
-
 -,  
 Dumps the built-in default `.dmtypes` XML. This can be used to quickly
 set up a starting point for a project's custom info codes, from which
