@@ -9,11 +9,11 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
-#define E_ENCODING_ERROR "Error encoding path name.\n"
+#define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 #define EXIT_ENCODING_ERROR 1

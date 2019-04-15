@@ -14,11 +14,11 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
-#define E_ENCODING_ERROR "Error encoding path name.\n"
+#define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
 
 #define EXIT_ENCODING_ERROR 1
 
