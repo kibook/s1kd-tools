@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.9.1"
+#define VERSION "2.9.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -765,10 +765,20 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 }
 
 /* Load a BREX DM from the filesystem or from in-memory. */
-xmlDocPtr load_brex(const char *name)
+xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 {
-	if (access(name, F_OK) != -1) {
+	/* If the BREX name is -, this means the DM on stdin is a BREX DM.
+	 * BREX DMs are checked against themselves, so return a copy of the
+	 * same document.
+	 */
+	if (strcmp(name, "-") == 0) {
+		return xmlCopyDoc(dmod_doc, 1);
+	/* If the BREX name is an existing filename, read from that. */
+	} else if (access(name, F_OK) != -1) {
 		return read_xml_doc(name);
+	/* If the BREX name is one of the standard Default BREX codes, read
+	 * it from memory.
+	 */
 	} else {
 		unsigned char *xml = NULL;
 		unsigned int len = 0;
@@ -837,7 +847,7 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 	for (i = 0; i < nbrex_fnames; ++i) {
 		xmlDocPtr brex;
 
-		brex = load_brex(brex_fnames[i]);
+		brex = load_brex(brex_fnames[i], dmod_doc);
 
 		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
 
@@ -966,7 +976,7 @@ int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDoc
 	for (i = 0; i < nbrex_fnames; ++i) {
 		xmlDocPtr brex;
 
-		brex = load_brex(brex_fnames[i]);
+		brex = load_brex(brex_fnames[i], dmod_doc);
 
 		xmlAddChild(notationRuleGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//notationRuleList"), 1));
 
@@ -1043,7 +1053,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlXPathObjectPtr result;
 		int status;
 
-		brex_doc = load_brex(brex_fnames[i]);
+		brex_doc = load_brex(brex_fnames[i], dmod_doc);
 
 		if (!brex_doc) {
 			if (verbose > SILENT) {
@@ -1114,7 +1124,7 @@ void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s)
 }
 
 /* Add the BREX referenced by another BREX DM in layered mode (-l).*/
-int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames)
+int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames, xmlDocPtr dmod_doc)
 {
 	int i;
 	int total = nfnames;
@@ -1124,7 +1134,7 @@ int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH
 		char fname[PATH_MAX];
 		int err;
 
-		doc = load_brex((*fnames)[i]);
+		doc = load_brex((*fnames)[i], dmod_doc);
 
 		err = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
 
@@ -1133,7 +1143,7 @@ int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH
 			exit(EXIT_BREX_NOT_FOUND);
 		} else if (!brex_exists(fname, (*fnames), nfnames, spaths, nspaths)) {
 			add_path(fnames, &total, &BREX_MAX, fname);
-			total = add_layered_brex(fnames, total, spaths, nspaths, dmod_fnames, num_dmod_fnames);
+			total = add_layered_brex(fnames, total, spaths, nspaths, dmod_fnames, num_dmod_fnames, dmod_doc);
 		}
 
 		xmlFreeDoc(doc);
@@ -1457,7 +1467,7 @@ int main(int argc, char *argv[])
 			num_brex_fnames = add_layered_brex(&brex_fnames,
 				num_brex_fnames, brex_search_paths,
 				num_brex_search_paths,
-				dmod_fnames, num_dmod_fnames);
+				dmod_fnames, num_dmod_fnames, dmod_doc);
 		}
 
 		status += check_brex(dmod_doc, dmod_fnames[i],
