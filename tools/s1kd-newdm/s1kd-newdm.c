@@ -20,12 +20,13 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.9.1"
+#define VERSION "1.9.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump templates in directory: %s\n"
+#define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -61,6 +62,7 @@
 #define EXIT_BAD_DATE 5
 #define EXIT_BAD_ISSUE 6
 #define EXIT_BAD_TEMPL_DIR 7
+#define EXIT_ENCODING_ERROR 8
 
 char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -459,12 +461,18 @@ void set_sns_title(xmlNodePtr snsTitle)
 /* Find the filename of the latest version of a BREX DM by its code. */
 bool find_brex_file(char *dst, const char *dir, const char *code)
 {
-	char s[256];
+	char s[PATH_MAX];
 
 	if (strncmp(code, "DMC-", 4) == 0) {
-		snprintf(s, 256, "%s", code);
+		if (snprintf(s, PATH_MAX, "%s", code) < 0) {
+			fprintf(stderr, E_ENCODING_ERROR);
+			exit(EXIT_ENCODING_ERROR);
+		}
 	} else {
-		snprintf(s, 256, "DMC-%s", code);
+		if (snprintf(s, PATH_MAX, "DMC-%s", code) < 0) {
+			fprintf(stderr, E_ENCODING_ERROR);
+			exit(EXIT_ENCODING_ERROR);
+		}
 	}
 
 	return find_csdb_object(dst, dir, s, NULL, true);
