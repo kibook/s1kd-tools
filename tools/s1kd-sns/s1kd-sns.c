@@ -14,13 +14,15 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
 
 #define EXIT_ENCODING_ERROR 1
+#define EXIT_OS_ERROR 2
+#define EXIT_NO_BREX 3
 
 #define DEFAULT_SNS_DNAME "SNS"
 
@@ -47,6 +49,22 @@ int (*linkfn)(const char *path, const char *fname) = hlink;
 
 /* Title SNS directories using only the SNS code, not including the SNS title. */
 bool only_numb = false;
+
+void change_dir(const char *dir)
+{
+	if (chdir(dir) != 0) {
+		fprintf(stderr, ERR_PREFIX "%s", strerror(errno));
+		exit(EXIT_OS_ERROR);
+	}
+}
+
+void rename_dir(const char *old, const char *new)
+{
+	if (rename(old, new) != 0) {
+		fprintf(stderr, ERR_PREFIX "%s", strerror(errno));
+		exit(EXIT_OS_ERROR);
+	}
+}
 
 /* Indent printed SNS entry to a specified level. */
 void indent(int level)
@@ -121,7 +139,7 @@ void setup_sns(xmlNodePtr node, const char *snsdname)
 
 	if (xmlStrcmp(node->name, BAD_CAST "snsDescr") == 0) {
 		makedir(snsdname);
-		if (chdir(snsdname) != 0) exit(1);
+		change_dir(snsdname);
 	}
 
 	for (cur = node->children; cur; cur = cur->next) {
@@ -134,13 +152,13 @@ void setup_sns(xmlNodePtr node, const char *snsdname)
 
 			makedir(code);
 
-			if (chdir(code) != 0) exit(1);
+			change_dir(code);
 		} else if (xmlStrcmp(cur->name, BAD_CAST "snsTitle") == 0) {
 			char oldname[PATH_MAX], newname[PATH_MAX];
 
 			if (only_numb) continue;
 
-			if (snprintf(oldname, PATH_MAX, "../%s", code) < 0) {
+			if (snprintf(oldname, PATH_MAX, "%s", code) < 0) {
 				fprintf(stderr, E_ENCODING_ERROR);
 				exit(EXIT_ENCODING_ERROR);
 			}
@@ -148,20 +166,22 @@ void setup_sns(xmlNodePtr node, const char *snsdname)
 			content = (char *) xmlNodeGetContent(cur);
 			cleanstr(content);
 
-			if (snprintf(newname, PATH_MAX, "../%s - %s", code, content) < 0) {
+			if (snprintf(newname, PATH_MAX, "%s - %s", code, content) < 0) {
 				fprintf(stderr, E_ENCODING_ERROR);
 				exit(EXIT_ENCODING_ERROR);
 			}
 
 			xmlFree(content);
 
-			rename(oldname, newname);
+			change_dir("..");
+			rename_dir(oldname, newname);
+			change_dir(newname);
 		} else if (cur->type == XML_ELEMENT_NODE) {
 			setup_sns(cur, snsdname);
 		}
 	}
 
-	if (chdir("..") != 0) exit(1);
+	change_dir("..");
 }
 
 /* Tests if the given file is a data module. */
@@ -241,23 +261,23 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 {
 	char path[PATH_MAX] = "../", orig[PATH_MAX], dname[256];
 
-	if (chdir(snsdname) != 0) exit(1);
+	change_dir(snsdname);
 
 	if (sns_exists(code->system_code, dname)) {
 		strcat(path, "../");
-		if (chdir(dname) != 0) exit(1);
+		change_dir(dname);
 
 		if (sns_exists(code->sub_system_code, dname)) {
 			strcat(path, "../");
-			if (chdir(dname) != 0) exit(1);
+			change_dir(dname);
 
 			if (sns_exists(code->sub_sub_system_code, dname)) {
 				strcat(path, "../");
-				if (chdir(dname) != 0) exit(1);
+				change_dir(dname);
 
 				if (sns_exists(code->assy_code, dname)) {
 					strcat(path, "../");
-					if (chdir(dname) != 0) exit(1);
+					change_dir(dname);
 				}
 			}
 		}
@@ -271,9 +291,12 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 		unlink(fname);
 	}
 
-	if (linkfn(path, fname) != 0) exit(1);
+	if (linkfn(path, fname) != 0) {
+		fprintf(stderr, ERR_PREFIX "%s", strerror(errno));
+		exit(EXIT_OS_ERROR);
+	}
 
-	if (chdir(orig) != 0) exit(1);
+	change_dir(orig);
 }
 
 /* Resort DMs in to the SNS directory hierarchy. */
@@ -308,7 +331,7 @@ void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdn
 
 	if (!(brex = read_xml_doc(brex_fname))) {
 		fprintf(stderr, ERR_PREFIX "Could not read BREX data module: %s\n", brex_fname);
-		exit(1);
+		exit(EXIT_NO_BREX);
 	}
 
 	ctxt = xmlXPathNewContext(brex);
