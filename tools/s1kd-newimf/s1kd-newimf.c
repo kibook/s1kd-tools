@@ -12,11 +12,9 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
-
-#define E_ENCODING_ERROR "Error encoding path name.\n"
 
 #define EXIT_IMF_EXISTS 1
 #define EXIT_BAD_BREX_DMC 2
@@ -26,6 +24,7 @@
 #define EXIT_ENCODING_ERROR 6
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
+#define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
