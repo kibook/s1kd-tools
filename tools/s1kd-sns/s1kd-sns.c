@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -53,7 +53,7 @@ bool only_numb = false;
 void change_dir(const char *dir)
 {
 	if (chdir(dir) != 0) {
-		fprintf(stderr, ERR_PREFIX "%s", strerror(errno));
+		fprintf(stderr, ERR_PREFIX "%s: %s\n", strerror(errno), dir);
 		exit(EXIT_OS_ERROR);
 	}
 }
@@ -61,7 +61,7 @@ void change_dir(const char *dir)
 void rename_dir(const char *old, const char *new)
 {
 	if (rename(old, new) != 0) {
-		fprintf(stderr, ERR_PREFIX "%s", strerror(errno));
+		fprintf(stderr, ERR_PREFIX "%s: %s -> %s\n", strerror(errno), old, new);
 		exit(EXIT_OS_ERROR);
 	}
 }
@@ -292,7 +292,7 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 	}
 
 	if (linkfn(path, fname) != 0) {
-		fprintf(stderr, ERR_PREFIX "%s", strerror(errno));
+		fprintf(stderr, ERR_PREFIX "%s: %s => %s\n", strerror(errno), path, fname);
 		exit(EXIT_OS_ERROR);
 	}
 
