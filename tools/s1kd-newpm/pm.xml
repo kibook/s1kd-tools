@@ -16,6 +16,13 @@
     <pmStatus>
       <security securityClassification=""/>
       <responsiblePartnerCompany/>
+      <applicCrossRefTableRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode/>
+          </dmRefIdent>
+        </dmRef>
+      </applicCrossRefTableRef>
       <applic>
         <displayText>
           <simplePara>All</simplePara>

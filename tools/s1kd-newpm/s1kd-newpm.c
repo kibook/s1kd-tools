@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -81,6 +81,8 @@ xmlChar *remarks = NULL;
 enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 char *template_dir = NULL;
+
+char *act_dmcode = NULL;
 
 xmlDocPtr xml_skeleton(void)
 {
@@ -379,6 +381,7 @@ void show_help(void)
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -# <code>      Publication module code");
+	puts("  -a <ACT>       ACT data module code");
 	puts("  -b <BREX>      BREX data module code");
 	puts("  -C <country>   Country ISO code");
 	puts("  -c <sec>       Security classification");
@@ -431,6 +434,8 @@ void copy_default_value(const char *key, const char *val)
 		template_dir = strdup(val);
 	else if (strcmp(key, "remarks") == 0 && !remarks)
 		remarks = xmlStrdup(BAD_CAST val);
+	else if (strcmp(key, "act") == 0 && !act_dmcode)
+		act_dmcode = strdup(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -453,10 +458,10 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
 	return node;
 }
 
-void set_brex(xmlDocPtr doc, const char *code)
+void set_dmcode(xmlNodePtr dmCode, const char *fname)
 {
-	xmlNodePtr dmCode;
-	int n;
+	int n, offset;
+	char *path, *code;
 
 	char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
 	char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
@@ -472,9 +477,12 @@ void set_brex(xmlDocPtr doc, const char *code)
 	char learnCode[MAX_LEARN_CODE] = "";
 	char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
 
-	dmCode = firstXPathNode(doc, "//brexDmRef/dmRef/dmRefIdent/dmCode");
+	path = strdup(fname);
+	code = basename(path);
 
-	n = sscanf(code, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
+	offset = strncmp(code, "DMC-", 4) == 0 ? 4 : 0;
+
+	n = sscanf(code + offset, "%14[^-]-%4[^-]-%3[^-]-%c%c-%4[^-]-%2s%3[^-]-%3s%c-%c-%3s%1s",
 		modelIdentCode,
 		systemDiffCode,
 		systemCode,
@@ -508,6 +516,30 @@ void set_brex(xmlDocPtr doc, const char *code)
 
 	if (strcmp(learnCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnCode", BAD_CAST learnCode);
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
+
+	free(path);
+}
+
+void set_brex(xmlDocPtr doc, const char *fname)
+{
+	xmlNodePtr dmCode;
+	dmCode = firstXPathNode(doc, "//brexDmRef/dmRef/dmRefIdent/dmCode");
+	set_dmcode(dmCode, fname);
+}
+
+void set_act(xmlDocPtr doc, const char *fname)
+{
+	xmlNodePtr dmCode;
+	dmCode = firstXPathNode(doc, "//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode");
+	set_dmcode(dmCode, fname);
+}
+
+void unset_act(xmlDocPtr doc)
+{
+	xmlNodePtr dmCode;
+	dmCode = firstXPathNode(doc, "//applicCrossRefTableRef");
+	xmlUnlinkNode(dmCode);
+	xmlFreeNode(dmCode);
 }
 
 /* Try reading the ISO language and country codes from the environment,
@@ -610,7 +642,7 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	char *outdir = NULL;
 
-	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:~:h?";
+	const char *sopts = "a:pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -627,6 +659,7 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
+			case 'a': act_dmcode = strdup(optarg); break;
 			case 'p': showprompts = true; break;
 			case 'D': include_date = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); custom_defaults = true; break;
@@ -814,8 +847,15 @@ int main(int argc, char **argv)
 	if (strcmp(enterprise_code, "") != 0)
 		xmlSetProp(responsiblePartnerCompany, BAD_CAST "enterpriseCode", BAD_CAST enterprise_code);
 
-	if (strcmp(brex_dmcode, "") != 0)
+	if (act_dmcode) {
+		set_act(pm_doc, act_dmcode);
+	} else {
+		unset_act(pm_doc);
+	}
+
+	if (strcmp(brex_dmcode, "") != 0) {
 		set_brex(pm_doc, brex_dmcode);
+	}
 
 	set_remarks(pm_doc, remarks);
 
@@ -905,6 +945,7 @@ int main(int argc, char **argv)
 	free(out);
 	free(outdir);
 	free(template_dir);
+	free(act_dmcode);
 	xmlFree(remarks);
 	xmlFreeDoc(pm_doc);
 

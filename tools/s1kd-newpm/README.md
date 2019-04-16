@@ -53,6 +53,9 @@ the default S1000D issue (4.2).
 -\~ &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
+-a &lt;ACT&gt;  
+ACT data module code.
+
 -b &lt;BREX&gt;  
 BREX data module code.
 

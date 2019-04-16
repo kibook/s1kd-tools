@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Allow -@ option to specify a directory.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -a option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -119,6 +122,12 @@
               <listItemTerm>-~ &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XML template to the specified directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-a &lt;ACT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>ACT data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
