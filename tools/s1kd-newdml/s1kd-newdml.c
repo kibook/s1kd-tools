@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -30,8 +30,10 @@
 #define EXIT_BAD_TEMPLATE 7
 #define EXIT_BAD_TEMPL_DIR 8
 #define EXIT_OS_ERROR 9
+#define EXIT_BAD_SNS 10
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
+#define E_BAD_SNS ERR_PREFIX "Specified BREX DM could not be read: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -495,12 +497,17 @@ void add_sns(xmlNodePtr content, const char *path, const char *incode)
 {
 	xmlDocPtr doc;
 	xmlNodePtr new_content, cur;
-	const char *params[7];
+	const char *params[9];
 	char infocode[4], variant[2], itemloc[2];
-	int n;
-	char *is = NULL, *vs = NULL, *ls = NULL;
+	int n, i = 0;
+	char *is = NULL, *vs = NULL, *ls = NULL, *rc = NULL, *rn = NULL;
 
-	params[0] = "infoCode";
+	if (!(doc = read_xml_doc(path))) {
+		fprintf(stderr, E_BAD_SNS, path);
+		exit(EXIT_BAD_SNS);
+	}
+
+	params[i++] = "infoCode";
 
 	if ((n = sscanf(incode, "%3s%1s-%1s", infocode, variant, itemloc)) < 1) {
 		fprintf(stderr, ERR_PREFIX "Bad info code: %s\n", incode);
@@ -509,37 +516,46 @@ void add_sns(xmlNodePtr content, const char *path, const char *incode)
 
 	is = malloc(7);
 	sprintf(is, "\"%s\"", infocode);
-	params[1] = is;
+	params[i++] = is;
 
 	if (n > 1) {
-		params[2] = "infoCodeVariant";
+		params[i++] = "infoCodeVariant";
 
 		vs = malloc(4);
 		sprintf(vs, "\"%s\"", variant);
-		params[3] = vs;
+		params[i++] = vs;
 
 		if (n > 2) {
-			params[4] = "itemLocationCode";
+			params[i++] = "itemLocationCode";
 
 			ls = malloc(4);
 			sprintf(ls, "\"%s\"", itemloc);
-			params[5] = ls;
-
-			params[6] = NULL;
-		} else {
-			params[4] = NULL;
+			params[i++] = ls;
 		}
-	} else {
-		params[2] = NULL;
 	}
 
-	doc = read_xml_doc(path);
+	if (defaultRpcCode) {
+		params[i++] = "RPCcode";
+		rc = malloc(strlen(defaultRpcCode) + 3);
+		sprintf(rc, "\"%s\"", defaultRpcCode);
+		params[i++] = rc;
+	}
+	if (defaultRpcName) {
+		params[i++] = "RPCname";
+		rn = malloc(strlen(defaultRpcName) + 3);
+		sprintf(rn, "\"%s\"", defaultRpcName);
+		params[i++] = rn;
+	}
+
+	params[i++] = NULL;
 
 	transform_doc(doc, sns2dmrl_xsl, sns2dmrl_xsl_len, params);
 
 	free(is);
 	free(vs);
 	free(ls);
+	free(rc);
+	free(rn);
 
 	new_content = xmlDocGetRootElement(doc);
 

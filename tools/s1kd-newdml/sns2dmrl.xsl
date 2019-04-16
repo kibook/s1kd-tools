@@ -4,6 +4,8 @@
   <xsl:param name="infoCode"/>
   <xsl:param name="infoCodeVariant">A</xsl:param>
   <xsl:param name="itemLocationCode">D</xsl:param>
+  <xsl:param name="RPCcode"/>
+  <xsl:param name="RPCname"/>
   
   <xsl:variable name="modelIdentCode" select="//@modelIdentCode[1]"/>
   <xsl:variable name="responsiblePartnerCompany" select="//responsiblePartnerCompany[1]"/>
@@ -63,7 +65,25 @@
           </dmCode>
         </dmRefIdent>
       </dmRef>
-      <xsl:copy-of select="$responsiblePartnerCompany"/>
+      <xsl:choose>
+        <xsl:when test="$RPCcode or $RPCname">
+          <responsiblePartnerCompany>
+            <xsl:if test="$RPCcode">
+              <xsl:attribute name="enterpriseCode">
+                <xsl:value-of select="$RPCcode"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$RPCname">
+              <enterpriseName>
+                <xsl:value-of select="$RPCname"/>
+              </enterpriseName>
+            </xsl:if>
+          </responsiblePartnerCompany>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:copy-of select="$responsiblePartnerCompany"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </dmlEntry>
   </xsl:template>
 
