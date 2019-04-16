@@ -10,6 +10,8 @@
   <xsl:param name="spec-issue"/>
   <xsl:param name="templates"/>
   <xsl:param name="outdir"/>
+  <xsl:param name="defaults"/>
+  <xsl:param name="dmtypes"/>
 
   <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -31,6 +33,11 @@
         <xsl:if test="$no-issue">
           <xsl:text> -N</xsl:text>
         </xsl:if>
+        <xsl:if test="$dmtypes">
+          <xsl:text> -D "</xsl:text>
+          <xsl:value-of select="$dmtypes"/>
+          <xsl:text>"</xsl:text>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="pmRef">
         <xsl:text>s1kd-newpm</xsl:text>
@@ -51,8 +58,10 @@
         <xsl:text>s1kd-newimf</xsl:text>
       </xsl:when>
     </xsl:choose>
-    <xsl:text> -$ </xsl:text>
-    <xsl:value-of select="$spec-issue"/>
+    <xsl:if test="$spec-issue">
+      <xsl:text> -$ </xsl:text>
+      <xsl:value-of select="$spec-issue"/>
+    </xsl:if>
     <xsl:if test="$overwrite">
       <xsl:text> -f</xsl:text>
     </xsl:if>
@@ -70,6 +79,11 @@
     <xsl:if test="$outdir">
       <xsl:text> -@ "</xsl:text>
       <xsl:value-of select="$outdir"/>
+      <xsl:text>"</xsl:text>
+    </xsl:if>
+    <xsl:if test="$defaults">
+      <xsl:text> -d "</xsl:text>
+      <xsl:value-of select="$defaults"/>
       <xsl:text>"</xsl:text>
     </xsl:if>
     <xsl:apply-templates select="*"/>

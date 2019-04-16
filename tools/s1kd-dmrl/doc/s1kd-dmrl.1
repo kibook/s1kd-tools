@@ -9,7 +9,7 @@ s1kd\-dmrl \- Create CSDB objects from a DMRL
 .IP
 .nf
 \f[C]
-s1kd\-dmrl\ [\-$\ <issue>]\ [\-%\ <dir>]\ [\-FfNqsvh?]\ <DML>...
+s1kd\-dmrl\ [options]\ <DML>...
 \f[]
 .fi
 .SH DESCRIPTION
@@ -32,6 +32,16 @@ Create new objects in <dir>.
 .B \-% <dir>
 Use XML templates in the specified directory instead of the built\-in
 templates of each of the s1kd\-new* tools.
+.RS
+.RE
+.TP
+.B \-D <path>
+Specify the .dmtypes file name.
+.RS
+.RE
+.TP
+.B \-d <path>
+Specify the .defaults file name.
 .RS
 .RE
 .TP

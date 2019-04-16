@@ -15,19 +15,19 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.5.0"
-
-#define DEFAULT_S1000D_ISSUE "4.2"
+#define VERSION "1.6.0"
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-$ <iss>] [-@ <dir>] [-% <dir>] [-FfNsh?] <DML>...");
+	puts("Usage: " PROG_NAME " [options] <DML>...");
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
 	puts("  -$ <iss>   Which issue of the spec to use.");
 	puts("  -@ <dir>   Output to specified directory.");
 	puts("  -% <dir>   Custom XML template directory.");
+	puts("  -D <path>  Specify .dmtypes file name.");
+	puts("  -d <path>  Specify .defaults file name.");
 	#ifndef _WIN32
 	puts("  -F         Fail on first error from s1kd-new* commands.");
 	#endif
@@ -60,11 +60,13 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool noOverwriteError = false;
 	bool verbose = false;
-	char *specIssue = strdup(DEFAULT_S1000D_ISSUE);
+	char *specIssue = NULL;
 	char *templateDir = NULL;
 	char *outDir = NULL;
+	char *defaultsFname = NULL;
+	char *dmtypesFname = NULL;
 
-	const char *sopts = "sNfFq$:%:@:vh?";
+	const char *sopts = "D:d:sNfFq$:%:@:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -84,6 +86,12 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
+			case 'd':
+				defaultsFname = strdup(optarg);
+				break;
+			case 'D':
+				dmtypesFname = strdup(optarg);
+				break;
 			case 's':
 				execute = false;
 				break;
@@ -102,7 +110,6 @@ int main(int argc, char **argv)
 				noOverwriteError = true;
 				break;
 			case '$':
-				free(specIssue);
 				specIssue = strdup(optarg);
 				break;
 			case 'v':
@@ -124,10 +131,12 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		xmlDocPtr in, out;
 		xmlChar *content;
-		const char *params[15];
+		const char *params[19];
 		char iss[8];
 		char *templs = NULL;
 		char *outd = NULL;
+		char *defname = NULL;
+		char *dmtname = NULL;
 
 		if (!(in = read_xml_doc(argv[i]))) {
 			continue;
@@ -142,9 +151,13 @@ int main(int argc, char **argv)
 		params[4] = "no-overwrite-error";
 		params[5] = noOverwriteError ? "true()" : "false()";
 
-		snprintf(iss, 8, "\"%s\"", specIssue);
 		params[6] = "spec-issue";
-		params[7] = iss;
+		if (specIssue) {
+			snprintf(iss, 8, "\"%s\"", specIssue);
+			params[7] = iss;
+		} else {
+			params[7] = "false()";
+		}
 
 		params[8] = "verbose";
 		params[9] = verbose ? "true()" : "false()";
@@ -167,12 +180,32 @@ int main(int argc, char **argv)
 			params[13] = "false()";
 		}
 
-		params[14] = NULL;
+		params[14] = "defaults";
+		if (defaultsFname) {
+			defname = malloc(strlen(defaultsFname) + 3);
+			sprintf(defname, "\"%s\"", defaultsFname);
+			params[15] = defname;
+		} else {
+			params[15] = "false()";
+		}
+
+		params[16] = "dmtypes";
+		if (dmtypesFname) {
+			dmtname = malloc(strlen(dmtypesFname) + 3);
+			sprintf(dmtname, "\"%s\"", dmtypesFname);
+			params[17] = dmtname;
+		} else {
+			params[17] = "false()";
+		}
+
+		params[18] = NULL;
 
 		out = xsltApplyStylesheet(dmrlStylesheet, in, params);
 
 		free(templs);
 		free(outd);
+		free(defname);
+		free(dmtname);
 
 		xmlFreeDoc(in);
 
@@ -213,6 +246,8 @@ int main(int argc, char **argv)
 	free(specIssue);
 	free(templateDir);
 	free(outDir);
+	free(defaultsFname);
+	free(dmtypesFname);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

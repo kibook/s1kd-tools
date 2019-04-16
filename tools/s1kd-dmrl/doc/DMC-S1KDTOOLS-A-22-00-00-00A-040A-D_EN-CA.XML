@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -@ option.</simplePara>
+        <simplePara>Add -@, -D and -d options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-dmrl [-$ &lt;issue&gt;] [-% &lt;dir&gt;] [-FfNqsvh?] &lt;DML&gt;...</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-dmrl [options] &lt;DML&gt;...</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -79,6 +79,18 @@
               <listItemTerm>-% &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use XML templates in the specified directory instead of the built-in templates of each of the s1kd-new* tools.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-D &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the .dmtypes file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-d &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the .defaults file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
