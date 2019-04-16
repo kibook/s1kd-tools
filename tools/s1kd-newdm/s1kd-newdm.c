@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -133,6 +133,8 @@ bool sns_prev_title = false;
 bool sns_prev_title_set = false;
 
 bool no_info_name = false;
+
+char *act_dmcode = NULL;
 
 #define BREX_INFOCODE_USE BAD_CAST "The information code used is not in the allowed set."
 
@@ -248,6 +250,7 @@ void show_help(void)
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
 	puts("  -# <code>      Data module code");
+	puts("  -a <ACT>       ACT data module code");
 	puts("  -b <BREX>      BREX data module code");
 	puts("  -C <country>   Country ISO code");
 	puts("  -c <sec>       Security classification");
@@ -344,6 +347,8 @@ void copy_default_value(const char *key, const char *val)
 		sns_prev_title = strcasecmp(val, "true") == 0;
 	else if (strcmp(key, "skillLevelCode") == 0 && !skill_level_code)
 		skill_level_code = xmlStrdup(BAD_CAST val);
+	else if (strcmp(key, "act") == 0 && !act_dmcode)
+		act_dmcode = strdup(val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -365,9 +370,8 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	return first;
 }
 
-void set_brex(xmlDocPtr doc, const char *fname)
+void set_dmcode(xmlNodePtr dmCode, const char *fname)
 {
-	xmlNodePtr dmCode;
 	int n, offset;
 	char *path, *code;
 
@@ -387,8 +391,6 @@ void set_brex(xmlDocPtr doc, const char *fname)
 
 	path = strdup(fname);
 	code = basename(path);
-
-	dmCode = firstXPathNode(doc, NULL, "//brexDmRef/dmRef/dmRefIdent/dmCode");
 
 	offset = strncmp(code, "DMC-", 4) == 0 ? 4 : 0;
 
@@ -428,6 +430,28 @@ void set_brex(xmlDocPtr doc, const char *fname)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 
 	free(path);
+}
+
+void set_brex(xmlDocPtr doc, const char *fname)
+{
+	xmlNodePtr dmCode;
+	dmCode = firstXPathNode(doc, NULL, "//brexDmRef/dmRef/dmRefIdent/dmCode");
+	set_dmcode(dmCode, fname);
+}
+
+void set_act(xmlDocPtr doc, const char *fname)
+{
+	xmlNodePtr dmCode;
+	dmCode = firstXPathNode(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode");
+	set_dmcode(dmCode, fname);
+}
+
+void unset_act(xmlDocPtr doc)
+{
+	xmlNodePtr dmCode;
+	dmCode = firstXPathNode(doc, NULL, "//applicCrossRefTableRef");
+	xmlUnlinkNode(dmCode);
+	xmlFreeNode(dmCode);
 }
 
 #define SNS_XPATH_1 "//snsSystem[snsCode='%s']/snsSubSystem[snsCode='%s']/snsSubSubSystem[snsCode='%s']/snsAssy[snsCode='%s']/snsTitle"
@@ -1298,7 +1322,7 @@ int main(int argc, char **argv)
 
 	char *outdir = NULL;
 
-	const char *sopts = "pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:h?";
+	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1315,6 +1339,7 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
+			case 'a': act_dmcode = strdup(optarg); break;
 			case 'p': showprompts = true; break;
 			case 'd': strcpy(defaults_fname, optarg); custom_defaults = true; break;
 			case 'D': strcpy(dmtypes_fname, optarg); custom_dmtypes = true; break;
@@ -1667,6 +1692,12 @@ int main(int argc, char **argv)
 	set_skill_level(dm, skill_level_code);
 
 	set_remarks(dm, remarks);
+
+	if (act_dmcode) {
+		set_act(dm, act_dmcode);
+	} else {
+		unset_act(dm);
+	}
 
 	if (strcmp(brex_dmcode, "") != 0)
 		set_brex(dm, brex_dmcode);

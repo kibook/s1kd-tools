@@ -178,6 +178,8 @@
     </issdate>
   </xsl:template>
 
+  <xsl:template match="applicCrossRefTableRef"/>
+
   <xsl:template match="brexDmRef">
     <brexref>
       <xsl:apply-templates select="@*|node()"/>

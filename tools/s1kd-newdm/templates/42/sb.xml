@@ -20,6 +20,13 @@
       <security/>
       <responsiblePartnerCompany/>
       <originator/>
+      <applicCrossRefTableRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode/>
+          </dmRefIdent>
+        </dmRef>
+      </applicCrossRefTableRef>
       <applic>
         <displayText>
           <simplePara>All</simplePara>

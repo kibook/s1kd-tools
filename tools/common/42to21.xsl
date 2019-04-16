@@ -192,6 +192,8 @@
     </issdate>
   </xsl:template>
 
+  <xsl:template match="applicCrossRefTableRef"/>
+
   <xsl:template match="brexDmRef"/>
 
   <xsl:template match="displayText">
