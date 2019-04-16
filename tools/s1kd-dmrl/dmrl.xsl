@@ -9,6 +9,7 @@
   <xsl:param name="verbose" select="false()"/>
   <xsl:param name="spec-issue"/>
   <xsl:param name="templates"/>
+  <xsl:param name="outdir"/>
 
   <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -64,6 +65,11 @@
     <xsl:if test="$templates">
       <xsl:text> -% "</xsl:text>
       <xsl:value-of select="$templates"/>
+      <xsl:text>"</xsl:text>
+    </xsl:if>
+    <xsl:if test="$outdir">
+      <xsl:text> -@ "</xsl:text>
+      <xsl:value-of select="$outdir"/>
       <xsl:text>"</xsl:text>
     </xsl:if>
     <xsl:apply-templates select="*"/>

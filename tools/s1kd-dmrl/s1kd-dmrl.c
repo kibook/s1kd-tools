@@ -15,17 +15,18 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define DEFAULT_S1000D_ISSUE "4.2"
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-$ <iss>] [-% <dir>] [-FfNsh?] <DML>...");
+	puts("Usage: " PROG_NAME " [-$ <iss>] [-@ <dir>] [-% <dir>] [-FfNsh?] <DML>...");
 	puts("");
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
 	puts("  -$ <iss>   Which issue of the spec to use.");
+	puts("  -@ <dir>   Output to specified directory.");
 	puts("  -% <dir>   Custom XML template directory.");
 	#ifndef _WIN32
 	puts("  -F         Fail on first error from s1kd-new* commands.");
@@ -61,8 +62,9 @@ int main(int argc, char **argv)
 	bool verbose = false;
 	char *specIssue = strdup(DEFAULT_S1000D_ISSUE);
 	char *templateDir = NULL;
+	char *outDir = NULL;
 
-	const char *sopts = "sNfFq$:%:vh?";
+	const char *sopts = "sNfFq$:%:@:vh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -109,6 +111,9 @@ int main(int argc, char **argv)
 			case '%':
 				templateDir = strdup(optarg);
 				break;
+			case '@':
+				outDir = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				showHelp();
@@ -119,9 +124,10 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		xmlDocPtr in, out;
 		xmlChar *content;
-		const char *params[13];
+		const char *params[15];
 		char iss[8];
 		char *templs = NULL;
+		char *outd = NULL;
 
 		if (!(in = read_xml_doc(argv[i]))) {
 			continue;
@@ -152,11 +158,21 @@ int main(int argc, char **argv)
 			params[11] = "false()";
 		}
 
-		params[12] = NULL;
+		params[12] = "outdir";
+		if (outDir) {
+			outd = malloc(strlen(outDir) + 3);
+			sprintf(outd, "\"%s\"", outDir);
+			params[13] = outd;
+		} else {
+			params[13] = "false()";
+		}
+
+		params[14] = NULL;
 
 		out = xsltApplyStylesheet(dmrlStylesheet, in, params);
 
 		free(templs);
+		free(outd);
 
 		xmlFreeDoc(in);
 
@@ -196,6 +212,7 @@ int main(int argc, char **argv)
 
 	free(specIssue);
 	free(templateDir);
+	free(outDir);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

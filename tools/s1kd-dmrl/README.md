@@ -20,6 +20,9 @@ OPTIONS
 -$ &lt;issue&gt;  
 Specify which issue of S1000D to use when creating objects.
 
+-@ &lt;dir&gt;  
+Create new objects in &lt;dir&gt;.
+
 -% &lt;dir&gt;  
 Use XML templates in the specified directory instead of the built-in
 templates of each of the s1kd-new\* tools.
