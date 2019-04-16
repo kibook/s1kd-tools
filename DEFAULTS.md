@@ -11,6 +11,7 @@ Alphabetic index
 
 | Identifier                      | Value description                        |
 |---------------------------------|------------------------------------------|
+| `act`                           | Data module code of ACT data module      |
 | `assyCode`                      | 2 to 4 alphanumeric characters           |
 | `authorization`                 | string                                   |
 | `brex`                          | Data module code of BREX data module     |
