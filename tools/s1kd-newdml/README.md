@@ -39,9 +39,11 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   2.0
 
--@ &lt;filename&gt;  
-Save new DML to &lt;filename&gt; instead of an automatically named file
-in the current directory.
+-@ &lt;path&gt;  
+Save the new DML to &lt;path&gt;. If &lt;path&gt; is an existing
+directory, the DML will be created in it instead of the current
+directory. Otherwise, the DML will be saved as the filename &lt;path&gt;
+instead of being automatically named.
 
 -% &lt;dir&gt;  
 Use the XML template in the specified directory instead of the built-in
@@ -55,7 +57,7 @@ Dump the built-in XML template to the specified directory.
 BREX data module code.
 
 -c &lt;sec&gt;  
-The security classification of the new data module.
+The security classification of the new DML.
 
 -d &lt;defaults&gt;  
 Specify the `.defaults` file name.
@@ -87,7 +89,7 @@ Set the remarks for the new data management list.
 Omit the issue/inwork numbers from filename.
 
 -n &lt;issue&gt;  
-The issue number of the new data module.
+The issue number of the new DML.
 
 -p  
 Prompts the user for any values left unspecified.
@@ -112,7 +114,7 @@ Create a DMRL using the specified SNS rules.
 Print the file name of the newly created DML.
 
 -w &lt;inwork&gt;  
-The inwork number of the new data module.
+The inwork number of the new DML.
 
 --version  
 Show version information.

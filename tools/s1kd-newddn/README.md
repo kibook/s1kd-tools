@@ -40,9 +40,11 @@ Specifiy which issue of S1000D to use. Currently supported issues are:
 
 -   2.0
 
--@ &lt;filename&gt;  
-Save the new DDN as &lt;filename&gt; instead of an automatically named
-file in the current directory.
+-@ &lt;path&gt;  
+Save the new DDN to &lt;path&gt;. If &lt;path&gt; is an existing
+directory, the DDN will be created in it instead of the current
+directory. Otherwise, the DDN will be saved as the filename &lt;path&gt;
+instead of being automatically named.
 
 -% &lt;dir&gt;  
 Use the XML template in the specified directory instead of the built-in

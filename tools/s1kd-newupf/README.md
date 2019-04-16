@@ -19,16 +19,18 @@ along with update instructions.
 OPTIONS
 =======
 
--@ &lt;filename&gt;  
-Save the new UPF as &lt;filename&gt; instead of an automatically named
-file in the current directory.
-
 -$ &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
 -   4.2 (default)
 
 -   4.1
+
+-@ &lt;path&gt;  
+Save the new update file to &lt;path&gt;. If &lt;path&gt; is an existing
+directory, the update file will be created in it instead of the current
+directory. Otherwise, the update file will be saved as the filename
+&lt;path&gt; instead of being automatically named.
 
 -% &lt;dir&gt;  
 Use XML template in the specified directory instead of the built-in

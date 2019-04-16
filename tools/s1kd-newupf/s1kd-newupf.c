@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <errno.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -14,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -24,6 +25,7 @@
 #define EXIT_BAD_ISSUE 4
 #define EXIT_BAD_TEMPLATE 5
 #define EXIT_BAD_TEMPL_DIR 6
+#define EXIT_OS_ERROR 7
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
@@ -288,6 +290,8 @@ xmlNodePtr deleteObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 		}
 	}
 
+	xmlXPathFreeObject(results);
+
 	if (group->children) {
 		return group;
 	}
@@ -337,6 +341,8 @@ xmlNodePtr insertObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 			}
 		}
 	}
+
+	xmlXPathFreeObject(results);
 
 	if (group->children) {
 		return group;
@@ -393,6 +399,8 @@ xmlNodePtr replaceObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 			}
 		}
 	}
+
+	xmlXPathFreeObject(results);
 
 	if (group->children) {
 		return group;
@@ -596,7 +604,7 @@ void showHelp(void)
 	puts("");
 	puts("Options:");
 	puts("  -$ <issue>  Specify which S1000D issue to use.");
-	puts("  -@ <file>   Output to <file>.");
+	puts("  -@ <path>   Output to specified file or directory.");
 	puts("  -% <dir>    Use templates in specified directory.");
 	puts("  -~ <dir>    Dump built-in template to directory.");
 	puts("  -d <file>   Specify the .defaults file name.");
@@ -626,6 +634,7 @@ int main(int argc, char **argv)
 	bool no_overwrite_error = false;
 	bool verbose = false;
 	char *out = NULL;
+	char *outdir = NULL;
 	char defaultsFname[PATH_MAX];
 	bool custom_defaults = false;
 	xmlDocPtr defaultsXml;
@@ -767,33 +776,48 @@ int main(int argc, char **argv)
 		updateFileContext = xmlXPathNewContext(updateFile);
 	}
 
-	if (out) {
-		save_xml_doc(updateFile, out);
+	if (out && isdir(out, false)) {
+		outdir = out;
+		out = NULL;
+	}
 
-		if (verbose) {
-			puts(out);
+	if (!out) {
+		out = malloc(PATH_MAX);
+		autoName(out, updateFileContext);
+	}
+
+	if (outdir) {
+		if (chdir(outdir) != 0) {
+			fprintf(stderr, ERR_PREFIX "Could not change to directory %s: %s\n", outdir, strerror(errno));
+			exit(EXIT_OS_ERROR);
 		}
-	} else {
-		char upfname[PATH_MAX];
+	}
 
-		autoName(upfname, updateFileContext);
-
-		if (!overwrite && access(upfname, F_OK) != -1) {
-			if (no_overwrite_error) return 0;
-			fprintf(stderr, ERR_PREFIX "'%s' already exists.\n", upfname);
-			exit(EXIT_UPF_EXISTS);
+	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
+		if (outdir) {
+			fprintf(stderr, ERR_PREFIX "%s/%s already exists.\n", outdir, out);
 		} else {
-			save_xml_doc(updateFile, upfname);
+			fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
+		}
+		exit(EXIT_UPF_EXISTS);
+	}
 
-			if (verbose) {
-				puts(upfname);
-			}
+	save_xml_doc(updateFile, out);
+
+	if (verbose) {
+		if (outdir) {
+			printf("%s/%s\n", outdir, out);
+		} else {
+			puts(out);
 		}
 	}
 
 	free(out);
+	free(outdir);
 	free(templateDir);
 
+	xmlXPathFreeContext(updateFileContext);
 	xmlXPathFreeContext(sourceContext);
 	xmlXPathFreeContext(targetContext);
 

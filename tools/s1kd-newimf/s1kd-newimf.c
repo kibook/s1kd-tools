@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <time.h>
+#include <errno.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -12,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.4.1"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -22,6 +23,7 @@
 #define EXIT_BAD_TEMPLATE 4
 #define EXIT_BAD_TEMPL_DIR 5
 #define EXIT_ENCODING_ERROR 6
+#define EXIT_OS_ERROR 7
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 #define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
@@ -149,6 +151,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
+	puts("  -@ <dir>      Output to specified directory.");
 	puts("  -% <dir>      Use template in specified directory.");
 	puts("  -~ <dir>      Dump built-in template to directory.");
 	puts("  -d <path>     Specify .defaults file path.");
@@ -326,9 +329,11 @@ int main(int argc, char **argv)
 	char defaults_fname[PATH_MAX];
 	bool custom_defaults = false;
 
+	char *outdir = NULL;
+
 	xmlDocPtr defaults_xml;
 
-	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:h?";
+	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:@:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -364,6 +369,7 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = true; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
+			case '@': outdir = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -490,22 +496,39 @@ int main(int argc, char **argv)
 			}
 		}
 
+		if (outdir) {
+			if (chdir(outdir) != 0) {
+				fprintf(stderr, ERR_PREFIX "Could not change to directory %s: %s\n", outdir, strerror(errno));
+				exit(EXIT_OS_ERROR);
+			}
+		}
+
 		if (!overwrite && access(fname, F_OK) != -1) {
 			if (no_overwrite_error) return 0;
-			fprintf(stderr, ERR_PREFIX "%s already exists.\n", fname);
+			if (outdir) {
+				fprintf(stderr, ERR_PREFIX "%s/%s already exists.\n", outdir, fname);
+			} else {
+				fprintf(stderr, ERR_PREFIX "%s already exists.\n", fname);
+			}
 			exit(EXIT_IMF_EXISTS);
 		}
 
 		save_xml_doc(template, fname);
 
-		if (verbose)
-			puts(fname);
+		if (verbose) {
+			if (outdir) {
+				printf("%s/%s\n", outdir, fname);
+			} else {
+				puts(fname);
+			}
+		}
 
 		xmlXPathFreeContext(ctx);
 
 		xmlFreeDoc(template);
 	}
 
+	free(outdir);
 	free(template_dir);
 	xmlFree(remarks);
 

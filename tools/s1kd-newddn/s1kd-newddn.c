@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <libgen.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -16,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,6 +33,7 @@
 #define EXIT_BAD_ISSUE 5
 #define EXIT_BAD_TEMPLATE 6
 #define EXIT_BAD_TEMPL_DIR 7
+#define EXIT_OS_ERROR 8
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template to directory: %s\n"
 
@@ -231,7 +233,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -$ <issue>       Specify which S1000D issue to use.");
-	puts("  -@ <file>        Output to specified file.");
+	puts("  -@ <path>        Output to specified file or directory.");
 	puts("  -% <dir>         Use templates in specified directory.");
 	puts("  -~ <dir>         Dump built-in XML template to directory.");
 	puts("  -d <defaults>    Specify the .defaults file name.");
@@ -488,6 +490,7 @@ int main(int argc, char **argv)
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
+	char *outdir = NULL;
 
 	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:~:h?";
 	struct option lopts[] = {
@@ -711,6 +714,11 @@ int main(int argc, char **argv)
 		ddn = toissue(ddn, issue);
 	}
 
+	if (out && isdir(out, false)) {
+		outdir = out;
+		out = NULL;
+	}
+
 	if (!out) {
 		char ddn_fname[PATH_MAX];
 
@@ -724,18 +732,35 @@ int main(int argc, char **argv)
 		out = strdup(ddn_fname);
 	}
 
+	if (outdir) {
+		if (chdir(outdir) != 0) {
+			fprintf(stderr, ERR_PREFIX "Could not change to directory %s: %s\n", outdir, strerror(errno));
+			exit(EXIT_OS_ERROR);
+		}
+	}
+
 	if (!overwrite && access(out, F_OK) != -1) {
 		if (no_overwrite_error) return 0;
-		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
+		if (outdir) {
+			fprintf(stderr, ERR_PREFIX "%s/%s already exists.\n", outdir, out);
+		} else {
+			fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
+		}
 		exit(EXIT_DDN_EXISTS);
 	}
 
 	save_xml_doc(ddn, out);
 
-	if (verbose)
-		puts(out);
+	if (verbose) {
+		if (outdir) {
+			printf("%s/%s\n", outdir, out);
+		} else {
+			puts(out);
+		}
+	}
 
 	free(out);
+	free(outdir);
 	free(template_dir);
 	xmlFree(remarks);
 	xmlFreeDoc(ddn);

@@ -17,6 +17,9 @@ specified ICN files.
 OPTIONS
 =======
 
+-@ &lt;dir&gt;  
+Create the new IMF in &lt;dir&gt;.
+
 -% &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.
 The template must be named `icnmetadata.xml` inside &lt;dir&gt; and must

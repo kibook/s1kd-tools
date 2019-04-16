@@ -39,9 +39,11 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   2.0
 
--@ &lt;filename&gt;  
-Save new publication module as &lt;filename&gt; instead of an
-automatically named file in the current directory.
+-@ &lt;path&gt;  
+Save the new publication module to &lt;path&gt;. If &lt;path&gt; is an
+existing directory, the publication module will be created in it instead
+of the current directory. Otherwise, the publication module will be
+saved as the filename &lt;path&gt; instead of being automatically named.
 
 -% &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.

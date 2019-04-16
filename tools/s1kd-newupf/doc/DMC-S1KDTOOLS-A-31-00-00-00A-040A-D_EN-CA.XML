@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="31" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="01"/>
+        <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="15"/>
+        <issueDate year="2019" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-newupf(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Allow -@ option to specify a directory.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -61,12 +64,6 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-@ &lt;filename&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Save the new UPF as &lt;filename&gt; instead of an automatically named file in the current directory.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
@@ -80,6 +77,12 @@
                     </listItem>
                   </randomList>
                 </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-@ &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new update file to &lt;path&gt;. If &lt;path&gt; is an existing directory, the update file will be created in it instead of the current directory. Otherwise, the update file will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

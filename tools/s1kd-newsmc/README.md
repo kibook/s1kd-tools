@@ -27,9 +27,12 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   4.1
 
--@ &lt;filename&gt;  
-Save new SCORM content package as &lt;filename&gt; instead of an
-automatically named file in the current directory.
+-@ &lt;path&gt;  
+Save the new SCORM content package to &lt;path&gt;. If &lt;path&gt; is
+an existing directory, the SCORM content package will be created in it
+instead of the current directory. Otherwise, the SCORM content package
+will be saved as the filename &lt;path&gt; instead of being
+automatically named.
 
 -% &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.
@@ -65,7 +68,7 @@ YYYY-MM-DD.
 Include issue information in referenced data modules.
 
 -k &lt;skill&gt;  
-The skill level code of the new data module.
+The skill level code of the new SCORM content package.
 
 -L &lt;language&gt;  
 The language ISO code of the new SCORM content package.

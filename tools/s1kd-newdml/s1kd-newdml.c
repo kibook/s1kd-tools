@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
+#include <errno.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -16,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -28,6 +29,7 @@
 #define EXIT_BAD_ISSUE 6
 #define EXIT_BAD_TEMPLATE 7
 #define EXIT_BAD_TEMPL_DIR 8
+#define EXIT_OS_ERROR 9
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
@@ -577,7 +579,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -$ <issue>     Specify which S1000d issue to use.");
-	puts("  -@ <file>      Output to specified file.");
+	puts("  -@ <path>      Output to specified file or directory.");
 	puts("  -% <dir>       Use template in specified directory.");
 	puts("  -~ <dir>       Dump built-in template to directory.");
 	puts("  -d <defaults>  Specify .defaults file name.");
@@ -740,6 +742,7 @@ int main(int argc, char **argv)
 	xmlDocPtr defaults_xml;
 
 	char *out = NULL;
+	char *outdir = NULL;
 
 	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:h?";
 	struct option lopts[] = {
@@ -929,38 +932,6 @@ int main(int argc, char **argv)
 
 	dml_type[0] = toupper(dml_type[0]);
 
-	if (!out) {
-		char dml_fname[PATH_MAX];
-
-		if (noissue) {
-			snprintf(dml_fname, PATH_MAX,
-				"DML-%s-%s-%s-%s-%s.XML",
-				model_ident_code,
-				sender_ident,
-				dml_type,
-				year_of_data_issue,
-				seq_number);
-		} else {
-			snprintf(dml_fname, PATH_MAX,
-				"DML-%s-%s-%s-%s-%s_%s-%s.XML",
-				model_ident_code,
-				sender_ident,
-				dml_type,
-				year_of_data_issue,
-				seq_number,
-				issue_number,
-				in_work);
-		}
-
-		out = strdup(dml_fname);
-	}
-
-	if (!overwrite && access(out, F_OK) != -1) {
-		if (no_overwrite_error) return 0;
-		fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
-		exit(EXIT_DML_EXISTS);
-	}
-
 	dmlContent = firstXPathNode("//dmlContent", dml_doc);
 
 	if (sns) {
@@ -1027,12 +998,66 @@ int main(int argc, char **argv)
 		dml_doc = toissue(dml_doc, issue);
 	}
 
+	if (out && isdir(out, false)) {
+		outdir = out;
+		out = NULL;
+	}
+
+	if (!out) {
+		char dml_fname[PATH_MAX];
+
+		if (noissue) {
+			snprintf(dml_fname, PATH_MAX,
+				"DML-%s-%s-%s-%s-%s.XML",
+				model_ident_code,
+				sender_ident,
+				dml_type,
+				year_of_data_issue,
+				seq_number);
+		} else {
+			snprintf(dml_fname, PATH_MAX,
+				"DML-%s-%s-%s-%s-%s_%s-%s.XML",
+				model_ident_code,
+				sender_ident,
+				dml_type,
+				year_of_data_issue,
+				seq_number,
+				issue_number,
+				in_work);
+		}
+
+		out = strdup(dml_fname);
+	}
+
+	if (outdir) {
+		if (chdir(outdir) != 0) {
+			fprintf(stderr, ERR_PREFIX "Could not change to directory %s: %s\n", outdir, strerror(errno));
+			exit(EXIT_OS_ERROR);
+		}
+	}
+
+	if (!overwrite && access(out, F_OK) != -1) {
+		if (no_overwrite_error) return 0;
+		if (outdir) {
+			fprintf(stderr, ERR_PREFIX "%s/%s already exists.\n", outdir, out);
+		} else {
+			fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
+		}
+		exit(EXIT_DML_EXISTS);
+	}
+
 	save_xml_doc(dml_doc, out);
 
-	if (verbose)
-		puts(out);
+	if (verbose) {
+		if (outdir) {
+			printf("%s/%s\n", outdir, out);
+		} else {
+			puts(out);
+		}
+	}
 
 	free(out);
+	free(outdir);
 	free(defaultRpcName);
 	free(defaultRpcCode);
 	free(template_dir);
