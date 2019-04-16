@@ -9,7 +9,7 @@ s1kd\-sns \- Organize data modules based on an SNS
 .IP
 .nf
 \f[C]
-s1kd\-sns\ [\-d\ <dir>]\ [\-cmnpsh?]\ [<BREX>\ ...]
+s1kd\-sns\ [\-D\ <dir>]\ [\-d\ <dir>]\ [\-cmnpsh?]\ [<BREX>\ ...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -23,6 +23,12 @@ structure.
 .TP
 .B \-c
 Copy files in to the SNS subfolders instead of linking them.
+.RS
+.RE
+.TP
+.B \-D <dir>
+The flat directory containing the data modules to organize.
+By default, the current directory is used.
 .RS
 .RE
 .TP

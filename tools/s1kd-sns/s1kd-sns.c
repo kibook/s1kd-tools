@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -53,7 +53,7 @@ bool only_numb = false;
 void change_dir(const char *dir)
 {
 	if (chdir(dir) != 0) {
-		fprintf(stderr, ERR_PREFIX "%s: %s\n", strerror(errno), dir);
+		fprintf(stderr, ERR_PREFIX "Cannot change directory to %s: %s\n", dir, strerror(errno));
 		exit(EXIT_OS_ERROR);
 	}
 }
@@ -61,7 +61,15 @@ void change_dir(const char *dir)
 void rename_dir(const char *old, const char *new)
 {
 	if (rename(old, new) != 0) {
-		fprintf(stderr, ERR_PREFIX "%s: %s -> %s\n", strerror(errno), old, new);
+		fprintf(stderr, ERR_PREFIX "Cannot rename directory %s to %s: %s\n", old, new, strerror(errno));
+		exit(EXIT_OS_ERROR);
+	}
+}
+
+void get_current_dir(char *buf, size_t size)
+{
+	if (!getcwd(buf, size)) {
+		fprintf(stderr, ERR_PREFIX "Cannot get current directory: %s\n", strerror(errno));
 		exit(EXIT_OS_ERROR);
 	}
 }
@@ -136,11 +144,6 @@ void setup_sns(xmlNodePtr node, const char *snsdname)
 	xmlNodePtr cur;
 	char *content;
 	char code[256];
-
-	if (xmlStrcmp(node->name, BAD_CAST "snsDescr") == 0) {
-		makedir(snsdname);
-		change_dir(snsdname);
-	}
 
 	for (cur = node->children; cur; cur = cur->next) {
 		if (xmlStrcmp(cur->name, BAD_CAST "snsCode") == 0) {
@@ -257,41 +260,46 @@ int sns_exists(const char *code, char *dname)
 }
 
 /* Place a link to a DM file in to the proper place in the SNS directory hierarchy. */
-void placedm(const char *fname, struct dm_code *code, const char *snsdname)
+void placedm(const char *fname, struct dm_code *code, const char *snsdname, const char *srcdname)
 {
-	char path[PATH_MAX] = "../", orig[PATH_MAX], dname[256];
+	char path[PATH_MAX], dname[PATH_MAX], orig[PATH_MAX];
+	bool link = true;
+
+	get_current_dir(orig, PATH_MAX);
+
+	strcpy(path, srcdname);
+	strcat(path, "/");
 
 	change_dir(snsdname);
 
 	if (sns_exists(code->system_code, dname)) {
-		strcat(path, "../");
 		change_dir(dname);
-
 		if (sns_exists(code->sub_system_code, dname)) {
-			strcat(path, "../");
 			change_dir(dname);
-
 			if (sns_exists(code->sub_sub_system_code, dname)) {
-				strcat(path, "../");
 				change_dir(dname);
-
 				if (sns_exists(code->assy_code, dname)) {
-					strcat(path, "../");
 					change_dir(dname);
 				}
 			}
 		}
 	}
 	
-	strcpy(orig, path);
-
 	strcat(path, fname);
 
 	if (access(fname, F_OK) != -1) {
-		unlink(fname);
+		char d[PATH_MAX];
+
+		get_current_dir(d, PATH_MAX);
+
+		if (strcmp(d, srcdname) != 0) {
+			unlink(fname);
+		} else {
+			link = false;
+		}
 	}
 
-	if (linkfn(path, fname) != 0) {
+	if (link && linkfn(path, fname) != 0) {
 		fprintf(stderr, ERR_PREFIX "%s: %s => %s\n", strerror(errno), path, fname);
 		exit(EXIT_OS_ERROR);
 	}
@@ -300,19 +308,19 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname)
 }
 
 /* Resort DMs in to the SNS directory hierarchy. */
-void sort_sns(const char *snsdname)
+void sort_sns(const char *snsdname, const char *srcdname)
 {
 	DIR *dir;
 	struct dirent *cur;
 
-	dir = opendir(".");
+	dir = opendir(srcdname);
 
 	while ((cur = readdir(dir))) {
 		if (is_dmodule(cur->d_name)) {
 			struct dm_code code;
 
 			if (parse_dmcode(&code, cur->d_name) == 0) {
-				placedm(cur->d_name, &code, snsdname);
+				placedm(cur->d_name, &code, snsdname, srcdname);
 			}
 		}
 
@@ -322,12 +330,11 @@ void sort_sns(const char *snsdname)
 }
 
 /* Print or setup the SNS directory structure for a given BREX containing SNS rules. */
-void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdname)
+void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdname, const char *srcdname)
 {
 	xmlDocPtr brex;
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
-	xmlNodePtr sns_descr;
 
 	if (!(brex = read_xml_doc(brex_fname))) {
 		fprintf(stderr, ERR_PREFIX "Could not read BREX data module: %s\n", brex_fname);
@@ -338,21 +345,35 @@ void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdn
 
 	results = xmlXPathEvalExpression(BAD_CAST "//snsRules/snsDescr", ctxt);
 
-	sns_descr = results->nodesetval->nodeTab[0];
+	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
+		xmlNodePtr sns_descr;
 
-	if (printsns) {
-		print_sns(sns_descr, -1);
-	} else if (access(snsdname, F_OK) == -1) {
-		setup_sns(sns_descr, snsdname);
+		sns_descr = results->nodesetval->nodeTab[0];
+
+		if (printsns) {
+			print_sns(sns_descr, -1);
+		} else if (access(snsdname, F_OK) == -1) {
+			char cwd[PATH_MAX];
+
+			get_current_dir(cwd, PATH_MAX);
+
+			makedir(snsdname);
+			change_dir(snsdname);
+
+			setup_sns(sns_descr, snsdname);
+
+			change_dir(cwd);
+		}
+
+		if (!printsns) {
+			sort_sns(snsdname, srcdname);
+		}
 	}
 
 	xmlXPathFreeObject(results);
 	xmlXPathFreeContext(ctxt);
 
 	xmlFreeDoc(brex);
-
-	if (!printsns)
-		sort_sns(snsdname);
 }
 
 void show_help(void)
@@ -362,7 +383,8 @@ void show_help(void)
 	puts("Options:");
 	puts("  -h -?      Show usage message.");
 	puts("  -c         Copy files instead of linking.");
-	puts("  -d <dir>   Directory to organize DMs in to. Default is '" DEFAULT_SNS_DNAME "'.");
+	puts("  -D <dir>   Directory where DMs are stored. Default is current directory.");
+	puts("  -d <dir>   Directory to organize DMs in to. Default is \"" DEFAULT_SNS_DNAME "\"");
 	puts("  -m         Move files instead of linking.");
 	puts("  -n         Only use the SNS code to name directories.");
 	puts("  -p         Print SNS instead of organizing.");
@@ -383,14 +405,18 @@ int main(int argc, char **argv)
 	int i;
 	bool printsns = false;
 	char *snsdname = NULL;
+	char *srcdname = NULL;
 
-	const char *sopts = "cd:mnpsh?";
+	const char *sopts = "cD:d:mnpsh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	srcdname = malloc(PATH_MAX + 1);
+	get_current_dir(srcdname, PATH_MAX);
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -402,6 +428,7 @@ int main(int argc, char **argv)
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'c': linkfn = copy; break;
+			case 'D': real_path(optarg, srcdname); break;
 			case 'd': snsdname = strdup(optarg); break;
 			case 's': linkfn = slink; break;
 			case 'm': linkfn = rename; break;
@@ -418,13 +445,14 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			print_or_setup_sns(argv[i], printsns, snsdname);
+			print_or_setup_sns(argv[i], printsns, snsdname, srcdname);
 		}
 	} else {
-		print_or_setup_sns("-", printsns, snsdname);
+		print_or_setup_sns("-", printsns, snsdname, srcdname);
 	}
 
 	free(snsdname);
+	free(srcdname);
 
 	xmlCleanupParser();
 

@@ -6,7 +6,7 @@ s1kd-sns - Organize data modules based on an SNS
 SYNOPSIS
 ========
 
-    s1kd-sns [-d <dir>] [-cmnpsh?] [<BREX> ...]
+    s1kd-sns [-D <dir>] [-d <dir>] [-cmnpsh?] [<BREX> ...]
 
 DESCRIPTION
 ===========
@@ -21,6 +21,10 @@ OPTIONS
 
 -c  
 Copy files in to the SNS subfolders instead of linking them.
+
+-D &lt;dir&gt;  
+The flat directory containing the data modules to organize. By default,
+the current directory is used.
 
 -d &lt;dir&gt;  
 The root directory of the new SNS structure. By default, the tool will

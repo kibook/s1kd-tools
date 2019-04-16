@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="34" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="01"/>
+        <issueInfo issueNumber="004" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="04" day="15"/>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-sns [-d <dir>] [-cmnpsh?] [<BREX> ...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-sns [-D <dir>] [-d <dir>] [-cmnpsh?] [<BREX> ...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -64,6 +67,12 @@
               <listItemTerm>-c</listItemTerm>
               <listItemDefinition>
                 <para>Copy files in to the SNS subfolders instead of linking them.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-D &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The flat directory containing the data modules to organize. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
