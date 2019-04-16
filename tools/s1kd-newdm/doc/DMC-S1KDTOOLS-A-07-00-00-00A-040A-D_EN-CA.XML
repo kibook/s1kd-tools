@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="038" inWork="02"/>
+        <issueInfo issueNumber="038" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="04" day="16"/>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Allow -@ option to specify a directory.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -a option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -137,6 +140,12 @@
               <listItemTerm>-!</listItemTerm>
               <listItemDefinition>
                 <para>Do not include an info name for the new data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-a &lt;ACT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>ACT data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

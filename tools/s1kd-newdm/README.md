@@ -64,6 +64,9 @@ Dumps the simple text form of the built-in default `.dmtypes`.
 -!  
 Do not include an info name for the new data module.
 
+-a &lt;ACT&gt;  
+ACT data module code.
+
 -B  
 When creating a new BREX data module, use the `.defaults` and `.dmtypes`
 files to add a basic set of context rules.
