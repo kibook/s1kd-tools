@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.11.0"
+#define VERSION "1.11.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1806,6 +1806,7 @@ int main(int argc, char **argv)
 	free(out);
 	free(outdir);
 	free(template_dir);
+	free(act_dmcode);
 	free(sns_fname);
 	free(maint_sns);
 	free(skill_level_code);
