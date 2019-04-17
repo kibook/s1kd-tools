@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.4.3"
+#define VERSION "2.5.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1224,7 +1224,7 @@ void set_code(xmlDocPtr doc, const char *new_code)
 }
 
 /* Set the techName and/or infoName of the data module instance */
-void set_title(xmlDocPtr doc, char *tech, char *info)
+void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no_info_name)
 {
 	xmlNodePtr dmTitle, techName, infoName;
 	enum issue iss;
@@ -1257,16 +1257,19 @@ void set_title(xmlDocPtr doc, char *tech, char *info)
 		iss = ISS_30;
 	}
 
-	if (strcmp(tech, "") != 0) {
+	if (tech) {
 		xmlNodeSetContent(techName, BAD_CAST tech);
 	}
 
-	if (strcmp(info, "") != 0) {
+	if (info) {
 		if (!infoName) {
 			infoName = xmlNewChild(dmTitle, NULL, BAD_CAST (iss == ISS_30 ? "infoname" : "infoName"), NULL);
 		}
 		xmlNodeSetContent(infoName, BAD_CAST info);
-	}	
+	} else if (no_info_name && infoName) {
+		xmlUnlinkNode(infoName);
+		xmlFreeNode(infoName);
+	}
 }
 
 xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values, enum issue iss)
@@ -2645,6 +2648,7 @@ void show_help(void)
 	puts("  -z            Fix certain elements automatically after filtering.");
 	puts("  -@            Update existing instance objects from their source.");
 	puts("  -%            Make instances read-only.");
+	puts("  -!            Do not include an infoName for the instance.");
 	puts("  --version     Show version information.");
 	puts("  <object>...   Source CSDB object(s)");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -2668,8 +2672,8 @@ int main(int argc, char **argv)
 	char out[PATH_MAX] = "-";
 	bool clean = false;
 	bool simpl = false;
-	char tech[256] = "";
-	char info[256] = "";
+	char *tech = NULL;
+	char *info = NULL;
 	bool autoname = false;
 	char dir[PATH_MAX] = "";
 	bool new_applic = false;
@@ -2708,10 +2712,11 @@ int main(int argc, char **argv)
 	bool use_stdout = true;
 	bool update_inst = false;
 	bool lock = false;
+	bool no_info_name = false;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yz@%";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yz@%!";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -2777,7 +2782,7 @@ int main(int argc, char **argv)
 				setorig = true; origspec = strdup(optarg);
 				break;
 			case 'i':
-				strncpy(info, optarg, 255);
+				info = strdup(optarg);
 				break;
 			case 'I':
 				strncpy(issdate, optarg, 15);
@@ -2836,7 +2841,7 @@ int main(int argc, char **argv)
 				tag_non_applic = true;
 				break;
 			case 't':
-				strncpy(tech, optarg, 255);
+				tech = strdup(optarg);
 				break;
 			case 'U':
 				sec_classes = strdup(optarg);
@@ -2874,6 +2879,9 @@ int main(int argc, char **argv)
 				break;
 			case '%':
 				lock = true;
+				break;
+			case '!':
+				no_info_name = true;
 				break;
 			case 'h':
 			case '?':
@@ -3115,7 +3123,7 @@ int main(int argc, char **argv)
 					set_code(doc, code);
 				}
 
-				set_title(doc, tech, info);
+				set_title(doc, tech, info, no_info_name);
 
 				if (strcmp(language, "") != 0) {
 					set_lang(doc, language);
@@ -3247,6 +3255,8 @@ int main(int argc, char **argv)
 	free(skill_codes);
 	free(sec_classes);
 	free(search_dir);
+	free(tech);
+	free(info);
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();

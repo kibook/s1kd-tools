@@ -332,6 +332,9 @@ Make instance objects read-only.
 --version  
 Show version information.
 
+-!  
+Do not include an infoName in the instance.
+
 &lt;object&gt;...  
 Source CSDB objects to instantiate.
 
