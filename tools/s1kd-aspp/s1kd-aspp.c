@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.3.0"
+#define VERSION "2.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -54,6 +54,9 @@ bool overwriteDispText = true;
 
 /* Verbose output. */
 bool verbose = false;
+
+/* Delimiter for format strings. */
+#define FMTSTR_DELIM '%'
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -238,7 +241,73 @@ void addIdentity(xmlDocPtr style)
 	xmlFreeDoc(identity);
 }
 
-void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
+/* Customize the display text based on a format string. */
+void apply_format_str(xmlDocPtr doc, const char *fmt)
+{
+	xmlNodePtr t, c;
+	int i;
+
+	/* Get the assert text template. */
+	t = firstXPathNode(doc, NULL, "//*[@match='assert' and @mode='text']");
+
+	if (!t) {
+		return;
+	}
+
+	/* Clear the template. */
+	c = t->children;
+	while (c) {
+		xmlNodePtr n;
+		n = c->next;
+		xmlUnlinkNode(c);
+		xmlFreeNode(c);
+		c = n;
+	}
+
+	/* Parse the format string and generate the new template. */
+	for (i = 0; fmt[i]; ++i) {
+		xmlChar s[2] = {0};
+
+		if (fmt[i] == FMTSTR_DELIM) {
+			if (fmt[i + 1] == FMTSTR_DELIM) {
+				s[0] = FMTSTR_DELIM;
+				xmlNewChild(t, t->nsDef, BAD_CAST "text", s);
+				++i;
+			} else {
+				const char *k, *e;
+				int n;
+
+				k = fmt + i + 1;
+				e = strchr(k, FMTSTR_DELIM);
+				if (!e) break;
+				n = e - k;
+
+				if (strncmp(k, "name", n) == 0) {
+					c = xmlNewChild(t, t->nsDef, BAD_CAST "call-template", NULL);
+					xmlSetProp(c, BAD_CAST "name", BAD_CAST "applicPropertyName");
+				} else if (strncmp(k, "values", n) == 0) {
+					c = xmlNewChild(t, t->nsDef, BAD_CAST "call-template", NULL);
+					xmlSetProp(c, BAD_CAST "name", BAD_CAST "applicPropertyVal");
+				}
+
+				i += n + 1;
+			}
+		} else {
+			if (fmt[i] == '\\') {
+				switch (fmt[i + 1]) {
+					case 'n': s[0] = '\n'; ++i; break;
+					case 't': s[0] = '\t'; ++i; break;
+					default: s[0] = fmt[i]; break;
+				}
+			} else {
+				s[0] = fmt[i];
+			}
+			xmlNewChild(t, t->nsDef, BAD_CAST "text", s);
+		}
+	}
+}
+
+void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts, const char *format)
 {
 	xmlDocPtr styledoc, res, muxdoc;
 	xsltStylesheetPtr style;
@@ -279,6 +348,10 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 	}
 
 	addIdentity(styledoc);
+
+	if (format) {
+		apply_format_str(styledoc, format);
+	}
 
 	style = xsltParseStylesheetDoc(styledoc);
 
@@ -474,7 +547,8 @@ void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 }
 
 void processFile(const char *in, const char *out, bool xincl, bool process,
-	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts)
+	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
+	const char *format)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -514,7 +588,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	}
 
 	if (genDispText) {
-		generateDisplayText(doc, all_acts, all_ccts);
+		generateDisplayText(doc, all_acts, all_ccts, format);
 	}
 
 	save_xml_doc(doc, out);
@@ -530,7 +604,8 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 }
 
 void process_list(const char *path, bool overwrite, bool xincl, bool process,
-	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts)
+	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
+	const char *format)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -546,7 +621,7 @@ void process_list(const char *path, bool overwrite, bool xincl, bool process,
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		processFile(line, overwrite ? line : "-", xincl, process, genDispText, acts, ccts, findcts);
+		processFile(line, overwrite ? line : "-", xincl, process, genDispText, acts, ccts, findcts, format);
 	}
 
 	if (path) {
@@ -559,7 +634,7 @@ void showHelp(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " -D");
-	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrvx] [<object>...]");
+	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>] [-cfklrvx] [<object>...]");
 	puts("  " PROG_NAME " -p [-a <ID>] [-flvx] [<object>...]");
 	puts("");
 	puts("Options:");
@@ -569,6 +644,7 @@ void showHelp(void)
 	puts("  -c            Search for ACT/CCT data modules.");
 	puts("  -D            Dump built-in XSLT for generating display text.");
 	puts("  -d <dir>      Directory to start search for ACT/CCT in.");
+	puts("  -F <fmt>      Use a custom format string for generating display text.");
 	puts("  -f            Overwrite input file(s).");
 	puts("  -G <XSL>      Use custom XSLT script to generate display text.");
 	puts("  -g            Generate display text for applicability annotations.");
@@ -600,10 +676,11 @@ int main(int argc, char **argv)
 	bool process = false;
 	bool findcts = false;
 	bool islist = false;
+	char *format = NULL;
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:fG:gklprvxh?";
+	const char *sopts = "A:a:C:cDd:F:fG:gklprvxh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -653,6 +730,9 @@ int main(int argc, char **argv)
 				free(search_dir);
 				search_dir = strdup(optarg);
 				break;
+			case 'F':
+				format = strdup(optarg);
+				break;
 			case 'f':
 				overwrite = true;
 				break;
@@ -689,19 +769,19 @@ int main(int argc, char **argv)
 
 	if (optind >= argc) {
 		if (islist) {
-			process_list(NULL, overwrite, xincl, process, genDispText, acts, ccts, findcts);
+			process_list(NULL, overwrite, xincl, process, genDispText, acts, ccts, findcts, format);
 		} else {
-			processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts);
+			processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts, format);
 		}
 	} else {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
 				process_list(argv[i], overwrite, xincl, process,
-					genDispText, acts, ccts, findcts);
+					genDispText, acts, ccts, findcts, format);
 			} else {
 				processFile(argv[i], overwrite ? argv[i] : "-",
 					xincl, process, genDispText, acts,
-					ccts, findcts);
+					ccts, findcts, format);
 			}
 		}
 	}
@@ -714,6 +794,7 @@ int main(int argc, char **argv)
 
 	free(customGenDispTextXsl);
 	free(search_dir);
+	free(format);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

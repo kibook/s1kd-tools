@@ -8,8 +8,8 @@ SYNOPSIS
 
     s1kd-aspp -h?
     s1kd-aspp -D
-    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrvx]
-                 [<object>...]
+    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
+                 [-cfklrvx] [<object>...]
     s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]
 
 DESCRIPTION
@@ -64,6 +64,9 @@ statements.
 -d &lt;dir&gt;  
 Directory to start searching for ACT/CCT data modules in. By default,
 the current directory is used.
+
+-F &lt;fmt&gt;  
+Use a custom format string to generate display text.
 
 -f  
 Overwrite input data module(s) rather than outputting to stdout.
@@ -127,8 +130,8 @@ Chap 7.8 of the S1000D 4.2 specification. For example, given the
 following:
 
     <applic>
-    <assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
-    applicPropertyValues="A"/>
+    <assert applicPropertyIdent="prodversion"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
     </applic>
 
 The resulting XML would contain:
@@ -137,8 +140,8 @@ The resulting XML would contain:
     <displayText>
     <simplePara>prodversion: A</simplePara>
     </displayText>
-    <assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
-    applicPropertyValues="A"/>
+    <assert applicPropertyIdent="prodversion"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
     </applic>
 
 If ACTs or CCTs are supplied which define display names for a property,
@@ -161,8 +164,8 @@ The resulting XML would instead contain:
     <applic>
     <displayText>
     <simplePara>Version: A</simplePara>
-    <assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
-    applicPropertyValues="A"/>
+    <assert applicPropertyIdent="prodversion"
+    applicPropertyType="prodattr" applicPropertyValues="A"/>
     </displayText>
     </applic>
 
@@ -180,6 +183,46 @@ following:
 
 This means any elements or attributes not matched by a more specific
 template in the script are copied.
+
+Display text format string (-F)
+-------------------------------
+
+The -F option allows for simple customizations to generated display text
+without needing to create a custom XSLT script (-G). The string
+determines the format of the display text of each `<assert>` element in
+the annotation.
+
+The following variables can be used within the format string:
+
+%name%  
+The name of the property.
+
+%values%  
+The applicable value(s) of the property.
+
+For example:
+
+    $ s1kd-aspp -g <DM>
+    ...
+    <applic>
+    <displayText>
+    <simplePara>Version: A</simplePara>
+    </displayText>
+    <assert applicPropertyIdent="version" applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    ...
+
+    $ s1kd-aspp -F '%name% = %values%' -g <DM>
+    ...
+    <applic>
+    <displayText>
+    <simplePara>Version = A</simplePara>
+    </displayText>
+    <assert applicPropertyIdent="version" applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    ...
 
 Creating presentation applicability statements
 ----------------------------------------------

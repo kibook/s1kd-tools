@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="01"/>
+        <issueInfo issueNumber="014" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="15"/>
+        <issueDate year="2019" month="04" day="18"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -F option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,10 +52,10 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-aspp -h?
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-aspp -h?
 s1kd-aspp -D
-s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-G <XSL>] [-cfklrvx]
-             [<object>...]
+s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
+             [-cfklrvx] [<object>...]
 s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -110,6 +113,12 @@ s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]]]></verbatimText>
               <listItemTerm>-d &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Directory to start searching for ACT/CCT data modules in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-F &lt;fmt&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom format string to generate display text.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -211,8 +220,8 @@ s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]]]></verbatimText>
           <para>The built-in XSLT for generating display text follows the guidance in Chap 7.8 of the S1000D 4.2 specification. For example, given the following:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
-<assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
-applicPropertyValues="A"/>
+<assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
 </applic>]]></verbatimText>
           </para>
           <para>The resulting XML would contain:</para>
@@ -221,8 +230,8 @@ applicPropertyValues="A"/>
 <displayText>
 <simplePara>prodversion: A</simplePara>
 </displayText>
-<assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
-applicPropertyValues="A"/>
+<assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
 </applic>]]></verbatimText>
           </para>
           <para>If ACTs or CCTs are supplied which define display names for a property, this will be used instead of the ident. For example, the ACT defines the display name for the "<verbatimText verbatimStyle="vs14">prodversion</verbatimText>" product attribute:</para>
@@ -243,8 +252,8 @@ applicPropertyValues="A"/>
             <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
 <displayText>
 <simplePara>Version: A</simplePara>
-<assert applicPropertyIdent="prodversion" applicPropertyType="prodattr"
-applicPropertyValues="A"/>
+<assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/>
 </displayText>
 </applic>]]></verbatimText>
           </para>
@@ -257,6 +266,49 @@ applicPropertyValues="A"/>
 </xsl:template>]]></verbatimText>
           </para>
           <para>This means any elements or attributes not matched by a more specific template in the script are copied.</para>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Display text format string (-F)</title>
+          <para>The -F option allows for simple customizations to generated display text without needing to create a custom XSLT script (-G). The string determines the format of the display text of each <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> element in the annotation.</para>
+          <para>The following variables can be used within the format string:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>%name%</listItemTerm>
+                <listItemDefinition>
+                  <para>The name of the property.</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>%values%</listItemTerm>
+                <listItemDefinition>
+                  <para>The applicable value(s) of the property.</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>For example:
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-aspp -g <DM>
+...
+<applic>
+<displayText>
+<simplePara>Version: A</simplePara>
+</displayText>
+<assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+...
+
+$ s1kd-aspp -F '%name% = %values%' -g <DM>
+...
+<applic>
+<displayText>
+<simplePara>Version = A</simplePara>
+</displayText>
+<assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+...]]></verbatimText>
+          </para>
         </levelledPara>
         <levelledPara>
           <title>Creating presentation applicability statements</title>
