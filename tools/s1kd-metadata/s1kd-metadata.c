@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1759,6 +1759,7 @@ void show_help(void)
 	puts("  -0           Use null-delimited fields.");
 	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
 	puts("  -e           Include only editable metadata when showing all.");
+	puts("  -F <fmt>     Print a formatted line for each CSDB object.");
 	puts("  -f           Overwrite modules when editing metadata.");
 	puts("  -H           List information on available metadata.");
 	puts("  -l           Input is a list of filenames.");
@@ -1770,7 +1771,7 @@ void show_help(void)
 	puts("  -W <name>    Only list/edit when metadata <name> does not equal a value.");
 	puts("  -w <name>    Only list/edit when metadata <name> equals a value.");
 	puts("  --version    Show version information.");
-	puts("  <module>     S1000D module to view/edit metadata on.");
+	puts("  <object>     CSDB object(s) to view/edit metadata on.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
