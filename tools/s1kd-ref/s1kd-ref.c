@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.5.2"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -51,7 +51,7 @@ xmlNode *find_child(xmlNode *parent, char *name)
 	return NULL;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, xmlChar *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -59,7 +59,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 
 	ctx = xmlXPathNewContext(doc ? doc : node->doc);
 	ctx->node = node;
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+	obj = xmlXPathEvalExpression(xpath, ctx);
 
 	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
 
@@ -73,11 +73,11 @@ xmlNodePtr find_or_create_refs(xmlDocPtr doc)
 {
 	xmlNodePtr refs;
 
-	refs = first_xpath_node(doc, NULL, "//content//refs");
+	refs = first_xpath_node(doc, NULL, BAD_CAST "//content//refs");
 
 	if (!refs) {
 		xmlNodePtr content, child;
-		content = first_xpath_node(doc, NULL, "//content");
+		content = first_xpath_node(doc, NULL, BAD_CAST "//content");
 		child = xmlFirstElementChild(content);
 		refs = xmlNewNode(NULL, BAD_CAST "refs");
 		if (child) {
@@ -216,7 +216,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		char *s;
 
 		if ((doc = read_xml_doc(fname))) {
-			ref_pm_address = first_xpath_node(doc, NULL, "//pmAddress");
+			ref_pm_address = first_xpath_node(doc, NULL, BAD_CAST "//pmAddress");
 			ref_pm_ident = find_child(ref_pm_address, "pmIdent");
 			ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
 			ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
@@ -426,7 +426,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		char *s;
 
 		if ((doc = read_xml_doc(fname))) {
-			ref_dm_address = first_xpath_node(doc, NULL, "//dmAddress");
+			ref_dm_address = first_xpath_node(doc, NULL, BAD_CAST "//dmAddress");
 			ref_dm_ident = find_child(ref_dm_address, "dmIdent");
 			ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
 			ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
@@ -565,7 +565,7 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		char *s;
 
 		if ((doc = read_xml_doc(fname))) {
-			ref_comment_address = first_xpath_node(doc, NULL, "//commentAddress");
+			ref_comment_address = first_xpath_node(doc, NULL, BAD_CAST "//commentAddress");
 			ref_comment_ident = find_child(ref_comment_address, "commentIdent");
 		}
 
@@ -640,7 +640,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		char *s;
 
 		if ((doc = read_xml_doc(fname))) {
-			ref_dml_address = first_xpath_node(doc, NULL, "//dmlAddress");
+			ref_dml_address = first_xpath_node(doc, NULL, BAD_CAST "//dmlAddress");
 			ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
 		}
 
@@ -779,8 +779,8 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 	if (optset(opts, OPT_SRCID)) {
 		xmlNodePtr src, node;
 
-		src  = first_xpath_node(doc, NULL, "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
-		node = first_xpath_node(doc, NULL, "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
+		src  = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
+		node = first_xpath_node(doc, NULL, BAD_CAST "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
 		if (node) {
 			if (src) {
 				xmlUnlinkNode(src);
@@ -820,8 +820,16 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 	xsltFreeStylesheet(style);
 }
 
+xmlNodePtr find_ext_pub(xmlDocPtr extpubs, const char *ref)
+{
+	xmlChar xpath[512];
+	xmlStrPrintf(xpath, 512, "//externalPubRef[externalPubRefIdent/externalPubCode='%s']", ref);
+	return xmlCopyNode(first_xpath_node(extpubs, NULL, xpath), 1);
+}
+
 void print_ref(const char *src, const char *dst, const char *ref,
-	const char *fname, int opts, bool overwrite, enum issue iss)
+	const char *fname, int opts, bool overwrite, enum issue iss,
+	xmlDocPtr extpubs)
 {
 	xmlNodePtr node;
 	xmlNodePtr (*f)(const char *, const char *, int);
@@ -838,6 +846,8 @@ void print_ref(const char *src, const char *dst, const char *ref,
 		f = new_icn_ref;
 	} else if (is_csn(ref)) {
 		f = new_csn_ref;
+	} else if (extpubs && (node = find_ext_pub(extpubs, ref))) {
+		f = NULL;
 	} else {
 		if (verbosity > QUIET) {
 			fprintf(stderr, ERR_PREFIX "Unknown reference type: %s\n", ref);
@@ -845,7 +855,9 @@ void print_ref(const char *src, const char *dst, const char *ref,
 		exit(EXIT_BAD_INPUT);
 	}
 
-	node = f(ref, fname, opts);
+	if (f) {
+		node = f(ref, fname, opts);
+	}
 
 	if (iss < DEFAULT_S1000D_ISSUE) {
 		unsigned char *xsl;
@@ -958,26 +970,28 @@ enum issue spec_issue(const char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfilqRrStvh?] [-s <src>] [-o <dst>] [<code>|<file>]");
+	puts("Usage: " PROG_NAME " [-dfilqRrStvh?] [-$ <issue>] [-e <file>] [-s <src>] [-o <dst>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -d         Include issue date (target must be file)");
-	puts("  -f         Overwrite source data module instead of writing to stdout.");
-	puts("  -i         Include issue info (target must be file)");
-	puts("  -l         Include language (target must be file)");
-	puts("  -o <dst>   Output to <dst> instead of stdout.");
-	puts("  -q         Quiet mode. Do not print errors.");
-	puts("  -R         Generate a <repositorySourceDmIdent>.");
-	puts("  -r         Add reference to data module's <refs> table.");
-	puts("  -S         Generate a <sourceDmIdent> or <sourcePmIdent>.");
-	puts("  -s <src>   Source data module to add references to.");
-	puts("  -t         Include title (target must be file)");
-	puts("  -v         Verbose output.");
-	puts("  -h -?      Show this help message.");
-	puts("  --version  Show version information.");
-	puts("  <code>     The code of the reference (must include prefix DMC/PMC/etc.).");
-	puts("  <file>     A file to reference.");
-	puts("             -t/-i/-l can then be used to include the title, issue, and language.");
+	puts("  -$ <issue>  Output XML for the specified issue of S1000D.");
+	puts("  -d          Include issue date (target must be file)");
+	puts("  -e <file>   Use a custom .externalpubs file.");
+	puts("  -f          Overwrite source data module instead of writing to stdout.");
+	puts("  -i          Include issue info (target must be file)");
+	puts("  -l          Include language (target must be file)");
+	puts("  -o <dst>    Output to <dst> instead of stdout.");
+	puts("  -q          Quiet mode. Do not print errors.");
+	puts("  -R          Generate a <repositorySourceDmIdent>.");
+	puts("  -r          Add reference to data module's <refs> table.");
+	puts("  -S          Generate a <sourceDmIdent> or <sourcePmIdent>.");
+	puts("  -s <src>    Source data module to add references to.");
+	puts("  -t          Include title (target must be file)");
+	puts("  -v          Verbose output.");
+	puts("  -h -?       Show this help message.");
+	puts("  --version   Show version information.");
+	puts("  <code>      The code of the reference (must include prefix DMC/PMC/etc.).");
+	puts("  <file>      A file to reference.");
+	puts("              -t/-i/-l can then be used to include the title, issue, and language.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -996,8 +1010,10 @@ int main(int argc, char **argv)
 	char dst[PATH_MAX] = "-";
 	bool overwrite = false;
 	enum issue iss = DEFAULT_S1000D_ISSUE;
+	char extpubs_fname[PATH_MAX] = "";
+	xmlDocPtr extpubs = NULL;
 
-	const char *sopts = "filo:qRrSs:tvd$:h?";
+	const char *sopts = "e:filo:qRrSs:tvd$:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1014,6 +1030,7 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
+			case 'e': strncpy(extpubs_fname, optarg, PATH_MAX - 1); break;
 			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;
 			case 'l': opts |= OPT_LANG; break;
@@ -1032,6 +1049,11 @@ int main(int argc, char **argv)
 		}
 	}
 
+	/* Load .externalpubs config file. */
+	if (strcmp(extpubs_fname, "") != 0 || find_config(extpubs_fname, DEFAULT_EXTPUBS_FNAME)) {
+		extpubs = read_xml_doc(extpubs_fname);
+	}
+
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			char fname[PATH_MAX];
@@ -1041,14 +1063,15 @@ int main(int argc, char **argv)
 			strcpy(scratch, fname);
 			base = basename(scratch);
 
-			print_ref(src, dst, base, fname, opts, overwrite, iss);
+			print_ref(src, dst, base, fname, opts, overwrite, iss, extpubs);
 		}
 	} else {
 		while (fgets(scratch, PATH_MAX, stdin)) {
-			print_ref(src, dst, trim(scratch), NULL, opts, overwrite, iss);
+			print_ref(src, dst, trim(scratch), NULL, opts, overwrite, iss, extpubs);
 		}
 	}
 
+	xmlFreeDoc(extpubs);
 	xmlCleanupParser();
 
 	return 0;

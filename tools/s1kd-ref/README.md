@@ -6,8 +6,8 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-dfilqRrStvh?] [-$ <issue>] [-s <src>] [-o <dst>]
-             [<code>|<filename>]...
+    s1kd-ref [-dfilqRrStvh?] [-$ <issue>] [-e <file>] [-s <src>]
+             [-o <dst>] [<code>|<file> ...]
 
 DESCRIPTION
 ===========
@@ -25,6 +25,9 @@ Output XML for the specified issue of S1000D.
 
 -d  
 Include the issue date in the reference (target must be a file)
+
+-e &lt;file&gt;  
+Use a custom `.externalpubs` file.
 
 -f  
 Overwrite source data module instead of writing to stdout.
@@ -69,7 +72,7 @@ Verbose output.
 --version  
 Show version information.
 
-&lt;code&gt;\|&lt;filename&gt;  
+&lt;code&gt;\|&lt;file&gt;  
 Either a code, including the prefix (DMC, PMC, etc.), or the filename of
 a CSDB object.
 
@@ -84,6 +87,24 @@ Allow network access to load external DTD and entities.
 
 --noent  
 Resolve entities.
+
+`.externalpubs` file
+--------------------
+
+The `.externalpubs` file contains definitions of external publication
+references. This can be used to generate the XML for an external
+publication reference by specifying the external publication code.
+
+Example of a `.externalpubs` file:
+
+    <externalPubs>
+    <externalPubRef>
+    <externalPubRefIdent>
+    <externalPubCode>ABC</externalPubCode>
+    <externalPubTitle>ABC Manual</externalPubTitle>
+    </externalPubRefIdent>
+    </externalPubRef>
+    </externalPubs>
 
 EXAMPLES
 ========
@@ -211,3 +232,13 @@ Repository source identification for a CIR data module:
     <language languageIsoCode="en" countryIsoCode="CA"/>
     <issueInfo issueNumber="001" inWork="00"/>
     </repositorySourceDmIdent>
+
+External publication (from the `.externalpubs` file):
+
+    $ s1kd-ref ABC
+    <externalPubRef>
+    <externalPubRefIdent>
+    <externalPubCode>ABC</externalPubCode>
+    <externalPubTitle>ABC Manual</externalPubTitle>
+    </externalPubRefIdent>
+    </externalPubRef>
