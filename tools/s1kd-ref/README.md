@@ -233,7 +233,7 @@ Repository source identification for a CIR data module:
     <issueInfo issueNumber="001" inWork="00"/>
     </repositorySourceDmIdent>
 
-External publication (from the `.externalpubs` file):
+Reference to an external publication (from the `.externalpubs` file):
 
     $ s1kd-ref ABC
     <externalPubRef>
