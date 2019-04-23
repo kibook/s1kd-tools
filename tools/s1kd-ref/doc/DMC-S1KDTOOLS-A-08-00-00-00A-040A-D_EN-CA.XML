@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add .externalpubs and -e option.</simplePara>
+        <simplePara>Add .externalpubs file and -e option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
