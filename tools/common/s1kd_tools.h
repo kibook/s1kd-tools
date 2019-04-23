@@ -27,6 +27,7 @@
 #define DEFAULT_BRSL_FNAME ".brseveritylevels"
 #define DEFAULT_UOM_FNAME ".uom"
 #define DEFAULT_UOMDISP_FNAME ".uomdisplay"
+#define DEFAULT_EXTPUBS_FNAME ".externalpubs"
 
 /* Default global XML parsing options. */
 extern int DEFAULT_PARSE_OPTS;

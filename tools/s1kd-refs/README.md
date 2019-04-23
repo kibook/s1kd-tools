@@ -6,7 +6,8 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGIilNnoPqRrsUuvXxh?] [-d <dir>] [<object>...]
+    s1kd-refs [-aCcDEFfGIilNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
+              [<object>...]
 
 DESCRIPTION
 ===========
@@ -41,6 +42,9 @@ List references in the `content` section of a CSDB object only.
 -d &lt;dir&gt;  
 Directory to search for matches to references in. By default, the
 current directory is used.
+
+-e &lt;file&gt;  
+Use a custom `.externalpubs` file.
 
 -F  
 When using the -U or -X options, overwrite the input objects that have
@@ -127,6 +131,31 @@ Allow network access to load external DTD and entities.
 
 --noent  
 Resolve entities.
+
+`.externalpubs` file
+--------------------
+
+The `.externalpubs` file contains definitions of external publication
+references. This can be used to update external publication references
+in CSDB objects with -U.
+
+By default, the tool will search the current directory and parent
+directories for a file named .externalpubs, but any file can be
+specified by using the -e option.
+
+Example of a `.externalpubs` file:
+
+    <externalPubs>
+    <externalPubRef>
+    <externalPubRefIdent>
+    <externalPubCode>ABC</externalPubCode>
+    <externalPubTitle>ABC Manual</externalPubTitle>
+    </externalPubRefIdent>
+    </externalPubRef>
+    </externalPubs>
+
+External publication references will be updated whether they are matched
+to a file or not.
 
 EXIT STATUS
 ===========

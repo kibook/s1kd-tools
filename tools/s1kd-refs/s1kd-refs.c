@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.6.1"
+#define VERSION "2.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -93,6 +93,9 @@ bool outputTree = false;
 
 /* Verbose output. */
 bool verbose = false;
+
+/* External pub list. */
+xmlDocPtr externalPubs = NULL;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
@@ -594,8 +597,10 @@ void getDispatchFileName(char *dst, xmlNodePtr ref)
 }
 
 /* Update address items using the matched referenced object. */
-void updateRef(xmlNodePtr ref, const char *src, const char *fname)
+void updateRef(xmlNodePtr *refptr, const char *src, const char *code, const char *fname)
 {
+	xmlNodePtr ref = *refptr;
+
 	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0) {
 		xmlDocPtr doc;
 		xmlNodePtr dmRefAddressItems, dmTitle;
@@ -845,6 +850,21 @@ void updateRef(xmlNodePtr ref, const char *src, const char *fname)
 		/* Add new ICN entity. */
 		e = add_icn(ref->doc, fname, false);
 		xmlNodeSetContent(ref, e->name);
+	} else if (xmlStrcmp(ref->name, BAD_CAST "externalPubRef") == 0) {
+		xmlNodePtr new;
+		xmlChar xpath[512];
+
+		xmlStrPrintf(xpath, 512, "//externalPubRef[externalPubRefIdent/externalPubCode='%s']", code);
+
+		if (!(new = firstXPathNode(externalPubs, NULL, xpath))) {
+			return;
+		}
+
+		xmlAddNextSibling(ref, xmlCopyNode(new, 1));
+
+		xmlUnlinkNode(ref);
+		xmlFreeNode(ref);
+		*refptr = NULL;
 	}
 }
 
@@ -857,10 +877,11 @@ void tagUnmatchedRef(xmlNodePtr ref)
 int listReferences(const char *path);
 
 /* Print a reference found in an object. */
-int printReference(xmlNodePtr ref, const char *src)
+int printReference(xmlNodePtr *refptr, const char *src)
 {
 	char code[PATH_MAX];
 	char fname[PATH_MAX];
+	xmlNodePtr ref = *refptr;
 
 	if ((showObjects & SHOW_DMC) == SHOW_DMC &&
 	    (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
@@ -892,7 +913,7 @@ int printReference(xmlNodePtr ref, const char *src)
 
 	if (find_csdb_object(fname, directory, code, NULL, recursive)) {
 		if (updateRefs) {
-			updateRef(ref, src, fname);
+			updateRef(refptr, src, code, fname);
 		} else if (!tagUnmatched) {
 			if (showMatched) {
 				printMatchedFn(ref, src, fname);
@@ -909,6 +930,11 @@ int printReference(xmlNodePtr ref, const char *src)
 		printMatchedFn(ref, src, code);
 	} else if (!quiet) {
 		printUnmatchedFn(ref, src, code);
+	}
+
+	/* Update metadata for unmatched external pubs. */
+	if (updateRefs && externalPubs && xmlStrcmp(ref->name, BAD_CAST "externalPubRef") == 0) {
+		updateRef(refptr, src, code, fname);
 	}
 
 	return 1;
@@ -982,7 +1008,7 @@ int listReferences(const char *path)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			unmatched += printReference(obj->nodesetval->nodeTab[i], path);
+			unmatched += printReference(&(obj->nodesetval->nodeTab[i]), path);
 		}
 	}
 
@@ -1044,7 +1070,7 @@ int listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuvXxh?] [-d <dir>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a         Print unmatched codes.");
@@ -1053,6 +1079,7 @@ void showHelp(void)
 	puts("  -D         List data module references.");
 	puts("  -d         Directory to search for matches in.");
 	puts("  -E         List external pub refs.");
+	puts("  -e <file>  Use custom .externalpubs file.");
 	puts("  -F         Overwrite updated (-U) or tagged (-X) objects.");
 	puts("  -f         Print the source filename for each reference.");
 	puts("  -G         List ICN references.");
@@ -1093,8 +1120,9 @@ int main(int argc, char **argv)
 	bool xmlOutput = false;
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
+	char extpubsFname[PATH_MAX] = "";
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsovh?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1118,6 +1146,9 @@ int main(int argc, char **argv)
 				break;
 			case 'c':
 				contentOnly = true;
+				break;
+			case 'e':
+				strncpy(extpubsFname, optarg, PATH_MAX - 1);
 				break;
 			case 'N':
 				noIssue = true;
@@ -1204,6 +1235,11 @@ int main(int argc, char **argv)
 		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR;
 	}
 
+	/* Load .externalpubs config file. */
+	if (strcmp(extpubsFname, "") != 0 || find_config(extpubsFname, DEFAULT_EXTPUBS_FNAME)) {
+		externalPubs = read_xml_doc(extpubsFname);
+	}
+
 	/* Set the functions for printing matched/unmatched refs. */
 	if (xmlOutput) {
 		printMatchedFn = printMatchedXml;
@@ -1240,6 +1276,7 @@ int main(int argc, char **argv)
 
 	free(directory);
 	free(listedFiles);
+	xmlFreeDoc(externalPubs);
 	xmlCleanupParser();
 
 	return unmatched > 0 ? EXIT_UNMATCHED_REF : EXIT_SUCCESS;
