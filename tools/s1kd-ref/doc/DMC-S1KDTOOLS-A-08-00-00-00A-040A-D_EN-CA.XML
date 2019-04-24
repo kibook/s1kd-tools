@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="03"/>
+        <issueInfo issueNumber="015" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="23"/>
+        <issueDate year="2019" month="04" day="24"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-ref [-dfilqRrStvh?] [-$ <issue>] [-e <file>] [-s <src>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-ref [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>]
          [-o <dst>] [<code>|<file> ...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -146,6 +146,12 @@
               <listItemTerm>-t</listItemTerm>
               <listItemDefinition>
                 <para>Include the title in the reference (target must be a file).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-u</listItemTerm>
+              <listItemDefinition>
+                <para>Include the full URL/filename of the reference with the <verbatimText verbatimStyle="vs13">xlink:href</verbatimText> attribute.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -331,6 +337,15 @@ itemLocationCode="D"/>
 <language languageIsoCode="en" countryIsoCode="CA"/>
 <issueInfo issueNumber="001" inWork="00"/>
 </repositorySourceDmIdent>]]></verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Reference to an external publication:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref ABC
+<externalPubRef>
+<externalPubRefIdent>
+<externalPubCode>ABC</externalPubCode>
+</externalPubRefIdent>
+</externalPubRef>]]></verbatimText>
         </para>
         <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Reference to an external publication (from the <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file):</para>
         <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">

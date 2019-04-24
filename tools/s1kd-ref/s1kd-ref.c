@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -29,6 +29,7 @@
 #define OPT_SRCID (int) 0x10
 #define OPT_CIRID (int) 0x20
 #define OPT_INS   (int) 0x40
+#define OPT_URL  (int) 0x80
 
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
@@ -138,6 +139,13 @@ xmlNodePtr new_language(char *s)
 	xmlSetProp(language, BAD_CAST "countryIsoCode", BAD_CAST c);
 
 	return language;
+}
+
+void set_xlink(xmlNodePtr node, const char *href)
+{
+	xmlNsPtr xlink;
+	xlink = xmlNewNs(node, BAD_CAST "http://www.w3.org/1999/xlink", BAD_CAST "xlink");
+	xmlSetNsProp(node, xlink, BAD_CAST "href", BAD_CAST href);
 }
 
 #define PME_FMT "PME-%255[^-]-%255[^-]-%14[^-]-%5s-%5s-%2s"
@@ -303,6 +311,10 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 			xmlFreeNode(pm_ref);
 			pm_ref = src;
+		}
+
+		if (optset(opts, OPT_URL)) {
+			set_xlink(pm_ref, fname);
 		}
 	}
 
@@ -514,6 +526,10 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 			xmlFreeNode(dm_ref);
 			dm_ref = src;
 		}
+
+		if (optset(opts, OPT_URL)) {
+			set_xlink(dm_ref, fname);
+		}
 	}
 
 	return dm_ref;
@@ -589,6 +605,10 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		}
 
 		xmlFreeDoc(doc);
+
+		if (optset(opts, OPT_URL)) {
+			set_xlink(comment_ref, fname);
+		}
 	}
 
 	return comment_ref;
@@ -664,6 +684,10 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		}
 
 		xmlFreeDoc(doc);
+
+		if (optset(opts, OPT_URL)) {
+			set_xlink(dml_ref, fname);
+		}
 	}
 
 	return dml_ref;
@@ -730,6 +754,10 @@ xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 	xmlSetProp(csn_ref, BAD_CAST "item", BAD_CAST item);
 	xmlSetProp(csn_ref, BAD_CAST "itemVariant", BAD_CAST item_variant);
 	xmlSetProp(csn_ref, BAD_CAST "itemLocationCode", BAD_CAST item_location_code);
+
+	if (optset(opts, OPT_URL)) {
+		set_xlink(csn_ref, fname);
+	}
 
 	return csn_ref;
 }
@@ -823,8 +851,39 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 xmlNodePtr find_ext_pub(xmlDocPtr extpubs, const char *ref)
 {
 	xmlChar xpath[512];
+	xmlNodePtr node;
+
+	/* Attempt to match an exact code (e.g., "ABC") */
 	xmlStrPrintf(xpath, 512, "//externalPubRef[externalPubRefIdent/externalPubCode='%s']", ref);
-	return xmlCopyNode(first_xpath_node(extpubs, NULL, xpath), 1);
+	node = first_xpath_node(extpubs, NULL, xpath);
+
+	/* Attempt to match a file name (e.g., "ABC.PDF") */
+	if (!node) {
+		xmlStrPrintf(xpath, 512, "//externalPubRef[starts-with('%s', externalPubRefIdent/externalPubCode)]", ref);
+		node = first_xpath_node(extpubs, NULL, xpath);
+	}
+
+	return xmlCopyNode(node, 1);
+}
+
+xmlNodePtr new_ext_pub(const char *ref, const char *fname, int opts)
+{
+	xmlNodePtr epr, epr_ident;
+
+	epr = xmlNewNode(NULL, BAD_CAST "externalPubRef");
+	epr_ident = xmlNewChild(epr, NULL, BAD_CAST "externalPubRefIdent", NULL);
+
+	if (optset(opts, OPT_TITLE)) {
+		xmlNewTextChild(epr_ident, NULL, BAD_CAST "externalPubTitle", BAD_CAST ref);
+	} else {
+		xmlNewTextChild(epr_ident, NULL, BAD_CAST "externalPubCode", BAD_CAST ref);
+	}
+
+	if (optset(opts, OPT_URL)) {
+		set_xlink(epr, fname);
+	}
+
+	return epr;
 }
 
 void print_ref(const char *src, const char *dst, const char *ref,
@@ -849,10 +908,7 @@ void print_ref(const char *src, const char *dst, const char *ref,
 	} else if (extpubs && (node = find_ext_pub(extpubs, ref))) {
 		f = NULL;
 	} else {
-		if (verbosity > QUIET) {
-			fprintf(stderr, ERR_PREFIX "Unknown reference type: %s\n", ref);
-		}
-		exit(EXIT_BAD_INPUT);
+		f = new_ext_pub;
 	}
 
 	if (f) {
@@ -970,15 +1026,15 @@ enum issue spec_issue(const char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfilqRrStvh?] [-$ <issue>] [-e <file>] [-s <src>] [-o <dst>] [<code>|<file> ...]");
+	puts("Usage: " PROG_NAME " [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>] [-o <dst>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -$ <issue>  Output XML for the specified issue of S1000D.");
 	puts("  -d          Include issue date (target must be file)");
 	puts("  -e <file>   Use a custom .externalpubs file.");
 	puts("  -f          Overwrite source data module instead of writing to stdout.");
-	puts("  -i          Include issue info (target must be file)");
-	puts("  -l          Include language (target must be file)");
+	puts("  -i          Include issue info.");
+	puts("  -l          Include language.");
 	puts("  -o <dst>    Output to <dst> instead of stdout.");
 	puts("  -q          Quiet mode. Do not print errors.");
 	puts("  -R          Generate a <repositorySourceDmIdent>.");
@@ -986,12 +1042,12 @@ void show_help(void)
 	puts("  -S          Generate a <sourceDmIdent> or <sourcePmIdent>.");
 	puts("  -s <src>    Source data module to add references to.");
 	puts("  -t          Include title (target must be file)");
+	puts("  -u          Include xlink:href to the full URL/filename.");
 	puts("  -v          Verbose output.");
 	puts("  -h -?       Show this help message.");
 	puts("  --version   Show version information.");
 	puts("  <code>      The code of the reference (must include prefix DMC/PMC/etc.).");
 	puts("  <file>      A file to reference.");
-	puts("              -t/-i/-l can then be used to include the title, issue, and language.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1013,7 +1069,7 @@ int main(int argc, char **argv)
 	char extpubs_fname[PATH_MAX] = "";
 	xmlDocPtr extpubs = NULL;
 
-	const char *sopts = "e:filo:qRrSs:tvd$:h?";
+	const char *sopts = "e:filo:qRrSs:tvd$:uh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1044,6 +1100,7 @@ int main(int argc, char **argv)
 			case 'v': verbosity = VERBOSE; break;
 			case 'd': opts |= OPT_DATE; break;
 			case '$': iss = spec_issue(optarg); break;
+			case 'u': opts |= OPT_URL; break;
 			case '?':
 			case 'h': show_help(); return EXIT_SUCCESS;
 		}
@@ -1056,14 +1113,16 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			char fname[PATH_MAX];
 			char *base;
 
-			strcpy(fname, argv[i]);
-			strcpy(scratch, fname);
-			base = basename(scratch);
+			if (strncmp(argv[i], "URN:S1000D:", 11) == 0) {
+				base = argv[i] + 11;
+			} else {
+				strcpy(scratch, argv[i]);
+				base = basename(scratch);
+			}
 
-			print_ref(src, dst, base, fname, opts, overwrite, iss, extpubs);
+			print_ref(src, dst, base, argv[i], opts, overwrite, iss, extpubs);
 		}
 	} else {
 		while (fgets(scratch, PATH_MAX, stdin)) {

@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-dfilqRrStvh?] [-$ <issue>] [-e <file>] [-s <src>]
+    s1kd-ref [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>]
              [-o <dst>] [<code>|<file> ...]
 
 DESCRIPTION
@@ -65,6 +65,10 @@ the -r option.
 
 -t  
 Include the title in the reference (target must be a file).
+
+-u  
+Include the full URL/filename of the reference with the `xlink:href`
+attribute.
 
 -v  
 Verbose output.
@@ -232,6 +236,15 @@ Repository source identification for a CIR data module:
     <language languageIsoCode="en" countryIsoCode="CA"/>
     <issueInfo issueNumber="001" inWork="00"/>
     </repositorySourceDmIdent>
+
+Reference to an external publication:
+
+    $ s1kd-ref ABC
+    <externalPubRef>
+    <externalPubRefIdent>
+    <externalPubCode>ABC</externalPubCode>
+    </externalPubRefIdent>
+    </externalPubRef>
 
 Reference to an external publication (from the `.externalpubs` file):
 
