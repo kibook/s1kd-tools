@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -270,9 +270,9 @@ int edit_schema_url(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "xsi:noNamespaceSchemaLocation", val);
 }
 
-void show_schema(xmlNodePtr node, int endl)
+char *get_schema(xmlNodePtr node)
 {
-	char *url, *s, *e;
+	char *url, *s, *e, *r;
 
 	url = (char *) xmlGetProp(node, BAD_CAST "noNamespaceSchemaLocation");
 
@@ -280,11 +280,20 @@ void show_schema(xmlNodePtr node, int endl)
 	s = s ? s + 1 : url;
 	e = strrchr(s, '.');
 	if (e) *e = '\0';
-
-	printf("%s", s);
-	if (endl > -1) putchar(endl);
+	r = strdup(s);
 
 	xmlFree(url);
+
+	return r;
+}
+
+void show_schema(xmlNodePtr node, int endl)
+{
+	char *s;
+	s = get_schema(node);
+	printf("%s", s);
+	if (endl > -1) putchar(endl);
+	free(s);
 }
 
 int edit_info_name(xmlNodePtr node, const char *val)
@@ -1913,6 +1922,8 @@ xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx)
 	if ((node = first_xpath_node(metadata[i].path, ctx))) {
 		if (metadata[i].show == show_dmcode) {
 			return BAD_CAST get_dmcode(node);
+		} else if (metadata[i].show == show_schema) {
+			return BAD_CAST get_schema(node);
 		} else {
 			return xmlNodeGetContent(node);
 		}
