@@ -121,7 +121,8 @@ EXAMPLE
     responsiblePartnerCompany      khzae.net
     originator                     khzae.net
     securityClassification         01
-    schema                         http://www.s1000d.org/S1000D_4-2/xml_
+    schema                         descript
+    schemaUrl                      http://www.s1000d.org/S1000D_4-2/xml_
     schema_flat/descript.xsd
     type                           dmodule
     applic                         All

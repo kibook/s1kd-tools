@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "1.8.1"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -260,14 +260,31 @@ int edit_sec_class(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_schema(xmlNodePtr node, int endl)
+void show_schema_url(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "noNamespaceSchemaLocation", endl);
 }
 
-int edit_schema(xmlNodePtr node, const char *val)
+int edit_schema_url(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "xsi:noNamespaceSchemaLocation", val);
+}
+
+void show_schema(xmlNodePtr node, int endl)
+{
+	char *url, *s, *e;
+
+	url = (char *) xmlGetProp(node, BAD_CAST "noNamespaceSchemaLocation");
+
+	s = strrchr(url, '/');
+	s = s ? s + 1 : url;
+	e = strrchr(s, '.');
+	if (e) *e = '\0';
+
+	printf("%s", s);
+	if (endl > -1) putchar(endl);
+
+	xmlFree(url);
 }
 
 int edit_info_name(xmlNodePtr node, const char *val)
@@ -1485,9 +1502,15 @@ struct metadata metadata[] = {
 	{"schema",
 		"/*",
 		show_schema,
-		edit_schema,
 		NULL,
-		"XML schema URI"},
+		NULL,
+		"S1000D schema name"},
+	{"schemaUrl",
+		"/*",
+		show_schema_url,
+		edit_schema_url,
+		NULL,
+		"XML schema URL"},
 	{"securityClassification",
 		"//security/@securityClassification|//security/@class",
 		show_sec_class,
