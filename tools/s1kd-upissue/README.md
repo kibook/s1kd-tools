@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-DdefHIilmNqRrvw] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
 
 DESCRIPTION
