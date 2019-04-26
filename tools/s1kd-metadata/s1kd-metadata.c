@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1921,6 +1921,32 @@ int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
+int show_icn_metadata_fmtstr_key(const char *fname, const char *k, int n)
+{
+	int i;
+	char *key;
+
+	key = malloc(n + 1);
+	sprintf(key, "%.*s", n, k);
+
+	for (i = 0; icn_metadata[i].key; ++i) {
+		if (strcmp(icn_metadata[i].key, key) == 0) {
+			icn_metadata[i].show(fname, -1);
+			free(key);
+			return EXIT_SUCCESS;
+		}
+	}
+
+	show_err(EXIT_INVALID_METADATA, key, NULL, NULL);
+	free(key);
+	return EXIT_INVALID_METADATA;
+}
+
+bool is_icn(const char *path)
+{
+	return strncmp(path, "ICN-", 4) == 0;
+}
+
 int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
 {
 	int i;
@@ -1939,6 +1965,8 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 
 				if (strncmp(k, "path", n) == 0) {
 					show_path(fname, -1);
+				} else if (is_icn(fname)) {
+					show_icn_metadata_fmtstr_key(fname, k, n);
 				} else {
 					show_metadata_fmtstr_key(ctx, k, n);
 				}
@@ -2044,11 +2072,6 @@ int show_all_icn_metadata(const char *fname, int formatall, int endl)
 	}
 
 	return 0;
-}
-
-bool is_icn(const char *path)
-{
-	return strncmp(path, "ICN-", 4) == 0;
 }
 
 int show_or_edit_metadata(const char *fname, const char *metadata_fname,
