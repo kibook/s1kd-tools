@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="01"/>
+        <issueInfo issueNumber="006" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="16"/>
+        <issueDate year="2019" month="04" day="25"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
@@ -624,8 +624,9 @@
       <levelledPara>
         <title>Example - XML format</title>
         <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+          <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
 <defaults>
+<default ident="act" value="MYPRJ-A-00-00-00-00A-00WA-D"/>
 <default ident="assyCode" value="00"/>
 <default ident="authorization" value="khzae.net"/>
 <default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/>
@@ -681,7 +682,8 @@
       <levelledPara>
         <title>Example - Simple text format</title>
         <para>
-          <verbatimText verbatimStyle="vs24">assyCode                       00
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">act                            MYPRJ-A-00-00-00-00A-00WA-D
+assyCode                       00
 authorization                  khzae.net
 brex                           MYPRJ-A-00-00-00-00A-022A-D
 city                           Toronto

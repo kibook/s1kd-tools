@@ -72,6 +72,7 @@ Example - XML format
 
     <?xml version="1.0"?>
     <defaults>
+    <default ident="act" value="MYPRJ-A-00-00-00-00A-00WA-D"/>
     <default ident="assyCode" value="00"/>
     <default ident="authorization" value="khzae.net"/>
     <default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/>
@@ -126,6 +127,7 @@ Example - XML format
 Example - Simple text format
 ============================
 
+    act                            MYPRJ-A-00-00-00-00A-00WA-D
     assyCode                       00
     authorization                  khzae.net
     brex                           MYPRJ-A-00-00-00-00A-022A-D
