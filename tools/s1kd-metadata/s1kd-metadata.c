@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.0.1"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -35,6 +35,11 @@ struct metadata {
 	int (*edit)(xmlNodePtr, const char *);
 	int (*create)(xmlXPathContextPtr, const char *val);
 	char *descr;
+};
+
+struct icn_metadata {
+	char *key;
+	void (*show)(const char *, int);
 };
 
 xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
@@ -1649,6 +1654,45 @@ struct metadata metadata[] = {
 	{NULL}
 };
 
+void show_icn_code(const char *fname, int endl)
+{
+	int n;
+	n = strchr(fname, '.') - fname;
+	printf("%.*s", n, fname);
+	if (endl > -1) putchar(endl);
+}
+
+void show_icn_sec(const char *fname, int endl)
+{
+	char *s, *e;
+	int n;
+	s = strrchr(fname, '-');
+	++s;
+	e = strchr(s, '.');
+	n = e - s;
+	printf("%.*s", n, s);
+	if (endl > -1) putchar(endl);
+}
+
+void show_icn_iss(const char *fname, int endl)
+{
+	char *s, *e;
+	int n;
+	s = strrchr(fname, '-');
+	s = s - 3;
+	e = strchr(s, '-');
+	n = e - s;
+	printf("%.*s", n, s);
+	if (endl > -1) putchar(endl);
+}
+
+struct icn_metadata icn_metadata[] = {
+	{"code", show_icn_code},
+	{"issueNumber", show_icn_iss},
+	{"securityClassification", show_icn_sec},
+	{NULL}
+};
+
 int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 {
 	int i;
@@ -1965,6 +2009,48 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 	return cmp;
 }
 
+int show_icn_metadata(const char *fname, const char *key, int endl)
+{
+	int i;
+
+	for (i = 0; icn_metadata[i].key; ++i) {
+		if (strcmp(key, icn_metadata[i].key) == 0) {
+			icn_metadata[i].show(fname, endl);
+			return EXIT_SUCCESS;
+		}
+	}
+
+	return EXIT_INVALID_METADATA;
+}
+
+int show_all_icn_metadata(const char *fname, int formatall, int endl)
+{
+	int i;
+
+	for (i = 0; icn_metadata[i].key; ++i) {
+		if (endl == '\n') {
+			printf("%s", icn_metadata[i].key);
+
+			if (formatall) {
+				int n = KEY_COLUMN_WIDTH - strlen(icn_metadata[i].key);
+				int j;
+				for (j = 0; j < n; ++j) putchar(' ');
+			} else {
+				putchar('\t');
+			}
+		}
+
+		icn_metadata[i].show(fname, endl);
+	}
+
+	return 0;
+}
+
+bool is_icn(const char *path)
+{
+	return strncmp(path, "ICN-", 4) == 0;
+}
+
 int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
 	int only_editable, const char *fmtstr, xmlNodePtr conds)
@@ -2001,6 +2087,8 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 					err = edit_metadata(ctxt, key, val);
 				} else if (strcmp(key, "path") == 0) {
 					err = show_path(fname, endl);
+				} else if (is_icn(fname)) {
+					err = show_icn_metadata(fname, key, endl);
 				} else {
 					err = show_metadata(ctxt, key, endl);
 				}
@@ -2011,21 +2099,23 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 				xmlFree(val);
 			}
 		} else if (metadata_fname) {
-				FILE *input;
+			FILE *input;
 
-				edit = 1;
+			edit = 1;
 
-				if (strcmp(metadata_fname, "-") == 0) {
-					input = stdin;
-				} else {
-					input = fopen(metadata_fname, "r");
-				}
+			if (strcmp(metadata_fname, "-") == 0) {
+				input = stdin;
+			} else {
+				input = fopen(metadata_fname, "r");
+			}
 
-				err = edit_all_metadata(input, ctxt);
+			err = edit_all_metadata(input, ctxt);
 
-				fclose(input);
+			fclose(input);
+		} else if (is_icn(fname)) {
+			err = show_all_icn_metadata(fname, formatall, endl);
 		} else {
-				err = show_all_metadata(ctxt, formatall, endl, only_editable);
+			err = show_all_metadata(ctxt, formatall, endl, only_editable);
 		}
 	}
 
