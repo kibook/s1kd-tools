@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="01"/>
+        <issueInfo issueNumber="014" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="15"/>
+        <issueDate year="2019" month="04" day="28"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Document -h? options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-d <dir>] [-X <URI>] [-floqvx] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-validate [-d <dir>] [-X <URI>] [-floqvxh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -71,6 +74,12 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>List invalid files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="0" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

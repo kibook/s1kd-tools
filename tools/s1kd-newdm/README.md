@@ -89,6 +89,9 @@ Specify the `.defaults` file name.
 -f  
 Overwrite existing file.
 
+-h -?  
+Show help/usage message.
+
 -I &lt;date&gt;  
 Issue date of the new data module in the form of YYYY-MM-DD.
 

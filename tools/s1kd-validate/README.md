@@ -6,7 +6,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-X <URI>] [-floqvx] [<object>...]
+    s1kd-validate [-d <dir>] [-X <URI>] [-floqvxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -27,6 +27,9 @@ This can also be accomplished through the use of XML catalogs.
 
 -f  
 List invalid files.
+
+-h -?  
+Show help/usage message.
 
 -l  
 Treat input as a list of object names to validate, rather than an object

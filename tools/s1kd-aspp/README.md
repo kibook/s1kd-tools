@@ -77,6 +77,9 @@ Use custom XSLT to generate display text for applicability statements.
 -g  
 Generate display text for applicability statements.
 
+-h -?  
+Show help/usage message.
+
 -k  
 When generating display text, do not overwrite existing display text on
 statements, only generate display text for statements which have none.

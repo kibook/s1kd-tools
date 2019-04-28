@@ -53,6 +53,9 @@ Overwrite existing upissued CSDB objects.
 -H  
 Mark the last specified reason for update (-c) as a highlight.
 
+-h -?  
+Show help/usage message.
+
 -I  
 Do not change issue date. Normally, when upissuing to the next inwork or
 official issue, the issue date is changed to the current date. This

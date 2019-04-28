@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -395,8 +395,8 @@ void show_help(void)
 	puts("Options:");
 	puts("  -d         Delete the references table.");
 	puts("  -f         Overwrite the data modules automatically.");
-	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -h -?      Show help/usage message.");
+	puts("  -l         Treat input as list of CSDB objects.");
 	puts("  -o <out>   Output to <out> instead of stdout.");
 	puts("  -v         Verbose output.");
 	puts("  --version  Show version information.");

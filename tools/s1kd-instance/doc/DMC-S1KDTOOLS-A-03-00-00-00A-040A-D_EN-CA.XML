@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="035" inWork="02"/>
+        <issueInfo issueNumber="035" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="17"/>
+        <issueDate year="2019" month="04" day="28"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -! option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Document -h? options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -210,6 +213,12 @@
               <listItemTerm>-g</listItemTerm>
               <listItemDefinition>
                 <para>Set the originator of the instance. When this option is specified, the code "<verbatimText verbatimStyle="vs14">S1KDI</verbatimText>" and the name "<verbatimText verbatimStyle="vs14">s1kd-instance tool</verbatimText>" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="0" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

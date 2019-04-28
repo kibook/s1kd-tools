@@ -40,6 +40,9 @@ Specify the `.defaults` file name.
 -f  
 Overwrite existing file.
 
+-h -?  
+Show help/usage message.
+
 -I &lt;date&gt;  
 The issue date of the new ICN metadata file in the form of YYYY-MM-DD.
 

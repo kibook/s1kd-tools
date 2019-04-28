@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="16" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="02"/>
+        <issueInfo issueNumber="019" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="16"/>
+        <issueDate year="2019" month="04" day="28"/>
         <dmTitle>
           <techName>s1kd-newcom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Allow -@ option to specify a directory.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Document -h? options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -149,6 +152,12 @@
               <listItemTerm>-f</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="0" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-h -?</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

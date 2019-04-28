@@ -44,6 +44,9 @@ the modified object to stdout.
 Lists all available metadata with a short description of each. Specify
 specific metadata to describe with the -n option.
 
+-h -?  
+Show help/usage message.
+
 -l  
 Treat input as a list of object filenames to read or edit metadata on,
 rather than an object itself.

@@ -47,6 +47,9 @@ Specify the `.defaults` file name.
 -f  
 Overwrite existing file.
 
+-h -?  
+Show help/usage message.
+
 -q  
 Do not report an error when the file already exists.
 

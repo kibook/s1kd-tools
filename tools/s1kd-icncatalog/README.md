@@ -38,6 +38,9 @@ delete the ICN from.
 Overwrite the input CSDB objects when resolving ICNs, or overwrite the
 catalog file when modifying it. Otherwise, output is written to stdout.
 
+-h -?  
+Show help/usage message.
+
 -l  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects,
 rather than CSDB objects themselves.
