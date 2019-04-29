@@ -29,6 +29,7 @@ Alphabetic index
 | `infoName`                      | string                                   |
 | `inWork`                        | 2 digits                                 |
 | `issueNumber`                   | 3 digits                                 |
+| `issueType`                     | S1000D issue type (new, changed, ...)    |
 | `issue`                         | S1000D issue number (4.2, 4.1, 4.0, 3.0) |
 | `itemLocationCode`              | A, B, C, D, or T                         |
 | `languageIsoCode`               | 2 to 3 character ISO language code       |
@@ -90,6 +91,7 @@ Example - XML format
     <default ident="infoName" value="Description"/>
     <default ident="inWork" value="01"/>
     <default ident="issueNumber" value="000"/>
+    <default ident="issueType" value="new"/>
     <default ident="issue" value="4.2"/>
     <default ident="itemLocationCode" value="D"/>
     <default ident="languageIsoCode" value="en"/>
@@ -145,6 +147,7 @@ Example - Simple text format
     infoName                       Description
     inWork                         01
     issueNumber                    000
+    issueType                      new
     issue                          4.2
     itemLocationCode               D
     languageIsoCode                en

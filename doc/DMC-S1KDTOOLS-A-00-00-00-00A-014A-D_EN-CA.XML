@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add 'act' default.</simplePara>
+        <simplePara>Add 'act' and 'issueType' defaults.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -245,6 +245,16 @@
                 </entry>
                 <entry>
                   <para>3 digits</para>
+                </entry>
+              </row>
+              <row changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">issueType</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>S1000D issue type (new, changed, ...)</para>
                 </entry>
               </row>
               <row>
@@ -644,6 +654,7 @@
 <default ident="infoName" value="Description"/>
 <default ident="inWork" value="01"/>
 <default ident="issueNumber" value="000"/>
+<default ident="issueType" value="new"/>
 <default ident="issue" value="4.2"/>
 <default ident="itemLocationCode" value="D"/>
 <default ident="languageIsoCode" value="en"/>
@@ -700,6 +711,7 @@ infoCode                       040
 infoName                       Description
 inWork                         01
 issueNumber                    000
+issueType                      new
 issue                          4.2
 itemLocationCode               D
 languageIsoCode                en
