@@ -123,6 +123,9 @@ Print the file name of the newly created publication module.
 -w &lt;inwork&gt;  
 The inwork number of the new publication module.
 
+-z &lt;type&gt;  
+The issue type of the new publication module.
+
 --version  
 Show version information.
 

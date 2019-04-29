@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -62,6 +62,7 @@ char responseType[6] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+xmlChar *issue_type = NULL;
 
 xmlChar *remarks = NULL;
 
@@ -304,6 +305,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		remarks = xmlStrdup(BAD_CAST def_val);
 	else if (strcmp(def_key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(def_val);
+	else if (strcmp(def_key, "issueType") == 0 && !issue_type)
+		issue_type = xmlStrdup(BAD_CAST def_val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -478,6 +481,7 @@ void show_help(void)
 	puts("  -o <orig>      Originator");
 	puts("  -r <type>      Response type");
 	puts("  -t <title>     Comment title");
+	puts("  -z <type>      Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -531,7 +535,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:~:h?";
+	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:~:z:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -610,6 +614,9 @@ int main(int argc, char **argv)
 			case '~':
 				dump_template(optarg);
 				return 0;
+			case 'z':
+				issue_type = xmlStrdup(BAD_CAST optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -763,6 +770,8 @@ int main(int argc, char **argv)
 
 	set_issue_date(issueDate);
 
+	if (issue_type) xmlSetProp(commentStatus, BAD_CAST "issueType", issue_type);
+
 	xmlNodeSetContent(enterpriseName, BAD_CAST enterprise_name);
 	xmlNodeSetContent(city, BAD_CAST address_city);
 	xmlNodeSetContent(country, BAD_CAST address_country);
@@ -860,6 +869,7 @@ int main(int argc, char **argv)
 	free(outdir);
 	free(template_dir);
 	xmlFree(remarks);
+	xmlFree(issue_type);
 	xmlFreeDoc(comment_doc);
 
 	xmlCleanupParser();

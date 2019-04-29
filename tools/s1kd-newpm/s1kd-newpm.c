@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -65,6 +65,7 @@ char enterprise_code[7] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+xmlChar *issue_type = NULL;
 
 xmlChar *remarks = NULL;
 
@@ -393,6 +394,7 @@ void show_help(void)
 	puts("  -s <title>     Short PM title");
 	puts("  -t <title>     Publication module title");
 	puts("  -w <inwork>    Inwork issue");
+	puts("  -z <type>      Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -436,6 +438,8 @@ void copy_default_value(const char *key, const char *val)
 		remarks = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "act") == 0 && !act_dmcode)
 		act_dmcode = strdup(val);
+	else if (strcmp(key, "issueType") == 0 && !issue_type)
+		issue_type = xmlStrdup(BAD_CAST val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -642,7 +646,7 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	char *outdir = NULL;
 
-	const char *sopts = "a:pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:~:h?";
+	const char *sopts = "a:pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:~:z:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -687,6 +691,7 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = true; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
+			case 'z': issue_type = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -833,6 +838,8 @@ int main(int argc, char **argv)
 
 	set_issue_date(issueDate);
 
+	if (issue_type) xmlSetProp(pmStatus, BAD_CAST "issueType", issue_type);
+
 	xmlNodeSetContent(pmTitle, BAD_CAST pm_title);
 
 	if (strcmp(short_pm_title, "") != 0) {
@@ -947,6 +954,7 @@ int main(int argc, char **argv)
 	free(template_dir);
 	free(act_dmcode);
 	xmlFree(remarks);
+	xmlFree(issue_type);
 	xmlFreeDoc(pm_doc);
 
 	xmlCleanupParser();

@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.11.1"
+#define VERSION "1.12.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -104,6 +104,7 @@ char brex_dmcode[PATH_MAX] = "";
 char *sns_fname = NULL;
 char *maint_sns = NULL;
 char issue_date[16] = "";
+xmlChar *issue_type = NULL;
 
 xmlChar *remarks = NULL;
 xmlChar *skill_level_code = NULL;
@@ -268,6 +269,7 @@ void show_help(void)
 	puts("  -T <type>      DM type (descript, proced, frontmatter, etc.)");
 	puts("  -t <tech>      Tech name");
 	puts("  -w <inwork>    Inwork issue");
+	puts("  -z <type>      Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -349,6 +351,8 @@ void copy_default_value(const char *key, const char *val)
 		skill_level_code = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "act") == 0 && !act_dmcode)
 		act_dmcode = strdup(val);
+	else if (strcmp(key, "issueType") == 0 && !issue_type)
+		issue_type = xmlStrdup(BAD_CAST val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
@@ -1322,7 +1326,7 @@ int main(int argc, char **argv)
 
 	char *outdir = NULL;
 
-	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:h?";
+	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:z:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -1377,6 +1381,7 @@ int main(int argc, char **argv)
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
 			case 'j': if (!brexmap) brexmap = read_xml_doc(optarg); break;
 			case '~': dump_templates(optarg); return 0;
+			case 'z': issue_type = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -1645,6 +1650,8 @@ int main(int argc, char **argv)
 
 	set_issue_date(issueDate);
 
+	if (issue_type) xmlSetProp(dmStatus, BAD_CAST "issueType", issue_type);
+
 	/* SB DMs also contain an "original issue date" */
 	if (strcmp(dmtype, "sb") == 0) {
 		xmlNodePtr sbissdate;
@@ -1812,6 +1819,7 @@ int main(int argc, char **argv)
 	free(skill_level_code);
 	free(defaults_dir_str);
 
+	xmlFree(issue_type);
 	xmlFree(remarks);
 
 	xmlFreeDoc(brexmap);

@@ -110,6 +110,9 @@ Print the file name of the newly created SCORM content package.
 -w &lt;inwork&gt;  
 The inwork number of the new SCORM content package.
 
+-z &lt;type&gt;  
+The issue type of the new SCORM content package.
+
 --version  
 Show version information.
 

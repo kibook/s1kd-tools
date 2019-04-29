@@ -116,6 +116,9 @@ Print the file name of the newly created DML.
 -w &lt;inwork&gt;  
 The inwork number of the new DML.
 
+-z &lt;type&gt;  
+The issue type of the new DML.
+
 --version  
 Show version information.
 

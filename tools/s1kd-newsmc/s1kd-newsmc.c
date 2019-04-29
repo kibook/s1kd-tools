@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newsmc"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 
 #define ERR_PREFIX PROG_NAME " ERROR: "
 
@@ -64,6 +64,7 @@ char enterprise_code[7] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+xmlChar *issue_type = NULL;
 
 xmlChar *remarks = NULL;
 xmlChar *skill_level_code = NULL;
@@ -345,6 +346,7 @@ void show_help(void)
 	puts("  -r <RPC>       Responsible partner company enterprise name");
 	puts("  -t <title>     SCORM content package title");
 	puts("  -w <inwork>    Inwork issue");
+	puts("  -z <type>      Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -388,6 +390,8 @@ void copy_default_value(const char *key, const char *val)
 		remarks = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "skillLevelCode") == 0 && !skill_level_code)
 		skill_level_code = xmlStrdup(BAD_CAST val);
+	else if (strcmp(key, "issueType") == 0 && !issue_type)
+		issue_type = xmlStrdup(BAD_CAST val);
 }
 
 xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
@@ -581,7 +585,7 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	char *outdir = NULL;
 
-	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:qm:~:k:h?";
+	const char *sopts = "pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:qm:~:k:z:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -625,6 +629,7 @@ int main(int argc, char **argv)
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
+			case 'z': issue_type = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?':
 				show_help();
@@ -771,6 +776,8 @@ int main(int argc, char **argv)
 
 	set_issue_date(issueDate);
 
+	if (issue_type) xmlSetProp(scormContentPackageStatus, BAD_CAST "issueType", issue_type);
+
 	xmlNodeSetContent(scormContentPackageTitle, BAD_CAST smc_title);
 
 	xmlSetProp(security, BAD_CAST "securityClassification", BAD_CAST security_classification);
@@ -864,6 +871,7 @@ int main(int argc, char **argv)
 	free(template_dir);
 	xmlFree(remarks);
 	xmlFree(skill_level_code);
+	xmlFree(issue_type);
 	xmlFreeDoc(smc_doc);
 
 	xmlCleanupParser();

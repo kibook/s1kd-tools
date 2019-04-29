@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.9.0"
+#define VERSION "1.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -61,6 +61,7 @@ char in_work[4] = "";
 char brex_dmcode[256] = "";
 
 char issue_date[16] = "";
+xmlChar *issue_type = NULL;
 
 xmlChar *remarks = NULL;
 
@@ -491,6 +492,8 @@ void copy_default_value(const char *def_key, const char *def_val)
 		remarks = xmlStrdup(BAD_CAST def_val);
 	else if (strcmp(def_key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(def_val);
+	else if (strcmp(def_key, "issueType") == 0 && !issue_type)
+		issue_type = xmlStrdup(BAD_CAST def_val);
 }
 
 void add_sns(xmlNodePtr content, const char *path, const char *incode)
@@ -620,6 +623,7 @@ void show_help(void)
 	puts("  -R <CAGE>      Default RPC code");
 	puts("  -r <RPC>       Default RPC name");
 	puts("  -w <inwork>    Inwork issue");
+	puts("  -z <type>      Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -736,7 +740,7 @@ int main(int argc, char **argv)
 {
 	xmlDocPtr dml_doc;
 
-	xmlNodePtr dmlCode, issueInfo, security, issueDate, dmlContent, sns_incodes;
+	xmlNodePtr dmlCode, issueInfo, security, issueDate, dmlContent, dmlStatus, sns_incodes;
 	
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
@@ -760,7 +764,7 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	char *outdir = NULL;
 
-	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:h?";
+	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:z:h?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -800,6 +804,7 @@ int main(int argc, char **argv)
 			case 'i': xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST optarg); break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
+			case 'z': issue_type = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -939,6 +944,9 @@ int main(int argc, char **argv)
 	
 	set_issue_date(issueDate);
 
+	dmlStatus = firstXPathNode("//dmlStatus", dml_doc);
+	if (issue_type) xmlSetProp(dmlStatus, BAD_CAST "issueType", issue_type);
+
 	xmlXPathFreeContext(ctxt);
 
 	if (strcmp(brex_dmcode, "") != 0)
@@ -1077,7 +1085,8 @@ int main(int argc, char **argv)
 	free(defaultRpcName);
 	free(defaultRpcCode);
 	free(template_dir);
-	free(remarks);
+	xmlFree(remarks);
+	xmlFree(issue_type);
 	free(sns);
 	xmlFreeDoc(dml_doc);
 	xmlFreeNode(sns_incodes);
