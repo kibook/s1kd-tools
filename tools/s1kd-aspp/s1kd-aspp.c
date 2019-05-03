@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.4.0"
+#define VERSION "2.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -737,6 +737,7 @@ int main(int argc, char **argv)
 				overwrite = true;
 				break;
 			case 'G':
+				genDispText = true;
 				customGenDispTextXsl = strdup(optarg);
 				break;
 			case 'g':
