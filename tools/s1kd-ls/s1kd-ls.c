@@ -23,7 +23,7 @@ unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.6.1"
+#define VERSION "1.6.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -770,6 +770,20 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (ncoms) {
+		if (!only_old) {
+			printfiles(coms, ncoms);
+		}
+		free(coms);
+	}
+
+	if (nddns) {
+		if (!only_old) {
+			printfiles(ddns, nddns);
+		}
+		free(ddns);
+	}
+
 	if (ndms) {
 		if (only_latest || only_old) {
 			printfiles(latest_dms, nlatest_dms);
@@ -783,24 +797,17 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (npms) {
+	if (ndmls) {
 		if (only_latest || only_old) {
-			printfiles(latest_pms, nlatest_pms);
-			free(latest_pms);
+			printfiles(latest_dmls, nlatest_dmls);
+			free(latest_dmls);
 		} else if (only_official_issue || only_inwork) {
-			printfiles(issue_pms, nissue_pms);
-			free(issue_pms);
+			printfiles(issue_dmls, nissue_dmls);
+			free(issue_dmls);
 		} else {
-			printfiles(pms, npms);
-			free(pms);
+			printfiles(dmls, ndmls);
+			free(dmls);
 		}
-	}
-
-	if (ncoms) {
-		if (!only_old) {
-			printfiles(coms, ncoms);
-		}
-		free(coms);
 	}
 
 	if (nicns) {
@@ -830,23 +837,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (nddns) {
-		if (!only_old) {
-			printfiles(ddns, nddns);
-		}
-		free(ddns);
-	}
-
-	if (ndmls) {
+	if (npms) {
 		if (only_latest || only_old) {
-			printfiles(latest_dmls, nlatest_dmls);
-			free(latest_dmls);
+			printfiles(latest_pms, nlatest_pms);
+			free(latest_pms);
 		} else if (only_official_issue || only_inwork) {
-			printfiles(issue_dmls, nissue_dmls);
-			free(issue_dmls);
+			printfiles(issue_pms, nissue_pms);
+			free(issue_pms);
 		} else {
-			printfiles(dmls, ndmls);
-			free(dmls);
+			printfiles(pms, npms);
+			free(pms);
 		}
 	}
 
