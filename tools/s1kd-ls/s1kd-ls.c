@@ -21,9 +21,10 @@ unsigned IMF_MAX = OBJECT_MAX;
 unsigned DDN_MAX = OBJECT_MAX;
 unsigned DML_MAX = OBJECT_MAX;
 unsigned ICN_MAX = OBJECT_MAX;
+unsigned SMC_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.6.2"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -39,16 +40,18 @@ unsigned ICN_MAX = OBJECT_MAX;
 #define SHOW_DDN 0x10
 #define SHOW_DML 0x20
 #define SHOW_ICN 0x40
+#define SHOW_SMC 0x80
 
 /* Lists of CSDB objects. */
 char (*dms)[PATH_MAX] = NULL;
 char (*pms)[PATH_MAX] = NULL;
+char (*smcs)[PATH_MAX] = NULL;
 char (*coms)[PATH_MAX] = NULL;
 char (*icns)[PATH_MAX] = NULL;
 char (*imfs)[PATH_MAX] = NULL;
 char (*ddns)[PATH_MAX] = NULL;
 char (*dmls)[PATH_MAX] = NULL;
-int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0;
+int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0;
 
 /* Separator between printed CSDB objects. */
 char sep = '\n';
@@ -116,11 +119,15 @@ int isicn(const char *name)
 {
 	return strncmp(name, "ICN-", 4) == 0;
 }
+int issmc(const char *name)
+{
+	return (strncmp(name, "SMC-", 4) == 0 || strncmp(name, "SME-", 4) == 0) && isxml(name);
+}
 
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPRrwX] [<object>|<dir> ...]");
+	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPRrSwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -0         Output null-delimited list.");
@@ -137,6 +144,7 @@ void show_help(void)
 	puts("  -P         List publication modules.");
 	puts("  -R         Show only non-writable object files.");
 	puts("  -r         Recursively search directories.");
+	puts("  -S         List SCORM content packages.");
 	puts("  -w         Show only writable object files.");
 	puts("  -X         List DDNs.");
 	puts("  -h -?      Show this help message.");
@@ -156,7 +164,7 @@ void resize(char (**list)[PATH_MAX], unsigned *max)
 {
 	if (!(*list = realloc(*list, (*max *= 2) * PATH_MAX))) {
 		fprintf(stderr, E_MAX_OBJECT,
-			ndms + npms + ncoms + nimfs + nicns + nddns + ndmls);
+			ndms + npms + ncoms + nimfs + nicns + nddns + ndmls + nsmcs);
 		exit(EXIT_OBJECT_MAX);
 	}
 }
@@ -227,6 +235,11 @@ void list_dir(const char *path, int only_writable, int only_readonly, int recurs
 				resize(&dmls, &DML_MAX);
 			}
 			strcpy(dmls[(ndmls)++], cpath);
+		} else if (smcs && issmc(cur->d_name)) {
+			if (nsmcs == SMC_MAX) {
+				resize(&smcs, &SMC_MAX);
+			}
+			strcpy(smcs[(nsmcs)++], cpath);
 		} else if (recursive && isdir(cpath, recursive)) {
 			list_dir(cpath, only_writable, only_readonly, recursive);
 		}
@@ -453,16 +466,18 @@ int main(int argc, char **argv)
 
 	char (*latest_dms)[PATH_MAX] = NULL;
 	char (*latest_pms)[PATH_MAX] = NULL;
+	char (*latest_smcs)[PATH_MAX] = NULL;
 	char (*latest_imfs)[PATH_MAX] = NULL;
 	char (*latest_dmls)[PATH_MAX] = NULL;
 	char (*latest_icns)[PATH_MAX] = NULL;
-	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0, nlatest_icns = 0;
+	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0, nlatest_icns = 0, nlatest_smcs = 0;
 
 	char (*issue_dms)[PATH_MAX] = NULL;
 	char (*issue_pms)[PATH_MAX] = NULL;
+	char (*issue_smcs)[PATH_MAX] = NULL;
 	char (*issue_imfs)[PATH_MAX] = NULL;
 	char (*issue_dmls)[PATH_MAX] = NULL;
-	int nissue_dms = 0, nissue_pms = 0, nissue_imfs = 0, nissue_dmls = 0;
+	int nissue_dms = 0, nissue_pms = 0, nissue_imfs = 0, nissue_dmls = 0, nissue_smcs = 0;
 
 	int only_latest = 0;
 	int only_official_issue = 0;
@@ -475,7 +490,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPRrwXoINh?";
+	const char *sopts = "0CDGiLlMPRrSwXoINh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -503,6 +518,7 @@ int main(int argc, char **argv)
 			case 'P': show |= SHOW_PM; break;
 			case 'R': only_readonly = 1; break;
 			case 'r': recursive = 1; break;
+			case 'S': show |= SHOW_SMC; break;
 			case 'w': only_writable = 1; break;
 			case 'X': show |= SHOW_DDN; break;
 			case 'o': only_old = 1; break;
@@ -514,7 +530,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML;
+	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML | SHOW_SMC;
 
 	if (optset(show, SHOW_DM)) {
 		dms = malloc(DM_MAX * PATH_MAX);
@@ -536,6 +552,9 @@ int main(int argc, char **argv)
 	}
 	if (optset(show, SHOW_DML)) {
 		dmls = malloc(DML_MAX * PATH_MAX);
+	}
+	if (optset(show, SHOW_SMC)) {
+		smcs = malloc(SMC_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
@@ -587,6 +606,11 @@ int main(int argc, char **argv)
 					resize(&dmls, &DML_MAX);
 				}
 				strcpy(dmls[ndmls++], argv[i]);
+			} else if (smcs && issmc(base)) {
+				if (nsmcs == SMC_MAX) {
+					resize(&smcs, &SMC_MAX);
+				}
+				strcpy(smcs[nsmcs++], argv[i]);
 			} else if (isdir(argv[i], 0)) {
 				list_dir(argv[i], only_writable, only_readonly, recursive);
 			}
@@ -610,6 +634,13 @@ int main(int argc, char **argv)
 		if (only_official_issue || only_inwork) issue_pms = malloc(npms * PATH_MAX);
 	} else {
 		free(pms);
+	}
+	if (nsmcs) {
+		qsort(smcs, nsmcs, PATH_MAX, compare);
+		if (only_latest || only_old) latest_smcs = malloc(nsmcs * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_smcs = malloc(nsmcs * PATH_MAX);
+	} else {
+		free(smcs);
 	}
 	if (nimfs) {
 		qsort(imfs, nimfs, PATH_MAX, compare);
@@ -651,6 +682,10 @@ int main(int argc, char **argv)
 				nissue_pms = remove_latest(issue_pms, pms, npms);
 				free(pms);
 			}
+			if (nsmcs) {
+				nissue_smcs = remove_latest(issue_smcs, smcs, nsmcs);
+				free(smcs);
+			}
 			if (nimfs) {
 				nissue_imfs = remove_latest(issue_imfs, imfs, nimfs);
 				free(imfs);
@@ -676,6 +711,9 @@ int main(int argc, char **argv)
 			if (nissue_pms) {
 				nlatest_pms = f(latest_pms, issue_pms, nissue_pms);
 			}
+			if (nissue_smcs) {
+				nlatest_smcs = f(latest_smcs, issue_smcs, nissue_smcs);
+			}
 			if (nissue_imfs) {
 				nlatest_imfs = f(latest_imfs, issue_imfs, nissue_imfs);
 			}
@@ -685,6 +723,7 @@ int main(int argc, char **argv)
 
 			free(issue_dms);
 			free(issue_pms);
+			free(issue_smcs);
 			free(issue_imfs);
 			free(issue_dmls);
 		} else {
@@ -704,6 +743,10 @@ int main(int argc, char **argv)
 				nissue_pms = f(issue_pms, pms, npms);
 				free(pms);
 			}
+			if (nsmcs) {
+				nissue_smcs = f(issue_smcs, smcs, nsmcs);
+				free(smcs);
+			}
 			if (nimfs) {
 				nissue_imfs = f(issue_imfs, imfs, nimfs);
 				free(imfs);
@@ -720,6 +763,9 @@ int main(int argc, char **argv)
 				if (nissue_pms) {
 					nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
 				}
+				if (nissue_smcs) {
+					nlatest_smcs = extract_latest(latest_smcs, issue_smcs, nissue_smcs);
+				}
 				if (nissue_imfs) {
 					nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
 				}
@@ -732,6 +778,7 @@ int main(int argc, char **argv)
 
 				free(issue_dms);
 				free(issue_pms);
+				free(issue_smcs);
 				free(issue_imfs);
 				free(issue_dmls);
 				free(icns);
@@ -755,6 +802,10 @@ int main(int argc, char **argv)
 		if (npms) {
 			nlatest_pms = f(latest_pms, pms, npms);
 			free(pms);
+		}
+		if (nsmcs) {
+			nlatest_smcs = f(latest_smcs, smcs, nsmcs);
+			free(smcs);
 		}
 		if (nimfs) {
 			nlatest_imfs = f(latest_imfs, imfs, nimfs);
@@ -812,7 +863,11 @@ int main(int argc, char **argv)
 
 	if (nicns) {
 		if (only_inwork) {
-			free(icns);
+			if (only_latest || only_old) {
+				free(latest_icns);
+			} else {
+				free(icns);
+			}
 		} else {
 			if (only_latest || only_old) {
 				printfiles(latest_icns, nlatest_icns);
@@ -847,6 +902,19 @@ int main(int argc, char **argv)
 		} else {
 			printfiles(pms, npms);
 			free(pms);
+		}
+	}
+
+	if (nsmcs) {
+		if (only_latest || only_old) {
+			printfiles(latest_smcs, nlatest_smcs);
+			free(latest_smcs);
+		} else if (only_official_issue || only_inwork) {
+			printfiles(issue_smcs, nissue_smcs);
+			free(issue_smcs);
+		} else {
+			printfiles(smcs, nsmcs);
+			free(smcs);
 		}
 	}
 
