@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.1.1"
+#define VERSION "2.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1701,7 +1701,7 @@ int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 		if (strcmp(key, metadata[i].key) == 0) {
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctxt))) {
-				putchar(endl);
+				if (endl > -1) putchar(endl);
 				return EXIT_MISSING_METADATA;
 			}
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
@@ -1709,6 +1709,8 @@ int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 			return EXIT_SUCCESS;
 		}
 	}
+
+	if (endl > -1) putchar(endl);
 
 	return EXIT_INVALID_METADATA;
 }
@@ -2047,6 +2049,8 @@ int show_icn_metadata(const char *fname, const char *key, int endl)
 			return EXIT_SUCCESS;
 		}
 	}
+
+	if (endl > -1) putchar(endl);
 
 	return EXIT_INVALID_METADATA;
 }
