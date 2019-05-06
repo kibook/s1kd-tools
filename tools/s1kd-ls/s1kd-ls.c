@@ -24,7 +24,7 @@ unsigned ICN_MAX = OBJECT_MAX;
 unsigned SMC_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -80,6 +80,45 @@ int compare(const void *a, const void *b)
 
 	d = strcasecmp(ba, bb);
 
+	free(sa);
+	free(sb);
+
+	return d;
+}
+
+/* Compare two ICN files, grouped by file extension. */
+int compare_icn(const void *a, const void *b)
+{
+	char *sa, *sb, *ba, *bb, *e, *ea, *eb;
+	int d;
+
+	sa = strdup((const char *) a);
+	sb = strdup((const char *) b);
+	ba = basename(sa);
+	bb = basename(sb);
+
+	/* Move the file extension to the front. */
+	ea = malloc(strlen(ba) + 1);
+	eb = malloc(strlen(bb) + 1);
+
+	if ((e = strchr(ba, '.'))) {
+		d = e - ba;
+		sprintf(ea, "%s%.*s", e, d, ba);
+	} else {
+		strcpy(ea, ba);
+	}
+
+	if ((e = strchr(bb, '.'))) {
+		d = e - bb;
+		sprintf(eb, "%s%.*s", e, d, bb);
+	} else {
+		strcpy(eb, bb);
+	}
+
+	d = strcasecmp(ea, eb);
+
+	free(ea);
+	free(eb);
 	free(sa);
 	free(sb);
 
@@ -339,7 +378,8 @@ int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int n
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
-		char *name1, *name2, *base1, *base2;
+		char *name1, *name2, *base1, *base2, *s;
+		int n;
 
 		name1 = strdup(files[i]);
 		base1 = basename(name1);
@@ -350,7 +390,10 @@ int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int n
 			name2 = NULL;
 		}
 
-		if (i == 0 || strncmp(base1, base2, strrchr(base1, '-') - 3 - base1) != 0) {
+		s = strrchr(base1, '-');
+		n = s - base1;
+
+		if (i == 0 || strncmp(base1, base2, n - 3) != 0 || strcmp(s, base2 + n) != 0) {
 			strcpy(latest[nlatest++], files[i]);
 		} else {
 			strcpy(latest[nlatest - 1], files[i]);
@@ -399,6 +442,7 @@ int remove_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nf
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
 		char *name1, *name3, *base1, *base3, *s;
+		int n;
 
 		name1 = strdup(files[i]);
 		base1 = basename(name1);
@@ -416,7 +460,9 @@ int remove_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nf
 			name3 = NULL;
 		}
 
-		if (name3 && strncmp(base1, base3, s - 3 - base1) == 0) {
+		n = s - base1;
+
+		if (name3 && strncmp(base1, base3, n - 3) == 0 && strcmp(s, base3 + n) == 0) {
 			strcpy(latest[nlatest++], files[i]);
 		}
 
@@ -657,7 +703,7 @@ int main(int argc, char **argv)
 		free(dmls);
 	}
 	if (nicns) {
-		qsort(icns, nicns, PATH_MAX, compare);
+		qsort(icns, nicns, PATH_MAX, compare_icn);
 		if (only_latest || only_old) latest_icns = malloc(nicns * PATH_MAX);
 	} else {
 		free(icns);
