@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="039" inWork="00"/>
+        <issueInfo issueNumber="039" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="03"/>
+        <issueDate year="2019" month="05" day="06"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,15 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Allow -@ option to specify a directory.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -a and -z options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Document -h? options.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -109,7 +100,7 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-@ &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new data module to &lt;path&gt;. If &lt;path&gt; is an existing directory, the data module will be created in it instead of the current directory. Otherwise, the data module will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
@@ -145,7 +136,7 @@
                 <para>Do not include an info name for the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-a &lt;ACT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>ACT data module code.</para>
@@ -193,7 +184,7 @@
                 <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="0" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-h -?</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
@@ -444,7 +435,7 @@
                 <para>The inwork number of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-z &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue type of the new data module.</para>
