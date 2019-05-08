@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="039" inWork="01"/>
+        <issueInfo issueNumber="039" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="06"/>
+        <issueDate year="2019" month="05" day="08"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add ILC and LC to .dmtypes syntax.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -504,7 +507,7 @@ securityClassification       01]]></verbatimText>
         </levelledPara>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file</title>
-          <para>This file sets the default type (schema) for data modules based on their info code. By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>, but any file can be specified by using the -D option.</para>
+          <para>This file sets the default schema and info name for data modules based on their info code. By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>, but any file can be specified by using the -D option.</para>
           <para>Each line consists of an info code, a schema identifier, and optionally a default info name. Example:</para>
           <para>
             <verbatimText verbatimStyle="vs23"><![CDATA[000    descript
@@ -522,13 +525,26 @@ securityClassification       01]]></verbatimText>
 <type infoCode="520" schema="proced" infoName="Remove procedure"/>
 </dmtypes>]]></verbatimText>
           </para>
-          <para>Info code variants can also be given specific default schema and info names. To do this, include the variant with the info code:</para>
-          <para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The info code field can also include an info code variant, item location code, learn code, and learn event code, which allows for more specific default schemas and info names.</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Example of info code variants:</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
             <verbatimText verbatimStyle="vs23">258A  proced  Other procedure to clean
 258B  proced  Other procedure to clean, Clean with air
 258C  proced  Other procedure to clean, Clean with water</verbatimText>
           </para>
-          <para>The two forms of info codes (with and without variant) can be mixed. Defaults are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file. An info code with no variant matches all possible variants.</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Example of item location codes:</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs23">200A-A  proced  Servicing, while installed
+200A-C  proced  Servicing, on the bench
+200A-T  proced  Servicing, training</verbatimText>
+          </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Example of learn codes:</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs23">100A-A-H10A  learning  Operation: Performance analysis
+100A-A-T5CC  learning  Operation: Simulation
+100A-A-T80E  learning  Operation: Assessment</verbatimText>
+          </para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Defaults are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file. An info code which does not specify a variant, item location code, learn code or learn event code, or uses asterisks in their place, matches all possible variants, item location codes, learn codes and learn event codes.</para>
         </levelledPara>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>

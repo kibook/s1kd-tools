@@ -21,13 +21,15 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.12.0"
+#define VERSION "1.13.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define E_BREX_NOT_FOUND ERR_PREFIX "Could not find BREX: %s\n"
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump templates in directory: %s\n"
 #define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
+#define E_NO_SCHEMA ERR_PREFIX "No schema defined for information type %s%s-%s\n"
+#define E_NO_SCHEMA_LEARN ERR_PREFIX "No schema defined for information type %s%s-%s-%s%s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -645,7 +647,13 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	unsigned int len;
 
 	if (strcmp(dmtype, "") == 0) {
-		fprintf(stderr, ERR_PREFIX "No schema defined for info code %s%s.\n", infoCode, infoCodeVariant);
+		if (strcmp(learnCode, "") == 0) {
+			fprintf(stderr, E_NO_SCHEMA, infoCode, infoCodeVariant,
+				itemLocationCode);
+		} else {
+			fprintf(stderr, E_NO_SCHEMA_LEARN, infoCode, infoCodeVariant,
+				itemLocationCode, learnCode, learnEventCode);
+		}
 		exit(EXIT_UNKNOWN_DMTYPE);
 	} else if (template_dir) {
 		char src[PATH_MAX];
@@ -1042,7 +1050,7 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 
 	for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
 		char *def_key, *def_val, *infname;
-		char code[4], variant[2];
+		char code[4], variant[2], itemloc[2], learn[4], levent[2];
 		int p;
 
 		if (cur->type != XML_ELEMENT_NODE) continue;
@@ -1053,17 +1061,29 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 		def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
 		infname = (char *) xmlGetProp(cur, BAD_CAST "infoName");
 
-		p = sscanf(def_key, "%3s%1s", code, variant);
+		p = sscanf(def_key, "%3s%1s-%1s-%3s%1s", code, variant, itemloc, learn, levent);
 
-		if (strcmp(code, infoCode) == 0 &&
-		    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
-		    strcmp(dmtype, "") == 0)
+		/* Get schema */
+		if (strcmp(dmtype, "") == 0 &&
+		    strcmp(code, infoCode) == 0 &&
+		    (p < 2 || strcmp(variant, "*") == 0 || strcmp(variant, infoCodeVariant) == 0) &&
+		    (p < 3 || strcmp(itemloc, "*") == 0 || strcmp(itemloc, itemLocationCode) == 0) &&
+		    (p < 4 || strcmp(learn, "***") == 0   || strcmp(learn, learnCode) == 0) &&
+		    (p < 5 || strcmp(levent, "*") == 0  || strcmp(levent, learnEventCode) == 0)) {
 			strcpy(dmtype, def_val);
+		}
 
-		if (infname && strcmp(code, infoCode) == 0 &&
-		    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
-		    strcmp(infoName_content, "") == 0 && !no_info_name)
+		/* Get info name */
+		if (infname &&
+		    strcmp(infoName_content, "") == 0 &&
+		    !no_info_name &&
+		    strcmp(code, infoCode) == 0 &&
+		    (p < 2 || strcmp(variant, "*") == 0 || strcmp(variant, infoCodeVariant) == 0) &&
+		    (p < 3 || strcmp(itemloc, "*") == 0 || strcmp(itemloc, itemLocationCode) == 0) &&
+		    (p < 4 || strcmp(learn, "***") == 0   || strcmp(learn, learnCode) == 0) &&
+		    (p < 5 || strcmp(levent, "*") == 0  || strcmp(levent, learnEventCode) == 0)) {
 			strcpy(infoName_content, infname);
+		}
 
 		if (brex_rules) {
 			add_dmtypes_brex_val(brex_rules, def_key, infname);
@@ -1496,7 +1516,7 @@ int main(int argc, char **argv)
 			while (fgets(default_line, 1024, defaults)) {
 				char def_key[32], def_val[256], infname[256];
 				int n;
-				char code[4], variant[2];
+				char code[4], variant[2], itemloc[2], learn[4], levent[2];
 				int p;
 
 				n = sscanf(default_line, "%31s %255s %255[^\n]", def_key, def_val, infname);
@@ -1504,17 +1524,29 @@ int main(int argc, char **argv)
 				if (n < 2)
 					continue;
 
-				p = sscanf(def_key, "%3s%1s", code, variant);
+				p = sscanf(def_key, "%3s%1s-%1s-%3s%1s", code, variant, itemloc, learn, levent);
 
-				if (strcmp(code, infoCode) == 0 &&
-				    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
-				    strcmp(dmtype, "") == 0)
+				/* Get schema */
+				if (strcmp(dmtype, "") == 0 &&
+				    strcmp(code, infoCode) == 0 &&
+				    (p < 2 || strcmp(variant, "*") == 0 || strcmp(variant, infoCodeVariant) == 0) &&
+				    (p < 3 || strcmp(itemloc, "*") == 0 || strcmp(itemloc, itemLocationCode) == 0) &&
+				    (p < 4 || strcmp(learn, "***") == 0   || strcmp(learn, learnCode) == 0) &&
+				    (p < 5 || strcmp(levent, "*") == 0  || strcmp(levent, learnEventCode) == 0)) {
 					strcpy(dmtype, def_val);
+				}
 
-				if (n == 3 && strcmp(code, infoCode) == 0 &&
-				    (p < 2 || strcmp(variant, infoCodeVariant) == 0) &&
-				    strcmp(infoName_content, "") == 0 && !no_info_name)
+				/* Get info name */
+				if (n == 3 &&
+				    strcmp(infoName_content, "") == 0 &&
+				    !no_info_name &&
+				    strcmp(code, infoCode) == 0 &&
+				    (p < 2 || strcmp(variant, "*") == 0 || strcmp(variant, infoCodeVariant) == 0) &&
+				    (p < 3 || strcmp(itemloc, "*") == 0 || strcmp(itemloc, itemLocationCode) == 0) &&
+				    (p < 4 || strcmp(learn, "***") == 0   || strcmp(learn, learnCode) == 0) &&
+				    (p < 5 || strcmp(levent, "*") == 0  || strcmp(levent, learnEventCode) == 0)) {
 					strcpy(infoName_content, infname);
+				}
 
 				if (brex_rules) {
 					add_dmtypes_brex_val(brex_rules, def_key, n == 3 ? infname : NULL);

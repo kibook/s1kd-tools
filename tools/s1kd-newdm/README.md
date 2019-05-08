@@ -307,10 +307,10 @@ each have an attribute `ident` and an attribute `value`.
 `.dmtypes` file
 ---------------
 
-This file sets the default type (schema) for data modules based on their
-info code. By default, the program will search the current directory and
-parent directories for a file named `.dmtypes`, but any file can be
-specified by using the -D option.
+This file sets the default schema and info name for data modules based
+on their info code. By default, the program will search the current
+directory and parent directories for a file named `.dmtypes`, but any
+file can be specified by using the -D option.
 
 Each line consists of an info code, a schema identifier, and optionally
 a default info name. Example:
@@ -332,16 +332,33 @@ XML format, where each child has an attribute `infoCode`, an attribute
     <type infoCode="520" schema="proced" infoName="Remove procedure"/>
     </dmtypes>
 
-Info code variants can also be given specific default schema and info
-names. To do this, include the variant with the info code:
+The info code field can also include an info code variant, item location
+code, learn code, and learn event code, which allows for more specific
+default schemas and info names.
+
+Example of info code variants:
 
     258A  proced  Other procedure to clean
     258B  proced  Other procedure to clean, Clean with air
     258C  proced  Other procedure to clean, Clean with water
 
-The two forms of info codes (with and without variant) can be mixed.
+Example of item location codes:
+
+    200A-A  proced  Servicing, while installed
+    200A-C  proced  Servicing, on the bench
+    200A-T  proced  Servicing, training
+
+Example of learn codes:
+
+    100A-A-H10A  learning  Operation: Performance analysis
+    100A-A-T5CC  learning  Operation: Simulation
+    100A-A-T80E  learning  Operation: Assessment
+
 Defaults are chosen in the order they are listed in the `.dmtypes` file.
-An info code with no variant matches all possible variants.
+An info code which does not specify a variant, item location code, learn
+code or learn event code, or uses asterisks in their place, matches all
+possible variants, item location codes, learn codes and learn event
+codes.
 
 `.brexmap` file
 ---------------
