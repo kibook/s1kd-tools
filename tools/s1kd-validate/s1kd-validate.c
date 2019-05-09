@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -129,7 +129,7 @@ void show_help(void)
 	puts("  -f         List invalid files.");
 	puts("  -l         Treat input as list of filenames.");
 	puts("  -o         Output valid CSDB objects to stdout.");
-	puts("  -q         Silent (not output).");
+	puts("  -q         Silent (no output).");
 	puts("  -v         Verbose output.");
 	puts("  -X <URI>   Exclude namespace from validation by URI.");
 	puts("  -x         Do XInclude processing before validation.");
