@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "2.5.0"
+#define VERSION "3.0.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1817,6 +1817,20 @@ void set_issue_date(xmlDocPtr doc, const char *year, const char *month, const ch
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day);
 }
 
+/* Set the issue type of the instance. */
+void set_issue_type(xmlDocPtr doc, const char *type)
+{
+	xmlNodePtr status;
+
+	status = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus|//pmStatus|//commentStatus|//dmlStatus|//scormContentPackageStatus|//issno");
+
+	if (xmlStrcmp(status->name, BAD_CAST "issno") == 0) {
+		xmlSetProp(status, BAD_CAST "type", BAD_CAST type);
+	} else {
+		xmlSetProp(status, BAD_CAST "issueType", BAD_CAST type);
+	}
+}
+
 /* Set the securty classification of the instance. */
 void set_security(xmlDocPtr dm, char *sec)
 {
@@ -2645,7 +2659,8 @@ void show_help(void)
 	puts("  -x <XSL>      Use custom XSLT to resolve CIR references.");
 	puts("  -Y <text>     Set applic for DM with text as the display text.");
 	puts("  -y            Set applic for DM based on the user-defined defs.");
-	puts("  -z            Fix certain elements automatically after filtering.");
+	puts("  -Z            Fix certain elements automatically after filtering.");
+	puts("  -z <type>     Set the issue type of the instance.");
 	puts("  -@            Update existing instance objects from their source.");
 	puts("  -%            Make instances read-only.");
 	puts("  -!            Do not include an infoName for the instance.");
@@ -2697,6 +2712,7 @@ int main(int argc, char **argv)
 	char issdate_year[5];
 	char issdate_month[3];
 	char issdate_day[3];
+	char *isstype = NULL;
 	bool stripext = false;
 	bool verbose = false;
 	bool setorig = false;
@@ -2716,7 +2732,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yz@%!";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -2870,8 +2886,11 @@ int main(int argc, char **argv)
 			case 'Y':
 				new_applic = true; strncpy(new_display_text, optarg, 255);
 				break;
-			case 'z':
+			case 'Z':
 				autocomp = true;
+				break;
+			case 'z':
+				isstype = strdup(optarg);
 				break;
 			case '@':
 				update_inst = true;
@@ -3152,6 +3171,10 @@ int main(int argc, char **argv)
 					set_issue_date(doc, issdate_year, issdate_month, issdate_day);
 				}
 
+				if (isstype) {
+					set_issue_type(doc, isstype);
+				}
+
 				if (strcmp(secu, "") != 0) {
 					set_security(doc, secu);
 				}
@@ -3257,6 +3280,7 @@ int main(int argc, char **argv)
 	free(search_dir);
 	free(tech);
 	free(info);
+	free(isstype);
 	xmlFreeNode(cirs);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();
