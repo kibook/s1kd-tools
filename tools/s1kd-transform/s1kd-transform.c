@@ -15,7 +15,7 @@ bool includeIdentity = false;
 bool verbose = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -24,6 +24,7 @@ bool verbose = false;
 
 #define I_TRANSFORM INF_PREFIX "Transforming %s...\n"
 
+/* Add identity template to stylesheet. */
 void addIdentity(xmlDocPtr style)
 {
 	xmlDocPtr identity;
@@ -45,6 +46,7 @@ void addIdentity(xmlDocPtr style)
 	xmlFreeDoc(identity);
 }
 
+/* Apply stylesheets to a doc. */
 xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 {
 	xmlDocPtr src;
@@ -53,53 +55,16 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 	src = xmlCopyDoc(doc, 1);
 
 	for (cur = stylesheets->children; cur; cur = cur->next) {
-		xmlDocPtr res, styledoc;
-		xmlChar *path;
+		xmlDocPtr res;
 		xsltStylesheetPtr style;
-		const char **params = NULL;
-		unsigned long nparams;
-		int i;
+		const char **params;
 
-		path = xmlGetProp(cur, BAD_CAST "path");
-
-		if ((nparams = xmlChildElementCount(cur)) > 0) {
-			xmlNodePtr param;
-			int n = 0;
-
-			params = malloc((nparams * 2 + 1) * sizeof(char *));
-
-			for (param = cur->children; param; param = param->next) {
-				char *name, *value;
-
-				name  = (char *) xmlGetProp(param, BAD_CAST "name");
-				value = (char *) xmlGetProp(param, BAD_CAST "value");
-
-				params[n++] = name;
-				params[n++] = value;
-			}
-
-			params[n] = NULL;
-		}
-
-		styledoc = read_xml_doc((char *) path);
-
-		if (includeIdentity) {
-			addIdentity(styledoc);
-		}
-
-		style = xsltParseStylesheetDoc(styledoc);
-
-		xmlFree(path);
+		/* Select cached stylesheet/params. */
+		style = (xsltStylesheetPtr) cur->doc;
+		params = (const char **) cur->children;
 
 		res = xsltApplyStylesheet(style, doc, params);
 
-		for (i = 0; i < nparams; ++i) {
-			xmlFree((char *) params[i]);
-			xmlFree((char *) params[i + 1]);
-		}
-		free(params);
-
-		xsltFreeStylesheet(style);
 		xmlFreeDoc(doc);
 
 		doc = res;
@@ -112,7 +77,8 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 
 	return src;
 }
-	
+
+/* Apply stylesheets to a file. */
 void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
 {
 	xmlDocPtr doc;
@@ -134,6 +100,7 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 	xmlFreeDoc(doc);
 }
 
+/* Apply stylesheets to a list of files. */
 void transform_list(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
 {
 	FILE *f;
@@ -158,6 +125,7 @@ void transform_list(const char *path, xmlNodePtr stylesheets, const char *out, b
 	}
 }
 
+/* Add a parameter to a stylesheet. */
 void addParam(xmlNodePtr stylesheet, char *s)
 {
 	char *n, *v;
@@ -171,6 +139,86 @@ void addParam(xmlNodePtr stylesheet, char *s)
 	xmlSetProp(p, BAD_CAST "value", BAD_CAST v);
 }
 
+/* Load stylesheets from disk and cache. */
+void loadStylesheets(xmlNodePtr stylesheets)
+{
+	xmlNodePtr cur;
+
+	for (cur = stylesheets->children; cur; cur = cur->next) {
+		xmlChar *path;
+		xmlDocPtr doc;
+		xsltStylesheetPtr style;
+		unsigned short nparams;
+		const char **params = NULL;
+
+		path = xmlGetProp(cur, BAD_CAST "path");
+		doc = read_xml_doc((char *) path);
+		xmlFree(path);
+
+		if (includeIdentity) {
+			addIdentity(doc);
+		}
+
+		style = xsltParseStylesheetDoc(doc);
+
+		cur->doc = (xmlDocPtr) style;
+
+		if ((nparams = xmlChildElementCount(cur)) > 0) {
+			xmlNodePtr param;
+			int n = 0;
+
+			params = malloc((nparams * 2 + 1) * sizeof(char *));
+
+			param = cur->children;
+			while (param) {
+				xmlNodePtr next;
+				char *name, *value;
+
+				next = param->next;
+
+				name  = (char *) xmlGetProp(param, BAD_CAST "name");
+				value = (char *) xmlGetProp(param, BAD_CAST "value");
+
+				params[n++] = name;
+				params[n++] = value;
+
+				xmlFreeNode(param);
+				param = next;
+			}
+
+			params[n] = NULL;
+		}
+
+		cur->children = (xmlNodePtr) params;
+		cur->line = nparams;
+	}
+}
+
+/* Free cached stylesheets. */
+void freeStylesheets(xmlNodePtr stylesheets)
+{
+	xmlNodePtr cur;
+
+	for (cur = stylesheets->children; cur; cur = cur->next) {
+		const char **params;
+		int i;
+		unsigned short nparams;
+
+		xsltFreeStylesheet((xsltStylesheetPtr) cur->doc);
+		cur->doc = NULL;
+
+		params = (const char **) cur->children;
+		nparams = cur->line;
+		for (i = 0; i < nparams; ++i) {
+			xmlFree((char *) params[i]);
+			xmlFree((char *) params[i + 1]);
+		}
+		free(params);
+		cur->children = NULL;
+	}
+}
+
+/* Show help/usage message. */
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [-filvh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
@@ -189,6 +237,7 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
+/* Show version information. */
 void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
@@ -257,6 +306,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	loadStylesheets(stylesheets);
+
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
@@ -275,6 +326,7 @@ int main(int argc, char **argv)
 		free(out);
 	}
 
+	freeStylesheets(stylesheets);
 	xmlFreeNode(stylesheets);
 
 	xsltCleanupGlobals();
