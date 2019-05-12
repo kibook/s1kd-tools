@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2635,7 +2635,7 @@ void show_help(void)
 	puts("  -j            Remove unused external entities (such as ICNs)");
 	puts("  -k <level>    Set the skill level of the instance.");
 	puts("  -K <levels>   Filter on the specified skill levels.");
-	puts("  -L            Source (-s/stdin) is a list of files instead of a DM.");
+	puts("  -L            Treat input as a list of objects.");
 	puts("  -l <lang>     Specify the language of the instance.");
 	puts("  -m <remarks>  Set the remarks for the instance.");
 	puts("  -N            Omit issue/inwork numbers from automatic filename.");
