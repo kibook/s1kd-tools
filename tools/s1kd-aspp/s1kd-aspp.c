@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.5.0"
+#define VERSION "2.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -731,6 +731,7 @@ int main(int argc, char **argv)
 				search_dir = strdup(optarg);
 				break;
 			case 'F':
+				genDispText = true;
 				format = strdup(optarg);
 				break;
 			case 'f':
