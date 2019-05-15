@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.7.0"
+#define VERSION "2.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -488,7 +488,7 @@ void getICNAttr(char *dst, xmlNodePtr ref)
 	xmlChar *icn;
 	xmlEntityPtr ent;
 	icn = xmlNodeGetContent(ref);
-	if ((ent = xmlGetDocEntity(ref->doc, icn))) {
+	if ((ent = xmlGetDocEntity(ref->doc, icn)) && ent->URI) {
 		char uri[PATH_MAX], *base;
 		strcpy(uri, (char *) ent->URI);
 		base = basename(uri);
