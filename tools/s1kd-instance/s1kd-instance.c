@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.0.1"
+#define VERSION "3.0.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2503,7 +2503,9 @@ void clean_entities_callback(void *payload, void *data, const xmlChar *name)
 /* Remove unused external entities after filtering. */
 void clean_entities(xmlDocPtr doc)
 {
-	xmlHashScan(doc->intSubset->entities, clean_entities_callback, NULL);
+	if (doc->intSubset) {
+		xmlHashScan(doc->intSubset->entities, clean_entities_callback, NULL);
+	}
 }
 
 /* Find the source object for an instance.
