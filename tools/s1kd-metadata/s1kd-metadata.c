@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.1.2"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1369,6 +1369,12 @@ struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Data management list code"},
+	{"format",
+		"false()",
+		NULL,
+		NULL,
+		NULL,
+		"File format of the object"},
 	{"icnTitle",
 		"//imfAddressItems/icnTitle",
 		show_simple_node,
@@ -1686,10 +1692,17 @@ void show_icn_iss(const char *fname, int endl)
 	if (endl > -1) putchar(endl);
 }
 
+void show_icn_type(const char *fname, int endl)
+{
+	printf("icn");
+	if (endl > -1) putchar(endl);
+}
+
 struct icn_metadata icn_metadata[] = {
 	{"code", show_icn_code},
 	{"issueNumber", show_icn_iss},
 	{"securityClassification", show_icn_sec},
+	{"type", show_icn_type},
 	{NULL}
 };
 
@@ -1895,6 +1908,23 @@ int show_path(const char *fname, int endl)
 	return 0;
 }
 
+char *get_format(const char *fname)
+{
+	char *s;
+	if ((s = strchr(fname, '.'))) {
+		return s + 1;
+	} else {
+		return "";
+	}
+}
+
+int show_format(const char *fname, int endl)
+{
+	printf("%s", get_format(fname));
+	if (endl > -1) putchar(endl);
+	return 0;
+}
+
 int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 {
 	int i;
@@ -1967,6 +1997,8 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 
 				if (strncmp(k, "path", n) == 0) {
 					show_path(fname, -1);
+				} else if (strncmp(k, "format", n) == 0) {
+					show_format(fname, -1);
 				} else if (is_icn(fname)) {
 					show_icn_metadata_fmtstr_key(fname, k, n);
 				} else {
@@ -1989,11 +2021,13 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 	return 0;
 }
 
-xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx)
+xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fname)
 {
 	xmlNodePtr node;
 
-	if ((node = first_xpath_node(metadata[i].path, ctx))) {
+	if (strcmp(metadata[i].key, "format") == 0) {
+		return xmlStrdup(BAD_CAST get_format(fname));
+	} else if ((node = first_xpath_node(metadata[i].path, ctx))) {
 		if (metadata[i].show == show_dmcode) {
 			return BAD_CAST get_dmcode(node);
 		} else if (metadata[i].show == show_schema) {
@@ -2006,7 +2040,7 @@ xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx)
 	return NULL;
 }
 
-int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
+int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
 {
 	xmlChar *key, *val, *op;
 	int i, cmp = 0;
@@ -2019,7 +2053,7 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond)
 		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
 			xmlChar *content;
 
-			content = get_cond_content(i, ctx);
+			content = get_cond_content(i, ctx, fname);
 
 			switch (op[0]) {
 				case '=': cmp = val == NULL ? content != NULL : xmlStrcmp(content, val) == 0; break;
@@ -2093,7 +2127,7 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	ctxt = xmlXPathNewContext(doc);
 
 	for (cond = conds->children; cond; cond = cond->next) {
-		if (!condition_met(ctxt, cond)) {
+		if (!condition_met(ctxt, cond, fname)) {
 			err = EXIT_CONDITION_UNMET;
 		}
 	}
@@ -2114,6 +2148,8 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 					err = edit_metadata(ctxt, key, val);
 				} else if (strcmp(key, "path") == 0) {
 					err = show_path(fname, endl);
+				} else if (strcmp(key, "format") == 0) {
+					err = show_format(fname, endl);
 				} else if (is_icn(fname)) {
 					err = show_icn_metadata(fname, key, endl);
 				} else {
