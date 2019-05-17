@@ -172,8 +172,15 @@ documenting the operation and maintenance of a line of bicycles.
 The system difference code identifies major variants of a product. It
 consists of 1 thru 4 alphanumeric characters.
 
-Continuing with the example above, "A" might represent one model of
-bicycle and "B" another.
+For example, if a bicycle is available in two different configurations,
+road or off-road, the system difference codes "A" and "B" could indicate
+which data modules apply to each configuration:
+
+-   BIKE-A-00-00-00-00A-040A-D: contains information for the road
+    variant.
+
+-   BIKE-B-00-00-00-00A-040A-D: contains information for the off-road
+    variant.
 
 ### Standard numbering system
 

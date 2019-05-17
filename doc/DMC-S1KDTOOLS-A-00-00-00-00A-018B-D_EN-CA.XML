@@ -10,10 +10,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="B" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="000" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2018" month="09" day="18"/>
+        <issueDate year="2019" month="05" day="17"/>
         <dmTitle>
           <techName>S1000D tutorial</techName>
         </dmTitle>
@@ -198,7 +198,17 @@
           <levelledPara>
             <title>System difference code</title>
             <para>The system difference code identifies major variants of a product. It consists of 1 thru 4 alphanumeric characters.</para>
-            <para>Continuing with the example above, "A" might represent one model of bicycle and "B" another.</para>
+            <para>For example, if a bicycle is available in two different configurations, road or off-road, the system difference codes "A" and "B" could indicate which data modules apply to each configuration:</para>
+            <para>
+              <randomList>
+                <listItem>
+                  <para>BIKE-A-00-00-00-00A-040A-D: contains information for the road variant.</para>
+                </listItem>
+                <listItem>
+                  <para>BIKE-B-00-00-00-00A-040A-D: contains information for the off-road variant.</para>
+                </listItem>
+              </randomList>
+            </para>
           </levelledPara>
           <levelledPara>
             <title>Standard numbering system</title>
