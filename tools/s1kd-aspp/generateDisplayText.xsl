@@ -7,6 +7,38 @@
 
   <xsl:param name="overwrite-display-text" select="true()"/>
 
+  <xsl:template match="assert" mode="text">
+    <xsl:call-template name="applicPropertyName"/>
+    <xsl:text>: </xsl:text>
+    <xsl:call-template name="applicPropertyVal"/>
+  </xsl:template>
+
+  <xsl:template match="assert[text()]" mode="text">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="evaluate" mode="text">
+    <xsl:variable name="op" select="@andOr|@operator"/>
+    <xsl:for-each select="assert|evaluate">
+      <xsl:if test="self::evaluate and (@andOr|@operator) != $op">
+        <xsl:text>(</xsl:text>
+      </xsl:if>
+      <xsl:apply-templates select="." mode="text"/>
+      <xsl:if test="self::evaluate and (@andOr|@operator) != $op">
+        <xsl:text>)</xsl:text>
+      </xsl:if>
+      <xsl:if test="position() != last()">
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="$op"/>
+        <xsl:text> </xsl:text>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="@applicPropertyValues|@actvalues" mode="text">
+    <xsl:value-of select="translate(str:replace(., '|', ', '), '~', '-')"/>
+  </xsl:template>
+
   <xsl:template match="applic">
     <xsl:variable name="disp-name">
       <xsl:choose>
@@ -42,12 +74,6 @@
     </applic>
   </xsl:template>
 
-  <xsl:template match="assert" mode="text">
-    <xsl:call-template name="applicPropertyName"/>
-    <xsl:text>: </xsl:text>
-    <xsl:call-template name="applicPropertyVal"/>
-  </xsl:template>
-
   <xsl:template name="applicPropertyName">
     <xsl:param name="id" select="@applicPropertyIdent|@actidref"/>
     <xsl:param name="type" select="@applicPropertyType|@actreftype"/>
@@ -81,32 +107,6 @@
         <xsl:apply-templates select="$values" mode="text"/>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
-
-  <xsl:template match="@applicPropertyValues|@actvalues" mode="text">
-    <xsl:value-of select="translate(str:replace(., '|', ', '), '~', '-')"/>
-  </xsl:template>
-
-  <xsl:template match="assert[text()]" mode="text">
-    <xsl:apply-templates/>
-  </xsl:template>
-
-  <xsl:template match="evaluate" mode="text">
-    <xsl:variable name="op" select="@andOr|@operator"/>
-    <xsl:for-each select="assert|evaluate">
-      <xsl:if test="self::evaluate and (@andOr|@operator) != $op">
-        <xsl:text>(</xsl:text>
-      </xsl:if>
-      <xsl:apply-templates select="." mode="text"/>
-      <xsl:if test="self::evaluate and (@andOr|@operator) != $op">
-        <xsl:text>)</xsl:text>
-      </xsl:if>
-      <xsl:if test="position() != last()">
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="$op"/>
-        <xsl:text> </xsl:text>
-      </xsl:if>
-    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
