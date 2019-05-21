@@ -29,20 +29,25 @@ modules in one of three ways:
 OPTIONS
 =======
 
--D  
+-D, --delete  
 Remove acronym markup, flattening it to the acronym term.
 
--d  
+-d, --deflist  
 Format XML output as an S1000D `<definitionList>`.
 
--f  
+-f, --overwrite  
 When marking up acronyms with the -m option, overwrite the input data
 modules instead of writing to stdout.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--i -I -!  
+-I, --always-ask  
+In interactive mode, show a prompt for all acronyms, not just those with
+multiple definitions. This can be useful if some occurrences of acronym
+terms should be ignored.
+
+-i, --interactive  
 Markup acronyms in interactive mode. If the specified acronyms list
 contains multiple definitions for a given acronym term, the tool will
 prompt the user with the context in which the acronym is used and
@@ -50,55 +55,51 @@ present a list of the definitions for them to choose from.
 
 When not in interactive mode, the first definition found will be used.
 
-The -I option prompts for all acronyms, not just those with multiple
-definitions. This can be useful if some occurrences of the acronym term
-should be ignored.
-
-The -! option will not prompt for acronyms, instead it will markup where
-acronyms are found using a &lt;`chooseAcronym`&gt; element, whose child
-elements are all possible acronyms matching the term. Another program
-can then use this as input to actually prompt the user.
-
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of filenames of data modules
 to find or markup acronyms in, rather than data modules themselves.
 
--M &lt;list&gt;  
+-M, --acronym-list &lt;list&gt;  
 Like the -m option, but use a custom list of acronyms instead of the
 default `.acronyms` file.
 
--m  
+-m, --markup  
 Instead of listing acronyms in the specified data modules, automatically
 markup acronyms in the data module using the `.acronyms` file.
 
--n &lt;\#&gt;  
+-n, --width &lt;\#&gt;  
 Minimum number of spaces after the term in pretty-printed text output.
 
--o &lt;file&gt;  
+-o, --out &lt;file&gt;  
 Output to &lt;file&gt; instead of stdout.
 
--p  
+-p, --pretty  
 Pretty print text/XML acronym list output.
 
--T &lt;types&gt;  
+-T, --types &lt;types&gt;  
 Only search for acronyms with an attribute `acronymType` whose value is
 contained within the string &lt;types&gt;.
 
--t  
+-t, --table  
 Format XML output as an S1000D `<table>`.
 
--v  
+-v, --verbose  
 Verbose output.
 
--X &lt;xpath&gt;  
+-X, --select &lt;xpath&gt;  
 When marking up acronyms with -m/-M, use a custom XPath expression to
 specify which text nodes to search for acronyms in. By default, this is
 all text nodes in any element where acronyms are allowed. This must be
 the path to the text() nodes, not the elements, e.g. `//para/text()` and
 not simply `//para`.
 
--x  
+-x, --xml  
 Use XML output instead of plain text.
+
+-!, --defer-choice  
+Mark where acronyms are found using a `<chooseAcronym>` element, whose
+child elements are all possible acronyms matching the term. Another
+program can then use this as input to actually prompt the user.
 
 --version  
 Show version information.

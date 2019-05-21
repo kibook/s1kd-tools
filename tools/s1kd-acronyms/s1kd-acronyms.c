@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -603,28 +603,30 @@ void showHelp(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-dlptvx] [-n <#>] [-o <file>] [-T <types>] [<dmodules>]");
-	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-flv] [-o <file>] [-X <xpath>] [<dmodules>]");
-	puts("  " PROG_NAME " -D [-flv] [-o <file>] [<dmodules>]");
+	puts("  " PROG_NAME " [-dlptvx] [-n <#>] [-o <file>] [-T <types>] [<dmodule>...]");
+	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-flv] [-o <file>] [-X <xpath>] [<dmodule>...]");
+	puts("  " PROG_NAME " -D [-flv] [-o <file>] [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -D          Remove acronym markup.");
-	puts("  -d          Format XML output as definitionList.");
-	puts("  -f          Overwrite data modules when marking up acronyms.");
-	puts("  -i -I -!    Markup acronyms in interactive modes.");
-	puts("  -l          Input is a list of file names.");
-	puts("  -M <list>   Markup acronyms from specified list.");
-	puts("  -m          Markup acronyms from .acronyms file.");
-	puts("  -n <#>      Minimum spaces after term in pretty printed output.");
-	puts("  -o <file>   Output to <file> instead of stdout.");
-	puts("  -p          Pretty print text/XML output.");
-	puts("  -T <types>  Only search for acronyms of these types.");
-	puts("  -t          Format XML output as table.");
-	puts("  -v          Verbose output.");
-	puts("  -X <xpath>  Use custom XPath to markup elements.");
-	puts("  -x          Output XML instead of text.");
-	puts("  -h -?       Show usage message.");
-	puts("  --version   Show version information.");
+	puts("  -D, --delete               Remove acronym markup.");
+	puts("  -d, --deflist              Format XML output as definitionList.");
+	puts("  -f, --overwrite            Overwrite data modules when marking up acronyms.");
+	puts("  -h, -?, --help             Show usage message.");
+	puts("  -I, --always-ask           Prompt for all acronyms in interactive mode.");
+	puts("  -i, --interactive          Markup acronyms in interactive mode.");
+	puts("  -l, --list                 Input is a list of file names.");
+	puts("  -M, --acronym-list <list>  Markup acronyms from specified list.");
+	puts("  -m, --markup               Markup acronyms from .acronyms file.");
+	puts("  -n, --width <#>            Minimum spaces after term in pretty printed output.");
+	puts("  -o, --out <file>           Output to <file> instead of stdout.");
+	puts("  -p, --pretty               Pretty print text/XML output.");
+	puts("  -T, --types <types>        Only search for acronyms of these types.");
+	puts("  -t, --table                Format XML output as table.");
+	puts("  -v, --verbose              Verbose output.");
+	puts("  -X, --select <xpath>       Use custom XPath to markup elements.");
+	puts("  -x, --xml                  Output XML instead of text.");
+	puts("  --version                  Show version information.");
+	puts("  <dmodule>                  Data module(s) to process.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -651,7 +653,25 @@ int main(int argc, char **argv)
 
 	const char *sopts = "pn:xDdtT:o:M:miIfl!X:vh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"      , no_argument      , 0, 0},
+		{"help"         , no_argument      , 0, 'h'},
+		{"pretty"       , no_argument      , 0, 'p'},
+		{"width"        , required_argument, 0, 'n'},
+		{"xml"          , no_argument      , 0, 'x'},
+		{"delete"       , no_argument      , 0, 'D'},
+		{"deflist"      , no_argument      , 0, 'd'},
+		{"table"        , no_argument      , 0, 't'},
+		{"types"        , required_argument, 0, 'T'},
+		{"out"          , required_argument, 0, 'o'},
+		{"markup"       , no_argument      , 0, 'm'},
+		{"acronym-list" , required_argument, 0, 'M'},
+		{"interactive"  , no_argument      , 0, 'i'},
+		{"always-ask"   , no_argument      , 0, 'I'},
+		{"overwrite"    , no_argument      , 0, 'f'},
+		{"list"         , no_argument      , 0, 'l'},
+		{"defer-choice" , no_argument      , 0, '!'},
+		{"select"       , required_argument, 0, 'X'},
+		{"verbose"      , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -679,9 +699,11 @@ int main(int argc, char **argv)
 				delete = true;
 				break;
 			case 'd':
+				xmlOut = true;
 				xmlFormat = DEFLIST;
 				break;
 			case 't':
+				xmlOut = true;
 				xmlFormat = TABLE;
 				break;
 			case 'T':
