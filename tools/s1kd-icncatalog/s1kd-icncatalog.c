@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -265,19 +265,19 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?  Show help/usage message.");
-	puts("  -a <icn>       Add an ICN to the catalog.");
-	puts("  -c <catalog>   Use <catalog> as the ICN catalog.");
-	puts("  -d <icn>       Delete an ICN from the catalog.");
-	puts("  -f             Overwrite input objects.");
-	puts("  -l             Treat input as list of objects.");
-	puts("  -m <media>     Specify intended output media.");
-	puts("  -n <notation>  Set the notation of the new ICN.");
-	puts("  -t             Create new ICN catalog.");
-	puts("  -u <uri>       Set the URI of the new ICN.");
-	puts("  -v             Verbose output.");
-	puts("  -x             Process XInclude elements.");
-	puts("  --version      Show version information.");
+	puts("  -a, --add <icn>         Add an ICN to the catalog.");
+	puts("  -c, --catalog <catalog> Use <catalog> as the ICN catalog.");
+	puts("  -d, --del <icn>         Delete an ICN from the catalog.");
+	puts("  -f, --overwrite         Overwrite input objects.");
+	puts("  -h, -?, --help          Show help/usage message.");
+	puts("  -l, --list              Treat input as list of objects.");
+	puts("  -m, --media <media>     Specify intended output media.");
+	puts("  -n, --ndata <notation>  Set the notation of the new ICN.");
+	puts("  -t, --new               Create new ICN catalog.");
+	puts("  -u, --uri <uri>         Set the URI of the new ICN.");
+	puts("  -v, --verbose           Verbose output.");
+	puts("  -x, --xinclude          Process XInclude elements.");
+	puts("  --version               Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -302,7 +302,19 @@ int main(int argc, char **argv)
 
 	const char *sopts = "a:c:d:flm:n:tu:vxh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"  , no_argument      , 0, 0},
+		{"help"     , no_argument      , 0, 'h'},
+		{"add"      , required_argument, 0, 'a'},
+		{"catalog"  , required_argument, 0, 'c'},
+		{"del"      , required_argument, 0, 'd'},
+		{"overwrite", no_argument      , 0, 'f'},
+		{"list"     , no_argument      , 0, 'l'},
+		{"media"    , required_argument, 0, 'm'},
+		{"ndata"    , required_argument, 0, 'n'},
+		{"new"      , no_argument      , 0, 't'},
+		{"uri"      , required_argument, 0, 'u'},
+		{"verbose"  , no_argument      , 0, 'v'},
+		{"xinclude" , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

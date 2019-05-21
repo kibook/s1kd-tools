@@ -19,50 +19,50 @@ declaration within CSDB objects.
 OPTIONS
 =======
 
--a &lt;ICN&gt;  
+-a, --add &lt;ICN&gt;  
 Add an ICN to the catalog. Follow with the -u and -n options to specify
 the URI and notation to use for this ICN. The -m option specifies a
 media group to add the ICN to.
 
--c &lt;catalog&gt;  
+-c, --catalog &lt;catalog&gt;  
 Specify the catalog file to manage or resolve against. By default, the
 file `.icncatalog` in the current directory is used. If the current
 directory does not contain this file, the parent directories will be
 searched.
 
--d &lt;ICN&gt;  
+-d, --del &lt;ICN&gt;  
 Delete an ICN from the catalog. The -m option specifies a media group to
 delete the ICN from.
 
--f  
+-f, --overwrite  
 Overwrite the input CSDB objects when resolving ICNs, or overwrite the
 catalog file when modifying it. Otherwise, output is written to stdout.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects,
 rather than CSDB objects themselves.
 
--m &lt;media&gt;  
+-m, --media &lt;media&gt;  
 Resolve ICNs for this intended output media. The catalog may contain
 alternative formats for the same ICN to be used for different output
 media.
 
--n &lt;notation&gt;  
+-n, --ndata &lt;notation&gt;  
 Specify the notation to reference when adding an ICN with the -a option.
 
--t  
+-t, --new  
 Create a new empty catalog.
 
--u &lt;URI&gt;  
+-u, --uri &lt;URI&gt;  
 Specify the URI when adding an ICN with the -a option.
 
--v  
+-v, --verbose  
 Verbose output.
 
--x  
+-x, --xinclude  
 Process input CSDB objects using the XInclude specification.
 
 --version  
