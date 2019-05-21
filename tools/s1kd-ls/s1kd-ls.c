@@ -24,7 +24,7 @@ unsigned ICN_MAX = OBJECT_MAX;
 unsigned SMC_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -169,25 +169,25 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPRrSwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -0         Output null-delimited list.");
-	puts("  -C         List comments.");
-	puts("  -D         List data modules.");
-	puts("  -G         List ICN files.");
-	puts("  -I         Show only inwork issues.");
-	puts("  -i         Show only official issues.");
-	puts("  -L         List DMLs.");
-	puts("  -l         Show only latest official/inwork issue.");
-	puts("  -M         List ICN metadata files.");
-	puts("  -N         Assume issue/inwork numbers are omitted.");
-	puts("  -o         Show only old official/inwork issues.");
-	puts("  -P         List publication modules.");
-	puts("  -R         Show only non-writable object files.");
-	puts("  -r         Recursively search directories.");
-	puts("  -S         List SCORM content packages.");
-	puts("  -w         Show only writable object files.");
-	puts("  -X         List DDNs.");
-	puts("  -h -?      Show this help message.");
-	puts("  --version  Show version information.");
+	puts("  -0, --null        Output null-delimited list.");
+	puts("  -C, --com         List comments.");
+	puts("  -D, --dm          List data modules.");
+	puts("  -G, --icn         List ICN files.");
+	puts("  -I, --inwork      Show only inwork issues.");
+	puts("  -i, --official    Show only official issues.");
+	puts("  -h, -?, --help    Show this help message.");
+	puts("  -L, --dml         List DMLs.");
+	puts("  -l, --latest      Show only latest official/inwork issue.");
+	puts("  -M, --imf         List ICN metadata files.");
+	puts("  -N, --omit-issue  Assume issue/inwork numbers are omitted.");
+	puts("  -o, --old         Show only old official/inwork issues.");
+	puts("  -P, --pm          List publication modules.");
+	puts("  -R, --read-only   Show only non-writable object files.");
+	puts("  -r, --recursive   Recursively search directories.");
+	puts("  -S, --smc         List SCORM content packages.");
+	puts("  -w, --writable    Show only writable object files.");
+	puts("  -X, --ddn         List DDNs.");
+	puts("  --version         Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -538,7 +538,25 @@ int main(int argc, char **argv)
 
 	const char *sopts = "0CDGiLlMPRrSwXoINh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"   , no_argument, 0, 0},
+		{"help"      , no_argument, 0, 'h'},
+		{"null"      , no_argument, 0, '0'},
+		{"com"       , no_argument, 0, 'C'},
+		{"dm"        , no_argument, 0, 'D'},
+		{"icn"       , no_argument, 0, 'G'},
+		{"official"  , no_argument, 0, 'i'},
+		{"dml"       , no_argument, 0, 'L'},
+		{"latest"    , no_argument, 0, 'l'},
+		{"imf"       , no_argument, 0, 'M'},
+		{"pm"        , no_argument, 0, 'P'},
+		{"read-only" , no_argument, 0, 'R'},
+		{"recursive" , no_argument, 0, 'r'},
+		{"smc"       , no_argument, 0, 'S'},
+		{"writable"  , no_argument, 0, 'w'},
+		{"ddn"       , no_argument, 0, 'X'},
+		{"old"       , no_argument, 0, 'o'},
+		{"inwork"    , no_argument, 0, 'I'},
+		{"omit-issue", no_argument, 0, 'N'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

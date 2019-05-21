@@ -22,7 +22,7 @@ supported by these tools using the -N option.
 OPTIONS
 =======
 
--0  
+-0, --null  
 Output a null-delimited list of CSDB object paths.
 
 -C, -D, -G, -L, -M, -P, -S, -X  
@@ -30,33 +30,36 @@ List comments, data modules, ICNs, data management lists, ICN metadata
 files, publication modules, SCORM content packages, and data dispatch
 notes respectively. If none are specified, -CDGLMPSX is assumed.
 
--h -?  
+The following long options can also be used for each: --com, --dm,
+--icn, --dml, --imf, --pm, --smc, --ddn.
+
+-h, -?, --help  
 Show the usage message.
 
--I  
+-I, --inwork  
 Show only inwork issues of objects (inwork != 00).
 
--i  
+-i, --official  
 Show only official issues of objects (inwork = 00).
 
--l  
+-l, --latest  
 Show only the latest official/inwork issue of objects.
 
--N  
+-N, --omit-issue  
 Assume that the files being listed do not include the issue info in
 their filenames, i.e. they were created using the -N option of the
 s1kd-new\* tools.
 
--o  
+-o, --old  
 Show only old official/inwork issues of objects.
 
--R  
+-R, --read-only  
 Show only non-writable object files.
 
--r  
+-r, --recursive  
 Recursively descend in to directories.
 
--w  
+-w, --writable  
 Show only writable object files.
 
 --version  
