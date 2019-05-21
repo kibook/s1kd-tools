@@ -22,36 +22,36 @@ type.
 OPTIONS
 =======
 
--,  
+-,, --dump-fmtypes-xml  
 Dump the built-in `.fmtypes` XML format.
 
--.  
+-., --dump-fmtypes  
 Dump the built-in `.fmtypes` simple text format.
 
--h -?  
+-h, -?, --help  
 Show usage message.
 
--F &lt;FMTYPES&gt;  
+-F, --fmtypes &lt;FMTYPES&gt;  
 Specify a custom `.fmtypes` file.
 
--f  
+-f, --overwrite  
 Overwrite the specified front matter data module files after generating
 their content.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of front matter data modules
 to generate content for, rather than data modules themselves. If reading
 list from stdin, the -P option must be used to specify the publication
 module.
 
--P &lt;PM&gt;  
+-P, --pm &lt;PM&gt;  
 Publication module or s1kd-flatten(1) PM format file to generate
 contents from. If none is specified, the tool will read from stdin.
 
--p &lt;name&gt;=&lt;value&gt;  
+-p, --param &lt;name&gt;=&lt;value&gt;  
 Pass a parameter to the XSLT specified with the -X option.
 
--t &lt;TYPE&gt;  
+-t, --type &lt;TYPE&gt;  
 Generate content for this type of front matter when no data modules are
 specified. Supported types are:
 
@@ -63,17 +63,17 @@ specified. Supported types are:
 
 -   TP - Title page
 
--v  
+-v, --verbose  
 Verbose output.
 
--X &lt;XSL&gt;  
+-X, --xsl &lt;XSL&gt;  
 Transform the front matter contents after generating them using the
 specified XSLT. This can be used, for example, to generate content for a
 descriptive schema data module instead, to support older issues of the
 specification, or for types of generated front matter not covered by the
 frontmatter schema.
 
--x  
+-x, --xinclude  
 Do XInclude processing.
 
 --version  

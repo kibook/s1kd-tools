@@ -13,7 +13,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -339,20 +339,20 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,flvxh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
-	puts("  -,                 Dump the built-in .fmtypes file in XML format.");
-	puts("  -.                 Dump the built-in .fmtypes file in simple text format.");
-	puts("  -h -?              Show usage message.");
-	puts("  -F <FMTYPES>       Specify .fmtypes file.");
-	puts("  -f                 Overwrite input data modules.");
-	puts("  -l                 Treat input as list of data modules.");
-	puts("  -P <PM>            Generate front matter from the specified PM.");
-	puts("  -p <name>=<value>  Pass parameters to the XSLT specified with -X.");
-	puts("  -t <TYPE>          Generate the specified type of front matter.");
-	puts("  -v                 Verbose output.");
-	puts("  -X <XSL>           Transform generated contents.");
-	puts("  -x                 Do XInclude processing.");
-	puts("  --version          Show version information.");
-	puts("  <DM>               Generate front matter content based on the specified data modules.");
+	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");
+	puts("  -., --dump-fmtypes          Dump the built-in .fmtypes file in simple text format.");
+	puts("  -F, --fmtypes <FMTYPES>     Specify .fmtypes file.");
+	puts("  -f, --overwrite             Overwrite input data modules.");
+	puts("  -h, -?, --help              Show usage message.");
+	puts("  -l, --list                  Treat input as list of data modules.");
+	puts("  -P, --pm <PM>               Generate front matter from the specified PM.");
+	puts("  -p, --param <name>=<value>  Pass parameters to the XSLT specified with -X.");
+	puts("  -t, --type <TYPE>           Generate the specified type of front matter.");
+	puts("  -v, --verbose               Verbose output.");
+	puts("  -X, --xsl <XSL>             Transform generated contents.");
+	puts("  -x, --xinclude              Do XInclude processing.");
+	puts("  --version                   Show version information.");
+	puts("  <DM>                        Generate front matter content based on the specified data modules.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -368,7 +368,19 @@ int main(int argc, char **argv)
 
 	const char *sopts = ",.F:flP:p:t:vX:xh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"         , no_argument      , 0, 0},
+		{"help"            , no_argument      , 0, 'h'},
+		{"dump-fmtypes-xml", no_argument      , 0, ','},
+		{"dump-fmtypes"    , no_argument      , 0, '.'},
+		{"fmtypes"         , required_argument, 0, 'F'},
+		{"overwrite"       , no_argument      , 0, 'f'},
+		{"list"            , no_argument      , 0, 'l'},
+		{"pm"              , required_argument, 0, 'P'},
+		{"param"           , required_argument, 0, 'p'},
+		{"type"            , required_argument, 0, 't'},
+		{"verbose"         , no_argument      , 0, 'v'},
+		{"xsl"             , required_argument, 0, 'X'},
+		{"xinclude"        , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
