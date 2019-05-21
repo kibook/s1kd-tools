@@ -39,68 +39,68 @@ applicability statements on elements without the attribute.
 OPTIONS
 =======
 
--A &lt;ACT&gt;  
+-A, --act &lt;ACT&gt;  
 Add an ACT to use when generating display text for product attributes.
 Multiple ACT data modules can be used by specifying this option multiple
 times.
 
--a &lt;ID&gt;  
+-a, --id &lt;ID&gt;  
 The ID to use for the inline applicability annotation representing the
 whole data module's applicability. Default is "app-0000".
 
--C &lt;CCT&gt;  
+-C, --cct &lt;CCT&gt;  
 Add a CCT to use when generating display text for conditions. Multiple
 CCT data modules can be used by specifying this option multiple times.
 
--c  
+-c, --search  
 Search for the ACT and CCT referenced by each data module, and add them
 to the list of ACTs/CCTs to use when generating display text for that
 data module.
 
--D  
+-D, --dump  
 Dump the built-in XSLT used to generate display text for applicability
 statements.
 
--d &lt;dir&gt;  
+-d, --dir &lt;dir&gt;  
 Directory to start searching for ACT/CCT data modules in. By default,
 the current directory is used.
 
--F &lt;fmt&gt;  
+-F, --format &lt;fmt&gt;  
 Use a custom format string to generate display text.
 
--f  
+-f, --overwrite  
 Overwrite input data module(s) rather than outputting to stdout.
 
--G &lt;XSLT&gt;  
+-G, --xsl &lt;XSLT&gt;  
 Use custom XSLT to generate display text for applicability statements.
 
--g  
+-g, --generate  
 Generate display text for applicability statements.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--k  
+-k, --keep  
 When generating display text, do not overwrite existing display text on
 statements, only generate display text for statements which have none.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of filenames of objects,
 rather than objects themselves.
 
--p  
+-p, --presentation  
 Preprocess applicability statements to produce "presentation"
 applicability statements which are simpler to parse in an XSLT
 stylesheet. The applicability in the resulting XML is no longer
 semantically correct.
 
--r  
+-r, --recursive  
 Search for ACT/CCT data modules recursively.
 
--v  
+-v, --verbose  
 Verbose output.
 
--x  
+-x, --xinclude  
 Process the objects using the XInclude specification.
 
 --version  

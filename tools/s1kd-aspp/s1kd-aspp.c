@@ -21,7 +21,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.6.1"
+#define VERSION "2.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -638,25 +638,25 @@ void showHelp(void)
 	puts("  " PROG_NAME " -p [-a <ID>] [-flvx] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A <ACT>      Use <ACT> when generating display text.");
-	puts("  -a <ID>       Use <ID> for DM-level applic.");
-	puts("  -C <CCT>      Use <CCT> when generating display text.");
-	puts("  -c            Search for ACT/CCT data modules.");
-	puts("  -D            Dump built-in XSLT for generating display text.");
-	puts("  -d <dir>      Directory to start search for ACT/CCT in.");
-	puts("  -F <fmt>      Use a custom format string for generating display text.");
-	puts("  -f            Overwrite input file(s).");
-	puts("  -G <XSL>      Use custom XSLT script to generate display text.");
-	puts("  -g            Generate display text for applicability annotations.");
-	puts("  -k            Do not overwrite existing display text.");
-	puts("  -l            Treat input as list of modules.");
-	puts("  -p            Convert semantic applicability to presentation applicability.");
-	puts("  -r            Search for ACT/CCT recursively.");
-	puts("  -v            Verbose output.");
-	puts("  -x            Perform XInclude processing.");
-	puts("  -h -?         Show help/usage message.");
-	puts("  --version     Show version information.");
-	puts("  <object>...   CSDB objects to process.");
+	puts("  -A, --act <ACT>       Use <ACT> when generating display text.");
+	puts("  -a, --id <ID>  Use <ID> for DM-level applic.");
+	puts("  -C, --cct <CCT>       Use <CCT> when generating display text.");
+	puts("  -c, --search          Search for ACT/CCT data modules.");
+	puts("  -D, --dump            Dump built-in XSLT for generating display text.");
+	puts("  -d, --dir <dir>       Directory to start search for ACT/CCT in.");
+	puts("  -F, --format <fmt>    Use a custom format string for generating display text.");
+	puts("  -f, --overwrite       Overwrite input file(s).");
+	puts("  -G, --xsl <XSL>       Use custom XSLT script to generate display text.");
+	puts("  -g, --generate        Generate display text for applicability annotations.");
+	puts("  -k, --keep            Do not overwrite existing display text.");
+	puts("  -l, --list            Treat input as list of modules.");
+	puts("  -p, --presentation    Convert semantic applicability to presentation applicability.");
+	puts("  -r, --recursive       Search for ACT/CCT recursively.");
+	puts("  -v, --verbose         Verbose output.");
+	puts("  -x, --xinclude        Perform XInclude processing.");
+	puts("  -h, -?, --help        Show help/usage message.");
+	puts("  --version             Show version information.");
+	puts("  <object>...           CSDB objects to process.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -682,7 +682,24 @@ int main(int argc, char **argv)
 
 	const char *sopts = "A:a:C:cDd:F:fG:gklprvxh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"     , no_argument      , 0, 0},
+		{"help"        , no_argument      , 0, 'h'},
+		{"act"         , required_argument, 0, 'A'},
+		{"id"          , required_argument, 0, 'a'},
+		{"cct"         , required_argument, 0, 'C'},
+		{"search"      , no_argument      , 0, 'c'},
+		{"dump"        , no_argument      , 0, 'D'},
+		{"dir"         , required_argument, 0, 'd'},
+		{"format"      , required_argument, 0, 'F'},
+		{"overwrite"   , no_argument      , 0, 'f'},
+		{"xsl"         , required_argument, 0, 'G'},
+		{"generate"    , no_argument      , 0, 'g'},
+		{"keep"        , no_argument      , 0, 'k'},
+		{"list"        , no_argument      , 0, 'l'},
+		{"presentation", no_argument      , 0, 'p'},
+		{"recursive"   , no_argument      , 0, 'r'},
+		{"verbose"     , no_argument      , 0, 'v'},
+		{"xinclude"    , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
