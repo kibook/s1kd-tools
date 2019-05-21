@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.1.1"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -447,16 +447,16 @@ void showHelp(void)
 	puts("Usage: " PROG_NAME " [-d <dir>] [-s <source>] [-t <target>] [-clvh?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?          Show help/usage message.");
-	puts("  -c             Only move references in content section of targets.");
-	puts("  -d <dir>       Update data modules in directory <dir>.");
-	puts("  -f             Overwrite input objects.");
-	puts("  -l             Input is a list of data module filenames.");
-	puts("  -s <source>    Source object.");
-	puts("  -t <target>    Change refs to <source> into refs to <target>.");
-	puts("  -v             Verbose output.");
-	puts("  --version      Show version information.");
-	puts("  <object>...    Objects to change refs in.");
+	puts("  -c, --content          Only move references in content section of targets.");
+	puts("  -d, --dir <dir>        Update data modules in directory <dir>.");
+	puts("  -f, --overwrite        Overwrite input objects.");
+	puts("  -h, -?, --help         Show help/usage message.");
+	puts("  -l, --list             Input is a list of data module filenames.");
+	puts("  -s, --source <source>  Source object.");
+	puts("  -t, --target <target>  Change refs to <source> into refs to <target>.");
+	puts("  -v, --verbose          Verbose output.");
+	puts("  --version              Show version information.");
+	puts("  <object>...            Objects to change refs in.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -649,7 +649,15 @@ int main(int argc, char **argv)
 
 	const char *sopts = "s:cfvd:lt:qh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"  , no_argument      , 0, 0},
+		{"help"     , no_argument      , 0, 'h'},
+		{"source"   , required_argument, 0, 's'},
+		{"content"  , no_argument      , 0, 'c'},
+		{"overwrite", no_argument      , 0, 'f'},
+		{"verbose"  , no_argument      , 0, 'v'},
+		{"dir"      , required_argument, 0, 'd'},
+		{"list"     , no_argument      , 0, 'l'},
+		{"target"   , required_argument, 0, 't'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

@@ -19,30 +19,30 @@ specified set of objects.
 OPTIONS
 =======
 
--c  
+-c, --content  
 Only move references within the content section of objects.
 
--d &lt;dir&gt;  
+-d, --dir &lt;dir&gt;  
 Move references in all objects in the specified directory.
 
--f  
+-f, --overwrite  
 Overwrite updated input objects.
 
--h -?  
+-h, -?, --help  
 Show help/usage message
 
--l  
+-l, --list  
 Treat input as a list of data module filenames, rather than a data
 module itself.
 
--s &lt;source&gt;  
+-s, --source &lt;source&gt;  
 The source object.
 
--t &lt;target&gt;  
+-t, --target &lt;target&gt;  
 Change all references to the source object specified with -s into
 references that point to &lt;target&gt;.
 
--v  
+-v, --verbose  
 Verbose output.
 
 --version  
