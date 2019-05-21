@@ -19,28 +19,28 @@ user-defined set of keywords.
 OPTIONS
 =======
 
--D  
+-D, --delete  
 Remove the current index flags from a data module.
 
--f  
+-f, --overwrite  
 Overwrite input module(s).
 
--I &lt;index&gt;  
+-h, -?, --help  
+Show help/usage message.
+
+-I, --indexflags &lt;index&gt;  
 Flag the terms in the specified &lt;index&gt; XML file instead of the
 default `.indexflags` file.
 
--i  
+-i, --ignore-case  
 Ignore case when flagging terms.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of filenames of data modules
 to add index flags to, rather than data modules themselves.
 
--v  
+-v, --verbose  
 Verbose output.
-
--h -?  
-Show help/usage message.
 
 --version  
 Show version information.

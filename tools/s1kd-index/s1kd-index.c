@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -40,14 +40,14 @@ void show_help(void)
 	puts("  " PROG_NAME " -D [-filv] [<module>...]");
 	puts("");
 	puts("Options:");
-	puts("  -D          Delete current index flags.");
-	puts("  -f          Overwrite input module(s).");
-	puts("  -I <index>  Specify a custom .indexflags file");
-	puts("  -i          Ignore case when flagging terms.");
-	puts("  -l          Input is a list of file names.");
-	puts("  -v          Verbose output.");
-	puts("  -h -?       Show help/usage message.");
-	puts("  --version   Show version information.");
+	puts("  -D, --delete              Delete current index flags.");
+	puts("  -f, --overwrite           Overwrite input module(s).");
+	puts("  -h, -?, --help            Show help/usage message.");
+	puts("  -I, --indexflags <index>  Specify a custom .indexflags file");
+	puts("  -i, --ignore-case         Ignore case when flagging terms.");
+	puts("  -l, --list                Input is a list of file names.");
+	puts("  -v, --verbose             Verbose output.");
+	puts("  --version                 Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -307,7 +307,14 @@ int main(int argc, char **argv)
 
 	const char *sopts = "DfI:livh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"    , no_argument      , 0, 0},
+		{"help"       , no_argument      , 0, 'h'},
+		{"delete"     , no_argument      , 0, 'D'},
+		{"overwrite"  , no_argument      , 0, 'f'},
+		{"indexflags" , required_argument, 0, 'I'},
+		{"ignore-case", no_argument      , 0, 'i'},
+		{"list"       , no_argument      , 0, 'l'},
+		{"verbose"    , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
