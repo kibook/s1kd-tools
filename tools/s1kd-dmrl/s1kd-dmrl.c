@@ -15,28 +15,28 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [options] <DML>...");
 	puts("");
 	puts("Options:");
-	puts("  -h -?      Show usage message.");
-	puts("  -$ <iss>   Which issue of the spec to use.");
-	puts("  -@ <dir>   Output to specified directory.");
-	puts("  -% <dir>   Custom XML template directory.");
-	puts("  -D <path>  Specify .dmtypes file name.");
-	puts("  -d <path>  Specify .defaults file name.");
+	puts("  -$, --issue <iss>      Which issue of the spec to use.");
+	puts("  -@, --out <dir>        Output to specified directory.");
+	puts("  -%, --templates <dir>  Custom XML template directory.");
+	puts("  -D, --dmtypes <path>   Specify .dmtypes file name.");
+	puts("  -d, --defaults <path>  Specify .defaults file name.");
 	#ifndef _WIN32
-	puts("  -F         Fail on first error from s1kd-new* commands.");
+	puts("  -F, --fail             Fail on first error from s1kd-new* commands.");
 	#endif
-	puts("  -f         Overwrite existing CSDB objects.");
-	puts("  -N         Omit issue/inwork numbers.");
-	puts("  -q         Don't report errors if objects exist.");
-	puts("  -s         Output s1kd-new* commands only.");
-	puts("  -v         Print the names of newly created objects.");
-	puts("  --version  Show version information.");
+	puts("  -f, --overwrite        Overwrite existing CSDB objects.");
+	puts("  -h, -?, --help         Show usage message.");
+	puts("  -N, --omit-issue       Omit issue/inwork numbers.");
+	puts("  -q, --quiet            Don't report errors if objects exist.");
+	puts("  -s, --commands         Output s1kd-new* commands only.");
+	puts("  -v, --verbose          Print the names of newly created objects.");
+	puts("  --version              Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -68,7 +68,19 @@ int main(int argc, char **argv)
 
 	const char *sopts = "D:d:sNfFq$:%:@:vh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"   , no_argument      , 0, 0},
+		{"help"      , no_argument      , 0, 'h'},
+		{"defaults"  , required_argument, 0, 'd'},
+		{"dmtypes"   , required_argument, 0, 'D'},
+		{"commands"  , no_argument      , 0, 's'},
+		{"omit-issue", no_argument      , 0, 'N'},
+		{"overwrite" , no_argument      , 0, 'f'},
+		{"fail"      , no_argument      , 0, 'F'},
+		{"quiet"     , no_argument      , 0, 'q'},
+		{"issue"     , required_argument, 0, '$'},
+		{"verbose"   , no_argument      , 0, 'v'},
+		{"templates" , required_argument, 0, '%'},
+		{"out"       , required_argument, 0, '@'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
