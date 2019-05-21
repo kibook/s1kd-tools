@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.10.0"
+#define VERSION "2.10.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1255,7 +1255,7 @@ void show_help(void)
 	puts("  -L, --list                           Input is a list of data module filenames.");
 	puts("  -l, --layered                        Check BREX referenced by other BREX.");
 	puts("  -n, --notations                      Check notation rules.");
-	puts("  -o, --chain                          Output valid CSDB objects to stdout.");
+	puts("  -o, --output-valid                   Output valid CSDB objects to stdout.");
 	puts("  -p, --progress                       Display progress bar.");
 	puts("  -q, --quiet                          Quiet mode. Do not print errors.");
 	puts("  -r, --recursive                      Search for BREX recursively.");
@@ -1329,7 +1329,7 @@ int main(int argc, char *argv[])
 		{"list"           , no_argument      , 0, 'L'},
 		{"summary"        , no_argument      , 0, 'T'},
 		{"recursive"      , no_argument      , 0, 'r'},
-		{"chain"          , no_argument      , 0, 'o'},
+		{"output-valid"   , no_argument      , 0, 'o'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

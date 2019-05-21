@@ -70,7 +70,7 @@ of the first inclusion rule will be returned with the error. For
 explicitly excluded notations, the `objectUse` of the explicit exclusion
 rule is returned.
 
--o, --chain  
+-o, --output-valid  
 Output valid CSDB objects to stdout.
 
 -p, --progress  
