@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="27" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="03"/>
+        <issueDate year="2019" month="05" day="21"/>
         <dmTitle>
           <techName>s1kd-addicn(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-addicn [-s &lt;src&gt;] [-o &lt;out&gt;] [-fh?] &lt;ICN&gt;...</verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-addicn [-o <file>] [-s <src>] [-fh?] <ICN>...]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -61,31 +64,31 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-F</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-F, --full-path</listItemTerm>
               <listItemDefinition>
                 <para>Use the whole path given for the ICN file as the SYSTEM ID.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite source file instead of writing to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o &lt;out&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --out &lt;out&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The filename to output to. Default is to write to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-s &lt;src&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-s, --source &lt;src&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The source module to add the ICN(s) to. Default is to read from stdin.</para>
               </listItemDefinition>

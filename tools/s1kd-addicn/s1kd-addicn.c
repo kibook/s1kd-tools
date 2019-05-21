@@ -10,20 +10,20 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 void showHelp(void)
 {
-	puts("Usage: " PROG_NAME " [-s <src>] [-o <out>] [-fh?] <ICN>...");
+	puts("Usage: " PROG_NAME " [-o <file>] [-s <src>] [-fh?] <ICN>...");
 	puts("");
 	puts("Options:");
-	puts("  -s <src>   Source filename.");
-	puts("  -o <out>   Output filename.");
-	puts("  -f         Overwrite source file.");
-	puts("  -F         Include full ICN file path.");
-	puts("  -h -?      Show help/usage message.");
-	puts("  <ICN>...   ICNs to add.");
-	puts("  --version  Show version information.");
+	puts("  -F, --full-path     Include full ICN file path.");
+	puts("  -f, --overwrite     Overwrite source file.");
+	puts("  -h, -?, --help      Show help/usage message.");
+	puts("  -o, --out <file>    Output filename.");
+	puts("  -s, --source <src>  Source filename.");
+	puts("  --version           Show version information.");
+	puts("  <ICN>...            ICNs to add.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -44,7 +44,12 @@ int main(int argc, char **argv)
 
 	const char *sopts = "s:o:fFh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"  , no_argument      , 0, 0},
+		{"help"     , no_argument      , 0, 'h'},
+		{"source"   , required_argument, 0, 's'},
+		{"out"      , required_argument, 0, 'o'},
+		{"overwrite", no_argument      , 0, 'f'},
+		{"full-path", no_argument      , 0, 'F'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
