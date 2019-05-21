@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -232,29 +232,29 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<files>...]");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>       Specify which S1000D issue to use.");
-	puts("  -@ <path>        Output to specified file or directory.");
-	puts("  -% <dir>         Use templates in specified directory.");
-	puts("  -~ <dir>         Dump built-in XML template to directory.");
-	puts("  -d <defaults>    Specify the .defaults file name.");
-	puts("  -f               Overwrite existing file.");
-	puts("  -p               Prompt user for values.");
-	puts("  -q               Don't report an error if file exists.");
-	puts("  -v               Print file name of DDN.");
-	puts("  --version        Show version information.");
+	puts("  -$, --issue <issue>               Specify which S1000D issue to use.");
+	puts("  -@, --out <path>                  Output to specified file or directory.");
+	puts("  -%, --templates <dir>             Use templates in specified directory.");
+	puts("  -~, --dump-templates <dir>        Dump built-in XML template to directory.");
+	puts("  -d, --defaults <file>             Specify the .defaults file name.");
+	puts("  -f, --overwrite                   Overwrite existing file.");
+	puts("  -p, --prompt                      Prompt user for values.");
+	puts("  -q, --quiet                       Don't report an error if file exists.");
+	puts("  -v, --verbose                     Print file name of DDN.");
+	puts("  --version                         Show version information.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
-	puts("  -# <code>        The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
-	puts("  -a <auth>        Authorization");
-	puts("  -b <BREX>        BREX data module code");
-	puts("  -I <date>        Issue date");
-	puts("  -m <remarks>     Remarks");
-	puts("  -N <country>     Receiver country");
-	puts("  -n <country>     Sender country");
-	puts("  -o <sender>      Sender enterprise name");
-	puts("  -r <receiver>    Receiver enterprise name");
-	puts("  -T <city>        Receiver city");
-	puts("  -t <city>        Sender city");
+	puts("  -#, --code <code>                 The DDN code (MIC-SENDER-RECEIVER-YEAR-SEQ)");
+	puts("  -a, --authorization <auth>        Authorization");
+	puts("  -b, --brex <BREX>                 BREX data module code");
+	puts("  -I, --date <date>                 Issue date");
+	puts("  -m, --remarks <remarks>           Remarks");
+	puts("  -N, --receiver-country <country>  Receiver country");
+	puts("  -n, --sender-country <country>    Sender country");
+	puts("  -o, --sender <sender>             Sender enterprise name");
+	puts("  -r, --receiver <receiver>         Receiver enterprise name");
+	puts("  -T, --receiver-city <city>        Receiver city");
+	puts("  -t, --sender-city <city>          Sender city");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -494,7 +494,28 @@ int main(int argc, char **argv)
 
 	const char *sopts = "pd:#:c:o:r:t:n:T:N:a:b:I:vf$:@:%:qm:~:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"         , no_argument      , 0, 0},
+		{"help"            , no_argument      , 0, 'h'},
+		{"prompt"          , no_argument      , 0, 'p'},
+		{"defaults"        , required_argument, 0, 'd'},
+		{"code"            , required_argument, 0, '#'},
+		{"sender"          , required_argument, 0, 'o'},
+		{"receiver"        , required_argument, 0, 'r'},
+		{"sender-city"     , required_argument, 0, 't'},
+		{"sender-country"  , required_argument, 0, 'n'},
+		{"receiver-city"   , required_argument, 0, 'T'},
+		{"receiver-country", required_argument, 0, 'N'},
+		{"authorization"   , required_argument, 0, 'a'},
+		{"brex"            , required_argument, 0, 'b'},
+		{"date"            , required_argument, 0, 'I'},
+		{"verbose"         , no_argument      , 0, 'v'},
+		{"overwrite"       , no_argument      , 0, 'f'},
+		{"issue"           , required_argument, 0, '$'},
+		{"out"             , required_argument, 0, '@'},
+		{"templates"       , required_argument, 0, '%'},
+		{"quiet"           , no_argument      , 0, 'q'},
+		{"remarks"         , required_argument, 0, 'm'},
+		{"dump-templates"  , required_argument, 0, '~'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

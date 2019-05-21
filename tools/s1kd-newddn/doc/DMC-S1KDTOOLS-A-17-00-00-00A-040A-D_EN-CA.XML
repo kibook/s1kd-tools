@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="17" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="17"/>
+        <issueDate year="2019" month="05" day="21"/>
         <dmTitle>
           <techName>s1kd-newddn(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -61,13 +64,13 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-# &lt;code&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-#, --code &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The code of the new data dispatch note, in the form of MODELIDENTCODE-SENDER-RECEIVER-YEAR-SEQUENCE.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-$, --issue &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specifiy which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
@@ -101,115 +104,115 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-@ &lt;path&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-@, --out &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new DDN to &lt;path&gt;. If &lt;path&gt; is an existing directory, the DDN will be created in it instead of the current directory. Otherwise, the DDN will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-% &lt;dir&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-%, --templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">ddn.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-~ &lt;dir&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-~, --dump-templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XML template to the specified directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-a &lt;auth&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-a, --authorization &lt;auth&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the authorization.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-b &lt;BREX&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-b, --brex &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d &lt;defaults&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --defaults &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-I &lt;date&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-I, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new DDN in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-m &lt;remarks&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-m, --remarks &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the remarks for the new data dispatch note.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-N &lt;country&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-N, --receiver-country &lt;country&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The receiver's country.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-n &lt;country&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-n, --sender-country &lt;country&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The sender's country.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o &lt;sender&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --sender &lt;name&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The enterprise name of the sender.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-p &lt;showprompts&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --prompt</listItemTerm>
               <listItemDefinition>
                 <para>Prompt the user for values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-q</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Do not report an error when the file already exists.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-r &lt;receiver&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-r, --receiver &lt;name&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The enterprise name of the receiver.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-T &lt;city&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-T, --receiver-city &lt;city&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The receiver's city.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-t &lt;city&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --sender-city &lt;city&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The sender's city.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Print the file name of the newly created DDN.</para>
               </listItemDefinition>
