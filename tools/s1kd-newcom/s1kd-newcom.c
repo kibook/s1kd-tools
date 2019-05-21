@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -459,29 +459,30 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>     Specify which S1000D issue to use.");
-	puts("  -@ <path>      Output to specified file or directory.");
-	puts("  -% <dir>       Use templates in specified directory.");
-	puts("  -~ <dir>       Dump built-in XML template to directory.");
-	puts("  -d <defaults>  Specify the .defaults file name.");
-	puts("  -f             Overwrite existing file.");
-	puts("  -p             Prompt the user for each value.");
-	puts("  -q             Don't report an error if file exists.");
-	puts("  -v             Print file name of comment.");
-	puts("  --version      Show version information.");
+	puts("  -$, --issue <issue>         Specify which S1000D issue to use.");
+	puts("  -@, --out <path>            Output to specified file or directory.");
+	puts("  -%, --templates <dir>       Use templates in specified directory.");
+	puts("  -~, --dump-templates <dir>  Dump built-in XML template to directory.");
+	puts("  -d, --defaults <file>       Specify the .defaults file name.");
+	puts("  -f, --overwrite             Overwrite existing file.");
+	puts("  -p, --prompt                Prompt the user for each value.");
+	puts("  -q, --quiet                 Don't report an error if file exists.");
+	puts("  -v, --verbose               Print file name of comment.");
+	puts("  --version                   Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -# <code>      Comment code");
-	puts("  -b <BREX>      BREX data module code");
-	puts("  -C <country>   Country ISO code");
-	puts("  -c <sec>       Security classification");
-	puts("  -I <date>      Issue date");
-	puts("  -m <remarks>   Remarks");
-	puts("  -L <lang>      Language ISO code");
-	puts("  -o <orig>      Originator");
-	puts("  -r <type>      Response type");
-	puts("  -t <title>     Comment title");
-	puts("  -z <type>      Issue type");
+	puts("  -#, --code <code>           Comment code");
+	puts("  -b, --brex <BREX>           BREX data module code");
+	puts("  -C, --country <country>     Country ISO code");
+	puts("  -c, --security <sec>        Security classification");
+	puts("  -I, --date <date>           Issue date");
+	puts("  -m, --remarks <remarks>     Remarks");
+	puts("  -L, --language <lang>       Language ISO code");
+	puts("  -o, --origname <orig>       Originator");
+	puts("  -P, --priority <code>       Priority code");
+	puts("  -r, --response <type>       Response type");
+	puts("  -t, --title <title>         Comment title");
+	puts("  -z, --issue-type <type>     Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -537,7 +538,29 @@ int main(int argc, char **argv)
 
 	const char *sopts = "d:p#:o:c:L:C:P:t:r:b:I:vf$:@:%:qm:~:z:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"defaults"      , required_argument, 0, 'd'},
+		{"prompt"        , no_argument      , 0, 'p'},
+		{"code"          , required_argument, 0, '#'},
+		{"origname"      , required_argument, 0, 'o'},
+		{"security"      , required_argument, 0, 'c'},
+		{"language"      , required_argument, 0, 'L'},
+		{"country"       , required_argument, 0, 'C'},
+		{"priority"      , required_argument, 0, 'P'},
+		{"title"         , required_argument, 0, 't'},
+		{"response"      , required_argument, 0, 'r'},
+		{"brex"          , required_argument, 0, 'b'},
+		{"date"          , required_argument, 0, 'I'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"overwrite"     , no_argument      , 0, 'f'},
+		{"issue"         , required_argument, 0, '$'},
+		{"out"           , required_argument, 0, '@'},
+		{"templates"     , required_argument, 0, '%'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"remarks"       , required_argument, 0, 'm'},
+		{"dump-templates", required_argument, 0, '~'},
+		{"issue-type"    , required_argument, 0, 'z'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
