@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.13.0"
+#define VERSION "1.14.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -230,48 +230,48 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>     Specify which S1000D issue to use.");
-	puts("  -@ <path>      Output to specified file or directory");
-	puts("  -% <dir>       Use templates in specified directory.");
-	puts("  -~ <dir>       Dump default templates to a directory.");
-	puts("  -,             Dump default dmtypes XML.");
-	puts("  -.             Dump default dmtypes text file.");
-	puts("  -!             Do not include an info name.");
-	puts("  -B             Generate BREX rules.");
-	puts("  -D <dmtypes>   Specify .dmtypes file name.");
-	puts("  -d <defaults>  Specify .defaults file name.");
-	puts("  -f             Overwrite existing file.");
-	puts("  -j <map>       Use a custom .brexmap file.");
-	puts("  -M <SNS>       Use one of the maintained SNS.");
-	puts("  -N             Omit issue/inwork from filename.");
-	puts("  -P             Include previous level of SNS in tech name.");
-	puts("  -p             Prompt the user for each value");
-	puts("  -q             Don't report an error if file exists.");
-	puts("  -S <BREX>      Get tech name from BREX SNS.");
-	puts("  -v             Print file name of new data module.");
-	puts("  --version      Show version information.");
+	puts("  -$, --issue <issue>         Specify which S1000D issue to use.");
+	puts("  -@, --out <path>            Output to specified file or directory");
+	puts("  -%, --templates <dir>       Use templates in specified directory.");
+	puts("  -~, --dump-templates <dir>  Dump default templates to a directory.");
+	puts("  -,, --dump-dmtypes-xml      Dump default dmtypes XML.");
+	puts("  -., --dump-dmtypes          Dump default dmtypes text file.");
+	puts("  -!, --no-infoname           Do not include an info name.");
+	puts("  -B, --generate-brex-rules   Generate BREX rules from .defaults file.");
+	puts("  -D, --dmtypes <dmtypes>     Specify .dmtypes file name.");
+	puts("  -d, --defaults <defaults>   Specify .defaults file name.");
+	puts("  -f, --overwrite             Overwrite existing file.");
+	puts("  -j, --brexmap <map>         Use a custom .brexmap file.");
+	puts("  -M, --maintained-sns <SNS>  Use one of the maintained SNS.");
+	puts("  -N, --omit-issue            Omit issue/inwork from filename.");
+	puts("  -P, --two-sns-levels        Include previous level of SNS in tech name.");
+	puts("  -p, --prompt                Prompt the user for each value");
+	puts("  -q, --quiet                 Don't report an error if file exists.");
+	puts("  -S, --sns <BREX>            Get tech name from BREX SNS.");
+	puts("  -v, --verbose               Print file name of new data module.");
+	puts("  --version                   Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -# <code>      Data module code");
-	puts("  -a <ACT>       ACT data module code");
-	puts("  -b <BREX>      BREX data module code");
-	puts("  -C <country>   Country ISO code");
-	puts("  -c <sec>       Security classification");
-	puts("  -I <date>      Issue date");
-	puts("  -i <info>      Info name");
-	puts("  -k <skill>     Skill level");
-	puts("  -L <lang>      Language ISO code");
-	puts("  -m <remarks>   Remarks");
-	puts("  -n <iss>       Issue number");
-	puts("  -O <CAGE>      Originator CAGE code.");
-	puts("  -o <orig>      Originator enterprise name");
-	puts("  -R <CAGE>      Responsible partner company CAGE code.");
-	puts("  -r <RPC>       Responsible partner company enterprise name");
-	puts("  -s <schema>    Schema");
-	puts("  -T <type>      DM type (descript, proced, frontmatter, etc.)");
-	puts("  -t <tech>      Tech name");
-	puts("  -w <inwork>    Inwork issue");
-	puts("  -z <type>      Issue type");
+	puts("  -#, --code <code>           Data module code");
+	puts("  -a, --act <ACT>             ACT data module code");
+	puts("  -b, --brex <BREX>           BREX data module code");
+	puts("  -C, --country <country>     Country ISO code");
+	puts("  -c, --security <sec>        Security classification");
+	puts("  -I, --date <date>           Issue date");
+	puts("  -i, --infoname <info>       Info name");
+	puts("  -k, --skill <skill>         Skill level");
+	puts("  -L, --language <lang>       Language ISO code");
+	puts("  -m, --remarks <remarks>     Remarks");
+	puts("  -n, --issue-number <iss>    Issue number");
+	puts("  -O, --origcode <CAGE>       Originator CAGE code.");
+	puts("  -o, --origname <orig>       Originator enterprise name");
+	puts("  -R, --rpccode <CAGE>        Responsible partner company CAGE code.");
+	puts("  -r, --rpcname <RPC>         Responsible partner company enterprise name");
+	puts("  -s, --schema <schema>       Schema");
+	puts("  -T, --type <type>           DM type (descript, proced, frontmatter, etc.)");
+	puts("  -t, --techname <tech>       Tech name");
+	puts("  -w, --inwork <inwork>       Inwork issue");
+	puts("  -z, --issue-type <type>     Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1348,7 +1348,47 @@ int main(int argc, char **argv)
 
 	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:z:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"               , no_argument      , 0, 0},
+		{"help"                  , no_argument      , 0, 'h'},
+		{"act"                   , required_argument, 0, 'a'},
+		{"prompt"                , no_argument      , 0, 'p'},
+		{"defaults"              , required_argument, 0, 'd'},
+		{"dmtypes"               , required_argument, 0, 'D'},
+		{"language"              , required_argument, 0, 'L'},
+		{"country"               , required_argument, 0, 'C'},
+		{"issno"                 , required_argument, 0, 'n'},
+		{"inwork"                , required_argument, 0, 'w'},
+		{"security"              , required_argument, 0, 'c'},
+		{"rpcname"               , required_argument, 0, 'r'},
+		{"rpccode"               , required_argument, 0, 'R'},
+		{"orgname"               , required_argument, 0, 'o'},
+		{"orgcode"               , required_argument, 0, 'O'},
+		{"techname"              , required_argument, 0, 't'},
+		{"infoname"              , required_argument, 0, 'i'},
+		{"type"                  , required_argument, 0, 'T'},
+		{"code"                  , required_argument, 0, '#'},
+		{"omit-issue"            , no_argument      , 0, 'N'},
+		{"schema"                , required_argument, 0, 's'},
+		{"generate-brex-rules"   , no_argument      , 0, 'B'},
+		{"brex"                  , required_argument, 0, 'b'},
+		{"sns"                   , required_argument, 0, 'S'},
+		{"date"                  , required_argument, 0, 'I'},
+		{"verbose"               , no_argument      , 0, 'v'},
+		{"overwrite"             , no_argument      , 0, 'f'},
+		{"issue"                 , required_argument, 0, '$'},
+		{"out"                   , required_argument, 0, '@'},
+		{"remarks"               , required_argument, 0, 'm'},
+		{"dump-dmtypes"          , no_argument      , 0, '.'},
+		{"dump-dmtypes-xml"      , no_argument      , 0, ','},
+		{"templates"             , required_argument, 0, '%'},
+		{"quiet"                 , no_argument      , 0, 'q'},
+		{"maintained-sns"        , required_argument, 0, 'M'},
+		{"two-sns-levels"        , no_argument      , 0, 'P'},
+		{"no-infoname"           , no_argument      , 0, '!'},
+		{"skill"                 , required_argument, 0, 'k'},
+		{"brexmap"               , required_argument, 0, 'j'},
+		{"dump-templates"        , required_argument, 0, '~'},
+		{"issue-type"            , required_argument, 0, 'z'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

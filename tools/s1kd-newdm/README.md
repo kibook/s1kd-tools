@@ -17,10 +17,10 @@ module code and other metadata specified.
 OPTIONS
 =======
 
--\# &lt;DMC&gt;  
+-\#, --code &lt;DMC&gt;  
 The data module code of the new data module.
 
--$ &lt;issue&gt;  
+-$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
 -   4.2 (default)
@@ -39,75 +39,75 @@ Specify which issue of S1000D to use. Currently supported issues are:
 
 -   2.0
 
--@ &lt;path&gt;  
+-@, --out &lt;path&gt;  
 Save the new data module to &lt;path&gt;. If &lt;path&gt; is an existing
 directory, the data module will be created in it instead of the current
 directory. Otherwise, the data module will be saved as the filename
 &lt;path&gt; instead of being automatically named.
 
--% &lt;dir&gt;  
+-%, --templates &lt;dir&gt;  
 Use XML templates in the specified directory instead of the built-in
 templates.
 
--\~ &lt;dir&gt;  
+-\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML templates to the specified directory.
 
--,  
+-,, --dump-dmtypes-xml  
 Dumps the built-in default `.dmtypes` XML. This can be used to quickly
 set up a starting point for a project's custom info codes, from which
 info names can be modified and unused codes can be removed to fit the
 project.
 
--.  
+-., --dump-dmtypes  
 Dumps the simple text form of the built-in default `.dmtypes`.
 
--!  
+-!, --no-infoname  
 Do not include an info name for the new data module.
 
--a &lt;ACT&gt;  
+-a, --act &lt;ACT&gt;  
 ACT data module code.
 
--B  
+-B, --generate-brex-rules  
 When creating a new BREX data module, use the `.defaults` and `.dmtypes`
 files to add a basic set of context rules.
 
--b &lt;BREX&gt;  
+-b, --brex &lt;BREX&gt;  
 BREX data module code.
 
--C &lt;country&gt;  
+-C, --country &lt;country&gt;  
 The country ISO code of the new data module.
 
--c &lt;sec&gt;  
+-c, --security &lt;sec&gt;  
 The security classification of the new data module.
 
--D &lt;dmtypes&gt;  
+-D, --dmtypes &lt;dmtypes&gt;  
 Specify the `.dmtypes` file name.
 
--d &lt;defaults&gt;  
+-d, --defaults &lt;defaults&gt;  
 Specify the `.defaults` file name.
 
--f  
+-f, --overwrite  
 Overwrite existing file.
 
--h -?  
+-h -? --help  
 Show help/usage message.
 
--I &lt;date&gt;  
+-I, --date &lt;date&gt;  
 Issue date of the new data module in the form of YYYY-MM-DD.
 
--i &lt;info&gt;  
+-i, --infoname &lt;info&gt;  
 The info name of the new data module.
 
--j &lt;map&gt;  
+-j, --brexmap &lt;map&gt;  
 Use a custom `.brexmap` file when using the -B option.
 
--k &lt;skill&gt;  
+-k, --skill &lt;skill&gt;  
 The skill level code of the new data module.
 
--L &lt;language&gt;  
+-L, --language &lt;language&gt;  
 The language ISO code of the new data module.
 
--M &lt;SNS&gt;  
+-M, --maintained-sns &lt;SNS&gt;  
 Determine the tech name from on one of the built-in S1000D maintained
 SNS. Supported SNS:
 
@@ -131,23 +131,23 @@ When creating a BREX data module, this SNS will be included as the SNS
 rules of the new data module. The "`maintainedSns`" `.defaults` file key
 can be used to set one of the above SNS as the default.
 
--m &lt;remarks&gt;  
+-m, --remarks &lt;remarks&gt;  
 Set remarks for the new data module.
 
--N  
+-N, --omit-issue  
 Omit issue/inwork numbers from filename. The "`omitIssueInfo`"
 `.defaults` file key can also be set to control this option.
 
--n &lt;issue&gt;  
+-n, --issno &lt;issue&gt;  
 The issue number of the new data module.
 
--O &lt;CAGE&gt;  
+-O, --origcode &lt;CAGE&gt;  
 The CAGE code of the originator.
 
--o &lt;orig&gt;  
+-o, --origname &lt;orig&gt;  
 The originator enterprise name of the new data module.
 
--P  
+-P, --two-sns-levels  
 When determining tech name from an SNS (-S or -M), include the previous
 level of SNS in the tech name. This means that:
 
@@ -164,27 +164,27 @@ If both levels have the same title, then only one will be used. The
 "`includePrevSnsTitle`" `.defaults` file key can also be set to control
 this option.
 
--p  
+-p, --prompt  
 Prompts the user for any values left unspecified.
 
--q  
+-q, --quiet  
 Do not report an error when the file already exists.
 
--R &lt;CAGE&gt;  
+-R, --rpccode &lt;CAGE&gt;  
 The CAGE code of the responsible partner company.
 
--r &lt;RPC&gt;  
+-r, --rpcname &lt;RPC&gt;  
 The responsible partner company enterprise name of the new data module.
 
--S &lt;BREX&gt;  
+-S, --sns &lt;BREX&gt;  
 Determine the tech name from the SNS rules of a specified BREX data
 module. This can also be specified in the `.defaults` file with the key
 "`sns`".
 
--s &lt;schema&gt;  
+-s, --schema &lt;schema&gt;  
 The schema URL.
 
--T &lt;schema&gt;  
+-T, --type &lt;schema&gt;  
 The type (schema) of the new data module. Supported schemas:
 
 -   appliccrossreftable - Applicability cross-reference table
@@ -231,16 +231,16 @@ The type (schema) of the new data module. Supported schemas:
 
 -   wrngflds - Wiring fields
 
--t &lt;tech&gt;  
+-t, --techname &lt;tech&gt;  
 The tech name of the new data module.
 
--v  
+-v, --verbose  
 Print the file name of the newly created data module.
 
--w &lt;inwork&gt;  
+-w, --inwork &lt;inwork&gt;  
 The inwork number of the new data module.
 
--z &lt;type&gt;  
+-z, --issue-type &lt;type&gt;  
 The issue type of the new data module.
 
 --version  
