@@ -21,24 +21,24 @@ includes:
 OPTIONS
 =======
 
--f  
+-f, --overwrite  
 Overwrite specified CSDB object(s) automatically.
 
--h -?  
+-h, -?, --help  
 Show usage message.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of CSDB objects to neutralize,
 rather than CSDB objects themselves.
 
--n  
+-n, --namespace  
 Include the IETP namespaces for data module and publication module
 elements.
 
--o &lt;file&gt;  
+-o, --out &lt;file&gt;  
 Output neutralized CSDB object XML to &lt;file&gt; instead of stdout.
 
--v  
+-v, --verbose  
 Verbose output.
 
 --version  
