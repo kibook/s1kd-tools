@@ -21,44 +21,44 @@ invalid XML tree.
 OPTIONS
 =======
 
--B  
+-B, --default-brex  
 Check each input object against the appropriate built-in S1000D default
 BREX only. The actual BREX reference of each object is ignored.
 
--b &lt;brex&gt;  
+-b, --brex &lt;brex&gt;  
 Check the CSDB objects against this BREX. Multiple BREX data modules can
 be specified by adding this option multiple times. When no BREX data
 modules are specified, the BREX data module referenced in
 &lt;brexDmRef&gt; in the CSDB object is attempted to be used instead.
 
--c  
+-c, --values  
 When a context rule defines values for an object (objectValue), check if
 the value of each object is within the allowed set of values.
 
--d &lt;dir&gt;  
+-d, --dir &lt;dir&gt;  
 Directory to start searching for BREX data modules in. By default, the
 current directory is used.
 
--f  
+-f, --overwrite  
 Print the filenames of CSDB objects with BREX/SNS errors.
 
--h -?  
+-h, -?, --help  
 Show the help/usage message.
 
--I &lt;path&gt;  
+-I, --include &lt;path&gt;  
 Add a search path for BREX data modules. By default, only the current
 directory is searched.
 
--L  
+-L, --list  
 Treat input as a list of object filenames to check, rather than an
 object itself.
 
--l  
+-l, --layered  
 Use the layered BREX concept. BREX data modules referenced by other BREX
 data modules (either specified with -b or referenced by the specified
 CSDB objects) will also be checked against.
 
--n  
+-n, --notations  
 Check notation rules. Any notation names listed in any of the BREX data
 modules with attribute `allowedNotationFlag` set to "1" or omitted are
 considered valid notations. If a notation in a CSDB object is not
@@ -70,39 +70,39 @@ of the first inclusion rule will be returned with the error. For
 explicitly excluded notations, the `objectUse` of the explicit exclusion
 rule is returned.
 
--o  
+-o, --chain  
 Output valid CSDB objects to stdout.
 
--p  
+-p, --progress  
 Display a progress bar.
 
--q  
+-q, --quiet  
 Quiet mode. No errors are printed, they are only indicated via the exit
 status.
 
--r  
+-r, --recursive  
 Search for BREX data modules recursively.
 
--S\[tu\]  
+-S\[tu\], --sns \[--strict\|--unstrict\]  
 Check Standard Numbering System (SNS) rules. The SNS of each specified
 data module is checked against the combination of all SNS rules of all
 specified BREX data modules.
 
--s  
+-s, --short  
 Use shortened, single-line messages to report BREX errors instead of
 multiline indented messages.
 
--T  
+-T, --summary  
 Print a summary of the check after it completes, including statistics on
 the number of documents that passed/failed the check.
 
--v  
+-v, --verbose  
 Verbose mode. The success or failure of each test is printed explicitly.
 
--w &lt;severities&gt;  
+-w, --severity-levels &lt;severities&gt;  
 Specify a list of severity levels for business rules.
 
--x  
+-x, --xml  
 Output an XML report.
 
 --version  

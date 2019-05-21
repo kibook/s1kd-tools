@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.9.2"
+#define VERSION "2.10.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1245,27 +1245,27 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <sev>] [-BcfLlnopqrS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?        Show this help message.");
-	puts("  -B           Use the default BREX.");
-	puts("  -b <brex>    Use <brex> as the BREX data module.");
-	puts("  -c           Check object values.");
-	puts("  -d <dir>     Directory to start search for BREX in.");
-	puts("  -f           Print the filenames of invalid objects.");
-	puts("  -I <path>    Add <path> to search path for BREX data module.");
-	puts("  -L           Input is a list of data module filenames.");
-	puts("  -l           Check BREX referenced by other BREX.");
-	puts("  -n           Check notation rules.");
-	puts("  -o           Output valid CSDB objects to stdout.");
-	puts("  -p           Display progress bar.");
-	puts("  -q           Quiet mode. Do not print errors.");
-	puts("  -r           Search for BREX recursively.");
-	puts("  -S[tu]       Check SNS rules (normal, strict, unstrict).");
-	puts("  -s           Short messages.");
-	puts("  -T           Print a summary of the check.");
-	puts("  -v           Verbose mode.");
-	puts("  -w <sev>     List of severity levels.");
-	puts("  -x           XML output.");
-	puts("  --version    Show version information.");
+	puts("  -B, --default-brex                   Use the default BREX.");
+	puts("  -b, --brex <brex>                    Use <brex> as the BREX data module.");
+	puts("  -c, --values                         Check object values.");
+	puts("  -d, --dir <dir>                      Directory to start search for BREX in.");
+	puts("  -f, --filenames                      Print the filenames of invalid objects.");
+	puts("  -h, -?, --help                       Show this help message.");
+	puts("  -I, --include <path>                 Add <path> to search path for BREX data module.");
+	puts("  -L, --list                           Input is a list of data module filenames.");
+	puts("  -l, --layered                        Check BREX referenced by other BREX.");
+	puts("  -n, --notations                      Check notation rules.");
+	puts("  -o, --chain                          Output valid CSDB objects to stdout.");
+	puts("  -p, --progress                       Display progress bar.");
+	puts("  -q, --quiet                          Quiet mode. Do not print errors.");
+	puts("  -r, --recursive                      Search for BREX recursively.");
+	puts("  -S[tu], --sns [--strict|--unstrict]  Check SNS rules.");
+	puts("  -s, --short                          Short messages.");
+	puts("  -T, --summary                        Print a summary of the check.");
+	puts("  -v, --verbose                        Verbose mode.");
+	puts("  -w, --severity-levels <sev>          List of severity levels.");
+	puts("  -x, --xml                            XML output.");
+	puts("  --version                            Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1307,7 +1307,29 @@ int main(int argc, char *argv[])
 
 	const char *sopts = "Bb:I:xvqslw:StupfncLTrd:oh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"        , no_argument      , 0, 0},
+		{"help"           , no_argument      , 0, 'h'},
+		{"default-brex"   , no_argument      , 0, 'B'},
+		{"brex"           , required_argument, 0, 'b'},
+		{"dir"            , required_argument, 0, 'd'},
+		{"include"        , required_argument, 0, 'I'},
+		{"xml"            , no_argument      , 0, 'x'},
+		{"quiet"          , no_argument      , 0, 'q'},
+		{"verbose"        , no_argument      , 0, 'v'},
+		{"short"          , no_argument      , 0, 's'},
+		{"layered"        , no_argument      , 0, 'l'},
+		{"severity-levels", required_argument, 0, 'w'},
+		{"sns"            , no_argument      , 0, 'S'},
+		{"strict"         , no_argument      , 0, 't'},
+		{"unstrict"       , no_argument      , 0, 'u'},
+		{"progress"       , no_argument      , 0, 'p'},
+		{"filenames"      , no_argument      , 0, 'f'},
+		{"notations"      , no_argument      , 0, 'n'},
+		{"values"         , no_argument      , 0, 'c'},
+		{"list"           , no_argument      , 0, 'L'},
+		{"summary"        , no_argument      , 0, 'T'},
+		{"recursive"      , no_argument      , 0, 'r'},
+		{"chain"          , no_argument      , 0, 'o'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
