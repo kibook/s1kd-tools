@@ -21,43 +21,43 @@ and `.fmtypes` files.
 OPTIONS
 =======
 
--b &lt;BREX&gt;  
+-b, --brex &lt;BREX&gt;  
 Use the specified BREX data module to build the `.defaults` and
 `.dmtypes` files. This can be used both when initializing a new CSDB
 (-i) or either file can be generated from a BREX data module separately.
 
--D  
+-D, --dmtypes  
 Convert a `.dmtypes` file.
 
--d  
+-d, --defaults  
 Convert a `.defaults` file.
 
--F  
+-F, --fmtypes  
 Convert a `.fmtypes` file.
 
--f  
+-f, --overwrite  
 Overwrite the existing file after conversion.
 
--i  
+-h, -?, --help  
+Show help/usage message.
+
+-i, --init  
 Initialize a new CSDB by generating the `.defaults`, `.dmtypes` and
 `.fmtypes` files in the current directory.
 
--J  
+-J, --dump-brexmap  
 Dump the default `.brexmap` file to stdout.
 
--j &lt;map&gt;  
+-j, --brexmap &lt;map&gt;  
 Use a custom `.brexmap` file to map a BREX DM to a `.defaults` or
 `.dmtypes` file.
 
--s  
+-s, --sort  
 Sort the entries alphabetically for either file/output format.
 
--t  
+-t, --text  
 Output using the simple text format. Otherwise, the XML format is used
 by default.
-
--h -?  
-Show help/usage message.
 
 --version  
 Show version information.

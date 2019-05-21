@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.6.1"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
@@ -32,17 +32,17 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [<file>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?      Show usage message.");
-	puts("  -b <BREX>  Create from a BREX DM.");
-	puts("  -D         Convert a .dmtypes file.");
-	puts("  -d         Convert a .defaults file.");
-	puts("  -F         Convert a .fmtypes file.");
-	puts("  -f         Overwrite an existing file.");
-	puts("  -i         Initialize a new CSDB.");
-	puts("  -J         Dump default .brexmap file.");
-	puts("  -j <map>   Use a custom .brexmap file.");
-	puts("  -s         Sort entries.");
-	puts("  -t         Output in the simple text format.");
+	puts("  -b, --brex <BREX>    Create from a BREX DM.");
+	puts("  -D, --dmtypes        Convert a .dmtypes file.");
+	puts("  -d, --defaults       Convert a .defaults file.");
+	puts("  -F, --fmtypes        Convert a .fmtypes file.");
+	puts("  -f, --overwrite      Overwrite an existing file.");
+	puts("  -h, -?, --help       Show usage message.");
+	puts("  -i, --init           Initialize a new CSDB.");
+	puts("  -J, --dump-brexmap   Dump default .brexmap file.");
+	puts("  -j, --brexmap <map>  Use a custom .brexmap file.");
+	puts("  -s, --sort           Sort entries.");
+	puts("  -t, --text           Output in the simple text format.");
 	puts("  --version  Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -516,7 +516,18 @@ int main(int argc, char **argv)
 
 	const char *sopts = "b:DdFfiJj:sth?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"     , no_argument      , 0, 0},
+		{"help"        , no_argument      , 0, 'h'},
+		{"brex"        , required_argument, 0, 'b'},
+		{"dmtypes"     , no_argument      , 0, 'D'},
+		{"defaults"    , no_argument      , 0, 'd'},
+		{"fmtypes"     , no_argument      , 0, 'F'},
+		{"overwrite"   , no_argument      , 0, 'f'},
+		{"init"        , no_argument      , 0, 'i'},
+		{"dump-brexmap", no_argument      , 0, 'J'},
+		{"brexmap"     , required_argument, 0, 'j'},
+		{"sort"        , no_argument      , 0, 's'},
+		{"text"        , no_argument      , 0, 't'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
