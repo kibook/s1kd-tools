@@ -17,59 +17,59 @@ metadata on S1000D CSDB objects.
 OPTIONS
 =======
 
--0  
+-0, --null  
 Print a null-delimited list of values of the pieces of metadata
 specified with -n, or all available metadata if -n is not specified.
 
--c &lt;file&gt;  
+-c, --set &lt;file&gt;  
 Use &lt;file&gt; to edit metadata files. &lt;file&gt; consists of lines
 starting with a metadata name, followed by whitespace, followed by the
 new value for the metadata (the program uses this same format when
 outputting all metadata if no &lt;name&gt; is specified).
 
--e  
+-e, --editable  
 When showing all metadata, only list editable items. This is useful when
 creating a file for use with the -c option.
 
--F &lt;fmt&gt;  
+-F, --format &lt;fmt&gt;  
 Print a formatted line for each CSDB object. Metadata names surrounded
 with % (e.g. %issueDate%) will be substituted by the value read from the
 object.
 
--f  
+-f, --overwrite  
 When editing metadata, overwrite the object. The default is to output
 the modified object to stdout.
 
--H  
+-H, --info  
 Lists all available metadata with a short description of each. Specify
 specific metadata to describe with the -n option.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--l  
+-l, --list  
 Treat input as a list of object filenames to read or edit metadata on,
 rather than an object itself.
 
--n &lt;name&gt;  
+-n, --name &lt;name&gt;  
 The name of the piece of metadata to fetch. This option can be specified
 multiple times to fetch multiple pieces of metadata. If -n is not
 specified, all available metadata names are printed with their values.
 This output can be sent to a text file, edited, and then specified with
 the -c option as a means of editing metadata in any text editor.
 
--q  
+-q, --quiet  
 Quiet mode. Non-fatal errors such as a missing piece of optional
 metadata in an object will not be printed to stderr.
 
--T  
+-T, --raw  
 Do not format columns in output.
 
--t  
+-t, --tab  
 Print a tab-delimited list of values of the pieces of metadata specified
 with -n, or all available metadata if -n is not specified.
 
--v &lt;value&gt;  
+-v, --value &lt;value&gt;  
 When following a -n option, this specifies the new value for that piece
 of metadata.
 
@@ -79,13 +79,13 @@ that piece of metadata to.
 Each -n, -w, or -W can be followed by -v to edit or define conditions on
 multiple pieces of metadata.
 
--W &lt;name&gt;  
+-W, --not-when &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is
 not equal to the value specified in the following -v option. If no -v
 option follows, this will show objects which do not have metadata
 &lt;name&gt; of any value.
 
--w &lt;name&gt;  
+-w, --when &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is
 equal to the value specified in the following -v option. If no -v option
 follows, this will show objects which have metadata &lt;name&gt; with

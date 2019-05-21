@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.2.0"
+#define VERSION "2.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1847,22 +1847,22 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -0           Use null-delimited fields.");
-	puts("  -c <file>    Set metadata using definitions in <file> (- for stdin).");
-	puts("  -e           Include only editable metadata when showing all.");
-	puts("  -F <fmt>     Print a formatted line for each CSDB object.");
-	puts("  -f           Overwrite modules when editing metadata.");
-	puts("  -H           List information on available metadata.");
-	puts("  -l           Input is a list of filenames.");
-	puts("  -n <name>    Specific metadata name to view/edit.");
-	puts("  -q           Quiet mode, do not show non-fatal errors.");
-	puts("  -T           Do not format columns in output.");
-	puts("  -t           Use tab-delimited fields.");
-	puts("  -v <value>   The value to set or match.");
-	puts("  -W <name>    Only list/edit when metadata <name> does not equal a value.");
-	puts("  -w <name>    Only list/edit when metadata <name> equals a value.");
-	puts("  --version    Show version information.");
-	puts("  <object>     CSDB object(s) to view/edit metadata on.");
+	puts("  -0, --null             Use null-delimited fields.");
+	puts("  -c, --set <file>       Set metadata using definitions in <file> (- for stdin).");
+	puts("  -e, --editable         Include only editable metadata when showing all.");
+	puts("  -F, --format <fmt>     Print a formatted line for each CSDB object.");
+	puts("  -f, --overwrite        Overwrite modules when editing metadata.");
+	puts("  -H, --info             List information on available metadata.");
+	puts("  -l, --list             Input is a list of filenames.");
+	puts("  -n, --name <name>      Specific metadata name to view/edit.");
+	puts("  -q, --quiet            Quiet mode, do not show non-fatal errors.");
+	puts("  -T, --raw              Do not format columns in output.");
+	puts("  -t, --tab              Use tab-delimited fields.");
+	puts("  -v, --value <value>    The value to set or match.");
+	puts("  -W, --not-when <name>  Only list/edit when metadata <name> does not equal a value.");
+	puts("  -w, --when <name>      Only list/edit when metadata <name> equals a value.");
+	puts("  --version              Show version information.");
+	puts("  <object>               CSDB object(s) to view/edit metadata on.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -2280,7 +2280,22 @@ int main(int argc, char **argv)
 
 	const char *sopts = "0c:eF:fHln:Ttv:qW:w:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"  , no_argument      , 0, 0},
+		{"help"     , no_argument      , 0, 'h'},
+		{"null"     , no_argument      , 0, '0'},
+		{"set"      , required_argument, 0, 'c'},
+		{"editable" , no_argument      , 0, 'e'},
+		{"format"   , required_argument, 0, 'F'},
+		{"overwrite", no_argument      , 0, 'f'},
+		{"info"     , no_argument      , 0, 'H'},
+		{"list"     , no_argument      , 0, 'l'},
+		{"name"     , required_argument, 0, 'n'},
+		{"raw"      , no_argument      , 0, 'T'},
+		{"tab"      , no_argument      , 0, 't'},
+		{"value"    , required_argument, 0, 'v'},
+		{"quiet"    , no_argument      , 0, 'q'},
+		{"when"     , required_argument, 0, 'w'},
+		{"not-when" , required_argument, 0, 'W'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
