@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.2.0"
+#define VERSION "2.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
@@ -39,17 +39,17 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfNpRrxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -c         Flatten referenced container data modules.");
-	puts("  -D         Remove unresolved refs without flattening.");
-	puts("  -d <dir>   Directory to start search in.");
-	puts("  -f         Overwrite publication module.");
-	puts("  -I <path>  Search <path> for referenced objects.");
-	puts("  -N         Assume issue/inwork numbers are omitted.");
-	puts("  -p         Output a simple, flat XML file.");
-	puts("  -R         Recursively flatten referenced PMs.");
-	puts("  -r         Search directories recursively.");
-	puts("  -x         Use XInclude references.");
-	puts("  -h -?      Show help/usage message.");
+	puts("  -c, --containers      Flatten referenced container data modules.");
+	puts("  -D, --remove          Remove unresolved refs without flattening.");
+	puts("  -d, --dir <dir>       Directory to start search in.");
+	puts("  -f, --overwrite       Overwrite publication module.");
+	puts("  -h, -?, --help        Show help/usage message.");
+	puts("  -I, --include <path>  Search <path> for referenced objects.");
+	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
+	puts("  -p, --simple          Output a simple, flat XML file.");
+	puts("  -R, --recursively     Recursively flatten referenced PMs.");
+	puts("  -r, --recursive       Search directories recursively.");
+	puts("  -x, --use-xinclude    Use XInclude references.");
 	puts("  --version  Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -465,7 +465,18 @@ int main(int argc, char **argv)
 
 	const char *sopts = "cDd:fxNpRrI:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"     , no_argument      , 0, 0},
+		{"help"        , no_argument      , 0, 'h'},
+		{"containers"  , no_argument      , 0, 'c'},
+		{"remove"      , no_argument      , 0, 'D'},
+		{"dir"         , required_argument, 0, 'd'},
+		{"overwrite"   , no_argument      , 0, 'f'},
+		{"use-xinclude", no_argument      , 0, 'x'},
+		{"omit-issue"  , no_argument      , 0, 'N'},
+		{"simple"      , no_argument      , 0, 'p'},
+		{"recursively" , no_argument      , 0, 'R'},
+		{"recursive"   , no_argument      , 0, 'r'},
+		{"include"     , required_argument, 0, 'I'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

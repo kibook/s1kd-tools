@@ -22,44 +22,44 @@ reference.
 OPTIONS
 =======
 
--c  
+-c, --containers  
 Flatten referenced container data modules by copying the references
 inside the container directly in to the publication module. The copied
 references will also be flattened, unless the -D option is specified.
 
--D  
+-D, --remove  
 Remove unresolved references, but do not flatten resolved ones.
 
--d &lt;dir&gt;  
+-d, --dir &lt;dir&gt;  
 Directory to start search in. By default, the current directory is used.
 
--f  
+-f, --overwrite  
 Overwrite input publication module instead of writing to stdout.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--I &lt;path&gt;  
+-I, --include &lt;path&gt;  
 Add &lt;path&gt; to the list of directories that the tool will search
 when resolving references.
 
--N  
+-N, --omit-issue  
 Assume that the files representing the referenced data modules do not
 include the issue info in their filenames, i.e. they were created using
 the -N option of the s1kd-new\* tools.
 
--p  
+-p, --simple  
 Instead of the hierarchical PM-based format, use a simpler "flat"
 format.
 
--R  
+-R, --recursively  
 Recursively flatten referenced publication modules, copying their
 content in to the "master" publication module.
 
--r  
+-r, --recursive  
 Search directories recursively.
 
--x  
+-x, --use-xinclude  
 Use XInclude rather than copying each data module's contents directly
 inside the publication module. DTD entities in data modules will only be
 carried over to the final publication when using this option, otherwise
