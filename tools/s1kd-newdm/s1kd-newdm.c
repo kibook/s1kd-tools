@@ -262,7 +262,7 @@ void show_help(void)
 	puts("  -k, --skill <skill>         Skill level");
 	puts("  -L, --language <lang>       Language ISO code");
 	puts("  -m, --remarks <remarks>     Remarks");
-	puts("  -n, --issue-number <iss>    Issue number");
+	puts("  -n, --issno <iss>           Issue number");
 	puts("  -O, --origcode <CAGE>       Originator CAGE code.");
 	puts("  -o, --origname <orig>       Originator enterprise name");
 	puts("  -R, --rpccode <CAGE>        Responsible partner company CAGE code.");
