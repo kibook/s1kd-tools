@@ -20,57 +20,57 @@ information in the reference.
 OPTIONS
 =======
 
--$ &lt;issue&gt;  
+-$, --issue &lt;issue&gt;  
 Output XML for the specified issue of S1000D.
 
--d  
+-d, --include-date  
 Include the issue date in the reference (target must be a file)
 
--e &lt;file&gt;  
+-e, --externalpubs &lt;file&gt;  
 Use a custom `.externalpubs` file.
 
--f  
+-f, --overwrite  
 Overwrite source data module instead of writing to stdout.
 
--h -?  
+-h, -?, --help  
 Show the usage message.
 
--i  
+-i, --include-issue  
 Include the issue information in the reference (target must be a file)
 
--l  
+-l, --include-lang  
 Include the language information in the reference (target must be a
 file)
 
--o &lt;dst&gt;  
+-o, --out &lt;dst&gt;  
 Output to &lt;dst&gt; instead of stdout.
 
--q  
+-q, --quiet  
 Quiet mode. Do not print errors.
 
--R  
+-R, --repository-id  
 Generate a `<repositorySourceDmIdent>` for a data module.
 
--r  
+-r, --add  
 Add the generated reference to the source data module's `refs` table and
 output the modified data module to stdout.
 
--S  
+-S, --source-id  
 Generate a `<sourceDmIdent>` (for data modules) or `<sourcePmIdent>`
 (for publication modules).
 
--s &lt;src&gt;  
+-s, --source &lt;src&gt;  
 Specify a source data module &lt;src&gt; to add references to when using
 the -r option.
 
--t  
+-t, --include-title  
 Include the title in the reference (target must be a file).
 
--u  
+-u, --include-url  
 Include the full URL/filename of the reference with the `xlink:href`
 attribute.
 
--v  
+-v, --verbose  
 Verbose output.
 
 --version  

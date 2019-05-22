@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="00"/>
+        <issueInfo issueNumber="017" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="17"/>
+        <issueDate year="2019" month="05" day="22"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -62,97 +65,97 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-$ &lt;issue&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-$, --issue &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Output XML for the specified issue of S1000D.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --include-date</listItemTerm>
               <listItemDefinition>
                 <para>Include the issue date in the reference (target must be a file)</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-e &lt;file&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-e, --externalpubs &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite source data module instead of writing to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show the usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-i</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-i, --include-issue</listItemTerm>
               <listItemDefinition>
                 <para>Include the issue information in the reference (target must be a file)</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --include-lang</listItemTerm>
               <listItemDefinition>
                 <para>Include the language information in the reference (target must be a file)</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o &lt;dst&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --out &lt;dst&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Output to &lt;dst&gt; instead of stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-q</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Do not print errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-R</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-R, --repository-id</listItemTerm>
               <listItemDefinition>
                 <para>Generate a <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> for a data module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-r</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-r, --add</listItemTerm>
               <listItemDefinition>
                 <para>Add the generated reference to the source data module's <verbatimText verbatimStyle="vs12">refs</verbatimText> table and output the modified data module to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-S</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-S, --source-id</listItemTerm>
               <listItemDefinition>
                 <para>Generate a <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText> (for data modules) or <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> (for publication modules).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-s &lt;src&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-s, --source &lt;src&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a source data module &lt;src&gt; to add references to when using the -r option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-t</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --include-title</listItemTerm>
               <listItemDefinition>
                 <para>Include the title in the reference (target must be a file).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-u</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-u, --include-url</listItemTerm>
               <listItemDefinition>
                 <para>Include the full URL/filename of the reference with the <verbatimText verbatimStyle="vs13">xlink:href</verbatimText> attribute.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
               </listItemDefinition>

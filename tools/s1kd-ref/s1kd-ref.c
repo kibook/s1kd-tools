@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -29,7 +29,7 @@
 #define OPT_SRCID (int) 0x10
 #define OPT_CIRID (int) 0x20
 #define OPT_INS   (int) 0x40
-#define OPT_URL  (int) 0x80
+#define OPT_URL   (int) 0x80
 
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
@@ -1029,25 +1029,25 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>] [-o <dst>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>  Output XML for the specified issue of S1000D.");
-	puts("  -d          Include issue date (target must be file)");
-	puts("  -e <file>   Use a custom .externalpubs file.");
-	puts("  -f          Overwrite source data module instead of writing to stdout.");
-	puts("  -i          Include issue info.");
-	puts("  -l          Include language.");
-	puts("  -o <dst>    Output to <dst> instead of stdout.");
-	puts("  -q          Quiet mode. Do not print errors.");
-	puts("  -R          Generate a <repositorySourceDmIdent>.");
-	puts("  -r          Add reference to data module's <refs> table.");
-	puts("  -S          Generate a <sourceDmIdent> or <sourcePmIdent>.");
-	puts("  -s <src>    Source data module to add references to.");
-	puts("  -t          Include title (target must be file)");
-	puts("  -u          Include xlink:href to the full URL/filename.");
-	puts("  -v          Verbose output.");
-	puts("  -h -?       Show this help message.");
-	puts("  --version   Show version information.");
-	puts("  <code>      The code of the reference (must include prefix DMC/PMC/etc.).");
-	puts("  <file>      A file to reference.");
+	puts("  -$, --issue <issue>        Output XML for the specified issue of S1000D.");
+	puts("  -d, --include-date         Include issue date (target must be file)");
+	puts("  -e, --externalpubs <file>  Use a custom .externalpubs file.");
+	puts("  -f, --overwrite            Overwrite source data module instead of writing to stdout.");
+	puts("  -h, -?, --help             Show this help message.");
+	puts("  -i, --include-issue        Include issue info.");
+	puts("  -l, --include-lang         Include language.");
+	puts("  -o, --out <dst>            Output to <dst> instead of stdout.");
+	puts("  -q, --quiet                Quiet mode. Do not print errors.");
+	puts("  -R, --repository-id        Generate a <repositorySourceDmIdent>.");
+	puts("  -r, --add                  Add reference to data module's <refs> table.");
+	puts("  -S, --source-id            Generate a <sourceDmIdent> or <sourcePmIdent>.");
+	puts("  -s, --source <src>         Source data module to add references to.");
+	puts("  -t, --include-title        Include title (target must be file)");
+	puts("  -u, --include-url          Include xlink:href to the full URL/filename.");
+	puts("  -v, --verbose              Verbose output.");
+	puts("  --version                  Show version information.");
+	puts("  <code>                     The code of the reference (must include prefix DMC/PMC/etc.).");
+	puts("  <file>                     A file to reference.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1071,7 +1071,23 @@ int main(int argc, char **argv)
 
 	const char *sopts = "e:filo:qRrSs:tvd$:uh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"      , no_argument      , 0, 0},
+		{"help"         , no_argument      , 0, 'h'},
+		{"externalpubs" , required_argument, 0, 'e'},
+		{"overwrite"    , no_argument      , 0, 'f'},
+		{"include-issue", no_argument      , 0, 'i'},
+		{"include-lang" , no_argument      , 0, 'l'},
+		{"out"          , required_argument, 0, 'o'},
+		{"quiet"        , no_argument      , 0, 'q'},
+		{"add"          , no_argument      , 0, 'r'},
+		{"repository-id", no_argument      , 0, 'R'},
+		{"source-id"    , no_argument      , 0, 'S'},
+		{"source"       , required_argument, 0, 's'},
+		{"include-title", no_argument      , 0, 't'},
+		{"verbose"      , no_argument      , 0, 'v'},
+		{"include-date" , no_argument      , 0, 'd'},
+		{"issue"        , required_argument, 0, '$'},
+		{"include-url"  , no_argument      , 0, 'u'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
