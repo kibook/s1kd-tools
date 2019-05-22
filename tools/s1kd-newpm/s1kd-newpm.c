@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -363,38 +363,39 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>     Specify which S1000D issue to use.");
-	puts("  -@ <path>      Output to specified file or directory.");
-	puts("  -% <dir>       Use template in specified directory.");
-	puts("  -~ <dir>       Dump built-in template to directory.");
-	puts("  -D             Include issue date in referenced data modules.");
-	puts("  -d <defaults>  Specify the .defaults file name.");
-	puts("  -f             Overwrite existing file.");
-	puts("  -i             Include issue info in referenced data modules.");
-	puts("  -l             Include language info in referenced data modules.");
-	puts("  -N             Omit issue/inwork from file name.");
-	puts("  -p             Prompt the user for each value.");
-	puts("  -q             Don't report an error if file exists.");
-	puts("  -v             Print file name of pub module.");
-	puts("  -T             Include titles in referenced data modules.");
-	puts("  --version      Show version information.");
-	puts("  <dmodule>...   Data modules to include in new PM.");
+	puts("  -$, --issue <issue>         Specify which S1000D issue to use.");
+	puts("  -@, --out <path>            Output to specified file or directory.");
+	puts("  -%, --templates <dir>       Use template in specified directory.");
+	puts("  -~, --dump-templates <dir>  Dump built-in template to directory.");
+	puts("  -D, --include-date          Include issue date in referenced data modules.");
+	puts("  -d, --defaults <file>       Specify the .defaults file name.");
+	puts("  -f, --overwrite             Overwrite existing file.");
+	puts("  -i, --include-issue         Include issue info in referenced data modules.");
+	puts("  -l, --include-lang          Include language info in referenced data modules.");
+	puts("  -N, --omit-issue            Omit issue/inwork from file name.");
+	puts("  -p, --prompt                Prompt the user for each value.");
+	puts("  -q, --quiet                 Don't report an error if file exists.");
+	puts("  -v, --verbose               Print file name of pub module.");
+	puts("  -T, --include-title         Include titles in referenced data modules.");
+	puts("  --version                   Show version information.");
+	puts("  <dmodule>...                Data modules to include in new PM.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -# <code>      Publication module code");
-	puts("  -a <ACT>       ACT data module code");
-	puts("  -b <BREX>      BREX data module code");
-	puts("  -C <country>   Country ISO code");
-	puts("  -c <sec>       Security classification");
-	puts("  -I <date>      Issue date");
-	puts("  -L <lang>      Language ISO code");
-	puts("  -m <remarks>   Remarks");
-	puts("  -n <iss>       Issue number");
-	puts("  -r <RPC>       Responsible partner company enterprise name");
-	puts("  -s <title>     Short PM title");
-	puts("  -t <title>     Publication module title");
-	puts("  -w <inwork>    Inwork issue");
-	puts("  -z <type>      Issue type");
+	puts("  -#, --code <code>           Publication module code");
+	puts("  -a, --act <ACT>             ACT data module code");
+	puts("  -b, --brex <BREX>           BREX data module code");
+	puts("  -C, --country <country>     Country ISO code");
+	puts("  -c, --security <sec>        Security classification");
+	puts("  -I, --date <date>           Issue date");
+	puts("  -L, --language <lang>       Language ISO code");
+	puts("  -m, --remarks <remarks>     Remarks");
+	puts("  -n, --issno <iss>           Issue number");
+	puts("  -R, --rpccode <CAGE>        Responsible partner company code");
+	puts("  -r, --rpcname <RPC>         Responsible partner company enterprise name");
+	puts("  -s, --short-title <title>   Short PM title");
+	puts("  -t, --title <title>         Publication module title");
+	puts("  -w, --inwork <inwork>       Inwork issue");
+	puts("  -z, --issue-type <type>     Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -648,7 +649,37 @@ int main(int argc, char **argv)
 
 	const char *sopts = "a:pDd:#:L:C:n:w:c:r:R:t:NilTb:I:vf$:@:%:s:qm:~:z:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"act"           , required_argument, 0, 'a'},
+		{"prompt"        , no_argument      , 0, 'p'},
+		{"include-date"  , no_argument      , 0, 'D'},
+		{"defaults"      , required_argument, 0, 'd'},
+		{"code"          , required_argument, 0, '#'},
+		{"language"      , required_argument, 0, 'L'},
+		{"country"       , required_argument, 0, 'C'},
+		{"issno"         , required_argument, 0, 'n'},
+		{"inwork"        , required_argument, 0, 'w'},
+		{"security"      , required_argument, 0, 'c'},
+		{"rpcname"       , required_argument, 0, 'r'},
+		{"rpccode"       , required_argument, 0, 'R'},
+		{"title"         , required_argument, 0, 't'},
+		{"omit-issue"    , no_argument      , 0, 'N'},
+		{"include-issue" , no_argument      , 0, 'i'},
+		{"include-lang"  , no_argument      , 0, 'l'},
+		{"include-title" , no_argument      , 0, 'T'},
+		{"brex"          , required_argument, 0, 'b'},
+		{"date"          , required_argument, 0, 'I'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"overwrite"     , no_argument      , 0, 'f'},
+		{"issue"         , required_argument, 0, '$'},
+		{"out"           , required_argument, 0, '@'},
+		{"templates"     , required_argument, 0, '%'},
+		{"short-title"   , required_argument, 0, 's'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"remarks"       , required_argument, 0, 'm'},
+		{"dump-templates", required_argument, 0, '~'},
+		{"issue-type"    , required_argument, 0, 'z'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
