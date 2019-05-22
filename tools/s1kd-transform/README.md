@@ -19,32 +19,32 @@ external entities such as ICN references intact.
 OPTIONS
 =======
 
--f  
+-f, --overwrite  
 Overwrite the specified CSDB object(s) instead of writing to stdout.
 
--h -?  
+-h, -?, --help  
 Show usage message.
 
--i  
+-i, --identity  
 Includes an "identity" template in to each specified stylesheet.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of CSDB objects to transform,
 rather than CSDB objects themselves.
 
--o &lt;file&gt;  
+-o, --out &lt;file&gt;  
 Output to &lt;file&gt; instead of stdout. This option only makes sense
 when the input is a single CSDB object.
 
--p &lt;name&gt;=&lt;value&gt;  
+-p, --param &lt;name&gt;=&lt;value&gt;  
 Pass a parameter to the last specified stylesheet.
 
--s &lt;stylesheet&gt;  
+-s, --stylesheet &lt;stylesheet&gt;  
 An XSLT stylesheet file to apply to each CSDB object. Multiple
 stylesheets can be specified by supplying this argument multiple times.
 The stylesheets will be applied in the order they are listed.
 
--v  
+-v, --verbose  
 Verbose output.
 
 --version  

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="15" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="03"/>
+        <issueDate year="2019" month="05" day="22"/>
         <dmTitle>
           <techName>s1kd-transform(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -62,49 +65,49 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite the specified CSDB object(s) instead of writing to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-i</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-i, --identity</listItemTerm>
               <listItemDefinition>
                 <para>Includes an "identity" template in to each specified stylesheet.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of CSDB objects to transform, rather than CSDB objects themselves.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o &lt;file&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --out &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Output to &lt;file&gt; instead of stdout. This option only makes sense when the input is a single CSDB object.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-p &lt;name&gt;=&lt;value&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --param &lt;name&gt;=&lt;value&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Pass a parameter to the last specified stylesheet.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-s &lt;stylesheet&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-s, --stylesheet &lt;stylesheet&gt;</listItemTerm>
               <listItemDefinition>
                 <para>An XSLT stylesheet file to apply to each CSDB object. Multiple stylesheets can be specified by supplying this argument multiple times. The stylesheets will be applied in the order they are listed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
               </listItemDefinition>

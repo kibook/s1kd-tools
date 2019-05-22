@@ -15,7 +15,7 @@ bool includeIdentity = false;
 bool verbose = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -224,16 +224,16 @@ void showHelp(void)
 	puts("Usage: " PROG_NAME " [-filvh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?              Show usage message.");
-	puts("  -f                 Overwrite input CSDB objects.");
-	puts("  -i                 Include identity template in stylesheets.");
-	puts("  -l                 Treat input as list of objects.");
-	puts("  -o <file>          Output result of transformation to <path>.");
-	puts("  -p <name>=<value>  Pass parameters to stylesheets.");
-	puts("  -s <stylesheet>    Apply XSLT stylesheet to CSDB objects.");
-	puts("  -v                 Verbose output.");
-	puts("  --version          Show version information.");
-	puts("  <object>           CSDB objects to apply transformations to.");
+	puts("  -f, --overwrite                Overwrite input CSDB objects.");
+	puts("  -h, -?, --help                 Show usage message.");
+	puts("  -i, --identity                 Include identity template in stylesheets.");
+	puts("  -l, --list                     Treat input as list of objects.");
+	puts("  -o, --out <file>               Output result of transformation to <path>.");
+	puts("  -p, --param <name>=<value>     Pass parameters to stylesheets.");
+	puts("  -s, --stylesheet <stylesheet>  Apply XSLT stylesheet to CSDB objects.");
+	puts("  -v, --verbose                  Verbose output.");
+	puts("  --version                      Show version information.");
+	puts("  <object>                       CSDB objects to apply transformations to.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -258,6 +258,13 @@ int main(int argc, char **argv)
 	const char *sopts = "s:ilo:p:fvh?";
 	struct option lopts[] = {
 		{"version", no_argument, 0, 0},
+		{"help"   , no_argument, 0, 'h'},
+		{"identity", no_argument, 0, 'i'},
+		{"list", no_argument, 0, 'l'},
+		{"out", required_argument, 0, 'o'},
+		{"param", required_argument, 0, 'p'},
+		{"stylesheet", required_argument, 0, 's'},
+		{"verbose", no_argument, 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
