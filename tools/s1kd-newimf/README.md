@@ -17,67 +17,67 @@ specified ICN files.
 OPTIONS
 =======
 
--@ &lt;dir&gt;  
+-@, --out &lt;dir&gt;  
 Create the new IMF in &lt;dir&gt;.
 
--% &lt;dir&gt;  
+-%, --templates &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.
 The template must be named `icnmetadata.xml` inside &lt;dir&gt; and must
 conform to the default S1000D issue (4.2).
 
--\~ &lt;dir&gt;  
+-\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
--b &lt;BREX&gt;  
+-b, --brex &lt;BREX&gt;  
 BREX data module code.
 
--c &lt;sec&gt;  
+-c, --security &lt;sec&gt;  
 The security classification of the new ICN metadata file.
 
--d &lt;defaults&gt;  
+-d, --defaults &lt;file&gt;  
 Specify the `.defaults` file name.
 
--f  
+-f, --overwrite  
 Overwrite existing file.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--I &lt;date&gt;  
+-I, --date &lt;date&gt;  
 The issue date of the new ICN metadata file in the form of YYYY-MM-DD.
 
--m &lt;remarks&gt;  
+-m, --remarks &lt;remarks&gt;  
 Set the remarks for the new ICN metadata file.
 
--n &lt;issue&gt;  
+-n, --issno &lt;issue&gt;  
 The issue number of the new ICN metadata file.
 
--O &lt;CAGE&gt;  
+-O, --origcode &lt;CAGE&gt;  
 The CAGE code of the originator.
 
--o &lt;orig&gt;  
+-o, --origname &lt;orig&gt;  
 The originator enterprise name of the new ICN metadata file.
 
--p  
+-p, --prompt  
 Prompts the user for any values left unspecified.
 
--q  
+-q, --quiet  
 Do not report an error when the file already exists.
 
--R &lt;CAGE&gt;  
+-R, --rpccode &lt;CAGE&gt;  
 The CAGE code of the responsible partner company.
 
--r &lt;RPC&gt;  
+-r, --rpcname &lt;RPC&gt;  
 The responsible partner company enterprise name of the new ICN metadata
 file.
 
--t &lt;title&gt;  
+-t, --title &lt;title&gt;  
 The ICN title (if creating multiple ICNs, they will all use this title).
 
--v  
+-v, --verbose  
 Print the file name of the newly created IMF.
 
--w &lt;inwork&gt;  
+-w, --inwork &lt;inwork&gt;  
 The inwork issue of the new ICN metadata file.
 
 --version  

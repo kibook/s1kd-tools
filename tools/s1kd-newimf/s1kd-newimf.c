@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -151,30 +151,30 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
-	puts("  -@ <dir>      Output to specified directory.");
-	puts("  -% <dir>      Use template in specified directory.");
-	puts("  -~ <dir>      Dump built-in template to directory.");
-	puts("  -d <path>     Specify .defaults file path.");
-	puts("  -f            Overwrite existing file.");
-	puts("  -N            Omit issue/inwork numbers from filename.");
-	puts("  -p            Show prompts.");
-	puts("  -q            Don't report an error if file exists.");
-	puts("  -v            Print file name of IMF.");
-	puts("  --version     Show version information.");
-	puts("  <icns>        1 or more ICNs to generate a metadata file for.");
+	puts("  -@, --out <dir>             Output to specified directory.");
+	puts("  -%, --templates <dir>       Use template in specified directory.");
+	puts("  -~, --dump-templates <dir>  Dump built-in template to directory.");
+	puts("  -d, --defaults <file>       Specify .defaults file path.");
+	puts("  -f, --overwrite             Overwrite existing file.");
+	puts("  -N, --omit-issue            Omit issue/inwork numbers from filename.");
+	puts("  -p, --prompt                Show prompts.");
+	puts("  -q, --quiet                 Don't report an error if file exists.");
+	puts("  -v, --verbose               Print file name of IMF.");
+	puts("  --version                   Show version information.");
+	puts("  <icns>                      1 or more ICNs to generate a metadata file for.");
 	puts("");
 	puts("In addition, the following metadata can be set:");
-	puts("  -b <BREX>     BREX data module code");
-	puts("  -c <sec>      Security classification");
-	puts("  -I <date>     Issue date");
-	puts("  -m <remarks>  Remarks");
-	puts("  -n <iss>      Issue number");
-	puts("  -O <CAGE>     Originator CAGE code");
-	puts("  -o <orig>     Originator");
-	puts("  -R <CAGE>     Responsible partner company CAGE code");
-	puts("  -r <RPC>      Responsible partner company");
-	puts("  -t <title>    ICN title");
-	puts("  -w <inwork>   Inwork issue");
+	puts("  -b, --brex <BREX>           BREX data module code");
+	puts("  -c, --security <sec>        Security classification");
+	puts("  -I, --date <date>           Issue date");
+	puts("  -m, --remarks <remarks>     Remarks");
+	puts("  -n, --issno <iss>           Issue number");
+	puts("  -O, --origcode <CAGE>       Originator CAGE code");
+	puts("  -o, --origname <orig>       Originator");
+	puts("  -R, --rpccode <CAGE>        Responsible partner company CAGE code");
+	puts("  -r, --rpcname <RPC>         Responsible partner company");
+	puts("  -t, --title <title>         ICN title");
+	puts("  -w, --inwork <inwork>       Inwork issue");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -335,7 +335,28 @@ int main(int argc, char **argv)
 
 	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:@:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"prompts"       , no_argument      , 0, 'p'},
+		{"defaults"      , required_argument, 0, 'd'},
+		{"issno"         , required_argument, 0, 'n'},
+		{"inwork"        , required_argument, 0, 'w'},
+		{"security"      , required_argument, 0, 'c'},
+		{"rpcname"       , required_argument, 0, 'r'},
+		{"rpccode"       , required_argument, 0, 'R'},
+		{"origname"      , required_argument, 0, 'o'},
+		{"origcode"      , required_argument, 0, 'O'},
+		{"omit-issue"    , no_argument      , 0, 'N'},
+		{"title"         , required_argument, 0, 't'},
+		{"brex"          , required_argument, 0, 'b'},
+		{"date"          , required_argument, 0, 'I'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"overwrite"     , no_argument      , 0, 'f'},
+		{"templates"     , required_argument, 0, '%'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"remarks"       , required_argument, 0, 'm'},
+		{"dump-templates", required_argument, 0, '~'},
+		{"out"           , required_argument, 0, '@'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
