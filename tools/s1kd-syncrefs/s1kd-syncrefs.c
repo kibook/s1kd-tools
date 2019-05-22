@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.4.1"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -393,14 +393,14 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-dflvh?] [-o <out>] [<dms>]");
 	puts("");
 	puts("Options:");
-	puts("  -d         Delete the references table.");
-	puts("  -f         Overwrite the data modules automatically.");
-	puts("  -h -?      Show help/usage message.");
-	puts("  -l         Treat input as list of CSDB objects.");
-	puts("  -o <out>   Output to <out> instead of stdout.");
-	puts("  -v         Verbose output.");
-	puts("  --version  Show version information.");
-	puts("  <dms>      Any number of data modules. Otherwise, read from stdin.");
+	puts("  -d, --delete     Delete the references table.");
+	puts("  -f, --overwrite  Overwrite the data modules automatically.");
+	puts("  -h, -?, --help   Show help/usage message.");
+	puts("  -l, --list       Treat input as list of CSDB objects.");
+	puts("  -o, --out <out>  Output to <out> instead of stdout.");
+	puts("  -v, --verbose    Verbose output.");
+	puts("  --version        Show version information.");
+	puts("  <dms>            Any number of data modules. Otherwise, read from stdin.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -421,7 +421,13 @@ int main(int argc, char *argv[])
 
 	const char *sopts = "dflo:vh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"  , no_argument      , 0, 0},
+		{"help"     , no_argument      , 0, 'h'},
+		{"delete"   , no_argument      , 0, 'd'},
+		{"overwrite", no_argument      , 0, 'f'},
+		{"list"     , no_argument      , 0, 'l'},
+		{"out"      , required_argument, 0, 'o'},
+		{"verbose"  , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

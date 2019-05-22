@@ -20,23 +20,23 @@ element already exists, it is overwritten.
 OPTIONS
 =======
 
--d  
+-d, --delete  
 Delete the &lt;refs&gt; element.
 
--f  
+-f, --overwrite  
 Overwrite the data modules automatically.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of data modules to synchronize
 references in, rather than data modules themselves.
 
--o &lt;out&gt;  
+-o, --out &lt;out&gt;  
 The resulting XML is written to &lt;out&gt; instead of stdout.
 
--v  
+-v, --verbose  
 Verbose output.
 
 --version  
