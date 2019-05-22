@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -378,19 +378,19 @@ void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdn
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-cmnpsh?] [<BREX> ...]");
+	puts("Usage: " PROG_NAME " [-D <dir>] [-d <dir>] [-cmnpsh?] [<BREX> ...]");
 	puts("");
 	puts("Options:");
-	puts("  -h -?      Show usage message.");
-	puts("  -c         Copy files instead of linking.");
-	puts("  -D <dir>   Directory where DMs are stored. Default is current directory.");
-	puts("  -d <dir>   Directory to organize DMs in to. Default is \"" DEFAULT_SNS_DNAME "\"");
-	puts("  -m         Move files instead of linking.");
-	puts("  -n         Only use the SNS code to name directories.");
-	puts("  -p         Print SNS instead of organizing.");
-	puts("  -s         Use symbolic links.");
-	puts("  --version  Show version information.");
-	puts("  <BREX>     BREX data module to read SNS structure from.");
+	puts("  -c, --copy          Copy files instead of linking.");
+	puts("  -D, --srcdir <dir>  Directory where DMs are stored. Default is current directory.");
+	puts("  -d, --outdir <dir>  Directory to organize DMs in to. Default is \"" DEFAULT_SNS_DNAME "\"");
+	puts("  -h, -?, --help      Show usage message.");
+	puts("  -m, --move          Move files instead of linking.");
+	puts("  -n, --only-code     Only use the SNS code to name directories.");
+	puts("  -p, --print         Print SNS instead of organizing.");
+	puts("  -s, --symlink       Use symbolic links.");
+	puts("  --version           Show version information.");
+	puts("  <BREX>              BREX data module to read SNS structure from.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -409,7 +409,15 @@ int main(int argc, char **argv)
 
 	const char *sopts = "cD:d:mnpsh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"  , no_argument      , 0, 0},
+		{"help"     , no_argument      , 0, 'h'},
+		{"copy"     , no_argument      , 0, 'c'},
+		{"srcdir"   , required_argument, 0, 'D'},
+		{"outdir"   , required_argument, 0, 'd'},
+		{"move"     , no_argument      , 0, 'm'},
+		{"only-code", no_argument      , 0, 'n'},
+		{"print"    , no_argument      , 0, 'p'},
+		{"symlink"  , no_argument      , 0, 's'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

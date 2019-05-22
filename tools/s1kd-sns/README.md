@@ -19,31 +19,31 @@ of an SNS structure.
 OPTIONS
 =======
 
--c  
+-c, --copy  
 Copy files in to the SNS subfolders instead of linking them.
 
--D &lt;dir&gt;  
+-D, --srcdir &lt;dir&gt;  
 The flat directory containing the data modules to organize. By default,
 the current directory is used.
 
--d &lt;dir&gt;  
+-d, --outdir &lt;dir&gt;  
 The root directory of the new SNS structure. By default, the tool will
 use the name "SNS" in the current directory.
 
--h -?  
+-h, -?, --help  
 Show usage message.
 
--m  
+-m, --move  
 Move files in to the SNS subfolders instead of linking them.
 
--n  
+-n, --only-code  
 Use only the SNS codes when naming directories. By default, each
 directory will be named in the form of "snsCode - snsTitle".
 
--p  
+-p, --print  
 Print the SNS structure only.
 
--s  
+-s, --symlink  
 Use symbolic links to organize the SNS instead of the default hard
 links.
 

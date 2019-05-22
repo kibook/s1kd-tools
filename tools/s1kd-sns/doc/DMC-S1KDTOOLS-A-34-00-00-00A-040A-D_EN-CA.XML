@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="34" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="17"/>
+        <issueDate year="2019" month="05" day="22"/>
         <dmTitle>
           <techName>s1kd-sns(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -61,49 +64,49 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-c</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-c, --copy</listItemTerm>
               <listItemDefinition>
                 <para>Copy files in to the SNS subfolders instead of linking them.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-D &lt;dir&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-D, --srcdir &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The flat directory containing the data modules to organize. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --outdir &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The root directory of the new SNS structure. By default, the tool will use the name "SNS" in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-m</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-m, --move</listItemTerm>
               <listItemDefinition>
                 <para>Move files in to the SNS subfolders instead of linking them.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-n</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-n, --only-code</listItemTerm>
               <listItemDefinition>
                 <para>Use only the SNS codes when naming directories. By default, each directory will be named in the form of "snsCode - snsTitle".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-p</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --print</listItemTerm>
               <listItemDefinition>
                 <para>Print the SNS structure only.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-s</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-s, --symlink</listItemTerm>
               <listItemDefinition>
                 <para>Use symbolic links to organize the SNS instead of the default hard links.</para>
               </listItemDefinition>
