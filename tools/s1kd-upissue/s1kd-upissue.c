@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.11.1"
+#define VERSION "1.12.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,28 +32,28 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
-	puts("  -1 <type>    Set first verification type.");
-	puts("  -2 <type>    Set second verification type.");
-	puts("  -c <reason>  Add an RFU to the upissued object.");
-	puts("  -D           Remove \"delete\"d elements.");
-	puts("  -d           Do not write anything, only print new filename.");
-	puts("  -e           Remove old issue.");
-	puts("  -f           Overwrite existing upissued object.");
-	puts("  -I           Do not change issue date.");
-	puts("  -i           Increase issue number instead of inwork.");
-	puts("  -l           Treat input as list of objects.");
-	puts("  -m           Modify metadata without upissuing.");
-	puts("  -N           Omit issue/inwork numbers from filename.");
-	puts("  -q           Keep quality assurance from old issue.");
-	puts("  -R           Only delete change marks associated with an RFU.");
-	puts("  -r           Keep RFUs from old issue.");
-	puts("  -s <status>  Set change status type.");
-	puts("  -t <urt>     Set the updateReasonType of the last RFU.");
-	puts("  -u           Remove unassociated RFUs.");
-	puts("  -H           Highlight the last RFU.");
-	puts("  -v           Print filename of upissued objects.");
-	puts("  -w           Make old and official issues read-only.");
-	puts("  --version    Show version information");
+	puts("  -1, --first-ver <type>       Set first verification type.");
+	puts("  -2, --second-ver <type>      Set second verification type.");
+	puts("  -c, --reason <reason>        Add an RFU to the upissued object.");
+	puts("  -D, --remove-deleted         Remove \"delete\"d elements.");
+	puts("  -d, --dry-run                Do not write anything, only print new filename.");
+	puts("  -e, --erase                  Remove old issue.");
+	puts("  -f, --overwrite              Overwrite existing upissued object.");
+	puts("  -I, --(keep|change)-date     Do not change issue date. In -m mode, change issue date.");
+	puts("  -i, --official               Increase issue number instead of inwork.");
+	puts("  -l, --list                   Treat input as list of objects.");
+	puts("  -m, --modify                 Modify metadata without upissuing.");
+	puts("  -N, --omit-issue             Omit issue/inwork numbers from filename.");
+	puts("  -q, --(keep|reset)-qa        Keep quality assurance from old issue. In -m mode, set to unverified.");
+	puts("  -R, --keep-unassoc-marks     Only delete change marks associated with an RFU.");
+	puts("  -r, --(keep|remove)-changes  Keep RFUs and change marks from old issue. In -m mode, remove them.");
+	puts("  -s, --status <status>        Set change status type.");
+	puts("  -t, --type <urt>             Set the updateReasonType of the last RFU.");
+	puts("  -u, --clean-rfus             Remove unassociated RFUs.");
+	puts("  -H, --highlight              Highlight the last RFU.");
+	puts("  -v, --verbose                Print filename of upissued objects.");
+	puts("  -w, --lock                   Make old and official issues read-only.");
+	puts("  --version                    Show version information");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -767,7 +767,32 @@ int main(int argc, char **argv)
 
 	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmuh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"           , no_argument      , 0, 0},
+		{"help"              , no_argument      , 0, 'h'},
+		{"first-ver"         , required_argument, 0, '1'},
+		{"second-ver"        , required_argument, 0, '2'},
+		{"reason"            , required_argument, 0, 'c'},
+		{"remove-deleted"    , no_argument      , 0, 'D'},
+		{"dry-run"           , no_argument      , 0, 'd'},
+		{"erase"             , no_argument      , 0, 'e'},
+		{"overwrite"         , no_argument      , 0, 'f'},
+		{"keep-date"         , no_argument      , 0, 'I'},
+		{"change-date"       , no_argument      , 0, 'I'},
+		{"official"          , no_argument      , 0, 'i'},
+		{"list"              , no_argument      , 0, 'l'},
+		{"modify"            , no_argument      , 0, 'm'},
+		{"omit-issue"        , no_argument      , 0, 'N'},
+		{"keep-qa"           , no_argument      , 0, 'q'},
+		{"reset-qa"          , no_argument      , 0, 'q'},
+		{"keep-unassoc-marks", no_argument      , 0, 'R'},
+		{"keep-changes"      , no_argument      , 0, 'r'},
+		{"remove-changes"    , no_argument      , 0, 'r'},
+		{"status"            , required_argument, 0, 's'},
+		{"type"              , required_argument, 0, 't'},
+		{"clean-rfus"        , no_argument      , 0, 'u'},
+		{"highlight"         , no_argument      , 0, 'H'},
+		{"verbose"           , no_argument      , 0, 'v'},
+		{"lock"              , no_argument      , 0, 'w'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

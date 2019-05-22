@@ -23,94 +23,109 @@ are simply copied.
 OPTIONS
 =======
 
--1 &lt;type&gt;  
+-1, --first-ver &lt;type&gt;  
 Set first verification type (tabtop, onobject, ttandoo).
 
--2 &lt;type&gt;  
+-2, --second-ver &lt;type&gt;  
 Set second verification type (tabtop, onobject, ttandoo).
 
--c &lt;reason&gt;  
+-c, --reason &lt;reason&gt;  
 Add a reason for update to the upissued objects. Multiple RFUs can be
 added by specifying this option multiple times.
 
--D  
+-D, --remove-deleted  
 Remove elements with change type of "delete". These elements are
 automatically removed along with all change marks and RFUs when an
 object is upissued from official to the next inwork issue. This option
 will remove them when upissuing between inwork issues, or when making
 the object official.
 
--d  
+-d, --dry-run  
 Do not actually create or modify any files, only print the name of the
 file that would be created or modified.
 
--e  
+-e, --erase  
 Remove old issue file after upissuing.
 
--f  
+-f, --overwrite  
 Overwrite existing upissued CSDB objects.
 
--H  
+-H, --highlight  
 Mark the last specified reason for update (-c) as a highlight.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--I  
+-I, --(keep\|change)-date  
 Do not change issue date. Normally, when upissuing to the next inwork or
 official issue, the issue date is changed to the current date. This
 option will keep the date of the previous inwork or official issue.
 
--i  
+In -m mode, this option has the opposite effect, causing the date to be
+changed to the current date. The two alternative long option names,
+--keep-date and --change-date, allow for the intended meaning of this
+option to be expressed clearly in each mode.
+
+-i, --official  
 Increase the issue number of the CSDB object. By default, the in-work
 issue is increased.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of CSDB objects to upissue,
 rather than CSDB objects themselves.
 
--m  
+-m, --modify  
 Modify issue-related metadata on objects without incrementing the issue
 or inwork numbers. The -I, -q, and -r options have the opposite effect
 in this mode. The modified objects are written to stdout by default, and
 the -f option can be used to change them in-place.
 
--N  
+-N, --omit-issue  
 Omit issue/inwork numbers from filename.
 
--q  
+-q, --(keep\|reset)-qa  
 Keep quality assurance information from old issue. Normally, when
 upissuing an official CSDB object to the first in-work issue, the
 quality assurance is set back to "unverified". Specify this option to
 indicate the upissue will not affect the contents of the CSDB object,
 and so does not require it to be re-verified.
 
--R  
+In -m mode, this option has the opposite effect, causing the QA status
+to be reset. The two alternative long option names, --keep-qa and
+--reset-qa, allow for the intended meaning of this option to be
+expressed clearly in each mode.
+
+-R, --keep-unassoc-marks  
 Delete only change markup on elements associated with an RFU (by use of
 the attribute `reasonForUpdateRefIds`). Change markup on other elements
 is ignored.
 
--r  
-Keep old RFUs. Normally, when upissuing an offical CSDB object to the
-first in-work issue, any reasons for update are deleted automatically,
-along with any change markup attributes on elements (when change type is
-"add" or "modify") or the elements themselves (when change type is
-"delete"). This option prevents their deletion.
+-r, --(keep\|remove)-changes  
+Keep old RFUs and change marks. Normally, when upissuing an offical CSDB
+object to the first in-work issue, any reasons for update are deleted
+automatically, along with any change markup attributes on elements (when
+change type is "add" or "modify") or the elements themselves (when
+change type is "delete"). This option prevents their deletion.
 
--s &lt;status&gt;  
+In -m mode, this option has the opposite effect, causing the current
+RFUs and change marks to be removed. The two alternative long option
+names, --keep-changes and --remove-changes, allow for the intended
+meaning of this option to be expressed clearly in each mode.
+
+-s, --status &lt;status&gt;  
 Set the status of the new issue. Default is 'changed'.
 
--t &lt;urt&gt;  
+-t, --type &lt;urt&gt;  
 Set the updateReasonType of the last specified reason for update (-c).
 
--u  
+-u, --clean-rfus  
 Remove RFUs which are not associated with any change markup (by use of
 the attribute `reasonForUpdateRefIds`).
 
--v  
+-v, --verbose  
 Print the file name of the upissued CSDB object.
 
--w  
+-w, --lock  
 Make the old issue file read-only after upissuing. Official issues (-i)
 will also be made read-only when they are created.
 
