@@ -17,8 +17,11 @@ specified ICN files.
 OPTIONS
 =======
 
--@, --out &lt;dir&gt;  
-Create the new IMF in &lt;dir&gt;.
+-@, --out &lt;path&gt;  
+Save the new IMF to &lt;path&gt;. If &lt;path&gt; is an existing
+directory, the IMF will be created in it instead of the current
+directory. Otherwise, the IMF will be saved as the filename &lt;path&gt;
+instead of being automatically named.
 
 -%, --templates &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.

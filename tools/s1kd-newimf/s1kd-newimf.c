@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -151,7 +151,7 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
 	puts("Options:");
-	puts("  -@, --out <dir>             Output to specified directory.");
+	puts("  -@, --out <path>            Output to specified file or directory.");
 	puts("  -%, --templates <dir>       Use template in specified directory.");
 	puts("  -~, --dump-templates <dir>  Dump built-in template to directory.");
 	puts("  -d, --defaults <file>       Specify .defaults file path.");
@@ -329,6 +329,7 @@ int main(int argc, char **argv)
 	char defaults_fname[PATH_MAX];
 	bool custom_defaults = false;
 
+	char *out = NULL;
 	char *outdir = NULL;
 
 	xmlDocPtr defaults_xml;
@@ -390,7 +391,7 @@ int main(int argc, char **argv)
 			case 'q': no_overwrite_error = true; break;
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
-			case '@': outdir = strdup(optarg); break;
+			case '@': out = strdup(optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -447,6 +448,18 @@ int main(int argc, char **argv)
 	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
+
+	if (out && isdir(out, false)) {
+		outdir = out;
+		out = NULL;
+	}
+
+	if (outdir) {
+		if (chdir(outdir) != 0) {
+			fprintf(stderr, ERR_PREFIX "Could not change to directory %s: %s\n", outdir, strerror(errno));
+			exit(EXIT_OS_ERROR);
+		}
+	}
 
 	for (i = optind; i < argc; ++i) {
 		int n;
@@ -505,7 +518,9 @@ int main(int argc, char **argv)
 
 		set_remarks(template, remarks);
 
-		if (no_issue) {
+		if (out) {
+			strcpy(fname, out);
+		} else if (no_issue) {
 			if (snprintf(fname, PATH_MAX, "IMF-%s.XML", icn) < 0) {
 				fprintf(stderr, E_ENCODING_ERROR);
 				exit(EXIT_ENCODING_ERROR);
@@ -514,13 +529,6 @@ int main(int argc, char **argv)
 			if (snprintf(fname, PATH_MAX, "IMF-%s_%s-%s.XML", icn, issue_number, in_work) < 0) {
 				fprintf(stderr, E_ENCODING_ERROR);
 				exit(EXIT_ENCODING_ERROR);
-			}
-		}
-
-		if (outdir) {
-			if (chdir(outdir) != 0) {
-				fprintf(stderr, ERR_PREFIX "Could not change to directory %s: %s\n", outdir, strerror(errno));
-				exit(EXIT_OS_ERROR);
 			}
 		}
 
@@ -549,6 +557,7 @@ int main(int argc, char **argv)
 		xmlFreeDoc(template);
 	}
 
+	free(out);
 	free(outdir);
 	free(template_dir);
 	xmlFree(remarks);
