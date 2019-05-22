@@ -89,7 +89,7 @@ Specify the `.defaults` file name.
 -f, --overwrite  
 Overwrite existing file.
 
--h -? --help  
+-h, -?, --help  
 Show help/usage message.
 
 -I, --date &lt;date&gt;  
