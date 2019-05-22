@@ -18,36 +18,39 @@ schemas.
 OPTIONS
 =======
 
--d &lt;dir&gt;  
+-d, --schemas &lt;dir&gt;  
 Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is
 used to fetch it locally or over a network, but this option will force
 searching to be performed only in the specified directory.
 
 This can also be accomplished through the use of XML catalogs.
 
--f  
+-f, --filenames  
 List invalid files.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--l  
+-l, --list  
 Treat input as a list of object names to validate, rather than an object
 itself.
 
--o  
+-o, --output-valid  
 Output valid CSDB objects to stdout.
 
--v -q  
-Set the verbosity of the output, verbose or quiet. Verbose will
-explictly indicate success, rather than simply not displaying any
-errors. Quiet will not output anything.
+-q, --quiet  
+Quiet mode. The tool will not output anything to stdout or stderr.
+Success/failure will only be indicated through the exit status.
 
--X &lt;URI&gt;  
+-v, --verbose  
+Verbose mode. Success/failure will be explicitly reported on top of any
+errors.
+
+-X, --exclude &lt;URI&gt;  
 Exclude an XML namespace from the validation. Elements in the namespace
 specified by &lt;URI&gt; are ignored.
 
--x  
+-x, --xinclude  
 Do XInclude processing before validation.
 
 --version  

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="17"/>
+        <issueDate year="2019" month="05" day="22"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Split -q and -v option descriptions.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -61,50 +67,56 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --schemas &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.</para>
                 <para>This can also be accomplished through the use of XML catalogs.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --filenames</listItemTerm>
               <listItemDefinition>
                 <para>List invalid files.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input as a list of object names to validate, rather than an object itself.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --output-valid</listItemTerm>
               <listItemDefinition>
                 <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-v -q</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+              <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
-                <para>Set the verbosity of the output, verbose or quiet. Verbose will explictly indicate success, rather than simply not displaying any errors. Quiet will not output anything.</para>
+                <para>Quiet mode. The tool will not output anything to stdout or stderr. Success/failure will only be indicated through the exit status.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose mode. Success/failure will be explicitly reported on top of any errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-X &lt;URI&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-X, --exclude &lt;URI&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-x</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-x, --xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing before validation.</para>
               </listItemDefinition>

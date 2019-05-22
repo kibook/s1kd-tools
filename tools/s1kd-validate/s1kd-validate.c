@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -121,20 +121,20 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-X <URI>] [-Dfloqvx] [<object>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-X <URI>] [-floqvx] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -D         Debug output.");
-	puts("  -d <dir>   Search for schemas in <dir> instead of using the URL.");
-	puts("  -f         List invalid files.");
-	puts("  -l         Treat input as list of filenames.");
-	puts("  -o         Output valid CSDB objects to stdout.");
-	puts("  -q         Silent (no output).");
-	puts("  -v         Verbose output.");
-	puts("  -X <URI>   Exclude namespace from validation by URI.");
-	puts("  -x         Do XInclude processing before validation.");
-	puts("  --version  Show version information.");
-	puts("  <object>   Any number of CSDB objects to validate.");
+	puts("  -d, --schemas <dir>  Search for schemas in <dir> instead of using the URL.");
+	puts("  -f, --filenames      List invalid files.");
+	puts("  -h, -?, --help       Show help/usage message.");
+	puts("  -l, --list           Treat input as list of filenames.");
+	puts("  -o, --output-valid   Output valid CSDB objects to stdout.");
+	puts("  -q, --quiet          Silent (no output).");
+	puts("  -v, --verbose        Verbose output.");
+	puts("  -X, --exclude <URI>  Exclude namespace from validation by URI.");
+	puts("  -x, --xinclude       Do XInclude processing before validation.");
+	puts("  --version            Show version information.");
+	puts("  <object>             Any number of CSDB objects to validate.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -420,7 +420,16 @@ int main(int argc, char *argv[])
 
 	const char *sopts = "vqd:X:xfloh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"     , no_argument      , 0, 0},
+		{"help"        , no_argument      , 0, 'h'},
+		{"schemas"     , required_argument, 0, 'd'},
+		{"filenames"   , no_argument      , 0, 'f'},
+		{"list"        , no_argument      , 0, 'l'},
+		{"output-valid", no_argument      , 0, 'o'},
+		{"quiet"       , no_argument      , 0, 'q'},
+		{"verbose"     , no_argument      , 0, 'v'},
+		{"exclude"     , required_argument, 0, 'X'},
+		{"xinclude"    , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
