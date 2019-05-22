@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.14.0"
+#define VERSION "1.14.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -231,7 +231,7 @@ void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -$, --issue <issue>         Specify which S1000D issue to use.");
-	puts("  -@, --out <path>            Output to specified file or directory");
+	puts("  -@, --out <path>            Output to specified file or directory.");
 	puts("  -%, --templates <dir>       Use templates in specified directory.");
 	puts("  -~, --dump-templates <dir>  Dump default templates to a directory.");
 	puts("  -,, --dump-dmtypes-xml      Dump default dmtypes XML.");
@@ -245,7 +245,7 @@ void show_help(void)
 	puts("  -M, --maintained-sns <SNS>  Use one of the maintained SNS.");
 	puts("  -N, --omit-issue            Omit issue/inwork from filename.");
 	puts("  -P, --two-sns-levels        Include previous level of SNS in tech name.");
-	puts("  -p, --prompt                Prompt the user for each value");
+	puts("  -p, --prompt                Prompt the user for each value.");
 	puts("  -q, --quiet                 Don't report an error if file exists.");
 	puts("  -S, --sns <BREX>            Get tech name from BREX SNS.");
 	puts("  -v, --verbose               Print file name of new data module.");
