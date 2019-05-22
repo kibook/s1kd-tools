@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -597,33 +597,33 @@ void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<datamodules>]");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>     Specify which S1000d issue to use.");
-	puts("  -@ <path>      Output to specified file or directory.");
-	puts("  -% <dir>       Use template in specified directory.");
-	puts("  -~ <dir>       Dump built-in template to directory.");
-	puts("  -d <defaults>  Specify .defaults file name.");
-	puts("  -f             Overwrite existing file.");
-	puts("  -h -?          Show usage message.");
-	puts("  -i <code>      Specify info code for SNS-generated DMRL.");
-	puts("  -N             Omit issue/inwork from filename.");
-	puts("  -p             Prompt the user for each value.");
-	puts("  -q             Don't report an error if file exists.");
-	puts("  -S <BREX>      Create a DMRL from SNS rules.");
-	puts("  -v             Print file name of DML.");
-	puts("  --version      Show version information.");
-	puts("  <datamodules>  DMs to add to new list.");
+	puts("  -$, --issue <issue>         Specify which S1000d issue to use.");
+	puts("  -@, --out <path>            Output to specified file or directory.");
+	puts("  -%, --templates <dir>       Use template in specified directory.");
+	puts("  -~, --dump-templates <dir>  Dump built-in template to directory.");
+	puts("  -d, --defaults <file>       Specify .defaults file name.");
+	puts("  -f, --overwrite             Overwrite existing file.");
+	puts("  -h, -?, --help              Show usage message.");
+	puts("  -i, --info-code <code>      Specify info code for SNS-generated DMRL.");
+	puts("  -N, --omit-issue            Omit issue/inwork from filename.");
+	puts("  -p, --prompt                Prompt the user for each value.");
+	puts("  -q, --quiet                 Don't report an error if file exists.");
+	puts("  -S, --sns <BREX>            Create a DMRL from SNS rules.");
+	puts("  -v, --verbose               Print file name of DML.");
+	puts("  --version                   Show version information.");
+	puts("  <datamodules>               DMs to add to new list.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
-	puts("  -# <code>      DML code");
-	puts("  -b <BREX>      BREX data module code");
-	puts("  -c <sec>       Security classification");
-	puts("  -I <date>      Issue date");
-	puts("  -m <remarks>   Remarks");
-	puts("  -n <iss>       Issue number");
-	puts("  -R <CAGE>      Default RPC code");
-	puts("  -r <RPC>       Default RPC name");
-	puts("  -w <inwork>    Inwork issue");
-	puts("  -z <type>      Issue type");
+	puts("  -#, --code <code>           DML code");
+	puts("  -b, --brex <BREX>           BREX data module code");
+	puts("  -c, --security <sec>        Security classification");
+	puts("  -I, --date <date>           Issue date");
+	puts("  -m, --remarks <remarks>     Remarks");
+	puts("  -n, --issno <iss>           Issue number");
+	puts("  -R, --rpccode <CAGE>        Default RPC code");
+	puts("  -r, --rpcname <RPC>         Default RPC name");
+	puts("  -w, --inwork <inwork>       Inwork issue");
+	puts("  -z, --issue-type <type>     Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -766,7 +766,30 @@ int main(int argc, char **argv)
 
 	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:z:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"prompt"        , no_argument      , 0, 'p'},
+		{"defaults"      , required_argument, 0, 'd'},
+		{"code"          , required_argument, 0, '#'},
+		{"issno"         , required_argument, 0, 'n'},
+		{"inwork"        , required_argument, 0, 'w'},
+		{"security"      , required_argument, 0, 'c'},
+		{"omit-issue"    , no_argument      , 0, 'N'},
+		{"brex"          , required_argument, 0, 'b'},
+		{"date"          , required_argument, 0, 'I'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"overwrite"     , no_argument      , 0, 'f'},
+		{"issue"         , required_argument, 0, '$'},
+		{"out"           , required_argument, 0, '@'},
+		{"rpcname"       , required_argument, 0, 'r'},
+		{"rpccode"       , required_argument, 0, 'R'},
+		{"templates"     , required_argument, 0, '%'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"sns"           , required_argument, 0, 'S'},
+		{"info-code"     , required_argument, 0, 'i'},
+		{"remarks"       , required_argument, 0, 'm'},
+		{"dump-templates", required_argument, 0, '~'},
+		{"issue-type"    , required_argument, 0, 'z'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
