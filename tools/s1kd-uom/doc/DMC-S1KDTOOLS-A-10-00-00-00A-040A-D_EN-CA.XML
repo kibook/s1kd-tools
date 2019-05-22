@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="03"/>
+        <issueDate year="2019" month="05" day="22"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -62,43 +65,43 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-e &lt;expr&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-e, --formula &lt;expr&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the formula for a conversion, given as an XPath expression.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-F &lt;fmt&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-F, --format &lt;fmt&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the format for quantity values. When used before -u, this specifies the format for all conversions. Otherwise, this specifies the format for each individual conversion.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite input CSDB objects.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-P &lt;path&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-P, --uomdisplay &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-p &lt;fmt&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --preformat &lt;fmt&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Preformat quantity data to the specified decimal format. The built-in formats are:</para>
                 <para>
@@ -117,37 +120,37 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-t &lt;uom&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --to &lt;uom&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Unit of measure to convert to.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-U &lt;path&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-U, --uom &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom <verbatimText verbatimStyle="vs02">.uom</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-u &lt;uom&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-u, --from &lt;uom&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Unit of measure to convert from.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-,</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-,, --dump-uom</listItemTerm>
               <listItemDefinition>
                 <para>Dump the default <verbatimText verbatimStyle="vs02">.uom</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-.</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-., --dump-uomdisplay</listItemTerm>
               <listItemDefinition>
                 <para>Dump the default <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file.</para>
               </listItemDefinition>

@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -27,22 +27,23 @@ bool verbose = false;
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [-lv,h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [-flv,h?] [<object>...]");
 	puts("");
-	puts("  -e <expr>  Specify formula for a conversion.");
-	puts("  -F <fmt>   Number format for converted values.");
-	puts("  -h -?      Show help/usage message.");
-	puts("  -l         Treat input as list of CSDB objects.");
-	puts("  -P <path>  Use custom UOM display file.");
-	puts("  -p <fmt>   Preformat quantity data.");
-	puts("  -t <uom>   UOM to convert to.");
-	puts("  -U <path>  Use custom .uom file.");
-	puts("  -u <uom>   UOM to convert from.");
-	puts("  -v         Verbose output.");
-	puts("  -,         Dump default .uom file.");
-	puts("  -.         Dump default UOM preformatting file.");
-	puts("  --version  Show version information.");
-	puts("  <object>   CSDB object to convert quantities in.");
+	puts("  -e, --formula <expr>     Specify formula for a conversion.");
+	puts("  -F, --format <fmt>       Number format for converted values.");
+	puts("  -f, --overwrite          Overwrite input objects.");
+	puts("  -h, -?, --help           Show help/usage message.");
+	puts("  -l, --list               Treat input as list of CSDB objects.");
+	puts("  -P, --uomdisplay <path>  Use custom UOM display file.");
+	puts("  -p, --preformat <fmt>    Preformat quantity data.");
+	puts("  -t, --to <uom>           UOM to convert to.");
+	puts("  -U, --uom <path>         Use custom .uom file.");
+	puts("  -u, --from <uom>         UOM to convert from.");
+	puts("  -v, --verbose            Verbose output.");
+	puts("  -,, --dump-uom           Dump default .uom file.");
+	puts("  -., --dump-uomdisplay    Dump default UOM preformatting file.");
+	puts("  --version                Show version information.");
+	puts("  <object>                 CSDB object to convert quantities in.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -279,7 +280,20 @@ int main(int argc, char **argv)
 
 	const char *sopts = "e:F:flP:p:t:U:u:v,.h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"        , no_argument      , 0, 0},
+		{"help"           , no_argument      , 0, 'h'},
+		{"formula"        , required_argument, 0, 'e'},
+		{"format"         , required_argument, 0, 'F'},
+		{"overwrite"      , no_argument      , 0, 'f'},
+		{"list"           , no_argument      , 0, 'l'},
+		{"uomdisplay"     , required_argument, 0, 'P'},
+		{"preformat"      , required_argument, 0, 'p'},
+		{"to"             , required_argument, 0, 't'},
+		{"uom"            , required_argument, 0, 'U'},
+		{"from"           , required_argument, 0, 'u'},
+		{"verbose"        , no_argument      , 0, 'v'},
+		{"dump-uom"       , no_argument      , 0, ','},
+		{"dump-uomdisplay", no_argument      , 0 ,'.'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

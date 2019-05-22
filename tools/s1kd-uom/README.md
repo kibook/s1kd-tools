@@ -19,28 +19,28 @@ in data modules.
 OPTIONS
 =======
 
--e &lt;expr&gt;  
+-e, --formula &lt;expr&gt;  
 Specify the formula for a conversion, given as an XPath expression.
 
--F &lt;fmt&gt;  
+-F, --format &lt;fmt&gt;  
 Specify the format for quantity values. When used before -u, this
 specifies the format for all conversions. Otherwise, this specifies the
 format for each individual conversion.
 
--f  
+-f, --overwrite  
 Overwrite input CSDB objects.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
 to list references in, rather than CSDB objects themselves.
 
--P &lt;path&gt;  
+-P, --uomdisplay &lt;path&gt;  
 Use a custom `.uomdisplay` file.
 
--p &lt;fmt&gt;  
+-p, --preformat &lt;fmt&gt;  
 Preformat quantity data to the specified decimal format. The built-in
 formats are:
 
@@ -50,22 +50,22 @@ formats are:
 
 -   imperial - full-stop for decimal separator, comma for grouping
 
--t &lt;uom&gt;  
+-t, --to &lt;uom&gt;  
 Unit of measure to convert to.
 
--U &lt;path&gt;  
+-U, --uom &lt;path&gt;  
 Use a custom `.uom` file.
 
--u &lt;uom&gt;  
+-u, --from &lt;uom&gt;  
 Unit of measure to convert from.
 
--v  
+-v, --verbose  
 Verbose output.
 
--,  
+-,, --dump-uom  
 Dump the default `.uom` file.
 
--.  
+-., --dump-uomdisplay  
 Dump the default `.uomdisplay` file.
 
 --version  
