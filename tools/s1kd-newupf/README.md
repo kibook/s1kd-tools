@@ -19,41 +19,41 @@ along with update instructions.
 OPTIONS
 =======
 
--$ &lt;issue&gt;  
+-$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
 -   4.2 (default)
 
 -   4.1
 
--@ &lt;path&gt;  
+-@, --out &lt;path&gt;  
 Save the new update file to &lt;path&gt;. If &lt;path&gt; is an existing
 directory, the update file will be created in it instead of the current
 directory. Otherwise, the update file will be saved as the filename
 &lt;path&gt; instead of being automatically named.
 
--% &lt;dir&gt;  
+-%, --templates &lt;dir&gt;  
 Use XML template in the specified directory instead of the built-in
 template. The template must be named `update.xml` in the directory
 &lt;dir&gt;, and must conform to the default S1000D issue of this tool
 (4.2).
 
--\~ &lt;dir&gt;  
+-\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
 
--d &lt;defaults&gt;  
+-d, --defaults &lt;file&gt;  
 Specify the `.defaults` file name.
 
--f  
+-f, --overwrite  
 Overwrite existing file.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--q  
+-q, --quiet  
 Do not report an error when the file already exists.
 
--v  
+-v, --verbose  
 Print the file name of the newly created data update file.
 
 --version  

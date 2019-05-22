@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -603,16 +603,16 @@ void showHelp(void)
 	puts("Usage: " PROG_NAME " [options] <SOURCE> <TARGET>");
 	puts("");
 	puts("Options:");
-	puts("  -$ <issue>  Specify which S1000D issue to use.");
-	puts("  -@ <path>   Output to specified file or directory.");
-	puts("  -% <dir>    Use templates in specified directory.");
-	puts("  -~ <dir>    Dump built-in template to directory.");
-	puts("  -d <file>   Specify the .defaults file name.");
-	puts("  -f          Overwrite existing file.");
-	puts("  -h -?       Show help/usage message.");
-	puts("  -q          Don't report an error if file exists.");
-	puts("  -v          Print file name of new update file.");
-	puts("  --version   Show version information.");
+	puts("  -$, --issue <issue>         Specify which S1000D issue to use.");
+	puts("  -@, --out <path>            Output to specified file or directory.");
+	puts("  -%, --templates <dir>       Use templates in specified directory.");
+	puts("  -~, --dump-templates <dir>  Dump built-in template to directory.");
+	puts("  -d, --defaults <file>       Specify the .defaults file name.");
+	puts("  -f, --overwrite             Overwrite existing file.");
+	puts("  -h, -?, --help              Show help/usage message.");
+	puts("  -q, --quiet                 Don't report an error if file exists.");
+	puts("  -v, --verbose               Print file name of new update file.");
+	puts("  --version                   Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -641,7 +641,16 @@ int main(int argc, char **argv)
 
 	const char *sopts = "@:$:%:d:fqv~:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"out"           , required_argument, 0, '@'},
+		{"issue"         , required_argument, 0, '$'},
+		{"templates"     , required_argument, 0, '%'},
+		{"defaults"      , required_argument, 0, 'd'},
+		{"overwrite"     , no_argument      , 0, 'f'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"dump-templates", required_argument, 0, '~'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
