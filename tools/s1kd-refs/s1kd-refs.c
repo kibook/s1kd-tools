@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.7.1"
+#define VERSION "2.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1073,35 +1073,35 @@ void showHelp(void)
 	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -a         Print unmatched codes.");
-	puts("  -C         List commnent references.");
-	puts("  -c         Only show references in content section.");
-	puts("  -D         List data module references.");
-	puts("  -d         Directory to search for matches in.");
-	puts("  -E         List external pub refs.");
-	puts("  -e <file>  Use custom .externalpubs file.");
-	puts("  -F         Overwrite updated (-U) or tagged (-X) objects.");
-	puts("  -f         Print the source filename for each reference.");
-	puts("  -G         List ICN references.");
-	puts("  -I         Update references to point to the latest matched object.");
-	puts("  -i         Ignore issue info/language when matching.");
-	puts("  -l         Treat input as list of CSDB objects.");
-	puts("  -N         Assume filenames omit issue info.");
-	puts("  -n         Print the source filename and line number for each reference.");
-	puts("  -o         Output valid CSDB objects to stdout.");
-	puts("  -P         List publication module references.");
-	puts("  -q         Quiet mode.");
-	puts("  -R         List references in matched objects recursively.");
-	puts("  -r         Search for matches in directories recursively.");
-	puts("  -s         Include the source object as a reference.");
-	puts("  -U         Update address items in matched references.");
-	puts("  -u         Show only unmatched references.");
-	puts("  -v         Verbose output.");
-	puts("  -X         Tag unmatched references.");
-	puts("  -x         Output XML report.");
-	puts("  -h -?      Show help/usage message.");
-	puts("  --version  Show version information.");
-	puts("  <object>   CSDB object to list references in.");
+	puts("  -a, --all                  Print unmatched codes.");
+	puts("  -C, --com                  List commnent references.");
+	puts("  -c, --content              Only show references in content section.");
+	puts("  -D, --dm                   List data module references.");
+	puts("  -d, --dir                  Directory to search for matches in.");
+	puts("  -E, --epr                  List external pub refs.");
+	puts("  -e, --externalpubs <file>  Use custom .externalpubs file.");
+	puts("  -F, --overwrite            Overwrite updated (-U) or tagged (-X) objects.");
+	puts("  -f, --filename             Print the source filename for each reference.");
+	puts("  -G, --icn                  List ICN references.");
+	puts("  -h, -?, --help             Show help/usage message.");
+	puts("  -I, --update-issue         Update references to point to the latest matched object.");
+	puts("  -i, --ignore-issue         Ignore issue info/language when matching.");
+	puts("  -l, --list                 Treat input as list of CSDB objects.");
+	puts("  -N, --omit-issue           Assume filenames omit issue info.");
+	puts("  -n, --lineno               Print the source filename and line number for each reference.");
+	puts("  -o, --output-valid         Output valid CSDB objects to stdout.");
+	puts("  -P, --pm                   List publication module references.");
+	puts("  -q, --quiet                Quiet mode.");
+	puts("  -R, --recursively          List references in matched objects recursively.");
+	puts("  -r, --recursive            Search for matches in directories recursively.");
+	puts("  -s, --include-src          Include the source object as a reference.");
+	puts("  -U, --update               Update address items in matched references.");
+	puts("  -u, --unmatched            Show only unmatched references.");
+	puts("  -v, --verbose              Verbose output.");
+	puts("  -X, --tag-unmatched        Tag unmatched references.");
+	puts("  -x, --xml                  Output XML report.");
+	puts("  --version                  Show version information.");
+	puts("  <object>                   CSDB object to list references in.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1124,7 +1124,34 @@ int main(int argc, char **argv)
 
 	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:h?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
+		{"version"      , no_argument      , 0, 0},
+		{"help"         , no_argument      , 0, 'h'},
+		{"quiet"        , no_argument      , 0, 'q'},
+		{"content"      , no_argument      , 0, 'c'},
+		{"externalpubs" , required_argument, 0, 'e'},
+		{"omit-issue"   , no_argument      , 0, 'N'},
+		{"all"          , no_argument      , 0, 'a'},
+		{"overwrite"    , no_argument      , 0, 'F'},
+		{"filename"     , no_argument      , 0, 'f'},
+		{"list"         , no_argument      , 0, 'l'},
+		{"update"       , no_argument      , 0, 'U'},
+		{"unmatched"    , no_argument      , 0, 'u'},
+		{"com"          , no_argument      , 0, 'C'},
+		{"dm"           , no_argument      , 0, 'D'},
+		{"icn"          , no_argument      , 0, 'G'},
+		{"pm"           , no_argument      , 0, 'P'},
+		{"recursively"  , no_argument      , 0, 'R'},
+		{"recursive"    , no_argument      , 0, 'r'},
+		{"dir"          , required_argument, 0, 'd'},
+		{"update-issue" , no_argument      , 0, 'I'},
+		{"ignore-issue" , no_argument      , 0, 'i'},
+		{"lineno"       , no_argument      , 0, 'n'},
+		{"epr"          , no_argument      , 0, 'E'},
+		{"tag-unmatched", no_argument      , 0, 'X'},
+		{"xml"          , no_argument      , 0, 'x'},
+		{"include-src"  , no_argument      , 0, 's'},
+		{"output-valid" , no_argument      , 0, 'o'},
+		{"verbose"      , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

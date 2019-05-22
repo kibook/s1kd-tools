@@ -28,7 +28,7 @@ check for references to objects which do not exist in the current CSDB
 update reference metadata, such as titles, from the matched objects
 .SH OPTIONS
 .TP
-.B \-a
+.B \-a, \-\-all
 List all references, both matched and unmatched.
 .RS
 .RE
@@ -38,124 +38,127 @@ List references to comments, data modules, external publications, ICNs,
 and publication modules respectively.
 If none are specified, \-CDEGP is assumed.
 .RS
+.PP
+The following long options can also be used for each: \-\-com, \-\-dm,
+\-\-epr, \-\-icn, \-\-pm.
 .RE
 .TP
-.B \-c
+.B \-c, \-\-content
 List references in the \f[C]content\f[] section of a CSDB object only.
 .RS
 .RE
 .TP
-.B \-d <dir>
+.B \-d, \-\-dir <dir>
 Directory to search for matches to references in.
 By default, the current directory is used.
 .RS
 .RE
 .TP
-.B \-e <file>
+.B \-e, \-\-externalpubs <file>
 Use a custom \f[C]\&.externalpubs\f[] file.
 .RS
 .RE
 .TP
-.B \-F
+.B \-F, \-\-overwrite
 When using the \-U or \-X options, overwrite the input objects that have
 been updated or tagged.
 .RS
 .RE
 .TP
-.B \-f
+.B \-f, \-\-filename
 Include the filename of the source object where each reference was found
 in the output.
 .RS
 .RE
 .TP
-.B \-h \-?
+.B \-h, \-?, \-\-help
 Show help/usage message.
 .RS
 .RE
 .TP
-.B \-I
+.B \-I, \-\-update\-issue
 Update the issue number, issue date, language, and title of references
 to that of the latest matched object.
 This option implies the \-U and \-i options.
 .RS
 .RE
 .TP
-.B \-i
+.B \-i, \-\-ignore\-issue
 Always match the latest issue of an object found, regardless of the
 issue and language specified in the reference.
 .RS
 .RE
 .TP
-.B \-l
+.B \-l, \-\-list
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
 to list references in, rather than CSDB objects themselves.
 .RS
 .RE
 .TP
-.B \-N
+.B \-N, \-\-omit\-issue
 Assume filenames of referenced CSDB objects omit the issue info, i.e.
 they were created with the \-N option to the s1kd\-new* tools.
 .RS
 .RE
 .TP
-.B \-n
+.B \-n, \-\-lineno
 Include the filename of the source object where each reference was
 found, and display the line number where the reference occurs in the
 source file after its filename.
 .RS
 .RE
 .TP
-.B \-o
+.B \-o, \-\-output\-valid
 Output valid CSDB objects to stdout.
 .RS
 .RE
 .TP
-.B \-q
+.B \-q, \-\-quiet
 Quiet mode.
 Errors are not printed.
 .RS
 .RE
 .TP
-.B \-R
+.B \-R, \-\-recursively
 List references in matched objects recursively.
 .RS
 .RE
 .TP
-.B \-r
+.B \-r, \-\-recursive
 Search for matches to references in directories recursively.
 .RS
 .RE
 .TP
-.B \-s
+.B \-s, \-\-include\-src
 Include the source object as a reference.
 This is helpful when the output of this tool is used to apply some
 operation to a source object and all its dependencies together.
 .RS
 .RE
 .TP
-.B \-U
+.B \-U, \-\-update
 Update the title of matched references from the corresponding object.
 .RS
 .RE
 .TP
-.B \-u
+.B \-u, \-\-unmatched
 Show only unmatched reference errors, or unmatched codes if combined
 with the \-a option.
 .RS
 .RE
 .TP
-.B \-v
+.B \-v, \-\-verbose
 Verbose output.
 .RS
 .RE
 .TP
-.B \-X
+.B \-X, \-\-tag\-unmatched
 Tag unmatched references with the processing instruction
 \f[C]<?unmatched?>\f[].
 .RS
 .RE
 .TP
-.B \-x
+.B \-x, \-\-xml
 Output a detailed XML report instead of plain text messages.
 .RS
 .RE

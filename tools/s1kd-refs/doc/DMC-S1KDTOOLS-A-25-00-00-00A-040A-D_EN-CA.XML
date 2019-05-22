@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add long options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -76,7 +79,7 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>-a</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-a, --all</listItemTerm>
               <listItemDefinition>
                 <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
@@ -85,130 +88,131 @@
               <listItemTerm>-C, -D, -E, -G, -P</listItemTerm>
               <listItemDefinition>
                 <para>List references to comments, data modules, external publications, ICNs, and publication modules respectively. If none are specified, -CDEGP is assumed.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">The following long options can also be used for each: --com, --dm, --epr, --icn, --pm.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-c</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-c, --content</listItemTerm>
               <listItemDefinition>
                 <para>List references in the <verbatimText verbatimStyle="vs12">content</verbatimText> section of a CSDB object only.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-d &lt;dir&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --dir &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Directory to search for matches to references in. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-e &lt;file&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-e, --externalpubs &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-F</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-F, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>When using the -U or -X options, overwrite the input objects that have been updated or tagged.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-f</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --filename</listItemTerm>
               <listItemDefinition>
                 <para>Include the filename of the source object where each reference was found in the output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-h -?</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-I</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-I, --update-issue</listItemTerm>
               <listItemDefinition>
                 <para>Update the issue number, issue date, language, and title of references to that of the latest matched object. This option implies the -U and -i options.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-i</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-i, --ignore-issue</listItemTerm>
               <listItemDefinition>
                 <para>Always match the latest issue of an object found, regardless of the issue and language specified in the reference.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-l</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-N</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-N, --omit-issue</listItemTerm>
               <listItemDefinition>
                 <para>Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new* tools.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-n</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-n, --lineno</listItemTerm>
               <listItemDefinition>
                 <para>Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-o</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --output-valid</listItemTerm>
               <listItemDefinition>
                 <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-q</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-R</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-R, --recursively</listItemTerm>
               <listItemDefinition>
                 <para>List references in matched objects recursively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-r</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-r, --recursive</listItemTerm>
               <listItemDefinition>
                 <para>Search for matches to references in directories recursively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-s</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-s, --include-src</listItemTerm>
               <listItemDefinition>
                 <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-U</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-U, --update</listItemTerm>
               <listItemDefinition>
                 <para>Update the title of matched references from the corresponding object.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-u</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-u, --unmatched</listItemTerm>
               <listItemDefinition>
                 <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-X</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-X, --tag-unmatched</listItemTerm>
               <listItemDefinition>
                 <para>Tag unmatched references with the processing instruction <verbatimText>&lt;?unmatched?&gt;</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-x</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para>Output a detailed XML report instead of plain text messages.</para>
               </listItemDefinition>

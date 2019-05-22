@@ -28,7 +28,7 @@ This allows you to:
 OPTIONS
 =======
 
--a  
+-a, --all  
 List all references, both matched and unmatched.
 
 -C, -D, -E, -G, -P  
@@ -36,81 +36,84 @@ List references to comments, data modules, external publications, ICNs,
 and publication modules respectively. If none are specified, -CDEGP is
 assumed.
 
--c  
+The following long options can also be used for each: --com, --dm,
+--epr, --icn, --pm.
+
+-c, --content  
 List references in the `content` section of a CSDB object only.
 
--d &lt;dir&gt;  
+-d, --dir &lt;dir&gt;  
 Directory to search for matches to references in. By default, the
 current directory is used.
 
--e &lt;file&gt;  
+-e, --externalpubs &lt;file&gt;  
 Use a custom `.externalpubs` file.
 
--F  
+-F, --overwrite  
 When using the -U or -X options, overwrite the input objects that have
 been updated or tagged.
 
--f  
+-f, --filename  
 Include the filename of the source object where each reference was found
 in the output.
 
--h -?  
+-h, -?, --help  
 Show help/usage message.
 
--I  
+-I, --update-issue  
 Update the issue number, issue date, language, and title of references
 to that of the latest matched object. This option implies the -U and -i
 options.
 
--i  
+-i, --ignore-issue  
 Always match the latest issue of an object found, regardless of the
 issue and language specified in the reference.
 
--l  
+-l, --list  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
 to list references in, rather than CSDB objects themselves.
 
--N  
+-N, --omit-issue  
 Assume filenames of referenced CSDB objects omit the issue info, i.e.
 they were created with the -N option to the s1kd-new\* tools.
 
--n  
+-n, --lineno  
 Include the filename of the source object where each reference was
 found, and display the line number where the reference occurs in the
 source file after its filename.
 
--o  
+-o, --output-valid  
 Output valid CSDB objects to stdout.
 
--q  
+-q, --quiet  
 Quiet mode. Errors are not printed.
 
--R  
+-R, --recursively  
 List references in matched objects recursively.
 
--r  
+-r, --recursive  
 Search for matches to references in directories recursively.
 
--s  
+-s, --include-src  
 Include the source object as a reference. This is helpful when the
 output of this tool is used to apply some operation to a source object
 and all its dependencies together.
 
--U  
+-U, --update  
 Update the title of matched references from the corresponding object.
 
--u  
+-u, --unmatched  
 Show only unmatched reference errors, or unmatched codes if combined
 with the -a option.
 
--v  
+-v, --verbose  
 Verbose output.
 
--X  
+-X, --tag-unmatched  
 Tag unmatched references with the processing instruction
 `<?unmatched?>`.
 
--x  
+-x, --xml  
 Output a detailed XML report instead of plain text messages.
 
 --version  
