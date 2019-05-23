@@ -15,7 +15,7 @@ bool includeIdentity = false;
 bool verbose = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.4.0"
+#define VERSION "1.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "

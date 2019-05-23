@@ -62,9 +62,6 @@ Specify the URI when adding an ICN with the -a option.
 -v, --verbose  
 Verbose output.
 
--x, --xinclude  
-Process input CSDB objects using the XInclude specification.
-
 --version  
 Show version information.
 
@@ -79,6 +76,9 @@ Allow network access to load external DTD and entities.
 
 --noent  
 Resolve entities.
+
+--xinclude  
+Do XInclude processing.
 
 EXAMPLES
 ========

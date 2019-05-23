@@ -430,6 +430,7 @@ xmlNodePtr add_first_child(xmlNodePtr parent, xmlNodePtr child)
 	}
 }
 
+/* Convert string to lowercase. */
 void lowercase(char *s)
 {
 	int i;
@@ -438,6 +439,7 @@ void lowercase(char *s)
 	}
 }
 
+/* Convert string to uppercase. */
 void uppercase(char *s)
 {
 	int i;
@@ -446,7 +448,42 @@ void uppercase(char *s)
 	}
 }
 
+/* Return whether a bitset contains an option. */
 bool optset(int opts, int opt)
 {
 	return ((opts & opt) == opt);
+}
+
+/* Read an XML document from a file. */
+xmlDocPtr read_xml_doc(const char *path)
+{
+	xmlDocPtr doc;
+
+	doc = xmlReadFile(path, NULL, DEFAULT_PARSE_OPTS);
+
+	if (optset(DEFAULT_PARSE_OPTS, XML_PARSE_XINCLUDE)) {
+		xmlXIncludeProcessFlags(doc, DEFAULT_PARSE_OPTS);
+	}
+
+	return doc;
+}
+
+/* Read an XML document from memory. */
+xmlDocPtr read_xml_mem(const char *buffer, int size)
+{
+	xmlDocPtr doc;
+
+	doc = xmlReadMemory(buffer, size, NULL, NULL, DEFAULT_PARSE_OPTS);
+
+	if (optset(DEFAULT_PARSE_OPTS, XML_PARSE_XINCLUDE)) {
+		xmlXIncludeProcessFlags(doc, DEFAULT_PARSE_OPTS);
+	}
+
+	return doc;
+}
+
+/* Save an XML document to a file. */
+int save_xml_doc(xmlDocPtr doc, const char *path)
+{
+	return xmlSaveFile(path, doc);
 }

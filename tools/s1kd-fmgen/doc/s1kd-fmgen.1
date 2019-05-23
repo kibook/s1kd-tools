@@ -9,8 +9,8 @@ s1kd\-fmgen \- Generate front matter data module contents
 .IP
 .nf
 \f[C]
-s1kd\-fmgen\ [\-F\ <FMTYPES>]\ [\-P\ <PM>]\ [\-X\ <XSL>\ [\-p\ <name>=<val>\ ...]]
-\ \ \ \ \ \ \ \ \ \ \ [\-,.flvxh?]\ (\-t\ <TYPE>|<DM>...)
+s1kd\-fmgen\ [\-F\ <FMTYPES>]\ [\-P\ <PM>]\ [\-x\ <XSL>\ [\-p\ <name>=<val>\ ...]]
+\ \ \ \ \ \ \ \ \ \ \ [\-,.flvh?]\ (\-t\ <TYPE>|<DM>...)
 \f[]
 .fi
 .SH DESCRIPTION
@@ -89,18 +89,13 @@ Verbose output.
 .RS
 .RE
 .TP
-.B \-X, \-\-xsl <XSL>
+.B \-x, \-\-xsl <XSL>
 Transform the front matter contents after generating them using the
 specified XSLT.
 This can be used, for example, to generate content for a descriptive
 schema data module instead, to support older issues of the
 specification, or for types of generated front matter not covered by the
 frontmatter schema.
-.RS
-.RE
-.TP
-.B \-x, \-\-xinclude
-Do XInclude processing.
 .RS
 .RE
 .TP
@@ -129,6 +124,11 @@ Allow network access to load external DTD and entities.
 .TP
 .B \-\-noent
 Resolve entities.
+.RS
+.RE
+.TP
+.B \-\-xinclude
+Do XInclude processing.
 .RS
 .RE
 .SS \f[C]\&.fmtypes\f[] file

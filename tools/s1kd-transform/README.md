@@ -65,6 +65,9 @@ Allow network access to load external DTD and entities.
 --noent  
 Resolve entities.
 
+--xinclude  
+Do XInclude processing.
+
 Identity template
 -----------------
 

@@ -6,8 +6,8 @@ s1kd-fmgen - Generate front matter data module contents
 SYNOPSIS
 ========
 
-    s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]]
-               [-,.flvxh?] (-t <TYPE>|<DM>...)
+    s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]]
+               [-,.flvh?] (-t <TYPE>|<DM>...)
 
 DESCRIPTION
 ===========
@@ -66,15 +66,12 @@ specified. Supported types are:
 -v, --verbose  
 Verbose output.
 
--X, --xsl &lt;XSL&gt;  
+-x, --xsl &lt;XSL&gt;  
 Transform the front matter contents after generating them using the
 specified XSLT. This can be used, for example, to generate content for a
 descriptive schema data module instead, to support older issues of the
 specification, or for types of generated front matter not covered by the
 frontmatter schema.
-
--x, --xinclude  
-Do XInclude processing.
 
 --version  
 Show version information.
@@ -93,6 +90,9 @@ Allow network access to load external DTD and entities.
 
 --noent  
 Resolve entities.
+
+--xinclude  
+Do XInclude processing.
 
 `.fmtypes` file
 ---------------

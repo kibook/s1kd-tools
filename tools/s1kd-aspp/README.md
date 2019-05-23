@@ -9,8 +9,8 @@ SYNOPSIS
     s1kd-aspp -h?
     s1kd-aspp -D
     s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
-                 [-cfklrvx] [<object>...]
-    s1kd-aspp -p [-a <ID>] [-flvx] [<object>...]
+                 [-cfklrv] [<object>...]
+    s1kd-aspp -p [-a <ID>] [-flv] [<object>...]
 
 DESCRIPTION
 ===========
@@ -100,9 +100,6 @@ Search for ACT/CCT data modules recursively.
 -v, --verbose  
 Verbose output.
 
--x, --xinclude  
-Process the objects using the XInclude specification.
-
 --version  
 Show version information.
 
@@ -121,6 +118,9 @@ Allow network access to load external DTD and entities.
 
 --noent  
 Resolve entities.
+
+--xinclude  
+Do XInclude processing.
 
 EXAMPLES
 ========

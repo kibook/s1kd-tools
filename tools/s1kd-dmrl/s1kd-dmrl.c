@@ -15,7 +15,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 void showHelp(void)
 {

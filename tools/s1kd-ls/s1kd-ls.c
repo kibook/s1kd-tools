@@ -24,7 +24,7 @@ unsigned ICN_MAX = OBJECT_MAX;
 unsigned SMC_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

@@ -46,12 +46,9 @@ Success/failure will only be indicated through the exit status.
 Verbose mode. Success/failure will be explicitly reported on top of any
 errors.
 
--X, --exclude &lt;URI&gt;  
+-x, --exclude &lt;URI&gt;  
 Exclude an XML namespace from the validation. Elements in the namespace
 specified by &lt;URI&gt; are ignored.
-
--x, --xinclude  
-Do XInclude processing before validation.
 
 --version  
 Show version information.
@@ -71,6 +68,9 @@ Allow network access to load external DTD and entities.
 
 --noent  
 Substitute entities.
+
+--xinclude  
+Do XInclude processing.
 
 Multi-spec directory with -d option
 -----------------------------------

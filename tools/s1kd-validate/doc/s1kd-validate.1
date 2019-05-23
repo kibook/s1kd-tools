@@ -63,14 +63,9 @@ Success/failure will be explicitly reported on top of any errors.
 .RS
 .RE
 .TP
-.B \-X, \-\-exclude <URI>
+.B \-x, \-\-exclude <URI>
 Exclude an XML namespace from the validation.
 Elements in the namespace specified by <URI> are ignored.
-.RS
-.RE
-.TP
-.B \-x, \-\-xinclude
-Do XInclude processing before validation.
 .RS
 .RE
 .TP
@@ -100,6 +95,11 @@ Allow network access to load external DTD and entities.
 .TP
 .B \-\-noent
 Substitute entities.
+.RS
+.RE
+.TP
+.B \-\-xinclude
+Do XInclude processing.
 .RS
 .RE
 .SS Multi\-spec directory with \-d option

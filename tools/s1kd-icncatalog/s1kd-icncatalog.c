@@ -6,7 +6,6 @@
 #include <libgen.h>
 
 #include <libxml/tree.h>
-#include <libxml/xinclude.h>
 #include <libxml/valid.h>
 #include <libxml/xpath.h>
 
@@ -14,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "1.6.0"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -131,7 +130,7 @@ void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, const xmlC
 }
 
 /* Resolve ICNs in a file against the ICN catalog. */
-void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, bool xinclude, const char *media)
+void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, const char *media)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -144,10 +143,6 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 
 	if (!(doc = read_xml_doc(fname))) {
 		return;
-	}
-
-	if (xinclude) {
-		xmlXIncludeProcess(doc);
 	}
 
 	ctx = xmlXPathNewContext(icns);
@@ -191,7 +186,7 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, boo
 }
 
 /* Resolve ICNs in objects in a list of file names. */
-void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, bool xinclude, const char *media)
+void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, const char *media)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -207,7 +202,7 @@ void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, bool
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		resolve_icns_in_file(line, icns, overwrite, xinclude, media);
+		resolve_icns_in_file(line, icns, overwrite, media);
 	}
 
 	if (path) {
@@ -276,7 +271,6 @@ void show_help(void)
 	puts("  -t, --new               Create new ICN catalog.");
 	puts("  -u, --uri <uri>         Set the URI of the new ICN.");
 	puts("  -v, --verbose           Verbose output.");
-	puts("  -x, --xinclude          Process XInclude elements.");
 	puts("  --version               Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -292,7 +286,6 @@ int main(int argc, char **argv)
 {
 	int i;
 	bool overwrite = false;
-	bool xinclude = false;
 	char *icns_fname = NULL;
 	bool createnew = false;
 	char *media = NULL;
@@ -314,7 +307,6 @@ int main(int argc, char **argv)
 		{"new"      , no_argument      , 0, 't'},
 		{"uri"      , required_argument, 0, 'u'},
 		{"verbose"  , no_argument      , 0, 'v'},
-		{"xinclude" , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -372,9 +364,6 @@ int main(int argc, char **argv)
 			case 'v':
 				verbose = true;
 				break;
-			case 'x':
-				xinclude = true;
-				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -408,9 +397,9 @@ int main(int argc, char **argv)
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				resolve_icns_in_list(argv[i], icns, overwrite, xinclude, media);
+				resolve_icns_in_list(argv[i], icns, overwrite, media);
 			} else {
-				resolve_icns_in_file(argv[i], icns, overwrite, xinclude, media);
+				resolve_icns_in_file(argv[i], icns, overwrite, media);
 			}
 		}
 	} else if (createnew) {
@@ -420,9 +409,9 @@ int main(int argc, char **argv)
 			save_xml_doc(icns, "-");
 		}
 	} else if (islist) {
-		resolve_icns_in_list(NULL, icns, overwrite, xinclude, media);
+		resolve_icns_in_list(NULL, icns, overwrite, media);
 	} else {
-		resolve_icns_in_file("-", icns, false, xinclude, media);
+		resolve_icns_in_file("-", icns, false, media);
 	}
 
 	free(icns_fname);

@@ -6,14 +6,13 @@
 #include <stdbool.h>
 
 #include <libxml/tree.h>
-#include <libxml/xinclude.h>
 #include <libxslt/transform.h>
 
 #include "s1kd_tools.h"
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "1.8.0"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -336,7 +335,7 @@ void add_param(xmlNodePtr params, char *s)
 
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-X <XSL> [-p <name>=<val> ...]] [-,flvxh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]] [-,flvh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
 	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");
@@ -349,8 +348,7 @@ void show_help(void)
 	puts("  -p, --param <name>=<value>  Pass parameters to the XSLT specified with -X.");
 	puts("  -t, --type <TYPE>           Generate the specified type of front matter.");
 	puts("  -v, --verbose               Verbose output.");
-	puts("  -X, --xsl <XSL>             Transform generated contents.");
-	puts("  -x, --xinclude              Do XInclude processing.");
+	puts("  -x, --xsl <XSL>             Transform generated contents.");
 	puts("  --version                   Show version information.");
 	puts("  <DM>                        Generate front matter content based on the specified data modules.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -380,7 +378,6 @@ int main(int argc, char **argv)
 		{"type"            , required_argument, 0, 't'},
 		{"verbose"         , no_argument      , 0, 'v'},
 		{"xsl"             , required_argument, 0, 'X'},
-		{"xinclude"        , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -392,7 +389,6 @@ int main(int argc, char **argv)
 	xmlDocPtr pm, fmtypes = NULL;
 
 	bool overwrite = false;
-	bool xincl = false;
 	bool islist = false;
 	char *xslpath = NULL;
 	xmlNodePtr params_node;
@@ -443,9 +439,6 @@ int main(int argc, char **argv)
 			case 'X':
 				xslpath = strdup(optarg);
 				break;
-			case 'x':
-				xincl = true;
-				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -488,10 +481,6 @@ int main(int argc, char **argv)
 	}
 
 	pm = read_xml_doc(pmpath);
-
-	if (xincl) {
-		xmlXIncludeProcess(pm);
-	}
 
 	if (optind < argc) {
 		void (*gen_fn)(xmlDocPtr, const char *, xmlDocPtr, const char *,

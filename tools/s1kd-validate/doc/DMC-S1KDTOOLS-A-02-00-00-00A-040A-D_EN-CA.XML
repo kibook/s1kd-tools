@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
         <simplePara>Split -q and -v option descriptions.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Replace -x option with standard --xinclude option, change -X to -x.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -110,15 +113,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-X, --exclude &lt;URI&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003">-x, --exclude &lt;URI&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-x, --xinclude</listItemTerm>
-              <listItemDefinition>
-                <para>Do XInclude processing before validation.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -154,6 +151,12 @@
               <listItemTerm>--noent</listItemTerm>
               <listItemDefinition>
                 <para>Substitute entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

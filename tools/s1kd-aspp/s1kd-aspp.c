@@ -12,7 +12,6 @@
 #include <string.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
-#include <libxml/xinclude.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 #include "s1kd_tools.h"
@@ -21,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "2.7.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -561,10 +560,6 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 
 	doc = read_xml_doc(in);
 
-	if (xincl) {
-		xmlXIncludeProcess(doc);
-	}
-
 	if (findcts) {
 		/* Copy the user-defined ACTs/CCTs. */
 		all_acts = xmlCopyNode(acts, 1);
@@ -653,7 +648,6 @@ void showHelp(void)
 	puts("  -p, --presentation    Convert semantic applicability to presentation applicability.");
 	puts("  -r, --recursive       Search for ACT/CCT recursively.");
 	puts("  -v, --verbose         Verbose output.");
-	puts("  -x, --xinclude        Perform XInclude processing.");
 	puts("  -h, -?, --help        Show help/usage message.");
 	puts("  --version             Show version information.");
 	puts("  <object>...           CSDB objects to process.");
@@ -699,7 +693,6 @@ int main(int argc, char **argv)
 		{"presentation", no_argument      , 0, 'p'},
 		{"recursive"   , no_argument      , 0, 'r'},
 		{"verbose"     , no_argument      , 0, 'v'},
-		{"xinclude"    , no_argument      , 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

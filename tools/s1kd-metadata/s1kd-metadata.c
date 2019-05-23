@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.3.0"
+#define VERSION "2.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
