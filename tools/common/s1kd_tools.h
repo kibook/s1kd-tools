@@ -121,7 +121,4 @@ xmlDocPtr read_xml_mem(const char *buffer, int size);
 /* Save an XML document to a file. */
 int save_xml_doc(xmlDocPtr doc, const char *path);
 
-/* Read an XML document from a file. */
-xmlDocPtr read_xml_doc(const char *path);
-
 #endif
