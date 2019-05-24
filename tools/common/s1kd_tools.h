@@ -47,7 +47,7 @@ extern int DEFAULT_PARSE_OPTS;
 	} else if (strcmp(lopts[loptind].name, "noent") == 0) {\
 		DEFAULT_PARSE_OPTS |= XML_PARSE_NOENT;\
 	} else if (strcmp(lopts[loptind].name, "xinclude") == 0) {\
-		DEFAULT_PARSE_OPTS |= XML_PARSE_XINCLUDE | XML_PARSE_NOBASEFIX;\
+		DEFAULT_PARSE_OPTS |= XML_PARSE_XINCLUDE | XML_PARSE_NOBASEFIX | XML_PARSE_NOXINCNODE;\
 	}
 #define LIBXML2_PARSE_LONGOPT_HELP \
 	puts("");\
