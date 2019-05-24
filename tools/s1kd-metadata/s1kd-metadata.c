@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.4.0"
+#define VERSION "2.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1660,19 +1660,19 @@ struct metadata metadata[] = {
 	{NULL}
 };
 
-void show_icn_code(const char *fname, int endl)
+void show_icn_code(const char *bname, int endl)
 {
 	int n;
-	n = strchr(fname, '.') - fname;
-	printf("%.*s", n, fname);
+	n = strchr(bname, '.') - bname;
+	printf("%.*s", n, bname);
 	if (endl > -1) putchar(endl);
 }
 
-void show_icn_sec(const char *fname, int endl)
+void show_icn_sec(const char *bname, int endl)
 {
 	char *s, *e;
 	int n;
-	s = strrchr(fname, '-');
+	s = strrchr(bname, '-');
 	++s;
 	e = strchr(s, '.');
 	n = e - s;
@@ -1680,11 +1680,11 @@ void show_icn_sec(const char *fname, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-void show_icn_iss(const char *fname, int endl)
+void show_icn_iss(const char *bname, int endl)
 {
 	char *s, *e;
 	int n;
-	s = strrchr(fname, '-');
+	s = strrchr(bname, '-');
 	s = s - 3;
 	e = strchr(s, '-');
 	n = e - s;
@@ -1692,7 +1692,7 @@ void show_icn_iss(const char *fname, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-void show_icn_type(const char *fname, int endl)
+void show_icn_type(const char *bname, int endl)
 {
 	printf("icn");
 	if (endl > -1) putchar(endl);
@@ -1908,19 +1908,19 @@ int show_path(const char *fname, int endl)
 	return 0;
 }
 
-char *get_format(const char *fname)
+char *get_format(const char *bname)
 {
 	char *s;
-	if ((s = strchr(fname, '.'))) {
+	if ((s = strchr(bname, '.'))) {
 		return s + 1;
 	} else {
 		return "";
 	}
 }
 
-int show_format(const char *fname, int endl)
+int show_format(const char *bname, int endl)
 {
-	printf("%s", get_format(fname));
+	printf("%s", get_format(bname));
 	if (endl > -1) putchar(endl);
 	return 0;
 }
@@ -1953,7 +1953,7 @@ int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_icn_metadata_fmtstr_key(const char *fname, const char *k, int n)
+int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
 {
 	int i;
 	char *key;
@@ -1963,7 +1963,7 @@ int show_icn_metadata_fmtstr_key(const char *fname, const char *k, int n)
 
 	for (i = 0; icn_metadata[i].key; ++i) {
 		if (strcmp(icn_metadata[i].key, key) == 0) {
-			icn_metadata[i].show(fname, -1);
+			icn_metadata[i].show(bname, -1);
 			free(key);
 			return EXIT_SUCCESS;
 		}
@@ -1974,9 +1974,9 @@ int show_icn_metadata_fmtstr_key(const char *fname, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-bool is_icn(const char *path)
+bool is_icn(const char *bname)
 {
-	return strncmp(path, "ICN-", 4) == 0;
+	return strncasecmp(bname, "ICN-", 4) == 0;
 }
 
 int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
@@ -1990,20 +1990,26 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 			} else {
 				const char *k, *e;
 				int n;
+				char *s, *bname;
+
 				k = fmt + i + 1;
 				e = strchr(k, FMTSTR_DELIM);
 				if (!e) break;
 				n = e - k;
 
+				bname = basename((s = strdup(fname)));
+
 				if (strncmp(k, "path", n) == 0) {
 					show_path(fname, -1);
 				} else if (strncmp(k, "format", n) == 0) {
-					show_format(fname, -1);
-				} else if (is_icn(fname)) {
-					show_icn_metadata_fmtstr_key(fname, k, n);
+					show_format(bname, -1);
+				} else if (is_icn(bname)) {
+					show_icn_metadata_fmtstr_key(bname, k, n);
 				} else {
 					show_metadata_fmtstr_key(ctx, k, n);
 				}
+
+				free(s);
 
 				i += n + 1;
 			}
@@ -2073,13 +2079,13 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
 	return cmp;
 }
 
-int show_icn_metadata(const char *fname, const char *key, int endl)
+int show_icn_metadata(const char *bname, const char *key, int endl)
 {
 	int i;
 
 	for (i = 0; icn_metadata[i].key; ++i) {
 		if (strcmp(key, icn_metadata[i].key) == 0) {
-			icn_metadata[i].show(fname, endl);
+			icn_metadata[i].show(bname, endl);
 			return EXIT_SUCCESS;
 		}
 	}
@@ -2133,6 +2139,10 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	}
 
 	if (!err) {
+		char *s, *bname;
+
+		bname = basename((s = strdup(fname)));
+
 		if (fmtstr) {
 			err = show_metadata_fmtstr(fname, ctxt, fmtstr);
 		} else if (keys->children) {
@@ -2149,9 +2159,9 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 				} else if (strcmp(key, "path") == 0) {
 					err = show_path(fname, endl);
 				} else if (strcmp(key, "format") == 0) {
-					err = show_format(fname, endl);
-				} else if (is_icn(fname)) {
-					err = show_icn_metadata(fname, key, endl);
+					err = show_format(bname, endl);
+				} else if (is_icn(bname)) {
+					err = show_icn_metadata(bname, key, endl);
 				} else {
 					err = show_metadata(ctxt, key, endl);
 				}
@@ -2175,11 +2185,13 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 			err = edit_all_metadata(input, ctxt);
 
 			fclose(input);
-		} else if (is_icn(fname)) {
-			err = show_all_icn_metadata(fname, formatall, endl);
+		} else if (is_icn(bname)) {
+			err = show_all_icn_metadata(bname, formatall, endl);
 		} else {
 			err = show_all_metadata(ctxt, formatall, endl, only_editable);
 		}
+
+		free(s);
 	}
 
 	xmlXPathFreeContext(ctxt);
