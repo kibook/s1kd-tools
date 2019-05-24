@@ -177,7 +177,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-w, --severity-levels &lt;severities&gt;</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-w, --severity-levels &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a list of severity levels for business rules.</para>
               </listItemDefinition>

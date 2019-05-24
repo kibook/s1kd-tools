@@ -99,7 +99,7 @@ the number of documents that passed/failed the check.
 -v, --verbose  
 Verbose mode. The success or failure of each test is printed explicitly.
 
--w, --severity-levels &lt;severities&gt;  
+-w, --severity-levels &lt;file&gt;  
 Specify a list of severity levels for business rules.
 
 -x, --xml  

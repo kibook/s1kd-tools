@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.11.0"
+#define VERSION "2.11.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1242,7 +1242,7 @@ void print_stats(xmlDocPtr doc)
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <sev>] [-BcfLlnopqrS[tu]sTvxh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcfLlnopqrS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -B, --default-brex                   Use the default BREX.");
@@ -1263,7 +1263,7 @@ void show_help(void)
 	puts("  -s, --short                          Short messages.");
 	puts("  -T, --summary                        Print a summary of the check.");
 	puts("  -v, --verbose                        Verbose mode.");
-	puts("  -w, --severity-levels <sev>          List of severity levels.");
+	puts("  -w, --severity-levels <file>         List of severity levels.");
 	puts("  -x, --xml                            XML output.");
 	puts("  --version                            Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
