@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="00"/>
+        <issueInfo issueNumber="017" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="24"/>
+        <issueDate year="2019" month="05" day="27"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,13 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add long options.</simplePara>
+        <simplePara>Add -e option.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Split -q and -v option descriptions.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Replace -x option with standard --xinclude option, change -X to -x.</simplePara>
+        <simplePara>Fix SYNOPSIS.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -58,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-d <dir>] [-X <URI>] [-floqvxh?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-validate [-d <dir>] [-x <URI>] [-efloqvh?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -70,50 +67,56 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --schemas &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-d, --schemas &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.</para>
                 <para>This can also be accomplished through the use of XML catalogs.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-e, --ignore-empty</listItemTerm>
+              <listItemDefinition>
+                <para>Ignore validation for empty or non-XML documents.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --filenames</listItemTerm>
+              <listItemTerm>-f, --filenames</listItemTerm>
               <listItemDefinition>
                 <para>List invalid files.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
+              <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --list</listItemTerm>
+              <listItemTerm>-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input as a list of object names to validate, rather than an object itself.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --output-valid</listItemTerm>
+              <listItemTerm>-o, --output-valid</listItemTerm>
               <listItemDefinition>
                 <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+            <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. The tool will not output anything to stdout or stderr. Success/failure will only be indicated through the exit status.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+            <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose mode. Success/failure will be explicitly reported on top of any errors.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003">-x, --exclude &lt;URI&gt;</listItemTerm>
+              <listItemTerm>-x, --exclude &lt;URI&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
               </listItemDefinition>
@@ -153,7 +156,7 @@
                 <para>Substitute entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>--xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing.</para>
