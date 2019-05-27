@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-BcfLlnopqrS[tu]sTvxh?] [<object>...]
+                   [-BcefLlnopqrS[tu]sTvxh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -38,6 +38,9 @@ the value of each object is within the allowed set of values.
 -d, --dir &lt;dir&gt;  
 Directory to start searching for BREX data modules in. By default, the
 current directory is used.
+
+-e, --ignore-empty  
+Ignore check for empty or non-XML documents.
 
 -f, --overwrite  
 Print the filenames of CSDB objects with BREX/SNS errors.

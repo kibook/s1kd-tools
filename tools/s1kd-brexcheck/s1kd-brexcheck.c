@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.11.1"
+#define VERSION "2.12.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -110,6 +110,9 @@ char *search_dir = NULL;
 
 /* Output XML tree if it passes the BREX check. */
 bool output_tree = false;
+
+/* Ignore empty/non-XML files. */
+bool ignore_empty = false;
 
 /* Return the first node in a set matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -1242,13 +1245,14 @@ void print_stats(xmlDocPtr doc)
 /* Show usage message. */
 void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcfLlnopqrS[tu]sTvxh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcefLlnopqrS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -B, --default-brex                   Use the default BREX.");
 	puts("  -b, --brex <brex>                    Use <brex> as the BREX data module.");
 	puts("  -c, --values                         Check object values.");
 	puts("  -d, --dir <dir>                      Directory to start search for BREX in.");
+	puts("  -e, --ignore-empty                   Ignore empty/non-XML files.");
 	puts("  -f, --filenames                      Print the filenames of invalid objects.");
 	puts("  -h, -?, --help                       Show this help message.");
 	puts("  -I, --include <path>                 Add <path> to search path for BREX data module.");
@@ -1305,13 +1309,14 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:I:xvqslw:StupfncLTrd:oh?";
+	const char *sopts = "Bb:eI:xvqslw:StupfncLTrd:oh?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
 		{"default-brex"   , no_argument      , 0, 'B'},
 		{"brex"           , required_argument, 0, 'b'},
 		{"dir"            , required_argument, 0, 'd'},
+		{"ignore-empty"   , no_argument      , 0, 'e'},
 		{"include"        , required_argument, 0, 'I'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"quiet"          , no_argument      , 0, 'q'},
@@ -1376,6 +1381,7 @@ int main(int argc, char *argv[])
 			case 'T': show_stats = true; break;
 			case 'r': recursive_search = true; break;
 			case 'o': output_tree = true; break;
+			case 'e': ignore_empty = true; break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1426,7 +1432,9 @@ int main(int argc, char *argv[])
 		dmod_doc = read_xml_doc(dmod_fnames[i]);
 
 		if (!dmod_doc) {
-			if (use_stdin) {
+			if (ignore_empty) {
+				continue;
+			} else if (use_stdin) {
 				if (verbose > SILENT) fprintf(stderr, E_NODMOD_STDIN);
 			} else {
 				if (verbose > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
