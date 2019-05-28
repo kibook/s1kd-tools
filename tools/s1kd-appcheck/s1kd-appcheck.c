@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -27,11 +27,11 @@
 #define I_CHECK_ALL_PROP INF_PREFIX "  %s %s = %s\n"
 
 /* Error messages. */
-#define E_FAIL ERR_PREFIX "%s is invalid when %s %s = %s\n"
-#define E_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
-#define E_FAIL_PROD_LINENO ERR_PREFIX "%s is invalid for product on line %ld of %s\n"
-#define E_FAIL_ALL_START ERR_PREFIX "%s is invalid for:\n"
-#define E_FAIL_ALL_PROP ERR_PREFIX "  %s %s = %s\n"
+#define E_CHECK_FAIL ERR_PREFIX "%s is invalid when %s %s = %s\n"
+#define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
+#define E_CHECK_FAIL_PROD_LINENO ERR_PREFIX "%s is invalid for product on line %ld of %s\n"
+#define E_CHECK_FAIL_ALL_START ERR_PREFIX "%s is invalid for:\n"
+#define E_CHECK_FAIL_ALL_PROP ERR_PREFIX "  %s %s = %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_INVALID ERR_PREFIX "%s failed the applicability check.\n"
 #define E_NO_ACT ERR_PREFIX "%s uses computable applicability, but no ACT could be found.\n"
@@ -419,7 +419,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 	if (e) {
 		if (verbose >= NORMAL) {
 			if (opts->all_props) {
-				fprintf(stderr, E_FAIL_ALL_START, path);
+				fprintf(stderr, E_CHECK_FAIL_ALL_START, path);
 				for (cur = asserts->children; cur; cur = cur->next) {
 					char *i, *t, *v;
 
@@ -427,16 +427,16 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 					t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType|@actreftype");
 					v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValues|@actvalues");
 
-					fprintf(stderr, E_FAIL_ALL_PROP, t, i, v);
+					fprintf(stderr, E_CHECK_FAIL_ALL_PROP, t, i, v);
 
 					xmlFree(i);
 					xmlFree(t);
 					xmlFree(v);
 				}
 			} else if (id) {
-				fprintf(stderr, E_FAIL_PROD, path, id, xmlGetLineNo(product), pctfname);
+				fprintf(stderr, E_CHECK_FAIL_PROD, path, id, xmlGetLineNo(product), pctfname);
 			} else {
-				fprintf(stderr, E_FAIL_PROD_LINENO, path, xmlGetLineNo(product), pctfname);
+				fprintf(stderr, E_CHECK_FAIL_PROD_LINENO, path, xmlGetLineNo(product), pctfname);
 			}
 		}
 
