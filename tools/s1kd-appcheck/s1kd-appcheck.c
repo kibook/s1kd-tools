@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -20,10 +20,9 @@
 #define SUC_PREFIX PROG_NAME ": SUCCESS: "
 
 /* Info messages. */
-#define I_CHECK INF_PREFIX "Checking for %s %s = %s...\n"
-#define I_CHECK_PROD INF_PREFIX "Checking for product %s in %s...\n"
-#define I_CHECK_PROD_LINENO INF_PREFIX "Checking for product on line %ld of %s...\n"
-#define I_CHECK_ALL_START INF_PREFIX "Checking for:\n"
+#define I_CHECK_PROD INF_PREFIX "Checking %s for product %s in %s...\n"
+#define I_CHECK_PROD_LINENO INF_PREFIX "Checking %s for product on line %ld of %s...\n"
+#define I_CHECK_ALL_START INF_PREFIX "Checking %s for:\n"
 #define I_CHECK_ALL_PROP INF_PREFIX "  %s %s = %s\n"
 
 /* Error messages. */
@@ -357,11 +356,11 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 
 	if (verbosity >= DEBUG) {
 		if (opts->all_props) {
-			fprintf(stderr, I_CHECK_ALL_START);
+			fprintf(stderr, I_CHECK_ALL_START, path);
 		} else if (id) {
-			fprintf(stderr, I_CHECK_PROD, id, pctfname);
+			fprintf(stderr, I_CHECK_PROD, path, id, pctfname);
 		} else {
-			fprintf(stderr, I_CHECK_PROD_LINENO, xmlGetLineNo(product), pctfname);
+			fprintf(stderr, I_CHECK_PROD_LINENO, path, xmlGetLineNo(product), pctfname);
 		}
 	}
 
