@@ -90,7 +90,7 @@ Print a summary of the check after it completes, including statistics on
 the number of objects that passed/failed the check.
 
 -v, --verbose  
-Verbose output.
+Verbose output. Specify multiple times to increase the verbosity.
 
 -x, --xml  
 Print an XML report of the check.

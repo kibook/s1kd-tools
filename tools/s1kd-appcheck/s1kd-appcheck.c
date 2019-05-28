@@ -57,7 +57,7 @@ bool no_issue = false;
 char *search_dir;
 
 /* The verbosity of output. */
-enum verbosity { QUIET, NORMAL, VERBOSE } verbose = NORMAL;
+enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 /* Applicability check options. */
 struct appcheckopts {
@@ -355,7 +355,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 	char cmd[4096];
 	FILE *p;
 
-	if (verbose >= VERBOSE) {
+	if (verbosity >= DEBUG) {
 		if (opts->all_props) {
 			fprintf(stderr, I_CHECK_ALL_START);
 		} else if (id) {
@@ -380,7 +380,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType|@actreftype");
 		v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValues|@actvalues");
 
-		if (opts->all_props && verbose >= VERBOSE) {
+		if (opts->all_props && verbosity >= DEBUG) {
 			fprintf(stderr, I_CHECK_ALL_PROP, t, i, v);
 		}
 
@@ -418,12 +418,15 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 
 		/* Schema validation */
 		strcat(cmd, "|s1kd-validate -e");
-		switch (verbose) {
-			case NORMAL:
+		switch (verbosity) {
 			case QUIET:
+			case NORMAL:
 				strcat(cmd, " -q");
 				break;
 			case VERBOSE:
+				break;
+			case DEBUG:
+				strcat(cmd, " -v");
 				break;
 		}
 
@@ -435,12 +438,15 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		if (opts->brexcheck) {
 			strcpy(cmd, filter_cmd);
 			strcat(cmd, "|s1kd-brexcheck -cel");
-			switch (verbose) {
-				case NORMAL:
+			switch (verbosity) {
 				case QUIET:
+				case NORMAL:
 					strcat(cmd, " -q");
 					break;
 				case VERBOSE:
+					break;
+				case DEBUG:
+					strcat(cmd, " -v");
 					break;
 			}
 
@@ -451,7 +457,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 	}
 
 	if (e) {
-		if (verbose >= NORMAL) {
+		if (verbosity >= NORMAL) {
 			if (opts->all_props) {
 				fprintf(stderr, E_CHECK_FAIL_ALL_START, path);
 				for (cur = asserts->children; cur; cur = cur->next) {
@@ -767,7 +773,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 	xmlNodePtr report_node = NULL;
 
 	if (!(doc = read_xml_doc(path))) {
-		if (verbose > QUIET) {
+		if (verbosity > QUIET) {
 			fprintf(stderr, E_BAD_OBJECT, path);
 		}
 		exit(EXIT_BAD_OBJECT);
@@ -811,7 +817,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 		}
 	}
 
-	if (verbose >= VERBOSE) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, err ? E_INVALID : S_VALID, path);
 	}
 
@@ -829,7 +835,7 @@ int check_applic_list(const char *fname, struct appcheckopts *opts, xmlNodePtr r
 
 	if (fname) {
 		if (!(f = fopen(fname, "r"))) {
-			if (verbose >= NORMAL) {
+			if (verbosity >= NORMAL) {
 				fprintf(stderr, E_BAD_LIST, fname);
 			}
 			return err;
@@ -980,10 +986,10 @@ int main(int argc, char **argv)
 				show_stats = true;
 				break;
 			case 'q':
-				verbose = QUIET;
+				--verbosity;
 				break;
 			case 'v':
-				verbose = VERBOSE;
+				++verbosity;
 				break;
 			case 'x':
 				xmlout = true;
