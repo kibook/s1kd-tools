@@ -36,8 +36,8 @@ default, objects are validated only against the defined product
 instances within the PCT.
 
 -b, --brexcheck  
-Validate objects with a BREX check (using the s1kd-brexcheck tool)
-instead of against a schema.
+Validate objects with a BREX check (using the s1kd-brexcheck tool) in
+addition to the schema check.
 
 -C, --cct &lt;file&gt;  
 Specify the CCT to read conditions from. This will override the CCT

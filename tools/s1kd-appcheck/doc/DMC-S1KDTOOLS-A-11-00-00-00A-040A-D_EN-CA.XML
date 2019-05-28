@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="000" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="05" day="28"/>
@@ -79,7 +79,7 @@
             <definitionListItem>
               <listItemTerm>-b, --brexcheck</listItemTerm>
               <listItemDefinition>
-                <para>Validate objects with a BREX check (using the s1kd-brexcheck tool) instead of against a schema.</para>
+                <para>Validate objects with a BREX check (using the s1kd-brexcheck tool) in addition to the schema check.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

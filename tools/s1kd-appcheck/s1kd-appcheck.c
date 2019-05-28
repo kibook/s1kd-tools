@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -80,7 +80,7 @@ void show_help(void)
 	puts("Options:");
 	puts("  -A, --act <file>    User-specified ACT.");
 	puts("  -a, --all           Validate against all property values.");
-	puts("  -b, --brexcheck     Validate against BREX rather than schema.");
+	puts("  -b, --brexcheck     Validate against BREX.");
 	puts("  -C, --cct <file>    User-specified CCT.");
 	puts("  -d, --dir <dir>     Search for ACT/CCT/PCT in <dir>.");
 	puts("  -e, --exec <cmd>    Commands used to validate objects.");
@@ -351,7 +351,8 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 {
 	xmlNodePtr cur;
 	int err = 0, e;
-	char cmd[4096] = "s1kd-instance";
+	char filter_cmd[1024] = "s1kd-instance";
+	char cmd[4096];
 	FILE *p;
 
 	if (verbose >= VERBOSE) {
@@ -365,10 +366,10 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 	}
 
 	if (opts->args) {
-		strcat(cmd, " ");
-		strncat(cmd, opts->args, 4095 - strlen(cmd));
+		strcat(filter_cmd, " ");
+		strncat(filter_cmd, opts->args, 4095 - strlen(filter_cmd));
 	} else {
-		strcat(cmd, " -w");
+		strcat(filter_cmd, " -w");
 	}
 
 	for (cur = asserts->children; cur; cur = cur->next) {
@@ -385,7 +386,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 
 		c = malloc(strlen(i) + strlen(t) + strlen(v) + 9);
 		sprintf(c, " -s \"%s:%s=%s\"", i, t, v);
-		strcat(cmd, c);
+		strcat(filter_cmd, c);
 		free(c);
 
 		xmlFree(i);
@@ -393,15 +394,13 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		xmlFree(v);
 	}
 
+	strcpy(cmd, filter_cmd);
+
 	strcat(cmd, "|");
 	if (opts->exec) {
 		strncat(cmd, opts->exec, 4095 - strlen(cmd));
 	} else { 
-		if (opts->brexcheck) {
-			strcat(cmd, "s1kd-brexcheck -cel");
-		} else {
-			strcat(cmd, "s1kd-validate -e");
-		}
+		strcat(cmd, "s1kd-validate -e");
 		switch (verbose) {
 			case NORMAL:
 			case QUIET:
@@ -415,6 +414,23 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 	p = popen(cmd, "w");
 	xmlDocDump(p, doc);
 	e = pclose(p);
+
+	if (opts->brexcheck) {
+		strcpy(cmd, filter_cmd);
+		strcat(cmd, "|s1kd-brexcheck -cel");
+		switch (verbose) {
+			case NORMAL:
+			case QUIET:
+				strcat(cmd, " -q");
+				break;
+			case VERBOSE:
+				break;
+		}
+
+		p = popen(cmd, "w");
+		xmlDocDump(p, doc);
+		e += pclose(p);
+	}
 
 	if (e) {
 		if (verbose >= NORMAL) {
