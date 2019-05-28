@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="02"/>
+        <issueInfo issueNumber="000" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="05" day="28"/>
@@ -97,7 +97,7 @@
             <definitionListItem>
               <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The commands used to validate objects.</para>
+                <para>The commands used to validate objects. Multiple commands can be used by specifying this option multiple times. The objects will be passed to each command on stdin, and the exit status of the command will be used to determine if the object is valid (with a non-zero exit status indicating it is invalid). This overrides the default commands (s1kd-validate, and s1kd-brexcheck if -b is specified).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

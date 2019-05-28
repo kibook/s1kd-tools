@@ -48,7 +48,12 @@ The directory to start searching for ACT/CCT/PCT data modules in. By
 default, the current directory is used.
 
 -e, --exec &lt;cmd&gt;  
-The commands used to validate objects.
+The commands used to validate objects. Multiple commands can be used by
+specifying this option multiple times. The objects will be passed to
+each command on stdin, and the exit status of the command will be used
+to determine if the object is valid (with a non-zero exit status
+indicating it is invalid). This overrides the default commands
+(s1kd-validate, and s1kd-brexcheck if -b is specified).
 
 -f, --filenames  
 Print the filenames of invalid objects.

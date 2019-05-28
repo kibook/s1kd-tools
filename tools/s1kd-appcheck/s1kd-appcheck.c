@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -65,7 +65,7 @@ struct appcheckopts {
 	char *usercct;
 	char *userpct;
 	char *args;
-	char *exec;
+	xmlNodePtr validators;
 	bool output_tree;
 	bool filenames;
 	bool all_props;
@@ -350,7 +350,7 @@ void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePtr product, const xmlChar *id, const char *pctfname, struct appcheckopts *opts)
 {
 	xmlNodePtr cur;
-	int err = 0, e;
+	int err = 0, e = 0;
 	char filter_cmd[1024] = "s1kd-instance";
 	char cmd[4096];
 	FILE *p;
@@ -394,30 +394,30 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		xmlFree(v);
 	}
 
-	strcpy(cmd, filter_cmd);
+	/* Custom validators. */
+	if (opts->validators) {
+		for (cur = opts->validators->children; cur; cur = cur->next) {
+			xmlChar *c;
 
-	strcat(cmd, "|");
-	if (opts->exec) {
-		strncat(cmd, opts->exec, 4095 - strlen(cmd));
-	} else { 
-		strcat(cmd, "s1kd-validate -e");
-		switch (verbose) {
-			case NORMAL:
-			case QUIET:
-				strcat(cmd, " -q");
-				break;
-			case VERBOSE:
-				break;
+			strcpy(cmd, filter_cmd);
+			strcat(cmd, "|");
+
+			c = xmlNodeGetContent(cur);
+
+			strncat(cmd, (char *) c, 4095 - strlen(cmd));
+
+			p = popen(cmd, "w");
+			xmlDocDump(p, doc);
+			e += pclose(p);
+
+			xmlFree(c);
 		}
-	}
-
-	p = popen(cmd, "w");
-	xmlDocDump(p, doc);
-	e = pclose(p);
-
-	if (opts->brexcheck) {
+	/* Default validators. */
+	} else {
 		strcpy(cmd, filter_cmd);
-		strcat(cmd, "|s1kd-brexcheck -cel");
+
+		/* Schema validation */
+		strcat(cmd, "|s1kd-validate -e");
 		switch (verbose) {
 			case NORMAL:
 			case QUIET:
@@ -430,6 +430,24 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		p = popen(cmd, "w");
 		xmlDocDump(p, doc);
 		e += pclose(p);
+
+		/* BREX validation */
+		if (opts->brexcheck) {
+			strcpy(cmd, filter_cmd);
+			strcat(cmd, "|s1kd-brexcheck -cel");
+			switch (verbose) {
+				case NORMAL:
+				case QUIET:
+					strcat(cmd, " -q");
+					break;
+				case VERBOSE:
+					break;
+			}
+
+			p = popen(cmd, "w");
+			xmlDocDump(p, doc);
+			e += pclose(p);
+		}
 	}
 
 	if (e) {
@@ -889,7 +907,7 @@ int main(int argc, char **argv)
 		/* usercct */     NULL,
 		/* userpct */     NULL,
 		/* args */        NULL,
-		/* exec */        NULL,
+		/* validators */  NULL,
 		/* output_tree */ false,
 		/* filenames */   false,
 		/* all_props */   false
@@ -932,7 +950,10 @@ int main(int argc, char **argv)
 				search_dir = strdup(optarg);
 				break;
 			case 'e':
-				opts.exec = strdup(optarg);
+				if (!opts.validators) {
+					opts.validators = xmlNewNode(NULL, BAD_CAST "validators");
+				}
+				xmlNewChild(opts.validators, NULL, BAD_CAST "cmd", BAD_CAST optarg);
 				break;
 			case 'f':
 				opts.filenames = true;
@@ -1002,7 +1023,7 @@ cleanup:
 	free(opts.useract);
 	free(opts.usercct);
 	free(opts.args);
-	free(opts.exec);
+	xmlFreeNode(opts.validators);
 	free(search_dir);
 
 	xsltCleanupGlobals();
