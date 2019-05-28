@@ -31,6 +31,7 @@ specification did not cover the function of the tool.
 |-----------------|-----|-----|-----|-----|-----|-----|-----|-----|
 | s1kd-acronyms   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   |
+| s1kd-appcheck   | X   | X   | X   | X   | \~  | \~  | \~  | \~  |
 | s1kd-aspp       | X   | X   | X   | X   | \~  | \~  | \~  | \~  |
 | s1kd-brexcheck  | X   | X   | X   | X   | X   | X   | \~  | \~  |
 | s1kd-defaults   | X   | X   | X   | X   | X   | X   | X   | X   |

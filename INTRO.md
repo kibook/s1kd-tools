@@ -83,8 +83,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 3.  **Validation:** These tools all validate different aspects of CSDB
     objects.
 
-    The **s1kd-validate** tool validates CSDB objects according to their
-    S1000D schema and general correctness as XML documents.
+    The **s1kd-appcheck** tool validates the applicability of CSDB
+    objects.
 
     The **s1kd-brexcheck** tool validates CSDB objects against a
     business rules exchange (BREX) data module, which contains the
@@ -92,6 +92,9 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
 
     The **s1kd-refs** tool lists references in a CSDB object to generate
     a list of dependencies on other CSDB objects.
+
+    The **s1kd-validate** tool validates CSDB objects according to their
+    S1000D schema and general correctness as XML documents.
 
 4.  **Publication:** These tools support the production of publications
     from a CSDB.
@@ -138,13 +141,13 @@ Manpages for each tool:
 
 -   s1kd-acronyms(1)
 
--   s1kd-aspp(1)
-
 -   s1kd-addicn(1)
 
--   s1kd-brexcheck(1)
+-   s1kd-appcheck(1)
 
--   s1kd-ls(1)
+-   s1kd-aspp(1)
+
+-   s1kd-brexcheck(1)
 
 -   s1kd-defaults(1)
 
@@ -159,6 +162,8 @@ Manpages for each tool:
 -   s1kd-index(1)
 
 -   s1kd-instance(1)
+
+-   s1kd-ls(1)
 
 -   s1kd-metadata(1)
 

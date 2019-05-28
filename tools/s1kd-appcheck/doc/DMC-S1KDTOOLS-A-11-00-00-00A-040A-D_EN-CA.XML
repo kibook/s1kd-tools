@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2019" month="05" day="28"/>
+        <dmTitle>
+          <techName>s1kd-appcheck(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>New tool for validating applicability.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-appcheck - Validate applicability of S1000D CSDB objects</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-appcheck [options] [<object>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered. It can test objects either against the defined product instances (using the PCT), or against all possible combinations of product attribute and condition values relevant to an object (using the ACT and CCT).</para>
+        <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-A, --act &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the ACT to read product attributes from, and to use to find the CCT or PCT. This will override the ACT reference within the individual objects being validated.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a, --all</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects against all possible, relevant combinations of product attribute and condition values as defined in the ACT and CCT. By default, objects are validated only against the defined product instances within the PCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b, --brexcheck</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects with a BREX check (using the s1kd-brexcheck tool) instead of against a schema.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C, --cct &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the CCT to read conditions from. This will override the CCT reference within the ACT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The directory to start searching for ACT/CCT/PCT data modules in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The commands used to validate objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --filenames</listItemTerm>
+              <listItemDefinition>
+                <para>Print the filenames of invalid objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-k, --args &lt;args&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The arguments to the s1kd-instance tool when filtering objects prior to validation.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of CSDB objects to validate.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the issue/inwork numbers are omitted from object filenames (they were created with the -N option).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --output-valid</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --pct &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the PCT to read product instances from. This will override the PCT reference in the ACT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Error messages will not be printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Search for the ACT/CCT/PCT recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T, --summary</listItemTerm>
+              <listItemDefinition>
+                <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x, --xml</listItemTerm>
+              <listItemDefinition>
+                <para>Print an XML report of the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Object(s) to validate.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>The check completed successfully, and all CSDB objects were valid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>The check completed successfully, but some CSDB objects were invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>One or more CSDB objects could not be read.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML]]></verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
