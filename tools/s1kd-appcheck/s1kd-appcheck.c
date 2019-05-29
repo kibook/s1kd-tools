@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -417,6 +417,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 
 		/* Schema validation */
 		strcat(cmd, "|s1kd-validate -e");
+
 		switch (verbosity) {
 			case QUIET:
 			case NORMAL:
@@ -437,6 +438,15 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		if (opts->brexcheck) {
 			strcpy(cmd, filter_cmd);
 			strcat(cmd, "|s1kd-brexcheck -cel");
+
+			strcat(cmd, " -d '");
+			strcat(cmd, search_dir);
+			strcat(cmd, "'");
+
+			if (recursive_search) {
+				strcat(cmd, " -r");
+			}
+
 			switch (verbosity) {
 				case QUIET:
 				case NORMAL:
