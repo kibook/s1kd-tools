@@ -11,13 +11,14 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 #define SUC_PREFIX PROG_NAME ": SUCCESS: "
+#define FLD_PREFIX PROG_NAME ": FAILED: "
 
 /* Info messages. */
 #define I_CHECK_PROD INF_PREFIX "Checking %s for product %s in %s...\n"
@@ -32,7 +33,6 @@
 #define E_CHECK_FAIL_ALL_START ERR_PREFIX "%s is invalid for:\n"
 #define E_CHECK_FAIL_ALL_PROP ERR_PREFIX "  %s %s = %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
-#define E_INVALID ERR_PREFIX "%s failed the applicability check.\n"
 #define E_NO_ACT ERR_PREFIX "%s uses computable applicability, but no ACT could be found.\n"
 #define E_NO_CCT ERR_PREFIX "%s uses conditions, but no CCT could be found.\n"
 #define E_BAD_OBJECT ERR_PREFIX "Could not read object: %s\n"
@@ -42,6 +42,9 @@
 
 /* Success messages. */
 #define S_VALID SUC_PREFIX "%s passed the applicability check.\n"
+
+/* Failure messages. */
+#define F_INVALID FLD_PREFIX "%s failed the applicability check.\n"
 
 /* Exit status codes. */
 #define EXIT_BAD_OBJECT 2
@@ -937,7 +940,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 	}
 
 	if (verbosity >= VERBOSE) {
-		fprintf(stderr, err ? E_INVALID : S_VALID, path);
+		fprintf(stderr, err ? F_INVALID : S_VALID, path);
 	}
 
 	xmlFreeDoc(doc);
