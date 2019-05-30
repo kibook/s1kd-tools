@@ -85,6 +85,10 @@ Quiet mode. Error messages will not be printed.
 -r, --recursive  
 Search for the ACT/CCT/PCT recursively.
 
+-s, --standalone  
+Perform a standalone applicability check without an ACT, CCT, or PCT,
+using only the applicability property values contained in each object.
+
 -T, --summary  
 Print a summary of the check after it completes, including statistics on
 the number of objects that passed/failed the check.

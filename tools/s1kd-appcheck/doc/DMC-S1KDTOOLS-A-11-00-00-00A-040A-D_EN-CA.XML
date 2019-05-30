@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="04"/>
+        <issueInfo issueNumber="000" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="28"/>
+        <issueDate year="2019" month="05" day="30"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -152,6 +152,12 @@
               <listItemTerm>-r, --recursive</listItemTerm>
               <listItemDefinition>
                 <para>Search for the ACT/CCT/PCT recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s, --standalone</listItemTerm>
+              <listItemDefinition>
+                <para>Perform a standalone applicability check without an ACT, CCT, or PCT, using only the applicability property values contained in each object.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

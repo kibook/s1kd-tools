@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -69,6 +69,7 @@ struct appcheckopts {
 	bool filenames;
 	bool all_props;
 	bool brexcheck;
+	bool standalone;
 };
 
 /* Show usage message. */
@@ -92,6 +93,7 @@ void show_help(void)
 	puts("  -p, --pct <file>    User-specified PCT.");
 	puts("  -q, --quiet         Quiet mode.");
 	puts("  -r, --recursive     Search for ACT/CCT/PCT recursively.");
+	puts("  -s, --standalone    Perform standalone check without ACT/CCT/PCT.");
 	puts("  -T, --summary       Print a summary of the check.");
 	puts("  -v, --verbose       Verbose output.");
 	puts("  -x, --xml           Output XML report.");
@@ -298,24 +300,20 @@ bool find_pct_fname(char *dst, xmlDocPtr act)
 	return found;
 }
 
-/* Add an assertion or assignment to a set of assertions. */
-void add_assert(xmlNodePtr asserts, xmlNodePtr assert, bool assign)
+/* Add an assignment to a set of assertions. */
+void add_assign(xmlNodePtr asserts, xmlNodePtr assert)
 {
 	xmlChar *i, *t, *v;
 	xmlNodePtr new;
 
 	i = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
 	t = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
-	if (assign) {
-		v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValue|@actvalue");
-	} else {
-		v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
-	}
+	v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValue|@actvalue");
 
-	new = xmlNewNode(NULL, BAD_CAST "assert");
+	new = xmlNewNode(NULL, BAD_CAST "assign");
 	xmlSetProp(new, BAD_CAST "applicPropertyIdent", i);
 	xmlSetProp(new, BAD_CAST "applicPropertyType", t);
-	xmlSetProp(new, BAD_CAST "applicPropertyValues", v);
+	xmlSetProp(new, BAD_CAST "applicPropertyValue", v);
 
 	xmlAddChild(asserts, new);
 
@@ -337,7 +335,7 @@ void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			add_assert(asserts, obj->nodesetval->nodeTab[i], true);
+			add_assign(asserts, obj->nodesetval->nodeTab[i]);
 		}
 	}
 
@@ -375,9 +373,9 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		char *i, *t, *v;
 		char *c;
 
-		i = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent|@actidref");
-		t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType|@actreftype");
-		v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValues|@actvalues");
+		i = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent");
+		t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
+		v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue");
 
 		if (opts->all_props && verbosity >= DEBUG) {
 			fprintf(stderr, I_CHECK_ALL_PROP, t, i, v);
@@ -472,9 +470,9 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 				for (cur = asserts->children; cur; cur = cur->next) {
 					char *i, *t, *v;
 
-					i = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent|@actidref");
-					t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType|@actreftype");
-					v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValues|@actvalues");
+					i = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent");
+					t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
+					v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue");
 
 					fprintf(stderr, E_CHECK_FAIL_ALL_PROP, t, i, v);
 
@@ -642,6 +640,116 @@ int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr act, s
 	return err;
 }
 
+/* Add an assertion from an object to a set of assertions. */
+void add_assert(xmlNodePtr asserts, xmlNodePtr assert)
+{
+	xmlChar *i, *t, *v, *c = NULL;
+
+	i = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	t = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+
+	while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|~"))) {
+		xmlNodePtr cur;
+		bool exists = false;
+
+		for (cur = asserts->children; cur && !exists; cur = cur->next) {
+			xmlChar *ci, *ct, *cv;
+
+			ci = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent");
+			ct = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
+			cv = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue");
+
+			exists = xmlStrcmp(i, ci) == 0 && xmlStrcmp(t, ct) == 0 && xmlStrcmp(c, cv) == 0;
+
+			xmlFree(ci);
+			xmlFree(ct);
+			xmlFree(cv);
+		}
+
+		if (!exists) {
+			xmlNodePtr new;
+
+			new = xmlNewNode(NULL, BAD_CAST "assign");
+			xmlSetProp(new, BAD_CAST "applicPropertyIdent", i);
+			xmlSetProp(new, BAD_CAST "applicPropertyType", t);
+			xmlSetProp(new, BAD_CAST "applicPropertyValue", c);
+
+			xmlAddChild(asserts, new);
+		}
+	}
+
+	xmlFree(i);
+	xmlFree(t);
+	xmlFree(v);
+}
+
+/* Find a property in a set of properties. */
+xmlNodePtr set_has_prop(xmlNodePtr set, const xmlChar *name)
+{
+	xmlNodePtr cur, assert = NULL;
+
+	for (cur = set->children; cur && !assert; cur = cur->next) {
+		xmlChar *i;
+
+		i = first_xpath_value(NULL, cur->children, BAD_CAST "@applicPropertyIdent|@actidref");
+
+		if (xmlStrcmp(i, name) == 0) {
+			assert = cur;
+		}
+
+		xmlFree(i);
+	}
+
+	return assert;
+}
+
+/* Check the applicability within an object without using an ACT, CCT or PCT. */
+int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
+{
+	xmlDocPtr psdoc;
+	xmlNodePtr propsets;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	int err = 0;
+
+	psdoc = xmlNewDoc(BAD_CAST "1.0");
+	propsets = xmlNewNode(NULL, BAD_CAST "propsets");
+	xmlDocSetRootElement(psdoc, propsets);
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlNodePtr asserts;
+			xmlChar *name;
+
+			name = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyIdent|@actidref");
+
+			if (!(asserts = set_has_prop(propsets, name))) {
+				asserts = xmlNewChild(propsets, NULL, BAD_CAST "asserts", NULL);
+			}
+
+			xmlFree(name);
+
+			add_assert(asserts, obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	transform_doc(psdoc, combos_xsl, combos_xsl_len, NULL);
+	err += check_prods(doc, path, psdoc, NULL, opts, report);
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	xmlFreeDoc(psdoc);
+
+	return err;
+}
+
 /* Determine whether a property is used in an object. */
 bool prop_is_used(const xmlChar *id, xmlDocPtr doc)
 {
@@ -792,7 +900,9 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 		report_node = add_object_node(report, "object", path);
 	}
 
-	if (find_act_fname(actfname, opts->useract, doc)) {
+	if (opts->standalone) {
+		err += check_object_props(doc, path, opts, report_node);
+	} else if (find_act_fname(actfname, opts->useract, doc)) {
 		xmlDocPtr act;
 
 		add_object_node(report_node, "act", actfname);
@@ -887,7 +997,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:d:e:fNk:lop:qrTvxh?";
+	const char *sopts = "A:abC:d:e:fNk:lop:qrsTvxh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -905,6 +1015,7 @@ int main(int argc, char **argv)
 		{"pct"         , required_argument, 0, 'p'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursive"   , no_argument      , 0, 'r'},
+		{"standalone"  , no_argument      , 0, 's'},
 		{"summary"     , no_argument      , 0, 'T'},
 		{"verbose"     , no_argument      , 0, 'v'},
 		{"xml"         , no_argument      , 0, 'x'},
@@ -925,7 +1036,8 @@ int main(int argc, char **argv)
 		/* validators */  NULL,
 		/* output_tree */ false,
 		/* filenames */   false,
-		/* all_props */   false
+		/* all_props */   false,
+		/* standalone */  false
 	};
 
 	int err = 0;
@@ -990,6 +1102,10 @@ int main(int argc, char **argv)
 				break;
 			case 'r':
 				recursive_search = true;
+				break;
+			case 's':
+				opts.standalone = true;
+				opts.all_props = true;
 				break;
 			case 'T':
 				show_stats = true;
