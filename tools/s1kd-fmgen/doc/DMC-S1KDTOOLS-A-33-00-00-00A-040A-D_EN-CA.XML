@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="24"/>
+        <issueDate year="2019" month="05" day="30"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add long options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Replace -x with standard --xinclude, rename -X to -x.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]]
            [-,.flvh?] (-t <TYPE>|<DM>...)]]></verbatimText>
         </para>
       </levelledPara>
@@ -68,55 +62,55 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-,, --dump-fmtypes-xml</listItemTerm>
+              <listItemTerm>-,, --dump-fmtypes-xml</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> XML format.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-., --dump-fmtypes</listItemTerm>
+              <listItemTerm>-., --dump-fmtypes</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> simple text format.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
+              <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-F, --fmtypes &lt;FMTYPES&gt;</listItemTerm>
+              <listItemTerm>-F, --fmtypes &lt;FMTYPES&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a custom <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
+              <listItemTerm>-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite the specified front matter data module files after generating their content.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --list</listItemTerm>
+              <listItemTerm>-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of front matter data modules to generate content for, rather than data modules themselves. If reading list from stdin, the -P option must be used to specify the publication module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-P, --pm &lt;PM&gt;</listItemTerm>
+              <listItemTerm>-P, --pm &lt;PM&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Publication module or s1kd-flatten(1) PM format file to generate contents from. If none is specified, the tool will read from stdin.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --param &lt;name&gt;=&lt;value&gt;</listItemTerm>
+              <listItemTerm>-p, --param &lt;name&gt;=&lt;value&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Pass a parameter to the XSLT specified with the -X option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --type &lt;TYPE&gt;</listItemTerm>
+              <listItemTerm>-t, --type &lt;TYPE&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Generate content for this type of front matter when no data modules are specified. Supported types are:</para>
                 <para>
@@ -138,13 +132,13 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
+              <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">-x, --xsl &lt;XSL&gt;</listItemTerm>
+              <listItemTerm>-x, --xsl &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Transform the front matter contents after generating them using the specified XSLT. This can be used, for example, to generate content for a descriptive schema data module instead, to support older issues of the specification, or for types of generated front matter not covered by the frontmatter schema.</para>
               </listItemDefinition>
@@ -184,7 +178,7 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>--xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing.</para>

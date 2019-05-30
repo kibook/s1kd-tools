@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="16" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="24"/>
+        <issueDate year="2019" month="05" day="30"/>
         <dmTitle>
           <techName>s1kd-newcom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,15 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add long options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Add missing -P option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add standard --xinclude option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -70,13 +61,13 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-#, --code &lt;code&gt;</listItemTerm>
+              <listItemTerm>-#, --code &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The code of the comment, in the form of MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-$, --issue &lt;issue&gt;</listItemTerm>
+              <listItemTerm>-$, --issue &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
@@ -110,121 +101,121 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-@, --out &lt;path&gt;</listItemTerm>
+              <listItemTerm>-@, --out &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new comment to &lt;path&gt;. If &lt;path&gt; is an existing directory, the comment will be created in it instead of the current directory. Otherwise, the comment will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-%, --templates &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">comment.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-~, --dump-templates &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-~, --dump-templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XML template to the specified directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-b, --brex &lt;BREX&gt;</listItemTerm>
+              <listItemTerm>-b, --brex &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-C, --country &lt;country&gt;</listItemTerm>
+              <listItemTerm>-C, --country &lt;country&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The country ISO code of the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-c, --security &lt;sec&gt;</listItemTerm>
+              <listItemTerm>-c, --security &lt;sec&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The security classification of the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --defaults &lt;file&gt;</listItemTerm>
+              <listItemTerm>-d, --defaults &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
+              <listItemTerm>-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
+              <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-I, --date &lt;date&gt;</listItemTerm>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new comment in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-L, --language &lt;lang&gt;</listItemTerm>
+              <listItemTerm>-L, --language &lt;lang&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The language ISO code of the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-m, --remarks &lt;remarks&gt;</listItemTerm>
+              <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the remarks for the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-o, --origname &lt;orig&gt;</listItemTerm>
+              <listItemTerm>-o, --origname &lt;orig&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The enterprise name of the originator of the comment.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="0" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-P, --priority &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The priority code of the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --prompt</listItemTerm>
+              <listItemTerm>-p, --prompt</listItemTerm>
               <listItemDefinition>
                 <para>Prompt the user for values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-q, --quiet</listItemTerm>
+              <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Do not report an error when the file already exists.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-r, --response &lt;type&gt;</listItemTerm>
+              <listItemTerm>-r, --response &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The response type of the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --title &lt;title&gt;</listItemTerm>
+              <listItemTerm>-t, --title &lt;title&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The title of the new comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
+              <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Print the file name of the newly created comment.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue type of the new comment.</para>
               </listItemDefinition>
@@ -258,7 +249,7 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>--xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing.</para>

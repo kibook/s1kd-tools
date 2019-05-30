@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="30" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="24"/>
+        <issueDate year="2019" month="05" day="30"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add long options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add standard --xinclude option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -67,67 +61,67 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-b, --brex &lt;BREX&gt;</listItemTerm>
+              <listItemTerm>-b, --brex &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use the specified BREX data module to build the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. This can be used both when initializing a new CSDB (-i) or either file can be generated from a BREX data module separately.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-D, --dmtypes</listItemTerm>
+              <listItemTerm>-D, --dmtypes</listItemTerm>
               <listItemDefinition>
                 <para>Convert a <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --defaults</listItemTerm>
+              <listItemTerm>-d, --defaults</listItemTerm>
               <listItemDefinition>
                 <para>Convert a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-F, --fmtypes</listItemTerm>
+              <listItemTerm>-F, --fmtypes</listItemTerm>
               <listItemDefinition>
                 <para>Convert a <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
+              <listItemTerm>-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite the existing file after conversion.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
+              <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-i, --init</listItemTerm>
+              <listItemTerm>-i, --init</listItemTerm>
               <listItemDefinition>
                 <para>Initialize a new CSDB by generating the <verbatimText verbatimStyle="vs02">.defaults</verbatimText>, <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> and <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> files in the current directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-J, --dump-brexmap</listItemTerm>
+              <listItemTerm>-J, --dump-brexmap</listItemTerm>
               <listItemDefinition>
                 <para>Dump the default <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-j, --brexmap &lt;map&gt;</listItemTerm>
+              <listItemTerm>-j, --brexmap &lt;map&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use a custom <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file to map a BREX DM to a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> or <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-s, --sort</listItemTerm>
+              <listItemTerm>-s, --sort</listItemTerm>
               <listItemDefinition>
                 <para>Sort the entries alphabetically for either file/output format.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --text</listItemTerm>
+              <listItemTerm>-t, --text</listItemTerm>
               <listItemDefinition>
                 <para>Output using the simple text format. Otherwise, the XML format is used by default.</para>
               </listItemDefinition>
@@ -167,7 +161,7 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>--xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing.</para>

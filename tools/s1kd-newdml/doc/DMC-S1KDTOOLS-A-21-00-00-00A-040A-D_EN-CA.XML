@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="21" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="00"/>
+        <issueInfo issueNumber="026" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="24"/>
+        <issueDate year="2019" month="05" day="30"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add long options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add standard --xinclude option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -67,13 +61,13 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-#, --code &lt;code&gt;</listItemTerm>
+              <listItemTerm>-#, --code &lt;code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The data management list code of the new DML.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-$, --issue &lt;issue&gt;</listItemTerm>
+              <listItemTerm>-$, --issue &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
@@ -107,61 +101,61 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-@, --out &lt;path&gt;</listItemTerm>
+              <listItemTerm>-@, --out &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new DML to &lt;path&gt;. If &lt;path&gt; is an existing directory, the DML will be created in it instead of the current directory. Otherwise, the DML will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-%, --templates &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">dml.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-~, --dump-templates &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-~, --dump-templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XML template to the specified directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-b, --brex &lt;BREX&gt;</listItemTerm>
+              <listItemTerm>-b, --brex &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-c, --security &lt;sec&gt;</listItemTerm>
+              <listItemTerm>-c, --security &lt;sec&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The security classification of the new DML.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --defaults &lt;file&gt;</listItemTerm>
+              <listItemTerm>-d, --defaults &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
+              <listItemTerm>-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
+              <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-I, --date &lt;date&gt;</listItemTerm>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new DML in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-i, --info-code &lt;info code&gt;</listItemTerm>
+              <listItemTerm>-i, --info-code &lt;info code&gt;</listItemTerm>
               <listItemDefinition>
                 <para>When creating a DMRL from SNS rules (-S), use the specified info code for each entry. Specify this option multiple times to create multiple data modules for each part of the SNS. &lt;info code&gt; can specify:</para>
                 <para>
@@ -180,67 +174,67 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-m, --remarks &lt;remarks&gt;</listItemTerm>
+              <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the remarks for the new data management list.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-N, --omit-issue</listItemTerm>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
               <listItemDefinition>
                 <para>Omit the issue/inwork numbers from filename.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-n, --issno &lt;issue&gt;</listItemTerm>
+              <listItemTerm>-n, --issno &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue number of the new DML.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --prompt</listItemTerm>
+              <listItemTerm>-p, --prompt</listItemTerm>
               <listItemDefinition>
                 <para>Prompts the user for any values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-q, --quiet</listItemTerm>
+              <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Do not report an error when the file already exists.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-R, --rpccode &lt;NCAGE&gt;</listItemTerm>
+              <listItemTerm>-R, --rpccode &lt;NCAGE&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specifies a default responsible partner company enterprise code for entries which do not carry this in their ID STATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-r, --rpcname &lt;name&gt;</listItemTerm>
+              <listItemTerm>-r, --rpcname &lt;name&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specifies a default responsible partner company enterprise name for entries which do not carry this in their IDSTATUS section (ICN, COM, DML).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-S, --sns &lt;SNS&gt;</listItemTerm>
+              <listItemTerm>-S, --sns &lt;SNS&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Create a DMRL using the specified SNS rules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
+              <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Print the file name of the newly created DML.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-w, --inwork &lt;inwork&gt;</listItemTerm>
+              <listItemTerm>-w, --inwork &lt;inwork&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The inwork number of the new DML.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue type of the new DML.</para>
               </listItemDefinition>
@@ -280,7 +274,7 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>--xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing.</para>

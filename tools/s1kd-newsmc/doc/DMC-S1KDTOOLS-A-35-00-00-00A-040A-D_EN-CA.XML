@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="35" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="24"/>
+        <issueDate year="2019" month="05" day="30"/>
         <dmTitle>
           <techName>s1kd-newsmc(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add long options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add standard --xinclude option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -67,13 +61,13 @@
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-#, --code &lt;SMC&gt;</listItemTerm>
+              <listItemTerm>-#, --code &lt;SMC&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The SCORM content package code of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-$, --issue &lt;issue&gt;</listItemTerm>
+              <listItemTerm>-$, --issue &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
@@ -89,163 +83,163 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-@, --out &lt;path&gt;</listItemTerm>
+              <listItemTerm>-@, --out &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Save the new SCORM content package to &lt;path&gt;. If &lt;path&gt; is an existing directory, the SCORM content package will be created in it instead of the current directory. Otherwise, the SCORM content package will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-%, --templates &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">scormcontentpackage.xml</verbatimText> in &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-~, --dump-templates &lt;dir&gt;</listItemTerm>
+              <listItemTerm>-~, --dump-templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XML template to the specified directory.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-a, --act &lt;ACT&gt;</listItemTerm>
+              <listItemTerm>-a, --act &lt;ACT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>ACT data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-b, --brex &lt;BREX&gt;</listItemTerm>
+              <listItemTerm>-b, --brex &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
                 <para>BREX data module code.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-C, --country &lt;country&gt;</listItemTerm>
+              <listItemTerm>-C, --country &lt;country&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The country ISO code of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-c, --security &lt;sec&gt;</listItemTerm>
+              <listItemTerm>-c, --security &lt;sec&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The security classification of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-D, --include-date</listItemTerm>
+              <listItemTerm>-D, --include-date</listItemTerm>
               <listItemDefinition>
                 <para>Include issue date in referenced data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-d, --defaults &lt;file&gt;</listItemTerm>
+              <listItemTerm>-d, --defaults &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-f, --overwrite</listItemTerm>
+              <listItemTerm>-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite existing file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-h, -?, --help</listItemTerm>
+              <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-I, --date &lt;date&gt;</listItemTerm>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue date of the new SCORM content package in the form of YYYY-MM-DD.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-i, --include-issue</listItemTerm>
+              <listItemTerm>-i, --include-issue</listItemTerm>
               <listItemDefinition>
                 <para>Include issue information in referenced data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-k, --skill &lt;skill&gt;</listItemTerm>
+              <listItemTerm>-k, --skill &lt;skill&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The skill level code of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-L, --language &lt;language&gt;</listItemTerm>
+              <listItemTerm>-L, --language &lt;language&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The language ISO code of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-l, --include-lang</listItemTerm>
+              <listItemTerm>-l, --include-lang</listItemTerm>
               <listItemDefinition>
                 <para>Include language information in referenced data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-m, --remarks &lt;remarks&gt;</listItemTerm>
+              <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set remarks for the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-n, --issno &lt;issue&gt;</listItemTerm>
+              <listItemTerm>-n, --issno &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue number of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-p, --prompt</listItemTerm>
+              <listItemTerm>-p, --prompt</listItemTerm>
               <listItemDefinition>
                 <para>Prompt the user for any values left unspecified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-q, --quiet</listItemTerm>
+              <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Do not report an error when the file already exists.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-R, --rpccode &lt;CAGE&gt;</listItemTerm>
+              <listItemTerm>-R, --rpccode &lt;CAGE&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The CAGE code of the responsible partner company.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-r, --rpcname &lt;RPC&gt;</listItemTerm>
+              <listItemTerm>-r, --rpcname &lt;RPC&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The responsible partner company enterprise name of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-T, --include-title</listItemTerm>
+              <listItemTerm>-T, --include-title</listItemTerm>
               <listItemDefinition>
                 <para>Include titles in referenced data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-t, --title &lt;title&gt;</listItemTerm>
+              <listItemTerm>-t, --title &lt;title&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The title of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-v, --verbose</listItemTerm>
+              <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Print the file name of the newly created SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-w, --inwork &lt;inwork&gt;</listItemTerm>
+              <listItemTerm>-w, --inwork &lt;inwork&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The inwork number of the new SCORM content package.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The issue type of the new SCORM content package.</para>
               </listItemDefinition>
@@ -285,7 +279,7 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>--xinclude</listItemTerm>
               <listItemDefinition>
                 <para>Do XInclude processing.</para>
