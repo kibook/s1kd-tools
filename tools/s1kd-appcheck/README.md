@@ -135,4 +135,61 @@ One or more CSDB objects could not be read.
 EXAMPLE
 =======
 
-    $ s1kd-appcheck DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+Consider the following data module snippet:
+
+    <dmodule>
+    ...
+    <applic>
+    <displayText>
+    <simplePara>All</simplePara>
+    </displayText>
+    </applic>
+    ...
+    <referencedApplicGroup>
+    <applic id="app-VersionB">
+    <assert applicPropertyIdent="version" applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    </referencedApplicGroup>
+    ...
+    <levelledPara id="par-0001" applicRefId="app-VersionB">
+    <title>Features of version B</title>
+    <para>...</para>
+    </levelledPara>
+    ...
+    <levelledPara>
+    <title>More information</title>
+    <para>...</para>
+    <para>Refer to <internalRef internalRefId="par-0001"/>.</para>
+    </levelledPara>
+    ...
+    </dmodule>
+
+And consider this snippet of the PCT associated with the above data
+module:
+
+    <productCrossRefTable>
+    <product id="Version_A">
+    <assign applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValue="A"/>
+    </product>
+    <product id="Version_B">
+    <assign applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValue="B"/>
+    </product>
+    </productCrossRefTable>
+
+There are two versions of the product, A and B, and the data module is
+meant to apply to both.
+
+By itself, the data module is valid:
+
+    $ s1kd-validate -v <DM>
+    s1kd-validate: SUCCESS: <DM> validates against schema <url>
+
+Checking it with this tool, however, reveals an issue:
+
+    $ s1kd-appcheck <DM>
+    s1kd-appcheck: ERROR: <DM> is invalid for product Version_A
+
+When the data module is filtered for version A, the first levelled
+paragraph will be removed, which causes the reference to it in the
+second levelled paragraph to become broken.
