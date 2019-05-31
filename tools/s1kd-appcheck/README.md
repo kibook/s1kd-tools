@@ -170,10 +170,12 @@ module:
 
     <productCrossRefTable>
     <product id="Version_A">
-    <assign applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValue="A"/>
+    <assign applicPropertyIdent="version" applicPropertyType="prodattr"
+    applicPropertyValue="A"/>
     </product>
     <product id="Version_B">
-    <assign applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValue="B"/>
+    <assign applicPropertyIdent="version" applicPropertyType="prodattr"
+    applicPropertyValue="B"/>
     </product>
     </productCrossRefTable>
 
