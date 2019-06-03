@@ -528,7 +528,7 @@ void add_cct_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlCh
 	xmlChar *vals, *v = NULL;
 	bool match = false;
 	xmlNodePtr eval;
-	char *end;
+	char *end = NULL;
 
 	vals = xmlGetProp(*assert, BAD_CAST "applicPropertyValues");
 
@@ -643,7 +643,7 @@ void add_cct_depend(xmlDocPtr doc, xmlNodePtr dep)
 		xmlXPathContextPtr ctx;
 		xmlXPathObjectPtr obj;
 		xmlChar *v = NULL;
-		char *end;
+		char *end = NULL;
 
 		ctx = xmlXPathNewContext(doc);
 
