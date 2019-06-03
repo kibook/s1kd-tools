@@ -99,6 +99,10 @@ Verbose output. Specify multiple times to increase the verbosity.
 -x, --xml  
 Print an XML report of the check.
 
+-\~, --dependencies  
+Check with CCT dependency tests added to assertions which use the
+dependant values.
+
 --version  
 Show version information.
 

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="07"/>
+        <issueInfo issueNumber="000" inWork="08"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="31"/>
+        <issueDate year="2019" month="06" day="03"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -176,6 +176,12 @@
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para>Print an XML report of the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-~, --dependencies</listItemTerm>
+              <listItemDefinition>
+                <para>Check with CCT dependency tests added to assertions which use the dependant values.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

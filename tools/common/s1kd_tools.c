@@ -487,3 +487,253 @@ int save_xml_doc(xmlDocPtr doc, const char *path)
 {
 	return xmlSaveFile(path, doc);
 }
+
+/* Return the first node matching an XPath expression. */
+xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr first;
+
+	if (doc) {
+		ctx = xmlXPathNewContext(doc);
+	} else {
+		ctx = xmlXPathNewContext(node->doc);
+	}
+
+	ctx->node = node;
+
+	obj = xmlXPathEvalExpression(BAD_CAST path, ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		first = NULL;
+	} else {
+		first = obj->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return first;
+}
+
+/* Add a dependency test to an assertion if it contains any of the dependent
+ * values.
+ *
+ * If the assertion uses a set (|), the values will be split up in order to
+ * only add the dependency to the appropriate values.
+ */
+void add_cct_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlChar *forval, xmlNodePtr applic)
+{
+	xmlChar *vals, *v = NULL;
+	bool match = false;
+	xmlNodePtr eval;
+	char *end;
+
+	vals = xmlGetProp(*assert, BAD_CAST "applicPropertyValues");
+
+	eval = xmlNewNode(NULL, BAD_CAST "evaluate");
+	xmlSetProp(eval, BAD_CAST "andOr", BAD_CAST "or");
+
+	/* Split any sets (|) */
+	while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
+		xmlNodePtr a;
+
+		a = xmlNewNode(NULL, BAD_CAST "assert");
+		xmlSetProp(a, BAD_CAST "applicPropertyIdent", id);
+		xmlSetProp(a, BAD_CAST "applicPropertyType", BAD_CAST "condition");
+		xmlSetProp(a, BAD_CAST "applicPropertyValues", v);
+
+		/* If the current value has a dependency, add the depedency
+		 * test to it with an AND evaluate.
+		 */
+		if (xmlStrcmp(v, forval) == 0) {
+			xmlNodePtr cur, e;
+
+			match = true;
+
+			e = xmlNewChild(eval, NULL, BAD_CAST "evaluate", NULL);
+			xmlSetProp(e, BAD_CAST "andOr", BAD_CAST "and");
+
+			for (cur = applic->children; cur; cur = cur->next) {
+				if (xmlStrcmp(cur->name, BAD_CAST "assert") == 0 || xmlStrcmp(cur->name, BAD_CAST "evaluate") == 0) {
+					xmlAddChild(e, xmlCopyNode(cur, 1));
+				}
+			}
+
+			xmlAddChild(e, a);
+		} else {
+			xmlAddChild(eval, a);
+		}
+	}
+
+	xmlFree(vals);
+
+	/* If any of the values in the set had a dependency, replace the assert
+	 * with the new evaluation.
+	 */
+	if (match) {
+		xmlChar *op;
+
+		op = xmlGetProp((*assert)->parent, BAD_CAST "andOr");
+
+		/* If the dependency test is being added to an OR evaluate,
+		 * simplify the output by combining the new OR and the existing
+		 * OR.
+		 */
+		if (!eval->children->next || (op && xmlStrcmp(op, BAD_CAST "or") == 0)) {
+			xmlNodePtr cur, last;
+
+			for (cur = eval->children, last = *assert; cur; cur = cur->next) {
+				xmlChar *o;
+
+				o = xmlGetProp(cur, BAD_CAST "andOr");
+
+				/* Combine evaluates with the same operation. */
+				if (o && xmlStrcmp(o, op) == 0) {
+					xmlNodePtr c;
+
+					for (c = cur->children; c; c = c->next) {
+						last = xmlAddNextSibling(last, xmlCopyNode(c, 1));
+					}
+				} else {
+					last = xmlAddNextSibling(last, xmlCopyNode(cur, 1));
+				}
+
+				xmlFree(o);
+			}
+
+			xmlFreeNode(eval);
+		/* Otherwise, just add the new OR. */
+		} else {
+			xmlAddNextSibling(*assert, eval);
+		}
+
+		xmlFree(op);
+
+		xmlUnlinkNode(*assert);
+		xmlFreeNode(*assert);
+		*assert = NULL;
+	} else {
+		xmlFreeNode(eval);
+	}
+}
+
+void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
+
+/* Add a dependency from the CCT. */
+void add_cct_depend(xmlDocPtr doc, xmlNodePtr dep)
+{
+	xmlChar *id, *test, *vals, *xpath;
+	int n;
+	xmlNodePtr applic;
+
+	id = xmlGetProp(dep->parent, BAD_CAST "id");
+	test = xmlGetProp(dep, BAD_CAST "dependencyTest");
+	vals = xmlGetProp(dep, BAD_CAST "forCondValues");
+
+	/* Find the annotation for the dependency test. */
+	n = xmlStrlen(test) + 17;
+	xpath = malloc(n * sizeof(xmlChar));
+	xmlStrPrintf(xpath, n, "//applic[@id='%s']", test);
+	applic = xpath_first_node(dep->doc, NULL, xpath);
+	xmlFree(xpath);
+
+	if (applic) {
+		xmlXPathContextPtr ctx;
+		xmlXPathObjectPtr obj;
+		xmlChar *v = NULL;
+		char *end;
+
+		ctx = xmlXPathNewContext(doc);
+
+		/* Add dependency tests to assertions that use the dependant values. */
+		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
+			n = xmlStrlen(id) + 70;
+			xpath = malloc(n * sizeof(xmlChar));
+			xmlStrPrintf(xpath, n, "//assert[@applicPropertyIdent='%s' and @applicPropertyType='condition']", id);
+			obj = xmlXPathEvalExpression(xpath, ctx);
+			xmlFree(xpath);
+
+			if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				int i;
+
+				for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+					add_cct_depend_to_assert(&obj->nodesetval->nodeTab[i], id, v, applic);
+				}
+			}
+
+			xmlXPathFreeObject(obj);
+		}
+
+		xmlXPathFreeContext(ctx);
+
+		/* Handle subdependencies, that is, dependant values which themselves
+		 * have dependencies.
+		 */
+		ctx = xmlXPathNewContext(applic->doc);
+		ctx->node = applic;
+		obj = xmlXPathEvalExpression(BAD_CAST ".//assert[@applicPropertyIdent and @applicPropertyType='condition']", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			int i;
+
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlChar *ident;
+
+				ident = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "applicPropertyIdent");
+				add_cct_depends(doc, applic->doc, ident);
+				xmlFree(ident);
+			}
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+	}
+
+	xmlFree(id);
+	xmlFree(test);
+	xmlFree(vals);
+}
+
+/* Add CCT dependencies to the source object.
+ *
+ * If id is NULL, all conditions will be added.
+ *
+ * If id is not NULL, then only the dependencies for condition with that id
+ * will be added. This is useful when handling sub-depedencies, to only handle
+ * the conditions which pertain to a particular dependency test.
+ */
+void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(cct);
+
+	if (id) {
+		int n;
+		xmlChar *xpath;
+
+		n = xmlStrlen(id) + 26;
+		xpath = malloc(n * sizeof(xmlChar));
+		xmlStrPrintf(xpath, n, "//cond[@id='%s']/dependency", id);
+
+		obj = xmlXPathEvalExpression(xpath, ctx);
+
+		xmlFree(xpath);
+	} else {
+		obj = xmlXPathEvalExpression(BAD_CAST "//cond/dependency", ctx);
+	}
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			add_cct_depend(doc, obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}

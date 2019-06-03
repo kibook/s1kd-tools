@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xinclude.h>
+#include <libxml/xpath.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -120,5 +121,11 @@ xmlDocPtr read_xml_mem(const char *buffer, int size);
 
 /* Save an XML document to a file. */
 int save_xml_doc(xmlDocPtr doc, const char *path);
+
+/* Return the first node matching an XPath expression. */
+xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path);
+
+/* Add CCT dependencies to an object's annotations. */
+void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
 
 #endif

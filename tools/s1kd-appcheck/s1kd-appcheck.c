@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.4.1"
+#define VERSION "1.5.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -73,6 +73,7 @@ struct appcheckopts {
 	bool all_props;
 	bool brexcheck;
 	bool standalone;
+	bool add_deps;
 };
 
 /* Show usage message. */
@@ -100,6 +101,7 @@ void show_help(void)
 	puts("  -T, --summary       Print a summary of the check.");
 	puts("  -v, --verbose       Verbose output.");
 	puts("  -x, --xml           Output XML report.");
+	puts("  -~, --dependencies  Check CCT dependencies.");
 	puts("  --version           Show version information.");
 	puts("  <object>...         CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -271,11 +273,13 @@ bool find_act_fname(char *dst, const char *useract, xmlDocPtr doc)
 	if (useract) {
 		strcpy(dst, useract);
 		return true;
-	} else {
+	} else if (doc) {
 		xmlNodePtr actref;
 		actref = first_xpath_node(doc, NULL, BAD_CAST "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
 		return actref && find_dmod_fname(dst, actref, false);
 	}
+
+	return false;
 }
 
 /* Find the filename of a referenced CCT data module. */
@@ -284,23 +288,28 @@ bool find_cct_fname(char *dst, const char *usercct, xmlDocPtr act)
 	if (usercct) {
 		strcpy(dst, usercct);
 		return true;
-	} else {
+	} else if (act) {
 		xmlNodePtr cctref;
 		cctref = first_xpath_node(act, NULL, BAD_CAST "//condCrossRefTableRef/dmRef/dmRefIdent|//cctref/refdm");
 		return cctref && find_dmod_fname(dst, cctref, false);
 	}
+
+	return false;
 }
 
 /* Find the filename of a referenced PCT data module via the ACT. */
-bool find_pct_fname(char *dst, xmlDocPtr act)
+bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 {
-	xmlNodePtr pctref;
-	bool found;
+	if (userpct) {
+		strcpy(dst, userpct);
+		return true;
+	} else if (act) {
+		xmlNodePtr pctref;
+		pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
+		return pctref && find_dmod_fname(dst, pctref, false);
+	}
 
-	pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
-	found = pctref && find_dmod_fname(dst, pctref, false);
-
-	return found;
+	return false;
 }
 
 /* Add an assignment to a set of assertions. */
@@ -579,9 +588,7 @@ int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr act, s
 	if (all) {
 		pct = all;
 	} else {
-		if (opts->userpct) {
-			strcpy(pctfname, opts->userpct);
-		} else if (!find_pct_fname(pctfname, act)) {
+		if (!find_pct_fname(pctfname, opts->userpct, act)) {
 			return 0;
 		}
 
@@ -720,6 +727,30 @@ int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opt
 	propsets = xmlNewNode(NULL, BAD_CAST "propsets");
 	xmlDocSetRootElement(psdoc, propsets);
 
+	/* Add CCT dependencies so they are counted as part of the object's applicability. */
+	if (opts->add_deps) {
+		char actfname[PATH_MAX];
+		char cctfname[PATH_MAX];
+		xmlDocPtr act = NULL;
+		xmlDocPtr cct = NULL;
+
+		if (find_act_fname(actfname, opts->useract, doc)) {
+			if ((act = read_xml_doc(actfname))) {
+				add_object_node(report, "act", actfname);
+			}
+		}
+
+		if (find_cct_fname(cctfname, opts->usercct, act)) {
+			if ((cct = read_xml_doc(cctfname))) {
+				add_object_node(report, "cct", cctfname);
+				add_cct_depends(doc, cct, NULL);
+			}
+		}
+
+		xmlFreeDoc(cct);
+		xmlFreeDoc(act);
+	}
+
 	ctx = xmlXPathNewContext(doc);
 	obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
 
@@ -784,6 +815,7 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 	xmlXPathObjectPtr obj;
 	int err = 0;
 	char cctfname[PATH_MAX];
+	xmlDocPtr cct = NULL;
 	int i;
 	xmlDocPtr psdoc;
 	xmlNodePtr propsets;
@@ -791,6 +823,16 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 	psdoc = xmlNewDoc(BAD_CAST "1.0");
 	propsets = xmlNewNode(NULL, BAD_CAST "propsets");
 	xmlDocSetRootElement(psdoc, propsets);
+
+	if (find_cct_fname(cctfname, opts->usercct, act)) {
+		add_object_node(report, "cct", cctfname);
+		cct = read_xml_doc(cctfname);
+
+		/* Add CCT dependencies. */
+		if (opts->add_deps && cct) {
+			add_cct_depends(doc, cct, NULL);
+		}
+	}
 
 	ctx = xmlXPathNewContext(act);
 	obj = xmlXPathEvalExpression(BAD_CAST "//productAttribute|//prodattr", ctx);
@@ -815,12 +857,7 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 
-	if (find_cct_fname(cctfname, opts->usercct, act)) {
-		xmlDocPtr cct;
-
-		add_object_node(report, "cct", cctfname);
-
-		cct = read_xml_doc(cctfname);
+	if (cct) {
 		ctx = xmlXPathNewContext(cct);
 		obj = xmlXPathEvalExpression(BAD_CAST "//cond|//condition", ctx);
 
@@ -878,6 +915,48 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 	return err;
 }
 
+/* Check product instances read from the PCT. */
+int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
+{
+	/* Add CCT dependencies. */
+	if (opts->add_deps) {
+		char cctfname[PATH_MAX];
+		xmlDocPtr cct = NULL;
+
+		/* The ACT may or may not have already been read. */
+		if (act) {
+			if (find_cct_fname(cctfname, opts->usercct, act)) {
+				if ((cct = read_xml_doc(cctfname))) {
+					add_object_node(report, "cct", cctfname);
+					add_cct_depends(doc, cct, NULL);
+					xmlFreeDoc(cct);
+				}
+			}
+		} else {
+			char actfname[PATH_MAX];
+
+			if (find_act_fname(actfname, opts->useract, doc)) {
+				if ((act = read_xml_doc(actfname))) {
+					add_object_node(report, "act", cctfname);
+				}
+			}
+
+			if (find_cct_fname(cctfname, opts->usercct, act)) {
+				if ((cct = read_xml_doc(cctfname))) {
+					add_object_node(report, "cct", cctfname);
+					add_cct_depends(doc, cct, NULL);
+				}
+			}
+
+			xmlFreeDoc(cct);
+			xmlFreeDoc(act);
+			act = NULL;
+		}
+	}
+
+	return check_prods(doc, path, NULL, act, opts, report);
+}
+
 /* Determine whether an object uses any computable applicability. */
 bool has_applic(xmlDocPtr doc)
 {
@@ -903,8 +982,19 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 		report_node = add_object_node(report, "object", path);
 	}
 
+	/* Add the type of check to the report. */
+	if (opts->standalone) {
+		xmlSetProp(report, BAD_CAST "type", BAD_CAST "standalone");
+	} else if (opts->all_props) {
+		xmlSetProp(report, BAD_CAST "type", BAD_CAST "all");
+	} else {
+		xmlSetProp(report, BAD_CAST "type", BAD_CAST "pct");
+	}
+
 	if (opts->standalone) {
 		err += check_object_props(doc, path, opts, report_node);
+	} else if (!opts->all_props && opts->userpct) {
+		err += check_pct_instances(doc, path, NULL, opts, report_node);
 	} else if (find_act_fname(actfname, opts->useract, doc)) {
 		xmlDocPtr act;
 
@@ -915,7 +1005,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 		if (opts->all_props) {
 			err += check_all_props(doc, path, act, opts, report_node);
 		} else {
-			err += check_prods(doc, path, NULL, act, opts, report_node);
+			err += check_pct_instances(doc, path, act, opts, report_node);
 		}
 
 		xmlFreeDoc(act);
@@ -1000,7 +1090,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:d:e:fNk:lop:qrsTvxh?";
+	const char *sopts = "A:abC:d:e:fNk:lop:qrsTvx~h?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -1022,6 +1112,7 @@ int main(int argc, char **argv)
 		{"summary"     , no_argument      , 0, 'T'},
 		{"verbose"     , no_argument      , 0, 'v'},
 		{"xml"         , no_argument      , 0, 'x'},
+		{"dependencies", no_argument      , 0, '~'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1040,7 +1131,8 @@ int main(int argc, char **argv)
 		/* output_tree */ false,
 		/* filenames */   false,
 		/* all_props */   false,
-		/* standalone */  false
+		/* standalone */  false,
+		/* add_deps */    false
 	};
 
 	int err = 0;
@@ -1121,6 +1213,9 @@ int main(int argc, char **argv)
 				break;
 			case 'x':
 				xmlout = true;
+				break;
+			case '~':
+				opts.add_deps = true;
 				break;
 			case 'h':
 			case '?':
