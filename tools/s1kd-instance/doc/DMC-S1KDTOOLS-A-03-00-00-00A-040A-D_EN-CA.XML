@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="038" inWork="01"/>
+        <issueInfo issueNumber="038" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="30"/>
+        <issueDate year="2019" month="06" day="03"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02" >
+        <simplePara>Add -1, -2, and -~ options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -314,7 +317,7 @@
             <definitionListItem>
               <listItemTerm>-p, --product &lt;product&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The ID or primary key of a product in the the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P) or the PCT data module referenced by the source data module. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>"</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". Multiple keys can be used by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -464,6 +467,18 @@
                 <para>Set the issue type of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-1, --act</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the ACT to use to find the CCT and/or PCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-2, --cct</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the CCT to read dependency tests from (-~).</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-@, --update-instances</listItemTerm>
               <listItemDefinition>
@@ -480,6 +495,12 @@
               <listItemTerm>-!, --no-infoname</listItemTerm>
               <listItemDefinition>
                 <para>Do not include an infoName in the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-~, --dependencies</listItemTerm>
+              <listItemDefinition>
+                <para>Add dependency tests from the CCT to assertions that use the dependant values.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.2.0"
+#define VERSION "3.3.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -42,7 +42,9 @@
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
 #define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
 #define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s\n"
-#define S_MISSING_PCT ERR_PREFIX "PCT '%s' not found.\n"
+#define S_MISSING_ACT ERR_PREFIX "Could not read ACT %s\n"
+#define S_MISSING_CCT ERR_PREFIX "Could not read CCT %s\n"
+#define S_MISSING_PCT ERR_PREFIX "Could not read PCT %s\n"
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
 #define S_MISSING_SOURCE ERR_PREFIX "Could not find source object for instance %s\n"
 
@@ -1936,14 +1938,12 @@ bool check_wholedm_applic(xmlDocPtr dm)
 /* Read applicability definitions from the <assign> elements of a
  * product instance in the specified PCT data module.\
  */
-void load_applic_from_pct(const char *pctfname, const char *product)
+void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char *product)
 {
-	xmlDocPtr pct;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	char xpath[512];
 
-	pct = read_xml_doc(pctfname);
 	ctx = xmlXPathNewContext(pct);
 
 	/* If the product is in the form of IDENT:TYPE:VALUE, it identifies the
@@ -1999,7 +1999,6 @@ void load_applic_from_pct(const char *pctfname, const char *product)
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
-	xmlFreeDoc(pct);
 }
 
 /* Remove the extended identification from the instance. */
@@ -2434,27 +2433,20 @@ bool find_act_fname(char *dst, xmlDocPtr doc)
 	return actref && find_dmod_fname(dst, actref, false);
 }
 
-/* Find the filename of a referenced PCT data module via the ACT. */
-bool find_pct_fname(char *dst, xmlDocPtr doc)
+/* Find the filename of a referenced CCT data module. */
+bool find_cct_fname(char *dst, xmlDocPtr act)
 {
-	char act_fname[PATH_MAX];
-	xmlDocPtr act;
+	xmlNodePtr cctref;
+	cctref = first_xpath_node(act, NULL, BAD_CAST "//condCrossRefTableRef/dmRef/dmRefIdent|//cctref/refdm");
+	return cctref && find_dmod_fname(dst, cctref, false);
+}
+
+/* Find the filename of a referenced PCT data module via the ACT. */
+bool find_pct_fname(char *dst, xmlDocPtr act)
+{
 	xmlNodePtr pctref;
-	bool found;
-
-	if (!find_act_fname(act_fname, doc)) {
-		return false;
-	}
-
-	if (!(act = read_xml_doc(act_fname))) {
-		return false;
-	}
-
 	pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
-	found = pctref && find_dmod_fname(dst, pctref, false);
-	xmlFreeDoc(act);
-
-	return found;
+	return pctref && find_dmod_fname(dst, pctref, false);
 }
 
 /* Unset all applicability assigned on a per-DM basis. */
@@ -2613,6 +2605,227 @@ void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Add a dependency test to an assertion if it contains any of the dependent
+ * values.
+ *
+ * If the assertion uses a set (|), the values will be split up in order to
+ * only add the dependency to the appropriate values.
+ */
+void add_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlChar *forval, xmlNodePtr applic)
+{
+	xmlChar *vals, *v = NULL;
+	bool match = false;
+	xmlNodePtr eval;
+	char *end;
+
+	vals = xmlGetProp(*assert, BAD_CAST "applicPropertyValues");
+
+	eval = xmlNewNode(NULL, BAD_CAST "evaluate");
+	xmlSetProp(eval, BAD_CAST "andOr", BAD_CAST "or");
+
+	/* Split any sets (|) */
+	while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
+		xmlNodePtr a;
+
+		a = xmlNewNode(NULL, BAD_CAST "assert");
+		xmlSetProp(a, BAD_CAST "applicPropertyIdent", id);
+		xmlSetProp(a, BAD_CAST "applicPropertyType", BAD_CAST "condition");
+		xmlSetProp(a, BAD_CAST "applicPropertyValues", v);
+
+		/* If the current value has a dependency, add the depedency
+		 * test to it with an AND evaluate.
+		 */
+		if (xmlStrcmp(v, forval) == 0) {
+			xmlNodePtr cur, e;
+
+			match = true;
+
+			e = xmlNewChild(eval, NULL, BAD_CAST "evaluate", NULL);
+			xmlSetProp(e, BAD_CAST "andOr", BAD_CAST "and");
+
+			for (cur = applic->children; cur; cur = cur->next) {
+				if (xmlStrcmp(cur->name, BAD_CAST "assert") == 0 || xmlStrcmp(cur->name, BAD_CAST "evaluate") == 0) {
+					xmlAddChild(e, xmlCopyNode(cur, 1));
+				}
+			}
+
+			xmlAddChild(e, a);
+		} else {
+			xmlAddChild(eval, a);
+		}
+	}
+
+	xmlFree(vals);
+
+	/* If any of the values in the set had a dependency, replace the assert
+	 * with the new evaluation.
+	 */
+	if (match) {
+		xmlChar *op;
+
+		op = xmlGetProp((*assert)->parent, BAD_CAST "andOr");
+
+		/* If the dependency test is being added to an OR evaluate,
+		 * simplify the output by combining the new OR and the existing
+		 * OR.
+		 */
+		if (!eval->children->next || (op && xmlStrcmp(op, BAD_CAST "or") == 0)) {
+			xmlNodePtr cur, last;
+
+			for (cur = eval->children, last = *assert; cur; cur = cur->next) {
+				xmlChar *o;
+
+				o = xmlGetProp(cur, BAD_CAST "andOr");
+
+				/* Combine evaluates with the same operation. */
+				if (o && xmlStrcmp(o, op) == 0) {
+					xmlNodePtr c;
+
+					for (c = cur->children; c; c = c->next) {
+						last = xmlAddNextSibling(last, xmlCopyNode(c, 1));
+					}
+				} else {
+					last = xmlAddNextSibling(last, xmlCopyNode(cur, 1));
+				}
+
+				xmlFree(o);
+			}
+
+			xmlFreeNode(eval);
+		/* Otherwise, just add the new OR. */
+		} else {
+			xmlAddNextSibling(*assert, eval);
+		}
+
+		xmlFree(op);
+
+		xmlUnlinkNode(*assert);
+		xmlFreeNode(*assert);
+		*assert = NULL;
+	} else {
+		xmlFreeNode(eval);
+	}
+}
+
+void add_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
+
+/* Add a dependency from the CCT. */
+void add_depend(xmlDocPtr doc, xmlNodePtr dep)
+{
+	xmlChar *id, *test, *vals, *xpath;
+	int n;
+	xmlNodePtr applic;
+
+	id = xmlGetProp(dep->parent, BAD_CAST "id");
+	test = xmlGetProp(dep, BAD_CAST "dependencyTest");
+	vals = xmlGetProp(dep, BAD_CAST "forCondValues");
+
+	/* Find the annotation for the dependency test. */
+	n = xmlStrlen(test) + 17;
+	xpath = malloc(n * sizeof(xmlChar));
+	xmlStrPrintf(xpath, n, "//applic[@id='%s']", test);
+	applic = first_xpath_node(dep->doc, NULL, xpath);
+	xmlFree(xpath);
+
+	if (applic) {
+		xmlXPathContextPtr ctx;
+		xmlXPathObjectPtr obj;
+		xmlChar *v = NULL;
+		char *end;
+
+		ctx = xmlXPathNewContext(doc);
+
+		/* Add dependency tests to assertions that use the dependant values. */
+		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
+			n = xmlStrlen(id) + 70;
+			xpath = malloc(n * sizeof(xmlChar));
+			xmlStrPrintf(xpath, n, "//assert[@applicPropertyIdent='%s' and @applicPropertyType='condition']", id);
+			obj = xmlXPathEvalExpression(xpath, ctx);
+			xmlFree(xpath);
+
+			if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				int i;
+
+				for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+					add_depend_to_assert(&obj->nodesetval->nodeTab[i], id, v, applic);
+				}
+			}
+
+			xmlXPathFreeObject(obj);
+		}
+
+		xmlXPathFreeContext(ctx);
+
+		/* Handle subdependencies, that is, dependant values which themselves
+		 * have dependencies.
+		 */
+		ctx = xmlXPathNewContext(applic->doc);
+		ctx->node = applic;
+		obj = xmlXPathEvalExpression(BAD_CAST ".//assert[@applicPropertyIdent and @applicPropertyType='condition']", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			int i;
+
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlChar *ident;
+
+				ident = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "applicPropertyIdent");
+				add_depends(doc, applic->doc, ident);
+				xmlFree(ident);
+			}
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+	}
+
+	xmlFree(id);
+	xmlFree(test);
+	xmlFree(vals);
+}
+
+/* Add CCT dependencies to the source object.
+ *
+ * If id is NULL, all conditions will be added.
+ *
+ * If id is not NULL, then only the dependencies for condition with that id
+ * will be added. This is useful when handling sub-depedencies, to only handle
+ * the conditions which pertain to a particular dependency test.
+ */
+void add_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(cct);
+
+	if (id) {
+		int n;
+		xmlChar *xpath;
+
+		n = xmlStrlen(id) + 26;
+		xpath = malloc(n * sizeof(xmlChar));
+		xmlStrPrintf(xpath, n, "//cond[@id='%s']/dependency", id);
+
+		obj = xmlXPathEvalExpression(xpath, ctx);
+
+		xmlFree(xpath);
+	} else {
+		obj = xmlXPathEvalExpression(BAD_CAST "//cond/dependency", ctx);
+	}
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			add_depend(doc, obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Print a usage message */
 void show_help(void)
 {
@@ -2663,9 +2876,12 @@ void show_help(void)
 	puts("  -y, --update-applic               Set applic for DM based on the user-defined defs.");
 	puts("  -Z, --add-required                Fix certain elements automatically after filtering.");
 	puts("  -z, --issue-type <type>           Set the issue type of the instance.");
+	puts("  -1, --act <file>                  Specify custom ACT.");
+	puts("  -2, --cct <file>                  Specify custom CCT.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
+	puts("  -~, --dependencies                Add CCT dependencies to annotations.");
 	puts("  --version                         Show version information.");
 	puts("  <object>...                       Source CSDB object(s)");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -2705,7 +2921,12 @@ int main(int argc, char **argv)
 	char issinfo[8] = "";
 	char secu[4] = "";
 	bool wholedm = false;
-	char pctfname[PATH_MAX] = "";
+	char *useract = NULL;
+	char *usercct = NULL;
+	char *userpct = NULL;
+	xmlDocPtr act = NULL;
+	xmlDocPtr cct = NULL;
+	xmlDocPtr pct = NULL;
 	char product[64] = "";
 	bool load_applic_per_dm = false;
 	bool dmlist = false;
@@ -2731,10 +2952,11 @@ int main(int argc, char **argv)
 	bool update_inst = false;
 	bool lock = false;
 	bool no_info_name = false;
+	bool add_deps = false;
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!1:2:~";
 	struct option lopts[] = {
 		{"version"         , no_argument      , 0, 0},
 		{"help"            , no_argument      , 0, 'h'},
@@ -2784,6 +3006,9 @@ int main(int argc, char **argv)
 		{"update-instances", no_argument      , 0, '@'},
 		{"read-only"       , no_argument      , 0, '%'},
 		{"no-infoname"     , no_argument      , 0, '!'},
+		{"act"             , required_argument, 0, '1'},
+		{"cct"             , required_argument, 0, '2'},
+		{"dependencies"    , no_argument      , 0, '~'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2884,8 +3109,14 @@ int main(int argc, char **argv)
 				strncpy(out, optarg, PATH_MAX - 1);
 				use_stdout = false;
 				break;
+			case '1':
+				useract = strdup(optarg);
+				break;
+			case '2':
+				usercct = strdup(optarg);
+				break;
 			case 'P':
-				strncpy(pctfname, optarg, PATH_MAX - 1);
+				userpct = strdup(optarg);
 				break;
 			case 'p':
 				strncpy(product, optarg, 63);
@@ -2951,6 +3182,9 @@ int main(int argc, char **argv)
 			case '!':
 				no_info_name = true;
 				break;
+			case '~':
+				add_deps = true;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2981,16 +3215,30 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (useract) {
+		if (!(act = read_xml_doc(useract))) {
+			fprintf(stderr, S_MISSING_ACT, useract);
+			exit(EXIT_MISSING_FILE);
+		}
+	}
+	if (usercct) {
+		if (!(cct = read_xml_doc(usercct))) {
+			fprintf(stderr, S_MISSING_CCT, usercct);
+			exit(EXIT_MISSING_FILE);
+		}
+	}
+	if (userpct) {
+		if (!(pct = read_xml_doc(userpct))) {
+			fprintf(stderr, S_MISSING_PCT, userpct);
+			exit(EXIT_MISSING_FILE);
+		}
+	}
+
 	if (strcmp(product, "") != 0) {
 		/* If a PCT filename is specified with -P, use that for all data
 		 * modules and ignore their individual ACT->PCT refs. */
-		if (strcmp(pctfname, "") != 0) {
-			if (access(pctfname, F_OK) == -1) {
-				fprintf(stderr, S_MISSING_PCT, pctfname);
-				exit(EXIT_MISSING_FILE);
-			} else {
-				load_applic_from_pct(pctfname, product);
-			}
+		if (pct) {
+			load_applic_from_pct(pct, userpct, product);
 		/* Otherwise the PCT must be loaded separately for each data
 		 * module, since they may reference different ones. */
 		} else {
@@ -3084,14 +3332,44 @@ int main(int argc, char **argv)
 		}
 
 		if ((doc = read_xml_doc(src))) {
-			/* Load the applic assigns from the PCT data module referenced
-			 * by the ACT data module referenced by this data module. */
-			if (strcmp(product, "") != 0 && strcmp(pctfname, "") == 0) {
+			/* Load the ACT to find the CCT and/or PCT. */
+			if (!useract && ((add_deps && !usercct) || (strcmp(product, "") != 0 && !userpct))) {
 				char fname[PATH_MAX];
-
-				if (find_pct_fname(fname, doc)) {
-					load_applic_from_pct(fname, product);
+				if (find_act_fname(fname, doc)) {
+					act = read_xml_doc(fname);
 				}
+			}
+
+			/* Add dependency tests from the CCT. */
+			if (add_deps) {
+				if (usercct) {
+					add_depends(doc, cct, NULL);
+				} else if (act) {
+					char fname[PATH_MAX];
+					if (find_cct_fname(fname, act)) {
+						if ((cct = read_xml_doc(fname))) {
+							add_depends(doc, cct, NULL);
+							xmlFreeDoc(cct);
+						}
+					}
+				}
+			}
+
+			/* Load the applic assigns from the PCT data module referenced
+			 * by the ACT data module referenced by this data module.
+			 */
+			if (!userpct && act && strcmp(product, "") != 0) {
+				char fname[PATH_MAX];
+				if (find_pct_fname(fname, act)) {
+					if ((pct = read_xml_doc(fname))) {
+						load_applic_from_pct(pct, fname, product);
+						xmlFreeDoc(pct);
+					}
+				}
+			}
+
+			if (act && !useract) {
+				xmlFreeDoc(act);
 			}
 
 			if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
@@ -3319,6 +3597,19 @@ int main(int argc, char **argv)
 		if (use_stdin) {
 			break;
 		}
+	}
+
+	if (useract) {
+		xmlFreeDoc(act);
+		free(useract);
+	}
+	if (usercct) {
+		xmlFreeDoc(cct);
+		free(usercct);
+	}
+	if (userpct) {
+		xmlFreeDoc(pct);
+		free(userpct);
 	}
 
 	free(origspec);

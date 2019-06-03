@@ -214,10 +214,13 @@ reference of each source data module to find the ACT and PCT data
 modules in the current directory.
 
 -p, --product &lt;product&gt;  
-The ID or primary key of a product in the the specified PCT data module
-(-P) or the PCT data module referenced by the source data module. A
+The ID or primary key of a product in the specified PCT data module
+(-P), the PCT referenced by the ACT data module specified with -1, or
+the PCT data module referenced by the source data module itself. A
 primary key is given in the same form as the -s option and should match
-a unique assign of a product instance, e.g., "`serialno:prodattr=12345`"
+a unique assign of a product instance, e.g.,
+"`serialno:prodattr=12345`". Multiple keys can be used by specifying
+this option multiple times.
 
 -R, --cir &lt;CIR&gt; ...  
 Use a CIR to resolve external dependencies in the master object, making
@@ -328,6 +331,12 @@ element will be inserted automatically.
 -z, --issue-type &lt;type&gt;  
 Set the issue type of the instance.
 
+-1, --act  
+Specify the ACT to use to find the CCT and/or PCT.
+
+-2, --cct  
+Specify the CCT to read dependency tests from (-\~).
+
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances
 that will be updated.
@@ -337,6 +346,10 @@ Make instance objects read-only.
 
 -!, --no-infoname  
 Do not include an infoName in the instance.
+
+-\~, --dependencies  
+Add dependency tests from the CCT to assertions that use the dependant
+values.
 
 --version  
 Show version information.
