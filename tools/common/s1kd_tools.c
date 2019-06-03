@@ -523,7 +523,7 @@ xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
  * If the assertion uses a set (|), the values will be split up in order to
  * only add the dependency to the appropriate values.
  */
-void add_cct_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlChar *forval, xmlNodePtr applic)
+static void add_cct_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlChar *forval, xmlNodePtr applic)
 {
 	xmlChar *vals, *v = NULL;
 	bool match = false;
@@ -619,10 +619,8 @@ void add_cct_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlCh
 	}
 }
 
-void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
-
 /* Add a dependency from the CCT. */
-void add_cct_depend(xmlDocPtr doc, xmlNodePtr dep)
+static void add_cct_depend(xmlDocPtr doc, xmlNodePtr dep)
 {
 	xmlChar *id, *test, *vals, *xpath;
 	int n;
