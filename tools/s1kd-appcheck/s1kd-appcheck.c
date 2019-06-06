@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "2.0.1"
+#define VERSION "2.0.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -36,8 +36,8 @@
 #define E_NO_ACT ERR_PREFIX "%s uses computable applicability, but no ACT could be found.\n"
 #define E_NO_CCT ERR_PREFIX "%s uses conditions, but no CCT could be found.\n"
 #define E_BAD_OBJECT ERR_PREFIX "Could not read object: %s\n"
-#define E_PROPCHECK ERR_PREFIX "%s: %s %s is not defined.\n"
-#define E_PROPCHECK_VAL ERR_PREFIX "%s: %s is not a defined value of %s %s.\n"
+#define E_PROPCHECK ERR_PREFIX "%s: %s %s is not defined (line %ld)\n"
+#define E_PROPCHECK_VAL ERR_PREFIX "%s: %s is not a defined value of %s %s (line %ld)\n"
 
 /* Warning messages. */
 #define W_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
@@ -330,8 +330,33 @@ bool match_pattern(const xmlChar *value, const xmlChar *pattern)
 	return match;
 }
 
+/* Add an undefined property node to the report. */
+xmlNodePtr add_undef_node(xmlNodePtr report, xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, long int line)
+{
+	xmlNodePtr und;
+	xmlChar line_s[16], *xpath;
+
+	und = xmlNewChild(report, NULL, BAD_CAST "undefined", NULL);
+
+	xmlSetProp(und, BAD_CAST "applicPropertyIdent", id);
+	xmlSetProp(und, BAD_CAST "applicPropertyType", type);
+
+	if (val) {
+		xmlSetProp(und, BAD_CAST "applicPropertyValue", val);
+	}
+
+	xmlStrPrintf(line_s, 16, "%ld", line);
+	xmlSetProp(und, BAD_CAST "line", line_s);
+
+	xpath = xpath_of(assert);
+	xmlSetProp(und, BAD_CAST "xpath", xpath);
+	xmlFree(xpath);
+
+	return und;
+}
+
 /* Check whether a property value is defined in the ACT/CCT. */
-int check_val_against_prop(const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
+int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -378,15 +403,16 @@ int check_val_against_prop(const xmlChar *id, const xmlChar *type, const xmlChar
 
 	if (match) {
 		return 0;
-	} else if (verbosity >= NORMAL) {
-		xmlNodePtr und;
+	} else {
+		long int line;
 
-		fprintf(stderr, E_PROPCHECK_VAL, path, (char *) val, (char *) type, (char *) id);
+		line = xmlGetLineNo(assert);
 
-		und = xmlNewChild(report, NULL, BAD_CAST "undefined", NULL);
-		xmlSetProp(und, BAD_CAST "applicPropertyIdent", id);
-		xmlSetProp(und, BAD_CAST "applicPropertyType", type);
-		xmlSetProp(und, BAD_CAST "applicPropertyValue", val);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_PROPCHECK_VAL, path, (char *) val, (char *) type, (char *) id, line);
+		}
+
+		add_undef_node(report, assert, id, type, val, line);
 	}
 
 	return 1;
@@ -429,6 +455,8 @@ int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const
 				xmlStrPrintf(xpath, n, "(//condType|//conditiontype)[@id='%s']", condtype);
 				prop = first_xpath_node(cct, NULL, xpath);
 			}
+
+			xmlFree(condtype);
 		}
 	} else {
 		n = xmlStrlen(id) + 40;
@@ -444,17 +472,18 @@ int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const
 		char *end = NULL;
 
 		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|~", &end))) {
-			err += check_val_against_prop(id, type, v, prop, path, report);
+			err += check_val_against_prop(assert, id, type, v, prop, path, report);
 		}
 	} else {
-		if (verbosity >= NORMAL) {
-			xmlNodePtr und;
-			fprintf(stderr, E_PROPCHECK, path, (char *) type, (char *) id);
+		long int line;
 
-			und = xmlNewChild(report, NULL, BAD_CAST "undefined", NULL);
-			xmlSetProp(und, BAD_CAST "applicPropertyIdent", id);
-			xmlSetProp(und, BAD_CAST "applicPropertyType", type);
+		line = xmlGetLineNo(assert);
+
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_PROPCHECK, path, (char *) type, (char *) id, line);
 		}
+
+		add_undef_node(report, assert, id, type, NULL, line);
 
 		++err;
 	}
