@@ -17,9 +17,33 @@ s1kd\-appcheck\ [options]\ [<object>...]
 The \f[I]s1kd\-appcheck\f[] tool validates the applicability of S1000D
 CSDB objects, detecting potential errors that could occur when the
 object is filtered.
-It can test objects either against the defined product instances (using
-the PCT), or against all possible combinations of product attribute and
-condition values relevant to an object (using the ACT and CCT).
+.PP
+There are four modes:
+.TP
+.B Basic (no argument)
+Check whether all product attributes, conditions, and their values used
+by objects are defined in the ACT and CCT.
+Specifying the \-c option in any other mode also performs this check.
+.RS
+.RE
+.TP
+.B Products (\-p)
+Check that objects are valid for all product instances defined in the
+PCT.
+.RS
+.RE
+.TP
+.B All (\-a)
+Check that objects are valid for all possible combinations of product
+attribute and condition values, as defined in the ACT and CCT.
+.RS
+.RE
+.TP
+.B Standalone (\-s)
+Check that objects are valid for all possible combinations of product
+attribute and condition values that are used within the object.
+.RS
+.RE
 .PP
 The s1kd\-instance and s1kd\-validate tools are used by default to
 perform the actual validation.
@@ -36,8 +60,6 @@ validated.
 .B \-a, \-\-all
 Validate objects against all possible, relevant combinations of product
 attribute and condition values as defined in the ACT and CCT.
-By default, objects are validated only against the defined product
-instances within the PCT.
 .RS
 .RE
 .TP
@@ -50,6 +72,12 @@ addition to the schema check.
 .B \-C, \-\-cct <file>
 Specify the CCT to read conditions from.
 This will override the CCT reference within the ACT.
+.RS
+.RE
+.TP
+.B \-c, \-\-strict
+Check whether product attributes and conditions used by an object are
+declared in the ACT and CCT respectively.
 .RS
 .RE
 .TP
@@ -102,9 +130,14 @@ Output valid CSDB objects to stdout.
 .RS
 .RE
 .TP
-.B \-p, \-\-pct <file>
+.B \-P, \-\-pct <file>
 Specify the PCT to read product instances from.
 This will override the PCT reference in the ACT.
+.RS
+.RE
+.TP
+.B \-p, \-\-products
+Validate objects against the defined product instances within the PCT.
 .RS
 .RE
 .TP
@@ -266,7 +299,7 @@ Checking it with this tool, however, reveals an issue:
 .IP
 .nf
 \f[C]
-$\ s1kd\-appcheck\ <DM>
+$\ s1kd\-appcheck\ \-p\ <DM>
 s1kd\-appcheck:\ ERROR:\ <DM>\ is\ invalid\ for\ product\ Version_A
 \f[]
 .fi

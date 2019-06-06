@@ -57,7 +57,36 @@
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered. It can test objects either against the defined product instances (using the PCT), or against all possible combinations of product attribute and condition values relevant to an object (using the ACT and CCT).</para>
+        <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered.</para>
+        <para>There are four modes:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>Basic (no argument)</listItemTerm>
+              <listItemDefinition>
+                <para>Check whether all product attributes, conditions, and their values used by objects are defined in the ACT and CCT. Specifying the -c option in any other mode also performs this check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>Products (-p)</listItemTerm>
+              <listItemDefinition>
+                <para>Check that objects are valid for all product instances defined in the PCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>All (-a)</listItemTerm>
+              <listItemDefinition>
+                <para>Check that objects are valid for all possible combinations of product attribute and condition values, as defined in the ACT and CCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>Standalone (-s)</listItemTerm>
+              <listItemDefinition>
+                <para>Check that objects are valid for all possible combinations of product attribute and condition values that are used within the object.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
         <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
       </levelledPara>
       <levelledPara>
@@ -73,7 +102,7 @@
             <definitionListItem>
               <listItemTerm>-a, --all</listItemTerm>
               <listItemDefinition>
-                <para>Validate objects against all possible, relevant combinations of product attribute and condition values as defined in the ACT and CCT. By default, objects are validated only against the defined product instances within the PCT.</para>
+                <para>Validate objects against all possible, relevant combinations of product attribute and condition values as defined in the ACT and CCT.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -86,6 +115,12 @@
               <listItemTerm>-C, --cct &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the CCT to read conditions from. This will override the CCT reference within the ACT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --strict</listItemTerm>
+              <listItemDefinition>
+                <para>Check whether product attributes and conditions used by an object are declared in the ACT and CCT respectively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -137,9 +172,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-p, --pct &lt;file&gt;</listItemTerm>
+              <listItemTerm>-P, --pct &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the PCT to read product instances from. This will override the PCT reference in the ACT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --products</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects against the defined product instances within the PCT.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -306,7 +347,7 @@ s1kd-validate: SUCCESS: <DM> validates against schema <url>]]></verbatimText>
         </para>
         <para>Checking it with this tool, however, reveals an issue: </para>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -p <DM>
 s1kd-appcheck: ERROR: <DM> is invalid for product Version_A]]></verbatimText>
         </para>
         <para>When the data module is filtered for version A, the first levelled paragraph will be removed, which causes the reference to it in the second levelled paragraph to become broken.</para>

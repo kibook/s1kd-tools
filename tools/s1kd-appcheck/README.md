@@ -13,10 +13,26 @@ DESCRIPTION
 
 The *s1kd-appcheck* tool validates the applicability of S1000D CSDB
 objects, detecting potential errors that could occur when the object is
-filtered. It can test objects either against the defined product
-instances (using the PCT), or against all possible combinations of
-product attribute and condition values relevant to an object (using the
-ACT and CCT).
+filtered.
+
+There are four modes:
+
+Basic (no argument)  
+Check whether all product attributes, conditions, and their values used
+by objects are defined in the ACT and CCT. Specifying the -c option in
+any other mode also performs this check.
+
+Products (-p)  
+Check that objects are valid for all product instances defined in the
+PCT.
+
+All (-a)  
+Check that objects are valid for all possible combinations of product
+attribute and condition values, as defined in the ACT and CCT.
+
+Standalone (-s)  
+Check that objects are valid for all possible combinations of product
+attribute and condition values that are used within the object.
 
 The s1kd-instance and s1kd-validate tools are used by default to perform
 the actual validation.
@@ -31,9 +47,7 @@ objects being validated.
 
 -a, --all  
 Validate objects against all possible, relevant combinations of product
-attribute and condition values as defined in the ACT and CCT. By
-default, objects are validated only against the defined product
-instances within the PCT.
+attribute and condition values as defined in the ACT and CCT.
 
 -b, --brexcheck  
 Validate objects with a BREX check (using the s1kd-brexcheck tool) in
@@ -42,6 +56,10 @@ addition to the schema check.
 -C, --cct &lt;file&gt;  
 Specify the CCT to read conditions from. This will override the CCT
 reference within the ACT.
+
+-c, --strict  
+Check whether product attributes and conditions used by an object are
+declared in the ACT and CCT respectively.
 
 -d, --dir &lt;dir&gt;  
 The directory to start searching for ACT/CCT/PCT data modules in. By
@@ -75,9 +93,12 @@ Assume that the issue/inwork numbers are omitted from object filenames
 -o, --output-valid  
 Output valid CSDB objects to stdout.
 
--p, --pct &lt;file&gt;  
+-P, --pct &lt;file&gt;  
 Specify the PCT to read product instances from. This will override the
 PCT reference in the ACT.
+
+-p, --products  
+Validate objects against the defined product instances within the PCT.
 
 -q, --quiet  
 Quiet mode. Error messages will not be printed.
@@ -193,7 +214,7 @@ By itself, the data module is valid:
 
 Checking it with this tool, however, reveals an issue:
 
-    $ s1kd-appcheck <DM>
+    $ s1kd-appcheck -p <DM>
     s1kd-appcheck: ERROR: <DM> is invalid for product Version_A
 
 When the data module is filtered for version A, the first levelled

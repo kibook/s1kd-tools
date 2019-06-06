@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "1.5.1"
+#define VERSION "2.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -36,6 +36,8 @@
 #define E_NO_ACT ERR_PREFIX "%s uses computable applicability, but no ACT could be found.\n"
 #define E_NO_CCT ERR_PREFIX "%s uses conditions, but no CCT could be found.\n"
 #define E_BAD_OBJECT ERR_PREFIX "Could not read object: %s\n"
+#define E_PROPCHECK ERR_PREFIX "%s: %s %s is not defined.\n"
+#define E_PROPCHECK_VAL ERR_PREFIX "%s: %s is not a defined value of %s %s.\n"
 
 /* Warning messages. */
 #define W_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
@@ -61,6 +63,9 @@ char *search_dir;
 /* The verbosity of output. */
 enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
+/* What type of check to perform. */
+enum appcheckmode { BASIC, PCT, ALL, STANDALONE };
+
 /* Applicability check options. */
 struct appcheckopts {
 	char *useract;
@@ -70,10 +75,10 @@ struct appcheckopts {
 	xmlNodePtr validators;
 	bool output_tree;
 	bool filenames;
-	bool all_props;
 	bool brexcheck;
-	bool standalone;
 	bool add_deps;
+	bool check_props;
+	enum appcheckmode mode;
 };
 
 /* Show usage message. */
@@ -86,6 +91,7 @@ void show_help(void)
 	puts("  -a, --all           Validate against all property values.");
 	puts("  -b, --brexcheck     Validate against BREX.");
 	puts("  -C, --cct <file>    User-specified CCT.");
+	puts("  -c, --strict        Check that all properties are defined.");
 	puts("  -d, --dir <dir>     Search for ACT/CCT/PCT in <dir>.");
 	puts("  -e, --exec <cmd>    Commands used to validate objects.");
 	puts("  -f, --filenames     List invalid files.");
@@ -94,7 +100,8 @@ void show_help(void)
 	puts("  -l, --list          Treat input as list of CSDB objects.");
 	puts("  -N, --omit-issue    Assume issue/inwork numbers are omitted.");
 	puts("  -o, --output-valid  Output valid CSDB objects to stdout.");
-	puts("  -p, --pct <file>    User-specified PCT.");
+	puts("  -P, --pct <file>    User-specified PCT.");
+	puts("  -p, --products      Validate against product instances.");
 	puts("  -q, --quiet         Quiet mode.");
 	puts("  -r, --recursive     Search for ACT/CCT/PCT recursively.");
 	puts("  -s, --standalone    Perform standalone check without ACT/CCT/PCT.");
@@ -312,6 +319,177 @@ bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 	return false;
 }
 
+/* Test whether an object value matches a regex pattern. */
+bool match_pattern(const xmlChar *value, const xmlChar *pattern)
+{
+	xmlRegexpPtr regex;
+	bool match;
+	regex = xmlRegexpCompile(BAD_CAST pattern);
+	match = xmlRegexpExec(regex, BAD_CAST value);
+	xmlRegFreeRegexp(regex);
+	return match;
+}
+
+/* Check whether a property value is defined in the ACT/CCT. */
+int check_val_against_prop(const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	bool match;
+	xmlChar *pattern;
+
+	pattern = first_xpath_value(NULL, prop, BAD_CAST "@valuePattern|@pattern");
+
+	if (pattern) {
+		match = match_pattern(val, pattern);
+		xmlFree(pattern);
+	} else {
+		match = false;
+
+		ctx = xmlXPathNewContext(prop->doc);
+		ctx->node = prop;
+
+		obj = xmlXPathEvalExpression(BAD_CAST "enumeration|enum", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			int i;
+
+			for (i = 0; !match && i < obj->nodesetval->nodeNr; ++i) {
+				xmlChar *vals, *v = NULL;
+				char *end = NULL;
+
+				vals = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
+					BAD_CAST "@applicPropertyValues|@actvalues");
+
+				while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
+					if (is_in_range((char *) val, (char *) v)) {
+						match = true;
+						break;
+					}
+				}
+
+				xmlFree(vals);
+			}
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+	}
+
+	if (match) {
+		return 0;
+	} else if (verbosity >= NORMAL) {
+		xmlNodePtr und;
+
+		fprintf(stderr, E_PROPCHECK_VAL, path, (char *) val, (char *) type, (char *) id);
+
+		und = xmlNewChild(report, NULL, BAD_CAST "undefined", NULL);
+		xmlSetProp(und, BAD_CAST "applicPropertyIdent", id);
+		xmlSetProp(und, BAD_CAST "applicPropertyType", type);
+		xmlSetProp(und, BAD_CAST "applicPropertyValue", val);
+	}
+
+	return 1;
+}
+
+/* Check whether a property is defined in the ACT/CCT. */
+int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const char *path, xmlNodePtr report)
+{
+	xmlChar *id, *type, *vals, *xpath;
+	int n, err = 0;
+	xmlNodePtr prop;
+
+	if (!(id = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref"))) {
+		return 0;
+	}
+	if (!(type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype"))) {
+		return 0;
+	}
+	if (!(vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@applicPropertyValue|@actvalues|@actvalue"))) {
+		return 0;
+	}
+
+	if (xmlStrcmp(type, BAD_CAST "condition") == 0) {
+		/* For conditions, first get the condition itself. */
+		n = xmlStrlen(id) + 29;
+		xpath = malloc(n * sizeof(xmlChar));
+		xmlStrPrintf(xpath, n, "(//cond|//condition)[@id='%s']", id);
+		prop = first_xpath_node(cct, NULL, xpath);
+
+		/* Then get the condition type. */
+		if (prop) {
+			xmlChar *condtype;
+
+			condtype = first_xpath_value(cct, prop, BAD_CAST "@condTypeRefId|@condtyperef");
+
+			if (condtype) {
+				xmlFree(xpath);
+				n = xmlStrlen(condtype) + 37;
+				xpath = malloc(n * sizeof(xmlChar));
+				xmlStrPrintf(xpath, n, "(//condType|//conditiontype)[@id='%s']", condtype);
+				prop = first_xpath_node(cct, NULL, xpath);
+			}
+		}
+	} else {
+		n = xmlStrlen(id) + 40;
+		xpath = malloc(n * sizeof(xmlChar));
+		xmlStrPrintf(xpath, n, "(//productAttribute|//prodattr)[@id='%s']", id);
+		prop = first_xpath_node(act, NULL, xpath);
+	}
+
+	xmlFree(xpath);
+
+	if (prop) {
+		xmlChar *v = NULL;
+		char *end = NULL;
+
+		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|~", &end))) {
+			err += check_val_against_prop(id, type, v, prop, path, report);
+		}
+	} else {
+		if (verbosity >= NORMAL) {
+			xmlNodePtr und;
+			fprintf(stderr, E_PROPCHECK, path, (char *) type, (char *) id);
+
+			und = xmlNewChild(report, NULL, BAD_CAST "undefined", NULL);
+			xmlSetProp(und, BAD_CAST "applicPropertyIdent", id);
+			xmlSetProp(und, BAD_CAST "applicPropertyType", type);
+		}
+
+		++err;
+	}
+
+	xmlFree(id);
+	xmlFree(type);
+	xmlFree(vals);
+
+	return err;
+}
+
+/* Check whether all properties in an object are defined in the ACT/CCT. */
+int check_props_against_cts(xmlDocPtr doc, const char *path, xmlDocPtr act, xmlDocPtr cct, xmlNodePtr report)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	int err = 0;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			err += check_prop_against_ct(obj->nodesetval->nodeTab[i], act, cct, path, report);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return err;
+}
+
 /* Add an assignment to a set of assertions. */
 void add_assign(xmlNodePtr asserts, xmlNodePtr assert)
 {
@@ -365,7 +543,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 	FILE *p;
 
 	if (verbosity >= DEBUG) {
-		if (opts->all_props) {
+		if (opts->mode >= ALL) {
 			fprintf(stderr, I_CHECK_ALL_START, path);
 		} else if (id) {
 			fprintf(stderr, I_CHECK_PROD, path, id, pctfname);
@@ -389,7 +567,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 		t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
 		v = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue");
 
-		if (opts->all_props && verbosity >= DEBUG) {
+		if (opts->mode >= ALL && verbosity >= DEBUG) {
 			fprintf(stderr, I_CHECK_ALL_PROP, t, i, v);
 		}
 
@@ -477,7 +655,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 
 	if (e) {
 		if (verbosity >= NORMAL) {
-			if (opts->all_props) {
+			if (opts->mode >= ALL) {
 				fprintf(stderr, E_CHECK_FAIL_ALL_START, path);
 				for (cur = asserts->children; cur; cur = cur->next) {
 					char *i, *t, *v;
@@ -574,6 +752,35 @@ xmlNodePtr add_object_node(xmlNodePtr parent, const char *name, const char *path
 	node = xmlNewChild(parent, NULL, BAD_CAST name, NULL);
 	xmlSetProp(node, BAD_CAST "path", BAD_CAST path);
 	return node;
+}
+
+int check_props_only(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
+{
+	char actfname[PATH_MAX];
+	char cctfname[PATH_MAX];
+	xmlDocPtr act = NULL;
+	xmlDocPtr cct = NULL;
+	int err;
+
+	if (find_act_fname(actfname, opts->useract, doc)) {
+		if ((act = read_xml_doc(actfname))) {
+			add_object_node(report, "act", actfname);
+		}
+	}
+
+	if (find_cct_fname(cctfname, opts->usercct, act)) {
+		if ((cct = read_xml_doc(cctfname))) {
+			add_object_node(report, "cct", cctfname);
+			add_cct_depends(doc, cct, NULL);
+		}
+	}
+
+	err = check_props_against_cts(doc, path, act, cct, report);
+
+	xmlFreeDoc(cct);
+	xmlFreeDoc(act);
+
+	return err;
 }
 
 /* Check that an object is valid for all defined product instances. */
@@ -728,7 +935,7 @@ int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opt
 	xmlDocSetRootElement(psdoc, propsets);
 
 	/* Add CCT dependencies so they are counted as part of the object's applicability. */
-	if (opts->add_deps) {
+	if (opts->add_deps || opts->check_props) {
 		char actfname[PATH_MAX];
 		char cctfname[PATH_MAX];
 		xmlDocPtr act = NULL;
@@ -743,7 +950,14 @@ int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opt
 		if (find_cct_fname(cctfname, opts->usercct, act)) {
 			if ((cct = read_xml_doc(cctfname))) {
 				add_object_node(report, "cct", cctfname);
-				add_cct_depends(doc, cct, NULL);
+
+				if (opts->check_props) {
+					err += check_props_against_cts(doc, path, act, cct, report);
+				}
+
+				if (opts->add_deps) {
+					add_cct_depends(doc, cct, NULL);
+				}
 			}
 		}
 
@@ -825,12 +1039,16 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 	xmlDocSetRootElement(psdoc, propsets);
 
 	if (find_cct_fname(cctfname, opts->usercct, act)) {
-		add_object_node(report, "cct", cctfname);
-		cct = read_xml_doc(cctfname);
+		if ((cct = read_xml_doc(cctfname))) {
+			add_object_node(report, "cct", cctfname);
 
-		/* Add CCT dependencies. */
-		if (opts->add_deps && cct) {
-			add_cct_depends(doc, cct, NULL);
+			if (opts->check_props) {
+				err += check_props_against_cts(doc, path, act, cct, report);
+			}
+
+			if (opts->add_deps) {
+				add_cct_depends(doc, cct, NULL);
+			}
 		}
 	}
 
@@ -918,8 +1136,10 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 /* Check product instances read from the PCT. */
 int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
 {
+	int err = 0;
+
 	/* Add CCT dependencies. */
-	if (opts->add_deps) {
+	if (opts->add_deps || opts->check_props) {
 		char cctfname[PATH_MAX];
 		xmlDocPtr cct = NULL;
 
@@ -928,7 +1148,15 @@ int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct a
 			if (find_cct_fname(cctfname, opts->usercct, act)) {
 				if ((cct = read_xml_doc(cctfname))) {
 					add_object_node(report, "cct", cctfname);
-					add_cct_depends(doc, cct, NULL);
+
+					if (opts->check_props) {
+						err += check_props_against_cts(doc, path, act, cct, report);
+					}
+
+					if (opts->add_deps) {
+						add_cct_depends(doc, cct, NULL);
+					}
+
 					xmlFreeDoc(cct);
 				}
 			}
@@ -944,7 +1172,14 @@ int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct a
 			if (find_cct_fname(cctfname, opts->usercct, act)) {
 				if ((cct = read_xml_doc(cctfname))) {
 					add_object_node(report, "cct", cctfname);
-					add_cct_depends(doc, cct, NULL);
+
+					if (opts->check_props) {
+						err += check_props_against_cts(doc, path, act, cct, report);
+					}
+
+					if (opts->add_deps) {
+						add_cct_depends(doc, cct, NULL);
+					}
 				}
 			}
 
@@ -954,7 +1189,9 @@ int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct a
 		}
 	}
 
-	return check_prods(doc, path, NULL, act, opts, report);
+	err += check_prods(doc, path, NULL, act, opts, report);
+
+	return err;
 }
 
 /* Determine whether an object uses any computable applicability. */
@@ -983,17 +1220,32 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 	}
 
 	/* Add the type of check to the report. */
-	if (opts->standalone) {
-		xmlSetProp(report, BAD_CAST "type", BAD_CAST "standalone");
-	} else if (opts->all_props) {
-		xmlSetProp(report, BAD_CAST "type", BAD_CAST "all");
-	} else {
-		xmlSetProp(report, BAD_CAST "type", BAD_CAST "pct");
+	switch (opts->mode) {
+		case BASIC:
+			xmlSetProp(report, BAD_CAST "type", BAD_CAST "basic");
+			break;
+		case PCT:
+			xmlSetProp(report, BAD_CAST "type", BAD_CAST "pct");
+			break;
+		case ALL:
+			xmlSetProp(report, BAD_CAST "type", BAD_CAST "all");
+			break;
+		case STANDALONE:
+			xmlSetProp(report, BAD_CAST "type", BAD_CAST "standalone");
+			break;
 	}
 
-	if (opts->standalone) {
+	if (opts->check_props) {
+		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "yes");
+	} else {
+		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "no");
+	}
+
+	if (opts->mode == BASIC) {
+		err += check_props_only(doc, path, opts, report_node);
+	} else if (opts->mode == STANDALONE) {
 		err += check_object_props(doc, path, opts, report_node);
-	} else if (!opts->all_props && opts->userpct) {
+	} else if (!opts->mode == ALL && opts->userpct) {
 		err += check_pct_instances(doc, path, NULL, opts, report_node);
 	} else if (find_act_fname(actfname, opts->useract, doc)) {
 		xmlDocPtr act;
@@ -1002,7 +1254,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 
 		act = read_xml_doc(actfname);
 
-		if (opts->all_props) {
+		if (opts->mode == ALL) {
 			err += check_all_props(doc, path, act, opts, report_node);
 		} else {
 			err += check_pct_instances(doc, path, act, opts, report_node);
@@ -1090,7 +1342,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:d:e:fNk:lop:qrsTvx~h?";
+	const char *sopts = "A:abC:cd:e:fNk:loP:pqrsTvx~h?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -1098,6 +1350,7 @@ int main(int argc, char **argv)
 		{"all"         , no_argument      , 0, 'a'},
 		{"brexcheck"   , no_argument      , 0, 'b'},
 		{"cct"         , required_argument, 0, 'C'},
+		{"strict"      , no_argument      , 0, 'c'},
 		{"dir"         , required_argument, 0, 'd'},
 		{"exec"        , required_argument, 0, 'e'},
 		{"filenames"   , no_argument      , 0, 'f'},
@@ -1105,7 +1358,8 @@ int main(int argc, char **argv)
 		{"list"        , no_argument      , 0, 'l'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
 		{"output-valid", no_argument      , 0, 'o'},
-		{"pct"         , required_argument, 0, 'p'},
+		{"pct"         , required_argument, 0, 'P'},
+		{"products"    , no_argument      , 0, 'p'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursive"   , no_argument      , 0, 'r'},
 		{"standalone"  , no_argument      , 0, 's'},
@@ -1130,9 +1384,9 @@ int main(int argc, char **argv)
 		/* validators */  NULL,
 		/* output_tree */ false,
 		/* filenames */   false,
-		/* all_props */   false,
-		/* standalone */  false,
-		/* add_deps */    false
+		/* add_deps */    false,
+		/* check_props */ false,
+		/* mode */        BASIC
 	};
 
 	int err = 0;
@@ -1159,13 +1413,16 @@ int main(int argc, char **argv)
 				opts.useract = strdup(optarg);
 				break;
 			case 'a':
-				opts.all_props = true;
+				opts.mode = ALL;
 				break;
 			case 'b':
 				opts.brexcheck = true;
 				break;
 			case 'C':
 				opts.usercct = strdup(optarg);
+				break;
+			case 'c':
+				opts.check_props = true;
 				break;
 			case 'd':
 				free(search_dir);
@@ -1192,15 +1449,17 @@ int main(int argc, char **argv)
 			case 'o':
 				opts.output_tree = true;
 				break;
-			case 'p':
+			case 'P':
 				opts.userpct = strdup(optarg);
+				break;
+			case 'p':
+				opts.mode = PCT;
 				break;
 			case 'r':
 				recursive_search = true;
 				break;
 			case 's':
-				opts.standalone = true;
-				opts.all_props = true;
+				opts.mode = STANDALONE;
 				break;
 			case 'T':
 				show_stats = true;
@@ -1222,6 +1481,10 @@ int main(int argc, char **argv)
 				show_help();
 				goto cleanup;
 		}
+	}
+
+	if (opts.mode == BASIC) {
+		opts.check_props = true;
 	}
 
 	if (optind < argc) {
