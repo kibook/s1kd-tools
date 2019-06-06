@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1245,7 +1245,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 		err += check_props_only(doc, path, opts, report_node);
 	} else if (opts->mode == STANDALONE) {
 		err += check_object_props(doc, path, opts, report_node);
-	} else if (!opts->mode == ALL && opts->userpct) {
+	} else if (opts->mode == PCT && opts->userpct) {
 		err += check_pct_instances(doc, path, NULL, opts, report_node);
 	} else if (find_act_fname(actfname, opts->useract, doc)) {
 		xmlDocPtr act;
