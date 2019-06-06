@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -421,7 +421,7 @@ int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xmlChar *
 /* Check whether a property is defined in the ACT/CCT. */
 int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const char *path, xmlNodePtr report)
 {
-	xmlChar *id, *type, *vals, *xpath;
+	xmlChar *id, *type, *vals, *xpath = NULL;
 	int n, err = 0;
 	xmlNodePtr prop;
 
@@ -435,7 +435,7 @@ int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const
 		return 0;
 	}
 
-	if (xmlStrcmp(type, BAD_CAST "condition") == 0) {
+	if (xmlStrcmp(type, BAD_CAST "condition") == 0 && cct) {
 		/* For conditions, first get the condition itself. */
 		n = xmlStrlen(id) + 29;
 		xpath = malloc(n * sizeof(xmlChar));
@@ -458,11 +458,13 @@ int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const
 
 			xmlFree(condtype);
 		}
-	} else {
+	} else if (act) {
 		n = xmlStrlen(id) + 40;
 		xpath = malloc(n * sizeof(xmlChar));
 		xmlStrPrintf(xpath, n, "(//productAttribute|//prodattr)[@id='%s']", id);
 		prop = first_xpath_node(act, NULL, xpath);
+	} else {
+		prop = NULL;
 	}
 
 	xmlFree(xpath);
