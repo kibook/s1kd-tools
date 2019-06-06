@@ -46,8 +46,10 @@ CCT or PCT. This will override the ACT reference within the individual
 objects being validated.
 
 -a, --all  
-Validate objects against all possible, relevant combinations of product
-attribute and condition values as defined in the ACT and CCT.
+Validate objects against all possible combinations of relevant product
+attribute and condition values as defined in the ACT and CCT. Relevant
+product attributes and conditions are those that are used by an object
+with any value.
 
 -b, --brexcheck  
 Validate objects with a BREX check (using the s1kd-brexcheck tool) in
