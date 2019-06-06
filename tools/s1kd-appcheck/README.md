@@ -15,24 +15,28 @@ The *s1kd-appcheck* tool validates the applicability of S1000D CSDB
 objects, detecting potential errors that could occur when the object is
 filtered.
 
-There are four modes:
+There are three methods for validating applicability:
 
-Basic (no argument)  
-Check whether all product attributes, conditions, and their values used
-by objects are defined in the ACT and CCT. Specifying the -c option in
-any other mode also performs this check.
+Products check (-p)  
+Check that objects are valid for all product instances, as defined in
+the PCT. Conditions that are not associated with a product instance will
+not be checked.
 
-Products (-p)  
-Check that objects are valid for all product instances defined in the
-PCT.
-
-All (-a)  
+Standalone check (-s)  
 Check that objects are valid for all possible combinations of product
-attribute and condition values, as defined in the ACT and CCT.
+attribute and condition values that are used within the object. If
+applicability is always given explicitly within objects, this is the
+most efficient method.
 
-Standalone (-s)  
+Full check (-a)  
 Check that objects are valid for all possible combinations of product
-attribute and condition values that are used within the object.
+attribute and condition values, as defined in the ACT and CCT. This is
+the most complete check.
+
+If no method is selected, the tool will by default check that all
+product attributes and conditions used by an object are defined in the
+ACT and CCT respectively. This can be combined with any of the above
+checks by specifying the -c option.
 
 The s1kd-instance and s1kd-validate tools are used by default to perform
 the actual validation.

@@ -58,35 +58,30 @@
       <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered.</para>
-        <para>There are four modes:</para>
+        <para>There are three methods for validating applicability:</para>
         <para>
           <definitionList>
             <definitionListItem>
-              <listItemTerm>Basic (no argument)</listItemTerm>
+              <listItemTerm>Products check (-p)</listItemTerm>
               <listItemDefinition>
-                <para>Check whether all product attributes, conditions, and their values used by objects are defined in the ACT and CCT. Specifying the -c option in any other mode also performs this check.</para>
+                <para>Check that objects are valid for all product instances, as defined in the PCT. Conditions that are not associated with a product instance will not be checked.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>Products (-p)</listItemTerm>
+              <listItemTerm>Standalone check (-s)</listItemTerm>
               <listItemDefinition>
-                <para>Check that objects are valid for all product instances defined in the PCT.</para>
+                <para>Check that objects are valid for all possible combinations of product attribute and condition values that are used within the object. If applicability is always given explicitly within objects, this is the most efficient method.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>All (-a)</listItemTerm>
+              <listItemTerm>Full check (-a)</listItemTerm>
               <listItemDefinition>
-                <para>Check that objects are valid for all possible combinations of product attribute and condition values, as defined in the ACT and CCT.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>Standalone (-s)</listItemTerm>
-              <listItemDefinition>
-                <para>Check that objects are valid for all possible combinations of product attribute and condition values that are used within the object.</para>
+                <para>Check that objects are valid for all possible combinations of product attribute and condition values, as defined in the ACT and CCT. This is the most complete check.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
         </para>
+        <para>If no method is selected, the tool will by default check that all product attributes and conditions used by an object are defined in the ACT and CCT respectively. This can be combined with any of the above checks by specifying the -c option.</para>
         <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
       </levelledPara>
       <levelledPara>
