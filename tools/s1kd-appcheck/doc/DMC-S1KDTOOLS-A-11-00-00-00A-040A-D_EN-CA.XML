@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="09"/>
+        <issueInfo issueNumber="000" inWork="10"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="06"/>
+        <issueDate year="2019" month="06" day="07"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -58,30 +58,7 @@
       <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered.</para>
-        <para>There are three methods for validating applicability:</para>
-        <para>
-          <definitionList>
-            <definitionListItem>
-              <listItemTerm>Products check (-p)</listItemTerm>
-              <listItemDefinition>
-                <para>Check that objects are valid for all product instances, as defined in the PCT. Conditions that are not associated with a product instance will not be checked.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>Standalone check (-s)</listItemTerm>
-              <listItemDefinition>
-                <para>Check that objects are valid for all possible combinations of product attribute and condition values that are used within the object. If applicability is always given explicitly within objects, this is the most efficient method.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>Full check (-a)</listItemTerm>
-              <listItemDefinition>
-                <para>Check that objects are valid for all possible combinations of product attribute and condition values, as defined in the ACT and CCT. This is the most complete check.</para>
-              </listItemDefinition>
-            </definitionListItem>
-          </definitionList>
-        </para>
-        <para>If no method is selected, the tool will by default check that all product attributes and conditions used by an object are defined in the ACT and CCT respectively. This can be combined with any of the above checks by specifying the -c option.</para>
+        <para>By default, the tool validates an object against only the product attribute and condition values which are explicitly used within the object. The products check (-p) and full check (-a) modes allow objects to be checked for issues with implicit applicability, that is, product attribute or condition values which are not explicitly used within an object, but may still affect it.</para>
         <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
       </levelledPara>
       <levelledPara>
@@ -113,9 +90,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-c, --strict</listItemTerm>
+              <listItemTerm>-c, --basic</listItemTerm>
               <listItemDefinition>
-                <para>Check whether product attributes and conditions used by an object are declared in the ACT and CCT respectively.</para>
+                <para>Only check that all product attributes and conditions are defined in the ACT and CCT respectively, without performing any other validation.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -191,9 +168,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-s, --standalone</listItemTerm>
+              <listItemTerm>-s, --strict</listItemTerm>
               <listItemDefinition>
-                <para>Perform a standalone applicability check without an ACT, CCT, or PCT, using only the applicability property values contained in each object.</para>
+                <para>Check whether product attributes and conditions used by an object are declared in the ACT and CCT respectively.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -297,8 +274,18 @@
 ...
 <applic>
 <displayText>
-<simplePara>All</simplePara>
+<simplePara>Version: A or Version: B</simplePara>
 </displayText>
+<evaluate andOr="or">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/>
+</evaluate>
 </applic>
 ...
 <referencedApplicGroup>
@@ -321,19 +308,6 @@ applicPropertyValues="B"/>
 ...
 </dmodule>]]></verbatimText>
         </para>
-        <para>And consider this snippet of the PCT associated with the above data module:</para>
-        <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<productCrossRefTable>
-<product id="Version_A">
-<assign applicPropertyIdent="version" applicPropertyType="prodattr"
-applicPropertyValue="A"/>
-</product>
-<product id="Version_B">
-<assign applicPropertyIdent="version" applicPropertyType="prodattr"
-applicPropertyValue="B"/>
-</product>
-</productCrossRefTable>]]></verbatimText>
-        </para>
         <para>There are two versions of the product, A and B, and the data module is meant to apply to both.</para>
         <para>By itself, the data module is valid:</para>
         <para>
@@ -342,8 +316,9 @@ s1kd-validate: SUCCESS: <DM> validates against schema <url>]]></verbatimText>
         </para>
         <para>Checking it with this tool, however, reveals an issue: </para>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -p <DM>
-s1kd-appcheck: ERROR: <DM> is invalid for product Version_A]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
+s1kd-appcheck: ERROR: <DM> is invalid when:
+s1kd-appcheck: ERROR:   prodattr version = A]]></verbatimText>
         </para>
         <para>When the data module is filtered for version A, the first levelled paragraph will be removed, which causes the reference to it in the second levelled paragraph to become broken.</para>
       </levelledPara>

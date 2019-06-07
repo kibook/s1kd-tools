@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "2.0.3"
+#define VERSION "3.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -27,10 +27,9 @@
 #define I_CHECK_ALL_PROP INF_PREFIX "  %s %s = %s\n"
 
 /* Error messages. */
-#define E_CHECK_FAIL ERR_PREFIX "%s is invalid when %s %s = %s\n"
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
 #define E_CHECK_FAIL_PROD_LINENO ERR_PREFIX "%s is invalid for product on line %ld of %s\n"
-#define E_CHECK_FAIL_ALL_START ERR_PREFIX "%s is invalid for:\n"
+#define E_CHECK_FAIL_ALL_START ERR_PREFIX "%s is invalid when:\n"
 #define E_CHECK_FAIL_ALL_PROP ERR_PREFIX "  %s %s = %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_NO_ACT ERR_PREFIX "%s uses computable applicability, but no ACT could be found.\n"
@@ -91,7 +90,7 @@ void show_help(void)
 	puts("  -a, --all           Validate against all property values.");
 	puts("  -b, --brexcheck     Validate against BREX.");
 	puts("  -C, --cct <file>    User-specified CCT.");
-	puts("  -c, --strict        Check that all properties are defined.");
+	puts("  -c, --basic         Only check that all properties are defined.");
 	puts("  -d, --dir <dir>     Search for ACT/CCT/PCT in <dir>.");
 	puts("  -e, --exec <cmd>    Commands used to validate objects.");
 	puts("  -f, --filenames     List invalid files.");
@@ -104,7 +103,7 @@ void show_help(void)
 	puts("  -p, --products      Validate against product instances.");
 	puts("  -q, --quiet         Quiet mode.");
 	puts("  -r, --recursive     Search for ACT/CCT/PCT recursively.");
-	puts("  -s, --standalone    Perform standalone check without ACT/CCT/PCT.");
+	puts("  -s, --strict        Check that all properties are defined.");
 	puts("  -T, --summary       Print a summary of the check.");
 	puts("  -v, --verbose       Verbose output.");
 	puts("  -x, --xml           Output XML report.");
@@ -458,7 +457,7 @@ int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const
 
 			xmlFree(condtype);
 		}
-	} else if (act) {
+	} else if (xmlStrcmp(type, BAD_CAST "prodattr") == 0 && act) {
 		n = xmlStrlen(id) + 40;
 		xpath = malloc(n * sizeof(xmlChar));
 		xmlStrPrintf(xpath, n, "(//productAttribute|//prodattr)[@id='%s']", id);
@@ -982,14 +981,14 @@ int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opt
 			if ((cct = read_xml_doc(cctfname))) {
 				add_object_node(report, "cct", cctfname);
 
-				if (opts->check_props) {
-					err += check_props_against_cts(doc, path, act, cct, report);
-				}
-
 				if (opts->add_deps) {
 					add_cct_depends(doc, cct, NULL);
 				}
 			}
+		}
+
+		if (opts->check_props) {
+			err += check_props_against_cts(doc, path, act, cct, report);
 		}
 
 		xmlFreeDoc(cct);
@@ -1073,14 +1072,14 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 		if ((cct = read_xml_doc(cctfname))) {
 			add_object_node(report, "cct", cctfname);
 
-			if (opts->check_props) {
-				err += check_props_against_cts(doc, path, act, cct, report);
-			}
-
 			if (opts->add_deps) {
 				add_cct_depends(doc, cct, NULL);
 			}
 		}
+	}
+
+	if (opts->check_props) {
+		err += check_props_against_cts(doc, path, act, cct, report);
 	}
 
 	ctx = xmlXPathNewContext(act);
@@ -1180,17 +1179,17 @@ int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct a
 				if ((cct = read_xml_doc(cctfname))) {
 					add_object_node(report, "cct", cctfname);
 
-					if (opts->check_props) {
-						err += check_props_against_cts(doc, path, act, cct, report);
-					}
-
 					if (opts->add_deps) {
 						add_cct_depends(doc, cct, NULL);
 					}
-
-					xmlFreeDoc(cct);
 				}
 			}
+
+			if (opts->check_props) {
+				err += check_props_against_cts(doc, path, act, cct, report);
+			}
+
+			xmlFreeDoc(cct);
 		} else {
 			char actfname[PATH_MAX];
 
@@ -1204,14 +1203,14 @@ int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct a
 				if ((cct = read_xml_doc(cctfname))) {
 					add_object_node(report, "cct", cctfname);
 
-					if (opts->check_props) {
-						err += check_props_against_cts(doc, path, act, cct, report);
-					}
-
 					if (opts->add_deps) {
 						add_cct_depends(doc, cct, NULL);
 					}
 				}
+			}
+
+			if (opts->check_props) {
+				err += check_props_against_cts(doc, path, act, cct, report);
 			}
 
 			xmlFreeDoc(cct);
@@ -1381,7 +1380,7 @@ int main(int argc, char **argv)
 		{"all"         , no_argument      , 0, 'a'},
 		{"brexcheck"   , no_argument      , 0, 'b'},
 		{"cct"         , required_argument, 0, 'C'},
-		{"strict"      , no_argument      , 0, 'c'},
+		{"basic"       , no_argument      , 0, 'c'},
 		{"dir"         , required_argument, 0, 'd'},
 		{"exec"        , required_argument, 0, 'e'},
 		{"filenames"   , no_argument      , 0, 'f'},
@@ -1393,7 +1392,7 @@ int main(int argc, char **argv)
 		{"products"    , no_argument      , 0, 'p'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursive"   , no_argument      , 0, 'r'},
-		{"standalone"  , no_argument      , 0, 's'},
+		{"strict"      , no_argument      , 0, 's'},
 		{"summary"     , no_argument      , 0, 'T'},
 		{"verbose"     , no_argument      , 0, 'v'},
 		{"xml"         , no_argument      , 0, 'x'},
@@ -1415,9 +1414,10 @@ int main(int argc, char **argv)
 		/* validators */  NULL,
 		/* output_tree */ false,
 		/* filenames */   false,
+		/* brexcheck */   false,
 		/* add_deps */    false,
 		/* check_props */ false,
-		/* mode */        BASIC
+		/* mode */        STANDALONE
 	};
 
 	int err = 0;
@@ -1453,7 +1453,7 @@ int main(int argc, char **argv)
 				opts.usercct = strdup(optarg);
 				break;
 			case 'c':
-				opts.check_props = true;
+				opts.mode = BASIC;
 				break;
 			case 'd':
 				free(search_dir);
@@ -1490,7 +1490,7 @@ int main(int argc, char **argv)
 				recursive_search = true;
 				break;
 			case 's':
-				opts.mode = STANDALONE;
+				opts.check_props = true;
 				break;
 			case 'T':
 				show_stats = true;

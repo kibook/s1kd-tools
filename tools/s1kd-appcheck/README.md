@@ -15,28 +15,12 @@ The *s1kd-appcheck* tool validates the applicability of S1000D CSDB
 objects, detecting potential errors that could occur when the object is
 filtered.
 
-There are three methods for validating applicability:
-
-Products check (-p)  
-Check that objects are valid for all product instances, as defined in
-the PCT. Conditions that are not associated with a product instance will
-not be checked.
-
-Standalone check (-s)  
-Check that objects are valid for all possible combinations of product
-attribute and condition values that are used within the object. If
-applicability is always given explicitly within objects, this is the
-most efficient method.
-
-Full check (-a)  
-Check that objects are valid for all possible combinations of product
-attribute and condition values, as defined in the ACT and CCT. This is
-the most complete check.
-
-If no method is selected, the tool will by default check that all
-product attributes and conditions used by an object are defined in the
-ACT and CCT respectively. This can be combined with any of the above
-checks by specifying the -c option.
+By default, the tool validates an object against only the product
+attribute and condition values which are explicitly used within the
+object. The products check (-p) and full check (-a) modes allow objects
+to be checked for issues with implicit applicability, that is, product
+attribute or condition values which are not explicitly used within an
+object, but may still affect it.
 
 The s1kd-instance and s1kd-validate tools are used by default to perform
 the actual validation.
@@ -63,9 +47,9 @@ addition to the schema check.
 Specify the CCT to read conditions from. This will override the CCT
 reference within the ACT.
 
--c, --strict  
-Check whether product attributes and conditions used by an object are
-declared in the ACT and CCT respectively.
+-c, --basic  
+Only check that all product attributes and conditions are defined in the
+ACT and CCT respectively, without performing any other validation.
 
 -d, --dir &lt;dir&gt;  
 The directory to start searching for ACT/CCT/PCT data modules in. By
@@ -112,9 +96,9 @@ Quiet mode. Error messages will not be printed.
 -r, --recursive  
 Search for the ACT/CCT/PCT recursively.
 
--s, --standalone  
-Perform a standalone applicability check without an ACT, CCT, or PCT,
-using only the applicability property values contained in each object.
+-s, --strict  
+Check whether product attributes and conditions used by an object are
+declared in the ACT and CCT respectively.
 
 -T, --summary  
 Print a summary of the check after it completes, including statistics on
@@ -172,8 +156,18 @@ Consider the following data module snippet:
     ...
     <applic>
     <displayText>
-    <simplePara>All</simplePara>
+    <simplePara>Version: A or Version: B</simplePara>
     </displayText>
+    <evaluate andOr="or">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </evaluate>
     </applic>
     ...
     <referencedApplicGroup>
@@ -196,20 +190,6 @@ Consider the following data module snippet:
     ...
     </dmodule>
 
-And consider this snippet of the PCT associated with the above data
-module:
-
-    <productCrossRefTable>
-    <product id="Version_A">
-    <assign applicPropertyIdent="version" applicPropertyType="prodattr"
-    applicPropertyValue="A"/>
-    </product>
-    <product id="Version_B">
-    <assign applicPropertyIdent="version" applicPropertyType="prodattr"
-    applicPropertyValue="B"/>
-    </product>
-    </productCrossRefTable>
-
 There are two versions of the product, A and B, and the data module is
 meant to apply to both.
 
@@ -220,8 +200,9 @@ By itself, the data module is valid:
 
 Checking it with this tool, however, reveals an issue:
 
-    $ s1kd-appcheck -p <DM>
-    s1kd-appcheck: ERROR: <DM> is invalid for product Version_A
+    $ s1kd-appcheck <DM>
+    s1kd-appcheck: ERROR: <DM> is invalid when:
+    s1kd-appcheck: ERROR:   prodattr version = A
 
 When the data module is filtered for version A, the first levelled
 paragraph will be removed, which causes the reference to it in the
