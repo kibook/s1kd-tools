@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="10"/>
+        <issueInfo issueNumber="000" inWork="11"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="07"/>
+        <issueDate year="2019" month="06" day="11"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -267,10 +267,12 @@
         </para>
       </levelledPara>
       <levelledPara>
-        <title>EXAMPLE</title>
-        <para>Consider the following data module snippet:</para>
-        <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Standalone validation</title>
+          <para>Consider the following data module snippet:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
 ...
 <applic>
 <displayText>
@@ -307,20 +309,129 @@ applicPropertyValues="B"/>
 </levelledPara>
 ...
 </dmodule>]]></verbatimText>
-        </para>
-        <para>There are two versions of the product, A and B, and the data module is meant to apply to both.</para>
-        <para>By itself, the data module is valid:</para>
-        <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-validate -v <DM>
+          </para>
+          <para>There are two versions of the product, A and B, and the data module is meant to apply to both.</para>
+          <para>By itself, the data module is valid:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-validate -v <DM>
 s1kd-validate: SUCCESS: <DM> validates against schema <url>]]></verbatimText>
-        </para>
-        <para>Checking it with this tool, however, reveals an issue: </para>
-        <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
+          </para>
+          <para>Checking it with this tool, however, reveals an issue: </para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
 s1kd-appcheck: ERROR: <DM> is invalid when:
 s1kd-appcheck: ERROR:   prodattr version = A]]></verbatimText>
-        </para>
-        <para>When the data module is filtered for version A, the first levelled paragraph will be removed, which causes the reference to it in the second levelled paragraph to become broken.</para>
+          </para>
+          <para>When the data module is filtered for version A, the first levelled paragraph will be removed, which causes the reference to it in the second levelled paragraph to become broken.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Full validation</title>
+          <para>Consider the following data module snippet:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+...
+<applic>
+<displayText>
+<simplePara>All</simplePara>
+</displayText>
+</applic>
+...
+<referencedApplicGroup>
+<applic id="app-IcyOrHot">
+<evaluate andOr="or">
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Icy"/>
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Hot"/>
+</applic>
+</referencedApplicGroup>
+...
+<proceduralStep>
+<para>Locate the handle.</para>
+</proceduralStep>
+<proceduralStep id="stp-0001" applicRefId="app-IcyOrHot">
+<para>Put on gloves prior to touching the handle.</para>
+</proceduralStep>
+<proceduralStep>
+<para>Grab the handle and turn it clockwise.</para>
+</proceduralStep>
+...
+<proceduralStep>
+<para>Remove the gloves you put on in <internalRef internalRefId="stp-0001"/>.</para>
+</proceduralStep>
+...
+</dmodule>]]></verbatimText>
+          </para>
+          <para>Once again, this data module is valid by itself:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-validate -v <DM>
+s1kd-validate: SUCCESS: <DM> validates against schema <url>]]></verbatimText>
+          </para>
+          <para>This time, however, it also initially appears valid when this tool is used:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -v <DM>
+s1kd-appcheck: SUCCESS: <DM> passed the applicability check.]]></verbatimText>
+          </para>
+          <para>However, now consider this snippet from the CCT:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<condCrossRefTable>
+...
+<condType id="weatherType">
+<name>Weather type</name>
+<descr>Possible types of weather conditions.</descr>
+<enumeration applicPropertyValues="Normal"/>
+<enumeration applicPropertyValues="Icy"/>
+<enumeration applicPropertyValues="Hot"/>
+</condType>
+...
+<cond id="weather" condTypeRefId="weatherType">
+<name>Weather</name>
+<descr>The current weather conditions.</descr>
+</cond>
+...
+</condCrossRefTable>]]></verbatimText>
+          </para>
+          <para>There is a third value for the <verbatimText verbatimStyle="vs14">weather</verbatimText> condition which is not explicitly used within the data module, and therefore will not be validated against in the default standalone check. When <verbatimText verbatimStyle="vs14">weather</verbatimText> has a value of <verbatimText verbatimStyle="vs14">Normal</verbatimText>, the cross-reference in the last step in the example above becomes broken.</para>
+          <para>To catch errors with implicit applicability, the full check (-a) can be used instead, which reads the values to check not from the data module itself, but from the ACT and CCT referenced by the data module:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -a <DM>
+s1kd-appcheck: ERROR: <DM> is invalid when:
+s1kd-appcheck: ERROR:   condition weather = Normal]]></verbatimText>
+          </para>
+          <para>This can also be fixed by making the applicability of the data module explicit:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
+<displayText>
+<simplePara>Weather: Normal or Weather: Icy or
+Weather: Hot</simplePara>
+</displayText>
+<evaluate andOr="or">
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Normal"/>
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Icy"/>
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Hot"/>
+</evaluate>
+</applic>]]></verbatimText>
+          </para>
+          <para>In which case, the standalone check will now also detect the error:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
+s1kd-appcheck: ERROR: <DM> is invalid when:
+s1kd-appcheck: ERROR:   condition weather = Normal]]></verbatimText>
+          </para>
+        </levelledPara>
       </levelledPara>
     </description>
   </content>
