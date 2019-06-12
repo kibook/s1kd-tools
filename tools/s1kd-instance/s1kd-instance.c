@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.3.2"
+#define VERSION "3.4.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -36,7 +36,7 @@
 #define S_MISSING_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define S_BAD_TYPE ERR_PREFIX "Cannot automatically name unsupported object types.\n"
 #define S_BAD_XML ERR_PREFIX "%s does not contain valid XML. If it is a list, specify the -L option.\n"
-#define S_MISSING_ANDOR ERR_PREFIX "Element evaluate missing required attribute andOr.\n"
+#define S_MISSING_ANDOR ERR_PREFIX "Evaluate has no operator.\n"
 #define S_BAD_CODE ERR_PREFIX "Bad %s code: %s.\n"
 #define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
@@ -69,6 +69,9 @@ char *search_dir;
 
 /* Tag non-applicable elements instead of deleting them. */
 bool tag_non_applic = false;
+
+/* Remove display text from annotations which are modified in -A mode. */
+bool clean_disp_text = false;
 
 /* Convenient structure for all strings related to uniquely identifying a
  * CSDB object.
@@ -609,26 +612,24 @@ bool eval_assert(xmlNodePtr assert, bool assume)
 /* Test whether an <evaluate> element is applicable. */
 bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 {
-	char *op;
-
+	xmlChar *op;
 	bool ret;
-
 	xmlNodePtr cur;
 
-	op = (char *) xmlGetProp(evaluate, BAD_CAST "andOr");
+	op = first_xpath_value(NULL, evaluate, BAD_CAST "@andOr|@operator");
 
 	if (!op) {
 		fprintf(stderr, S_MISSING_ANDOR);
 		exit(EXIT_BAD_XML);
 	}
 
-	ret = strcmp(op, "and") == 0;
+	ret = xmlStrcmp(op, BAD_CAST "and") == 0;
 
 	for (cur = evaluate->children; cur; cur = cur->next) {
-		if (strcmp((char *) cur->name, "assert") == 0 || strcmp((char *) cur->name, "evaluate") == 0) {
-			if (strcmp(op, "and") == 0) {
+		if (xmlStrcmp(cur->name, BAD_CAST "assert") == 0 || xmlStrcmp(cur->name, BAD_CAST "evaluate") == 0) {
+			if (xmlStrcmp(op, BAD_CAST "and") == 0) {
 				ret = ret && eval_applic(cur, assume);
-			} else if (strcmp(op, "or") == 0) {
+			} else if (xmlStrcmp(op, BAD_CAST "or") == 0) {
 				ret = ret || eval_applic(cur, assume);
 			}
 		}
@@ -776,25 +777,47 @@ void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	}
 }
 
+/* Remove display text from the containing annotation. */
+void rem_disp_text(xmlNodePtr node)
+{
+	xmlNodePtr disptext;
+
+	disptext = first_xpath_node(NULL, node, BAD_CAST "ancestor::applic/*[self::displayText or self::displaytext]");
+
+	if (disptext) {
+		xmlUnlinkNode(disptext);
+		xmlFreeNode(disptext);
+	}
+}
+
 /* Remove applic statements or parts of applic statements where all assertions
- * are unambigously true or false */
+ * are unambigously true or false.
+ *
+ * Returns true if the whole annotation is removed, or false if only parts of
+ * it are removed.
+ */
 bool simpl_applic(xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
-	if (strcmp((char *) node->name, "applic") == 0) {
+	if (xmlStrcmp(node->name, BAD_CAST "applic") == 0) {
 		if (eval_applic_stmt(node, false) || !eval_applic_stmt(node, true)) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
 			return true;
 		}
-	} else if (strcmp((char *) node->name, "evaluate") == 0) {
+	} else if (xmlStrcmp(node->name, BAD_CAST "evaluate") == 0) {
 		if (eval_applic(node, false) || !eval_applic(node, true)) {
+			if (clean_disp_text) {
+				rem_disp_text(node);
+			}
+
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
+
 			return false;
 		}
-	} else if (strcmp((char *) node->name, "assert") == 0) {
+	} else if (xmlStrcmp(node->name, BAD_CAST "assert") == 0) {
 		xmlNodePtr ident_attr  = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyIdent|@actidref");
 		xmlNodePtr type_attr   = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyType|@actreftype");
 		xmlNodePtr values_attr = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyValues|@actvalues");
@@ -810,8 +833,13 @@ bool simpl_applic(xmlNodePtr node)
 		xmlFree(values);
 
 		if (uneeded) {
+			if (clean_disp_text) {
+				rem_disp_text(node);
+			}
+
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
+
 			return false;
 		}
 	}
@@ -2626,6 +2654,7 @@ void show_help(void)
 	puts("  -h, -?, --help                    Show this help/usage message.");
 	puts("  -I, --date <date>                 Set the issue date of the instance (- for current date).");
 	puts("  -i, --infoname <infoName>         Give the data module instance a different infoName.");
+	puts("  -J, --clean-display-text          Remove display text from simplified annotations (-A).");
 	puts("  -j, --clean-ents                  Remove unused external entities (such as ICNs)");
 	puts("  -k, --skill <level>               Set the skill level of the instance.");
 	puts("  -K, --skill-levels <levels>       Filter on the specified skill levels.");
@@ -2735,59 +2764,60 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cirs, cir;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:jK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!1:2:~";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!1:2:~";
 	struct option lopts[] = {
-		{"version"         , no_argument      , 0, 0},
-		{"help"            , no_argument      , 0, 'h'},
-		{"remove-unused"   , no_argument      , 0, 'a'},
-		{"simplify"        , no_argument      , 0, 'A'},
-		{"code"            , required_argument, 0, 'c'},
-		{"comment"         , required_argument, 0, 'C'},
-		{"dump"            , required_argument, 0, 'D'},
-		{"dir"             , required_argument, 0, 'd'},
-		{"no-extension"    , no_argument      , 0, 'E'},
-		{"extension"       , required_argument, 0, 'e'},
-		{"flatten-alts"    , no_argument      , 0, 'F'},
-		{"overwrite"       , no_argument      , 0, 'f'},
-		{"set-orig"        , no_argument      , 0, 'g'},
-		{"custom-orig"     , required_argument, 0, 'G'},
-		{"infoname"        , required_argument, 0, 'i'},
-		{"date"            , required_argument, 0, 'I'},
-		{"clean-ents"      , no_argument      , 0, 'j'},
-		{"skill-levels"    , required_argument, 0, 'K'},
-		{"skill"           , required_argument, 0, 'k'},
-		{"list"            , no_argument      , 0, 'L'},
-		{"language"        , required_argument, 0, 'l'},
-		{"remarks"         , required_argument, 0, 'm'},
-		{"omit-issue"      , no_argument      , 0, 'N'},
-		{"issue"           , required_argument, 0, 'n'},
-		{"outdir"          , required_argument, 0, 'O'},
-		{"out"             , required_argument, 0, 'o'},
-		{"pct"             , required_argument, 0, 'P'},
-		{"product"         , required_argument, 0, 'p'},
-		{"cir"             , required_argument, 0, 'R'},
-		{"recursive"       , no_argument      , 0, 'r'},
-		{"no-source-ident" , no_argument      , 0, 'S'},
-		{"assign"          , required_argument, 0, 's'},
-		{"tag"             , no_argument      , 0, 'T'},
-		{"techname"        , required_argument, 0, 't'},
-		{"security-classes", required_argument, 0, 'U'},
-		{"security"        , required_argument, 0, 'u'},
-		{"verbose"         , no_argument      , 0, 'v'},
-		{"set-applic"      , no_argument      , 0, 'W'},
-		{"whole-objects"   , no_argument      , 0, 'w'},
-		{"comment-xpath"   , required_argument, 0, 'X'},
-		{"xsl"             , required_argument, 0, 'x'},
-		{"applic"          , required_argument, 0, 'Y'},
-		{"update-applic"   , no_argument      , 0 ,'y'},
-		{"add-required"    , no_argument      , 0, 'Z'},
-		{"issue-type"      , required_argument, 0, 'z'},
-		{"update-instances", no_argument      , 0, '@'},
-		{"read-only"       , no_argument      , 0, '%'},
-		{"no-infoname"     , no_argument      , 0, '!'},
-		{"act"             , required_argument, 0, '1'},
-		{"cct"             , required_argument, 0, '2'},
-		{"dependencies"    , no_argument      , 0, '~'},
+		{"version"           , no_argument      , 0, 0},
+		{"help"              , no_argument      , 0, 'h'},
+		{"remove-unused"     , no_argument      , 0, 'a'},
+		{"simplify"          , no_argument      , 0, 'A'},
+		{"code"              , required_argument, 0, 'c'},
+		{"comment"           , required_argument, 0, 'C'},
+		{"dump"              , required_argument, 0, 'D'},
+		{"dir"               , required_argument, 0, 'd'},
+		{"no-extension"      , no_argument      , 0, 'E'},
+		{"extension"         , required_argument, 0, 'e'},
+		{"flatten-alts"      , no_argument      , 0, 'F'},
+		{"overwrite"         , no_argument      , 0, 'f'},
+		{"set-orig"          , no_argument      , 0, 'g'},
+		{"custom-orig"       , required_argument, 0, 'G'},
+		{"infoname"          , required_argument, 0, 'i'},
+		{"date"              , required_argument, 0, 'I'},
+		{"clean-display-text", no_argument      , 0, 'J'},
+		{"clean-ents"        , no_argument      , 0, 'j'},
+		{"skill-levels"      , required_argument, 0, 'K'},
+		{"skill"             , required_argument, 0, 'k'},
+		{"list"              , no_argument      , 0, 'L'},
+		{"language"          , required_argument, 0, 'l'},
+		{"remarks"           , required_argument, 0, 'm'},
+		{"omit-issue"        , no_argument      , 0, 'N'},
+		{"issue"             , required_argument, 0, 'n'},
+		{"outdir"            , required_argument, 0, 'O'},
+		{"out"               , required_argument, 0, 'o'},
+		{"pct"               , required_argument, 0, 'P'},
+		{"product"           , required_argument, 0, 'p'},
+		{"cir"               , required_argument, 0, 'R'},
+		{"recursive"         , no_argument      , 0, 'r'},
+		{"no-source-ident"   , no_argument      , 0, 'S'},
+		{"assign"            , required_argument, 0, 's'},
+		{"tag"               , no_argument      , 0, 'T'},
+		{"techname"          , required_argument, 0, 't'},
+		{"security-classes"  , required_argument, 0, 'U'},
+		{"security"          , required_argument, 0, 'u'},
+		{"verbose"           , no_argument      , 0, 'v'},
+		{"set-applic"        , no_argument      , 0, 'W'},
+		{"whole-objects"     , no_argument      , 0, 'w'},
+		{"comment-xpath"     , required_argument, 0, 'X'},
+		{"xsl"               , required_argument, 0, 'x'},
+		{"applic"            , required_argument, 0, 'Y'},
+		{"update-applic"     , no_argument      , 0 ,'y'},
+		{"add-required"      , no_argument      , 0, 'Z'},
+		{"issue-type"        , required_argument, 0, 'z'},
+		{"update-instances"  , no_argument      , 0, '@'},
+		{"read-only"         , no_argument      , 0, '%'},
+		{"no-infoname"       , no_argument      , 0, '!'},
+		{"act"               , required_argument, 0, '1'},
+		{"cct"               , required_argument, 0, '2'},
+		{"dependencies"      , no_argument      , 0, '~'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2855,6 +2885,9 @@ int main(int argc, char **argv)
 				break;
 			case 'I':
 				strncpy(issdate, optarg, 15);
+				break;
+			case 'J':
+				clean_disp_text = true;
 				break;
 			case 'j':
 				clean_ents = true;

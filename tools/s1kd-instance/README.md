@@ -147,6 +147,9 @@ be used.
 -i, --infoname &lt;infoName&gt;  
 Give the data module instance a different infoName.
 
+-J, --clean-display-text  
+Remove display text from annotations which are simplified in -A mode.
+
 -j, --clean-ents  
 After filtering, remove external entities (such as ICNs) which are no
 longer used from the resulting instances.
@@ -578,9 +581,13 @@ the weather.
 > The -A option may change the *meaning* of certain applicability
 > annotations without changing the *display text*. Display text is
 > always left untouched, so using this option may cause display text to
-> be technically incorrect. This option is best used when display text
-> will be automatically generated after filtering, such as with the
-> s1kd-aspp tool.
+> be technically incorrect.
+>
+> This option is best used when display text will be automatically
+> generated after filtering, such as with the s1kd-aspp tool. The -J
+> option of this tool can be combined with the -k option of the
+> s1kd-aspp tool to only generate display text for annotations which are
+> modified.
 
 Applicability of an instance (-W, -Y, -y)
 -----------------------------------------
