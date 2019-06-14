@@ -20,12 +20,15 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.0.0"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define WRN_PREFIX PROG_NAME ": WARNING: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+
+#define W_MISSING_REF WRN_PREFIX "Could not read referenced object: %s\n"
 
 #define I_PROCESS INF_PREFIX "Processing %s...\n"
 
@@ -53,6 +56,9 @@ bool overwriteDispText = true;
 
 /* Verbose output. */
 bool verbose = false;
+
+/* Assume objects were created with -N. */
+bool no_issue = false;
 
 /* Delimiter for format strings. */
 #define FMTSTR_DELIM '%'
@@ -473,19 +479,23 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 	xmlFree(learn_code);
 	xmlFree(learn_event_code);
 
-	if (issueInfo) {
-		char *issue_number;
-		char *in_work;
-		char iss[8];
+	if (!no_issue) {
+		if (issueInfo) {
+			char *issue_number;
+			char *in_work;
+			char iss[8];
 
-		issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
-		in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
+			issue_number = (char *) first_xpath_value(NULL, issueInfo, "@issno|@issueNumber");
+			in_work      = (char *) first_xpath_value(NULL, issueInfo, "@inwork|@inWork");
 
-		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
-		strcat(code, iss);
+			snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
+			strcat(code, iss);
 
-		xmlFree(issue_number);
-		xmlFree(in_work);
+			xmlFree(issue_number);
+			xmlFree(in_work);
+		} else if (language) {
+			strcat(code, "_\?\?\?-\?\?");
+		}
 	}
 
 	if (language) {
@@ -503,7 +513,12 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		xmlFree(country_iso_code);
 	}
 
-	return find_csdb_object(dst, search_dir, code, is_dm, recursive_search);
+	if (find_csdb_object(dst, search_dir, code, is_dm, recursive_search)) {
+		return true;
+	}
+
+	fprintf(stderr, W_MISSING_REF, code);
+	return false;
 }
 
 /* Find the filename of a referenced ACT data module. */
@@ -674,7 +689,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:F:fG:gklprvxh?";
+	const char *sopts = "A:a:C:cDd:F:fG:gklNprvxh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -690,6 +705,7 @@ int main(int argc, char **argv)
 		{"generate"    , no_argument      , 0, 'g'},
 		{"keep"        , no_argument      , 0, 'k'},
 		{"list"        , no_argument      , 0, 'l'},
+		{"omit-issue"  , no_argument      , 0, 'N'},
 		{"presentation", no_argument      , 0, 'p'},
 		{"recursive"   , no_argument      , 0, 'r'},
 		{"verbose"     , no_argument      , 0, 'v'},
@@ -759,6 +775,9 @@ int main(int argc, char **argv)
 				break;
 			case 'l':
 				islist = true;
+				break;
+			case 'N':
+				no_issue = true;
 				break;
 			case 'p':
 				process = true;

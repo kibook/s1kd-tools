@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.9.0"
+#define VERSION "2.9.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -340,23 +340,27 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 	xmlFree(learnEventCode);
 
 	if (fullMatch) {
-		if (issueInfo && !noIssue) {
-			char *issueNumber, *inWork;
+		if (!noIssue) {
+			if (issueInfo) {
+				char *issueNumber, *inWork;
 
-			issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
-			inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
+				issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
+				inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
 
-			if (!inWork) {
-				inWork = strdup("00");
+				if (!inWork) {
+					inWork = strdup("00");
+				}
+
+				strcat(dst, "_");
+				strcat(dst, issueNumber);
+				strcat(dst, "-");
+				strcat(dst, inWork);
+
+				xmlFree(issueNumber);
+				xmlFree(inWork);
+			} else if (language) {
+				strcat(dst, "_\?\?\?-\?\?");
 			}
-
-			strcat(dst, "_");
-			strcat(dst, issueNumber);
-			strcat(dst, "-");
-			strcat(dst, inWork);
-
-			xmlFree(issueNumber);
-			xmlFree(inWork);
 		}
 
 		if (language) {
@@ -439,19 +443,23 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 	xmlFree(pmVolume);
 
 	if (fullMatch) {
-		if (issueInfo && !noIssue) {
-			char *issueNumber, *inWork;
+		if (!noIssue) {
+			if (issueInfo) {
+				char *issueNumber, *inWork;
 
-			issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
-			inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
+				issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
+				inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
 
-			strcat(dst, "_");
-			strcat(dst, issueNumber);
-			strcat(dst, "-");
-			strcat(dst, inWork);
+				strcat(dst, "_");
+				strcat(dst, issueNumber);
+				strcat(dst, "-");
+				strcat(dst, inWork);
 
-			xmlFree(issueNumber);
-			xmlFree(inWork);
+				xmlFree(issueNumber);
+				xmlFree(inWork);
+			} else if (language) {
+				strcat(dst, "_\?\?\?-\?\?");
+			}
 		}
 
 		if (language) {

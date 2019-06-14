@@ -96,7 +96,7 @@
   <xsl:template name="applicPropertyVal">
     <xsl:param name="id" select="@applicPropertyIdent|@actidref"/>
     <xsl:param name="type" select="@applicPropertyType|@actreftype"/>
-    <xsl:variable name="prop" select="//productAttribute[$type='prodattr' and @id=$id]|//prodattr[$type='prodattr' and @id=$id]|//cond[$type='condition' and @id=$id]|//condition[$type='condition' and @id=$id]"/>
+    <xsl:variable name="prop" select="//productAttribute[$type='prodattr' and @id=$id]|//prodattr[$type='prodattr' and @id=$id]|//condType[$type='condition' and @id=//cond[@id=$id]/@condTypeRefId]|//condition[$type='condition' and @id=//cond[@id=$id]/@condtyperef]"/>
     <xsl:variable name="values" select="@applicPropertyValues|@actvalues"/>
     <xsl:variable name="label" select="$prop/enumeration[@applicPropertyValues=$values]/@enumerationLabel"/>
     <xsl:choose>

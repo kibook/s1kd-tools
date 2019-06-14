@@ -76,15 +76,8 @@ bool isdir(const char *path, bool recursive);
 /* Free an XML entity. From libxml2, but not exposed by the API. */
 void xmlFreeEntity(xmlEntityPtr entity);
 
-/* Compare the codes of two CSDB objects. */
-int codecmp(const char *p1, const char *p2);
-
 /* Find a CSDB object in a directory hierarchy based on its code. */
 bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive);
-
-/* Convert string to double. Returns true if the string contained only a double
- * value or false if it contained extra content. */
-bool strtodbl(double *d, const char *s);
 
 /* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
 bool is_in_range(const char *value, const char *range);
@@ -121,9 +114,6 @@ xmlDocPtr read_xml_mem(const char *buffer, int size);
 
 /* Save an XML document to a file. */
 int save_xml_doc(xmlDocPtr doc, const char *path);
-
-/* Return the first node matching an XPath expression. */
-xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path);
 
 /* Add CCT dependencies to an object's annotations. */
 void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);

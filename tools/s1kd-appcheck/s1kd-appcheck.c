@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -163,7 +163,7 @@ bool is_dm(const char *name)
 
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
-bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
+bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 {
 	bool found = false;
 	char *model_ident_code;
@@ -234,22 +234,26 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 	xmlFree(learn_code);
 	xmlFree(learn_event_code);
 
-	if (issueInfo && !(no_issue || ignore_iss)) {
-		char *issue_number;
-		char *in_work;
-		char iss[8];
+	if (!no_issue) {
+		if (issueInfo) {
+			char *issue_number;
+			char *in_work;
+			char iss[8];
 
-		issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
-		in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
+			issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
+			in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
 
-		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
-		strcat(code, iss);
+			snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
+			strcat(code, iss);
 
-		xmlFree(issue_number);
-		xmlFree(in_work);
+			xmlFree(issue_number);
+			xmlFree(in_work);
+		} else if (language) {
+			strcat(code, "_\?\?\?-\?\?");
+		}
 	}
 
-	if (language && !ignore_iss) {
+	if (language) {
 		char *language_iso_code;
 		char *country_iso_code;
 		char lang[8];
@@ -282,7 +286,7 @@ bool find_act_fname(char *dst, const char *useract, xmlDocPtr doc)
 	} else if (doc) {
 		xmlNodePtr actref;
 		actref = first_xpath_node(doc, NULL, BAD_CAST "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
-		return actref && find_dmod_fname(dst, actref, false);
+		return actref && find_dmod_fname(dst, actref);
 	}
 
 	return false;
@@ -297,7 +301,7 @@ bool find_cct_fname(char *dst, const char *usercct, xmlDocPtr act)
 	} else if (act) {
 		xmlNodePtr cctref;
 		cctref = first_xpath_node(act, NULL, BAD_CAST "//condCrossRefTableRef/dmRef/dmRefIdent|//cctref/refdm");
-		return cctref && find_dmod_fname(dst, cctref, false);
+		return cctref && find_dmod_fname(dst, cctref);
 	}
 
 	return false;
@@ -312,7 +316,7 @@ bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 	} else if (act) {
 		xmlNodePtr pctref;
 		pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
-		return pctref && find_dmod_fname(dst, pctref, false);
+		return pctref && find_dmod_fname(dst, pctref);
 	}
 
 	return false;

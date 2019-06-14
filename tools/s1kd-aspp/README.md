@@ -9,7 +9,7 @@ SYNOPSIS
     s1kd-aspp -h?
     s1kd-aspp -D
     s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
-                 [-cfklrv] [<object>...]
+                 [-cfklNrv] [<object>...]
     s1kd-aspp -p [-a <ID>] [-flv] [<object>...]
 
 DESCRIPTION
@@ -87,6 +87,10 @@ statements, only generate display text for statements which have none.
 -l, --list  
 Treat input (stdin or arguments) as lists of filenames of objects,
 rather than objects themselves.
+
+-N, --omit-issue  
+Assume that the filenames for the ACT and CCT do not include issue info,
+i.e. they were created using the -N option of the s1kd-newdm tool.
 
 -p, --presentation  
 Preprocess applicability statements to produce "presentation"

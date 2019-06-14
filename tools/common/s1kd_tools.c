@@ -230,7 +230,7 @@ void xmlFreeEntity(xmlEntityPtr entity)
 }
 
 /* Compare the codes of two CSDB objects. */
-int codecmp(const char *p1, const char *p2)
+static int codecmp(const char *p1, const char *p2)
 {
 	char s1[PATH_MAX], s2[PATH_MAX], *b1, *b2;
 
@@ -243,12 +243,27 @@ int codecmp(const char *p1, const char *p2)
 	return strcasecmp(b1, b2);
 }
 
+/* Match a string with a pattern case-insensitively, using ? as a wildcard. */
+static bool strmatch(const char *p, const char *s)
+{
+	int ip, is;
+
+	for (ip = 0, is = 0; p[ip] && s[is]; ++ip, ++is) {
+		if (p[ip] != '?') {
+			if (tolower(p[ip]) != tolower(s[is])) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 /* Find a CSDB object in a directory hierarchy based on its code. */
 bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
-	int n;
 	bool found = false;
 	int len = strlen(path);
 	char fpath[PATH_MAX], cpath[PATH_MAX];
@@ -270,8 +285,6 @@ bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(
 		strcpy(fpath, path);
 	}
 
-	n = strlen(code);
-
 	while ((cur = readdir(dir))) {
 		strcpy(cpath, fpath);
 		strcat(cpath, cur->d_name);
@@ -283,7 +296,7 @@ bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(
 				strcpy(dst, tmp);
 				found = true;
 			}
-		} else if ((!is || is(cur->d_name)) && strncasecmp(cur->d_name, code, n) == 0) {
+		} else if ((!is || is(cur->d_name)) && strmatch(code, cur->d_name)) {
 			if (!found || codecmp(cpath, dst) > 0) {
 				strcpy(dst, cpath);
 				found = true;
@@ -298,7 +311,7 @@ bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(
 
 /* Convert string to double. Returns true if the string contained only a
  * correct double value or false if it contained extra content. */
-bool strtodbl(double *d, const char *s)
+static bool strtodbl(double *d, const char *s)
 {
 	char *e;
 	*d = strtod(s, &e);
@@ -489,7 +502,7 @@ int save_xml_doc(xmlDocPtr doc, const char *path)
 }
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+static xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;

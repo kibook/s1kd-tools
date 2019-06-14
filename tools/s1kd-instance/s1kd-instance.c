@@ -1401,9 +1401,10 @@ void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 }
 
 /* Set the language/country for the data module instance */
-void set_lang(xmlDocPtr doc, char *lang)
+void set_lang(xmlDocPtr doc, const char *lang)
 {
 	xmlNodePtr language;
+	char *l;
 	char *language_iso_code;
 	char *country_iso_code;
 	enum issue iss;
@@ -1422,7 +1423,8 @@ void set_lang(xmlDocPtr doc, char *lang)
 		return;
 	}
 
-	language_iso_code = strtok(lang, "-");
+	l = strdup(lang);
+	language_iso_code = strtok(l, "-");
 	country_iso_code = strtok(NULL, "");
 
 	lowercase(language_iso_code);
@@ -1430,6 +1432,8 @@ void set_lang(xmlDocPtr doc, char *lang)
 
 	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "language" : "languageIsoCode"), BAD_CAST language_iso_code);
 	xmlSetProp(language, BAD_CAST (iss == ISS_30 ? "country" : "countryIsoCode"), BAD_CAST country_iso_code);
+
+	free(l);
 }
 
 bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool noiss)
@@ -1904,14 +1908,16 @@ xmlNodePtr find_or_create_orig(xmlDocPtr doc)
  * Otherwise, origspec is a string in the form of "CODE/NAME", where CODE is
  * the NCAGE code and NAME is the enterprise name.
  */
-void set_orig(xmlDocPtr doc, char *origspec)
+void set_orig(xmlDocPtr doc, const char *origspec)
 {
 	xmlNodePtr originator;
 	const char *code, *name;
 	enum issue iss;
+	char *s;
 
 	if (origspec) {
-		code = strtok(origspec, "/");
+		s = strdup(origspec);
+		code = strtok(s, "/");
 		name = strtok(NULL, "");
 	} else {
 		code = DEFAULT_ORIG_CODE;
@@ -1946,6 +1952,10 @@ void set_orig(xmlDocPtr doc, char *origspec)
 				xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
 			}
 		}
+	}
+
+	if (origspec) {
+		free(s);
 	}
 }
 
@@ -2268,7 +2278,6 @@ bool is_dm(const char *name)
  * element. */
 bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 {
-	bool found = false;
 	char *model_ident_code;
 	char *system_diff_code;
 	char *system_code;
@@ -2337,22 +2346,26 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 	xmlFree(learn_code);
 	xmlFree(learn_event_code);
 
-	if (issueInfo && !(no_issue || ignore_iss)) {
-		char *issue_number;
-		char *in_work;
-		char iss[8];
+	if (!no_issue) {
+		if (!ignore_iss && issueInfo) {
+			char *issue_number;
+			char *in_work;
+			char iss[8];
 
-		issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
-		in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
+			issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
+			in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
 
-		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
-		strcat(code, iss);
+			snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
+			strcat(code, iss);
 
-		xmlFree(issue_number);
-		xmlFree(in_work);
+			xmlFree(issue_number);
+			xmlFree(in_work);
+		} else if (language) {
+			strcat(code, "_\?\?\?-\?\?");
+		}
 	}
 
-	if (language && !ignore_iss) {
+	if (language) {
 		char *language_iso_code;
 		char *country_iso_code;
 		char lang[8];
@@ -2367,13 +2380,12 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 		xmlFree(country_iso_code);
 	}
 
-	found = find_csdb_object(dst, search_dir, code, is_dm, recursive_search);
-
-	if (!found) {
-		fprintf(stderr, S_MISSING_REF_DM, code);
+	if (find_csdb_object(dst, search_dir, code, is_dm, recursive_search)) {
+		return true;
 	}
 
-	return found;
+	fprintf(stderr, S_MISSING_REF_DM, code);
+	return false;
 }
 
 /* Determine if the file is a publication module. */
@@ -2386,7 +2398,6 @@ bool is_pm(const char *name)
  * element. */
 bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
 {
-	bool found = false;
 	char *model_ident_code;
 	char *pm_issuer;
 	char *pm_number;
@@ -2414,22 +2425,26 @@ bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
 	xmlFree(pm_number);
 	xmlFree(pm_volume);
 
-	if (issueInfo && !(no_issue || ignore_iss)) {
-		char *issue_number;
-		char *in_work;
-		char iss[8];
+	if (!no_issue) {
+		if (!ignore_iss && issueInfo) {
+			char *issue_number;
+			char *in_work;
+			char iss[8];
 
-		issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
-		in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
+			issue_number = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@issno|@issueNumber");
+			in_work      = (char *) first_xpath_value(NULL, issueInfo, BAD_CAST "@inwork|@inWork");
 
-		snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
-		strcat(code, iss);
+			snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
+			strcat(code, iss);
 
-		xmlFree(issue_number);
-		xmlFree(in_work);
+			xmlFree(issue_number);
+			xmlFree(in_work);
+		} else if (language) {
+			strcat(code, "_\?\?\?-\?\?");
+		}
 	}
 
-	if (language && !ignore_iss) {
+	if (language) {
 		char *language_iso_code;
 		char *country_iso_code;
 		char lang[8];
@@ -2444,13 +2459,12 @@ bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
 		xmlFree(country_iso_code);
 	}
 
-	found = find_csdb_object(dst, search_dir, code, is_pm, recursive_search);
-
-	if (!found) {
-		fprintf(stderr, S_MISSING_REF_DM, code);
+	if (find_csdb_object(dst, search_dir, code, is_pm, recursive_search)) {
+		return true;
 	}
 
-	return found;
+	fprintf(stderr, S_MISSING_REF_DM, code);
+	return false;
 }
 
 /* Find the filename of a referenced ACT data module. */

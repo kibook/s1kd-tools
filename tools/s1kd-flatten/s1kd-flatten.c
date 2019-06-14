@@ -12,10 +12,12 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.4.0"
+#define VERSION "2.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define WRN_PREFIX PROG_NAME ": WARNING: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
+#define W_MISSING_REF WRN_PREFIX "Could not read referenced object: %s\n"
 #define EXIT_BAD_PM 1
 #define EXIT_BAD_CODE 2
 
@@ -153,13 +155,20 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 
 	snprintf(pm_fname, PATH_MAX, "PMC-%s", pmc);
 
-	if (issue_info && !no_issue) {
-		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
-		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
+	if (!no_issue) {
 		strcpy(pm_fname_temp, pm_fname);
 
-		if (snprintf(pm_fname, PATH_MAX, "%s_%s-%s", pm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
-			exit(EXIT_BAD_CODE);
+		if (issue_info) {
+			issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
+			in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
+
+			if (snprintf(pm_fname, PATH_MAX, "%s_%s-%s", pm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
+				exit(EXIT_BAD_CODE);
+			}
+		} else if (language) {
+			if (snprintf(pm_fname, PATH_MAX, "%s_\?\?\?-\?\?", pm_fname_temp) < 0) {
+				exit(EXIT_BAD_CODE);
+			}
 		}
 	}
 
@@ -233,6 +242,8 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 					xmlFreeDoc(doc);
 				}
 			}
+		} else if (flatten_ref) {
+			fprintf(stderr, W_MISSING_REF, pm_fname);
 		}
 
 		xmlFree(path);
@@ -309,13 +320,20 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 
 	snprintf(dm_fname, PATH_MAX, "DMC-%s", dmc);
 
-	if (issue_info && !no_issue) {
-		issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
-		in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
+	if (!no_issue) {
 		strcpy(dm_fname_temp, dm_fname);
 
-		if (snprintf(dm_fname, PATH_MAX, "%s_%s-%s", dm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
-			exit(EXIT_BAD_CODE);
+		if (issue_info) {
+			issue_number = first_xpath_string(NULL, issue_info, "@issueNumber|@issno");
+			in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
+
+			if (snprintf(dm_fname, PATH_MAX, "%s_%s-%s", dm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
+				exit(EXIT_BAD_CODE);
+			}
+		} else if (language) {
+			if (snprintf(dm_fname, PATH_MAX, "%s_\?\?\?-\?\?", dm_fname_temp) < 0) {
+				exit(EXIT_BAD_CODE);
+			}
 		}
 	}
 
@@ -411,6 +429,8 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 					xmlFreeDoc(doc);
 				}
 			}
+		} else if (flatten_ref) {
+			fprintf(stderr, W_MISSING_REF, dm_fname);
 		}
 
 		xmlFree(path);

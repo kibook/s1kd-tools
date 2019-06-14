@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="01"/>
+        <issueInfo issueNumber="017" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="30"/>
+        <issueDate year="2019" month="06" day="13"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -N option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,10 +52,10 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-aspp -h?
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-aspp -h?
 s1kd-aspp -D
 s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
-             [-cfklrv] [<object>...]
+             [-cfklNrv] [<object>...]
 s1kd-aspp -p [-a <ID>] [-flv] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -152,6 +155,12 @@ s1kd-aspp -p [-a <ID>] [-flv] [<object>...]]]></verbatimText>
               <listItemTerm>-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of objects, rather than objects themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the filenames for the ACT and CCT do not include issue info, i.e. they were created using the -N option of the s1kd-newdm tool.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
