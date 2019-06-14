@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.4.1"
+#define VERSION "2.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1997,7 +1997,8 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 				if (!e) break;
 				n = e - k;
 
-				bname = basename((s = strdup(fname)));
+				s = strdup(fname);
+				bname = basename(s);
 
 				if (strncmp(k, "path", n) == 0) {
 					show_path(fname, -1);
@@ -2141,7 +2142,8 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	if (!err) {
 		char *s, *bname;
 
-		bname = basename((s = strdup(fname)));
+		s = strdup(fname);
+		bname = basename(s);
 
 		if (fmtstr) {
 			err = show_metadata_fmtstr(fname, ctxt, fmtstr);
