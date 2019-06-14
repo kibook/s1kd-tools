@@ -20,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.1.0"
+#define VERSION "3.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "

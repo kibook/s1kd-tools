@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.4.1"
+#define VERSION "2.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "

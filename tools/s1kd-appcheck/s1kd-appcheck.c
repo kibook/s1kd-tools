@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "3.0.1"
+#define VERSION "3.0.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "

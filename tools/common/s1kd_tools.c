@@ -246,14 +246,15 @@ static int codecmp(const char *p1, const char *p2)
 /* Match a string with a pattern case-insensitively, using ? as a wildcard. */
 static bool strmatch(const char *p, const char *s)
 {
-	int ip, is;
+	const unsigned char *cp = (const unsigned char *) p;
+	const unsigned char *cs = (const unsigned char *) s;
 
-	for (ip = 0, is = 0; p[ip] && s[is]; ++ip, ++is) {
-		if (p[ip] != '?') {
-			if (tolower(p[ip]) != tolower(s[is])) {
-				return false;
-			}
+	while (*cp) {
+		if (tolower(*cp) != tolower(*cs) && *cp != '?') {
+			return false;
 		}
+		++cp;
+		++cs;
 	}
 
 	return true;

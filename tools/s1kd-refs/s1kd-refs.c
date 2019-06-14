@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.9.1"
+#define VERSION "2.9.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "

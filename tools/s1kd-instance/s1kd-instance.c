@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.4.1"
+#define VERSION "3.4.2"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
