@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.9.2"
+#define VERSION "2.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -96,6 +96,16 @@ bool verbose = false;
 
 /* External pub list. */
 xmlDocPtr externalPubs = NULL;
+
+/* Allow matching of filenames which only start with the code.
+ *
+ * If this is false, then the filenames must match the exact code up to the
+ * extension (last .)
+ *
+ * For example, with loose matching a code of ABC would match a file named
+ * ABC_001.PDF, while without loose matching it will not.
+ */
+bool looseMatch = true;
 
 /* Return the first node matching an XPath expression. */
 xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
@@ -884,6 +894,13 @@ void tagUnmatchedRef(xmlNodePtr ref)
 
 int listReferences(const char *path);
 
+/* Match a code to a file name. */
+bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
+{
+	return find_csdb_object(dst, dir, code, NULL, recursive) &&
+		(looseMatch || strrchr(dst, '.') - dst == strlen(code));
+}
+
 /* Print a reference found in an object. */
 int printReference(xmlNodePtr *refptr, const char *src)
 {
@@ -919,7 +936,7 @@ int printReference(xmlNodePtr *refptr, const char *src)
 	else
 		return 0;
 
-	if (find_csdb_object(fname, directory, code, NULL, recursive)) {
+	if (find_object_fname(fname, directory, code, recursive)) {
 		if (updateRefs) {
 			updateRef(refptr, src, code, fname);
 		} else if (!tagUnmatched) {
@@ -1078,7 +1095,7 @@ int listReferencesInList(const char *path)
 /* Display the usage message. */
 void showHelp(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGIilNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGIilmNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                  Print unmatched codes.");
@@ -1095,6 +1112,7 @@ void showHelp(void)
 	puts("  -I, --update-issue         Update references to point to the latest matched object.");
 	puts("  -i, --ignore-issue         Ignore issue info/language when matching.");
 	puts("  -l, --list                 Treat input as list of CSDB objects.");
+	puts("  -m, --strict-match         Be more strict when matching filenames of objects.");
 	puts("  -N, --omit-issue           Assume filenames omit issue info.");
 	puts("  -n, --lineno               Print the source filename and line number for each reference.");
 	puts("  -o, --output-valid         Output valid CSDB objects to stdout.");
@@ -1130,7 +1148,7 @@ int main(int argc, char **argv)
 	bool inclLineNum = false;
 	char extpubsFname[PATH_MAX] = "";
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:h?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1160,6 +1178,7 @@ int main(int argc, char **argv)
 		{"include-src"  , no_argument      , 0, 's'},
 		{"output-valid" , no_argument      , 0, 'o'},
 		{"verbose"      , no_argument      , 0, 'v'},
+		{"strict-match" , no_argument      , 0, 'm'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1257,6 +1276,9 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				verbose = true;
+				break;
+			case 'm':
+				looseMatch = false;
 				break;
 			case 'h':
 			case '?':

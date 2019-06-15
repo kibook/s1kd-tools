@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGIilNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
+    s1kd-refs [-aCcDEFfGIilmNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
               [<object>...]
 
 DESCRIPTION
@@ -81,6 +81,12 @@ they were created with the -N option to the s1kd-new\* tools.
 Include the filename of the source object where each reference was
 found, and display the line number where the reference occurs in the
 source file after its filename.
+
+-m, --strict-match  
+Be more strict when matching codes of CSDB objects to filenames. By
+default, the name of a file (minus the extension) only needs to start
+with the code to be matched. When this option is specified, the name
+must match the code exactly.
 
 -o, --output-valid  
 Output valid CSDB objects to stdout.
