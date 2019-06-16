@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.4.3"
+#define VERSION "3.4.4"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3196,6 +3196,7 @@ int main(int argc, char **argv)
 
 			if (act && !useract) {
 				xmlFreeDoc(act);
+				act = NULL;
 			}
 
 			if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
