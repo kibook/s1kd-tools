@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.15.2"
+#define VERSION "1.15.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -207,7 +207,7 @@ static void prompt(const char *prompt, char *str, int n)
 		*(strchr(temp, '\n')) = '\0';
 
 		if (strcmp(temp, "") != 0) {
-			strncpy(str, temp, n - 1);
+			memcpy(str, temp, n - 1);
 		}
 	}
 }
