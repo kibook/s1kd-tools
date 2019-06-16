@@ -12,7 +12,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -28,9 +28,9 @@
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 
-bool verbose = false;
+static bool verbose = false;
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -49,12 +49,12 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 	return first;
 }
 
-char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
+static char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
-xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
+static xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
 {
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
@@ -70,7 +70,7 @@ xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
 	return res;
 }
 
-xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 {
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
@@ -86,27 +86,27 @@ xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int 
 	return res;
 }
 
-xmlDocPtr generate_tp(xmlDocPtr doc)
+static xmlDocPtr generate_tp(xmlDocPtr doc)
 {
 	return transform_doc_builtin(doc, xsl_tp_xsl, xsl_tp_xsl_len);
 }
 
-xmlDocPtr generate_toc(xmlDocPtr doc)
+static xmlDocPtr generate_toc(xmlDocPtr doc)
 {
 	return transform_doc_builtin(doc, xsl_toc_xsl, xsl_toc_xsl_len);
 }
 
-xmlDocPtr generate_high(xmlDocPtr doc)
+static xmlDocPtr generate_high(xmlDocPtr doc)
 {
 	return transform_doc_builtin(doc, xsl_high_xsl, xsl_high_xsl_len);
 }
 
-xmlDocPtr generate_loedm(xmlDocPtr doc)
+static xmlDocPtr generate_loedm(xmlDocPtr doc)
 {
 	return transform_doc_builtin(doc, xsl_loedm_xsl, xsl_loedm_xsl_len);
 }
 
-xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *xslpath, const char **params)
+static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *xslpath, const char **params)
 {
 	xmlDocPtr res = NULL;
 
@@ -135,7 +135,7 @@ xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const ch
 	return res;
 }
 
-char *find_fmtype(xmlDocPtr fmtypes, char *incode)
+static char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 {
 	xmlChar xpath[256];
 	xmlStrPrintf(xpath, 256, "//fm[@infoCode='%s']/@type", incode);
@@ -143,7 +143,7 @@ char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 }
 
 /* Copy elements from the source TP DM that can't be derived from the PM. */
-void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
+static void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 {
 	xmlNodePtr fmtp, node;
 
@@ -198,7 +198,7 @@ void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 	}
 }
 
-void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
+static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
 {
 	xmlDocPtr doc, res = NULL;
 	char *type;
@@ -250,7 +250,7 @@ void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmty
 	xmlFreeDoc(res);
 }
 
-void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
+static void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -274,7 +274,7 @@ void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocPtr fmty
 	}
 }
 
-void dump_fmtypes_xml(void)
+static void dump_fmtypes_xml(void)
 {
 	xmlDocPtr doc;
 	doc = read_xml_mem((const char *) fmtypes_xml, fmtypes_xml_len);
@@ -282,12 +282,12 @@ void dump_fmtypes_xml(void)
 	xmlFreeDoc(doc);
 }
 
-void dump_fmtypes_txt(void)
+static void dump_fmtypes_txt(void)
 {
 	printf("%.*s", fmtypes_txt_len, fmtypes_txt);
 }
 
-xmlDocPtr read_fmtypes(const char *path)
+static xmlDocPtr read_fmtypes(const char *path)
 {
 	xmlDocPtr doc;
 
@@ -320,7 +320,7 @@ xmlDocPtr read_fmtypes(const char *path)
 	return doc;
 }
 
-void add_param(xmlNodePtr params, char *s)
+static void add_param(xmlNodePtr params, char *s)
 {
 	char *n, *v;
 	xmlNodePtr p;
@@ -333,7 +333,7 @@ void add_param(xmlNodePtr params, char *s)
 	xmlSetProp(p, BAD_CAST "value", BAD_CAST v);
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]] [-,flvh?] (-t <TYPE>|<DM>...)");
 	puts("");
@@ -354,7 +354,7 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);

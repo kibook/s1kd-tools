@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -21,10 +21,10 @@
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define I_RESOLVE INF_PREFIX "Resolving ICN references in %s...\n"
 
-bool verbose = false;
+static bool verbose = false;
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -44,7 +44,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 }
 
 /* Add a notation by its reference in the catalog file. */
-void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
+static void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -84,7 +84,7 @@ void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
 }
 
 /* Check whether an ICN is used in an object. */
-bool icn_is_used(xmlDocPtr doc, const xmlChar *ident)
+static bool icn_is_used(xmlDocPtr doc, const xmlChar *ident)
 {
 	xmlChar xpath[256];
 	xmlStrPrintf(xpath, 256, "//@*[.='%s']", ident);
@@ -92,7 +92,7 @@ bool icn_is_used(xmlDocPtr doc, const xmlChar *ident)
 }
 
 /* Resolve the ICNs in a document against the ICN catalog. */
-void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, const xmlChar *uri, const xmlChar *notation)
+static void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, const xmlChar *uri, const xmlChar *notation)
 {
 	xmlEntityPtr e;
 
@@ -130,7 +130,7 @@ void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, const xmlC
 }
 
 /* Resolve ICNs in a file against the ICN catalog. */
-void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, const char *media)
+static void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, const char *media)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -186,7 +186,7 @@ void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwrite, con
 }
 
 /* Resolve ICNs in objects in a list of file names. */
-void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, const char *media)
+static void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, const char *media)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -211,7 +211,7 @@ void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrite, cons
 }
 
 /* Add ICNs to a catalog. */
-void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
+static void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
 {
 	xmlNodePtr root, cur;
 
@@ -230,7 +230,7 @@ void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
 }
 
 /* Remove ICNs from a catalog. */
-void del_icns(xmlDocPtr icns, xmlNodePtr del, const char *media)
+static void del_icns(xmlDocPtr icns, xmlNodePtr del, const char *media)
 {
 	xmlNodePtr cur;
 
@@ -255,7 +255,7 @@ void del_icns(xmlDocPtr icns, xmlNodePtr del, const char *media)
 }
 
 /* Help/usage message. */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
@@ -276,7 +276,7 @@ void show_help(void)
 }
 
 /* Show version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);

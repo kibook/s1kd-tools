@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.4.2"
+#define VERSION "2.4.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -21,22 +21,22 @@
 #define EXIT_BAD_PM 1
 #define EXIT_BAD_CODE 2
 
-int xinclude = 0;
-int no_issue = 0;
+static int xinclude = 0;
+static int no_issue = 0;
 
-int use_pub_fmt = 0;
-xmlDocPtr pub_doc = NULL;
-xmlNodePtr pub;
+static int use_pub_fmt = 0;
+static xmlDocPtr pub_doc = NULL;
+static xmlNodePtr pub;
 
-xmlNodePtr search_paths;
-char *search_dir;
+static xmlNodePtr search_paths;
+static char *search_dir;
 
-int flatten_ref = 1;
-int flatten_container = 0;
-int recursive = 0;
-int recursive_search = 0;
+static int flatten_ref = 1;
+static int flatten_container = 0;
+static int recursive = 0;
+static int recursive_search = 0;
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfNpRrxh?] <pubmodule> [<dmodule>...]");
 	puts("");
@@ -56,13 +56,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
+static xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 {
 	xmlNodePtr cur;
 
@@ -75,7 +75,7 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 	return NULL;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -94,24 +94,24 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 	return first;
 }
 
-char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+static char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 {
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
-bool is_dm(const char *fname)
+static bool is_dm(const char *fname)
 {
 	return strncmp(fname, "DMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
-bool is_pm(const char *fname)
+static bool is_pm(const char *fname)
 {
 	return strncmp(fname, "PMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
-void flatten_pm_entry(xmlNodePtr pm_entry);
+static void flatten_pm_entry(xmlNodePtr pm_entry);
 
-void flatten_pm_ref(xmlNodePtr pm_ref)
+static void flatten_pm_ref(xmlNodePtr pm_ref)
 {
 	xmlNodePtr pm_code;
 	xmlNodePtr issue_info;
@@ -255,7 +255,7 @@ void flatten_pm_ref(xmlNodePtr pm_ref)
 	}
 }
 
-void flatten_dm_ref(xmlNodePtr dm_ref)
+static void flatten_dm_ref(xmlNodePtr dm_ref)
 {
 	xmlNodePtr dm_code;
 	xmlNodePtr issue_info;
@@ -442,7 +442,7 @@ void flatten_dm_ref(xmlNodePtr dm_ref)
 	}
 }
 
-void flatten_pm_entry(xmlNodePtr pm_entry)
+static void flatten_pm_entry(xmlNodePtr pm_entry)
 {
 	xmlNodePtr cur, next;
 

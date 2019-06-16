@@ -20,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.1.1"
+#define VERSION "3.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -35,36 +35,36 @@
 /* ID for the inline <applic> element representing the whole data module's
  * applicability. */
 #define DEFAULT_DM_APPLIC_ID BAD_CAST "app-0000"
-xmlChar *dmApplicId;
+static xmlChar *dmApplicId;
 
 /* XPath to select all elements which may have applicability annotations.
  *
  * Read from elements_list.h*/
-xmlChar *applicElemsXPath;
+static xmlChar *applicElemsXPath;
 
 /* Custom XSL for generating display text. */
-char *customGenDispTextXsl = NULL;
+static char *customGenDispTextXsl = NULL;
 
 /* Search for ACTs/CCTs recursively. */
-bool recursive_search = false;
+static bool recursive_search = false;
 
 /* Directory to start search for ACTs/CCTs in. */
-char *search_dir;
+static char *search_dir;
 
 /* Overwrite existing display text in annotations. */
-bool overwriteDispText = true;
+static bool overwriteDispText = true;
 
 /* Verbose output. */
-bool verbose = false;
+static bool verbose = false;
 
 /* Assume objects were created with -N. */
-bool no_issue = false;
+static bool no_issue = false;
 
 /* Delimiter for format strings. */
 #define FMTSTR_DELIM '%'
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -95,7 +95,7 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 }
 
 /* Return the last node matching an XPath expression. */
-xmlNodePtr lastXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlNodePtr lastXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -126,7 +126,7 @@ xmlNodePtr lastXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 }
 
 /* Return the value of the first node matching an XPath expression. */
-xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	return xmlNodeGetContent(firstXPathNode(doc, node, xpath));
 }
@@ -138,7 +138,7 @@ xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
  * Nodes without @applicRefId have an implicit annotation inherited from their
  * parent/ancestor which does have an explicit annotation, or ultimately from
  * the applicability of the whole data module. */
-void processNode(xmlNodePtr node)
+static void processNode(xmlNodePtr node)
 {
 	xmlNodePtr attr;
 
@@ -166,7 +166,7 @@ void processNode(xmlNodePtr node)
 }
 
 /* Set explicit applicability on all nodes in a nodeset. */
-void processNodeSet(xmlNodeSetPtr nodes)
+static void processNodeSet(xmlNodeSetPtr nodes)
 {
 	int i;
 
@@ -177,7 +177,7 @@ void processNodeSet(xmlNodeSetPtr nodes)
 
 /* Remove duplicate applicability annotations in document-order so that an
  * annotation is only shown when applicability changes. */
-void removeDuplicates(xmlNodeSetPtr nodes)
+static void removeDuplicates(xmlNodeSetPtr nodes)
 {
 	int i;
 
@@ -205,7 +205,7 @@ void removeDuplicates(xmlNodeSetPtr nodes)
 
 /* Insert a new inline <applic> element representing the applicability of the
  * whole data module, based on the dmStatus/applic element. */
-void addDmApplic(xmlNodePtr dmodule)
+static void addDmApplic(xmlNodePtr dmodule)
 {
 	xmlNodePtr referencedApplicGroup;
 
@@ -220,12 +220,12 @@ void addDmApplic(xmlNodePtr dmodule)
 	}
 }
 
-void dumpGenDispTextXsl(void)
+static void dumpGenDispTextXsl(void)
 {
 	printf("%.*s", generateDisplayText_xsl_len, generateDisplayText_xsl);
 }
 
-void addIdentity(xmlDocPtr style)
+static void addIdentity(xmlDocPtr style)
 {
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
@@ -247,7 +247,7 @@ void addIdentity(xmlDocPtr style)
 }
 
 /* Customize the display text based on a format string. */
-void apply_format_str(xmlDocPtr doc, const char *fmt)
+static void apply_format_str(xmlDocPtr doc, const char *fmt)
 {
 	xmlNodePtr t, c;
 	int i;
@@ -312,7 +312,7 @@ void apply_format_str(xmlDocPtr doc, const char *fmt)
 	}
 }
 
-void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts, const char *format)
+static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts, const char *format)
 {
 	xmlDocPtr styledoc, res, muxdoc;
 	xsltStylesheetPtr style;
@@ -375,7 +375,7 @@ void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts, const 
 	xsltFreeStylesheet(style);
 }
 
-void processDmodule(xmlNodePtr dmodule)
+static void processDmodule(xmlNodePtr dmodule)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -392,7 +392,7 @@ void processDmodule(xmlNodePtr dmodule)
 	xmlXPathFreeContext(ctx);
 }
 
-void processDmodules(xmlNodeSetPtr dmodules)
+static void processDmodules(xmlNodeSetPtr dmodules)
 {
 	int i;
 
@@ -402,14 +402,14 @@ void processDmodules(xmlNodeSetPtr dmodules)
 }
 
 /* Determine if the file is a data module. */
-bool is_dm(const char *name)
+static bool is_dm(const char *name)
 {
 	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
-bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
+static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 {
 	char *model_ident_code;
 	char *system_diff_code;
@@ -522,7 +522,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 }
 
 /* Find the filename of a referenced ACT data module. */
-bool find_act_fname(char *dst, xmlDocPtr doc)
+static bool find_act_fname(char *dst, xmlDocPtr doc)
 {
 	xmlNodePtr actref;
 	actref = firstXPathNode(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
@@ -530,7 +530,7 @@ bool find_act_fname(char *dst, xmlDocPtr doc)
 }
 
 /* Find the filename of a referenced PCT data module via the ACT. */
-bool find_cct_fname(char *dst, xmlDocPtr act)
+static bool find_cct_fname(char *dst, xmlDocPtr act)
 {
 	xmlNodePtr pctref;
 	bool found;
@@ -542,7 +542,7 @@ bool find_cct_fname(char *dst, xmlDocPtr act)
 }
 
 /* Add cross-reference tables by searching for them in the current directory. */
-void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
+static void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 {
 	char act_fname[PATH_MAX];
 	xmlDocPtr act = NULL;
@@ -560,7 +560,7 @@ void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts)
 	}
 }
 
-void processFile(const char *in, const char *out, bool xincl, bool process,
+static void processFile(const char *in, const char *out, bool xincl, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
 	const char *format)
 {
@@ -613,7 +613,7 @@ void processFile(const char *in, const char *out, bool xincl, bool process,
 	xmlFreeDoc(doc);
 }
 
-void process_list(const char *path, bool overwrite, bool xincl, bool process,
+static void process_list(const char *path, bool overwrite, bool xincl, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
 	const char *format)
 {
@@ -639,7 +639,7 @@ void process_list(const char *path, bool overwrite, bool xincl, bool process,
 	}
 }
 
-void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
@@ -669,7 +669,7 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s, libxslt %s and libexslt %s\n",
@@ -793,7 +793,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			case '?':
-				showHelp();
+				show_help();
 				exit(0);
 		}
 	}

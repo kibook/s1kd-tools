@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -35,9 +35,9 @@ enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
-enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
-xmlNode *find_child(xmlNode *parent, char *name)
+static xmlNode *find_child(xmlNode *parent, char *name)
 {
 	xmlNode *cur;
 
@@ -52,7 +52,7 @@ xmlNode *find_child(xmlNode *parent, char *name)
 	return NULL;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, xmlChar *xpath)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, xmlChar *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -70,7 +70,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, xmlChar *xpath)
 	return first;
 }
 
-xmlNodePtr find_or_create_refs(xmlDocPtr doc)
+static xmlNodePtr find_or_create_refs(xmlDocPtr doc)
 {
 	xmlNodePtr refs;
 
@@ -91,7 +91,7 @@ xmlNodePtr find_or_create_refs(xmlDocPtr doc)
 	return refs;
 }
 
-void dump_node(xmlNodePtr node, const char *dst)
+static void dump_node(xmlNodePtr node, const char *dst)
 {
 	xmlBufferPtr buf;
 	buf = xmlBufferCreate();
@@ -107,7 +107,7 @@ void dump_node(xmlNodePtr node, const char *dst)
 	xmlBufferFree(buf);
 }
 
-xmlNodePtr new_issue_info(char *s)
+static xmlNodePtr new_issue_info(char *s)
 {
 	char n[4], w[3];
 	xmlNodePtr issue_info;
@@ -123,7 +123,7 @@ xmlNodePtr new_issue_info(char *s)
 	return issue_info;
 }
 
-xmlNodePtr new_language(char *s)
+static xmlNodePtr new_language(char *s)
 {
 	char l[4], c[3];
 	xmlNodePtr language;
@@ -141,7 +141,7 @@ xmlNodePtr new_language(char *s)
 	return language;
 }
 
-void set_xlink(xmlNodePtr node, const char *href)
+static void set_xlink(xmlNodePtr node, const char *href)
 {
 	xmlNsPtr xlink;
 	xlink = xmlNewNs(node, BAD_CAST "http://www.w3.org/1999/xlink", BAD_CAST "xlink");
@@ -151,7 +151,7 @@ void set_xlink(xmlNodePtr node, const char *href)
 #define PME_FMT "PME-%255[^-]-%255[^-]-%14[^-]-%5s-%5s-%2s"
 #define PMC_FMT "PMC-%14[^-]-%5s-%5s-%2s"
 
-xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 {
 	char extension_producer[256] = "";
 	char extension_code[256]     = "";
@@ -324,7 +324,7 @@ xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 #define DME_FMT "DME-%255[^-]-%255[^-]-%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s"
 #define DMC_FMT "DMC-%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s-%3s%1s"
 
-xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 {
 	char extension_producer[256] = "";
 	char extension_code[256]     = "";
@@ -537,7 +537,7 @@ xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 
 #define COM_FMT "COM-%14[^-]-%5s-%4s-%5s-%1s"
 
-xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 {
 	char model_ident_code[15]  = "";
 	char sender_ident[6]       = "";
@@ -616,7 +616,7 @@ xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 
 #define DML_FMT "DML-%14[^-]-%5s-%1s-%4s-%5s"
 
-xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 {
 	char model_ident_code[15]  = "";
 	char sender_ident[6]       = "";
@@ -693,7 +693,7 @@ xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 	return dml_ref;
 }
 
-xmlNodePtr new_icn_ref(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_icn_ref(const char *ref, const char *fname, int opts)
 {
 	xmlNodePtr info_entity_ref;
 
@@ -706,7 +706,7 @@ xmlNodePtr new_icn_ref(const char *ref, const char *fname, int opts)
 
 #define CSN_FMT "CSN-%14[^-]-%4[^-]-%3[^-]-%1s%1s-%4[^-]-%2s%3[^-]-%3s%1s-%1s"
 
-xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 {
 	char model_ident_code[15]    = "";
 	char system_diff_code[5]     = "";
@@ -762,37 +762,37 @@ xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 	return csn_ref;
 }
 
-bool is_pm(const char *ref)
+static bool is_pm(const char *ref)
 {
 	return strncmp(ref, "PMC-", 4) == 0 || strncmp(ref, "PME-", 4) == 0;
 }
 
-bool is_dm(const char *ref)
+static bool is_dm(const char *ref)
 {
 	return strncmp(ref, "DMC-", 4) == 0 || strncmp(ref, "DME-", 4) == 0;
 }
 
-bool is_com(const char *ref)
+static bool is_com(const char *ref)
 {
 	return strncmp(ref, "COM-", 4) == 0;
 }
 
-bool is_dml(const char *ref)
+static bool is_dml(const char *ref)
 {
 	return strncmp(ref, "DML-", 4) == 0;
 }
 
-bool is_icn(const char *ref)
+static bool is_icn(const char *ref)
 {
 	return strncmp(ref, "ICN-", 4) == 0;
 }
 
-bool is_csn(const char *ref)
+static bool is_csn(const char *ref)
 {
 	return strncmp(ref, "CSN-", 4) == 0;
 }
 
-void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
+static void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 {
 	xmlDocPtr doc;
 	xmlNodePtr refs;
@@ -827,7 +827,7 @@ void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 }
 
 /* Apply a built-in XSLT transform to a doc in place. */
-void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 {
 	xmlDocPtr styledoc, src, res;
 	xsltStylesheetPtr style;
@@ -848,7 +848,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 	xsltFreeStylesheet(style);
 }
 
-xmlNodePtr find_ext_pub(xmlDocPtr extpubs, const char *ref)
+static xmlNodePtr find_ext_pub(xmlDocPtr extpubs, const char *ref)
 {
 	xmlChar xpath[512];
 	xmlNodePtr node;
@@ -866,7 +866,7 @@ xmlNodePtr find_ext_pub(xmlDocPtr extpubs, const char *ref)
 	return xmlCopyNode(node, 1);
 }
 
-xmlNodePtr new_ext_pub(const char *ref, const char *fname, int opts)
+static xmlNodePtr new_ext_pub(const char *ref, const char *fname, int opts)
 {
 	xmlNodePtr epr, epr_ident;
 
@@ -886,7 +886,7 @@ xmlNodePtr new_ext_pub(const char *ref, const char *fname, int opts)
 	return epr;
 }
 
-void print_ref(const char *src, const char *dst, const char *ref,
+static void print_ref(const char *src, const char *dst, const char *ref,
 	const char *fname, int opts, bool overwrite, enum issue iss,
 	xmlDocPtr extpubs)
 {
@@ -982,7 +982,7 @@ void print_ref(const char *src, const char *dst, const char *ref,
 	xmlFreeNode(node);
 }
 
-char *trim(char *str)
+static char *trim(char *str)
 {
 	char *end;
 
@@ -998,7 +998,7 @@ char *trim(char *str)
 	return str;
 }
 
-enum issue spec_issue(const char *s)
+static enum issue spec_issue(const char *s)
 {
 	if (strcmp(s, "2.0") == 0) {
 		return ISS_20;
@@ -1024,7 +1024,7 @@ enum issue spec_issue(const char *s)
 	exit(EXIT_BAD_ISSUE);
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>] [-o <dst>] [<code>|<file> ...]");
 	puts("");
@@ -1051,7 +1051,7 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);

@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.4.2"
+#define VERSION "3.4.3"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -62,16 +62,16 @@
 #define DEFAULT_ORIG_NAME "s1kd-instance tool"
 
 /* Search for ACT/PCT recursively. */
-bool recursive_search = false;
+static bool recursive_search = false;
 
 /* Directory to start searching for ACT/PCT in. */
-char *search_dir;
+static char *search_dir;
 
 /* Tag non-applicable elements instead of deleting them. */
-bool tag_non_applic = false;
+static bool tag_non_applic = false;
 
 /* Remove display text from annotations which are modified in -A mode. */
-bool clean_disp_text = false;
+static bool clean_disp_text = false;
 
 /* Convenient structure for all strings related to uniquely identifying a
  * CSDB object.
@@ -112,14 +112,14 @@ struct ident {
 };
 
 /* User-defined applicability */
-xmlNodePtr applicability;
-int napplics = 0;
+static xmlNodePtr applicability;
+static int napplics = 0;
 
 /* Assume objects were created with -N. */
-bool no_issue = false;
+static bool no_issue = false;
 
 /* Define a value for a product attribute or condition. */
-void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm)
+static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
@@ -190,7 +190,7 @@ void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *val
 }
 
 /* Find the first child element with a given name */
-xmlNodePtr find_child(xmlNodePtr parent, const char *name)
+static xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
 
@@ -203,7 +203,7 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -231,7 +231,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 	return first;
 }
 
-xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+static xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	return xmlNodeGetContent(first_xpath_node(doc, node, path));
 }
@@ -269,7 +269,7 @@ xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 	"//dmlIdent/issueInfo|//dml/issno|" \
 	"//imfIdent/issueInfo|" \
 	"//updateIdent/issueInfo"
-bool init_ident(struct ident *ident, xmlDocPtr doc)
+static bool init_ident(struct ident *ident, xmlDocPtr doc)
 {
 	xmlNodePtr moduleIdent, identExtension, code, language, issueInfo;
 
@@ -455,7 +455,7 @@ bool init_ident(struct ident *ident, xmlDocPtr doc)
 	return true;
 }
 
-void free_ident(struct ident *ident)
+static void free_ident(struct ident *ident)
 {
 	if (ident->extended) {
 		xmlFree(ident->extensionProducer);
@@ -520,10 +520,10 @@ void free_ident(struct ident *ident)
  * condition (CCT) for which a value is asserted in the applic statement but
  * for which no value was supplied by the user.
  */
-bool eval_applic(xmlNodePtr node, bool assume);
+static bool eval_applic(xmlNodePtr node, bool assume);
 
 /* Evaluate multiple values for a property */
-bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const char *value)
+static bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const char *value)
 {
 	xmlNodePtr cur;
 	bool result = false;
@@ -546,7 +546,7 @@ bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const cha
 }
 
 /* Tests whether ident:type=value was defined by the user */
-bool is_applic(const char *ident, const char *type, const char *value, bool assume)
+static bool is_applic(const char *ident, const char *type, const char *value, bool assume)
 {
 	xmlNodePtr cur;
 
@@ -585,7 +585,7 @@ bool is_applic(const char *ident, const char *type, const char *value, bool assu
 }
 
 /* Tests whether an <assert> element is applicable */
-bool eval_assert(xmlNodePtr assert, bool assume)
+static bool eval_assert(xmlNodePtr assert, bool assume)
 {
 	xmlNodePtr ident_attr, type_attr, values_attr;
 	char *ident, *type, *values;
@@ -610,7 +610,7 @@ bool eval_assert(xmlNodePtr assert, bool assume)
 }
 
 /* Test whether an <evaluate> element is applicable. */
-bool eval_evaluate(xmlNodePtr evaluate, bool assume)
+static bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 {
 	xmlChar *op;
 	bool ret;
@@ -641,7 +641,7 @@ bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 }
 
 /* Generic test for either <assert> or <evaluate> */
-bool eval_applic(xmlNodePtr node, bool assume)
+static bool eval_applic(xmlNodePtr node, bool assume)
 {
 	if (strcmp((char *) node->name, "assert") == 0) {
 		return eval_assert(node, assume);
@@ -653,7 +653,7 @@ bool eval_applic(xmlNodePtr node, bool assume)
 }
 
 /* Tests whether an <applic> element is true. */
-bool eval_applic_stmt(xmlNodePtr applic, bool assume)
+static bool eval_applic_stmt(xmlNodePtr applic, bool assume)
 {
 	xmlNodePtr stmt;
 
@@ -671,7 +671,7 @@ bool eval_applic_stmt(xmlNodePtr applic, bool assume)
 }
 
 /* Search recursively for a descendant element with the given id */
-xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
+static xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 {
 	xmlNodePtr cur;
 	char *cid;
@@ -701,7 +701,7 @@ xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 }
 
 /* Remove non-applicable elements from content */
-void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
+static void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 	xmlNodePtr attr;
@@ -736,7 +736,7 @@ void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 }
 
 /* Remove unambigously true or false applic statements. */
-void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
+static void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
 {
 	xmlNodePtr cur;
 
@@ -755,7 +755,7 @@ void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
 }
 
 /* Remove applic references on content where the applic statement was removed by clean_applic_stmts. */
-void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
+static void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
@@ -778,7 +778,7 @@ void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 }
 
 /* Remove display text from the containing annotation. */
-void rem_disp_text(xmlNodePtr node)
+static void rem_disp_text(xmlNodePtr node)
 {
 	xmlNodePtr disptext;
 
@@ -796,7 +796,7 @@ void rem_disp_text(xmlNodePtr node)
  * Returns true if the whole annotation is removed, or false if only parts of
  * it are removed.
  */
-bool simpl_applic(xmlNodePtr node)
+static bool simpl_applic(xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
@@ -855,7 +855,7 @@ bool simpl_applic(xmlNodePtr node)
 }
 
 /* If an <evaluate> contains only one (or no) child elements, remove it. */
-void simpl_evaluate(xmlNodePtr evaluate)
+static void simpl_evaluate(xmlNodePtr evaluate)
 {
 	int nchild = 0;
 	xmlNodePtr cur;
@@ -878,7 +878,7 @@ void simpl_evaluate(xmlNodePtr evaluate)
 }
 
 /* Simplify <evaluate> elements recursively. */
-void simpl_applic_evals(xmlNodePtr node)
+static void simpl_applic_evals(xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
@@ -901,7 +901,7 @@ void simpl_applic_evals(xmlNodePtr node)
 }
 
 /* Remove <referencedApplicGroup> if all applic statements are removed */
-void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
+static void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
 {
 	bool has_applic = false;
 	xmlNodePtr cur;
@@ -925,7 +925,7 @@ void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
 	}
 }
 
-xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
+static xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
 {
 	xmlNodePtr applic, orig;
 
@@ -954,7 +954,7 @@ xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
 }
 
 /* Add metadata linking the data module instance with the source data module */
-void add_source(xmlDocPtr source, xmlDocPtr inst)
+static void add_source(xmlDocPtr source, xmlDocPtr inst)
 {
 	xmlNodePtr ident, sourceIdent, node, cur;
 	const xmlChar *type;
@@ -996,7 +996,7 @@ void add_source(xmlDocPtr source, xmlDocPtr inst)
 }
 
 /* Add an extension to the data module code */
-void set_extd(xmlDocPtr doc, const char *extension)
+static void set_extd(xmlDocPtr doc, const char *extension)
 {
 	xmlNodePtr identExtension, code;
 	char *ext, *extensionProducer, *extensionCode;
@@ -1036,7 +1036,7 @@ void set_extd(xmlDocPtr doc, const char *extension)
 	free(ext);
 }
 
-void set_dm_code(xmlNodePtr code, enum issue iss, const char *s)
+static void set_dm_code(xmlNodePtr code, enum issue iss, const char *s)
 {
 	char model_ident_code[15];
 	char system_diff_code[5];
@@ -1106,7 +1106,7 @@ void set_dm_code(xmlNodePtr code, enum issue iss, const char *s)
 	}
 }
 
-void set_pm_code(xmlNodePtr code, enum issue iss, const char *s)
+static void set_pm_code(xmlNodePtr code, enum issue iss, const char *s)
 {
 	char model_ident_code[15];
 	char pm_issuer[6];
@@ -1139,7 +1139,7 @@ void set_pm_code(xmlNodePtr code, enum issue iss, const char *s)
 	}
 }
 
-void set_com_code(xmlNodePtr code, enum issue iss, const char *s)
+static void set_com_code(xmlNodePtr code, enum issue iss, const char *s)
 {
 	char model_ident_code[15];
 	char sender_ident[6];
@@ -1177,7 +1177,7 @@ void set_com_code(xmlNodePtr code, enum issue iss, const char *s)
 	}
 }
 
-void set_dml_code(xmlNodePtr code, enum issue iss, const char *s)
+static void set_dml_code(xmlNodePtr code, enum issue iss, const char *s)
 {
 	char model_ident_code[15];
 	char sender_ident[6];
@@ -1216,7 +1216,7 @@ void set_dml_code(xmlNodePtr code, enum issue iss, const char *s)
 	}
 }
 
-void set_code(xmlDocPtr doc, const char *new_code)
+static void set_code(xmlDocPtr doc, const char *new_code)
 {
 	xmlNodePtr code;
 
@@ -1254,7 +1254,7 @@ void set_code(xmlDocPtr doc, const char *new_code)
 }
 
 /* Set the techName and/or infoName of the data module instance */
-void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no_info_name)
+static void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no_info_name)
 {
 	xmlNodePtr dmTitle, techName, infoName;
 	enum issue iss;
@@ -1302,7 +1302,7 @@ void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no_info_n
 	}
 }
 
-xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values, enum issue iss)
+static xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values, enum issue iss)
 {
 	xmlNodePtr assert;
 
@@ -1315,7 +1315,7 @@ xmlNodePtr create_assert(xmlChar *ident, xmlChar *type, xmlChar *values, enum is
 	return assert;
 }
 
-xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values, enum issue iss)
+static xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values, enum issue iss)
 {
 	xmlNodePtr or, cur;
 
@@ -1334,7 +1334,7 @@ xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values, enum issu
 }
 
 /* Set the applicability for the whole data module instance */
-void set_applic(xmlDocPtr doc, char *new_text, bool combine)
+static void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 {
 	xmlNodePtr new_applic, new_displayText, new_simplePara, new_evaluate, cur, applic;
 	enum issue iss;
@@ -1401,7 +1401,7 @@ void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 }
 
 /* Set the language/country for the data module instance */
-void set_lang(xmlDocPtr doc, const char *lang)
+static void set_lang(xmlDocPtr doc, const char *lang)
 {
 	xmlNodePtr language;
 	char *l;
@@ -1436,9 +1436,9 @@ void set_lang(xmlDocPtr doc, const char *lang)
 	free(l);
 }
 
-bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool noiss)
+static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool noiss)
 {
-	struct ident ident;
+	struct ident ident = {0};
 	char iss[8] = "";
 
 	if (!init_ident(&ident, dm)) {
@@ -1577,7 +1577,7 @@ bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool noiss)
 }
 
 /* Add an "identity" template to an XSL stylesheet */
-void add_identity(xmlDocPtr style)
+static void add_identity(xmlDocPtr style)
 {
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
@@ -1599,7 +1599,7 @@ void add_identity(xmlDocPtr style)
 }
 
 /* Get the appropriate built-in CIR repository XSLT by name */
-bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
+static bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 {
 	if (strcmp(cirtype, "accessPointRepository") == 0) {
 		*xsl = cirxsl_accessPointRepository_xsl;
@@ -1652,7 +1652,7 @@ bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 }
 
 /* Dump built-in XSLT for resolving CIR repository dependencies */
-void dump_cir_xsl(const char *repo)
+static void dump_cir_xsl(const char *repo)
 {
 	unsigned char *xsl;
 	unsigned int len;
@@ -1665,7 +1665,7 @@ void dump_cir_xsl(const char *repo)
 }
 
 /* Use user-supplied XSL script to resolve CIR references. */
-void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
+static void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 {
 	xmlDocPtr res, muxdoc;
 	xmlNodePtr mux, old;
@@ -1687,7 +1687,7 @@ void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr style)
 
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
-xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl)
+static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl)
 {
 	xmlDocPtr cir;
 	xmlXPathContextPtr ctxt;
@@ -1796,7 +1796,7 @@ xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, con
 }
 
 /* Set the issue and inwork numbers of the instance. */
-void set_issue(xmlDocPtr dm, char *issinfo)
+static void set_issue(xmlDocPtr dm, char *issinfo)
 {
 	char issue[32], inwork[32];
 	xmlNodePtr issueInfo;
@@ -1840,7 +1840,7 @@ void set_issue(xmlDocPtr dm, char *issinfo)
 }
 
 /* Set the issue date of the instance. */
-void set_issue_date(xmlDocPtr doc, const char *year, const char *month, const char *day)
+static void set_issue_date(xmlDocPtr doc, const char *year, const char *month, const char *day)
 {
 	xmlNodePtr issueDate;
 
@@ -1852,7 +1852,7 @@ void set_issue_date(xmlDocPtr doc, const char *year, const char *month, const ch
 }
 
 /* Set the issue type of the instance. */
-void set_issue_type(xmlDocPtr doc, const char *type)
+static void set_issue_type(xmlDocPtr doc, const char *type)
 {
 	xmlNodePtr status;
 
@@ -1866,7 +1866,7 @@ void set_issue_type(xmlDocPtr doc, const char *type)
 }
 
 /* Set the securty classification of the instance. */
-void set_security(xmlDocPtr dm, char *sec)
+static void set_security(xmlDocPtr dm, char *sec)
 {
 	xmlNodePtr security;
 	enum issue iss;
@@ -1888,7 +1888,7 @@ void set_security(xmlDocPtr dm, char *sec)
  * (e.g. pub modules do not require one) then create one in the
  * instance.
  */
-xmlNodePtr find_or_create_orig(xmlDocPtr doc)
+static xmlNodePtr find_or_create_orig(xmlDocPtr doc)
 {
 	xmlNodePtr orig, rpc;
 	orig = first_xpath_node(doc, NULL, BAD_CAST "//originator|//orig");
@@ -1908,7 +1908,7 @@ xmlNodePtr find_or_create_orig(xmlDocPtr doc)
  * Otherwise, origspec is a string in the form of "CODE/NAME", where CODE is
  * the NCAGE code and NAME is the enterprise name.
  */
-void set_orig(xmlDocPtr doc, const char *origspec)
+static void set_orig(xmlDocPtr doc, const char *origspec)
 {
 	xmlNodePtr originator;
 	const char *code, *name;
@@ -1960,7 +1960,7 @@ void set_orig(xmlDocPtr doc, const char *origspec)
 }
 
 /* Determine if the whole object is applicable. */
-bool check_wholedm_applic(xmlDocPtr dm)
+static bool check_wholedm_applic(xmlDocPtr dm)
 {
 	xmlNodePtr applic;
 
@@ -1976,7 +1976,7 @@ bool check_wholedm_applic(xmlDocPtr dm)
 /* Read applicability definitions from the <assign> elements of a
  * product instance in the specified PCT data module.\
  */
-void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char *product)
+static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char *product)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2040,7 +2040,7 @@ void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char *produ
 }
 
 /* Remove the extended identification from the instance. */
-void strip_extension(xmlDocPtr doc)
+static void strip_extension(xmlDocPtr doc)
 {
 	xmlNodePtr ext;
 
@@ -2051,7 +2051,7 @@ void strip_extension(xmlDocPtr doc)
 }
 
 /* General XSLT transformation with embedded stylesheet, preserving the DTD. */
-void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
+static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc, res, src;
 	xsltStylesheetPtr style;
@@ -2073,7 +2073,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const ch
 }
 
 /* Flatten alts elements. */
-void flatten_alts(xmlDocPtr doc)
+static void flatten_alts(xmlDocPtr doc)
 {
 	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len, NULL);
 }
@@ -2081,19 +2081,19 @@ void flatten_alts(xmlDocPtr doc)
 /* Removes invalid empty sections in a PM after all references have
  * been filtered out.
  */
-void remove_empty_pmentries(xmlDocPtr doc)
+static void remove_empty_pmentries(xmlDocPtr doc)
 {
 	transform_doc(doc, xsl_remove_empty_pmentries_xsl, xsl_remove_empty_pmentries_xsl_len, NULL);
 }
 
 /* Fix certain elements automatically after filtering. */
-void autocomplete(xmlDocPtr doc)
+static void autocomplete(xmlDocPtr doc)
 {
 	transform_doc(doc, xsl_autocomplete_xsl, xsl_autocomplete_xsl_len, NULL);
 }
 
 /* Insert a custom comment. */
-void insert_comment(xmlDocPtr doc, const char *text, const char *path)
+static void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 {
 	xmlNodePtr comment, pos;
 
@@ -2111,7 +2111,7 @@ void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 }
 
 /* Read an applicability assign in the form of ident:type=value */
-void read_applic(char *s)
+static void read_applic(char *s)
 {
 
 	char *ident, *type, *value;
@@ -2129,7 +2129,7 @@ void read_applic(char *s)
 }
 
 /* Set the remarks for the object */
-void set_remarks(xmlDocPtr doc, const char *s)
+static void set_remarks(xmlDocPtr doc, const char *s)
 {
 	xmlNodePtr status, remarks;
 
@@ -2171,7 +2171,7 @@ void set_remarks(xmlDocPtr doc, const char *s)
 
 /* Return whether objects with the given classification code should be
  * instantiated. */
-bool valid_object(xmlDocPtr doc, const char *path, const char *codes)
+static bool valid_object(xmlDocPtr doc, const char *path, const char *codes)
 {
 	xmlNodePtr obj;
 	xmlChar *code;
@@ -2187,7 +2187,7 @@ bool valid_object(xmlDocPtr doc, const char *path, const char *codes)
 
 /* Remove elements that have an attribute whose value does not match a given
  * set of valid values. */
-void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *codes)
+static void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *codes)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2224,7 +2224,7 @@ void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *codes)
  * - Skill level
  * - Security classification
  */
-bool create_instance(xmlDocPtr doc, const char *skills, const char *securities)
+static bool create_instance(xmlDocPtr doc, const char *skills, const char *securities)
 {
 	if (!check_wholedm_applic(doc)) {
 		return false;
@@ -2242,7 +2242,7 @@ bool create_instance(xmlDocPtr doc, const char *skills, const char *securities)
 }
 
 /* Set the skill level code of the instance. */
-void set_skill(xmlDocPtr doc, const char *skill)
+static void set_skill(xmlDocPtr doc, const char *skill)
 {
 	xmlNodePtr skill_level;
 
@@ -2269,14 +2269,14 @@ void set_skill(xmlDocPtr doc, const char *skill)
 }
 
 /* Determine if the file is a data module. */
-bool is_dm(const char *name)
+static bool is_dm(const char *name)
 {
 	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
-bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
+static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 {
 	char *model_ident_code;
 	char *system_diff_code;
@@ -2389,14 +2389,14 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 }
 
 /* Determine if the file is a publication module. */
-bool is_pm(const char *name)
+static bool is_pm(const char *name)
 {
 	return strncmp(name, "PMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 /* Find a PM filename in the current directory based on the pmRefIdent
  * element. */
-bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
+static bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
 {
 	char *model_ident_code;
 	char *pm_issuer;
@@ -2468,7 +2468,7 @@ bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
 }
 
 /* Find the filename of a referenced ACT data module. */
-bool find_act_fname(char *dst, xmlDocPtr doc)
+static bool find_act_fname(char *dst, xmlDocPtr doc)
 {
 	xmlNodePtr actref;
 	actref = first_xpath_node(doc, NULL, BAD_CAST "//applicCrossRefTableRef/dmRef/dmRefIdent|//actref/refdm");
@@ -2476,7 +2476,7 @@ bool find_act_fname(char *dst, xmlDocPtr doc)
 }
 
 /* Find the filename of a referenced CCT data module. */
-bool find_cct_fname(char *dst, xmlDocPtr act)
+static bool find_cct_fname(char *dst, xmlDocPtr act)
 {
 	xmlNodePtr cctref;
 	cctref = first_xpath_node(act, NULL, BAD_CAST "//condCrossRefTableRef/dmRef/dmRefIdent|//cctref/refdm");
@@ -2484,7 +2484,7 @@ bool find_cct_fname(char *dst, xmlDocPtr act)
 }
 
 /* Find the filename of a referenced PCT data module via the ACT. */
-bool find_pct_fname(char *dst, xmlDocPtr act)
+static bool find_pct_fname(char *dst, xmlDocPtr act)
 {
 	xmlNodePtr pctref;
 	pctref = first_xpath_node(act, NULL, BAD_CAST "//productCrossRefTableRef/dmRef/dmRefIdent|//pctref/refdm");
@@ -2492,7 +2492,7 @@ bool find_pct_fname(char *dst, xmlDocPtr act)
 }
 
 /* Unset all applicability assigned on a per-DM basis. */
-void clear_perdm_applic(void)
+static void clear_perdm_applic(void)
 {
 	xmlNodePtr cur;
 	cur = applicability->children;
@@ -2516,9 +2516,9 @@ void clear_perdm_applic(void)
  * Older versions, and the publically documented API, have it as non-const.
  */
 #if LIBXML_VERSION < 20907
-void clean_entities_callback(void *payload, void *data, xmlChar *name)
+static void clean_entities_callback(void *payload, void *data, xmlChar *name)
 #else
-void clean_entities_callback(void *payload, void *data, const xmlChar *name)
+static void clean_entities_callback(void *payload, void *data, const xmlChar *name)
 #endif
 {
 	xmlEntityPtr e = (xmlEntityPtr) payload;
@@ -2535,7 +2535,7 @@ void clean_entities_callback(void *payload, void *data, const xmlChar *name)
 }
 
 /* Remove unused external entities after filtering. */
-void clean_entities(xmlDocPtr doc)
+static void clean_entities(xmlDocPtr doc)
 {
 	if (doc->intSubset) {
 		xmlHashScan(doc->intSubset->entities, clean_entities_callback, NULL);
@@ -2547,7 +2547,7 @@ void clean_entities(xmlDocPtr doc)
  *  0  Object identifies a source and it was found.
  *  1  Object identifies a source but it couldn't be found.
  */
-int find_source(char *src, xmlDocPtr *doc)
+static int find_source(char *src, xmlDocPtr *doc)
 {
 	xmlNodePtr sdi;
 	bool found = false;
@@ -2569,7 +2569,7 @@ int find_source(char *src, xmlDocPtr *doc)
 	return !found;
 }
 
-void load_applic_from_inst(xmlDocPtr doc)
+static void load_applic_from_inst(xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2599,7 +2599,7 @@ void load_applic_from_inst(xmlDocPtr doc)
 	xmlXPathFreeContext(ctx);
 }
 
-void load_skill_from_inst(xmlDocPtr doc, char **skill_codes)
+static void load_skill_from_inst(xmlDocPtr doc, char **skill_codes)
 {
 	char *skill;
 
@@ -2609,7 +2609,7 @@ void load_skill_from_inst(xmlDocPtr doc, char **skill_codes)
 	}
 }
 
-void load_sec_from_inst(xmlDocPtr doc, char **sec_classes)
+static void load_sec_from_inst(xmlDocPtr doc, char **sec_classes)
 {
 	char *sec;
 
@@ -2619,7 +2619,7 @@ void load_sec_from_inst(xmlDocPtr doc, char **sec_classes)
 	}
 }
 
-void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
+static void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2648,7 +2648,7 @@ void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
 }
 
 /* Print a usage message */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
@@ -2710,7 +2710,7 @@ void show_help(void)
 }
 
 /* Print version information */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s, libxslt %s and libexslt %s\n",

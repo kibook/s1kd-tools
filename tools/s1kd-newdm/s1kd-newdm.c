@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "1.15.0"
+#define VERSION "1.15.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -68,54 +68,54 @@
 #define EXIT_ENCODING_ERROR 8
 #define EXIT_OS_ERROR 9
 
-char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
-char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
-char systemCode[MAX_SYSTEM_CODE] = "";
-char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
-char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
-char assyCode[MAX_ASSY_CODE] = "";
-char disassyCode[MAX_DISASSY_CODE] = "";
-char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
-char infoCode[MAX_INFO_CODE] = "";
-char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
-char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
-char learnCode[MAX_LEARN_CODE] = "";
-char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
+static char modelIdentCode[MAX_MODEL_IDENT_CODE] = "";
+static char systemDiffCode[MAX_SYSTEM_DIFF_CODE] = "";
+static char systemCode[MAX_SYSTEM_CODE] = "";
+static char subSystemCode[MAX_SUB_SYSTEM_CODE] = "";
+static char subSubSystemCode[MAX_SUB_SUB_SYSTEM_CODE] = "";
+static char assyCode[MAX_ASSY_CODE] = "";
+static char disassyCode[MAX_DISASSY_CODE] = "";
+static char disassyCodeVariant[MAX_DISASSY_CODE_VARIANT] = "";
+static char infoCode[MAX_INFO_CODE] = "";
+static char infoCodeVariant[MAX_INFO_CODE_VARIANT] = "";
+static char itemLocationCode[MAX_ITEM_LOCATION_CODE] = "";
+static char learnCode[MAX_LEARN_CODE] = "";
+static char learnEventCode[MAX_LEARN_EVENT_CODE] = "";
 
-char languageIsoCode[MAX_LANGUAGE_ISO_CODE] = "";
-char countryIsoCode[MAX_COUNTRY_ISO_CODE] = "";
+static char languageIsoCode[MAX_LANGUAGE_ISO_CODE] = "";
+static char countryIsoCode[MAX_COUNTRY_ISO_CODE] = "";
 
-char securityClassification[MAX_SECURITY_CLASSIFICATION] = "";
+static char securityClassification[MAX_SECURITY_CLASSIFICATION] = "";
 
-char issueNumber[MAX_ISSUE_NUMBER] = "";
-char inWork[MAX_IN_WORK] = "";
+static char issueNumber[MAX_ISSUE_NUMBER] = "";
+static char inWork[MAX_IN_WORK] = "";
 
-char responsiblePartnerCompany_enterpriseName[MAX_ENTERPRISE_NAME] = "";
-char originator_enterpriseName[MAX_ENTERPRISE_NAME] = "";
+static char responsiblePartnerCompany_enterpriseName[MAX_ENTERPRISE_NAME] = "";
+static char originator_enterpriseName[MAX_ENTERPRISE_NAME] = "";
 
-char responsiblePartnerCompany_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
-char originator_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
+static char responsiblePartnerCompany_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
+static char originator_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
 
-char techName_content[MAX_TECH_NAME] = "";
-char infoName_content[MAX_INFO_NAME] = "";
+static char techName_content[MAX_TECH_NAME] = "";
+static char infoName_content[MAX_INFO_NAME] = "";
 
-char dmtype[32] = "";
+static char dmtype[32] = "";
 
-char schema[PATH_MAX] = "";
-char brex_dmcode[PATH_MAX] = "";
-char *sns_fname = NULL;
-char *maint_sns = NULL;
-char issue_date[16] = "";
-xmlChar *issue_type = NULL;
+static char schema[PATH_MAX] = "";
+static char brex_dmcode[PATH_MAX] = "";
+static char *sns_fname = NULL;
+static char *maint_sns = NULL;
+static char issue_date[16] = "";
+static xmlChar *issue_type = NULL;
 
-xmlChar *remarks = NULL;
-xmlChar *skill_level_code = NULL;
+static xmlChar *remarks = NULL;
+static xmlChar *skill_level_code = NULL;
 
 /* Omit the issue information from the object filename. */
-bool no_issue = false;
-bool no_issue_set = false;
+static bool no_issue = false;
+static bool no_issue_set = false;
 
-enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
@@ -129,19 +129,19 @@ enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS
 #define DEFAULT_LANGUAGE_ISO_CODE "und"
 #define DEFAULT_COUNTRY_ISO_CODE "ZZ"
 
-char *template_dir = NULL;
+static char *template_dir = NULL;
 
 /* Include the previous level of SNS title in a tech name. */
-bool sns_prev_title = false;
-bool sns_prev_title_set = false;
+static bool sns_prev_title = false;
+static bool sns_prev_title_set = false;
 
-bool no_info_name = false;
+static bool no_info_name = false;
 
-char *act_dmcode = NULL;
+static char *act_dmcode = NULL;
 
 #define BREX_INFOCODE_USE BAD_CAST "The information code used is not in the allowed set."
 
-enum issue get_issue(const char *iss)
+static enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
@@ -166,7 +166,7 @@ enum issue get_issue(const char *iss)
 	return NO_ISS;
 }
 
-const char *issue_name(enum issue iss)
+static const char *issue_name(enum issue iss)
 {
 	switch (iss) {
 		case ISS_42: return "4.2";
@@ -181,7 +181,7 @@ const char *issue_name(enum issue iss)
 	}
 }
 
-void prompt(const char *prompt, char *str, int n)
+static void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
 		printf("%s: ", prompt);
@@ -212,7 +212,7 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-xmlNodePtr find_child(xmlNodePtr parent, const char *name)
+static xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
 
@@ -225,7 +225,7 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
@@ -275,13 +275,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
-void copy_default_value(const char *key, const char *val)
+static void copy_default_value(const char *key, const char *val)
 {
 	if (strcmp(key, "modelIdentCode") == 0 && strcmp(modelIdentCode, "") == 0)
 		strncpy(modelIdentCode, val, MAX_MODEL_IDENT_CODE - 2);
@@ -357,7 +357,7 @@ void copy_default_value(const char *key, const char *val)
 		issue_type = xmlStrdup(BAD_CAST val);
 }
 
-xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -376,7 +376,7 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 	return first;
 }
 
-void set_dmcode(xmlNodePtr dmCode, const char *fname)
+static void set_dmcode(xmlNodePtr dmCode, const char *fname)
 {
 	int n, offset;
 	char *path, *code;
@@ -438,21 +438,21 @@ void set_dmcode(xmlNodePtr dmCode, const char *fname)
 	free(path);
 }
 
-void set_brex(xmlDocPtr doc, const char *fname)
+static void set_brex(xmlDocPtr doc, const char *fname)
 {
 	xmlNodePtr dmCode;
 	dmCode = firstXPathNode(doc, NULL, "//brexDmRef/dmRef/dmRefIdent/dmCode");
 	set_dmcode(dmCode, fname);
 }
 
-void set_act(xmlDocPtr doc, const char *fname)
+static void set_act(xmlDocPtr doc, const char *fname)
 {
 	xmlNodePtr dmCode;
 	dmCode = firstXPathNode(doc, NULL, "//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode");
 	set_dmcode(dmCode, fname);
 }
 
-void unset_act(xmlDocPtr doc)
+static void unset_act(xmlDocPtr doc)
 {
 	xmlNodePtr dmCode;
 	dmCode = firstXPathNode(doc, NULL, "//applicCrossRefTableRef");
@@ -465,7 +465,7 @@ void unset_act(xmlDocPtr doc)
 #define SNS_XPATH_3 "//snsSystem[snsCode='%s']/snsSubSystem[snsCode='%s']/snsTitle"
 #define SNS_XPATH_4 "//snsSystem[snsCode='%s']/snsTitle"
 
-void set_sns_title(xmlNodePtr snsTitle)
+static void set_sns_title(xmlNodePtr snsTitle)
 {
 	char *title;
 
@@ -491,7 +491,7 @@ void set_sns_title(xmlNodePtr snsTitle)
 }
 
 /* Find the filename of the latest version of a BREX DM by its code. */
-bool find_brex_file(char *dst, const char *dir, const char *code)
+static bool find_brex_file(char *dst, const char *dir, const char *code)
 {
 	char s[PATH_MAX];
 
@@ -516,7 +516,7 @@ struct inmem_xml {
 };
 
 /* Map maintained SNS title to XML template. */
-struct inmem_xml maint_sns_xml(void)
+static struct inmem_xml maint_sns_xml(void)
 {
 	struct inmem_xml res;
 
@@ -554,7 +554,7 @@ struct inmem_xml maint_sns_xml(void)
 }
 
 
-xmlDocPtr maint_sns_doc(void)
+static xmlDocPtr maint_sns_doc(void)
 {
 	struct inmem_xml xml;
 
@@ -563,7 +563,7 @@ xmlDocPtr maint_sns_doc(void)
 	return read_xml_mem((const char *) xml.xml, xml.len);
 }
 
-xmlDocPtr set_tech_from_sns(const char *dir)
+static xmlDocPtr set_tech_from_sns(const char *dir)
 {
 	xmlDocPtr brex = NULL;
 	char xpath[256];
@@ -609,7 +609,7 @@ xmlDocPtr set_tech_from_sns(const char *dir)
 	return brex;
 }
 
-void set_issue_date(xmlNodePtr issueDate)
+static void set_issue_date(xmlNodePtr issueDate)
 {
 	char year_s[5], month_s[3], day_s[3];
 
@@ -641,7 +641,7 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
-xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
+static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 {
 	unsigned char *xml = NULL;
 	unsigned int len;
@@ -974,7 +974,7 @@ xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 	return read_xml_mem((const char *) xml, len);
 }
 
-xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr styledoc, res, orig;
@@ -1033,7 +1033,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	return orig;
 }
 
-void add_dmtypes_brex_val(xmlNodePtr rules, const char *key, const char *val)
+static void add_dmtypes_brex_val(xmlNodePtr rules, const char *key, const char *val)
 {
 	xmlNodePtr objval;
 	xmlChar *name;
@@ -1044,7 +1044,7 @@ void add_dmtypes_brex_val(xmlNodePtr rules, const char *key, const char *val)
 	xmlFree(name);
 }
 
-void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
+static void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 {
 	xmlNodePtr cur;
 
@@ -1095,7 +1095,7 @@ void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 	}
 }
 
-void set_remarks(xmlDocPtr doc, xmlChar *text)
+static void set_remarks(xmlDocPtr doc, xmlChar *text)
 {
 	xmlNodePtr remarks;
 	
@@ -1111,7 +1111,7 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
-void set_skill_level(xmlDocPtr doc, xmlChar *code)
+static void set_skill_level(xmlDocPtr doc, xmlChar *code)
 {
 	xmlNodePtr skill_level;
 
@@ -1126,11 +1126,11 @@ void set_skill_level(xmlDocPtr doc, xmlChar *code)
 }
 
 /* Dump the built-in dmtypes XML or text */
-void print_dmtypes(void)
+static void print_dmtypes(void)
 {
 	printf("%.*s", dmtypes_xml_len, dmtypes_xml);
 }
-void print_dmtypes_txt(void)
+static void print_dmtypes_txt(void)
 {
 	printf("%.*s", dmtypes_txt_len, dmtypes_txt);
 }
@@ -1139,7 +1139,7 @@ void print_dmtypes_txt(void)
  * otherwise default to "und" (undetermined) for language and ZZ for
  * country.
  */
-void set_env_lang(void)
+static void set_env_lang(void)
 {
 	char *env, *lang, *lang_l, *lang_c;
 
@@ -1175,7 +1175,7 @@ void set_env_lang(void)
 	free(lang);
 }
 
-void add_brex_rule(xmlNodePtr rules, xmlDocPtr brexmap, const char *key, const char *val)
+static void add_brex_rule(xmlNodePtr rules, xmlDocPtr brexmap, const char *key, const char *val)
 {
 	xmlNodePtr rule, objpath, objval;
 	char *path;
@@ -1201,7 +1201,7 @@ void add_brex_rule(xmlNodePtr rules, xmlDocPtr brexmap, const char *key, const c
 	xmlFree(path);
 }
 
-xmlDocPtr read_default_brexmap(void)
+static xmlDocPtr read_default_brexmap(void)
 {
 	char fname[PATH_MAX];
 
@@ -1212,7 +1212,7 @@ xmlDocPtr read_default_brexmap(void)
 	}
 }
 
-void dump_templ(const char *fname, const unsigned char *xml, const unsigned int len)
+static void dump_templ(const char *fname, const unsigned char *xml, const unsigned int len)
 {
 	FILE *f;
 	f = fopen(fname, "w");
@@ -1220,7 +1220,7 @@ void dump_templ(const char *fname, const unsigned char *xml, const unsigned int 
 	fclose(f);
 }
 
-void dump_templates(const char *path)
+static void dump_templates(const char *path)
 {
 	if (access(path, W_OK) == -1 || chdir(path)) {
 		fprintf(stderr, E_BAD_TEMPL_DIR, path);

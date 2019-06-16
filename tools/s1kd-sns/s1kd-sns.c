@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -26,7 +26,7 @@
 
 #define DEFAULT_SNS_DNAME "SNS"
 
-int hlink(const char *path, const char *fname)
+static int hlink(const char *path, const char *fname)
 {
 	#ifdef _WIN32
 		return CreateHardLink(fname, path, 0);
@@ -35,7 +35,7 @@ int hlink(const char *path, const char *fname)
 	#endif
 }
 
-int slink(const char *path, const char *fname)
+static int slink(const char *path, const char *fname)
 {
 	#ifdef _WIN32
 		return CreateSymbolicLink(fname, path, 0);
@@ -45,12 +45,12 @@ int slink(const char *path, const char *fname)
 }
 
 /* The type of link to use, hard or soft (symbolic). */
-int (*linkfn)(const char *path, const char *fname) = hlink;
+static int (*linkfn)(const char *path, const char *fname) = hlink;
 
 /* Title SNS directories using only the SNS code, not including the SNS title. */
-bool only_numb = false;
+static bool only_numb = false;
 
-void change_dir(const char *dir)
+static void change_dir(const char *dir)
 {
 	if (chdir(dir) != 0) {
 		fprintf(stderr, ERR_PREFIX "Cannot change directory to %s: %s\n", dir, strerror(errno));
@@ -58,7 +58,7 @@ void change_dir(const char *dir)
 	}
 }
 
-void rename_dir(const char *old, const char *new)
+static void rename_dir(const char *old, const char *new)
 {
 	if (rename(old, new) != 0) {
 		fprintf(stderr, ERR_PREFIX "Cannot rename directory %s to %s: %s\n", old, new, strerror(errno));
@@ -66,7 +66,7 @@ void rename_dir(const char *old, const char *new)
 	}
 }
 
-void get_current_dir(char *buf, size_t size)
+static void get_current_dir(char *buf, size_t size)
 {
 	if (!getcwd(buf, size)) {
 		fprintf(stderr, ERR_PREFIX "Cannot get current directory: %s\n", strerror(errno));
@@ -75,14 +75,14 @@ void get_current_dir(char *buf, size_t size)
 }
 
 /* Indent printed SNS entry to a specified level. */
-void indent(int level)
+static void indent(int level)
 {
 	int i;
 	for (i = 0; i < level * 4; ++i) putchar(' ');
 }
 
 /* Print the SNS. */
-void print_sns(xmlNodePtr node, int level)
+static void print_sns(xmlNodePtr node, int level)
 {
 	xmlNodePtr cur;
 
@@ -105,7 +105,7 @@ void print_sns(xmlNodePtr node, int level)
 }
 
 /* Replace characters that cannot be used in directory names. */
-void cleanstr(char *s)
+static void cleanstr(char *s)
 {
 	int i;
 	for (i = 0; s[i]; ++i) {
@@ -127,7 +127,7 @@ void cleanstr(char *s)
 }
 
 /* Create a directory if it does not exist. */
-void makedir(const char *path)
+static void makedir(const char *path)
 {
 	if (access(path, F_OK) == -1) {
 		#ifdef _WIN32
@@ -139,7 +139,7 @@ void makedir(const char *path)
 }
 
 /* Create the directory structure for the SNS. */
-void setup_sns(xmlNodePtr node, const char *snsdname)
+static void setup_sns(xmlNodePtr node, const char *snsdname)
 {
 	xmlNodePtr cur;
 	char *content;
@@ -188,7 +188,7 @@ void setup_sns(xmlNodePtr node, const char *snsdname)
 }
 
 /* Tests if the given file is a data module. */
-int is_dmodule(const char *fname)
+static int is_dmodule(const char *fname)
 {
 	return (strncmp(fname, "DMC-", 4) == 0 || strncmp(fname, "DME-", 4) == 0) &&
 	       strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
@@ -212,7 +212,7 @@ struct dm_code {
 };
 
 /* Read a DM code from a given string. */
-int parse_dmcode(struct dm_code *code, const char *str)
+static int parse_dmcode(struct dm_code *code, const char *str)
 {
 	int c;
 
@@ -238,7 +238,7 @@ int parse_dmcode(struct dm_code *code, const char *str)
 }
 
 /* Test if the SNS directory exists for a specified code. */
-int sns_exists(const char *code, char *dname)
+static int sns_exists(const char *code, char *dname)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -260,7 +260,7 @@ int sns_exists(const char *code, char *dname)
 }
 
 /* Place a link to a DM file in to the proper place in the SNS directory hierarchy. */
-void placedm(const char *fname, struct dm_code *code, const char *snsdname, const char *srcdname)
+static void placedm(const char *fname, struct dm_code *code, const char *snsdname, const char *srcdname)
 {
 	char path[PATH_MAX], dname[PATH_MAX], orig[PATH_MAX];
 	bool link = true;
@@ -308,7 +308,7 @@ void placedm(const char *fname, struct dm_code *code, const char *snsdname, cons
 }
 
 /* Resort DMs in to the SNS directory hierarchy. */
-void sort_sns(const char *snsdname, const char *srcdname)
+static void sort_sns(const char *snsdname, const char *srcdname)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -330,7 +330,7 @@ void sort_sns(const char *snsdname, const char *srcdname)
 }
 
 /* Print or setup the SNS directory structure for a given BREX containing SNS rules. */
-void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdname, const char *srcdname)
+static void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdname, const char *srcdname)
 {
 	xmlDocPtr brex;
 	xmlXPathContextPtr ctxt;
@@ -376,7 +376,7 @@ void print_or_setup_sns(const char *brex_fname, bool printsns, const char *snsdn
 	xmlFreeDoc(brex);
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-D <dir>] [-d <dir>] [-cmnpsh?] [<BREX> ...]");
 	puts("");
@@ -394,7 +394,7 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);

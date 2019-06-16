@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.1.1"
+#define VERSION "2.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -40,7 +40,7 @@
 #define INVALID_IDS_XPATH BAD_CAST \
 	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs"
 
-enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
+static enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
 
 /* Cache schemas to prevent parsing them twice (mainly needed when accessing
  * the schema over a network)
@@ -53,13 +53,13 @@ struct s1kd_schema_parser {
 };
 
 /* Initial max schema parsers. */
-unsigned SCHEMA_PARSERS_MAX = 1;
+static unsigned SCHEMA_PARSERS_MAX = 1;
 
-struct s1kd_schema_parser *schema_parsers;
+static struct s1kd_schema_parser *schema_parsers;
 
-int schema_parser_count = 0;
+static int schema_parser_count = 0;
 
-void print_error(void *userData, xmlErrorPtr error)
+static void print_error(void *userData, xmlErrorPtr error)
 {
 	if (error->file) {
 		fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
@@ -68,7 +68,7 @@ void print_error(void *userData, xmlErrorPtr error)
 	}
 }
 
-void print_non_parser_error(void *userData, xmlErrorPtr error)
+static void print_non_parser_error(void *userData, xmlErrorPtr error)
 {
 	if (error->domain != XML_FROM_PARSER) {
 		if (error->file) {
@@ -79,16 +79,16 @@ void print_non_parser_error(void *userData, xmlErrorPtr error)
 	}
 }
 
-void suppress_error(void *userData, xmlErrorPtr error)
+static void suppress_error(void *userData, xmlErrorPtr error)
 {
 }
 
 xmlStructuredErrorFunc schema_errfunc = print_error;
 
 /* Print the XML tree to stdout if it is valid. */
-int output_tree = 0;
+static int output_tree = 0;
 
-struct s1kd_schema_parser *get_schema_parser(const char *url)
+static struct s1kd_schema_parser *get_schema_parser(const char *url)
 {
 	int i;
 
@@ -101,7 +101,7 @@ struct s1kd_schema_parser *get_schema_parser(const char *url)
 	return NULL;
 }
 
-struct s1kd_schema_parser *add_schema_parser(char *url)
+static struct s1kd_schema_parser *add_schema_parser(char *url)
 {
 	struct s1kd_schema_parser *parser;
 
@@ -128,7 +128,7 @@ struct s1kd_schema_parser *add_schema_parser(char *url)
 	return parser;
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-d <dir>] [-x <URI>] [-efloqv] [<object>...]");
 	puts("");
@@ -147,18 +147,18 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-void add_ignore_ns(xmlNodePtr ignore_ns, const char *arg)
+static void add_ignore_ns(xmlNodePtr ignore_ns, const char *arg)
 {
 	xmlNewChild(ignore_ns, NULL, BAD_CAST "ignore", BAD_CAST arg);
 }
 
-void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
+static void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
 {
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
@@ -190,7 +190,7 @@ void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
 /* Check that certain attributes of type xs:IDREF and xs:IDREFS have a matching
  * xs:ID attribute.
  */
-int check_idrefs(xmlDocPtr doc, const char *fname)
+static int check_idrefs(xmlDocPtr doc, const char *fname)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -263,7 +263,7 @@ int check_idrefs(xmlDocPtr doc, const char *fname)
 	return err;
 }
 
-void resize_schema_parsers(void)
+static void resize_schema_parsers(void)
 {
 	if (!(schema_parsers = realloc(schema_parsers, (SCHEMA_PARSERS_MAX *= 2) * sizeof(struct s1kd_schema_parser)))) {
 		fprintf(stderr, E_MAX_SCHEMA_PARSERS, schema_parser_count);
@@ -271,7 +271,7 @@ void resize_schema_parsers(void)
 	}
 }
 
-int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list, int ignore_empty)
+static int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_ns, int list, int ignore_empty)
 {
 	xmlDocPtr doc;
 	xmlDocPtr validtree = NULL;
@@ -383,7 +383,7 @@ int validate_file(const char *fname, const char *schema_dir, xmlNodePtr ignore_n
 	return err;
 }
 
-int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns, int list_invalid, int ignore_empty)
+static int validate_file_list(const char *fname, char *schema_dir, xmlNodePtr ignore_ns, int list_invalid, int ignore_empty)
 {
 	FILE *f;
 	char path[PATH_MAX];

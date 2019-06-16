@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "1.10.0"
+#define VERSION "1.10.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -48,26 +48,26 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
-char model_ident_code[16] = "";
-char pm_issuer[7] = "";
-char pm_number[7] = "";
-char pm_volume[4] = "";
-char language_iso_code[5] = "";
-char country_iso_code[4] = "";
-char issue_number[5] = "";
-char in_work[4] = "";
-char pm_title[256] = "";
-char short_pm_title[256] = "";
-char security_classification[4] = "";
-char enterprise_name[256] = "";
-char enterprise_code[7] = "";
+static char model_ident_code[16] = "";
+static char pm_issuer[7] = "";
+static char pm_number[7] = "";
+static char pm_volume[4] = "";
+static char language_iso_code[5] = "";
+static char country_iso_code[4] = "";
+static char issue_number[5] = "";
+static char in_work[4] = "";
+static char pm_title[256] = "";
+static char short_pm_title[256] = "";
+static char security_classification[4] = "";
+static char enterprise_name[256] = "";
+static char enterprise_code[7] = "";
 
-char brex_dmcode[256] = "";
+static char brex_dmcode[256] = "";
 
-char issue_date[16] = "";
-xmlChar *issue_type = NULL;
+static char issue_date[16] = "";
+static xmlChar *issue_type = NULL;
 
-xmlChar *remarks = NULL;
+static xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -79,13 +79,13 @@ xmlChar *remarks = NULL;
 #define DEFAULT_LANGUAGE_ISO_CODE "und"
 #define DEFAULT_COUNTRY_ISO_CODE "ZZ"
 
-enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
-char *template_dir = NULL;
+static char *template_dir = NULL;
 
-char *act_dmcode = NULL;
+static char *act_dmcode = NULL;
 
-xmlDocPtr xml_skeleton(void)
+static xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
 		char src[PATH_MAX];
@@ -102,7 +102,7 @@ xmlDocPtr xml_skeleton(void)
 	}
 }
 
-enum issue get_issue(const char *iss)
+static enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
@@ -127,22 +127,7 @@ enum issue get_issue(const char *iss)
 	return NO_ISS;
 }
 
-const char *issue_name(enum issue iss)
-{
-	switch (iss) {
-		case ISS_42: return "4.2";
-		case ISS_41: return "4.1";
-		case ISS_40: return "4.0";
-		case ISS_30: return "3.0";
-		case ISS_23: return "2.3";
-		case ISS_22: return "2.2";
-		case ISS_21: return "2.1";
-		case ISS_20: return "2.0";
-		default: return "";
-	}
-}
-
-xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr styledoc, res, orig;
@@ -199,7 +184,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	return orig;
 }
 
-xmlNodePtr find_child(xmlNodePtr parent, char *name)
+static xmlNodePtr find_child(xmlNodePtr parent, char *name)
 {
 	xmlNodePtr cur;
 
@@ -212,7 +197,7 @@ xmlNodePtr find_child(xmlNodePtr parent, char *name)
 	return NULL;
 }
 
-void prompt(const char *prompt, char *str, int n)
+static void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
 		printf("%s: ", prompt);
@@ -243,7 +228,7 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
+static xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
@@ -260,7 +245,7 @@ xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 	return node;
 }
 
-void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool include_language, bool include_title, bool include_date)
+static void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool include_language, bool include_title, bool include_date)
 {
 	xmlNodePtr ident_extension, dm_code, issue_info, language;
 	xmlNodePtr dm_ref, dm_ref_ident, dm_ref_address_items;
@@ -312,7 +297,7 @@ void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, bool in
 	xmlAddChild(pmEntry, dm_ref);
 }
 
-void set_issue_date(xmlNodePtr issueDate)
+static void set_issue_date(xmlNodePtr issueDate)
 {
 	char year_s[5], month_s[3], day_s[3];
 
@@ -344,7 +329,7 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day_s);
 }
 
-void dump_template(const char *path)
+static void dump_template(const char *path)
 {
 	FILE *f;
 
@@ -358,7 +343,7 @@ void dump_template(const char *path)
 	fclose(f);
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<dmodule>...]");
 	puts("");
@@ -399,13 +384,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
-void copy_default_value(const char *key, const char *val)
+static void copy_default_value(const char *key, const char *val)
 {
 	if (strcmp(key, "modelIdentCode") == 0 && strcmp(model_ident_code, "") == 0)
 		strcpy(model_ident_code, val);
@@ -443,7 +428,7 @@ void copy_default_value(const char *key, const char *val)
 		issue_type = xmlStrdup(BAD_CAST val);
 }
 
-xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
+static xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -463,7 +448,7 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, const char *xpath)
 	return node;
 }
 
-void set_dmcode(xmlNodePtr dmCode, const char *fname)
+static void set_dmcode(xmlNodePtr dmCode, const char *fname)
 {
 	int n, offset;
 	char *path, *code;
@@ -525,21 +510,21 @@ void set_dmcode(xmlNodePtr dmCode, const char *fname)
 	free(path);
 }
 
-void set_brex(xmlDocPtr doc, const char *fname)
+static void set_brex(xmlDocPtr doc, const char *fname)
 {
 	xmlNodePtr dmCode;
 	dmCode = firstXPathNode(doc, "//brexDmRef/dmRef/dmRefIdent/dmCode");
 	set_dmcode(dmCode, fname);
 }
 
-void set_act(xmlDocPtr doc, const char *fname)
+static void set_act(xmlDocPtr doc, const char *fname)
 {
 	xmlNodePtr dmCode;
 	dmCode = firstXPathNode(doc, "//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode");
 	set_dmcode(dmCode, fname);
 }
 
-void unset_act(xmlDocPtr doc)
+static void unset_act(xmlDocPtr doc)
 {
 	xmlNodePtr dmCode;
 	dmCode = firstXPathNode(doc, "//applicCrossRefTableRef");
@@ -551,7 +536,7 @@ void unset_act(xmlDocPtr doc)
  * otherwise default to "und" (undetermined) for language and ZZ for
  * country.
  */
-void set_env_lang(void)
+static void set_env_lang(void)
 {
 	char *env, *lang, *lang_l, *lang_c;
 
@@ -587,7 +572,7 @@ void set_env_lang(void)
 	free(lang);
 }
 
-void set_remarks(xmlDocPtr doc, xmlChar *text)
+static void set_remarks(xmlDocPtr doc, xmlChar *text)
 {
 	xmlXPathContextPtr ctx;
 	xmlNodePtr remarks;

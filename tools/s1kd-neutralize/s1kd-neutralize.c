@@ -13,7 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -22,9 +22,9 @@
 
 #define I_NEUTRALIZE INF_PREFIX "Adding neutral metadata to %s...\n"
 
-bool verbose = false;
+static bool verbose = false;
 
-void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool namesp)
+static void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool namesp)
 {
 	xmlDocPtr doc, res, styledoc, orig;
 	xsltStylesheetPtr style;
@@ -79,7 +79,7 @@ void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool
 	xmlFreeDoc(orig);
 }
 
-void neutralizeList(const char *path, const char *outfile, bool overwrite, bool namesp)
+static void neutralizeList(const char *path, const char *outfile, bool overwrite, bool namesp)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -103,7 +103,7 @@ void neutralizeList(const char *path, const char *outfile, bool overwrite, bool 
 	}
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-o <file>] [-flnvh?] [<object>...]");
 	puts("");
@@ -118,7 +118,7 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);

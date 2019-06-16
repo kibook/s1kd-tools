@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.3.0"
+#define VERSION "2.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -23,9 +23,9 @@
 #define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content/refpm"
 #define REFS_PATH BAD_CAST "//dmRef|//pmRef|//refdm[*]|//refpm"
 
-bool verbose = false;
+static bool verbose = false;
 
-xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
+static xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -54,12 +54,12 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 	return first;
 }
 
-char *firstXPathString(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
+static char *firstXPathString(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
 	return (char *) xmlNodeGetContent(firstXPathNode(xpath, doc, node));
 }
 
-xmlNodePtr findChild(xmlNodePtr parent, const char *name)
+static xmlNodePtr findChild(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
 
@@ -74,7 +74,7 @@ xmlNodePtr findChild(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
-void replaceNode(xmlNodePtr a, xmlNodePtr b)
+static void replaceNode(xmlNodePtr a, xmlNodePtr b)
 {
 	xmlNodePtr c;
 	c = xmlCopyNode(b, 1);
@@ -84,7 +84,7 @@ void replaceNode(xmlNodePtr a, xmlNodePtr b)
 	xmlFreeNode(a);
 }
 
-void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
+static void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 {
 	xmlNodePtr identExtension, pmCode, issueInfo, language;
 
@@ -156,7 +156,7 @@ void getPmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	}
 }
 
-void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
+static void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 {
 	xmlNodePtr identExtension, dmCode, issueInfo, language;
 	char *modelIdentCode;
@@ -274,17 +274,17 @@ void getDmCode(char *dst, xmlNodePtr ident, bool withIssue, bool withLang)
 	}
 }
 
-bool isDmRef(xmlNodePtr ref)
+static bool isDmRef(xmlNodePtr ref)
 {
 	return xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "refdm") == 0;
 }
 
-bool isDmAddress(xmlNodePtr address)
+static bool isDmAddress(xmlNodePtr address)
 {
 	return xmlStrcmp(address->name, BAD_CAST "dmAddress") == 0 || xmlStrcmp(address->name, BAD_CAST "dmaddres") == 0;
 }
 
-bool sameDm(xmlNodePtr ref, xmlNodePtr address)
+static bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 {
 	char refcode[256], addcode[256];
 	bool withIssue, withLang;
@@ -311,17 +311,17 @@ bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 	return strcmp(refcode, addcode) == 0;
 }
 
-bool isPmRef(xmlNodePtr ref)
+static bool isPmRef(xmlNodePtr ref)
 {
 	return xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 || xmlStrcmp(ref->name, BAD_CAST "refpm") == 0;
 }
 
-bool isPmAddress(xmlNodePtr address)
+static bool isPmAddress(xmlNodePtr address)
 {
 	return xmlStrcmp(address->name, BAD_CAST "pmAddress") == 0 || xmlStrcmp(address->name, BAD_CAST "pmaddres") == 0;
 }
 
-bool samePm(xmlNodePtr ref, xmlNodePtr address)
+static bool samePm(xmlNodePtr ref, xmlNodePtr address)
 {
 	char refcode[256], addcode[256];
 	bool withIssue, withLang;
@@ -348,7 +348,7 @@ bool samePm(xmlNodePtr ref, xmlNodePtr address)
 	return strcmp(refcode, addcode) == 0;
 }
 
-void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
+static void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	xmlNodePtr cur;
 
@@ -433,7 +433,7 @@ void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, xmlNodeP
 	}
 }
 
-void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
+static void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xmlNodePtr recode)
 {
 	int i;
 
@@ -442,7 +442,7 @@ void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fname, xml
 	}
 }
 
-void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-d <dir>] [-s <source>] [-t <target>] [-clvh?] [<object>...]");
 	puts("");
@@ -460,13 +460,13 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-bool isS1000D(const char *fname)
+static bool isS1000D(const char *fname)
 {
 	return (strncmp(fname, "DMC-", 4) == 0 ||
 		strncmp(fname, "DME-", 4) == 0 ||
@@ -482,7 +482,7 @@ bool isS1000D(const char *fname)
 		strncmp(fname, "SME-", 4) == 0) && strncasecmp(fname + strlen(fname) - 4, ".XML", 4) == 0;
 }
 
-void addAddress(const char *fname, xmlNodePtr addresses)
+static void addAddress(const char *fname, xmlNodePtr addresses)
 {
 	xmlDocPtr doc;
 	xmlNodePtr address;
@@ -504,7 +504,7 @@ void addAddress(const char *fname, xmlNodePtr addresses)
 	xmlFreeDoc(doc);
 }
 
-void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, const char *recode, bool overwrite)
+static void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, const char *recode, bool overwrite)
 {
 	xmlDocPtr doc, recodeDoc;
 	xmlXPathContextPtr ctx;
@@ -549,7 +549,7 @@ void updateRefsFile(const char *fname, xmlNodePtr addresses, bool contentOnly, c
 	xmlFreeDoc(doc);
 }
 
-void addDirectory(const char *path, xmlNodePtr addresses)
+static void addDirectory(const char *path, xmlNodePtr addresses)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -575,7 +575,7 @@ void addDirectory(const char *path, xmlNodePtr addresses)
 	closedir(dir);
 }
 
-void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly, const char *recode, bool overwrite)
+static void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnly, const char *recode, bool overwrite)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -596,7 +596,7 @@ void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool contentOnl
 	closedir(dir);
 }
 
-xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr paths)
+static xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr paths)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -623,7 +623,7 @@ xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNodePtr pa
 	return paths;
 }
 
-void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly, const char *recode, bool overwrite)
+static void updateRefsList(xmlNodePtr addresses, xmlNodePtr paths, bool contentOnly, const char *recode, bool overwrite)
 {
 	xmlNodePtr cur;
 	for (cur = paths->children; cur; cur = cur->next) {
@@ -695,8 +695,8 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			case '?':
-				showHelp();
-				exit(0);
+				show_help();
+				return 0;
 		}
 	}
 

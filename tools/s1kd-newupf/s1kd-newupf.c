@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
-enum issue { NO_ISS, ISS_41, ISS_42 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_41, ISS_42 } issue = NO_ISS;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 
@@ -61,9 +61,9 @@ typedef enum {
 	WARNING_REPOSITORY
 } cirType;
 
-char *templateDir = NULL;
+static char *templateDir = NULL;
 
-enum issue getIssue(const char *iss)
+static enum issue getIssue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0) {
 		return ISS_42;
@@ -77,7 +77,7 @@ enum issue getIssue(const char *iss)
 	return NO_ISS;
 }
 
-xmlNodePtr nodeExists(const char *xpath, xmlXPathContextPtr ctx)
+static xmlNodePtr nodeExists(const char *xpath, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
@@ -95,7 +95,7 @@ xmlNodePtr nodeExists(const char *xpath, xmlXPathContextPtr ctx)
 	return node;
 }
 
-xmlNodePtr firstXPathNode(const char *xpath, xmlXPathContextPtr ctx)
+static xmlNodePtr firstXPathNode(const char *xpath, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
@@ -113,7 +113,7 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlXPathContextPtr ctx)
 	return node;
 }
 
-cirType typeOfCir(xmlXPathContextPtr ctx)
+static cirType typeOfCir(xmlXPathContextPtr ctx)
 {
 	xmlNodePtr type;
 	
@@ -147,7 +147,7 @@ cirType typeOfCir(xmlXPathContextPtr ctx)
 }
 
 /* XPath for specs which are distinguished by a single unique attribute */
-xmlNodePtr xpathForBasicSpec(char *xpath, xmlNodePtr object, const char *attr)
+static xmlNodePtr xpathForBasicSpec(char *xpath, xmlNodePtr object, const char *attr)
 {
 	xmlNodePtr ident;
 	xmlChar *value;
@@ -166,7 +166,7 @@ xmlNodePtr xpathForBasicSpec(char *xpath, xmlNodePtr object, const char *attr)
 	return ident;
 }
 
-xmlNodePtr xpathForPartSpec(char *xpath, xmlNodePtr object)
+static xmlNodePtr xpathForPartSpec(char *xpath, xmlNodePtr object)
 {
 	xmlNodePtr ident;
 	xmlChar *partNumberValue, *manufacturerCodeValue;
@@ -185,7 +185,7 @@ xmlNodePtr xpathForPartSpec(char *xpath, xmlNodePtr object)
 	return ident;
 }
 
-xmlNodePtr xpathForToolSpec(char *xpath, xmlNodePtr object)
+static xmlNodePtr xpathForToolSpec(char *xpath, xmlNodePtr object)
 {
 	xmlNodePtr ident;
 	xmlChar *toolNumber, *manufacturerCodeValue;
@@ -204,7 +204,7 @@ xmlNodePtr xpathForToolSpec(char *xpath, xmlNodePtr object)
 	return ident;
 }
 
-xmlNodePtr xpathForControlIndicatorSpec(char *xpath, xmlNodePtr object)
+static xmlNodePtr xpathForControlIndicatorSpec(char *xpath, xmlNodePtr object)
 {
 	xmlChar *controlIndicatorNumber;
 	xmlNodePtr ident;
@@ -223,7 +223,7 @@ xmlNodePtr xpathForControlIndicatorSpec(char *xpath, xmlNodePtr object)
 	return ident;
 }
 
-xmlNodePtr getNodeXPath(char *xpath, xmlNodePtr object)
+static xmlNodePtr getNodeXPath(char *xpath, xmlNodePtr object)
 {
 	xmlNodePtr ident;
 	xmlChar *id;
@@ -261,7 +261,7 @@ xmlNodePtr getNodeXPath(char *xpath, xmlNodePtr object)
 	return ident;
 }
 
-xmlNodePtr deleteObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
+static xmlNodePtr deleteObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 {
 	xmlNodePtr group;
 	xmlXPathObjectPtr results;
@@ -300,7 +300,7 @@ xmlNodePtr deleteObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 	return NULL;
 }
 
-xmlNodePtr insertObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
+static xmlNodePtr insertObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 {
 	xmlNodePtr group;
 	xmlXPathObjectPtr results;
@@ -352,7 +352,7 @@ xmlNodePtr insertObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 	return NULL;
 }
 
-bool sameNodes(xmlNodePtr a, xmlNodePtr b)
+static bool sameNodes(xmlNodePtr a, xmlNodePtr b)
 {
 	xmlBufferPtr bufA, bufB;
 	bool equal;
@@ -371,7 +371,7 @@ bool sameNodes(xmlNodePtr a, xmlNodePtr b)
 	return equal;
 }
 
-xmlNodePtr replaceObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
+static xmlNodePtr replaceObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 {
 	xmlNodePtr group;
 	xmlXPathObjectPtr results;
@@ -410,7 +410,7 @@ xmlNodePtr replaceObjects(xmlXPathContextPtr src, xmlXPathContextPtr tgt)
 }
 
 /* Copy metadata from source and target CIRs */
-void setMetadata(xmlXPathContextPtr update, xmlXPathContextPtr source, xmlXPathContextPtr target)
+static void setMetadata(xmlXPathContextPtr update, xmlXPathContextPtr source, xmlXPathContextPtr target)
 {
 	xmlNodePtr updateAddress, updateIdent, updateCode, sourceDmIdent,
 		updateStatus, targetDmIssueInfo, updateIdentAndStatusSection,
@@ -445,7 +445,7 @@ void setMetadata(xmlXPathContextPtr update, xmlXPathContextPtr source, xmlXPathC
 	xmlNodeSetName(targetDmStatus, BAD_CAST "targetDmStatus");
 }
 
-void autoName(char *dst, xmlXPathContextPtr update)
+static void autoName(char *dst, xmlXPathContextPtr update)
 {
 	xmlNodePtr updateCode, issueInfo, language;
 	char *modelIdentCode;
@@ -525,7 +525,7 @@ void autoName(char *dst, xmlXPathContextPtr update)
 	xmlFree(countryIsoCode);
 }
 
-xmlDocPtr toIssue(xmlDocPtr doc, enum issue iss)
+static xmlDocPtr toIssue(xmlDocPtr doc, enum issue iss)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr styledoc, res, orig;
@@ -558,7 +558,7 @@ xmlDocPtr toIssue(xmlDocPtr doc, enum issue iss)
 	return orig;
 }
 
-xmlDocPtr xmlSkeleton(const char *templateDir)
+static xmlDocPtr xmlSkeleton(const char *templateDir)
 {
 	if (templateDir) {
 		char src[PATH_MAX];
@@ -575,7 +575,7 @@ xmlDocPtr xmlSkeleton(const char *templateDir)
 	}
 }
 
-void copyDefaultValue(const char *key, const char *val)
+static void copyDefaultValue(const char *key, const char *val)
 {
 	if (strcmp(key, "issue") == 0 && issue == NO_ISS) {
 		issue = getIssue(val);
@@ -584,7 +584,7 @@ void copyDefaultValue(const char *key, const char *val)
 	}
 }
 
-void dump_template(const char *path)
+static void dump_template(const char *path)
 {
 	FILE *f;
 
@@ -598,7 +598,7 @@ void dump_template(const char *path)
 	fclose(f);
 }
 
-void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] <SOURCE> <TARGET>");
 	puts("");
@@ -616,7 +616,7 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
@@ -692,7 +692,7 @@ int main(int argc, char **argv)
 				return 0;
 			case 'h':
 			case '?':
-				showHelp();
+				show_help();
 				return 0;
 		}
 	}

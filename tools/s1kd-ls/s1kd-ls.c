@@ -14,17 +14,17 @@
 
 /* Initial maximum number of CSDB objects of each type. */
 #define OBJECT_MAX 1
-unsigned DM_MAX  = OBJECT_MAX;
-unsigned PM_MAX  = OBJECT_MAX;
-unsigned COM_MAX = OBJECT_MAX;
-unsigned IMF_MAX = OBJECT_MAX;
-unsigned DDN_MAX = OBJECT_MAX;
-unsigned DML_MAX = OBJECT_MAX;
-unsigned ICN_MAX = OBJECT_MAX;
-unsigned SMC_MAX = OBJECT_MAX;
+static unsigned DM_MAX  = OBJECT_MAX;
+static unsigned PM_MAX  = OBJECT_MAX;
+static unsigned COM_MAX = OBJECT_MAX;
+static unsigned IMF_MAX = OBJECT_MAX;
+static unsigned DDN_MAX = OBJECT_MAX;
+static unsigned DML_MAX = OBJECT_MAX;
+static unsigned ICN_MAX = OBJECT_MAX;
+static unsigned SMC_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -43,23 +43,23 @@ unsigned SMC_MAX = OBJECT_MAX;
 #define SHOW_SMC 0x80
 
 /* Lists of CSDB objects. */
-char (*dms)[PATH_MAX] = NULL;
-char (*pms)[PATH_MAX] = NULL;
-char (*smcs)[PATH_MAX] = NULL;
-char (*coms)[PATH_MAX] = NULL;
-char (*icns)[PATH_MAX] = NULL;
-char (*imfs)[PATH_MAX] = NULL;
-char (*ddns)[PATH_MAX] = NULL;
-char (*dmls)[PATH_MAX] = NULL;
-int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0;
+static char (*dms)[PATH_MAX] = NULL;
+static char (*pms)[PATH_MAX] = NULL;
+static char (*smcs)[PATH_MAX] = NULL;
+static char (*coms)[PATH_MAX] = NULL;
+static char (*icns)[PATH_MAX] = NULL;
+static char (*imfs)[PATH_MAX] = NULL;
+static char (*ddns)[PATH_MAX] = NULL;
+static char (*dmls)[PATH_MAX] = NULL;
+static int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0;
 
 /* Separator between printed CSDB objects. */
-char sep = '\n';
+static char sep = '\n';
 
 /* Whether the CSDB objects were created with the -N option. */
-int no_issue = 0;
+static int no_issue = 0;
 
-void printfiles(char (*files)[PATH_MAX], int n)
+static void printfiles(char (*files)[PATH_MAX], int n)
 {
 	int i;
 	for (i = 0; i < n; ++i) {
@@ -68,7 +68,7 @@ void printfiles(char (*files)[PATH_MAX], int n)
 }
 
 /* Compare the base names of two files. */
-int compare(const void *a, const void *b)
+static int compare(const void *a, const void *b)
 {
 	char *sa, *sb, *ba, *bb;
 	int d;
@@ -87,7 +87,7 @@ int compare(const void *a, const void *b)
 }
 
 /* Compare two ICN files, grouped by file extension. */
-int compare_icn(const void *a, const void *b)
+static int compare_icn(const void *a, const void *b)
 {
 	char *sa, *sb, *ba, *bb, *e, *ea, *eb;
 	int d;
@@ -126,45 +126,45 @@ int compare_icn(const void *a, const void *b)
 }
 
 /* Determine whether files are CSDB objects. */
-int isxml(const char *name)
+static int isxml(const char *name)
 {
 	return strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
-int isdm(const char *name)
+static int isdm(const char *name)
 {
 	return (strncmp(name, "DMC-", 4) == 0 || strncmp(name, "DME-", 4) == 0) && isxml(name);
 }
-int ispm(const char *name)
+static int ispm(const char *name)
 {
 	return (strncmp(name, "PMC-", 4) == 0 || strncmp(name, "PME-", 4) == 0) && isxml(name);
 }
-int iscom(const char *name)
+static int iscom(const char *name)
 {
 	return strncmp(name, "COM-", 4) == 0 && isxml(name);
 }
-int isimf(const char *name)
+static int isimf(const char *name)
 {
 	return strncmp(name, "IMF-", 4) == 0 && isxml(name);
 }
-int isddn(const char *name)
+static int isddn(const char *name)
 {
 	return strncmp(name, "DDN-", 4) == 0 && isxml(name);
 }
-int isdml(const char *name)
+static int isdml(const char *name)
 {
 	return strncmp(name, "DML-", 4) == 0 && isxml(name);
 }
-int isicn(const char *name)
+static int isicn(const char *name)
 {
 	return strncmp(name, "ICN-", 4) == 0;
 }
-int issmc(const char *name)
+static int issmc(const char *name)
 {
 	return (strncmp(name, "SMC-", 4) == 0 || strncmp(name, "SME-", 4) == 0) && isxml(name);
 }
 
 /* Show usage message. */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPRrSwX] [<object>|<dir> ...]");
 	puts("");
@@ -192,14 +192,14 @@ void show_help(void)
 }
 
 /* Show version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
 /* Resize CSDB object lists when it is full. */
-void resize(char (**list)[PATH_MAX], unsigned *max)
+static void resize(char (**list)[PATH_MAX], unsigned *max)
 {
 	if (!(*list = realloc(*list, (*max *= 2) * PATH_MAX))) {
 		fprintf(stderr, E_MAX_OBJECT,
@@ -209,7 +209,7 @@ void resize(char (**list)[PATH_MAX], unsigned *max)
 }
 
 /* Find CSDB objects in a given directory. */
-void list_dir(const char *path, int only_writable, int only_readonly, int recursive)
+static void list_dir(const char *path, int only_writable, int only_readonly, int recursive)
 {
 	DIR *dir;
 	struct dirent *cur;
@@ -288,7 +288,7 @@ void list_dir(const char *path, int only_writable, int only_readonly, int recurs
 }
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -312,13 +312,13 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 }
 
 /* Return the content of the first node matching an XPath expression. */
-xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	return xmlNodeGetContent(first_xpath_node(doc, node, xpath));
 }
 
 /* Checks if a CSDB object is in the official state (inwork = 00). */
-int is_official_issue(const char *fname, const char *path)
+static int is_official_issue(const char *fname, const char *path)
 {
 	if (no_issue) {
 		xmlDocPtr doc;
@@ -348,7 +348,7 @@ int is_official_issue(const char *fname, const char *path)
 }
 
 /* Copy only the latest issues of CSDB objects. */
-int extract_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+static int extract_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -374,7 +374,7 @@ int extract_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles
 	}
 	return nlatest;
 }
-int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+static int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -406,7 +406,7 @@ int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int n
 }
 
 /* Copy only old issues of CSDB objects. */
-int remove_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+static int remove_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -437,7 +437,7 @@ int remove_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 	}
 	return nlatest;
 }
-int remove_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+static int remove_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -473,7 +473,7 @@ int remove_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nf
 }
 
 /* Copy only official issues of CSDB objects. */
-int extract_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+static int extract_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nofficial = 0;
 	for (i = 0; i < nfiles; ++i) {
@@ -490,7 +490,7 @@ int extract_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nf
 }
 
 /* Copy a list, removing official CSDB objects. */
-int remove_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+static int remove_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nofficial = 0;
 	for (i = 0; i < nfiles; ++i) {

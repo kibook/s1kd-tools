@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -42,24 +42,24 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
-char issue_number[5] = "";
-char in_work[4] = "";
-char security_classification[4] = "";
-char responsible_partner_company[256] = "";
-char responsible_partner_company_code[7] = "";
-char originator[256] = "";
-char originator_code[7] = "";
-char icn_title[256] = "";
+static char issue_number[5] = "";
+static char in_work[4] = "";
+static char security_classification[4] = "";
+static char responsible_partner_company[256] = "";
+static char responsible_partner_company_code[7] = "";
+static char originator[256] = "";
+static char originator_code[7] = "";
+static char icn_title[256] = "";
 
-char brex_dmcode[256] = "";
+static char brex_dmcode[256] = "";
 
-char issue_date[16] = "";
+static char issue_date[16] = "";
 
-char *template_dir = NULL;
+static char *template_dir = NULL;
 
-xmlChar *remarks = NULL;
+static xmlChar *remarks = NULL;
 
-xmlDocPtr xml_skeleton(void)
+static xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
 		char src[PATH_MAX];
@@ -76,7 +76,7 @@ xmlDocPtr xml_skeleton(void)
 	}
 }
 
-void prompt(const char *prompt, char *str, int n)
+static void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
 		printf("%s: ", prompt);
@@ -107,14 +107,14 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-void copy_def_val(char *dst, const char *target, const char *key, const char *val)
+static void copy_def_val(char *dst, const char *target, const char *key, const char *val)
 {
 	if (strcmp(target, key) == 0 && strcmp(dst, "") == 0) {
 		strcpy(dst, val);
 	}
 }
 
-xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
+static xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
 	xmlNodePtr result;
@@ -132,7 +132,7 @@ xmlNodePtr first_xpath_node(const char *xpath, xmlXPathContextPtr ctx)
 	return result;
 }
 
-void dump_template(const char *path)
+static void dump_template(const char *path)
 {
 	FILE *f;
 
@@ -146,7 +146,7 @@ void dump_template(const char *path)
 	fclose(f);
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] <icns>...");
 	puts("");
@@ -178,13 +178,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-void copy_default_value(const char *def_key, const char *def_val)
+static void copy_default_value(const char *def_key, const char *def_val)
 {
 	copy_def_val(issue_number, "issueNumber", def_key, def_val);
 	copy_def_val(in_work, "inWork", def_key, def_val);
@@ -203,7 +203,7 @@ void copy_default_value(const char *def_key, const char *def_val)
 	}
 }
 
-void set_brex(xmlDocPtr doc, const char *code)
+static void set_brex(xmlDocPtr doc, const char *code)
 {
 	xmlNodePtr dmCode;
 	xmlXPathContextPtr ctx;
@@ -265,7 +265,7 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
-void set_issue_date(xmlNodePtr issueDate)
+static void set_issue_date(xmlNodePtr issueDate)
 {
 	char year_s[5], month_s[3], day_s[3];
 
@@ -297,7 +297,7 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
 }
 
-void set_remarks(xmlDocPtr doc, xmlChar *text)
+static void set_remarks(xmlDocPtr doc, xmlChar *text)
 {
 	xmlXPathContextPtr ctx;
 	xmlNodePtr remarks;

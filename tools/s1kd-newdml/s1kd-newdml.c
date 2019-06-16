@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.12.0"
+#define VERSION "1.12.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -49,21 +49,21 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
-char model_ident_code[16] = "";
-char sender_ident[7] = "";
-char dml_type[3] = "";
-char year_of_data_issue[6] = "";
-char seq_number[7] = "";
-char security_classification[4] = "";
-char issue_number[5] = "";
-char in_work[4] = "";
+static char model_ident_code[16] = "";
+static char sender_ident[7] = "";
+static char dml_type[3] = "";
+static char year_of_data_issue[6] = "";
+static char seq_number[7] = "";
+static char security_classification[4] = "";
+static char issue_number[5] = "";
+static char in_work[4] = "";
 
-char brex_dmcode[256] = "";
+static char brex_dmcode[256] = "";
 
-char issue_date[16] = "";
-xmlChar *issue_type = NULL;
+static char issue_date[16] = "";
+static xmlChar *issue_type = NULL;
 
-xmlChar *remarks = NULL;
+static xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -72,14 +72,14 @@ xmlChar *remarks = NULL;
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
-enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
-char *defaultRpcName = NULL;
-char *defaultRpcCode = NULL;
+static char *defaultRpcName = NULL;
+static char *defaultRpcCode = NULL;
 
-char *template_dir = NULL;
+static char *template_dir = NULL;
 
-xmlDocPtr xml_skeleton(void)
+static xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
 		char src[PATH_MAX];
@@ -96,7 +96,7 @@ xmlDocPtr xml_skeleton(void)
 	}
 }
 
-enum issue get_issue(const char *iss)
+static enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
@@ -121,22 +121,7 @@ enum issue get_issue(const char *iss)
 	return NO_ISS;
 }
 
-const char *issue_name(enum issue iss)
-{
-	switch (iss) {
-		case ISS_42: return "4.2";
-		case ISS_41: return "4.1";
-		case ISS_40: return "4.0";
-		case ISS_30: return "3.0";
-		case ISS_23: return "2.3";
-		case ISS_22: return "2.2";
-		case ISS_21: return "2.1";
-		case ISS_20: return "2.0";
-		default: return "";
-	}
-}
-
-void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
+static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc, src, res;
 	xsltStylesheetPtr style;
@@ -157,7 +142,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const ch
 	xsltFreeStylesheet(style);
 }
 
-xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
 	xmlDocPtr orig;
 	unsigned char *xml = NULL;
@@ -203,7 +188,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	return orig;
 }
 
-void prompt(const char *prompt, char *str, int n)
+static void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
 		printf("%s: ", prompt);
@@ -234,7 +219,7 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
+static xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -255,37 +240,37 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 	return node;
 }
 
-bool isdm(xmlDocPtr doc)
+static bool isdm(xmlDocPtr doc)
 {
 	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "dmodule") == 0;
 }
 
-bool ispm(xmlDocPtr doc)
+static bool ispm(xmlDocPtr doc)
 {
 	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "pm") == 0;
 }
 
-bool isicn(const char *name)
+static bool isicn(const char *name)
 {
 	return strncmp(name, "ICN-", 4) == 0;
 }
 
-bool isimf(xmlDocPtr doc)
+static bool isimf(xmlDocPtr doc)
 {
 	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "icnMetadataFile") == 0;
 }
 
-bool iscom(xmlDocPtr doc)
+static bool iscom(xmlDocPtr doc)
 {
 	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "comment") == 0;
 }
 
-bool isdml(xmlDocPtr doc)
+static bool isdml(xmlDocPtr doc)
 {
 	return xmlStrcmp(xmlDocGetRootElement(doc)->name, BAD_CAST "dml") == 0;
 }
 
-void addDmRef(xmlDocPtr dm, xmlNodePtr dmlContent, bool csl)
+static void addDmRef(xmlDocPtr dm, xmlNodePtr dmlContent, bool csl)
 {
 	xmlNodePtr dmRef, dmRefIdent, dmRefAddressItems, dmlEntry;
 
@@ -325,7 +310,7 @@ void addDmRef(xmlDocPtr dm, xmlNodePtr dmlContent, bool csl)
 	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//dmStatus/responsiblePartnerCompany", dm), 1));
 }
 
-void addPmRef(xmlDocPtr pm, xmlNodePtr dmlContent, bool csl)
+static void addPmRef(xmlDocPtr pm, xmlNodePtr dmlContent, bool csl)
 {
 	xmlNodePtr pmRef, pmRefIdent, pmRefAddressItems, dmlEntry;
 
@@ -367,7 +352,7 @@ void addPmRef(xmlDocPtr pm, xmlNodePtr dmlContent, bool csl)
 	xmlAddChild(dmlEntry, xmlCopyNode(firstXPathNode("//pmStatus/responsiblePartnerCompany", pm), 1));
 }
 
-void addIcnRef(const char *str, xmlNodePtr dmlContent)
+static void addIcnRef(const char *str, xmlNodePtr dmlContent)
 {
 	xmlNodePtr dmlEntry, infoEntityRef, responsiblePartnerCompany, security;
 	char *icn;
@@ -397,7 +382,7 @@ void addIcnRef(const char *str, xmlNodePtr dmlContent)
 	free(icn);
 }
 
-void addImfRef(xmlDocPtr imf, xmlNodePtr dmlContent)
+static void addImfRef(xmlDocPtr imf, xmlNodePtr dmlContent)
 {
 	xmlChar *imfIdentIcn;
 
@@ -415,7 +400,7 @@ void addImfRef(xmlDocPtr imf, xmlNodePtr dmlContent)
 	xmlFree(imfIdentIcn);
 }
 
-void addComRef(xmlDocPtr com, xmlNodePtr dmlContent)
+static void addComRef(xmlDocPtr com, xmlNodePtr dmlContent)
 {
 	xmlNodePtr dmlEntry, commentRef, commentRefIdent, responsiblePartnerCompany;
 
@@ -437,7 +422,7 @@ void addComRef(xmlDocPtr com, xmlNodePtr dmlContent)
 	}
 }
 
-void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
+static void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
 {
 	xmlNodePtr dmlEntry, dmlRef, dmlRefIdent, responsiblePartnerCompany;
 
@@ -462,7 +447,7 @@ void addDmlRef(xmlDocPtr dml, xmlNodePtr dmlContent, bool csl)
 	}
 }
 
-void copy_default_value(const char *def_key, const char *def_val)
+static void copy_default_value(const char *def_key, const char *def_val)
 {
 	if (strcmp(def_key, "modelIdentCode") == 0 && strcmp(model_ident_code, "") == 0)
 		strcpy(model_ident_code, def_val);
@@ -496,7 +481,7 @@ void copy_default_value(const char *def_key, const char *def_val)
 		issue_type = xmlStrdup(BAD_CAST def_val);
 }
 
-void add_sns(xmlNodePtr content, const char *path, const char *incode)
+static void add_sns(xmlNodePtr content, const char *path, const char *incode)
 {
 	xmlDocPtr doc;
 	xmlNodePtr new_content, cur;
@@ -573,12 +558,12 @@ void add_sns(xmlNodePtr content, const char *path, const char *incode)
 	xmlFreeDoc(doc);
 }
 
-void sort_entries(xmlDocPtr doc)
+static void sort_entries(xmlDocPtr doc)
 {
 	transform_doc(doc, sort_xsl, sort_xsl_len, NULL);
 }
 
-void dump_template(const char *path)
+static void dump_template(const char *path)
 {
 	FILE *f;
 
@@ -592,7 +577,7 @@ void dump_template(const char *path)
 	fclose(f);
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<datamodules>]");
 	puts("");
@@ -627,13 +612,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
-void set_brex(xmlDocPtr doc, const char *code)
+static void set_brex(xmlDocPtr doc, const char *code)
 {
 	xmlNodePtr dmCode;
 	int n;
@@ -690,7 +675,7 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
-void set_issue_date(xmlNodePtr issueDate)
+static void set_issue_date(xmlNodePtr issueDate)
 {
 	char year_s[5], month_s[3], day_s[3];
 
@@ -722,7 +707,7 @@ void set_issue_date(xmlNodePtr issueDate)
 	xmlSetProp(issueDate, BAD_CAST "day",   BAD_CAST day_s);
 }
 
-void set_remarks(xmlDocPtr doc, xmlChar *text)
+static void set_remarks(xmlDocPtr doc, xmlChar *text)
 {
 	xmlNodePtr remarks;
 

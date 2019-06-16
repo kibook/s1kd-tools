@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
@@ -27,7 +27,7 @@ enum format {TEXT, XML};
 enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
 
 /* Show the help/usage message. */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [<file>...]");
 	puts("");
@@ -47,13 +47,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
-xmlDocPtr transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc)
+static xmlDocPtr transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr res;
@@ -64,7 +64,7 @@ xmlDocPtr transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc)
 }
 
 /* Apply a built-in XSLT stylesheet to an XML document. */
-xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
+static xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 {
 	xmlDocPtr styledoc, res;
 
@@ -75,31 +75,31 @@ xmlDocPtr transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len)
 }
 
 /* Sort entries in defaults/dmtypes files. */
-xmlDocPtr sort_entries(xmlDocPtr doc)
+static xmlDocPtr sort_entries(xmlDocPtr doc)
 {
 	return transform_doc(doc, xsl_sort_xsl, xsl_sort_xsl_len);
 }
 
 /* Convert XML defaults to the simple text version. */
-xmlDocPtr xml_defaults_to_text(xmlDocPtr doc)
+static xmlDocPtr xml_defaults_to_text(xmlDocPtr doc)
 {
 	return transform_doc(doc, xsl_xml_defaults_to_text_xsl, xsl_xml_defaults_to_text_xsl_len);
 }
 
 /* Convert XML dmtypes to the simple text version. */
-xmlDocPtr xml_dmtypes_to_text(xmlDocPtr doc)
+static xmlDocPtr xml_dmtypes_to_text(xmlDocPtr doc)
 {
 	return transform_doc(doc, xsl_xml_dmtypes_to_text_xsl, xsl_xml_dmtypes_to_text_xsl_len);
 }
 
 /* Convert XML fmtypes to the simple text version. */
-xmlDocPtr xml_fmtypes_to_text(xmlDocPtr doc)
+static xmlDocPtr xml_fmtypes_to_text(xmlDocPtr doc)
 {
 	return transform_doc(doc, xsl_xml_fmtypes_to_text_xsl, xsl_xml_fmtypes_to_text_xsl_len);
 }
 
 /* Convert simple text defaults to the XML version. */
-xmlDocPtr text_defaults_to_xml(const char *path)
+static xmlDocPtr text_defaults_to_xml(const char *path)
 {
 	FILE *f;
 	char line[1024];
@@ -142,7 +142,7 @@ xmlDocPtr text_defaults_to_xml(const char *path)
 }
 
 /* Convert simple text dmtypes to the XML version. */
-xmlDocPtr text_dmtypes_to_xml(const char *path)
+static xmlDocPtr text_dmtypes_to_xml(const char *path)
 {
 	FILE *f;
 	char line[1024];
@@ -188,7 +188,7 @@ xmlDocPtr text_dmtypes_to_xml(const char *path)
 }
 
 /* Convert simple text fmtypes to the XML version. */
-xmlDocPtr text_fmtypes_to_xml(const char *path)
+static xmlDocPtr text_fmtypes_to_xml(const char *path)
 {
 	FILE *f;
 	char line[1024];
@@ -231,7 +231,7 @@ xmlDocPtr text_fmtypes_to_xml(const char *path)
 }
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -250,7 +250,7 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *xpath)
 }
 
 /* Obtain some defaults values from the environment. */
-void set_defaults(xmlDocPtr doc)
+static void set_defaults(xmlDocPtr doc)
 {
 	char *env;
 
@@ -279,7 +279,7 @@ void set_defaults(xmlDocPtr doc)
 /* Use the .brexmap to create the XSL to transform a BREX DM to a .defaults
  * file.
  */
-xmlDocPtr make_brex2defaults_xsl(xmlDocPtr brexmap)
+static xmlDocPtr make_brex2defaults_xsl(xmlDocPtr brexmap)
 {
 	xmlDocPtr res;
 	res = transform_doc(brexmap, xsl_brexmap_defaults_xsl, xsl_brexmap_defaults_xsl_len);
@@ -289,7 +289,7 @@ xmlDocPtr make_brex2defaults_xsl(xmlDocPtr brexmap)
 /* Use the .brexmap to create the XSL to transform a BREX DM to a .dmtypes
  * file.
  */
-xmlDocPtr make_brex2dmtypes_xsl(xmlDocPtr brexmap)
+static xmlDocPtr make_brex2dmtypes_xsl(xmlDocPtr brexmap)
 {
 	xmlDocPtr res;
 	res = transform_doc(brexmap, xsl_brexmap_dmtypes_xsl, xsl_brexmap_dmtypes_xsl_len);
@@ -297,7 +297,7 @@ xmlDocPtr make_brex2dmtypes_xsl(xmlDocPtr brexmap)
 }
 
 /* Create a .defaults file from a BREX DM. */
-xmlDocPtr new_defaults_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
+static xmlDocPtr new_defaults_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr styledoc, res, sorted;
 
@@ -310,7 +310,7 @@ xmlDocPtr new_defaults_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
 }
 
 /* Create a .dmtypes file from a BREX DM. */
-xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
+static xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr styledoc, res, sorted;
 
@@ -323,7 +323,7 @@ xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
 }
 
 /* Dump the built-in defaults in the XML format. */
-void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
+static void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc;
 
@@ -344,7 +344,7 @@ void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDoc
 }
 
 /* Dump the built-in defaults in the simple text format. */
-void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
+static void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc, res;
 	FILE *f;
@@ -374,7 +374,7 @@ void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDo
 	xmlFreeDoc(doc);
 }
 
-xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc = NULL;
 
@@ -402,7 +402,7 @@ xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xmlDocPtr
 }
 
 /* Convert an XML defaults/dmtypes file to the simple text version. */
-void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc, res = NULL;
 
@@ -442,7 +442,7 @@ void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDo
 }
 
 /* Convert a simple text defaults/dmtypes file to the XML version. */
-void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	xmlDocPtr doc;
 
@@ -464,7 +464,7 @@ void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDo
 	xmlFreeDoc(doc);
 }
 
-void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
 {
 	if (f != NONE && (!brex || f == FMTYPES) && access(fname, F_OK) == -1) {
 		fprintf(stderr, S_NO_FILE_ERR, fname);
@@ -486,7 +486,7 @@ void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overw
 	}
 }
 
-xmlDocPtr read_default_brexmap(void)
+static xmlDocPtr read_default_brexmap(void)
 {
 	char fname[PATH_MAX];
 
@@ -497,7 +497,7 @@ xmlDocPtr read_default_brexmap(void)
 	}
 }
 
-void dump_brexmap(void)
+static void dump_brexmap(void)
 {
 	printf("%.*s", ___common_brexmap_xml_len, ___common_brexmap_xml);
 }

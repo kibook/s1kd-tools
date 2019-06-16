@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.4.2"
+#define VERSION "2.4.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -26,7 +26,7 @@
 
 #define FMTSTR_DELIM '%'
 
-enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
+static enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
 
 struct metadata {
 	char *key;
@@ -42,7 +42,7 @@ struct icn_metadata {
 	void (*show)(const char *, int);
 };
 
-xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
+static xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
 {
 	xmlXPathObjectPtr results;
 	xmlNodePtr node;
@@ -60,7 +60,7 @@ xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
 	return node;
 }
 
-xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
+static xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -83,14 +83,14 @@ xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
 	return first;
 }
 
-char *first_xpath_string(xmlNodePtr node, const char *expr)
+static char *first_xpath_string(xmlNodePtr node, const char *expr)
 {
 	xmlNodePtr first;
 	first = first_xpath_node_local(node, expr);
 	return (char *) xmlNodeGetContent(first);
 }
 
-void show_issue_date(xmlNodePtr issue_date, int endl)
+static void show_issue_date(xmlNodePtr issue_date, int endl)
 {
 	char *year, *month, *day;
 
@@ -106,7 +106,7 @@ void show_issue_date(xmlNodePtr issue_date, int endl)
 	xmlFree(day);
 }
 
-int edit_issue_date(xmlNodePtr issue_date, const char *val)
+static int edit_issue_date(xmlNodePtr issue_date, const char *val)
 {
 	char year[5], month[3], day[3];
 
@@ -121,7 +121,7 @@ int edit_issue_date(xmlNodePtr issue_date, const char *val)
 	return 0;
 }
 
-void show_simple_node(xmlNodePtr node, int endl)
+static void show_simple_node(xmlNodePtr node, int endl)
 {
 	char *content = (char *) xmlNodeGetContent(node);
 	printf("%s", content);
@@ -129,13 +129,13 @@ void show_simple_node(xmlNodePtr node, int endl)
 	xmlFree(content);
 }
 
-int edit_simple_node(xmlNodePtr node, const char *val)
+static int edit_simple_node(xmlNodePtr node, const char *val)
 {
 	xmlNodeSetContent(node, BAD_CAST val);
 	return 0;
 }
 
-int create_info_name(xmlXPathContextPtr ctxt, const char *val)
+static int create_info_name(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr tech_name, info_name;
 
@@ -153,7 +153,7 @@ int create_info_name(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-void show_simple_attr(xmlNodePtr node, const char *attr, int endl)
+static void show_simple_attr(xmlNodePtr node, const char *attr, int endl)
 {
 	char *text = (char *) xmlGetProp(node, BAD_CAST attr);
 	printf("%s", text);
@@ -161,13 +161,13 @@ void show_simple_attr(xmlNodePtr node, const char *attr, int endl)
 	xmlFree(text);
 }
 
-int edit_simple_attr(xmlNodePtr node, const char *attr, const char *val)
+static int edit_simple_attr(xmlNodePtr node, const char *attr, const char *val)
 {
 	xmlSetProp(node, BAD_CAST attr, BAD_CAST val);
 	return 0;
 }
 
-void show_rpc_name(xmlNodePtr node, int endl)
+static void show_rpc_name(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
 		show_simple_attr(node, "rpcname", endl);
@@ -176,7 +176,7 @@ void show_rpc_name(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_rpc_name(xmlNodePtr node, const char *val)
+static int edit_rpc_name(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
 		return edit_simple_attr(node, "rpcname", val);
@@ -185,7 +185,7 @@ int edit_rpc_name(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_orig_name(xmlNodePtr node, int endl)
+static void show_orig_name(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
 		show_simple_attr(node, "origname", endl);
@@ -194,7 +194,7 @@ void show_orig_name(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_orig_name(xmlNodePtr node, const char *val)
+static int edit_orig_name(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
 		return edit_simple_attr(node, "origname", val);
@@ -203,7 +203,7 @@ int edit_orig_name(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_ent_code(xmlNodePtr node, int endl)
+static void show_ent_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0 || xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
 		show_simple_node(node, endl);
@@ -212,7 +212,7 @@ void show_ent_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_ent_code(xmlNodePtr node, const char *val)
+static int edit_ent_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0 || xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
 		return edit_simple_node(node, val);
@@ -221,7 +221,7 @@ int edit_ent_code(xmlNodePtr node, const char *val)
 	}
 }
 
-int create_rpc_ent_code(xmlXPathContextPtr ctxt, const char *val)
+static int create_rpc_ent_code(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 	node = first_xpath_node("//rpc|//responsiblePartnerCompany", ctxt);
@@ -234,7 +234,7 @@ int create_rpc_ent_code(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
+static int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 	node = first_xpath_node("//orig|//originator", ctxt);
@@ -247,7 +247,7 @@ int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-void show_sec_class(xmlNodePtr node, int endl)
+static void show_sec_class(xmlNodePtr node, int endl)
 {
 	if (xmlHasProp(node, BAD_CAST "securityClassification")) {
 		show_simple_attr(node, "securityClassification", endl);
@@ -256,7 +256,7 @@ void show_sec_class(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_sec_class(xmlNodePtr node, const char *val)
+static int edit_sec_class(xmlNodePtr node, const char *val)
 {
 	if (xmlHasProp(node, BAD_CAST "securityClassification")) {
 		return edit_simple_attr(node, "securityClassification", val);
@@ -265,17 +265,17 @@ int edit_sec_class(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_schema_url(xmlNodePtr node, int endl)
+static void show_schema_url(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "noNamespaceSchemaLocation", endl);
 }
 
-int edit_schema_url(xmlNodePtr node, const char *val)
+static int edit_schema_url(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "xsi:noNamespaceSchemaLocation", val);
 }
 
-char *get_schema(xmlNodePtr node)
+static char *get_schema(xmlNodePtr node)
 {
 	char *url, *s, *e, *r;
 
@@ -292,7 +292,7 @@ char *get_schema(xmlNodePtr node)
 	return r;
 }
 
-void show_schema(xmlNodePtr node, int endl)
+static void show_schema(xmlNodePtr node, int endl)
 {
 	char *s;
 	s = get_schema(node);
@@ -301,7 +301,7 @@ void show_schema(xmlNodePtr node, int endl)
 	free(s);
 }
 
-int edit_info_name(xmlNodePtr node, const char *val)
+static int edit_info_name(xmlNodePtr node, const char *val)
 {
 	if (strcmp(val, "") == 0) {
 		xmlUnlinkNode(node);
@@ -312,13 +312,13 @@ int edit_info_name(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_type(xmlNodePtr node, int endl)
+static void show_type(xmlNodePtr node, int endl)
 {
 	printf("%s", node->name);
 	if (endl > -1) putchar(endl);
 }
 
-char *get_dmcode(xmlNodePtr node)
+static char *get_dmcode(xmlNodePtr node)
 {
 	char *model_ident_code;
 	char *system_diff_code;
@@ -401,7 +401,7 @@ char *get_dmcode(xmlNodePtr node)
 	return code;
 }
 
-void show_dmcode(xmlNodePtr node, int endl)
+static void show_dmcode(xmlNodePtr node, int endl)
 {
 	char *code;
 	code = get_dmcode(node);
@@ -410,7 +410,7 @@ void show_dmcode(xmlNodePtr node, int endl)
 	free(code);
 }
 
-int edit_dmcode(xmlNodePtr node, const char *val)
+static int edit_dmcode(xmlNodePtr node, const char *val)
 {
 	char model_ident_code[15];
 	char system_diff_code[5];
@@ -482,7 +482,7 @@ int edit_dmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-void show_ddncode(xmlNodePtr node, int endl)
+static void show_ddncode(xmlNodePtr node, int endl)
 {
 	char *modelic, *sendid, *recvid, *diyear, *seqnum;
 
@@ -507,7 +507,7 @@ void show_ddncode(xmlNodePtr node, int endl)
 	xmlFree(seqnum);
 }
 
-void show_dmlcode(xmlNodePtr node, int endl)
+static void show_dmlcode(xmlNodePtr node, int endl)
 {
 	char *modelic, *sendid, *dmltype, *diyear, *seqnum;
 
@@ -532,7 +532,7 @@ void show_dmlcode(xmlNodePtr node, int endl)
 	xmlFree(seqnum);
 }
 
-void show_pmcode(xmlNodePtr node, int endl)
+static void show_pmcode(xmlNodePtr node, int endl)
 {
 	char *modelic, *pmissuer, *pmnumber, *pmvolume;
 
@@ -554,7 +554,7 @@ void show_pmcode(xmlNodePtr node, int endl)
 	xmlFree(pmvolume);
 }
 
-int edit_pmcode(xmlNodePtr node, const char *val)
+static int edit_pmcode(xmlNodePtr node, const char *val)
 {
 	char model_ident_code[15];
 	char pm_issuer[6];
@@ -589,7 +589,7 @@ int edit_pmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-void show_pm_issuer(xmlNodePtr node, int endl)
+static void show_pm_issuer(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmissuer") == 0) {
 		show_simple_node(node, endl);
@@ -598,7 +598,7 @@ void show_pm_issuer(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_pm_issuer(xmlNodePtr node, const char *val)
+static int edit_pm_issuer(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmissuer") == 0) {
 		return edit_simple_node(node, val);
@@ -607,7 +607,7 @@ int edit_pm_issuer(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_pm_number(xmlNodePtr node, int endl)
+static void show_pm_number(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmnumber") == 0) {
 		show_simple_node(node, endl);
@@ -616,7 +616,7 @@ void show_pm_number(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_pm_number(xmlNodePtr node, const char *val)
+static int edit_pm_number(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmnumber") == 0) {
 		return edit_simple_node(node, val);
@@ -625,7 +625,7 @@ int edit_pm_number(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_pm_volume(xmlNodePtr node, int endl)
+static void show_pm_volume(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmvolume") == 0) {
 		show_simple_node(node, endl);
@@ -634,7 +634,7 @@ void show_pm_volume(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_pm_volume(xmlNodePtr node, const char *val)
+static int edit_pm_volume(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmvolume") == 0) {
 		return edit_simple_node(node, val);
@@ -643,7 +643,7 @@ int edit_pm_volume(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_comment_code(xmlNodePtr node, int endl)
+static void show_comment_code(xmlNodePtr node, int endl)
 {
 	char *model_ident_code;
 	char *sender_ident;
@@ -680,7 +680,7 @@ void show_comment_code(xmlNodePtr node, int endl)
 	xmlFree(comment_type);
 }
 
-void show_code(xmlNodePtr node, int endl)
+static void show_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
 		show_dmcode(node, endl);
@@ -695,7 +695,7 @@ void show_code(xmlNodePtr node, int endl)
 	}
 }
 
-void show_issue_type(xmlNodePtr node, int endl)
+static void show_issue_type(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
 		show_simple_attr(node, "type", endl);
@@ -704,7 +704,7 @@ void show_issue_type(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_issue_type(xmlNodePtr node, const char *val)
+static int edit_issue_type(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
 		return edit_simple_attr(node, "type", val);
@@ -713,7 +713,7 @@ int edit_issue_type(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_language_iso_code(xmlNodePtr node, int endl)
+static void show_language_iso_code(xmlNodePtr node, int endl)
 {
 	if (xmlHasProp(node, BAD_CAST "languageIsoCode")) {
 		show_simple_attr(node, "languageIsoCode", endl);
@@ -722,7 +722,7 @@ void show_language_iso_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_language_iso_code(xmlNodePtr node, const char *val)
+static int edit_language_iso_code(xmlNodePtr node, const char *val)
 {
 	if (xmlHasProp(node, BAD_CAST "languageIsoCode")) {
 		return edit_simple_attr(node, "languageIsoCode", val);
@@ -731,7 +731,7 @@ int edit_language_iso_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_country_iso_code(xmlNodePtr node, int endl)
+static void show_country_iso_code(xmlNodePtr node, int endl)
 {
 	if (xmlHasProp(node, BAD_CAST "countryIsoCode")) {
 		show_simple_attr(node, "countryIsoCode", endl);
@@ -740,7 +740,7 @@ void show_country_iso_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_country_iso_code(xmlNodePtr node, const char *val)
+static int edit_country_iso_code(xmlNodePtr node, const char *val)
 {
 	if (xmlHasProp(node, BAD_CAST "countryIsoCode")) {
 		return edit_simple_attr(node, "countryIsoCode", val);
@@ -749,7 +749,7 @@ int edit_country_iso_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_issue_number(xmlNodePtr node, int endl)
+static void show_issue_number(xmlNodePtr node, int endl)
 {
 	if (xmlHasProp(node, BAD_CAST "issueNumber")) {
 		show_simple_attr(node, "issueNumber", endl);
@@ -758,12 +758,12 @@ void show_issue_number(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_issue_number(xmlNodePtr node, const char *val)
+static int edit_issue_number(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "issueNumber", val);
 }
 
-void show_in_work(xmlNodePtr node, int endl)
+static void show_in_work(xmlNodePtr node, int endl)
 {
 	if (xmlHasProp(node, BAD_CAST "inWork")) {
 		show_simple_attr(node, "inWork", endl);
@@ -775,12 +775,12 @@ void show_in_work(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_in_work(xmlNodePtr node, const char *val)
+static int edit_in_work(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "inWork", val);
 }
 
-int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
+static int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 
@@ -794,7 +794,7 @@ int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
 	return edit_dmcode(node, val);
 }
 
-int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
+static int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 
@@ -807,7 +807,7 @@ int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
 	return edit_simple_node(node, val);
 }
 
-void show_comment_priority(xmlNodePtr node, int endl)
+static void show_comment_priority(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "priority") == 0) {
 		show_simple_attr(node, "cprio", endl);
@@ -816,7 +816,7 @@ void show_comment_priority(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_comment_priority(xmlNodePtr node, const char *val)
+static int edit_comment_priority(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "priority") == 0) {
 		return edit_simple_attr(node, "cprio", val);
@@ -825,7 +825,7 @@ int edit_comment_priority(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_comment_response(xmlNodePtr node, int endl)
+static void show_comment_response(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "response") == 0) {
 		show_simple_attr(node, "rsptype", endl);
@@ -834,7 +834,7 @@ void show_comment_response(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_comment_response(xmlNodePtr node, const char *val)
+static int edit_comment_response(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "response") == 0) {
 		return edit_simple_attr(node, "rsptype", val);
@@ -843,12 +843,12 @@ int edit_comment_response(xmlNodePtr node, const char *val)
 	}
 }
 
-int create_ent_name(xmlNodePtr node, const char *val)
+static int create_ent_name(xmlNodePtr node, const char *val)
 {
 	return xmlNewChild(node, NULL, BAD_CAST "enterpriseName", BAD_CAST val) == NULL;
 }
 
-int create_rpc_name(xmlXPathContextPtr ctxt, const char *val)
+static int create_rpc_name(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 	node = first_xpath_node("//responsiblePartnerCompany|//rpc", ctxt);
@@ -861,7 +861,7 @@ int create_rpc_name(xmlXPathContextPtr ctxt, const char *val)
 	}
 }
 
-int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
+static int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
 	node = first_xpath_node("//originator|//orig", ctxt);
@@ -874,13 +874,13 @@ int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
 	}
 }
 
-void show_url(xmlNodePtr node, int endl)
+static void show_url(xmlNodePtr node, int endl)
 {
 	printf("%s", node->doc->URL);
 	if (endl > -1) putchar(endl);
 }
 
-void show_title(xmlNodePtr node, int endl)
+static void show_title(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0 || xmlStrcmp(node->name, BAD_CAST "dmtitle") == 0) {
 		xmlNodePtr tech, info;
@@ -902,7 +902,7 @@ void show_title(xmlNodePtr node, int endl)
 	}
 }
 
-void show_model_ident_code(xmlNodePtr node, int endl)
+static void show_model_ident_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "modelic") == 0) {
 		show_simple_node(node, endl);
@@ -911,7 +911,7 @@ void show_model_ident_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_model_ident_code(xmlNodePtr node, const char *val)
+static int edit_model_ident_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "modelic") == 0) {
 		return edit_simple_node(node, val);
@@ -920,7 +920,7 @@ int edit_model_ident_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_system_diff_code(xmlNodePtr node, int endl)
+static void show_system_diff_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sdc") == 0) {
 		show_simple_node(node, endl);
@@ -929,7 +929,7 @@ void show_system_diff_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_system_diff_code(xmlNodePtr node, const char *val)
+static int edit_system_diff_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sdc") == 0) {
 		return edit_simple_node(node, val);
@@ -938,7 +938,7 @@ int edit_system_diff_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_system_code(xmlNodePtr node, int endl)
+static void show_system_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "chapnum") == 0) {
 		show_simple_node(node, endl);
@@ -947,7 +947,7 @@ void show_system_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_system_code(xmlNodePtr node, const char *val)
+static int edit_system_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "chapnum") == 0) {
 		return edit_simple_node(node, val);
@@ -956,7 +956,7 @@ int edit_system_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_sub_system_code(xmlNodePtr node, int endl)
+static void show_sub_system_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "section") == 0) {
 		show_simple_node(node, endl);
@@ -965,7 +965,7 @@ void show_sub_system_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_sub_system_code(xmlNodePtr node, const char *val)
+static int edit_sub_system_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "section") == 0) {
 		return edit_simple_node(node, val);
@@ -974,7 +974,7 @@ int edit_sub_system_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_sub_sub_system_code(xmlNodePtr node, int endl)
+static void show_sub_sub_system_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subsect") == 0) {
 		show_simple_node(node, endl);
@@ -983,7 +983,7 @@ void show_sub_sub_system_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_sub_sub_system_code(xmlNodePtr node, const char *val)
+static int edit_sub_sub_system_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subsect") == 0) {
 		return edit_simple_node(node, val);
@@ -992,7 +992,7 @@ int edit_sub_sub_system_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_assy_code(xmlNodePtr node, int endl)
+static void show_assy_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subject") == 0) {
 		show_simple_node(node, endl);
@@ -1001,7 +1001,7 @@ void show_assy_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_assy_code(xmlNodePtr node, const char *val)
+static int edit_assy_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subject") == 0) {
 		return edit_simple_node(node, val);
@@ -1010,7 +1010,7 @@ int edit_assy_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_disassy_code(xmlNodePtr node, int endl)
+static void show_disassy_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discode") == 0) {
 		show_simple_node(node, endl);
@@ -1019,7 +1019,7 @@ void show_disassy_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_disassy_code(xmlNodePtr node, const char *val)
+static int edit_disassy_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discode") == 0) {
 		return edit_simple_node(node, val);
@@ -1028,7 +1028,7 @@ int edit_disassy_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_disassy_code_variant(xmlNodePtr node, int endl)
+static void show_disassy_code_variant(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discodev") == 0) {
 		show_simple_node(node, endl);
@@ -1037,7 +1037,7 @@ void show_disassy_code_variant(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_disassy_code_variant(xmlNodePtr node, const char *val)
+static int edit_disassy_code_variant(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discodev") == 0) {
 		return edit_simple_node(node, val);
@@ -1046,7 +1046,7 @@ int edit_disassy_code_variant(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_info_code(xmlNodePtr node, int endl)
+static void show_info_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incode") == 0) {
 		show_simple_node(node, endl);
@@ -1055,7 +1055,7 @@ void show_info_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_info_code(xmlNodePtr node, const char *val)
+static int edit_info_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incode") == 0) {
 		return edit_simple_node(node, val);
@@ -1064,7 +1064,7 @@ int edit_info_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_info_code_variant(xmlNodePtr node, int endl)
+static void show_info_code_variant(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incodev") == 0) {
 		show_simple_node(node, endl);
@@ -1073,7 +1073,7 @@ void show_info_code_variant(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_info_code_variant(xmlNodePtr node, const char *val)
+static int edit_info_code_variant(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incodev") == 0) {
 		return edit_simple_node(node, val);
@@ -1082,7 +1082,7 @@ int edit_info_code_variant(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_item_location_code(xmlNodePtr node, int endl)
+static void show_item_location_code(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "itemloc") == 0) {
 		show_simple_node(node, endl);
@@ -1091,7 +1091,7 @@ void show_item_location_code(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_item_location_code(xmlNodePtr node, const char *val)
+static int edit_item_location_code(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "itemloc") == 0) {
 		return edit_simple_node(node, val);
@@ -1100,27 +1100,27 @@ int edit_item_location_code(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_learn_code(xmlNodePtr node, int endl)
+static void show_learn_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "learnCode", endl);
 }
 
-int edit_learn_code(xmlNodePtr node, const char *val)
+static int edit_learn_code(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "learnCode", val);
 }
 
-void show_learn_event_code(xmlNodePtr node, int endl)
+static void show_learn_event_code(xmlNodePtr node, int endl)
 {
 	show_simple_attr(node, "learnEventCode", endl);
 }
 
-int edit_learn_event_code(xmlNodePtr node, const char *val)
+static int edit_learn_event_code(xmlNodePtr node, const char *val)
 {
 	return edit_simple_attr(node, "learnEventCode", val);
 }
 
-void show_skill_level(xmlNodePtr node, int endl)
+static void show_skill_level(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "skill") == 0) {
 		show_simple_attr(node, "skill", endl);
@@ -1129,7 +1129,7 @@ void show_skill_level(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_skill_level(xmlNodePtr node, const char *val)
+static int edit_skill_level(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "skill") == 0) {
 		return edit_simple_attr(node, "skill", val);
@@ -1138,7 +1138,7 @@ int edit_skill_level(xmlNodePtr node, const char *val)
 	}
 }
 
-int create_skill_level(xmlXPathContextPtr ctx, const char *val)
+static int create_skill_level(xmlXPathContextPtr ctx, const char *val)
 {
 	xmlNodePtr node, skill_level;
 	int iss30;
@@ -1155,7 +1155,7 @@ int create_skill_level(xmlXPathContextPtr ctx, const char *val)
 	return 0;
 }
 
-void show_comment_type(xmlNodePtr node, int endl)
+static void show_comment_type(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "ctype") == 0) {
 		show_simple_attr(node, "type", endl);
@@ -1164,7 +1164,7 @@ void show_comment_type(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_comment_type(xmlNodePtr node, const char *val)
+static int edit_comment_type(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "ctype") == 0) {
 		return edit_simple_attr(node, "type", val);
@@ -1173,7 +1173,7 @@ int edit_comment_type(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_seq_number(xmlNodePtr node, int endl)
+static void show_seq_number(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "seqnum") == 0) {
 		show_simple_node(node, endl);
@@ -1182,7 +1182,7 @@ void show_seq_number(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_seq_number(xmlNodePtr node, const char *val)
+static int edit_seq_number(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "seqnum") == 0) {
 		return edit_simple_node(node, val);
@@ -1191,7 +1191,7 @@ int edit_seq_number(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_year_of_data_issue(xmlNodePtr node, int endl)
+static void show_year_of_data_issue(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "diyear") == 0) {
 		show_simple_node(node, endl);
@@ -1200,7 +1200,7 @@ void show_year_of_data_issue(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_year_of_data_issue(xmlNodePtr node, const char *val)
+static int edit_year_of_data_issue(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "diyear") == 0) {
 		return edit_simple_node(node, val);
@@ -1209,7 +1209,7 @@ int edit_year_of_data_issue(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_sender_ident(xmlNodePtr node, int endl)
+static void show_sender_ident(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sendid") == 0) {
 		show_simple_node(node, endl);
@@ -1218,7 +1218,7 @@ void show_sender_ident(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_sender_ident(xmlNodePtr node, const char *val)
+static int edit_sender_ident(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sendid") == 0) {
 		return edit_simple_node(node, val);
@@ -1227,7 +1227,7 @@ int edit_sender_ident(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_receiver_ident(xmlNodePtr node, int endl)
+static void show_receiver_ident(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "recvid") == 0) {
 		show_simple_node(node, endl);
@@ -1236,7 +1236,7 @@ void show_receiver_ident(xmlNodePtr node, int endl)
 	}
 }
 
-int edit_receiver_ident(xmlNodePtr node, const char *val)
+static int edit_receiver_ident(xmlNodePtr node, const char *val)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "recvid") == 0) {
 		return edit_simple_node(node, val);
@@ -1245,7 +1245,7 @@ int edit_receiver_ident(xmlNodePtr node, const char *val)
 	}
 }
 
-void show_source(xmlNodePtr node, int endl)
+static void show_source(xmlNodePtr node, int endl)
 {
 	xmlNodePtr dmc, issno, lang;
 
@@ -1266,7 +1266,7 @@ void show_source(xmlNodePtr node, int endl)
 	show_country_iso_code(lang, endl);
 }
 
-struct metadata metadata[] = {
+static struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
 		show_dmcode,
@@ -1660,7 +1660,7 @@ struct metadata metadata[] = {
 	{NULL}
 };
 
-void show_icn_code(const char *bname, int endl)
+static void show_icn_code(const char *bname, int endl)
 {
 	int n;
 	n = strchr(bname, '.') - bname;
@@ -1668,7 +1668,7 @@ void show_icn_code(const char *bname, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-void show_icn_sec(const char *bname, int endl)
+static void show_icn_sec(const char *bname, int endl)
 {
 	char *s, *e;
 	int n;
@@ -1680,7 +1680,7 @@ void show_icn_sec(const char *bname, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-void show_icn_iss(const char *bname, int endl)
+static void show_icn_iss(const char *bname, int endl)
 {
 	char *s, *e;
 	int n;
@@ -1692,13 +1692,13 @@ void show_icn_iss(const char *bname, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-void show_icn_type(const char *bname, int endl)
+static void show_icn_type(const char *bname, int endl)
 {
 	printf("icn");
 	if (endl > -1) putchar(endl);
 }
 
-struct icn_metadata icn_metadata[] = {
+static struct icn_metadata icn_metadata[] = {
 	{"code", show_icn_code},
 	{"issueNumber", show_icn_iss},
 	{"securityClassification", show_icn_sec},
@@ -1706,7 +1706,7 @@ struct icn_metadata icn_metadata[] = {
 	{NULL}
 };
 
-int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
+static int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 {
 	int i;
 
@@ -1728,7 +1728,7 @@ int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 	return EXIT_INVALID_METADATA;
 }
 
-int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *val)
+static int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *val)
 {
 	int i;
 
@@ -1755,7 +1755,7 @@ int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *val)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, int endl, int only_editable)
+static int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, int endl, int only_editable)
 {
 	int i;
 
@@ -1786,7 +1786,7 @@ int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, int endl, int only
 	return 0;
 }
 
-int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
+static int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 {
 	char key[256], val[256];
 
@@ -1797,7 +1797,7 @@ int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 	return 0;
 }
 
-void list_metadata_key(const char *key, const char *descr, int formatall)
+static void list_metadata_key(const char *key, const char *descr, int formatall)
 {
 	int n = KEY_COLUMN_WIDTH - strlen(key);
 	printf("%s", key);
@@ -1811,7 +1811,7 @@ void list_metadata_key(const char *key, const char *descr, int formatall)
 	putchar('\n');
 }
 
-int has_key(xmlNodePtr keys, const char *key)
+static int has_key(xmlNodePtr keys, const char *key)
 {
 	if (keys->children) {
 		xmlNodePtr cur;
@@ -1832,7 +1832,7 @@ int has_key(xmlNodePtr keys, const char *key)
 	return 1;
 }
 
-void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable)
+static void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable)
 {
 	int i;
 	for (i = 0; metadata[i].key; ++i) {
@@ -1842,7 +1842,7 @@ void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable)
 	}
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
@@ -1866,13 +1866,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-int show_err(int err, const char *key, const char *val, const char *fname)
+static int show_err(int err, const char *key, const char *val, const char *fname)
 {
 	if (verbosity < NORMAL) return err;
 
@@ -1901,14 +1901,14 @@ int show_err(int err, const char *key, const char *val, const char *fname)
 	return err;
 }
 
-int show_path(const char *fname, int endl)
+static int show_path(const char *fname, int endl)
 {
 	printf("%s", fname);
 	if (endl > -1) putchar(endl);
 	return 0;
 }
 
-char *get_format(const char *bname)
+static char *get_format(const char *bname)
 {
 	char *s;
 	if ((s = strchr(bname, '.'))) {
@@ -1918,14 +1918,14 @@ char *get_format(const char *bname)
 	}
 }
 
-int show_format(const char *bname, int endl)
+static int show_format(const char *bname, int endl)
 {
 	printf("%s", get_format(bname));
 	if (endl > -1) putchar(endl);
 	return 0;
 }
 
-int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
+static int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 {
 	int i;
 	char *key;
@@ -1953,7 +1953,7 @@ int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
+static int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
 {
 	int i;
 	char *key;
@@ -1974,12 +1974,12 @@ int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-bool is_icn(const char *bname)
+static bool is_icn(const char *bname)
 {
 	return strncasecmp(bname, "ICN-", 4) == 0;
 }
 
-int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
+static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
 {
 	int i;
 	for (i = 0; fmt[i]; ++i) {
@@ -2028,7 +2028,7 @@ int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *
 	return 0;
 }
 
-xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fname)
+static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fname)
 {
 	xmlNodePtr node;
 
@@ -2047,7 +2047,7 @@ xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fname)
 	return NULL;
 }
 
-int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
+static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
 {
 	xmlChar *key, *val, *op;
 	int i, cmp = 0;
@@ -2080,7 +2080,7 @@ int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
 	return cmp;
 }
 
-int show_icn_metadata(const char *bname, const char *key, int endl)
+static int show_icn_metadata(const char *bname, const char *key, int endl)
 {
 	int i;
 
@@ -2096,7 +2096,7 @@ int show_icn_metadata(const char *bname, const char *key, int endl)
 	return EXIT_INVALID_METADATA;
 }
 
-int show_all_icn_metadata(const char *fname, int formatall, int endl)
+static int show_all_icn_metadata(const char *fname, int formatall, int endl)
 {
 	int i;
 
@@ -2119,7 +2119,7 @@ int show_all_icn_metadata(const char *fname, int formatall, int endl)
 	return 0;
 }
 
-int show_or_edit_metadata(const char *fname, const char *metadata_fname,
+static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
 	int only_editable, const char *fmtstr, xmlNodePtr conds)
 {
@@ -2218,21 +2218,21 @@ int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	return err;
 }
 
-void add_key(xmlNodePtr keys, const char *name)
+static void add_key(xmlNodePtr keys, const char *name)
 {
 	xmlNodePtr key;
 	key = xmlNewChild(keys, NULL, BAD_CAST "key", NULL);
 	xmlSetProp(key, BAD_CAST "name", BAD_CAST name);
 }
 
-void add_val(xmlNodePtr keys, const char *val)
+static void add_val(xmlNodePtr keys, const char *val)
 {
 	xmlNodePtr key;
 	key = keys->last;
 	xmlSetProp(key, BAD_CAST "value", BAD_CAST val);
 }
 
-void add_cond(xmlNodePtr conds, const char *k, const char *o)
+static void add_cond(xmlNodePtr conds, const char *k, const char *o)
 {
 	xmlNodePtr cond;
 	cond = xmlNewChild(conds, NULL, BAD_CAST "cond", NULL);
@@ -2240,14 +2240,14 @@ void add_cond(xmlNodePtr conds, const char *k, const char *o)
 	xmlSetProp(cond, BAD_CAST "op", BAD_CAST o);
 }
 
-void add_cond_val(xmlNodePtr conds, const char *v)
+static void add_cond_val(xmlNodePtr conds, const char *v)
 {
 	xmlNodePtr cond;
 	cond = conds->last;
 	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
 }
 
-int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
+static int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
 	int only_editable, const char *fmtstr, xmlNodePtr conds)
 {

@@ -16,11 +16,11 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
-xmlChar *acro_markup_xpath = NULL;
+static xmlChar *acro_markup_xpath = NULL;
 
 /* Characters that must occur before/after a set of characters in order for the
  * set to be considered a valid acronym. */
@@ -37,17 +37,17 @@ xmlChar *acro_markup_xpath = NULL;
 #define I_DELETE INF_PREFIX "Deleting acronym markup in %s...\n"
 #define EXIT_NO_LIST 1
 
-bool prettyPrint = false;
-int minimumSpaces = 2;
-enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
-bool interactive = false;
-bool alwaysAsk = false;
-bool deferChoice = false;
-bool verbose = false;
+static bool prettyPrint = false;
+static int minimumSpaces = 2;
+static enum xmlFormat { BASIC, DEFLIST, TABLE } xmlFormat = BASIC;
+static bool interactive = false;
+static bool alwaysAsk = false;
+static bool deferChoice = false;
+static bool verbose = false;
 
-xsltStylesheetPtr termStylesheet, idStylesheet;
+static xsltStylesheetPtr termStylesheet, idStylesheet;
 
-void combineAcronymLists(xmlNodePtr dst, xmlNodePtr src)
+static void combineAcronymLists(xmlNodePtr dst, xmlNodePtr src)
 {
 	xmlNodePtr cur;
 
@@ -58,7 +58,7 @@ void combineAcronymLists(xmlNodePtr dst, xmlNodePtr src)
 	}
 }
 
-void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
+static void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 {
 	xmlDocPtr doc, styleDoc, result;
 	xsltStylesheetPtr style;
@@ -86,7 +86,7 @@ void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 	xmlFreeDoc(result);
 }
 
-xmlDocPtr removeNonUniqueAcronyms(xmlDocPtr doc)
+static xmlDocPtr removeNonUniqueAcronyms(xmlDocPtr doc)
 {
 	xmlDocPtr styleDoc, result;
 	xsltStylesheetPtr style;
@@ -100,7 +100,7 @@ xmlDocPtr removeNonUniqueAcronyms(xmlDocPtr doc)
 	return result;
 }
 
-xmlNodePtr findChild(xmlNodePtr parent, const char *name)
+static xmlNodePtr findChild(xmlNodePtr parent, const char *name)
 {
 	xmlNodePtr cur;
 
@@ -113,7 +113,7 @@ xmlNodePtr findChild(xmlNodePtr parent, const char *name)
 	return NULL;
 }
 
-int longestAcronymTerm(xmlNodePtr acronyms)
+static int longestAcronymTerm(xmlNodePtr acronyms)
 {
 	xmlNodePtr cur;
 	int longest = 0;
@@ -134,7 +134,7 @@ int longestAcronymTerm(xmlNodePtr acronyms)
 	return longest;
 }
 
-void printAcronyms(xmlNodePtr acronyms, const char *path)
+static void printAcronyms(xmlNodePtr acronyms, const char *path)
 {
 	xmlNodePtr cur;
 	int longest = 0;
@@ -195,7 +195,7 @@ void printAcronyms(xmlNodePtr acronyms, const char *path)
 		fclose(out);
 }
 
-xmlDocPtr formatXmlAs(xmlDocPtr doc, unsigned char *src, unsigned int len)
+static xmlDocPtr formatXmlAs(xmlDocPtr doc, unsigned char *src, unsigned int len)
 {
 	xmlDocPtr styleDoc, result;
 	xsltStylesheetPtr style;
@@ -212,7 +212,7 @@ xmlDocPtr formatXmlAs(xmlDocPtr doc, unsigned char *src, unsigned int len)
 	return result;
 }
 
-xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
+static xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 {
 	xmlDocPtr styleDoc, result;
 	xsltStylesheetPtr style;
@@ -240,7 +240,7 @@ xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 	return result;
 }
 
-xmlNodePtr firstXPathNode(char *xpath, xmlNodePtr from)
+static xmlNodePtr firstXPathNode(char *xpath, xmlNodePtr from)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -262,7 +262,7 @@ xmlNodePtr firstXPathNode(char *xpath, xmlNodePtr from)
 	return node;
 }
 
-xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
+static xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -323,7 +323,7 @@ xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
 	return acronym;
 }
 
-bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term, int termLen)
+static bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term, int termLen)
 {
 	bool isTerm;
 	xmlChar s, e;
@@ -338,7 +338,7 @@ bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term, int t
 	return isTerm;
 }
 
-void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
+static void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 {
 	xmlChar *content;
 	xmlChar *term;
@@ -388,7 +388,7 @@ void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 	xmlFree(content);
 }
 
-void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
+static void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 {
 	xmlNodePtr cur;
 
@@ -415,7 +415,7 @@ void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 	}
 }
 
-xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
+static xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 {
 	xmlDocPtr res, orig;
 	xmlNodePtr old;
@@ -435,7 +435,7 @@ xmlDocPtr matchAcronymTerms(xmlDocPtr doc)
 	return orig;
 }
 
-void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+static void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 {
 	xmlDocPtr styledoc, src, res;
 	xsltStylesheetPtr style;
@@ -456,12 +456,12 @@ void transformDoc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 	xsltFreeStylesheet(style);
 }
 
-void convertToIssue30(xmlDocPtr doc)
+static void convertToIssue30(xmlDocPtr doc)
 {
 	transformDoc(doc, stylesheets_30_xsl, stylesheets_30_xsl_len);
 }
 
-void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out)
+static void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out)
 {
 	xmlDocPtr doc;
 
@@ -487,7 +487,7 @@ void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const char *out
 	xmlFreeDoc(doc);
 }
 
-xmlDocPtr sortAcronyms(xmlDocPtr doc)
+static xmlDocPtr sortAcronyms(xmlDocPtr doc)
 {
 	xmlDocPtr sortdoc;
 	xsltStylesheetPtr sort;
@@ -501,7 +501,7 @@ xmlDocPtr sortAcronyms(xmlDocPtr doc)
 	return sorted;
 }
 
-void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *out, bool overwrite)
+static void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *out, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -528,7 +528,7 @@ void markupAcronymsInList(const char *fname, xmlNodePtr acronyms, const char *ou
 	fclose(f);
 }
 
-void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
+static void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -550,12 +550,12 @@ void findAcronymsInList(xmlNodePtr acronyms, const char *fname)
 	fclose(f);
 }
 
-void deleteAcronyms(xmlDocPtr doc)
+static void deleteAcronyms(xmlDocPtr doc)
 {
 	transformDoc(doc, stylesheets_delete_xsl, stylesheets_delete_xsl_len);
 }
 
-void deleteAcronymsInFile(const char *fname, const char *out)
+static void deleteAcronymsInFile(const char *fname, const char *out)
 {
 	xmlDocPtr doc;
 
@@ -572,7 +572,7 @@ void deleteAcronymsInFile(const char *fname, const char *out)
 	xmlFreeDoc(doc);
 }
 
-void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
+static void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -599,7 +599,7 @@ void deleteAcronymsInList(const char *fname, const char *out, bool overwrite)
 	fclose(f);
 }
 
-void showHelp(void)
+static void showHelp(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
@@ -630,7 +630,7 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);

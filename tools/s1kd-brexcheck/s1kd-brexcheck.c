@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.12.0"
+#define VERSION "2.12.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -57,22 +57,22 @@
 #define EXIT_MAX_OBJS 5
 
 /* Initial maximum numbers of CSDB objects/search paths. */
-unsigned BREX_MAX = 1;
-unsigned DMOD_MAX = 1;
-unsigned BREX_PATH_MAX = 1;
+static unsigned BREX_MAX = 1;
+static unsigned DMOD_MAX = 1;
+static unsigned BREX_PATH_MAX = 1;
 
 /* The total width of the progress bar displayed by the -p option. */
 #define PROGRESS_BAR_WIDTH 60
 
 /* Verbosity of the tool's output. */
-enum verbosity {SILENT, NORMAL, VERBOSE} verbose = NORMAL;
+static enum verbosity {SILENT, NORMAL, VERBOSE} verbose = NORMAL;
 
 /* Whether to use short, single-line error messages. */
-bool shortmsg = false;
+static bool shortmsg = false;
 
 /* Business rules severity levels configuration file. */
-char *brsl_fname = NULL;
-xmlDocPtr brsl;
+static char *brsl_fname = NULL;
+static xmlDocPtr brsl;
 
 /* Whether to check the SNS of specified data modules against the SNS rules
  * defined in the BREX data modules.
@@ -81,41 +81,41 @@ xmlDocPtr brsl;
  * rules only allow the value of '0' (or '00'/'0000' for the assyCode). Any
  * other code is treated as invalid.
  */
-bool check_sns = false;
+static bool check_sns = false;
 /* In strict SNS check mode, all levels of the SNS must be explicitly defined
  * in the SNS rules, otherwise an error will be reported.
  */
-bool strict_sns = false;
+static bool strict_sns = false;
 /* In unstrict SNS check mode, if an optional level is omitted from the SNS
  * rules, that is interpreted as allowing ANY code.
  */
-bool unstrict_sns = false;
+static bool unstrict_sns = false;
 
 /* Whether to check notation rules, that is, what NOTATIONs are allowed in
  * the DTD.
  */
-bool check_notation = false;
+static bool check_notation = false;
 
 /* Whether to check object values. */
-bool check_values = false;
+static bool check_values = false;
 
 /* Print the filenames of invalid objects. */
-bool show_fnames = false;
+static bool show_fnames = false;
 
 /* Search for BREX data modules recursively. */
-bool recursive_search = false;
+static bool recursive_search = false;
 
 /* Directory to start search for BREX data modules in. */
-char *search_dir = NULL;
+static char *search_dir = NULL;
 
 /* Output XML tree if it passes the BREX check. */
-bool output_tree = false;
+static bool output_tree = false;
 
 /* Ignore empty/non-XML files. */
-bool ignore_empty = false;
+static bool ignore_empty = false;
 
 /* Return the first node in a set matching an XPath expression. */
-xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
+static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -138,13 +138,13 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
 }
 
 /* Return the string value of the first node matching an XPath expression. */
-xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
+static xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
 {
 	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
 }
 
 /* Test whether an object value matches a regex pattern. */
-bool match_pattern(const char *value, const char *pattern)
+static bool match_pattern(const char *value, const char *pattern)
 {
 	xmlRegexpPtr regex;
 	bool match;
@@ -155,7 +155,7 @@ bool match_pattern(const char *value, const char *pattern)
 }
 
 /* Check the values of objects against the patterns in the BREX rule. */
-bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
+static bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 {
 	int i;
 	bool ret = false;
@@ -187,7 +187,7 @@ bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 }
 
 /* Check an individual node's value against a rule. */
-bool check_single_object_values(xmlNodePtr rule, xmlNodePtr node)
+static bool check_single_object_values(xmlNodePtr rule, xmlNodePtr node)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -211,7 +211,7 @@ bool check_single_object_values(xmlNodePtr rule, xmlNodePtr node)
 }
 
 /* Check the values of a set of nodes against a rule. */
-bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
+static bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -243,7 +243,7 @@ bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
 }
 
 /* Determine whether a BREX context rule is violated. */
-bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
+static bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
 {
 	bool invalid = false;
 
@@ -270,7 +270,7 @@ bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
 }
 
 /* Dump the XML branches that violate a given BREX context rule. */
-void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule)
+static void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule)
 {
 	int i;
 
@@ -299,13 +299,13 @@ void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError
 }
 
 /* Determine whether a file in the filesystem is an XML file by extension. */
-bool is_xml_file(const char *fname)
+static bool is_xml_file(const char *fname)
 {
 	return strcasecmp(fname + (strlen(fname) - 4), ".XML") == 0;
 }
 
 /* Search for the BREX in the list of CSDB objects to be checked. */
-bool search_brex_fname_from_dmods(char *fname,
+static bool search_brex_fname_from_dmods(char *fname,
 	char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames,
 	char *dmcode, int len)
 {
@@ -330,7 +330,7 @@ bool search_brex_fname_from_dmods(char *fname,
 }
 
 /* Search for the BREX in the built-in default BREX data modules. */
-bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
+static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 {
 	return
 		(strcmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0 ||
@@ -345,7 +345,7 @@ bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
  *  0  Object references a BREX DM, and it was found.
  *  1  Object references a BREX DM, but it couldn't be found.
  */
-int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MAX],
+static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MAX],
 	int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames)
 {
 	xmlXPathContextPtr context;
@@ -470,7 +470,7 @@ int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MAX
 /* Determine whether a violated rule counts as a failure, based on its
  * business rule severity level.
  */
-bool is_failure(xmlChar *severity)
+static bool is_failure(xmlChar *severity)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -509,7 +509,7 @@ bool is_failure(xmlChar *severity)
 }
 
 /* Extract the type name of a business rule severity level. */
-xmlChar *brsl_type(xmlChar *severity)
+static xmlChar *brsl_type(xmlChar *severity)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -534,7 +534,7 @@ xmlChar *brsl_type(xmlChar *severity)
 }
 
 /* Copy the allowed object values to the XML report. */
-void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
+static void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -556,7 +556,7 @@ void add_object_values(xmlNodePtr brexError, xmlNodePtr rule)
 }
 
 /* Print the XML report as plain text messages */
-void print_node(xmlNodePtr node)
+static void print_node(xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
@@ -660,7 +660,7 @@ void print_node(xmlNodePtr node)
 }
 
 /* Check the context rules of a BREX DM against a CSDB object. */
-int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
+static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr documentNode)
 {
 	xmlXPathContextPtr context;
@@ -768,7 +768,7 @@ int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, con
 }
 
 /* Load a BREX DM from the filesystem or from in-memory. */
-xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
+static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 {
 	/* If the BREX name is -, this means the DM on stdin is a BREX DM.
 	 * BREX DMs are checked against themselves, so return a copy of the
@@ -805,7 +805,7 @@ xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 }
 
 /* Determine which parts of the SNS rules to check. */
-bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
+static bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
 {
 	bool ret;
 
@@ -824,7 +824,7 @@ bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr c
 }
 
 /* Check the SNS rules of BREX DMs against a CSDB object. */
-bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
+static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
 	const char *dmod_fname, xmlNodePtr documentNode)
 {
 	xmlNodePtr dmcode;
@@ -933,7 +933,7 @@ bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr d
 }
 
 /* Check the notation used by an entity against the notation rules. */
-int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
+static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 	xmlNodePtr notationCheck, const char *docname)
 {	
 	char xpath[256];
@@ -959,7 +959,7 @@ int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 }
 
 /* Check the notation rules of BREX DMs against a CSDB object. */
-int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
+static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
 	const char *dmod_fname, xmlNodePtr documentNode)
 {
 	xmlDocPtr notationRuleDoc;
@@ -1005,7 +1005,7 @@ int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDoc
 }
 
 /* Print the filenames of CSDB objects with BREX errors. */
-void print_fnames(xmlNodePtr node)
+static void print_fnames(xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
@@ -1022,7 +1022,7 @@ void print_fnames(xmlNodePtr node)
 }
 
 /* Check context, SNS, and notation rules of BREX DMs against a CSDB object. */
-int check_brex(xmlDocPtr dmod_doc, const char *docname,
+static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
 {
 	xmlDocPtr brex_doc;
@@ -1098,7 +1098,7 @@ int check_brex(xmlDocPtr dmod_doc, const char *docname,
 }
 
 /* Determine if a BREX exists in the given search paths. */
-bool brex_exists(char fname[PATH_MAX], char (*fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths)
+static bool brex_exists(char fname[PATH_MAX], char (*fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths)
 {
 	int i;
 
@@ -1112,7 +1112,7 @@ bool brex_exists(char fname[PATH_MAX], char (*fnames)[PATH_MAX], int nfnames, ch
 }
 
 /* Add a path to a list of paths, extending its size if necessary. */
-void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s)
+static void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s)
 {
 	if ((*n) == (*max)) {
 		if (!(*list = realloc(*list, (*max *= 2) * PATH_MAX))) {
@@ -1127,7 +1127,7 @@ void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s)
 }
 
 /* Add the BREX referenced by another BREX DM in layered mode (-l).*/
-int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames, xmlDocPtr dmod_doc)
+static int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames, xmlDocPtr dmod_doc)
 {
 	int i;
 	int total = nfnames;
@@ -1156,7 +1156,7 @@ int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH
 }
 
 /* Display a progress bar. */
-void show_progress(float cur, float total)
+static void show_progress(float cur, float total)
 {
 	float p;
 	int i, b;
@@ -1178,7 +1178,7 @@ void show_progress(float cur, float total)
 }
 
 /* Add CSDB objects to check from a list of filenames. */
-void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int *num_dmod_fnames)
+static void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int *num_dmod_fnames)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -1203,7 +1203,7 @@ void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int *num_d
 }
 
 /* Return the default BREX DMC for a given issue of the spec. */
-const char *default_brex_dmc(xmlDocPtr doc)
+static const char *default_brex_dmc(xmlDocPtr doc)
 {
 	char *schema;
 	const char *code;
@@ -1225,7 +1225,7 @@ const char *default_brex_dmc(xmlDocPtr doc)
 	return code;
 }
 
-void print_stats(xmlDocPtr doc)
+static void print_stats(xmlDocPtr doc)
 {
 	xmlDocPtr styledoc;
 	xsltStylesheetPtr style;
@@ -1243,7 +1243,7 @@ void print_stats(xmlDocPtr doc)
 }
 
 /* Show usage message. */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcefLlnopqrS[tu]sTvxh?] [<object>...]");
 	puts("");
@@ -1274,7 +1274,7 @@ void show_help(void)
 }
 
 /* Show version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);

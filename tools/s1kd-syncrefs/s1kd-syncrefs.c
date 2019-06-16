@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.6.0"
+#define VERSION "1.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -26,20 +26,20 @@
 #define EXIT_INVALID_DM 1
 #define EXIT_MAX_REFS 2
 
-unsigned MAX_REFS = 1;
+static unsigned MAX_REFS = 1;
 
 struct ref {
 	char code[256];
 	xmlNodePtr ref;
 };
 
-bool only_delete = false;
-bool verbose = false;
+static bool only_delete = false;
+static bool verbose = false;
 
-struct ref *refs;
-int nrefs;
+static struct ref *refs;
+static int nrefs;
 
-bool contains_code(const char *code)
+static bool contains_code(const char *code)
 {
 	int i;
 
@@ -52,7 +52,7 @@ bool contains_code(const char *code)
 	return false;
 }
 
-xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
+static xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 {
 	xmlNodePtr cur;
 
@@ -65,7 +65,7 @@ xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
 	return NULL;
 }
 
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -84,12 +84,12 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 	return first;
 }
 
-char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
+static char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 {
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
-bool is_ref(xmlNodePtr node)
+static bool is_ref(xmlNodePtr node)
 {
 	return node->type == XML_ELEMENT_NODE && (
 		xmlStrcmp(node->name, BAD_CAST "dmRef") == 0 ||
@@ -99,7 +99,7 @@ bool is_ref(xmlNodePtr node)
 		xmlStrcmp(node->name, BAD_CAST "externalPubRef") == 0);
 }
 
-void copy_code(char *dst, xmlNodePtr ref)
+static void copy_code(char *dst, xmlNodePtr ref)
 {
 	xmlNodePtr code;
 
@@ -213,7 +213,7 @@ void copy_code(char *dst, xmlNodePtr ref)
 	}
 }
 
-void resize(void)
+static void resize(void)
 {
 	if (!(refs = realloc(refs, (MAX_REFS *= 2) * sizeof(struct ref)))) {
 		fprintf(stderr, E_MAX_REFS, nrefs);
@@ -221,7 +221,7 @@ void resize(void)
 	}
 }
 
-void find_refs(xmlNodePtr node)
+static void find_refs(xmlNodePtr node)
 {
 	xmlNodePtr cur;
 
@@ -246,7 +246,7 @@ void find_refs(xmlNodePtr node)
 	}
 }
 
-int compare_refs(const void *a, const void *b)
+static int compare_refs(const void *a, const void *b)
 {
 	struct ref *ref1 = (struct ref *) a;
 	struct ref *ref2 = (struct ref *) b;
@@ -254,7 +254,7 @@ int compare_refs(const void *a, const void *b)
 	return strcmp(ref1->code, ref2->code);
 }
 
-void sync_refs(xmlNodePtr dmodule)
+static void sync_refs(xmlNodePtr dmodule)
 {
 	int i;
 
@@ -338,7 +338,7 @@ void sync_refs(xmlNodePtr dmodule)
 	}
 }
 
-void sync_refs_file(const char *path, const char *out, bool overwrite)
+static void sync_refs_file(const char *path, const char *out, bool overwrite)
 {
 	xmlDocPtr dm;
 	xmlNodePtr dmodule;
@@ -364,7 +364,7 @@ void sync_refs_file(const char *path, const char *out, bool overwrite)
 	xmlFreeDoc(dm);
 }
 
-void sync_refs_list(const char *path, const char *out, bool overwrite)
+static void sync_refs_list(const char *path, const char *out, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -388,7 +388,7 @@ void sync_refs_list(const char *path, const char *out, bool overwrite)
 	}
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-dflvh?] [-o <out>] [<dms>]");
 	puts("");
@@ -404,7 +404,7 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);

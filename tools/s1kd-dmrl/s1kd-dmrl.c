@@ -15,9 +15,9 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
-void showHelp(void)
+static void showHelp(void)
 {
 	puts("Usage: " PROG_NAME " [options] <DML>...");
 	puts("");
@@ -40,7 +40,7 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);

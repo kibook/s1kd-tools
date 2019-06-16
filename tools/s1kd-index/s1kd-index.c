@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -29,10 +29,10 @@
 #define I_DELETE INF_PREFIX "Deleting index flags from %s...\n"
 #define EXIT_NO_LIST 1
 
-bool verbose = false;
+static bool verbose = false;
 
 /* Help/usage message */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
@@ -51,7 +51,7 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
@@ -60,7 +60,7 @@ void show_version(void)
 /* Return the lowest level in an indexFlag. This is matched against the text
  * to determine where to insert the flag.
  */
-xmlChar *last_level(xmlNodePtr flag)
+static xmlChar *last_level(xmlNodePtr flag)
 {
 	xmlChar *lvl;
 
@@ -77,7 +77,7 @@ xmlChar *last_level(xmlNodePtr flag)
 	return NULL;
 }
 
-bool is_term(xmlChar *content, int content_len, int i, xmlChar *term, int term_len, bool ignorecase)
+static bool is_term(xmlChar *content, int content_len, int i, xmlChar *term, int term_len, bool ignorecase)
 {
 	bool is;
 	xmlChar s, e;
@@ -95,7 +95,7 @@ bool is_term(xmlChar *content, int content_len, int i, xmlChar *term, int term_l
 }
 
 /* Insert indexFlag elements after matched terms. */
-void gen_index_node(xmlNodePtr node, xmlNodePtr flag, bool ignorecase)
+static void gen_index_node(xmlNodePtr node, xmlNodePtr flag, bool ignorecase)
 {
 	xmlChar *content;
 	xmlChar *term;
@@ -136,7 +136,7 @@ void gen_index_node(xmlNodePtr node, xmlNodePtr flag, bool ignorecase)
 }
 
 /* Flag an individual term in all applicable elements in a module. */
-void gen_index_flag(xmlNodePtr flag, xmlXPathContextPtr ctx, bool ignorecase)
+static void gen_index_flag(xmlNodePtr flag, xmlXPathContextPtr ctx, bool ignorecase)
 {
 	xmlXPathObjectPtr obj;
 
@@ -154,7 +154,7 @@ void gen_index_flag(xmlNodePtr flag, xmlXPathContextPtr ctx, bool ignorecase)
 }
 
 /* Insert indexFlags for each term included in the specified index file. */
-void gen_index_flags(xmlNodeSetPtr flags, xmlXPathContextPtr ctx, bool ignorecase)
+static void gen_index_flags(xmlNodeSetPtr flags, xmlXPathContextPtr ctx, bool ignorecase)
 {
 	int i;
 
@@ -164,7 +164,7 @@ void gen_index_flags(xmlNodeSetPtr flags, xmlXPathContextPtr ctx, bool ignorecas
 }
 
 /* Apply a built-in XSLT transform to a doc in place. */
-void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 {
 	xmlDocPtr styledoc, src, res;
 	xsltStylesheetPtr style;
@@ -186,12 +186,12 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
 }
 
 /* Convert index flags for older issues. */
-void convert_to_iss_30(xmlDocPtr doc)
+static void convert_to_iss_30(xmlDocPtr doc)
 {
 	transform_doc(doc, iss30_xsl, iss30_xsl_len);
 }
 
-void delete_index_flags(const char *path, bool overwrite)
+static void delete_index_flags(const char *path, bool overwrite)
 {
 	xmlDocPtr doc;
 
@@ -211,7 +211,7 @@ void delete_index_flags(const char *path, bool overwrite)
 }
 
 /* Insert indexFlag elements after matched terms in a document. */
-void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignorecase)
+static void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignorecase)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr doc_ctx, index_ctx;
@@ -254,7 +254,7 @@ void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, bool ignor
 	xmlFreeDoc(doc);
 }
 
-xmlDocPtr read_index_flags(const char *fname)
+static xmlDocPtr read_index_flags(const char *fname)
 {
 	xmlDocPtr index_doc;
 
@@ -266,7 +266,7 @@ xmlDocPtr read_index_flags(const char *fname)
 	return index_doc;
 }
 
-void handle_list(const char *path, bool delflags, xmlDocPtr index_doc, bool overwrite, bool ignorecase)
+static void handle_list(const char *path, bool delflags, xmlDocPtr index_doc, bool overwrite, bool ignorecase)
 {
 	FILE *f;
 	char line[PATH_MAX];

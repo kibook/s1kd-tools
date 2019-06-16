@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "3.0.2"
+#define VERSION "3.0.3"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -51,16 +51,16 @@
 #define EXIT_BAD_OBJECT 2
 
 /* Search for ACT, CCT, PCT recursively. */
-bool recursive_search = false;
+static bool recursive_search = false;
 
 /* Assume issue/inwork numbers are omitted. */
-bool no_issue = false;
+static bool no_issue = false;
 
 /* Directory to search for ACT, CCT, PCT in. */
-char *search_dir;
+static char *search_dir;
 
 /* The verbosity of output. */
-enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
+static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 /* What type of check to perform. */
 enum appcheckmode { BASIC, PCT, ALL, STANDALONE };
@@ -81,7 +81,7 @@ struct appcheckopts {
 };
 
 /* Show usage message. */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
@@ -114,14 +114,14 @@ void show_help(void)
 }
 
 /* Show version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -150,20 +150,20 @@ xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 }
 
 /* Return the value of the first node matching an XPath expression. */
-xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+static xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	return xmlNodeGetContent(first_xpath_node(doc, node, path));
 }
 
 /* Determine if the file is a data module. */
-bool is_dm(const char *name)
+static bool is_dm(const char *name)
 {
 	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
-bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
+static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 {
 	bool found = false;
 	char *model_ident_code;
@@ -278,7 +278,7 @@ bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 }
 
 /* Find the filename of a referenced ACT data module. */
-bool find_act_fname(char *dst, const char *useract, xmlDocPtr doc)
+static bool find_act_fname(char *dst, const char *useract, xmlDocPtr doc)
 {
 	if (useract) {
 		strcpy(dst, useract);
@@ -293,7 +293,7 @@ bool find_act_fname(char *dst, const char *useract, xmlDocPtr doc)
 }
 
 /* Find the filename of a referenced CCT data module. */
-bool find_cct_fname(char *dst, const char *usercct, xmlDocPtr act)
+static bool find_cct_fname(char *dst, const char *usercct, xmlDocPtr act)
 {
 	if (usercct) {
 		strcpy(dst, usercct);
@@ -308,7 +308,7 @@ bool find_cct_fname(char *dst, const char *usercct, xmlDocPtr act)
 }
 
 /* Find the filename of a referenced PCT data module via the ACT. */
-bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
+static bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 {
 	if (userpct) {
 		strcpy(dst, userpct);
@@ -323,7 +323,7 @@ bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 }
 
 /* Test whether an object value matches a regex pattern. */
-bool match_pattern(const xmlChar *value, const xmlChar *pattern)
+static bool match_pattern(const xmlChar *value, const xmlChar *pattern)
 {
 	xmlRegexpPtr regex;
 	bool match;
@@ -334,7 +334,7 @@ bool match_pattern(const xmlChar *value, const xmlChar *pattern)
 }
 
 /* Add an undefined property node to the report. */
-xmlNodePtr add_undef_node(xmlNodePtr report, xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, long int line)
+static xmlNodePtr add_undef_node(xmlNodePtr report, xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, long int line)
 {
 	xmlNodePtr und;
 	xmlChar line_s[16], *xpath;
@@ -359,7 +359,7 @@ xmlNodePtr add_undef_node(xmlNodePtr report, xmlNodePtr assert, const xmlChar *i
 }
 
 /* Check whether a property value is defined in the ACT/CCT. */
-int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
+static int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -422,7 +422,7 @@ int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xmlChar *
 }
 
 /* Check whether a property is defined in the ACT/CCT. */
-int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const char *path, xmlNodePtr report)
+static int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const char *path, xmlNodePtr report)
 {
 	xmlChar *id, *type, *vals, *xpath = NULL;
 	int n, err = 0;
@@ -501,7 +501,7 @@ int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const
 }
 
 /* Check whether all properties in an object are defined in the ACT/CCT. */
-int check_props_against_cts(xmlDocPtr doc, const char *path, xmlDocPtr act, xmlDocPtr cct, xmlNodePtr report)
+static int check_props_against_cts(xmlDocPtr doc, const char *path, xmlDocPtr act, xmlDocPtr cct, xmlNodePtr report)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -525,7 +525,7 @@ int check_props_against_cts(xmlDocPtr doc, const char *path, xmlDocPtr act, xmlD
 }
 
 /* Add an assignment to a set of assertions. */
-void add_assign(xmlNodePtr asserts, xmlNodePtr assert)
+static void add_assign(xmlNodePtr asserts, xmlNodePtr assert)
 {
 	xmlChar *i, *t, *v;
 	xmlNodePtr new;
@@ -547,7 +547,7 @@ void add_assign(xmlNodePtr asserts, xmlNodePtr assert)
 }
 
 /* Extract the assignments in a PCT instance. */
-void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
+static void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -568,7 +568,7 @@ void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 }
 
 /* Check if an object is valid for a set of assertions. */
-int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePtr product, const xmlChar *id, const char *pctfname, struct appcheckopts *opts)
+static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePtr product, const xmlChar *id, const char *pctfname, struct appcheckopts *opts)
 {
 	xmlNodePtr cur;
 	int err = 0, e = 0;
@@ -721,7 +721,7 @@ int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePt
 }
 
 /* Extract assertions from ACT/CCT enumerations. */
-void extract_enumvals(xmlNodePtr asserts, xmlNodePtr prop, const xmlChar *id, bool cct)
+static void extract_enumvals(xmlNodePtr asserts, xmlNodePtr prop, const xmlChar *id, bool cct)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -759,7 +759,7 @@ void extract_enumvals(xmlNodePtr asserts, xmlNodePtr prop, const xmlChar *id, bo
 }
 
 /* General XSLT transformation with embedded stylesheet, preserving the DTD. */
-void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
+static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc, res, src;
 	xsltStylesheetPtr style;
@@ -780,7 +780,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const ch
 }
 
 /* Add a node containing the path of an object to the report. */
-xmlNodePtr add_object_node(xmlNodePtr parent, const char *name, const char *path)
+static xmlNodePtr add_object_node(xmlNodePtr parent, const char *name, const char *path)
 {
 	xmlNodePtr node;
 	node = xmlNewChild(parent, NULL, BAD_CAST name, NULL);
@@ -788,7 +788,7 @@ xmlNodePtr add_object_node(xmlNodePtr parent, const char *name, const char *path
 	return node;
 }
 
-int check_props_only(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
+static int check_props_only(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
 {
 	char actfname[PATH_MAX];
 	char cctfname[PATH_MAX];
@@ -818,7 +818,7 @@ int check_props_only(xmlDocPtr doc, const char *path, struct appcheckopts *opts,
 }
 
 /* Check that an object is valid for all defined product instances. */
-int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
+static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
 {
 	char pctfname[PATH_MAX];
 	int err = 0;
@@ -892,7 +892,7 @@ int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr act, s
 }
 
 /* Add an assertion from an object to a set of assertions. */
-void add_assert(xmlNodePtr asserts, xmlNodePtr assert)
+static void add_assert(xmlNodePtr asserts, xmlNodePtr assert)
 {
 	xmlChar *i, *t, *v, *c = NULL;
 
@@ -936,7 +936,7 @@ void add_assert(xmlNodePtr asserts, xmlNodePtr assert)
 }
 
 /* Find a property in a set of properties. */
-xmlNodePtr set_has_prop(xmlNodePtr set, const xmlChar *name)
+static xmlNodePtr set_has_prop(xmlNodePtr set, const xmlChar *name)
 {
 	xmlNodePtr cur, assert = NULL;
 
@@ -956,7 +956,7 @@ xmlNodePtr set_has_prop(xmlNodePtr set, const xmlChar *name)
 }
 
 /* Check the applicability within an object without using an ACT, CCT or PCT. */
-int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
+static int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
 {
 	xmlDocPtr psdoc;
 	xmlNodePtr propsets;
@@ -1033,7 +1033,7 @@ int check_object_props(xmlDocPtr doc, const char *path, struct appcheckopts *opt
 }
 
 /* Determine whether a property is used in an object. */
-bool prop_is_used(const xmlChar *id, xmlDocPtr doc)
+static bool prop_is_used(const xmlChar *id, xmlDocPtr doc)
 {
 	xmlChar *xpath;
 	int n;
@@ -1049,7 +1049,7 @@ bool prop_is_used(const xmlChar *id, xmlDocPtr doc)
 }
 
 /* Determine whether an object uses any conditions. */
-bool has_conds(xmlDocPtr doc)
+static bool has_conds(xmlDocPtr doc)
 {
 	return first_xpath_node(doc, NULL, BAD_CAST "//assert[@applicPropertyType='condition' or @actreftype='condition']");
 }
@@ -1057,7 +1057,7 @@ bool has_conds(xmlDocPtr doc)
 /* Check all possible combinations of applicability property values which may
  * affect the object.
  */
-int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
+static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -1168,7 +1168,7 @@ int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appch
 }
 
 /* Check product instances read from the PCT. */
-int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
+static int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
 {
 	int err = 0;
 
@@ -1229,13 +1229,13 @@ int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, struct a
 }
 
 /* Determine whether an object uses any computable applicability. */
-bool has_applic(xmlDocPtr doc)
+static bool has_applic(xmlDocPtr doc)
 {
 	return first_xpath_node(doc, NULL, BAD_CAST "//assert") != NULL;
 }
 
 /* Check the applicability in an object. */
-int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr report)
+static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr report)
 {
 	xmlDocPtr doc;
 	int err = 0;
@@ -1325,7 +1325,7 @@ int check_applic_file(const char *path, struct appcheckopts *opts, xmlNodePtr re
 }
 
 /* Check the applicability in a list of objects. */
-int check_applic_list(const char *fname, struct appcheckopts *opts, xmlNodePtr report)
+static int check_applic_list(const char *fname, struct appcheckopts *opts, xmlNodePtr report)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -1355,7 +1355,7 @@ int check_applic_list(const char *fname, struct appcheckopts *opts, xmlNodePtr r
 }
 
 /* Show a summary of the check. */
-void print_stats(xmlDocPtr doc)
+static void print_stats(xmlDocPtr doc)
 {
 	xmlDocPtr styledoc;
 	xsltStylesheetPtr style;

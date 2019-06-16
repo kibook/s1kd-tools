@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.13.0"
+#define VERSION "1.13.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -27,7 +27,7 @@
 #define EXIT_ICN_INWORK 5
 #define EXIT_ISSUE_TOO_LARGE 6
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
 	putchar('\n');
@@ -57,13 +57,13 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
 }
 
-xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
+static xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -84,7 +84,7 @@ xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
 }
 
 /* Remove change markup attributes from elements referencing old RFUs */
-void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
+static void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
 	char *rfuid;
@@ -124,7 +124,7 @@ void del_assoc_rfu_attrs(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 }
 
 /* Determine if an RFU is ever referenced */
-bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
+static bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 {
 	xmlXPathObjectPtr obj;
 	bool ret = false;
@@ -164,7 +164,7 @@ bool rfu_used(xmlNodePtr rfu, xmlXPathContextPtr ctx)
 }
 
 /* Remove RFUs which are never referenced */
-void rem_unassoc_rfus(xmlDocPtr doc)
+static void rem_unassoc_rfus(xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -189,7 +189,7 @@ void rem_unassoc_rfus(xmlDocPtr doc)
 }
 
 /* Remove all change markup attributes */
-void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
+static void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
 {
 	xmlXPathObjectPtr obj;
 	const xmlChar *change, *mark, *rfc;
@@ -236,7 +236,7 @@ void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
 }
 
 /* Remove elements marked as "delete". */
-void rem_delete(xmlDocPtr doc, bool iss30)
+static void rem_delete(xmlDocPtr doc, bool iss30)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -264,7 +264,7 @@ void rem_delete(xmlDocPtr doc, bool iss30)
 }
 
 /* Delete old RFUs */
-void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
+static void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -297,7 +297,7 @@ void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 	xmlXPathFreeContext(ctx);
 }
 
-void set_unverified(xmlDocPtr doc, bool iss30)
+static void set_unverified(xmlDocPtr doc, bool iss30)
 {
 	xmlNodePtr qa, cur;
 
@@ -317,7 +317,7 @@ void set_unverified(xmlDocPtr doc, bool iss30)
 	xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "unverif" : "unverified"), NULL);
 }
 
-void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
+static void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 {
 	xmlNodePtr qa, unverif;
 
@@ -363,7 +363,7 @@ void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 #define ISS_30_RFU_PATH "(//qa|//sbc|//fic|//ein|//skill|//rfu)[last()]"
 #define ISS_4X_RFU_PATH "(//qualityAssurance|//systemBreakdownCode|//functionalItemCode|//functionalItemRef|//skillLevel|//reasonForUpdate)[last()]"
 
-void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
+static void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 {
 	xmlNodePtr node, cur, next;
 
@@ -404,7 +404,7 @@ void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 	}
 }
 
-void set_iss_date(xmlDocPtr dmdoc)
+static void set_iss_date(xmlDocPtr dmdoc)
 {
 	time_t now;
 	struct tm *local;
@@ -431,7 +431,7 @@ void set_iss_date(xmlDocPtr dmdoc)
 	xmlSetProp(issueDate, (xmlChar *) "day",   (xmlChar *) day_s);
 }
 
-void set_status(xmlDocPtr dmdoc, const char *status, bool iss30, xmlNodePtr issueInfo)
+static void set_status(xmlDocPtr dmdoc, const char *status, bool iss30, xmlNodePtr issueInfo)
 {
 	xmlNodePtr dmStatus;
 
@@ -445,26 +445,26 @@ void set_status(xmlDocPtr dmdoc, const char *status, bool iss30, xmlNodePtr issu
 }
 
 /* Upissue options */
-bool verbose = false;
-bool newissue = false;
-bool overwrite = false;
-char *status = NULL;
-bool no_issue = false;
-bool keep_rfus = false;
-bool set_date = true;
-bool only_assoc_rfus = false;
-bool set_unverif = true;
-bool dry_run = false;
-char *firstver = NULL;
-char *secondver = NULL;
-xmlNodePtr rfus = NULL;
-bool lock = false;
-bool remdel= false;
-bool remold = false;
-bool only_mod = false;
-bool clean_rfus = false;
+static bool verbose = false;
+static bool newissue = false;
+static bool overwrite = false;
+static char *status = NULL;
+static bool no_issue = false;
+static bool keep_rfus = false;
+static bool set_date = true;
+static bool only_assoc_rfus = false;
+static bool set_unverif = true;
+static bool dry_run = false;
+static char *firstver = NULL;
+static char *secondver = NULL;
+static xmlNodePtr rfus = NULL;
+static bool lock = false;
+static bool remdel= false;
+static bool remold = false;
+static bool only_mod = false;
+static bool clean_rfus = false;
 
-void upissue(const char *path)
+static void upissue(const char *path)
 {
 	char *issueNumber = NULL;
 	char *inWork = NULL;
@@ -736,7 +736,7 @@ void upissue(const char *path)
 	}
 }
 
-void upissue_list(const char *path)
+static void upissue_list(const char *path)
 {
 	FILE *f;
 	char line[PATH_MAX];

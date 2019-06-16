@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.7.0"
+#define VERSION "1.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -22,10 +22,10 @@
 #define EXIT_NO_CONV 1
 #define EXIT_NO_UOM 2
 
-bool verbose = false;
+static bool verbose = false;
 
 /* Show usage message. */
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [-flv,h?] [<object>...]");
 	puts("");
@@ -48,14 +48,14 @@ void show_help(void)
 }
 
 /* Show version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 /* Select specified UOM to convert. */
-void select_uoms(xmlNodePtr uom, xmlNodePtr conversions)
+static void select_uoms(xmlNodePtr uom, xmlNodePtr conversions)
 {
 	xmlNodePtr cur;
 
@@ -163,7 +163,7 @@ void select_uoms(xmlNodePtr uom, xmlNodePtr conversions)
 }
 
 /* Transform a document with a pre-parsed stylesheet. */
-void transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc, const char **params)
+static void transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc, const char **params)
 {
 	xmlDocPtr src, res, sdoc;
 	xsltStylesheetPtr style;
@@ -184,7 +184,7 @@ void transform_doc_with(xmlDocPtr doc, xmlDocPtr styledoc, const char **params)
 }
 
 /* Transform a document with an in-memory stylesheet. */
-void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
+static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc;
 	styledoc = read_xml_mem((const char *) xsl, len);
@@ -193,7 +193,7 @@ void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const ch
 }
 
 /* Convert UOM for a single data module. */
-void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
+static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
 {
 	xmlDocPtr doc;
 	char *params[3];
@@ -250,7 +250,7 @@ void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr
 }
 
 /* Convert UOM for data modules given in a list. */
-void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
+static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];

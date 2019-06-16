@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.10.0"
+#define VERSION "2.10.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -30,53 +30,53 @@
 #define EXIT_BAD_STDIN 3
 
 /* List only references found in the content section. */
-bool contentOnly = false;
+static bool contentOnly = false;
 
 /* Do not display errors. */
-bool quiet = false;
+static bool quiet = false;
 
 /* Assume objects were created with the -N option. */
-bool noIssue = false;
+static bool noIssue = false;
 
 /* Show unmatched references instead of an error. */
-bool showUnmatched = false;
+static bool showUnmatched = false;
 
 /* Show references which are matched in the filesystem. */
-bool showMatched = true;
+static bool showMatched = true;
 
 /* Recurse in to child directories. */
-bool recursive = false;
+static bool recursive = false;
 
 /* Directory to start search in. */
-char *directory;
+static char *directory;
 
 /* Only match against code, ignore language/issue info even if present. */
-bool fullMatch = true;
+static bool fullMatch = true;
 
 /* Include the source object as a reference. */
-bool listSrc = false;
+static bool listSrc = false;
 
 /* List references in matched objects recursively. */
-bool listRecursively = false;
+static bool listRecursively = false;
 
 /* Update the address information of references. */
-bool updateRefs = false;
+static bool updateRefs = false;
 
 /* Update the ident and address info from the latest matched issue. */
-bool updateRefIdent = false;
+static bool updateRefIdent = false;
 
 /* Overwrite updated input objects. */
-bool overwriteUpdated = false;
+static bool overwriteUpdated = false;
 
 /* Remove unmatched references from the input objects. */
-bool tagUnmatched = false;
+static bool tagUnmatched = false;
 
 /* When listing references recursively, keep track of files which have already 
  * been listed to avoid loops.
  */
-char (*listedFiles)[PATH_MAX] = NULL;
-int numListedFiles = 0;
-long unsigned maxListedFiles = 1;
+static char (*listedFiles)[PATH_MAX] = NULL;
+static int numListedFiles = 0;
+static long unsigned maxListedFiles = 1;
 
 /* Possible objects to list references to. */
 #define SHOW_COM 0x01 /* Comments */
@@ -86,16 +86,16 @@ long unsigned maxListedFiles = 1;
 #define SHOW_EPR 0x10 /* External publications */
 
 /* Which types of object references will be listed. */
-int showObjects = 0;
+static int showObjects = 0;
 
 /* Write valid CSDB objects to stdout. */
-bool outputTree = false;
+static bool outputTree = false;
 
 /* Verbose output. */
-bool verbose = false;
+static bool verbose = false;
 
 /* External pub list. */
-xmlDocPtr externalPubs = NULL;
+static xmlDocPtr externalPubs = NULL;
 
 /* Allow matching of filenames which only start with the code.
  *
@@ -105,10 +105,10 @@ xmlDocPtr externalPubs = NULL;
  * For example, with loose matching a code of ABC would match a file named
  * ABC_001.PDF, while without loose matching it will not.
  */
-bool looseMatch = true;
+static bool looseMatch = true;
 
 /* Return the first node matching an XPath expression. */
-xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
+static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
 	xmlNodePtr node;
 
@@ -141,25 +141,25 @@ xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 }
 
 /* Return the value of the first node matching an XPath expression. */
-xmlChar *firstXPathValue(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
+static xmlChar *firstXPathValue(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
 	return xmlNodeGetContent(firstXPathNode(doc, root, path));
 }
 
 /* Print a reference which is matched in the filesystem. */
-void printMatched(xmlNodePtr node, const char *src, const char *ref)
+static void printMatched(xmlNodePtr node, const char *src, const char *ref)
 {
 	puts(ref);
 }
-void printMatchedSrc(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedSrc(xmlNodePtr node, const char *src, const char *ref)
 {
 	printf("%s: %s\n", src, ref);
 }
-void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
 {
 	printf("%s (%ld): %s\n", src, xmlGetLineNo(node), ref);
 }
-void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 {
 	xmlChar *s, *r, *xpath;
 	xmlDocPtr doc;
@@ -196,19 +196,19 @@ void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 }
 
 /* Print an error for references which are unmatched. */
-void printUnmatched(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatched(xmlNodePtr node, const char *src, const char *ref)
 {
 	fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", ref);
 }
-void printUnmatchedSrc(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedSrc(xmlNodePtr node, const char *src, const char *ref)
 {
 	fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
 }
-void printUnmatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
 {
 	fprintf(stderr, ERR_PREFIX "%s (%ld): Unmatched reference: %s\n", src, xmlGetLineNo(node), ref);
 }
-void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 {
 	xmlChar *s, *r, *xpath;
 	xmlDocPtr doc;
@@ -240,11 +240,11 @@ void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	xmlFree(xpath);
 }
 
-void (*printMatchedFn)(xmlNodePtr, const char *, const char *) = printMatched;
-void (*printUnmatchedFn)(xmlNodePtr, const char *, const char*) = printUnmatched;
+static void (*printMatchedFn)(xmlNodePtr, const char *, const char *) = printMatched;
+static void (*printUnmatchedFn)(xmlNodePtr, const char *, const char*) = printUnmatched;
 
 /* Get the DMC as a string from a dmRef. */
-void getDmCode(char *dst, xmlNodePtr dmRef)
+static void getDmCode(char *dst, xmlNodePtr dmRef)
 {
 	char *modelIdentCode;
 	char *systemDiffCode;
@@ -393,7 +393,7 @@ void getDmCode(char *dst, xmlNodePtr dmRef)
 }
 
 /* Get the PMC as a string from a pmRef. */
-void getPmCode(char *dst, xmlNodePtr pmRef)
+static void getPmCode(char *dst, xmlNodePtr pmRef)
 {
 	xmlNodePtr identExtension, pmCode, issueInfo, language;
 
@@ -492,7 +492,7 @@ void getPmCode(char *dst, xmlNodePtr pmRef)
 }
 
 /* Get the ICN as a string from an ICN reference. */
-void getICN(char *dst, xmlNodePtr ref)
+static void getICN(char *dst, xmlNodePtr ref)
 {
 	char *icn;
 	icn = (char *) xmlGetProp(ref, BAD_CAST "infoEntityRefIdent");
@@ -501,7 +501,7 @@ void getICN(char *dst, xmlNodePtr ref)
 }
 
 /* Get the ICN as a string from an ICN entity reference. */
-void getICNAttr(char *dst, xmlNodePtr ref)
+static void getICNAttr(char *dst, xmlNodePtr ref)
 {
 	xmlChar *icn;
 	xmlEntityPtr ent;
@@ -524,7 +524,7 @@ void getICNAttr(char *dst, xmlNodePtr ref)
 }
 
 /* Get the comment code as a string from a commentRef. */
-void getComCode(char *dst, xmlNodePtr ref)
+static void getComCode(char *dst, xmlNodePtr ref)
 {
 	xmlNodePtr commentCode, language;
 
@@ -586,7 +586,7 @@ void getComCode(char *dst, xmlNodePtr ref)
 }
 
 /* Get the external pub code as a string from an externalPubRef. */
-void getExternalPubCode(char *dst, xmlNodePtr ref)
+static void getExternalPubCode(char *dst, xmlNodePtr ref)
 {
 	xmlNodePtr externalPubCode;
 	char *code;
@@ -606,7 +606,7 @@ void getExternalPubCode(char *dst, xmlNodePtr ref)
 }
 
 /* Get filename from DDN item. */
-void getDispatchFileName(char *dst, xmlNodePtr ref)
+static void getDispatchFileName(char *dst, xmlNodePtr ref)
 {
 	char *fname;
 	fname = (char *) xmlNodeGetContent(ref);
@@ -615,7 +615,7 @@ void getDispatchFileName(char *dst, xmlNodePtr ref)
 }
 
 /* Update address items using the matched referenced object. */
-void updateRef(xmlNodePtr *refptr, const char *src, const char *code, const char *fname)
+static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, const char *fname)
 {
 	xmlNodePtr ref = *refptr;
 
@@ -887,22 +887,22 @@ void updateRef(xmlNodePtr *refptr, const char *src, const char *code, const char
 }
 
 /* Tag unmatched references in the source object. */
-void tagUnmatchedRef(xmlNodePtr ref)
+static void tagUnmatchedRef(xmlNodePtr ref)
 {
 	add_first_child(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
 }
 
-int listReferences(const char *path);
+static int listReferences(const char *path);
 
 /* Match a code to a file name. */
-bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
+static bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
 {
 	return find_csdb_object(dst, dir, code, NULL, recursive) &&
 		(looseMatch || strrchr(dst, '.') - dst == strlen(code));
 }
 
 /* Print a reference found in an object. */
-int printReference(xmlNodePtr *refptr, const char *src)
+static int printReference(xmlNodePtr *refptr, const char *src)
 {
 	char code[PATH_MAX];
 	char fname[PATH_MAX];
@@ -966,7 +966,7 @@ int printReference(xmlNodePtr *refptr, const char *src)
 }
 
 /* Check if a file has already been listed when listing recursively. */
-bool listedFile(const char *path)
+static bool listedFile(const char *path)
 {
 	int i;
 	for (i = 0; i < numListedFiles; ++i) {
@@ -978,7 +978,7 @@ bool listedFile(const char *path)
 }
 
 /* Add a file to the list of files already checked. */
-void addFile(const char *path)
+static void addFile(const char *path)
 {
 	if (!listedFiles || numListedFiles == maxListedFiles) {
 		if (!(listedFiles = realloc(listedFiles, (maxListedFiles *= 2) * PATH_MAX))) {
@@ -991,7 +991,7 @@ void addFile(const char *path)
 }
 
 /* List all references in the given object. */
-int listReferences(const char *path)
+static int listReferences(const char *path)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -1065,7 +1065,7 @@ int listReferences(const char *path)
 }
 
 /* Parse a list of filenames as input. */
-int listReferencesInList(const char *path)
+static int listReferencesInList(const char *path)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -1093,7 +1093,7 @@ int listReferencesInList(const char *path)
 }
 
 /* Display the usage message. */
-void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage: s1kd-refs [-aCcDEFfGIilmNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [<object>...]");
 	puts("");
@@ -1132,7 +1132,7 @@ void showHelp(void)
 }
 
 /* Display version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
@@ -1282,7 +1282,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			case '?':
-				showHelp();
+				show_help();
 				return 0;
 		}
 	}

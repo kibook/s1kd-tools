@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -51,25 +51,25 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
-char model_ident_code[MODEL_IDENT_CODE_MAX] = "";
-char sender_ident[CAGE_MAX] = "";
-char receiver_ident[CAGE_MAX] = "";
-char year_of_data_issue[YEAR_MAX] = "";
-char seq_number[SEQ_NO_MAX] = "";
-char sender[256] = "";
-char receiver[256] = "";
-char sender_city[256] = "";
-char receiver_city[256] = "";
-char sender_country[256] = "";
-char receiver_country[256] = "";
-char security_classification[4] = "";
-char authorization[256] = "";
+static char model_ident_code[MODEL_IDENT_CODE_MAX] = "";
+static char sender_ident[CAGE_MAX] = "";
+static char receiver_ident[CAGE_MAX] = "";
+static char year_of_data_issue[YEAR_MAX] = "";
+static char seq_number[SEQ_NO_MAX] = "";
+static char sender[256] = "";
+static char receiver[256] = "";
+static char sender_city[256] = "";
+static char receiver_city[256] = "";
+static char sender_country[256] = "";
+static char receiver_country[256] = "";
+static char security_classification[4] = "";
+static char authorization[256] = "";
 
-char brex_dmcode[256] = "";
+static char brex_dmcode[256] = "";
 
-char ddn_issue_date[16] = "";
+static char ddn_issue_date[16] = "";
 
-xmlChar *remarks = NULL;
+static xmlChar *remarks = NULL;
 
 #define DEFAULT_S1000D_ISSUE ISS_42
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -78,11 +78,11 @@ xmlChar *remarks = NULL;
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 
-enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
 
-char *template_dir = NULL;
+static char *template_dir = NULL;
 
-xmlDocPtr xml_skeleton(void)
+static xmlDocPtr xml_skeleton(void)
 {
 	if (template_dir) {
 		char src[PATH_MAX];
@@ -99,7 +99,7 @@ xmlDocPtr xml_skeleton(void)
 	}
 }
 
-enum issue get_issue(const char *iss)
+static enum issue get_issue(const char *iss)
 {
 	if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
@@ -124,22 +124,7 @@ enum issue get_issue(const char *iss)
 	return NO_ISS;
 }
 
-const char *issue_name(enum issue iss)
-{
-	switch (iss) {
-		case ISS_42: return "4.2";
-		case ISS_41: return "4.1";
-		case ISS_40: return "4.0";
-		case ISS_30: return "3.0";
-		case ISS_23: return "2.3";
-		case ISS_22: return "2.2";
-		case ISS_21: return "2.1";
-		case ISS_20: return "2.0";
-		default: return "";
-	}
-}
-
-xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 {
 	xsltStylesheetPtr style;
 	xmlDocPtr styledoc, res, orig;
@@ -196,7 +181,7 @@ xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	return orig;
 }
 
-void prompt(const char *prompt, char *str, int n)
+static void prompt(const char *prompt, char *str, int n)
 {
 	if (strcmp(str, "") == 0) {
 		printf("%s: ", prompt);
@@ -227,7 +212,7 @@ void prompt(const char *prompt, char *str, int n)
 	}
 }
 
-void show_help(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [options] [<files>...]");
 	puts("");
@@ -258,18 +243,18 @@ void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
-int matches_key_and_not_set(const char *key, const char *match, const char *var)
+static int matches_key_and_not_set(const char *key, const char *match, const char *var)
 {
 	return strcmp(key, match) == 0 && strcmp(var, "") == 0;
 }
 
-xmlNodePtr first_xpath_node(const char *expr, xmlXPathContextPtr ctxt)
+static xmlNodePtr first_xpath_node(const char *expr, xmlXPathContextPtr ctxt)
 {
 	xmlXPathObjectPtr results;
 	xmlNodePtr ret;
@@ -287,7 +272,7 @@ xmlNodePtr first_xpath_node(const char *expr, xmlXPathContextPtr ctxt)
 	return ret;
 }
 
-void populate_list(xmlNodePtr deliv, int argc, char **argv, int i)
+static void populate_list(xmlNodePtr deliv, int argc, char **argv, int i)
 {
 	for (; i < argc; ++i) {
 		xmlNodePtr item = xmlNewChild(deliv, NULL, BAD_CAST "deliveryListItem", NULL);
@@ -295,7 +280,7 @@ void populate_list(xmlNodePtr deliv, int argc, char **argv, int i)
 	}
 }
 
-void copy_default_value(const char *def_key, const char *def_val)
+static void copy_default_value(const char *def_key, const char *def_val)
 {
 	if (matches_key_and_not_set(def_key, "modelIdentCode", model_ident_code))
 		strcpy(model_ident_code, def_val);
@@ -333,7 +318,7 @@ void copy_default_value(const char *def_key, const char *def_val)
 		remarks = xmlStrdup(BAD_CAST def_val);
 }
 
-void set_brex(xmlDocPtr doc, const char *code)
+static void set_brex(xmlDocPtr doc, const char *code)
 {
 	xmlNodePtr dmCode;
 	xmlXPathContextPtr ctx;
@@ -395,7 +380,7 @@ void set_brex(xmlDocPtr doc, const char *code)
 	if (strcmp(learnEventCode, "") != 0) xmlSetProp(dmCode, BAD_CAST "learnEventCode", BAD_CAST learnEventCode);
 }
 
-void set_issue_date(xmlNodePtr issue_date)
+static void set_issue_date(xmlNodePtr issue_date)
 {
 	char year_s[5], month_s[3], day_s[3];
 
@@ -427,7 +412,7 @@ void set_issue_date(xmlNodePtr issue_date)
 	xmlSetProp(issue_date, BAD_CAST "day", BAD_CAST day_s);
 }
 
-void set_remarks(xmlDocPtr doc, xmlChar *text)
+static void set_remarks(xmlDocPtr doc, xmlChar *text)
 {
 	xmlXPathContextPtr ctx;
 	xmlNodePtr remarks;
@@ -445,7 +430,7 @@ void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
-void dump_template(const char *path)
+static void dump_template(const char *path)
 {
 	FILE *f;
 

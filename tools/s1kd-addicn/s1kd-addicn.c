@@ -10,9 +10,9 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
-void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-o <file>] [-s <src>] [-fh?] <ICN>...");
 	puts("");
@@ -27,7 +27,7 @@ void showHelp(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			case '?':
-				showHelp();
+				show_help();
 				return 0;
 		}
 	}

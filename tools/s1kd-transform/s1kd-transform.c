@@ -11,11 +11,11 @@
 #include "s1kd_tools.h"
 #include "identity.h"
 
-bool includeIdentity = false;
-bool verbose = false;
+static bool includeIdentity = false;
+static bool verbose = false;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -25,7 +25,7 @@ bool verbose = false;
 #define I_TRANSFORM INF_PREFIX "Transforming %s...\n"
 
 /* Add identity template to stylesheet. */
-void addIdentity(xmlDocPtr style)
+static void addIdentity(xmlDocPtr style)
 {
 	xmlDocPtr identity;
 	xmlNodePtr stylesheet, first, template;
@@ -47,7 +47,7 @@ void addIdentity(xmlDocPtr style)
 }
 
 /* Apply stylesheets to a doc. */
-xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
+static xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 {
 	xmlDocPtr src;
 	xmlNodePtr cur, old;
@@ -79,7 +79,7 @@ xmlDocPtr transformDoc(xmlDocPtr doc, xmlNodePtr stylesheets)
 }
 
 /* Apply stylesheets to a file. */
-void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
+static void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
 {
 	xmlDocPtr doc;
 
@@ -101,7 +101,7 @@ void transformFile(const char *path, xmlNodePtr stylesheets, const char *out, bo
 }
 
 /* Apply stylesheets to a list of files. */
-void transform_list(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
+static void transform_list(const char *path, xmlNodePtr stylesheets, const char *out, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -126,7 +126,7 @@ void transform_list(const char *path, xmlNodePtr stylesheets, const char *out, b
 }
 
 /* Add a parameter to a stylesheet. */
-void addParam(xmlNodePtr stylesheet, char *s)
+static void addParam(xmlNodePtr stylesheet, char *s)
 {
 	char *n, *v;
 	xmlNodePtr p;
@@ -140,7 +140,7 @@ void addParam(xmlNodePtr stylesheet, char *s)
 }
 
 /* Load stylesheets from disk and cache. */
-void loadStylesheets(xmlNodePtr stylesheets)
+static void loadStylesheets(xmlNodePtr stylesheets)
 {
 	xmlNodePtr cur;
 
@@ -195,7 +195,7 @@ void loadStylesheets(xmlNodePtr stylesheets)
 }
 
 /* Free cached stylesheets. */
-void freeStylesheets(xmlNodePtr stylesheets)
+static void freeStylesheets(xmlNodePtr stylesheets)
 {
 	xmlNodePtr cur;
 
@@ -219,7 +219,7 @@ void freeStylesheets(xmlNodePtr stylesheets)
 }
 
 /* Show help/usage message. */
-void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage: " PROG_NAME " [-filvh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
@@ -238,7 +238,7 @@ void showHelp(void)
 }
 
 /* Show version information. */
-void show_version(void)
+static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s, libxslt %s and libexslt %s\n",
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			case '?':
-				showHelp();
+				show_help();
 				return 0;
 		}
 	}
