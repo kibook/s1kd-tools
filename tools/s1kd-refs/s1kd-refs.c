@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.10.1"
+#define VERSION "2.10.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -894,11 +894,26 @@ static void tagUnmatchedRef(xmlNodePtr ref)
 
 static int listReferences(const char *path);
 
+static bool exact_match(char *dst, const char *code)
+{
+	char *s, *base;
+	bool match;
+
+	s = strdup(dst);
+	base = basename(s);
+
+	match = strrchr(base, '.') - base == strlen(code);
+
+	free(s);
+
+	return match;
+}
+
+
 /* Match a code to a file name. */
 static bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
 {
-	return find_csdb_object(dst, dir, code, NULL, recursive) &&
-		(looseMatch || strrchr(dst, '.') - dst == strlen(code));
+	return find_csdb_object(dst, dir, code, NULL, recursive) && (looseMatch || exact_match(dst, code));
 }
 
 /* Print a reference found in an object. */
