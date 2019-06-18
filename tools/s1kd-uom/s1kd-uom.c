@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -27,8 +27,9 @@ static bool verbose = false;
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [-flv,h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-dflv,.h?] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [<object>...]");
 	puts("");
+	puts("  -d, --duplicate          Include conversions as duplicate quantities in parenthesis.");
 	puts("  -e, --formula <expr>     Specify formula for a conversion.");
 	puts("  -F, --format <fmt>       Number format for converted values.");
 	puts("  -f, --overwrite          Overwrite input objects.");
@@ -114,6 +115,9 @@ static void select_uoms(xmlNodePtr uom, xmlNodePtr conversions)
 				}
 
 				c = n;
+
+				xmlFree(formula);
+				xmlFree(format);
 			}
 
 			xmlFree(uom_from);
@@ -193,10 +197,12 @@ static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, c
 }
 
 /* Convert UOM for a single data module. */
-static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
+static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, xmlDocPtr dupl, bool overwrite)
 {
 	xmlDocPtr doc;
-	char *params[3];
+	char *params[5];
+	int i = 0;
+	char *s;
 
 	if (verbose) {
 		fprintf(stderr, I_CONVERT, path ? path : "-");
@@ -212,32 +218,43 @@ static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xm
 		return;
 	}
 
-	if (format) {
-		params[0] = "user-format";
-		params[1] = malloc(strlen(format) + 3);
-		sprintf(params[1], "\"%s\"", format);
-		params[2] = NULL;
-	} else {
-		params[0] = NULL;
+	if (dupl) {
+		transform_doc(doc, dupl_xsl, dupl_xsl_len, NULL);
+		params[i++] = "duplicate";
+		params[i++] = "true()";
 	}
+
+	if (format) {
+		params[i++] = "user-format";
+		s = malloc(strlen(format) + 3);
+		sprintf(s, "\"%s\"", format);
+		params[i++] = s;
+	}
+	params[i++] = NULL;
 
 	transform_doc(uom, uom_xsl, uom_xsl_len, (const char **) params);
 	transform_doc_with(doc, uom, NULL);
 
 	if (format) {
-		free(params[1]);
+		free(s);
+	}
+
+	if (dupl) {
+		transform_doc(doc, undupl_xsl, undupl_xsl_len, NULL);
 	}
 
 	if (dispfmt) {
-		params[0] = "format";
-		params[1] = malloc(strlen(dispfmt) + 3);
-		sprintf(params[1], "\"%s\"", dispfmt);
-		params[2] = NULL;
+		i = 0;
+		params[i++] = "format";
+		s = malloc(strlen(dispfmt) + 3);
+		sprintf(s, "\"%s\"", dispfmt);
+		params[i++] = s;
+		params[i++] = NULL;
 
 		transform_doc(uomdisp, uomdisplay_xsl, uomdisplay_xsl_len, (const char **) params);
 		transform_doc_with(doc, uomdisp, NULL);
 
-		free(params[1]);
+		free(s);
 	}
 
 	if (overwrite) {
@@ -250,7 +267,7 @@ static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xm
 }
 
 /* Convert UOM for data modules given in a list. */
-static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, bool overwrite)
+static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, xmlDocPtr dupl, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -266,7 +283,7 @@ static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *forma
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		convert_uoms(line, uom, format, uomdisp, dispfmt, overwrite);
+		convert_uoms(line, uom, format, uomdisp, dispfmt, dupl, overwrite);
 	}
 
 	if (path) {
@@ -278,10 +295,11 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "e:F:flP:p:t:U:u:v,.h?";
+	const char *sopts = "de:F:flP:p:t:U:u:v,.h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
+		{"duplicate"      , no_argument      , 0, 'd'},
 		{"formula"        , required_argument, 0, 'e'},
 		{"format"         , required_argument, 0, 'F'},
 		{"overwrite"      , no_argument      , 0, 'f'},
@@ -314,6 +332,8 @@ int main(int argc, char **argv)
 	char *dispfmt = NULL;
 	bool dump_uomdisp = false;
 
+	xmlDocPtr dupl = NULL;
+
 	conversions = xmlNewNode(NULL, BAD_CAST "conversions");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
@@ -324,6 +344,11 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				break;
+			case 'd':
+				if (!dupl) {
+					dupl = read_xml_mem((const char *) dupl_xsl, dupl_xsl_len);
+				}
 				break;
 			case 'e':
 				if (!cur) {
@@ -408,15 +433,15 @@ int main(int argc, char **argv)
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (list) {
-				convert_uoms_list(argv[i], uom, format, uomdisp, dispfmt, overwrite);
+				convert_uoms_list(argv[i], uom, format, uomdisp, dispfmt, dupl, overwrite);
 			} else {
-				convert_uoms(argv[i], uom, format, uomdisp, dispfmt, overwrite);
+				convert_uoms(argv[i], uom, format, uomdisp, dispfmt, dupl, overwrite);
 			}
 		}
 	} else if (list) {
-		convert_uoms_list(NULL, uom, format, uomdisp, dispfmt, overwrite);
+		convert_uoms_list(NULL, uom, format, uomdisp, dispfmt, dupl, overwrite);
 	} else {
-		convert_uoms(NULL, uom, format, uomdisp, dispfmt, false);
+		convert_uoms(NULL, uom, format, uomdisp, dispfmt, dupl, false);
 	}
 	
 	free(format);
@@ -425,6 +450,8 @@ int main(int argc, char **argv)
 	xmlFreeDoc(uom);
 	xmlFreeNode(conversions);
 	xmlFreeDoc(uomdisp);
+
+	xmlFreeDoc(dupl);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

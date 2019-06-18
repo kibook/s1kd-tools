@@ -6,8 +6,9 @@ s1kd-uom - Convert units of measure in quantity data
 SYNOPSIS
 ========
 
-    s1kd-uom [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
-             [-U <path>] [-p <fmt> [-P <path>]] [-flv,.h?] [<object>...]
+    s1kd-uom [-dflv,.h?] [-F <fmt>]
+             [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
+             [-U <path>] [-p <fmt> [-P <path>]] [<object>...]
 
 DESCRIPTION
 ===========
@@ -18,6 +19,11 @@ in data modules.
 
 OPTIONS
 =======
+
+-d, --duplicate  
+When converting, instead of overwriting the original quantity, include
+the converted quantity after the original in parenthesis. For example,
+"200 mm" when converting mm to in would become "200 mm (7.87 in)".
 
 -e, --formula &lt;expr&gt;  
 Specify the formula for a conversion, given as an XPath expression.

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="01"/>
+        <issueInfo issueNumber="007" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="05" day="30"/>
+        <issueDate year="2019" month="06" day="18"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -d option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,8 +52,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-uom [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
-         [-U <path>] [-p <fmt> [-P <path>]] [-flv,.h?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-uom [-dflv,.h?] [-F <fmt>]
+         [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
+         [-U <path>] [-p <fmt> [-P <path>]] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -61,6 +65,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-d, --duplicate</listItemTerm>
+              <listItemDefinition>
+                <para>When converting, instead of overwriting the original quantity, include the converted quantity after the original in parenthesis. For example, "200 mm" when converting mm to in would become "200 mm (7.87 in)".</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-e, --formula &lt;expr&gt;</listItemTerm>
               <listItemDefinition>

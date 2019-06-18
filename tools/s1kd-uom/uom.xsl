@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
+  <xsl:param name="duplicate" select="false()"/>
   <xsl:param name="user-format"/>
 
   <xsl:variable name="default-format">0.##</xsl:variable>
@@ -100,6 +101,11 @@
         <xsl:value-of select="@from"/>
         <xsl:text>'</xsl:text>
       </xsl:attribute>
+      <xsl:if test="$duplicate and @from != @to">
+        <xsl:element name="xsl:processing-instruction">
+          <xsl:attribute name="name">s1kd-uom_CONVERTED</xsl:attribute>
+        </xsl:element>
+      </xsl:if>
       <xsl:element name="xsl:value-of">
         <xsl:attribute name="select">
           <xsl:choose>

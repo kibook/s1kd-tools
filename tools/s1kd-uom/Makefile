@@ -21,11 +21,13 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) uom.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-uom.h: uom.xml uom.xsl uomdisplay.xml uomdisplay.xsl
+uom.h: uom.xml uom.xsl uomdisplay.xml uomdisplay.xsl dupl.xsl undupl.xsl
 	xxd -i uom.xml > uom.h
 	xxd -i uom.xsl >> uom.h
 	xxd -i uomdisplay.xml >> uom.h
 	xxd -i uomdisplay.xsl >> uom.h
+	xxd -i dupl.xsl >> uom.h
+	xxd -i undupl.xsl >> uom.h
 
 .PHONY: docs clean maintainer-clean install uninstall
 
