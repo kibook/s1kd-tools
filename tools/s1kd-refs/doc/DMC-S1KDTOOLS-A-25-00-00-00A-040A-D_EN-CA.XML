@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="02"/>
+        <issueInfo issueNumber="019" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="15"/>
+        <issueDate year="2019" month="06" day="19"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -145,6 +145,13 @@
                 <para>Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-m, --strict-match</listItemTerm>
+              <listItemDefinition>
+                <para>Be more strict when matching codes of CSDB objects to filenames. By default, the name of a file (minus the extension) only needs to start with the code to be matched. When this option is specified, the name must match the code exactly.</para>
+                <para>For example, the code "ABC" will normally match either of the files "ABC.PDF" or "ABC_1.PDF", but when strict matching is enabled, it will only match the former.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-N, --omit-issue</listItemTerm>
               <listItemDefinition>
@@ -155,12 +162,6 @@
               <listItemTerm>-n, --lineno</listItemTerm>
               <listItemDefinition>
                 <para>Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
-              <listItemTerm>-m, --strict-match</listItemTerm>
-              <listItemDefinition>
-                <para>Be more strict when matching codes of CSDB objects to filenames. By default, the name of a file (minus the extension) only needs to start with the code to be matched. When this option is specified, the name must match the code exactly.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

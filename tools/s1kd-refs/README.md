@@ -73,6 +73,16 @@ issue and language specified in the reference.
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
 to list references in, rather than CSDB objects themselves.
 
+-m, --strict-match  
+Be more strict when matching codes of CSDB objects to filenames. By
+default, the name of a file (minus the extension) only needs to start
+with the code to be matched. When this option is specified, the name
+must match the code exactly.
+
+For example, the code "ABC" will normally match either of the files
+"ABC.PDF" or "ABC\_1.PDF", but when strict matching is enabled, it will
+only match the former.
+
 -N, --omit-issue  
 Assume filenames of referenced CSDB objects omit the issue info, i.e.
 they were created with the -N option to the s1kd-new\* tools.
@@ -81,12 +91,6 @@ they were created with the -N option to the s1kd-new\* tools.
 Include the filename of the source object where each reference was
 found, and display the line number where the reference occurs in the
 source file after its filename.
-
--m, --strict-match  
-Be more strict when matching codes of CSDB objects to filenames. By
-default, the name of a file (minus the extension) only needs to start
-with the code to be matched. When this option is specified, the name
-must match the code exactly.
 
 -o, --output-valid  
 Output valid CSDB objects to stdout.
