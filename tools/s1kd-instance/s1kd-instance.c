@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.4.4"
+#define VERSION "3.5.0"
 
 /* Prefixes before errors/warnings printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1687,7 +1687,7 @@ static void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr styl
 
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
-static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl)
+static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl, xmlDocPtr def_cir_xsl)
 {
 	xmlDocPtr cir;
 	xmlXPathContextPtr ctxt;
@@ -1742,6 +1742,8 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_s
 
 	if (cir_xsl) {
 		styledoc = read_xml_doc(cir_xsl);
+	} else if (def_cir_xsl) {
+		styledoc = xmlCopyDoc(def_cir_xsl, 1);
 	} else {
 		unsigned char *xsl = NULL;
 		unsigned int len = 0;
@@ -2777,6 +2779,7 @@ int main(int argc, char **argv)
 	bool add_deps = false;
 
 	xmlNodePtr cirs, cir;
+	xmlDocPtr def_cir_xsl = NULL;
 
 	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!1:2:~";
 	struct option lopts[] = {
@@ -2984,7 +2987,11 @@ int main(int argc, char **argv)
 				strncpy(comment_path, optarg, 255);
 				break;
 			case 'x':
-				xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg);
+				if (cirs->last) {
+					xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg);
+				} else if (!def_cir_xsl) {
+					def_cir_xsl = read_xml_doc(optarg);
+				}
 				break;
 			case 'y':
 				new_applic = true;
@@ -3241,9 +3248,9 @@ int main(int argc, char **argv)
 					}
 
 					if (ispm) {
-						root = undepend_cir(doc, cirdocfname, false, cirxsl);
+						root = undepend_cir(doc, cirdocfname, false, cirxsl, def_cir_xsl);
 					} else {
-						root = undepend_cir(doc, cirdocfname, add_source_ident, cirxsl);
+						root = undepend_cir(doc, cirdocfname, add_source_ident, cirxsl, def_cir_xsl);
 					}
 
 					xmlFree(cirdocfname);
@@ -3449,6 +3456,7 @@ int main(int argc, char **argv)
 	free(info);
 	free(isstype);
 	xmlFreeNode(cirs);
+	xmlFreeDoc(def_cir_xsl);
 	xmlFreeNode(applicability);
 	xsltCleanupGlobals();
 	xmlCleanupParser();

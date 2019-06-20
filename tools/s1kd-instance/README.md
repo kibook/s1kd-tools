@@ -315,8 +315,10 @@ will be inserted as the first child node. By default, this is the top of
 the document.
 
 -x, --xsl &lt;XSL&gt;  
-Use a custom XSLT script to resolve CIR dependencies for the last
-specified CIR.
+Use a custom XSLT script to resolve CIR dependencies. If this option
+follows -R, the specified XSLT script will only be used for the last
+specified CIR. If it precedes any -R, the specified XSLT script will be
+used for all CIRs that do not override it with a following -x.
 
 -Y, --applic &lt;text&gt;  
 Update the applicability for the whole object using the user-defined
