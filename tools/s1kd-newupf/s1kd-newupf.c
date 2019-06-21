@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "1.7.1"
+#define VERSION "1.7.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -805,9 +805,9 @@ int main(int argc, char **argv)
 	if (!overwrite && access(out, F_OK) != -1) {
 		if (no_overwrite_error) return 0;
 		if (outdir) {
-			fprintf(stderr, ERR_PREFIX "%s/%s already exists.\n", outdir, out);
+			fprintf(stderr, ERR_PREFIX "%s/%s already exists. Use -f to overwrite.\n", outdir, out);
 		} else {
-			fprintf(stderr, ERR_PREFIX "%s already exists.\n", out);
+			fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", out);
 		}
 		exit(EXIT_UPF_EXISTS);
 	}

@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.8.3"
+#define VERSION "1.8.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -535,9 +535,9 @@ int main(int argc, char **argv)
 		if (!overwrite && access(fname, F_OK) != -1) {
 			if (no_overwrite_error) return 0;
 			if (outdir) {
-				fprintf(stderr, ERR_PREFIX "%s/%s already exists.\n", outdir, fname);
+				fprintf(stderr, ERR_PREFIX "%s/%s already exists. Use -f to overwrite.\n", outdir, fname);
 			} else {
-				fprintf(stderr, ERR_PREFIX "%s already exists.\n", fname);
+				fprintf(stderr, ERR_PREFIX "%s already exists. Use -f to overwrite.\n", fname);
 			}
 			exit(EXIT_IMF_EXISTS);
 		}
