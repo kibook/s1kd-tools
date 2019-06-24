@@ -17,10 +17,11 @@ done
 # Create labels
 echo "$refs" | sed 's/: /\n/' | sort -u | while read path
 do
-	id=$(basename "$path" | sed 's/[-\.]/_/g')
+	base=$(basename "$path")
+	id=$(echo "$base" | sed 's/[-\.]/_/g')
 	title=$(s1kd-metadata -n title "$path")
 	
-	echo "$id [label=\"$path\n$title\"]"
+	echo "$id [label=\"$base\n$title\"]"
 done
 
 echo "}"
