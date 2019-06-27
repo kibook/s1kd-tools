@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.6.1"
+#define VERSION "1.6.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -22,6 +22,7 @@
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_MAX_REFS ERR_PREFIX "Maximum references reached: %d\n"
 #define I_SYNCREFS INF_PREFIX "Synchronizing references in %s...\n"
+#define I_DELREFS  INF_PREFIX "Deleting refs table in %s...\n"
 
 #define EXIT_INVALID_DM 1
 #define EXIT_MAX_REFS 2
@@ -344,7 +345,11 @@ static void sync_refs_file(const char *path, const char *out, bool overwrite)
 	xmlNodePtr dmodule;
 
 	if (verbose) {
-		fprintf(stderr, I_SYNCREFS, path);
+		if (only_delete) {
+			fprintf(stderr, I_DELREFS, path);
+		} else {
+			fprintf(stderr, I_SYNCREFS, path);
+		}
 	}
 
 	if (!(dm = read_xml_doc(path))) {
