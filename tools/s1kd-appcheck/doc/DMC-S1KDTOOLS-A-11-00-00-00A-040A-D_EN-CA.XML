@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="00"/>
+        <issueInfo issueNumber="001" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="06" day="27"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="new">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>New tool for validating applicability.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
