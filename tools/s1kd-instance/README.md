@@ -225,6 +225,9 @@ a unique assign of a product instance, e.g.,
 "`serialno:prodattr=12345`". Multiple keys can be used by specifying
 this option multiple times.
 
+-q, --quiet  
+Quiet mode. Errors are not printed.
+
 -R, --cir &lt;CIR&gt; ...  
 Use a CIR to resolve external dependencies in the master object, making
 the instance object standalone. Additional CIRs can be used by
@@ -294,9 +297,12 @@ Set the security classification of the instance. An instance may have a
 lower security classification than the source if classified information
 is removed for a particular customer.
 
--v, --verbose  
+-V, --print  
 When -O is used, print the automatically generated file name of the
 instance.
+
+-v, --verbose  
+Verbose output.
 
 -W, --set-applic  
 Set the applicability for the whole object, overwriting the current

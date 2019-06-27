@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="039" inWork="00"/>
+        <issueInfo issueNumber="039" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="06" day="27"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -1, -2, -J, and -~ options.</simplePara>
+        <simplePara>Change -v to -V</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of the -x option.</simplePara>
+        <simplePara>Add -v and -q options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -230,7 +230,7 @@
                 <para>Give the data module instance a different infoName.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-J, --clean-display-text</listItemTerm>
               <listItemDefinition>
                 <para>Remove display text from annotations which are simplified in -A mode.</para>
@@ -326,7 +326,13 @@
             <definitionListItem>
               <listItemTerm>-p, --product &lt;product&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". Multiple keys can be used by specifying this option multiple times.</para>
+                <para>The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". Multiple keys can be used by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -423,9 +429,15 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-V, --print</listItemTerm>
               <listItemDefinition>
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -449,7 +461,7 @@
             <definitionListItem>
               <listItemTerm>-x, --xsl &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Use a custom XSLT script to resolve CIR dependencies. If this option follows -R, the specified XSLT script will only be used for the last specified CIR. If it precedes any -R, the specified XSLT script will be used for all CIRs that do not override it with a following -x.</para>
+                <para>Use a custom XSLT script to resolve CIR dependencies. If this option follows -R, the specified XSLT script will only be used for the last specified CIR. If it precedes any -R, the specified XSLT script will be used for all CIRs that do not override it with a following -x.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -476,13 +488,13 @@
                 <para>Set the issue type of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-1, --act</listItemTerm>
               <listItemDefinition>
                 <para>Specify the ACT to use to find the CCT and/or PCT.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-2, --cct</listItemTerm>
               <listItemDefinition>
                 <para>Specify the CCT to read dependency tests from (-~).</para>
@@ -506,7 +518,7 @@
                 <para>Do not include an infoName in the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-~, --dependencies</listItemTerm>
               <listItemDefinition>
                 <para>Add dependency tests from the CCT to assertions that use the dependant values.</para>
@@ -716,7 +728,7 @@ the weather is icy.
 </para>]]></verbatimText>
           </para>
           <para>The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is <emphasis>not</emphasis> A can be removed as invalid. This leaves only the assertion about the weather.</para>
-          <note changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <note>
             <notePara>The -A option may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect.</notePara>
             <notePara>This option is best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool. The -J option of this tool can be combined with the -k option of the s1kd-aspp tool to only generate display text for annotations which are modified.</notePara>
           </note>

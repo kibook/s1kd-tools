@@ -16,11 +16,12 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "3.5.0"
+#define VERSION "4.0.0"
 
-/* Prefixes before errors/warnings printed to console */
+/* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 /* Error codes */
 #define EXIT_MISSING_ARGS 1	/* Option or parameter missing */
@@ -47,6 +48,7 @@
 #define S_MISSING_PCT ERR_PREFIX "Could not read PCT %s\n"
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
 #define S_MISSING_SOURCE ERR_PREFIX "Could not find source object for instance %s\n"
+#define S_NOT_DIR ERR_PREFIX "%s is not a directory.\n"
 
 /* Warning messages */
 #define S_FILE_EXISTS WRN_PREFIX "%s already exists. Use -f to overwrite.\n"
@@ -54,6 +56,12 @@
 #define S_NO_XSLT WRN_PREFIX "No built-in XSLT for CIR type: %s\n"
 #define S_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
 #define S_MISSING_CIR WRN_PREFIX "Could not find CIR %s."
+
+/* Info messages */
+#define I_UPDATE_INST INF_PREFIX "Updating instance %s from source %s...\n"
+#define I_CUSTOMIZE INF_PREFIX "Customizing %s...\n"
+#define I_CUSTOMIZE_DIR INF_PREFIX "Customizing %s -> %s...\n"
+#define I_COPY INF_PREFIX "Copying %s -> %s...\n"
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -117,6 +125,9 @@ static int napplics = 0;
 
 /* Assume objects were created with -N. */
 static bool no_issue = false;
+
+/* Verbosity level */
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 /* Define a value for a product attribute or condition. */
 static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm)
@@ -619,7 +630,9 @@ static bool eval_evaluate(xmlNodePtr evaluate, bool assume)
 	op = first_xpath_value(NULL, evaluate, BAD_CAST "@andOr|@operator");
 
 	if (!op) {
-		fprintf(stderr, S_MISSING_ANDOR);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_MISSING_ANDOR);
+		}
 		exit(EXIT_BAD_XML);
 	}
 
@@ -1070,7 +1083,9 @@ static void set_dm_code(xmlNodePtr code, enum issue iss, const char *s)
 		learn_event_code);
 
 	if (n != 11 && n != 13) {
-		fprintf(stderr, S_BAD_CODE, "data module", s);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_BAD_CODE, "data module", s);
+		}
 		exit(EXIT_BAD_ARG);
 	}
 
@@ -1122,7 +1137,9 @@ static void set_pm_code(xmlNodePtr code, enum issue iss, const char *s)
 		pm_volume);
 
 	if (n != 4) {
-		fprintf(stderr, S_BAD_CODE, "publication module", s);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_BAD_CODE, "publication module", s);
+		}
 		exit(EXIT_BAD_ARG);
 	}
 
@@ -1157,7 +1174,9 @@ static void set_com_code(xmlNodePtr code, enum issue iss, const char *s)
 		comment_type);
 
 	if (n != 5) {
-		fprintf(stderr, S_BAD_CODE, "comment", s);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_BAD_CODE, "comment", s);
+		}
 		exit(EXIT_BAD_ARG);
 	}
 
@@ -1195,7 +1214,9 @@ static void set_dml_code(xmlNodePtr code, enum issue iss, const char *s)
 		seq_number);
 
 	if (n != 5) {
-		fprintf(stderr, S_BAD_CODE, "data management list", s);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_BAD_CODE, "data management list", s);
+		}
 		exit(EXIT_BAD_ARG);
 	}
 
@@ -1644,7 +1665,9 @@ static bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *
 		*xsl = cirxsl_zoneRepository_xsl;
 		*len = cirxsl_zoneRepository_xsl_len;
 	} else {
-		fprintf(stderr, S_NO_XSLT, cirtype);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_NO_XSLT, cirtype);
+		}
 		return false;
 	}
 
@@ -1704,7 +1727,9 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_s
 	cir = read_xml_doc(cirdocfname);
 
 	if (!cir) {
-		fprintf(stderr, S_INVALID_CIR, cirdocfname);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_INVALID_CIR, cirdocfname);
+		}
 		exit(EXIT_BAD_XML);
 	}
 
@@ -1731,7 +1756,9 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_s
 		ctxt);
 
 	if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
-		fprintf(stderr, S_INVALID_CIR, cirdocfname);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_INVALID_CIR, cirdocfname);
+		}
 		exit(EXIT_BAD_XML);
 	}
 
@@ -1828,7 +1855,9 @@ static void set_issue(xmlDocPtr dm, char *issinfo)
 
 		snprintf(inwork, 32, "%.2d", inwork_i + 1);
 	} else if (sscanf(issinfo, "%3s-%2s", issue, inwork) != 2) {
-		fprintf(stderr, ERR_PREFIX S_INVALID_ISSFMT);
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX S_INVALID_ISSFMT);
+		}
 		exit(EXIT_MISSING_ARGS);
 	}
 
@@ -2001,7 +2030,9 @@ static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char
 		value = strtok(NULL, "");
 
 		if (!(ident && type && value)) {
-			fprintf(stderr, S_BAD_ASSIGN, product);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_BAD_ASSIGN, product);
+			}
 			exit(EXIT_BAD_APPLIC);
 		}
 
@@ -2015,7 +2046,9 @@ static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		fprintf(stderr, S_NO_PRODUCT, product, pctfname);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_NO_PRODUCT, product, pctfname);
+		}
 	} else {
 		int i;
 
@@ -2119,7 +2152,9 @@ static void read_applic(char *s)
 	char *ident, *type, *value;
 
 	if (!strchr(s, ':') || !strchr(s, '=')) {
-		fprintf(stderr, S_BAD_ASSIGN, s);
+		if (verbosity > QUIET) {
+			fprintf(stderr, S_BAD_ASSIGN, s);
+		}
 		exit(EXIT_BAD_APPLIC);
 	}
 
@@ -2386,7 +2421,9 @@ static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 		return true;
 	}
 
-	fprintf(stderr, S_MISSING_REF_DM, code);
+	if (verbosity > QUIET) {
+		fprintf(stderr, S_MISSING_REF_DM, code);
+	}
 	return false;
 }
 
@@ -2465,7 +2502,9 @@ static bool find_pm_fname(char *dst, xmlNodePtr pmRefIdent, bool ignore_iss)
 		return true;
 	}
 
-	fprintf(stderr, S_MISSING_REF_DM, code);
+	if (verbosity > QUIET) {
+		fprintf(stderr, S_MISSING_REF_DM, code);
+	}
 	return false;
 }
 
@@ -2683,6 +2722,7 @@ static void show_help(void)
 	puts("  -o, --out <file>                  Output instance to file instead of stdout.");
 	puts("  -P, --pct <PCT>                   PCT file to read products from.");
 	puts("  -p, --product <product>           ID/primary key of a product in the PCT to filter on.");
+	puts("  -q, --quiet                       Quiet mode.");
 	puts("  -R, --cir <CIR>                   Resolve externalized items using the given CIR.");
 	puts("  -r, --recursive                   Search for referenced data modules recursively.");
 	puts("  -S, --no-source-ident             Do not include <sourceDmIdent> or <repositorySourceDmIdent>.");
@@ -2691,7 +2731,8 @@ static void show_help(void)
 	puts("  -t, --techname <techName>         Give the instance a different techName/pmTitle.");
 	puts("  -U, --security-classes <classes>  Filter on the specified security classes.");
 	puts("  -u, --security <sec>              Set the security classification of the instance.");
-	puts("  -v, --verbose                     Print the file name of the instance when -O is used.");
+	puts("  -V, --print                       Print the file name of the instance when -O is used.");
+	puts("  -v, --verbose                     Verbose output.");
 	puts("  -W, --set-applic                  Overwrite whole object applicability.");
 	puts("  -w, --whole-objects               Check the status of the whole object.");
 	puts("  -X, --comment-xpath <xpath>       XPath where the -C comment will be inserted.");
@@ -2761,7 +2802,6 @@ int main(int argc, char **argv)
 	char issdate_day[3];
 	char *isstype = NULL;
 	bool stripext = false;
-	bool verbose = false;
 	bool setorig = false;
 	char *origspec = NULL;
 	bool flat_alts = false;
@@ -2777,11 +2817,12 @@ int main(int argc, char **argv)
 	bool lock = false;
 	bool no_info_name = false;
 	bool add_deps = false;
+	bool print_fnames = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:R:rSs:Tt:U:u:vWwX:x:Y:yZz:@%!1:2:~";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:qR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:~";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -2812,6 +2853,7 @@ int main(int argc, char **argv)
 		{"out"               , required_argument, 0, 'o'},
 		{"pct"               , required_argument, 0, 'P'},
 		{"product"           , required_argument, 0, 'p'},
+		{"quiet"             , no_argument      , 0, 'q'},
 		{"cir"               , required_argument, 0, 'R'},
 		{"recursive"         , no_argument      , 0, 'r'},
 		{"no-source-ident"   , no_argument      , 0, 'S'},
@@ -2820,6 +2862,7 @@ int main(int argc, char **argv)
 		{"techname"          , required_argument, 0, 't'},
 		{"security-classes"  , required_argument, 0, 'U'},
 		{"security"          , required_argument, 0, 'u'},
+		{"print"             , no_argument      , 0, 'V'},
 		{"verbose"           , no_argument      , 0, 'v'},
 		{"set-applic"        , no_argument      , 0, 'W'},
 		{"whole-objects"     , no_argument      , 0, 'w'},
@@ -2950,6 +2993,9 @@ int main(int argc, char **argv)
 			case 'p':
 				strncpy(product, optarg, 63);
 				break;
+			case 'q':
+				verbosity = QUIET;
+				break;
 			case 'R':
 				xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg);
 				break;
@@ -2974,8 +3020,11 @@ int main(int argc, char **argv)
 			case 'u':
 				strncpy(secu, optarg, 2);
 				break;
+			case 'V':
+				print_fnames = true;
+				break;
 			case 'v':
-				verbose = true;
+				verbosity = VERBOSE;
 				break;
 			case 'W':
 				new_applic = true; combine_applic = false;
@@ -3033,36 +3082,56 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (autoname && access(dir, F_OK) == -1) {
-		int err;
+	/* If the -O option is given, create the directory if it does not
+	 * exist.
+	 *
+	 * Fail if an existing non-directory file is specified.
+	 */
+	if (autoname) {
+		if (access(dir, F_OK) == -1) {
+			int err;
 
-		#ifdef _WIN32
-			err = mkdir(dir);
-		#else
-			err = mkdir(dir, S_IRWXU);
-		#endif
+			#ifdef _WIN32
+				err = mkdir(dir);
+			#else
+				err = mkdir(dir, S_IRWXU);
+			#endif
 
-		if (err) {
-			fprintf(stderr, S_MKDIR_FAILED, dir);
+			if (err) {
+				if (verbosity > QUIET) {
+					fprintf(stderr, S_MKDIR_FAILED, dir);
+				}
+				exit(EXIT_BAD_ARG);
+			}
+		} else if (!isdir(dir, false)) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_NOT_DIR, dir);
+			}
 			exit(EXIT_BAD_ARG);
 		}
 	}
 
 	if (useract) {
 		if (!(act = read_xml_doc(useract))) {
-			fprintf(stderr, S_MISSING_ACT, useract);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_ACT, useract);
+			}
 			exit(EXIT_MISSING_FILE);
 		}
 	}
 	if (usercct) {
 		if (!(cct = read_xml_doc(usercct))) {
-			fprintf(stderr, S_MISSING_CCT, usercct);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_CCT, usercct);
+			}
 			exit(EXIT_MISSING_FILE);
 		}
 	}
 	if (userpct) {
 		if (!(pct = read_xml_doc(userpct))) {
-			fprintf(stderr, S_MISSING_PCT, userpct);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_PCT, userpct);
+			}
 			exit(EXIT_MISSING_FILE);
 		}
 	}
@@ -3093,7 +3162,9 @@ int main(int argc, char **argv)
 			exit(EXIT_BAD_DATE);
 	} else if (strcmp(issdate, "") != 0) {
 		if (sscanf(issdate, "%4s-%2s-%2s", issdate_year, issdate_month, issdate_day) != 3) {
-			fprintf(stderr, S_BAD_DATE, issdate);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_BAD_DATE, issdate);
+			}
 			exit(EXIT_BAD_DATE);
 		}
 	}
@@ -3108,7 +3179,9 @@ int main(int argc, char **argv)
 
 		if (dmlist) {
 			if (!list && !(list = fopen(argv[i++], "r"))) {
-				fprintf(stderr, S_MISSING_LIST, argv[i - 1]);
+				if (verbosity > QUIET) {
+					fprintf(stderr, S_MISSING_LIST, argv[i - 1]);
+				}
 				exit(EXIT_MISSING_FILE);
 			}
 
@@ -3133,7 +3206,9 @@ int main(int argc, char **argv)
 		}
 
 		if (!use_stdin && access(src, F_OK) == -1) {
-			fprintf(stderr, S_MISSING_OBJECT, src);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_OBJECT, src);
+			}
 			exit(EXIT_MISSING_FILE);
 		}
 
@@ -3145,7 +3220,9 @@ int main(int argc, char **argv)
 
 			if ((e = find_source(src, &inst))) {
 				if (e == 1) {
-					fprintf(stderr, S_MISSING_SOURCE, src);
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_MISSING_SOURCE, src);
+					}
 					err = EXIT_MISSING_SOURCE;
 				}
 				xmlFreeDoc(inst);
@@ -3158,6 +3235,10 @@ int main(int argc, char **argv)
 				}
 			}
 
+			if (verbosity >= VERBOSE) {
+				fprintf(stderr, I_UPDATE_INST, inst_src, src);
+			}
+
 			load_applic_from_inst(inst);
 			load_skill_from_inst(inst, &skill_codes);
 			load_sec_from_inst(inst, &sec_classes);
@@ -3165,6 +3246,14 @@ int main(int argc, char **argv)
 		}
 
 		if ((doc = read_xml_doc(src))) {
+			if (verbosity >= VERBOSE && !update_inst) {
+				if (autoname) {
+					fprintf(stderr, I_CUSTOMIZE_DIR, src, dir);
+				} else {
+					fprintf(stderr, I_CUSTOMIZE, src);
+				}
+			}
+
 			/* Load the ACT to find the CCT and/or PCT. */
 			if (!useract && ((add_deps && !usercct) || (strcmp(product, "") != 0 && !userpct))) {
 				char fname[PATH_MAX];
@@ -3243,7 +3332,9 @@ int main(int argc, char **argv)
 					char *cirxsl = (char *) xmlGetProp(cir, BAD_CAST "xsl");
 
 					if (access(cirdocfname, F_OK) == -1) {
-						fprintf(stderr, S_MISSING_CIR, cirdocfname);
+						if (verbosity > QUIET) {
+							fprintf(stderr, S_MISSING_CIR, cirdocfname);
+						}
 						continue;
 					}
 
@@ -3375,12 +3466,16 @@ int main(int argc, char **argv)
 				if (use_stdout && force_overwrite) {
 					strcpy(out, src);
 				} else if (autoname && !auto_name(out, src, doc, dir, no_issue)) {
-					fprintf(stderr, S_BAD_TYPE);
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_BAD_TYPE);
+					}
 					exit(EXIT_BAD_XML);
 				}
 
 				if (!use_stdout && access(out, F_OK) == 0 && !force_overwrite) {
-					fprintf(stderr, S_FILE_EXISTS, out);
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_FILE_EXISTS, out);
+					}
 				} else {
 					save_xml_doc(doc, out);
 
@@ -3388,7 +3483,7 @@ int main(int argc, char **argv)
 						mkreadonly(out);
 					}
 
-					if (verbose) {
+					if (print_fnames) {
 						puts(out);
 					}
 				}
@@ -3405,13 +3500,19 @@ int main(int argc, char **argv)
 		} else if (autoname) { /* Copy the non-XML object to the directory. */
 			char *base;
 
+			if (verbosity >= VERBOSE) {
+				fprintf(stderr, I_COPY, src, dir);
+			}
+
 			base = basename(src);
 			if (snprintf(out, PATH_MAX, "%s/%s", dir, base) < 0) {
 				exit(EXIT_BAD_ARG);
 			}
 
 			if (access(out, F_OK) == 0 && !force_overwrite) {
-				fprintf(stderr, S_FILE_EXISTS, out);
+				if (verbosity > QUIET) {
+					fprintf(stderr, S_FILE_EXISTS, out);
+				}
 			} else {
 				copy(src, out);
 
@@ -3419,12 +3520,14 @@ int main(int argc, char **argv)
 					mkreadonly(out);
 				}
 
-				if (verbose) {
+				if (print_fnames) {
 					puts(out);
 				}
 			}
 		} else {
-			fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
+			if (verbosity > QUIET) {
+				fprintf(stderr, S_BAD_XML, use_stdin ? "stdin" : src);
+			}
 			exit(EXIT_BAD_XML);
 		}
 
