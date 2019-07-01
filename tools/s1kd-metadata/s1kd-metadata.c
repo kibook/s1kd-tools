@@ -2082,9 +2082,10 @@ static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fn
 		}
 	}
 
-	free(key);
-	free(val);
-	free(op);
+	xmlFree(key);
+	xmlFree(val);
+	xmlFree(op);
+	xmlFree(regex);
 
 	return cmp;
 }
