@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="09" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="07" day="01"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -m option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Update examples to reflect current SNS.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -106,6 +112,12 @@
               <listItemTerm>-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input as a list of object filenames to read or edit metadata on, rather than an object itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-m, --matches &lt;regex&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Used after a -w or -W option, this specifies a regular expression to match the value of the given metadata against, instead of a literal value (-v).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -199,11 +211,11 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ ls
-DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
-DMC-S1KDTOOLS-A-00-0Q-00-00A-040A-D_EN-CA.XML
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[$ ls
+DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML
+DMC-S1KDTOOLS-A-0Q-00-00-00A-040A-D_EN-CA.XML
 
-$ DMOD=DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+$ DMOD=DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML
 $ s1kd-metadata $DMOD
 issueDate                      2017-08-14
 techName                       s1kd-metadata(1) | s1kd-tools
@@ -221,7 +233,7 @@ languageIsoCode                en
 countryIsoCode                 CA
 issueNumber                    001
 inWork                         00
-dmCode                         S1KDTOOLS-A-00-09-00-00A-040A-D
+dmCode                         S1KDTOOLS-A-09-00-00-00A-040A-D
 
 $ s1kd-metadata -n techName -v "New title" $DMOD
 $ s1kd-metadata -n techName $DMOD
@@ -236,7 +248,16 @@ New title (2017-08-14) new
 s1kd-aspp(1) | s1kd-tools (2018-03-28) changed
 
 $ s1kd-metadata -F "%techName%" -w subSubSystemCode -v Q DMC-*.XML
-s1kd-aspp(1) | s1kd-tools]]></verbatimText>
+s1kd-aspp(1) | s1kd-tools
+
+$ s1kd-metadata -n path -w subSystemCode -v Q
+DMC-S1KDTOOLS-A-0Q-00-00-00A-040A-D_EN-CA.XML
+
+$ s1kd-metadata -n path -W subSystemCode -v Q
+DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML
+
+$ s1kd-metadata -n path -w subSystemCode -m [0-9]
+DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML]]></verbatimText>
         </para>
       </levelledPara>
     </description>

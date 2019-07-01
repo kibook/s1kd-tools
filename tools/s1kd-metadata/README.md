@@ -51,6 +51,11 @@ Show help/usage message.
 Treat input as a list of object filenames to read or edit metadata on,
 rather than an object itself.
 
+-m, --matches &lt;regex&gt;  
+Used after a -w or -W option, this specifies a regular expression to
+match the value of the given metadata against, instead of a literal
+value (-v).
+
 -n, --name &lt;name&gt;  
 The name of the piece of metadata to fetch. This option can be specified
 multiple times to fetch multiple pieces of metadata. If -n is not
@@ -117,10 +122,10 @@ EXAMPLE
 =======
 
     $ ls
-    DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
-    DMC-S1KDTOOLS-A-00-0Q-00-00A-040A-D_EN-CA.XML
+    DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML
+    DMC-S1KDTOOLS-A-0Q-00-00-00A-040A-D_EN-CA.XML
 
-    $ DMOD=DMC-S1KDTOOLS-A-00-09-00-00A-040A-D_EN-CA.XML
+    $ DMOD=DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML
     $ s1kd-metadata $DMOD
     issueDate                      2017-08-14
     techName                       s1kd-metadata(1) | s1kd-tools
@@ -138,7 +143,7 @@ EXAMPLE
     countryIsoCode                 CA
     issueNumber                    001
     inWork                         00
-    dmCode                         S1KDTOOLS-A-00-09-00-00A-040A-D
+    dmCode                         S1KDTOOLS-A-09-00-00-00A-040A-D
 
     $ s1kd-metadata -n techName -v "New title" $DMOD
     $ s1kd-metadata -n techName $DMOD
@@ -154,3 +159,12 @@ EXAMPLE
 
     $ s1kd-metadata -F "%techName%" -w subSubSystemCode -v Q DMC-*.XML
     s1kd-aspp(1) | s1kd-tools
+
+    $ s1kd-metadata -n path -w subSystemCode -v Q
+    DMC-S1KDTOOLS-A-0Q-00-00-00A-040A-D_EN-CA.XML
+
+    $ s1kd-metadata -n path -W subSystemCode -v Q
+    DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML
+
+    $ s1kd-metadata -n path -w subSystemCode -m [0-9]
+    DMC-S1KDTOOLS-A-09-00-00-00A-040A-D_EN-CA.XML

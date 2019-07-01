@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.12.1"
+#define VERSION "2.12.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -143,17 +143,6 @@ static xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
 	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
 }
 
-/* Test whether an object value matches a regex pattern. */
-static bool match_pattern(const char *value, const char *pattern)
-{
-	xmlRegexpPtr regex;
-	bool match;
-	regex = xmlRegexpCompile(BAD_CAST pattern);
-	match = xmlRegexpExec(regex, BAD_CAST value);
-	xmlRegFreeRegexp(regex);
-	return match;
-}
-
 /* Check the values of objects against the patterns in the BREX rule. */
 static bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 {
@@ -164,18 +153,18 @@ static bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 		return true;
 
 	for (i = 0; i < values->nodeNr; ++i) {
-		char *allowed, *value, *form;
+		xmlChar *allowed, *value, *form;
 
-		allowed = (char *) firstXPathValue(values->nodeTab[i], "@valueAllowed|@val1");
-		form    = (char *) firstXPathValue(values->nodeTab[i], "@valueForm|@valtype");
-		value   = (char *) xmlNodeGetContent(node);
+		allowed = firstXPathValue(values->nodeTab[i], "@valueAllowed|@val1");
+		form    = firstXPathValue(values->nodeTab[i], "@valueForm|@valtype");
+		value   = xmlNodeGetContent(node);
 
-		if (form && strcmp(form, "range") == 0) {
-			ret = ret || is_in_set(value, allowed);
-		} else if (form && strcmp(form, "pattern") == 0) {
+		if (form && xmlStrcmp(form, BAD_CAST "range") == 0) {
+			ret = ret || is_in_set((char *) value, (char *) allowed);
+		} else if (form && xmlStrcmp(form, BAD_CAST "pattern") == 0) {
 			ret = ret || match_pattern(value, allowed);
 		} else {
-			ret = ret || strcmp(value, allowed) == 0;
+			ret = ret || xmlStrcmp(value, allowed) == 0;
 		}
 
 		xmlFree(allowed);

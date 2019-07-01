@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "3.0.3"
+#define VERSION "3.0.4"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -320,17 +320,6 @@ static bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 	}
 
 	return false;
-}
-
-/* Test whether an object value matches a regex pattern. */
-static bool match_pattern(const xmlChar *value, const xmlChar *pattern)
-{
-	xmlRegexpPtr regex;
-	bool match;
-	regex = xmlRegexpCompile(BAD_CAST pattern);
-	match = xmlRegexpExec(regex, BAD_CAST value);
-	xmlRegFreeRegexp(regex);
-	return match;
 }
 
 /* Add an undefined property node to the report. */

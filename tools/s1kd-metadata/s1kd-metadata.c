@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.4.3"
+#define VERSION "2.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1854,6 +1854,7 @@ static void show_help(void)
 	puts("  -f, --overwrite        Overwrite modules when editing metadata.");
 	puts("  -H, --info             List information on available metadata.");
 	puts("  -l, --list             Input is a list of filenames.");
+	puts("  -m, --matches <regex>  Use a pattern instead of a literal value (-v) with -w/-W.");
 	puts("  -n, --name <name>      Specific metadata name to view/edit.");
 	puts("  -q, --quiet            Quiet mode, do not show non-fatal errors.");
 	puts("  -T, --raw              Do not format columns in output.");
@@ -2049,12 +2050,13 @@ static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fnam
 
 static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
 {
-	xmlChar *key, *val, *op;
+	xmlChar *key, *val, *op, *regex;
 	int i, cmp = 0;
 
 	key = xmlGetProp(cond, BAD_CAST "key");
 	val = xmlGetProp(cond, BAD_CAST "val");
 	op = xmlGetProp(cond, BAD_CAST "op");
+	regex = xmlGetProp(cond, BAD_CAST "regex");
 
 	for (i = 0; metadata[i].key; ++i) {
 		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
@@ -2062,10 +2064,17 @@ static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fn
 
 			content = get_cond_content(i, ctx, fname);
 
-			switch (op[0]) {
-				case '=': cmp = val == NULL ? content != NULL : xmlStrcmp(content, val) == 0; break;
-				case '~': cmp = val == NULL ? content == NULL : xmlStrcmp(content, val) != 0; break;
-				default: break;
+			if (regex) {
+				switch (op[0]) {
+					case '=': cmp = val == NULL ? content != NULL : match_pattern(content, val); break;
+					case '~': cmp = val == NULL ? content == NULL : !match_pattern(content, val); break;
+				}
+			} else {
+				switch (op[0]) {
+					case '=': cmp = val == NULL ? content != NULL : xmlStrcmp(content, val) == 0; break;
+					case '~': cmp = val == NULL ? content == NULL : xmlStrcmp(content, val) != 0; break;
+					default: break;
+				}
 			}
 
 			xmlFree(content);
@@ -2240,10 +2249,13 @@ static void add_cond(xmlNodePtr conds, const char *k, const char *o)
 	xmlSetProp(cond, BAD_CAST "op", BAD_CAST o);
 }
 
-static void add_cond_val(xmlNodePtr conds, const char *v)
+static void add_cond_val(xmlNodePtr conds, const char *v, bool regex)
 {
 	xmlNodePtr cond;
 	cond = conds->last;
+	if (regex) {
+		xmlSetProp(cond, BAD_CAST "regex", BAD_CAST "yes");
+	}
 	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
 }
 
@@ -2292,7 +2304,7 @@ int main(int argc, char **argv)
 	int only_editable = 0;
 	char *fmtstr = NULL;
 
-	const char *sopts = "0c:eF:fHln:Ttv:qW:w:h?";
+	const char *sopts = "0c:eF:fHlm:n:Ttv:qW:w:h?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
@@ -2303,6 +2315,7 @@ int main(int argc, char **argv)
 		{"overwrite", no_argument      , 0, 'f'},
 		{"info"     , no_argument      , 0, 'H'},
 		{"list"     , no_argument      , 0, 'l'},
+		{"matches"  , required_argument, 0, 'm'},
 		{"name"     , required_argument, 0, 'n'},
 		{"raw"      , no_argument      , 0, 'T'},
 		{"tab"      , no_argument      , 0, 't'},
@@ -2334,6 +2347,11 @@ int main(int argc, char **argv)
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
 			case 'l': islist = 1; break;
+			case 'm':
+				  if (last == conds) {
+					  add_cond_val(conds, optarg, true);
+				  }
+				  break;
 			case 'n': add_key(keys, optarg); last = keys; break;
 			case 'T': formatall = 0; break;
 			case 't': endl = '\t'; break;
@@ -2341,7 +2359,7 @@ int main(int argc, char **argv)
 				if (last == keys)
 					add_val(keys, optarg);
 				else if (last == conds)
-					add_cond_val(conds, optarg);
+					add_cond_val(conds, optarg, false);
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'w': add_cond(conds, optarg, "="); last = conds; break;

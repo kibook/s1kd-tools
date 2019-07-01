@@ -118,4 +118,7 @@ int save_xml_doc(xmlDocPtr doc, const char *path);
 /* Add CCT dependencies to an object's annotations. */
 void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
 
+/* Test whether an object value matches a regex pattern. */
+bool match_pattern(const xmlChar *value, const xmlChar *pattern);
+
 #endif

@@ -749,3 +749,14 @@ void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id)
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 }
+
+/* Test whether an object value matches a regex pattern. */
+bool match_pattern(const xmlChar *value, const xmlChar *pattern)
+{
+	xmlRegexpPtr regex;
+	bool match;
+	regex = xmlRegexpCompile(BAD_CAST pattern);
+	match = xmlRegexpExec(regex, BAD_CAST value);
+	xmlRegFreeRegexp(regex);
+	return match;
+}
