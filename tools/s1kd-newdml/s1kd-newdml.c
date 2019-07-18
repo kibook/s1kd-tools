@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "1.12.4"
+#define VERSION "1.13.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -34,6 +34,7 @@
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 #define E_BAD_SNS ERR_PREFIX "Specified BREX DM could not be read: %s\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 #define MAX_MODEL_IDENT_CODE		14	+ 2
 #define MAX_SYSTEM_DIFF_CODE		 4	+ 2
@@ -579,7 +580,7 @@ static void dump_template(const char *path)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [options] [<datamodules>]");
+	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -$, --issue <issue>         Specify which S1000d issue to use.");
@@ -590,13 +591,14 @@ static void show_help(void)
 	puts("  -f, --overwrite             Overwrite existing file.");
 	puts("  -h, -?, --help              Show usage message.");
 	puts("  -i, --info-code <code>      Specify info code for SNS-generated DMRL.");
+	puts("  -l, --list                  Treat input as a list of objects to add to the new list.");
 	puts("  -N, --omit-issue            Omit issue/inwork from filename.");
 	puts("  -p, --prompt                Prompt the user for each value.");
 	puts("  -q, --quiet                 Don't report an error if file exists.");
 	puts("  -S, --sns <BREX>            Create a DMRL from SNS rules.");
 	puts("  -v, --verbose               Print file name of DML.");
 	puts("  --version                   Show version information.");
-	puts("  <datamodules>               DMs to add to new list.");
+	puts("  <object>...                 CSDB object(s) to add to the new list.");
 	puts("");
 	puts("In addition, the following pieces of metadata can be set:");
 	puts("  -#, --code <code>           DML code");
@@ -721,6 +723,57 @@ static void set_remarks(xmlDocPtr doc, xmlChar *text)
 	}
 }
 
+static void add_ref(xmlNodePtr dmlContent, char *path)
+{
+	xmlDocPtr doc = read_xml_doc(path);
+
+	if (doc) {
+		if (isdm(doc)) {
+			addDmRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
+		} else if (ispm(doc)) {
+			addPmRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
+		} else if (isimf(doc)) {
+			addImfRef(doc, dmlContent);
+		} else if (iscom(doc)) {
+			addComRef(doc, dmlContent);
+		} else if (isdml(doc)) {
+			addDmlRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
+		}
+
+		xmlFreeDoc(doc);
+	} else {
+		char *base = basename(path);
+
+		if (isicn(base)) {
+			addIcnRef(base, dmlContent);
+		}
+	}
+}
+
+static void add_ref_list(xmlNodePtr dmlContent, const char *fname)
+{
+	FILE *f;
+	char path[PATH_MAX];
+
+	if (fname) {
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(path, PATH_MAX, f)) {
+		strtok(path, "\t\r\n");
+		add_ref(dmlContent, path);
+	}
+
+	if (fname) {
+		fclose(f);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	xmlDocPtr dml_doc;
@@ -741,6 +794,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool no_overwrite_error = false;
 	char *sns = NULL;
+	bool islist = false;
 
 	int c;
 
@@ -749,7 +803,7 @@ int main(int argc, char **argv)
 	char *out = NULL;
 	char *outdir = NULL;
 
-	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:z:h?";
+	const char *sopts = "pd:#:n:w:c:Nb:I:vf$:@:r:R:%:qS:i:m:~:z:lh?";
 	struct option lopts[] = {
 		{"version"       , no_argument      , 0, 0},
 		{"help"          , no_argument      , 0, 'h'},
@@ -775,6 +829,7 @@ int main(int argc, char **argv)
 		{"remarks"       , required_argument, 0, 'm'},
 		{"dump-templates", required_argument, 0, '~'},
 		{"issue-type"    , required_argument, 0, 'z'},
+		{"list"          , no_argument      , 0, 'l'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -813,6 +868,7 @@ int main(int argc, char **argv)
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
 			case 'z': issue_type = xmlStrdup(BAD_CAST optarg); break;
+			case 'l': islist = true; break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -976,30 +1032,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	for (c = optind; c < argc; ++c) {
-		xmlDocPtr doc = read_xml_doc(argv[c]);
-
-		if (doc) {
-			if (isdm(doc)) {
-				addDmRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
-			} else if (ispm(doc)) {
-				addPmRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
-			} else if (isimf(doc)) {
-				addImfRef(doc, dmlContent);
-			} else if (iscom(doc)) {
-				addComRef(doc, dmlContent);
-			} else if (isdml(doc)) {
-				addDmlRef(doc, dmlContent, strcmp(dml_type, "S") == 0);
-			}
-
-			xmlFreeDoc(doc);
-		} else {
-			char *base = basename(argv[c]);
-
-			if (isicn(base)) {
-				addIcnRef(base, dmlContent);
+	if (optind < argc) {
+		for (c = optind; c < argc; ++c) {
+			if (islist) {
+				add_ref_list(dmlContent, argv[c]);
+			} else {
+				add_ref(dmlContent, argv[c]);
 			}
 		}
+	} else if (islist) {
+		add_ref_list(dmlContent, NULL);
 	}
 
 	sort_entries(dml_doc);

@@ -6,7 +6,7 @@ s1kd-newdml - Create a new S1000D data management list
 SYNOPSIS
 ========
 
-    s1kd-newdml [options] [<datamodules>]
+    s1kd-newdml [options] [<object>...]
 
 DESCRIPTION
 ===========
@@ -82,6 +82,10 @@ data modules for each part of the SNS. &lt;info code&gt; can specify:
 
 -   the item location code (e.g., 520B-C)
 
+-l, --list  
+Treat input (stdin or arguments) as lists of CSDB objects to add to the
+new list.
+
 -m, --remarks &lt;remarks&gt;  
 Set the remarks for the new data management list.
 
@@ -122,8 +126,8 @@ The issue type of the new DML.
 --version  
 Show version information.
 
-&lt;datamodules&gt;  
-Any number of data module file names to automatically add to the list.
+&lt;object&gt;...  
+Any number of CSDB object file names to automatically add to the list.
 
 In addition, the following options enable features of the XML parser
 that are disabled as a precaution by default:

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="21" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="00"/>
+        <issueInfo issueNumber="027" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="07" day="18"/>
         <dmTitle>
           <techName>s1kd-newdml(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -l option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Change "datamodule" to "object".</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-newdml [options] [&lt;datamodules&gt;]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-newdml [options] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -173,6 +179,12 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of CSDB objects to add to the new list.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
               <listItemDefinition>
@@ -245,10 +257,10 @@
                 <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>&lt;datamodules&gt;</listItemTerm>
+            <definitionListItem changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
               <listItemDefinition>
-                <para>Any number of data module file names to automatically add to the list.</para>
+                <para>Any number of CSDB object file names to automatically add to the list.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
