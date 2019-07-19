@@ -244,7 +244,7 @@ static int codecmp(const char *p1, const char *p2)
 }
 
 /* Match a string with a pattern case-insensitively, using ? as a wildcard. */
-static bool strmatch(const char *p, const char *s)
+bool strmatch(const char *p, const char *s)
 {
 	const unsigned char *cp = (const unsigned char *) p;
 	const unsigned char *cs = (const unsigned char *) s;

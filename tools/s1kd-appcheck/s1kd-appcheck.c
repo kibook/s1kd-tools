@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "3.0.4"
+#define VERSION "4.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -37,6 +37,7 @@
 #define E_BAD_OBJECT ERR_PREFIX "Could not read object: %s\n"
 #define E_PROPCHECK ERR_PREFIX "%s: %s %s is not defined (line %ld)\n"
 #define E_PROPCHECK_VAL ERR_PREFIX "%s: %s is not a defined value of %s %s (line %ld)\n"
+#define E_MAX_OBJECTS "Out of memory\n"
 
 /* Warning messages. */
 #define W_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
@@ -49,6 +50,16 @@
 
 /* Exit status codes. */
 #define EXIT_BAD_OBJECT 2
+#define EXIT_MAX_OBJECTS 3
+
+/* The total width of the progress bar displayed by the option. */
+#define PROGRESS_BAR_WIDTH 60
+
+/* Initial maximum number of CSDB object paths. */
+static int OBJECT_MAX = 1;
+/* List of CSDB object paths. */
+static char (*objects)[PATH_MAX];
+static int nobjects = 0;
 
 /* Search for ACT, CCT, PCT recursively. */
 static bool recursive_search = false;
@@ -100,11 +111,12 @@ static void show_help(void)
 	puts("  -N, --omit-issue    Assume issue/inwork numbers are omitted.");
 	puts("  -o, --output-valid  Output valid CSDB objects to stdout.");
 	puts("  -P, --pct <file>    User-specified PCT.");
-	puts("  -p, --products      Validate against product instances.");
+	puts("  -p, --progress      Display a progress bar.");
 	puts("  -q, --quiet         Quiet mode.");
 	puts("  -r, --recursive     Search for ACT/CCT/PCT recursively.");
 	puts("  -s, --strict        Check that all properties are defined.");
 	puts("  -T, --summary       Print a summary of the check.");
+	puts("  -t, --products      Validate against product instances.");
 	puts("  -v, --verbose       Verbose output.");
 	puts("  -x, --xml           Output XML report.");
 	puts("  -~, --dependencies  Check CCT dependencies.");
@@ -161,11 +173,33 @@ static bool is_dm(const char *name)
 	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
+/* Find a CSDB object in the list of paths. */
+static bool find_dmod_in_list(char *dst, const char *code)
+{
+	int i;
+	bool found = false;
+
+	for (i = 0; i < nobjects; ++i) {
+		char *name, *base;
+
+		name = strdup(objects[i]);
+		base = basename(name);
+		found = is_dm(base) && strmatch(code, base);
+		free(name);
+
+		if (found) {
+			strcpy(dst, objects[i]);
+			break;
+		}
+	}
+
+	return found;
+}
+
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
 static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 {
-	bool found = false;
 	char *model_ident_code;
 	char *system_diff_code;
 	char *system_code;
@@ -268,13 +302,18 @@ static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		xmlFree(country_iso_code);
 	}
 
-	found = find_csdb_object(dst, search_dir, code, is_dm, recursive_search);
-
-	if (!found) {
-		fprintf(stderr, W_MISSING_REF_DM, code);
+	/* Look for DM in the directory hierarchy. */
+	if (find_csdb_object(dst, search_dir, code, is_dm, recursive_search)) {
+		return true;
 	}
 
-	return found;
+	/* Look for DM in the list of objects to check. */
+	if (find_dmod_in_list(dst, code)) {
+		return true;
+	}
+
+	fprintf(stderr, W_MISSING_REF_DM, code);
+	return false;
 }
 
 /* Find the filename of a referenced ACT data module. */
@@ -1313,19 +1352,33 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 	return err;
 }
 
-/* Check the applicability in a list of objects. */
-static int check_applic_list(const char *fname, struct appcheckopts *opts, xmlNodePtr report)
+/* Add a CSDB object path to check. */
+static void add_object(const char *path)
+{
+	if (nobjects == OBJECT_MAX) {
+		if (!(objects = realloc(objects, (OBJECT_MAX *= 2) * PATH_MAX))) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, E_MAX_OBJECTS);
+			}
+			exit(EXIT_MAX_OBJECTS);
+		}
+	}
+
+	strcpy(objects[nobjects++], path);
+}
+
+/* Add a list of CSDB object paths to check. */
+static void add_object_list(const char *fname)
 {
 	FILE *f;
 	char path[PATH_MAX];
-	int err = 0;
 
 	if (fname) {
 		if (!(f = fopen(fname, "r"))) {
 			if (verbosity >= NORMAL) {
 				fprintf(stderr, E_BAD_LIST, fname);
 			}
-			return err;
+			return;
 		}
 	} else {
 		f = stdin;
@@ -1333,14 +1386,12 @@ static int check_applic_list(const char *fname, struct appcheckopts *opts, xmlNo
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		err += check_applic_file(path, opts, report);
+		add_object(path);
 	}
 
 	if (fname) {
 		fclose(f);
 	}
-
-	return err;
 }
 
 /* Show a summary of the check. */
@@ -1359,6 +1410,30 @@ static void print_stats(xmlDocPtr doc)
 
 	xmlFreeDoc(res);
 	xsltFreeStylesheet(style);
+}
+
+/* Display a progress bar. */
+static void print_progress(float cur, float total)
+{
+	float p;
+	int i, b;
+
+	p = cur / total;
+	b = PROGRESS_BAR_WIDTH * p;
+
+	fprintf(stderr, "\r[");
+	for (i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
+		if (i < b) {
+			fputc('=', stderr);
+		} else {
+			fputc(' ', stderr);
+		}
+	}
+	fprintf(stderr, "] %d%% (%d/%d) ", (int)(p * 100.0), (int) cur, (int) total);
+	if (cur == total) {
+		fputc('\n', stderr);
+	}
+	fflush(stderr);
 }
 
 int main(int argc, char **argv)
@@ -1382,11 +1457,12 @@ int main(int argc, char **argv)
 		{"omit-issue"  , no_argument      , 0, 'N'},
 		{"output-valid", no_argument      , 0, 'o'},
 		{"pct"         , required_argument, 0, 'P'},
-		{"products"    , no_argument      , 0, 'p'},
+		{"progress"    , required_argument, 0, 'p'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursive"   , no_argument      , 0, 'r'},
 		{"strict"      , no_argument      , 0, 's'},
 		{"summary"     , no_argument      , 0, 'T'},
+		{"products"    , no_argument      , 0, 't'},
 		{"verbose"     , no_argument      , 0, 'v'},
 		{"xml"         , no_argument      , 0, 'x'},
 		{"dependencies", no_argument      , 0, '~'},
@@ -1398,6 +1474,7 @@ int main(int argc, char **argv)
 	bool islist = false;
 	bool xmlout = false;
 	bool show_stats = false;
+	bool show_progress = false;
 
 	struct appcheckopts opts = {
 		/* useract */     NULL,
@@ -1417,6 +1494,8 @@ int main(int argc, char **argv)
 
 	xmlDocPtr report;
 	xmlNodePtr appcheck;
+
+	objects = malloc(OBJECT_MAX * PATH_MAX);
 
 	search_dir = strdup(".");
 
@@ -1477,7 +1556,7 @@ int main(int argc, char **argv)
 				opts.userpct = strdup(optarg);
 				break;
 			case 'p':
-				opts.mode = PCT;
+				show_progress = true;
 				break;
 			case 'r':
 				recursive_search = true;
@@ -1487,6 +1566,9 @@ int main(int argc, char **argv)
 				break;
 			case 'T':
 				show_stats = true;
+				break;
+			case 't':
+				opts.mode = PCT;
 				break;
 			case 'q':
 				--verbosity;
@@ -1514,15 +1596,27 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				err += check_applic_list(argv[i], &opts, appcheck);
+				add_object_list(argv[i]);
 			} else {
-				err += check_applic_file(argv[i], &opts, appcheck);
+				add_object(argv[i]);
 			}
 		}
 	} else if (islist) {
-		err += check_applic_list(NULL, &opts, appcheck);
+		add_object_list(NULL);
 	} else {
-		err += check_applic_file("-", &opts, appcheck);
+		add_object("-");
+	}
+
+	for (i = 0; i < nobjects; ++i) {
+		err += check_applic_file(objects[i], &opts, appcheck);
+
+		if (show_progress) {
+			print_progress(i, nobjects);
+		}
+	}
+
+	if (show_progress && nobjects) {
+		print_progress(i, nobjects);
 	}
 
 	if (xmlout) {
@@ -1541,6 +1635,7 @@ cleanup:
 	free(opts.args);
 	xmlFreeNode(opts.validators);
 	free(search_dir);
+	free(objects);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

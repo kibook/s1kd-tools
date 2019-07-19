@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="001" inWork="01"/>
+        <issueInfo issueNumber="001" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="27"/>
+        <issueDate year="2019" month="07" day="18"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change -p to -t, add new -p option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,7 +58,7 @@
       <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered.</para>
-        <para>By default, the tool validates an object against only the product attribute and condition values which are explicitly used within the object. The products check (-p) and full check (-a) modes allow objects to be checked for issues with implicit applicability, that is, product attribute or condition values which are not explicitly used within an object, but may still affect it.</para>
+        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, the tool validates an object against only the product attribute and condition values which are explicitly used within the object. The products check (-t) and full check (-a) modes allow objects to be checked for issues with implicit applicability, that is, product attribute or condition values which are not explicitly used within an object, but may still affect it.</para>
         <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
       </levelledPara>
       <levelledPara>
@@ -146,10 +149,10 @@
                 <para>Specify the PCT to read product instances from. This will override the PCT reference in the ACT.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-p, --products</listItemTerm>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-p, --progress</listItemTerm>
               <listItemDefinition>
-                <para>Validate objects against the defined product instances within the PCT.</para>
+                <para>Display a progress bar.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -174,6 +177,12 @@
               <listItemTerm>-T, --summary</listItemTerm>
               <listItemDefinition>
                 <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-t, --products</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects against the defined product instances within the PCT.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -258,6 +267,12 @@
               <listItemTerm>2</listItemTerm>
               <listItemDefinition>
                 <para>One or more CSDB objects could not be read.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>The number of CSDB objects specified exceeded the available memory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

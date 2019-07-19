@@ -17,7 +17,7 @@ filtered.
 
 By default, the tool validates an object against only the product
 attribute and condition values which are explicitly used within the
-object. The products check (-p) and full check (-a) modes allow objects
+object. The products check (-t) and full check (-a) modes allow objects
 to be checked for issues with implicit applicability, that is, product
 attribute or condition values which are not explicitly used within an
 object, but may still affect it.
@@ -87,8 +87,8 @@ Output valid CSDB objects to stdout.
 Specify the PCT to read product instances from. This will override the
 PCT reference in the ACT.
 
--p, --products  
-Validate objects against the defined product instances within the PCT.
+-p, --progress  
+Display a progress bar.
 
 -q, --quiet  
 Quiet mode. Error messages will not be printed.
@@ -103,6 +103,9 @@ declared in the ACT and CCT respectively.
 -T, --summary  
 Print a summary of the check after it completes, including statistics on
 the number of objects that passed/failed the check.
+
+-t, --products  
+Validate objects against the defined product instances within the PCT.
 
 -v, --verbose  
 Verbose output. Specify multiple times to increase the verbosity.
@@ -146,6 +149,9 @@ The check completed successfully, but some CSDB objects were invalid.
 
 2  
 One or more CSDB objects could not be read.
+
+3  
+The number of CSDB objects specified exceeded the available memory.
 
 EXAMPLES
 ========

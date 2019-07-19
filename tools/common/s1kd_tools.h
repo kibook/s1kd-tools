@@ -76,6 +76,9 @@ bool isdir(const char *path, bool recursive);
 /* Free an XML entity. From libxml2, but not exposed by the API. */
 void xmlFreeEntity(xmlEntityPtr entity);
 
+/* Match a string with a pattern case-insensitively, using ? as a wildcard. */
+bool strmatch(const char *p, const char *s);
+
 /* Find a CSDB object in a directory hierarchy based on its code. */
 bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive);
 
