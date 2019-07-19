@@ -1975,11 +1975,6 @@ static int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-static bool is_icn(const char *bname)
-{
-	return strncasecmp(bname, "ICN-", 4) == 0;
-}
-
 static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
 {
 	int i;

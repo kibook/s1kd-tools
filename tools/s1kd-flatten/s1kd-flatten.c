@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.4.3"
+#define VERSION "2.4.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -97,16 +97,6 @@ static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *e
 static char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr)
 {
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
-}
-
-static bool is_dm(const char *fname)
-{
-	return strncmp(fname, "DMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
-}
-
-static bool is_pm(const char *fname)
-{
-	return strncmp(fname, "PMC-", 4) == 0 && strncasecmp(fname + (strlen(fname) - 4), ".XML", 4) == 0;
 }
 
 static void flatten_pm_entry(xmlNodePtr pm_entry);

@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.9.1"
+#define VERSION "1.9.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -762,32 +762,32 @@ static xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 	return csn_ref;
 }
 
-static bool is_pm(const char *ref)
+static bool is_pm_ref(const char *ref)
 {
 	return strncmp(ref, "PMC-", 4) == 0 || strncmp(ref, "PME-", 4) == 0;
 }
 
-static bool is_dm(const char *ref)
+static bool is_dm_ref(const char *ref)
 {
 	return strncmp(ref, "DMC-", 4) == 0 || strncmp(ref, "DME-", 4) == 0;
 }
 
-static bool is_com(const char *ref)
+static bool is_com_ref(const char *ref)
 {
 	return strncmp(ref, "COM-", 4) == 0;
 }
 
-static bool is_dml(const char *ref)
+static bool is_dml_ref(const char *ref)
 {
 	return strncmp(ref, "DML-", 4) == 0;
 }
 
-static bool is_icn(const char *ref)
+static bool is_icn_ref(const char *ref)
 {
 	return strncmp(ref, "ICN-", 4) == 0;
 }
 
-static bool is_csn(const char *ref)
+static bool is_csn_ref(const char *ref)
 {
 	return strncmp(ref, "CSN-", 4) == 0;
 }
@@ -893,17 +893,17 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 	xmlNodePtr node;
 	xmlNodePtr (*f)(const char *, const char *, int);
 
-	if (is_dm(ref)) {
+	if (is_dm_ref(ref)) {
 		f = new_dm_ref;
-	} else if (is_pm(ref)) {
+	} else if (is_pm_ref(ref)) {
 		f = new_pm_ref;
-	} else if (is_com(ref)) {
+	} else if (is_com_ref(ref)) {
 		f = new_com_ref;
-	} else if (is_dml(ref)) {
+	} else if (is_dml_ref(ref)) {
 		f = new_dml_ref;
-	} else if (is_icn(ref)) {
+	} else if (is_icn_ref(ref)) {
 		f = new_icn_ref;
-	} else if (is_csn(ref)) {
+	} else if (is_csn_ref(ref)) {
 		f = new_csn_ref;
 	} else if (extpubs && (node = find_ext_pub(extpubs, ref))) {
 		f = NULL;

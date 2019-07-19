@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.12.3"
+#define VERSION "2.12.4"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -290,31 +290,6 @@ static bool is_xml_file(const char *fname)
 	return strcasecmp(fname + (strlen(fname) - 4), ".XML") == 0;
 }
 
-/* Search for the BREX in the list of CSDB objects to be checked. */
-static bool search_brex_fname_from_dmods(char *fname,
-	char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames,
-	char *dmcode, int len)
-{
-	int i;
-	bool found = false;
-
-	for (i = 0; i < num_dmod_fnames; ++i) {
-		char *name, *base;
-
-		name = strdup(dmod_fnames[i]);
-		base = basename(name);
-		found = strncmp(base, dmcode, len) == 0;
-		free(name);
-
-		if (found) {
-			strcpy(fname, dmod_fnames[i]);
-			break;
-		}
-	}
-
-	return found;
-}
-
 /* Search for the BREX in the built-in default BREX data modules. */
 static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 {
@@ -438,7 +413,7 @@ static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[P
 
 	/* Look for the BREX in the list of objects to check. */
 	if (!found) {
-		found = search_brex_fname_from_dmods(fname, dmod_fnames, num_dmod_fnames, dmcode, len);
+		found = find_csdb_object_in_list(fname, dmod_fnames, num_dmod_fnames, dmcode);
 	}
 
 	/* Look for the BREX in the built-in default BREX. */

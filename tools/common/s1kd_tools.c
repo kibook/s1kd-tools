@@ -312,6 +312,29 @@ bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(
 	return found;
 }
 
+/* Find a CSDB object in a list of paths. */
+bool find_csdb_object_in_list(char *dst, char (*objects)[PATH_MAX], int n, const char *code)
+{
+	int i;
+	bool found = false;
+
+	for (i = 0; i < n; ++i) {
+		char *name, *base;
+
+		name = strdup(objects[i]);
+		base = basename(name);
+		found = strmatch(code, base);
+		free(name);
+
+		if (found) {
+			strcpy(dst, objects[i]);
+			break;
+		}
+	}
+
+	return found;
+}
+
 /* Convert string to double. Returns true if the string contained only a
  * correct double value or false if it contained extra content. */
 static bool strtodbl(double *d, const char *s)
@@ -785,4 +808,58 @@ void print_progress_bar(float cur, float total)
 		fputc('\n', stderr);
 	}
 	fflush(stderr);
+}
+
+/* Determine if the file is an XML file. */
+static bool is_xml(const char *name)
+{
+	return strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
+}
+
+/* Determine if the file is a data module. */
+bool is_dm(const char *name)
+{
+	return strncmp(name, "DMC-", 4) == 0 && is_xml(name);
+}
+
+/* Determine if the file is a publication module. */
+bool is_pm(const char *name)
+{
+	return strncmp(name, "PMC-", 4) == 0 && is_xml(name);
+}
+
+/* Determine if the file is a comment. */
+bool is_com(const char *name)
+{
+	return strncmp(name, "COM-", 4) == 0 && is_xml(name);
+}
+
+/* Determine if the file is an ICN metadata file. */
+bool is_imf(const char *name)
+{
+	return strncmp(name, "IMF-", 4) == 0 && is_xml(name);
+}
+
+/* Determine if the file is a data dispatch note. */
+bool is_ddn(const char *name)
+{
+	return strncmp(name, "DDN-", 4) == 0 && is_xml(name);
+}
+
+/* Determine if the file is a data management list. */
+bool is_dml(const char *name)
+{
+	return strncmp(name, "DML-", 4) == 0 && is_xml(name);
+}
+
+/* Determine if the file is an ICN. */
+bool is_icn(const char *name)
+{
+	return strncmp(name, "ICN-", 4) == 0;
+}
+
+/* Determine if the file is a SCORM content package. */
+bool is_smc(const char *name)
+{
+	return (strncmp(name, "SMC-", 4) == 0 || strncmp(name, "SME-", 4) == 0) && is_xml(name);
 }

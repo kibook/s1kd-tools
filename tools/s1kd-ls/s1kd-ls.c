@@ -24,7 +24,7 @@ static unsigned ICN_MAX = OBJECT_MAX;
 static unsigned SMC_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.9.1"
+#define VERSION "1.9.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -125,44 +125,6 @@ static int compare_icn(const void *a, const void *b)
 	return d;
 }
 
-/* Determine whether files are CSDB objects. */
-static int isxml(const char *name)
-{
-	return strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
-}
-static int isdm(const char *name)
-{
-	return (strncmp(name, "DMC-", 4) == 0 || strncmp(name, "DME-", 4) == 0) && isxml(name);
-}
-static int ispm(const char *name)
-{
-	return (strncmp(name, "PMC-", 4) == 0 || strncmp(name, "PME-", 4) == 0) && isxml(name);
-}
-static int iscom(const char *name)
-{
-	return strncmp(name, "COM-", 4) == 0 && isxml(name);
-}
-static int isimf(const char *name)
-{
-	return strncmp(name, "IMF-", 4) == 0 && isxml(name);
-}
-static int isddn(const char *name)
-{
-	return strncmp(name, "DDN-", 4) == 0 && isxml(name);
-}
-static int isdml(const char *name)
-{
-	return strncmp(name, "DML-", 4) == 0 && isxml(name);
-}
-static int isicn(const char *name)
-{
-	return strncmp(name, "ICN-", 4) == 0;
-}
-static int issmc(const char *name)
-{
-	return (strncmp(name, "SMC-", 4) == 0 || strncmp(name, "SME-", 4) == 0) && isxml(name);
-}
-
 /* Show usage message. */
 static void show_help(void)
 {
@@ -239,42 +201,42 @@ static void list_dir(const char *path, int only_writable, int only_readonly, int
 			continue;
 		} else if (only_readonly && access(cpath, W_OK) == 0) {
 			continue;
-		} else if (dms && isdm(cur->d_name)) {
+		} else if (dms && is_dm(cur->d_name)) {
 			if (ndms == DM_MAX) {
 				resize(&dms, &DM_MAX);
 			}
 			strcpy(dms[(ndms)++], cpath);
-		} else if (pms && ispm(cur->d_name)) {
+		} else if (pms && is_pm(cur->d_name)) {
 			if (npms == PM_MAX) {
 				resize(&pms, &PM_MAX);
 			}
 			strcpy(pms[(npms)++], cpath);
-		} else if (coms && iscom(cur->d_name)) {
+		} else if (coms && is_com(cur->d_name)) {
 			if (ncoms == COM_MAX) {
 				resize(&coms, &COM_MAX);
 			}
 			strcpy(coms[(ncoms)++], cpath);
-		} else if (imfs && isimf(cur->d_name)) {
+		} else if (imfs && is_imf(cur->d_name)) {
 			if (nimfs == IMF_MAX) {
 				resize(&imfs, &IMF_MAX);
 			}
 			strcpy(imfs[(nimfs)++], cpath);
-		} else if (icns && isicn(cur->d_name)) {
+		} else if (icns && is_icn(cur->d_name)) {
 			if (nicns == ICN_MAX) {
 				resize(&icns, &ICN_MAX);
 			}
 			strcpy(icns[(nicns)++], cpath);
-		} else if (ddns && isddn(cur->d_name)) {
+		} else if (ddns && is_ddn(cur->d_name)) {
 			if (nddns == DDN_MAX) {
 				resize(&ddns, &DDN_MAX);
 			}
 			strcpy(ddns[(nddns)++], cpath);
-		} else if (dmls && isdml(cur->d_name)) {
+		} else if (dmls && is_dml(cur->d_name)) {
 			if (ndmls == DML_MAX) {
 				resize(&dmls, &DML_MAX);
 			}
 			strcpy(dmls[(ndmls)++], cpath);
-		} else if (smcs && issmc(cur->d_name)) {
+		} else if (smcs && is_smc(cur->d_name)) {
 			if (nsmcs == SMC_MAX) {
 				resize(&smcs, &SMC_MAX);
 			}
@@ -635,42 +597,42 @@ int main(int argc, char **argv)
 				continue;
 			} else if (only_readonly && access(argv[i], W_OK) == 0) {
 				continue;
-			} else if (dms && isdm(base)) {
+			} else if (dms && is_dm(base)) {
 				if (ndms == DM_MAX) {
 					resize(&dms, &DM_MAX);
 				}
 				strcpy(dms[ndms++], argv[i]);
-			} else if (pms && ispm(base)) {
+			} else if (pms && is_pm(base)) {
 				if (npms == PM_MAX) {
 					resize(&pms, &PM_MAX);
 				}
 				strcpy(pms[npms++], argv[i]);
-			} else if (coms && iscom(base)) {
+			} else if (coms && is_com(base)) {
 				if (ncoms == COM_MAX) {
 					resize(&coms, &COM_MAX);
 				}
 				strcpy(coms[ncoms++], argv[i]);
-			} else if (icns && isicn(base)) {
+			} else if (icns && is_icn(base)) {
 				if (nicns == ICN_MAX) {
 					resize(&icns, &ICN_MAX);
 				}
 				strcpy(icns[nicns++], argv[i]);
-			} else if (imfs && isimf(base)) {
+			} else if (imfs && is_imf(base)) {
 				if (nimfs == IMF_MAX) {
 					resize(&imfs, &IMF_MAX);
 				}
 				strcpy(imfs[nimfs++], argv[i]);
-			} else if (ddns && isddn(base)) {
+			} else if (ddns && is_ddn(base)) {
 				if (nddns == DDN_MAX) {
 					resize(&ddns, &DDN_MAX);
 				}
 				strcpy(ddns[nddns++], argv[i]);
-			} else if (dmls && isdml(base)) {
+			} else if (dmls && is_dml(base)) {
 				if (ndmls == DML_MAX) {
 					resize(&dmls, &DML_MAX);
 				}
 				strcpy(dmls[ndmls++], argv[i]);
-			} else if (smcs && issmc(base)) {
+			} else if (smcs && is_smc(base)) {
 				if (nsmcs == SMC_MAX) {
 					resize(&smcs, &SMC_MAX);
 				}

@@ -82,6 +82,9 @@ bool strmatch(const char *p, const char *s);
 /* Find a CSDB object in a directory hierarchy based on its code. */
 bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive);
 
+/* Find a CSDB object in a list of paths. */
+bool find_csdb_object_in_list(char *dst, char (*objects)[PATH_MAX], int n, const char *code);
+
 /* Tests whether a value is in an S1000D range (a~c is equivalent to a|b|c) */
 bool is_in_range(const char *value, const char *range);
 
@@ -126,5 +129,29 @@ bool match_pattern(const xmlChar *value, const xmlChar *pattern);
 
 /* Display a progress bar. */
 void print_progress_bar(float cur, float total);
+
+/* Determine if the file is a data module. */
+bool is_dm(const char *name);
+
+/* Determine if the file is a publication module. */
+bool is_pm(const char *fname);
+
+/* Determine if the file is a comment. */
+bool is_com(const char *name);
+
+/* Determine if the file is an ICN metadata file. */
+bool is_imf(const char *name);
+
+/* Determine if the file is a data dispatch note. */
+bool is_ddn(const char *name);
+
+/* Determine if the file is a data management list. */
+bool is_dml(const char *name);
+
+/* Determine if the file is an ICN. */
+bool is_icn(const char *name);
+
+/* Determine if the file is a SCORM content package. */
+bool is_smc(const char *name);
 
 #endif

@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "4.0.1"
+#define VERSION "4.0.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -164,35 +164,6 @@ static xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar 
 	return xmlNodeGetContent(first_xpath_node(doc, node, path));
 }
 
-/* Determine if the file is a data module. */
-static bool is_dm(const char *name)
-{
-	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
-}
-
-/* Find a CSDB object in the list of paths. */
-static bool find_dmod_in_list(char *dst, const char *code)
-{
-	int i;
-	bool found = false;
-
-	for (i = 0; i < nobjects; ++i) {
-		char *name, *base;
-
-		name = strdup(objects[i]);
-		base = basename(name);
-		found = is_dm(base) && strmatch(code, base);
-		free(name);
-
-		if (found) {
-			strcpy(dst, objects[i]);
-			break;
-		}
-	}
-
-	return found;
-}
-
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
 static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
@@ -305,7 +276,7 @@ static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 	}
 
 	/* Look for DM in the list of objects to check. */
-	if (find_dmod_in_list(dst, code)) {
+	if (find_csdb_object_in_list(dst, objects, nobjects, code)) {
 		return true;
 	}
 

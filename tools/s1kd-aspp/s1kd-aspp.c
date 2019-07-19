@@ -20,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.1.2"
+#define VERSION "3.1.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -399,12 +399,6 @@ static void processDmodules(xmlNodeSetPtr dmodules)
 	for (i = 0; i < dmodules->nodeNr; ++i) {
 		processDmodule(dmodules->nodeTab[i]);
 	}
-}
-
-/* Determine if the file is a data module. */
-static bool is_dm(const char *name)
-{
-	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 /* Find a data module filename in the current directory based on the dmRefIdent

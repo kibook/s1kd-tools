@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "4.0.0"
+#define VERSION "4.0.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2305,12 +2305,6 @@ static void set_skill(xmlDocPtr doc, const char *skill)
 	xmlSetProp(skill_level, BAD_CAST "skillLevelCode", BAD_CAST skill);
 }
 
-/* Determine if the file is a data module. */
-static bool is_dm(const char *name)
-{
-	return strncmp(name, "DMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
-}
-
 /* Find a data module filename in the current directory based on the dmRefIdent
  * element. */
 static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
@@ -2425,12 +2419,6 @@ static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, bool ignore_iss)
 		fprintf(stderr, S_MISSING_REF_DM, code);
 	}
 	return false;
-}
-
-/* Determine if the file is a publication module. */
-static bool is_pm(const char *name)
-{
-	return strncmp(name, "PMC-", 4) == 0 && strncasecmp(name + strlen(name) - 4, ".XML", 4) == 0;
 }
 
 /* Find a PM filename in the current directory based on the pmRefIdent
