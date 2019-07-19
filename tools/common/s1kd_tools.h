@@ -124,4 +124,7 @@ void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
 /* Test whether an object value matches a regex pattern. */
 bool match_pattern(const xmlChar *value, const xmlChar *pattern);
 
+/* Display a progress bar. */
+void print_progress_bar(float cur, float total);
+
 #endif

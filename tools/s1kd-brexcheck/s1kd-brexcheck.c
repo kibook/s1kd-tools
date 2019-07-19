@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.12.2"
+#define VERSION "2.12.3"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -60,9 +60,6 @@
 static unsigned BREX_MAX = 1;
 static unsigned DMOD_MAX = 1;
 static unsigned BREX_PATH_MAX = 1;
-
-/* The total width of the progress bar displayed by the -p option. */
-#define PROGRESS_BAR_WIDTH 60
 
 /* Verbosity of the tool's output. */
 static enum verbosity {SILENT, NORMAL, VERBOSE} verbose = NORMAL;
@@ -1144,28 +1141,6 @@ static int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spath
 	return total;
 }
 
-/* Display a progress bar. */
-static void show_progress(float cur, float total)
-{
-	float p;
-	int i, b;
-
-	p = cur / total;
-	b = PROGRESS_BAR_WIDTH * p;
-
-	fprintf(stderr, "\r[");
-	for (i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
-		if (i < b)
-			fputc('=', stderr);
-		else
-			fputc(' ', stderr);
-	}
-	fprintf(stderr, "] %d%% (%d/%d) ", (int)(p * 100.0), (int) cur, (int) total);
-	if (cur == total)
-		fputc('\n', stderr);
-	fflush(stderr);
-}
-
 /* Add CSDB objects to check from a list of filenames. */
 static void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int *num_dmod_fnames)
 {
@@ -1494,8 +1469,9 @@ int main(int argc, char *argv[])
 
 		xmlFreeDoc(dmod_doc);
 
-		if (progress) 
-			show_progress(i, num_dmod_fnames);
+		if (progress) {
+			print_progress_bar(i, num_dmod_fnames);
+		}
 
 		/* If the referenced BREX was used, reset the BREX data module
 		 * list, as each data module may reference a different BREX or
@@ -1504,8 +1480,9 @@ int main(int argc, char *argv[])
 			num_brex_fnames = 0;
 	}
 
-	if (progress && num_dmod_fnames)
-		show_progress(i, num_dmod_fnames);
+	if (progress && num_dmod_fnames) {
+		print_progress_bar(i, num_dmod_fnames);
+	}
 
 	if (xmlout) {
 		save_xml_doc(outdoc, "-");

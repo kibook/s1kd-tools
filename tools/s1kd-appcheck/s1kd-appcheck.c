@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "4.0.0"
+#define VERSION "4.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -51,9 +51,6 @@
 /* Exit status codes. */
 #define EXIT_BAD_OBJECT 2
 #define EXIT_MAX_OBJECTS 3
-
-/* The total width of the progress bar displayed by the option. */
-#define PROGRESS_BAR_WIDTH 60
 
 /* Initial maximum number of CSDB object paths. */
 static int OBJECT_MAX = 1;
@@ -1412,30 +1409,6 @@ static void print_stats(xmlDocPtr doc)
 	xsltFreeStylesheet(style);
 }
 
-/* Display a progress bar. */
-static void print_progress(float cur, float total)
-{
-	float p;
-	int i, b;
-
-	p = cur / total;
-	b = PROGRESS_BAR_WIDTH * p;
-
-	fprintf(stderr, "\r[");
-	for (i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
-		if (i < b) {
-			fputc('=', stderr);
-		} else {
-			fputc(' ', stderr);
-		}
-	}
-	fprintf(stderr, "] %d%% (%d/%d) ", (int)(p * 100.0), (int) cur, (int) total);
-	if (cur == total) {
-		fputc('\n', stderr);
-	}
-	fflush(stderr);
-}
-
 int main(int argc, char **argv)
 {
 	int i;
@@ -1611,12 +1584,12 @@ int main(int argc, char **argv)
 		err += check_applic_file(objects[i], &opts, appcheck);
 
 		if (show_progress) {
-			print_progress(i, nobjects);
+			print_progress_bar(i, nobjects);
 		}
 	}
 
 	if (show_progress && nobjects) {
-		print_progress(i, nobjects);
+		print_progress_bar(i, nobjects);
 	}
 
 	if (xmlout) {

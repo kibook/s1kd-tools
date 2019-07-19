@@ -1,5 +1,7 @@
 #include "s1kd_tools.h"
 
+#define PROGRESS_BAR_WIDTH 60
+
 /* Default global XML parsing options.
  *
  * XML_PARSE_NOERROR / XML_PARSE_NOWARNING
@@ -759,4 +761,28 @@ bool match_pattern(const xmlChar *value, const xmlChar *pattern)
 	match = xmlRegexpExec(regex, BAD_CAST value);
 	xmlRegFreeRegexp(regex);
 	return match;
+}
+
+/* Display a progress bar. */
+void print_progress_bar(float cur, float total)
+{
+	float p;
+	int i, b;
+
+	p = cur / total;
+	b = PROGRESS_BAR_WIDTH * p;
+
+	fprintf(stderr, "\r[");
+	for (i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
+		if (i < b) {
+			fputc('=', stderr);
+		} else {
+			fputc(' ', stderr);
+		}
+	}
+	fprintf(stderr, "] %d%% (%d/%d) ", (int)(p * 100.0), (int) cur, (int) total);
+	if (cur == total) {
+		fputc('\n', stderr);
+	}
+	fflush(stderr);
 }
