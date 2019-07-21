@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "4.0.2"
+#define VERSION "4.0.3"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1384,7 +1384,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cd:e:fNk:loP:pqrsTvx~h?";
+	const char *sopts = "A:abC:cd:e:fNk:loP:pqrsTtvx~h?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
