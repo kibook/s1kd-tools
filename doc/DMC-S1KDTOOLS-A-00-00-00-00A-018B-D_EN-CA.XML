@@ -385,7 +385,16 @@
           <levelledPara>
             <title>Disassembly code</title>
             <para>The disassembly code identifies further breakdown on an assembly to which maintenance information applies. The code consists of 2 typically numeric but optionally alphanumeric characters, plus a 1 thru 3 alphanumeric variant code. The variant code identifies minor variants in components, smaller than the major variants identified by the system difference code.</para>
-            <para>For example, two alternative physical parts that perform the same function (and thus have the same SNS in a functional breakdown) could be identified by disassembly code variants B and C respectively.</para>
+            <para>For example, two alternative physical parts that perform the same function (and thus have the same SNS in a functional breakdown) could be identified by disassembly code variants B and C respectively:
+              <randomList>
+                <listItem>
+                  <para>BIKE-A-DA1-10-00-00B-720A-D: Installation procedures for brake pads produced by ABC company</para>
+                </listItem>
+                <listItem>
+                  <para>BIKE-A-DA1-10-00-00C-720A-D: Installation procedures for brake pads produced by XYZ company</para>
+                </listItem>
+              </randomList>
+            </para>
           </levelledPara>
           <levelledPara>
             <title>Information code</title>

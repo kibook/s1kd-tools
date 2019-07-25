@@ -223,7 +223,13 @@ difference code.
 
 For example, two alternative physical parts that perform the same
 function (and thus have the same SNS in a functional breakdown) could be
-identified by disassembly code variants B and C respectively.
+identified by disassembly code variants B and C respectively:
+
+-   BIKE-A-DA1-10-00-00B-720A-D: Installation procedures for brake pads
+    produced by ABC company
+
+-   BIKE-A-DA1-10-00-00C-720A-D: Installation procedures for brake pads
+    produced by XYZ company
 
 ### Information code
 
