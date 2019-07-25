@@ -16,6 +16,7 @@
             schema](#validating-against-the-schema)
         -   [Validating against a BREX data
             module](#validating-against-a-brex-data-module)
+        -   [Checking applicability](#checking-applicability)
         -   [Quality assurance
             verification](#quality-assurance-verification)
     -   [Changes to official data
@@ -276,6 +277,8 @@ means:
 
 -   It is valid according to the relevant business rules
 
+-   Any applicability filtering applied will not affect the above
+
 -   The actual narrative (content) is correct
 
 ### Validating against the schema
@@ -334,9 +337,25 @@ the -B option of the s1kd-newdm tool:
 This will use the customized `.defaults` and `.dmtypes` files to
 generate a basic set of business rules.
 
+### Checking applicability
+
+The fourth point can be tested using the **s1kd-appcheck** tool:
+
+    $ s1kd-appcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
+
+The S1000D applicability model allows for conditional processing to be
+applied both to whole data modules as well as parts of a data module.
+However, this latter functionality means that, if elements are removed
+as part of applicability filtering, the validity of the data module in
+regards to the S1000D schema and business rules can change.
+
+The s1kd-appcheck tool can report product attribute or condition
+assignments which would cause the data module to become invalid after
+filtering.
+
 ### Quality assurance verification
 
-In contrast to the first three points, which can be verified
+In contrast to the first four points, which can be verified
 automatically, the last point is generally not an automatic process, and
 involves quality assurance testing by a human. That a data module has
 been first or second QA tested can be indicated with the s1kd-upissue

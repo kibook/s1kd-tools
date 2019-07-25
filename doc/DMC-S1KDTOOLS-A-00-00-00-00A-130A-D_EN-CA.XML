@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="04" day="05"/>
+        <issueDate year="2019" month="07" day="25"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -42,6 +42,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add s1kd-appcheck example</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -245,6 +248,9 @@ infoCodeVariant="A" itemLocationCode="D"/>
               <listItem>
                 <para>It is valid according to the relevant business rules</para>
               </listItem>
+              <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                <para>Any applicability filtering applied will not affect the above</para>
+              </listItem>
               <listItem>
                 <para>The actual narrative (content) is correct</para>
               </listItem>
@@ -292,9 +298,18 @@ or 02 (Classified).
             </para>
             <para>This will use the customized <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to generate a basic set of business rules.</para>
           </levelledPara>
+          <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <title>Checking applicability</title>
+            <para>The fourth point can be tested using the <emphasis>s1kd-appcheck</emphasis> tool:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-appcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+            <para>The S1000D applicability model allows for conditional processing to be applied both to whole data modules as well as parts of a data module. However, this latter functionality means that, if elements are removed as part of applicability filtering, the validity of the data module in regards to the S1000D schema and business rules can change.</para>
+            <para>The s1kd-appcheck tool can report product attribute or condition assignments which would cause the data module to become invalid after filtering.</para>
+          </levelledPara>
           <levelledPara>
             <title>Quality assurance verification</title>
-            <para>In contrast to the first three points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first or second QA tested can be indicated with the s1kd-upissue tool:</para>
+            <para>In contrast to the first four points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first or second QA tested can be indicated with the s1kd-upissue tool:</para>
             <para>
               <verbatimText verbatimStyle="vs23">$ s1kd-upissue -1 tabtop -2 ttandoo ...</verbatimText>
             </para>
