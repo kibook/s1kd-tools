@@ -80,6 +80,11 @@ Treat input as a list of CSDB objects to validate.
 Assume that the issue/inwork numbers are omitted from object filenames
 (they were created with the -N option).
 
+-n, --nested  
+Check that all product attribute and condition values used in nested
+applicability annotations are subsets of the values used in their
+parents.
+
 -o, --output-valid  
 Output valid CSDB objects to stdout.
 
@@ -333,3 +338,66 @@ In which case, the standalone check will now also detect the error:
     $ s1kd-appcheck <DM>
     s1kd-appcheck: ERROR: <DM> is invalid when:
     s1kd-appcheck: ERROR:   condition weather = Normal
+
+Nested applicability annotations
+--------------------------------
+
+Consider the following data module snippet:
+
+    <dmodule>
+    ...
+    <applic>
+    <displayText>
+    <simplePara>Version: A, B</simplePara>
+    </displayText>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    ...
+    <referencedApplicGroup>
+    <applic id="app-C">
+    <displayText>
+    <simplePara>Version: C</simplePara>
+    </displayText>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="C"/>
+    </applic>
+    </referencedApplicGroup>
+    ...
+    <proceduralStep>
+    <para>Step A</para>
+    </proceduralStep>
+    <proceduralStep applicRefId="app-C">
+    <para>Step B</para>
+    </proceduralStep>
+    <proceduralStep>
+    <para>Step C</para>
+    </proceduralStep>
+    ...
+    </dmodule>
+
+Here, the whole data module is applicable to versions A and B, but an
+individual step has been made applicable to version C. Normally, this is
+not reported as an error, since the removal of this step would not cause
+the data module to become invalid:
+
+    $ s1kd-appcheck -v <DM>
+    s1kd-appcheck: SUCCESS: <DM> passed the applicability check
+
+However, the content is essentially useless, since it will never appear.
+The -n option will report when the applicability of an element is
+incompatible with the applicability of any parent elements or the whole
+object:
+
+    $ s1kd-appcheck -n <DM>
+    s1kd-appcheck: ERROR: <DM>: proceduralStep on line 62 is applicable
+    when prodattr version = C, which is not a subset of the applicability
+    of the whole object.

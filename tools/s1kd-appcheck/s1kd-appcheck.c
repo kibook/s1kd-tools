@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "4.0.3"
+#define VERSION "4.1.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -25,6 +25,7 @@
 #define I_CHECK_PROD_LINENO INF_PREFIX "Checking %s for product on line %ld of %s...\n"
 #define I_CHECK_ALL_START INF_PREFIX "Checking %s for:\n"
 #define I_CHECK_ALL_PROP INF_PREFIX "  %s %s = %s\n"
+#define I_NESTEDCHECK INF_PREFIX "Checking nested applicability in %s...\n"
 
 /* Error messages. */
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
@@ -37,6 +38,8 @@
 #define E_BAD_OBJECT ERR_PREFIX "Could not read object: %s\n"
 #define E_PROPCHECK ERR_PREFIX "%s: %s %s is not defined (line %ld)\n"
 #define E_PROPCHECK_VAL ERR_PREFIX "%s: %s is not a defined value of %s %s (line %ld)\n"
+#define E_NESTEDCHECK ERR_PREFIX "%s: %s on line %ld is applicable when %s %s = %s, which is not a subset of the applicability of the parent %s on line %ld\n"
+#define E_NESTEDCHECK_WHOLE ERR_PREFIX "%s: %s on line %ld is applicable when %s %s = %s, which is not a subset of the applicability of the whole object.\n"
 #define E_MAX_OBJECTS "Out of memory\n"
 
 /* Warning messages. */
@@ -85,6 +88,7 @@ struct appcheckopts {
 	bool brexcheck;
 	bool add_deps;
 	bool check_props;
+	bool check_nested;
 	enum appcheckmode mode;
 };
 
@@ -106,6 +110,7 @@ static void show_help(void)
 	puts("  -k, --args <args>   Arguments used to create objects.");
 	puts("  -l, --list          Treat input as list of CSDB objects.");
 	puts("  -N, --omit-issue    Assume issue/inwork numbers are omitted.");
+	puts("  -n, --nested        Check nested applicability annotations.");
 	puts("  -o, --output-valid  Output valid CSDB objects to stdout.");
 	puts("  -P, --pct <file>    User-specified PCT.");
 	puts("  -p, --progress      Display a progress bar.");
@@ -327,6 +332,311 @@ static bool find_pct_fname(char *dst, const char *userpct, xmlDocPtr act)
 	}
 
 	return false;
+}
+
+/* Add a nested applic error to the report. */
+static xmlNodePtr add_nested_error(xmlNodePtr report, xmlNodePtr node, xmlNodePtr parent, const xmlChar *id, const xmlChar *type, const xmlChar *val, long int cline, long int pline)
+{
+	xmlNodePtr und;
+	xmlChar line_s[16], *xpath;
+
+	und = xmlNewChild(report, NULL, BAD_CAST "nestedApplicError", NULL);
+
+	xmlSetProp(und, BAD_CAST "applicPropertyIdent", id);
+	xmlSetProp(und, BAD_CAST "applicPropertyType", type);
+	xmlSetProp(und, BAD_CAST "applicPropertyValue", val);
+
+	xmlStrPrintf(line_s, 16, "%ld", cline);
+	xmlSetProp(und, BAD_CAST "line", line_s);
+
+	xpath = xpath_of(node);
+	xmlSetProp(und, BAD_CAST "xpath", xpath);
+	xmlFree(xpath);
+
+	if (parent) {
+		xmlStrPrintf(line_s, 16, "%ld", pline);
+		xmlSetProp(und, BAD_CAST "parentLine", line_s);
+
+		xpath = xpath_of(parent);
+		xmlSetProp(und, BAD_CAST "parentXpath", xpath);
+		xmlFree(xpath);
+	}
+
+	return und;
+}
+
+/* Check that a value of an assertion in a nested applicability annotation is a
+ * subset of the values of its parent.
+ */
+static int check_nested_applic_val(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	bool match = false;
+
+	ctx = xmlXPathNewContext(prop->doc);
+	ctx->node = prop;
+
+	obj = xmlXPathEvalExpression(BAD_CAST "enumeration|enum", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; !match && i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *vals, *v = NULL;
+			char *end = NULL;
+
+			vals = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
+				BAD_CAST "@applicPropertyValues|@actvalues");
+
+			while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
+				if (is_in_range((char *) val, (char *) v)) {
+					match = true;
+					break;
+				}
+			}
+
+			xmlFree(vals);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	if (match) {
+		return 0;
+	} else {
+		long int cline, pline;
+
+		cline = xmlGetLineNo(node);
+		pline = xmlGetLineNo(parent);
+
+		if (verbosity >= NORMAL) {
+			if (parent) {
+				fprintf(stderr, E_NESTEDCHECK,
+					path,
+					(char *) node->name,
+					cline,
+					(char *) type,
+					(char *) id,
+					(char *) val,
+					(char *) parent->name,
+					pline);
+			} else {
+				fprintf(stderr, E_NESTEDCHECK_WHOLE,
+					path,
+					(char *) node->name,
+					cline,
+					(char *) type,
+					(char *) id,
+					(char *) val);
+			}
+		}
+
+		add_nested_error(report, node, parent, id, type, val, cline, pline);
+	}
+
+	return 1;
+}
+
+/* Check that an assertion in a nested applicability annotation is a subset of
+ * its parent.
+ */
+static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, xmlNodePtr props, const char *path, xmlNodePtr report)
+{
+	xmlChar *id, *type, *vals;
+	xmlNodePtr cur, prop = NULL;
+	int err = 0;
+
+	id   = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+
+	for (cur = props->children; cur && !prop; cur = cur->next) {
+		xmlChar *prop_id, *prop_type;
+
+		prop_id = xmlGetProp(cur, BAD_CAST "id");
+		prop_type = xmlGetProp(cur, BAD_CAST "type");
+
+		if (xmlStrcmp(id, prop_id) == 0 && xmlStrcmp(type, prop_type) == 0) {
+			prop = cur;
+		}
+
+		xmlFree(prop_id);
+		xmlFree(prop_type);
+	}
+
+	if (prop) {
+		xmlChar *v = NULL;
+		char *end = NULL;
+
+		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|~", &end))) {
+			err += check_nested_applic_val(node, parent, assert, id, type, v, prop, path, report);
+		}
+	}
+
+	xmlFree(id);
+	xmlFree(type);
+	xmlFree(vals);
+
+	return err;
+}
+
+/* Add an assertion of a parent applicability annotation to a set in order to
+ * check the annotations of its children against it.
+ */
+static void check_nested_applic_add_assert(xmlNodePtr props, xmlNodePtr assert)
+{
+	xmlChar *id, *type, *vals;
+	xmlNodePtr cur, node, enu;
+
+	id   = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+
+	for (cur = props->children, node = NULL; cur && !node; cur = cur->next) {
+		xmlChar *prop_id, *prop_type;
+
+		prop_id   = xmlGetProp(cur, BAD_CAST "id");
+		prop_type = xmlGetProp(cur, BAD_CAST "type");
+
+		if (xmlStrcmp(prop_id, id) == 0 && xmlStrcmp(prop_type, type) == 0) {
+			node = cur;
+		}
+
+		xmlFree(prop_id);
+		xmlFree(prop_type);
+	}
+
+	if (!node) {
+		node = xmlNewChild(props, NULL, BAD_CAST "prop", NULL);
+		xmlSetProp(node, BAD_CAST "id", id);
+		xmlSetProp(node, BAD_CAST "type", type);
+	}
+
+	for (cur = node->children, enu = NULL; cur && !enu; cur = cur->next) {
+		xmlChar *val;
+
+		val = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValue|@actvalue");
+
+		if (xmlStrcmp(val, vals) == 0) {
+			enu = cur;
+		}
+
+		xmlFree(val);
+	}
+
+	if (!enu) {
+		enu = xmlNewChild(node, NULL, BAD_CAST "enumeration", NULL);
+		xmlSetProp(enu, BAD_CAST "applicPropertyValues", vals);
+	}
+
+	xmlFree(id);
+	xmlFree(type);
+	xmlFree(vals);
+}
+
+/* Check that an applicability annotation is a subset of any parent annotation. */
+static int check_nested_applic(xmlDocPtr doc, xmlNodePtr node, const char *path, xmlNodePtr report)
+{
+	xmlNodePtr app, parent_app, parent, props;
+	xmlChar *id, *xpath;
+	int n, err = 0;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	id = first_xpath_value(doc, node, BAD_CAST "@applicRefId|@refapplic");
+	n = xmlStrlen(id) + 17;
+	xpath = malloc(n * sizeof(xmlChar));
+	xmlStrPrintf(xpath, n, "//applic[@id='%s']", id);
+	app = first_xpath_node(doc, NULL, xpath);
+	xmlFree(xpath);
+	xmlFree(id);
+
+	parent = first_xpath_node(doc, node, BAD_CAST "ancestor::*[@applicRefId or @refapplic]");
+
+	if (parent) {
+		xmlChar *parent_id;
+		parent_id = first_xpath_value(doc, parent, BAD_CAST "@applicRefId|@refapplic");
+		n = xmlStrlen(parent_id) + 100;
+		xpath = malloc(n * sizeof(xmlChar));
+		xmlStrPrintf(xpath, n, "//applic[@id='%s']", parent_id);
+		parent_app = first_xpath_node(doc, NULL, xpath);
+		xmlFree(xpath);
+		xmlFree(parent_id);
+	} else {
+		/* If there is no parent annotation within the content of the object,
+		 * then use the annotation for the whole object.
+		 */
+		parent_app = first_xpath_node(doc, node, BAD_CAST "//applic");
+	}
+
+	props = xmlNewNode(NULL, BAD_CAST "props");
+
+	ctx = xmlXPathNewContext(doc);
+	ctx->node = parent_app;
+
+	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			check_nested_applic_add_assert(props, obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	ctx = xmlXPathNewContext(doc);
+	ctx->node = app;
+
+	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			err += check_nested_applic_assert(node, parent, obj->nodesetval->nodeTab[i], props, path, report);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	xmlFreeNode(props);
+
+	return err;
+}
+
+/* Check that all applicability annotations are subsets of their parent annotations. */
+static int check_nested_applics(xmlDocPtr doc, const char *path, xmlNodePtr report)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	int err = 0;
+
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_NESTEDCHECK, path);
+	}
+
+	ctx = xmlXPathNewContext(doc);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//*[@applicRefId or @refapplic]", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			err += check_nested_applic(doc, obj->nodesetval->nodeTab[i], path, report);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return err;
 }
 
 /* Add an undefined property node to the report. */
@@ -995,6 +1305,10 @@ static int check_object_props(xmlDocPtr doc, const char *path, struct appcheckop
 		xmlFreeDoc(act);
 	}
 
+	if (opts->check_nested) {
+		err += check_nested_applics(doc, path, report);
+	}
+
 	ctx = xmlXPathNewContext(doc);
 	obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
 
@@ -1080,6 +1394,10 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 
 	if (opts->check_props) {
 		err += check_props_against_cts(doc, path, act, cct, report);
+	}
+
+	if (opts->check_nested) {
+		err += check_nested_applics(doc, path, report);
 	}
 
 	ctx = xmlXPathNewContext(act);
@@ -1217,6 +1535,10 @@ static int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, s
 			xmlFreeDoc(act);
 			act = NULL;
 		}
+	}
+
+	if (opts->check_nested) {
+		err += check_nested_applics(doc, path, report);
 	}
 
 	err += check_prods(doc, path, NULL, act, opts, report);
@@ -1384,7 +1706,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cd:e:fNk:loP:pqrsTtvx~h?";
+	const char *sopts = "A:abC:cd:e:fNnk:loP:pqrsTtvx~h?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -1399,6 +1721,7 @@ int main(int argc, char **argv)
 		{"args"        , required_argument, 0, 'k'},
 		{"list"        , no_argument      , 0, 'l'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
+		{"nested"      , no_argument      , 0, 'n'},
 		{"output-valid", no_argument      , 0, 'o'},
 		{"pct"         , required_argument, 0, 'P'},
 		{"progress"    , required_argument, 0, 'p'},
@@ -1421,17 +1744,18 @@ int main(int argc, char **argv)
 	bool show_progress = false;
 
 	struct appcheckopts opts = {
-		/* useract */     NULL,
-		/* usercct */     NULL,
-		/* userpct */     NULL,
-		/* args */        NULL,
-		/* validators */  NULL,
-		/* output_tree */ false,
-		/* filenames */   false,
-		/* brexcheck */   false,
-		/* add_deps */    false,
-		/* check_props */ false,
-		/* mode */        STANDALONE
+		/* useract */      NULL,
+		/* usercct */      NULL,
+		/* userpct */      NULL,
+		/* args */         NULL,
+		/* validators */   NULL,
+		/* output_tree */  false,
+		/* filenames */    false,
+		/* brexcheck */    false,
+		/* add_deps */     false,
+		/* check_props */  false,
+		/* check_nested */ false,
+		/* mode */         STANDALONE
 	};
 
 	int err = 0;
@@ -1492,6 +1816,9 @@ int main(int argc, char **argv)
 				break;
 			case 'N':
 				no_issue = true;
+				break;
+			case 'n':
+				opts.check_nested = true;
 				break;
 			case 'o':
 				opts.output_tree = true;
