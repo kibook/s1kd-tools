@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "4.1.0"
+#define VERSION "5.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -26,6 +26,7 @@
 #define I_CHECK_ALL_START INF_PREFIX "Checking %s for:\n"
 #define I_CHECK_ALL_PROP INF_PREFIX "  %s %s = %s\n"
 #define I_NESTEDCHECK INF_PREFIX "Checking nested applicability in %s...\n"
+#define I_PROPCHECK INF_PREFIX "Checking product attribute and condition definitions in %s...\n"
 
 /* Error messages. */
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
@@ -74,7 +75,7 @@ static char *search_dir;
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 /* What type of check to perform. */
-enum appcheckmode { BASIC, PCT, ALL, STANDALONE };
+enum appcheckmode { CUSTOM, PCT, ALL, STANDALONE };
 
 /* Applicability check options. */
 struct appcheckopts {
@@ -102,7 +103,7 @@ static void show_help(void)
 	puts("  -a, --all           Validate against all property values.");
 	puts("  -b, --brexcheck     Validate against BREX.");
 	puts("  -C, --cct <file>    User-specified CCT.");
-	puts("  -c, --basic         Only check that all properties are defined.");
+	puts("  -c, --custom        Perform a customized check.");
 	puts("  -d, --dir <dir>     Search for ACT/CCT/PCT in <dir>.");
 	puts("  -e, --exec <cmd>    Commands used to validate objects.");
 	puts("  -f, --filenames     List invalid files.");
@@ -813,6 +814,10 @@ static int check_props_against_cts(xmlDocPtr doc, const char *path, xmlDocPtr ac
 	xmlXPathObjectPtr obj;
 	int err = 0;
 
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_PROPCHECK, path);
+	}
+
 	ctx = xmlXPathNewContext(doc);
 	obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
 
@@ -1094,28 +1099,39 @@ static xmlNodePtr add_object_node(xmlNodePtr parent, const char *name, const cha
 	return node;
 }
 
-static int check_props_only(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
+static int custom_check(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
 {
 	char actfname[PATH_MAX];
 	char cctfname[PATH_MAX];
 	xmlDocPtr act = NULL;
 	xmlDocPtr cct = NULL;
-	int err;
+	int err = 0;
 
-	if (find_act_fname(actfname, opts->useract, doc)) {
-		if ((act = read_xml_doc(actfname))) {
-			add_object_node(report, "act", actfname);
+	if (opts->add_deps || opts->check_props) {
+		if (find_act_fname(actfname, opts->useract, doc)) {
+			if ((act = read_xml_doc(actfname))) {
+				add_object_node(report, "act", actfname);
+			}
+		}
+
+		if (find_cct_fname(cctfname, opts->usercct, act)) {
+			if ((cct = read_xml_doc(cctfname))) {
+				add_object_node(report, "cct", cctfname);
+
+				if (opts->add_deps) {
+					add_cct_depends(doc, cct, NULL);
+				}
+			}
+		}
+
+		if (opts->check_props) {
+			err += check_props_against_cts(doc, path, act, cct, report);
 		}
 	}
 
-	if (find_cct_fname(cctfname, opts->usercct, act)) {
-		if ((cct = read_xml_doc(cctfname))) {
-			add_object_node(report, "cct", cctfname);
-			add_cct_depends(doc, cct, NULL);
-		}
+	if (opts->check_nested) {
+		err += check_nested_applics(doc, path, report);
 	}
-
-	err = check_props_against_cts(doc, path, act, cct, report);
 
 	xmlFreeDoc(cct);
 	xmlFreeDoc(act);
@@ -1573,8 +1589,8 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 
 	/* Add the type of check to the report. */
 	switch (opts->mode) {
-		case BASIC:
-			xmlSetProp(report, BAD_CAST "type", BAD_CAST "basic");
+		case CUSTOM:
+			xmlSetProp(report, BAD_CAST "type", BAD_CAST "custom");
 			break;
 		case PCT:
 			xmlSetProp(report, BAD_CAST "type", BAD_CAST "pct");
@@ -1593,8 +1609,8 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "no");
 	}
 
-	if (opts->mode == BASIC) {
-		err += check_props_only(doc, path, opts, report_node);
+	if (opts->mode == CUSTOM) {
+		err += custom_check(doc, path, opts, report_node);
 	} else if (opts->mode == STANDALONE) {
 		err += check_object_props(doc, path, opts, report_node);
 	} else if (opts->mode == PCT && opts->userpct) {
@@ -1714,7 +1730,7 @@ int main(int argc, char **argv)
 		{"all"         , no_argument      , 0, 'a'},
 		{"brexcheck"   , no_argument      , 0, 'b'},
 		{"cct"         , required_argument, 0, 'C'},
-		{"basic"       , no_argument      , 0, 'c'},
+		{"custom"      , no_argument      , 0, 'c'},
 		{"dir"         , required_argument, 0, 'd'},
 		{"exec"        , required_argument, 0, 'e'},
 		{"filenames"   , no_argument      , 0, 'f'},
@@ -1793,7 +1809,7 @@ int main(int argc, char **argv)
 				opts.usercct = strdup(optarg);
 				break;
 			case 'c':
-				opts.mode = BASIC;
+				opts.mode = CUSTOM;
 				break;
 			case 'd':
 				free(search_dir);
@@ -1858,10 +1874,6 @@ int main(int argc, char **argv)
 				show_help();
 				goto cleanup;
 		}
-	}
-
-	if (opts.mode == BASIC) {
-		opts.check_props = true;
 	}
 
 	if (optind < argc) {

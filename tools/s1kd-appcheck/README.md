@@ -47,9 +47,13 @@ addition to the schema check.
 Specify the CCT to read conditions from. This will override the CCT
 reference within the ACT.
 
--c, --basic  
-Only check that all product attributes and conditions are defined in the
-ACT and CCT respectively, without performing any other validation.
+-c, --custom  
+Perform a customized check. The default standalone applicability check
+is disabled. This can then be combined with the -s option, to only check
+that all product attributes and conditions are defined in the ACT and
+CCT respectively, and/or the -n option, to only check nested
+applicability annotations. If neither of these options are specified, no
+checks will be performed.
 
 -d, --dir &lt;dir&gt;  
 The directory to start searching for ACT/CCT/PCT data modules in. By
