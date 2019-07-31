@@ -9,7 +9,7 @@ s1kd\-ls \- List CSDB objects in a directory hierarchy
 .IP
 .nf
 \f[C]
-s1kd\-ls\ [\-0CDGIiLlMNoPRrSUwX]\ [<object>|<dir>\ ...]
+s1kd\-ls\ [\-0CDGIiLlMNnoPRrSUwX]\ [<object>|<dir>\ ...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -63,6 +63,11 @@ Show only the latest official/inwork issue of objects.
 Assume that the files being listed do not include the issue info in
 their filenames, i.e.
 they were created using the \-N option of the s1kd\-new* tools.
+.RS
+.RE
+.TP
+.B \-n, \-\-other
+List non\-S1000D files.
 .RS
 .RE
 .TP

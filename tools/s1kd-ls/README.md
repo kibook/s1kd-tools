@@ -6,7 +6,7 @@ s1kd-ls - List CSDB objects in a directory hierarchy
 SYNOPSIS
 ========
 
-    s1kd-ls [-0CDGIiLlMNoPRrSUwX] [<object>|<dir> ...]
+    s1kd-ls [-0CDGIiLlMNnoPRrSUwX] [<object>|<dir> ...]
 
 DESCRIPTION
 ===========
@@ -50,6 +50,9 @@ Show only the latest official/inwork issue of objects.
 Assume that the files being listed do not include the issue info in
 their filenames, i.e. they were created using the -N option of the
 s1kd-new\* tools.
+
+-n, --other  
+List non-S1000D files.
 
 -o, --old  
 Show only old official/inwork issues of objects.

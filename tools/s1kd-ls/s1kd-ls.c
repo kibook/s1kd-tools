@@ -23,9 +23,10 @@ static unsigned DML_MAX = OBJECT_MAX;
 static unsigned ICN_MAX = OBJECT_MAX;
 static unsigned SMC_MAX = OBJECT_MAX;
 static unsigned UPF_MAX = OBJECT_MAX;
+static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -43,6 +44,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 #define SHOW_ICN 0x040
 #define SHOW_SMC 0x080
 #define SHOW_UPF 0x100
+#define SHOW_NON 0x200
 
 /* Lists of CSDB objects. */
 static char (*dms)[PATH_MAX] = NULL;
@@ -54,7 +56,8 @@ static char (*imfs)[PATH_MAX] = NULL;
 static char (*ddns)[PATH_MAX] = NULL;
 static char (*dmls)[PATH_MAX] = NULL;
 static char (*upfs)[PATH_MAX] = NULL;
-static int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0, nupfs = 0;
+static char (*nons)[PATH_MAX] = NULL;
+static int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0, nupfs = 0, nnons = 0;
 
 /* Separator between printed CSDB objects. */
 static char sep = '\n';
@@ -131,7 +134,7 @@ static int compare_icn(const void *a, const void *b)
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-0CDGIiLlMNoPRrSwX] [<object>|<dir> ...]");
+	puts("Usage: " PROG_NAME " [-0CDGIiLlMNnoPRrSUwX] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -0, --null        Output null-delimited list.");
@@ -145,6 +148,7 @@ static void show_help(void)
 	puts("  -l, --latest      Show only latest official/inwork issue.");
 	puts("  -M, --imf         List ICN metadata files.");
 	puts("  -N, --omit-issue  Assume issue/inwork numbers are omitted.");
+	puts("  -n, --other       List non-S1000D files.");
 	puts("  -o, --old         Show only old official/inwork issues.");
 	puts("  -P, --pm          List publication modules.");
 	puts("  -R, --read-only   Show only non-writable object files.");
@@ -172,6 +176,12 @@ static void resize(char (**list)[PATH_MAX], unsigned *max)
 			ndms + npms + ncoms + nimfs + nicns + nddns + ndmls + nsmcs);
 		exit(EXIT_OBJECT_MAX);
 	}
+}
+
+/* Determine if file is not a CSDB object. */
+static int is_non(const char *path)
+{
+	return !(path[0] == '.' || is_com(path) || is_ddn(path) || is_dm(path) || is_dml(path) || is_icn(path) || is_imf(path) || is_pm(path) || is_smc(path) || is_upf(path));
 }
 
 /* Find CSDB objects in a given directory. */
@@ -250,6 +260,11 @@ static void list_dir(const char *path, int only_writable, int only_readonly, int
 				resize(&upfs, &UPF_MAX);
 			}
 			strcpy(upfs[(nupfs)++], cpath);
+		} else if (nons && is_non(cur->d_name)) {
+			if (nnons == NON_MAX) {
+				resize(&nons, &NON_MAX);
+			}
+			strcpy(nons[nnons++], cpath);
 		} else if (recursive && isdir(cpath, recursive)) {
 			list_dir(cpath, only_writable, only_readonly, recursive);
 		}
@@ -509,7 +524,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPRrSwXoINUh?";
+	const char *sopts = "0CDGiLlMPRrSwXoINnUh?";
 	struct option lopts[] = {
 		{"version"   , no_argument, 0, 0},
 		{"help"      , no_argument, 0, 'h'},
@@ -531,6 +546,7 @@ int main(int argc, char **argv)
 		{"inwork"    , no_argument, 0, 'I'},
 		{"omit-issue", no_argument, 0, 'N'},
 		{"upf"       , no_argument, 0, 'U'},
+		{"other"     , no_argument, 0, 'n'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -562,6 +578,7 @@ int main(int argc, char **argv)
 			case 'o': only_old = 1; break;
 			case 'I': only_inwork = 1; break;
 			case 'N': no_issue = 1; break;
+			case 'n': show |= SHOW_NON; break;
 			case 'U': show |= SHOW_UPF; break;
 			case 'h':
 			case '?': show_help();
@@ -597,6 +614,9 @@ int main(int argc, char **argv)
 	}
 	if (optset(show, SHOW_UPF)) {
 		upfs = malloc(UPF_MAX * PATH_MAX);
+	}
+	if (optset(show, SHOW_NON)) {
+		nons = malloc(NON_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
@@ -658,6 +678,11 @@ int main(int argc, char **argv)
 					resize(&upfs, &UPF_MAX);
 				}
 				strcpy(upfs[nupfs++], argv[i]);
+			} else if (nons && is_non(base)) {
+				if (nnons == NON_MAX) {
+					resize(&nons, &NON_MAX);
+				}
+				strcpy(nons[nnons++], argv[i]);
 			} else if (isdir(argv[i], 0)) {
 				list_dir(argv[i], only_writable, only_readonly, recursive);
 			}
@@ -1003,6 +1028,11 @@ int main(int argc, char **argv)
 			printfiles(upfs, nupfs);
 			free(upfs);
 		}
+	}
+
+	if (nnons) {
+		printfiles(nons, nnons);
+		free(nons);
 	}
 
 	if (dir) {
