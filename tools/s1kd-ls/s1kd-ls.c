@@ -22,9 +22,10 @@ static unsigned DDN_MAX = OBJECT_MAX;
 static unsigned DML_MAX = OBJECT_MAX;
 static unsigned ICN_MAX = OBJECT_MAX;
 static unsigned SMC_MAX = OBJECT_MAX;
+static unsigned UPF_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.9.2"
+#define VERSION "1.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -33,14 +34,15 @@ static unsigned SMC_MAX = OBJECT_MAX;
 #define E_MAX_OBJECT ERR_PREFIX "Maximum CSDB objects reached: %d\n"
 
 /* Set of CSDB object types to list. */
-#define SHOW_DM  0x01
-#define SHOW_PM  0x02
-#define SHOW_COM 0x04
-#define SHOW_IMF 0x08
-#define SHOW_DDN 0x10
-#define SHOW_DML 0x20
-#define SHOW_ICN 0x40
-#define SHOW_SMC 0x80
+#define SHOW_DM  0x001
+#define SHOW_PM  0x002
+#define SHOW_COM 0x004
+#define SHOW_IMF 0x008
+#define SHOW_DDN 0x010
+#define SHOW_DML 0x020
+#define SHOW_ICN 0x040
+#define SHOW_SMC 0x080
+#define SHOW_UPF 0x100
 
 /* Lists of CSDB objects. */
 static char (*dms)[PATH_MAX] = NULL;
@@ -51,7 +53,8 @@ static char (*icns)[PATH_MAX] = NULL;
 static char (*imfs)[PATH_MAX] = NULL;
 static char (*ddns)[PATH_MAX] = NULL;
 static char (*dmls)[PATH_MAX] = NULL;
-static int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0;
+static char (*upfs)[PATH_MAX] = NULL;
+static int ndms = 0, npms = 0, ncoms = 0, nicns = 0, nimfs = 0, nddns = 0, ndmls = 0, nsmcs = 0, nupfs = 0;
 
 /* Separator between printed CSDB objects. */
 static char sep = '\n';
@@ -147,6 +150,7 @@ static void show_help(void)
 	puts("  -R, --read-only   Show only non-writable object files.");
 	puts("  -r, --recursive   Recursively search directories.");
 	puts("  -S, --smc         List SCORM content packages.");
+	puts("  -U, --upf         List data update files.");
 	puts("  -w, --writable    Show only writable object files.");
 	puts("  -X, --ddn         List DDNs.");
 	puts("  --version         Show version information.");
@@ -241,6 +245,11 @@ static void list_dir(const char *path, int only_writable, int only_readonly, int
 				resize(&smcs, &SMC_MAX);
 			}
 			strcpy(smcs[(nsmcs)++], cpath);
+		} else if (upfs && is_upf(cur->d_name)) {
+			if (nupfs == UPF_MAX) {
+				resize(&upfs, &UPF_MAX);
+			}
+			strcpy(upfs[(nupfs)++], cpath);
 		} else if (recursive && isdir(cpath, recursive)) {
 			list_dir(cpath, only_writable, only_readonly, recursive);
 		}
@@ -478,14 +487,16 @@ int main(int argc, char **argv)
 	char (*latest_imfs)[PATH_MAX] = NULL;
 	char (*latest_dmls)[PATH_MAX] = NULL;
 	char (*latest_icns)[PATH_MAX] = NULL;
-	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0, nlatest_icns = 0, nlatest_smcs = 0;
+	char (*latest_upfs)[PATH_MAX] = NULL;
+	int nlatest_dms = 0, nlatest_pms = 0, nlatest_imfs = 0, nlatest_dmls = 0, nlatest_icns = 0, nlatest_smcs = 0, nlatest_upfs = 0;
 
 	char (*issue_dms)[PATH_MAX] = NULL;
 	char (*issue_pms)[PATH_MAX] = NULL;
 	char (*issue_smcs)[PATH_MAX] = NULL;
 	char (*issue_imfs)[PATH_MAX] = NULL;
 	char (*issue_dmls)[PATH_MAX] = NULL;
-	int nissue_dms = 0, nissue_pms = 0, nissue_imfs = 0, nissue_dmls = 0, nissue_smcs = 0;
+	char (*issue_upfs)[PATH_MAX] = NULL;
+	int nissue_dms = 0, nissue_pms = 0, nissue_imfs = 0, nissue_dmls = 0, nissue_smcs = 0, nissue_upfs = 0;
 
 	int only_latest = 0;
 	int only_official_issue = 0;
@@ -498,7 +509,7 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPRrSwXoINh?";
+	const char *sopts = "0CDGiLlMPRrSwXoINUh?";
 	struct option lopts[] = {
 		{"version"   , no_argument, 0, 0},
 		{"help"      , no_argument, 0, 'h'},
@@ -519,6 +530,7 @@ int main(int argc, char **argv)
 		{"old"       , no_argument, 0, 'o'},
 		{"inwork"    , no_argument, 0, 'I'},
 		{"omit-issue", no_argument, 0, 'N'},
+		{"upf"       , no_argument, 0, 'U'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -550,13 +562,14 @@ int main(int argc, char **argv)
 			case 'o': only_old = 1; break;
 			case 'I': only_inwork = 1; break;
 			case 'N': no_issue = 1; break;
+			case 'U': show |= SHOW_UPF; break;
 			case 'h':
 			case '?': show_help();
 				  return 0;
 		}
 	}
 
-	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML | SHOW_SMC;
+	if (!show) show = SHOW_DM | SHOW_PM | SHOW_COM | SHOW_ICN | SHOW_IMF | SHOW_DDN | SHOW_DML | SHOW_SMC | SHOW_UPF;
 
 	if (optset(show, SHOW_DM)) {
 		dms = malloc(DM_MAX * PATH_MAX);
@@ -581,6 +594,9 @@ int main(int argc, char **argv)
 	}
 	if (optset(show, SHOW_SMC)) {
 		smcs = malloc(SMC_MAX * PATH_MAX);
+	}
+	if (optset(show, SHOW_UPF)) {
+		upfs = malloc(UPF_MAX * PATH_MAX);
 	}
 
 	if (optind < argc) {
@@ -637,6 +653,11 @@ int main(int argc, char **argv)
 					resize(&smcs, &SMC_MAX);
 				}
 				strcpy(smcs[nsmcs++], argv[i]);
+			} else if (upfs && is_upf(base)) {
+				if (nupfs == UPF_MAX) {
+					resize(&upfs, &UPF_MAX);
+				}
+				strcpy(upfs[nupfs++], argv[i]);
 			} else if (isdir(argv[i], 0)) {
 				list_dir(argv[i], only_writable, only_readonly, recursive);
 			}
@@ -667,6 +688,13 @@ int main(int argc, char **argv)
 		if (only_official_issue || only_inwork) issue_smcs = malloc(nsmcs * PATH_MAX);
 	} else {
 		free(smcs);
+	}
+	if (nupfs) {
+		qsort(upfs, nupfs, PATH_MAX, compare);
+		if (only_latest || only_old) latest_upfs = malloc(nupfs * PATH_MAX);
+		if (only_official_issue || only_inwork) issue_upfs = malloc(nupfs * PATH_MAX);
+	} else {
+		free(upfs);
 	}
 	if (nimfs) {
 		qsort(imfs, nimfs, PATH_MAX, compare);
@@ -712,6 +740,10 @@ int main(int argc, char **argv)
 				nissue_smcs = remove_latest(issue_smcs, smcs, nsmcs);
 				free(smcs);
 			}
+			if (nupfs) {
+				nissue_upfs = remove_latest(issue_upfs, upfs, nupfs);
+				free(upfs);
+			}
 			if (nimfs) {
 				nissue_imfs = remove_latest(issue_imfs, imfs, nimfs);
 				free(imfs);
@@ -740,6 +772,9 @@ int main(int argc, char **argv)
 			if (nissue_smcs) {
 				nlatest_smcs = f(latest_smcs, issue_smcs, nissue_smcs);
 			}
+			if (nissue_upfs) {
+				nlatest_upfs = f(latest_upfs, issue_upfs, nissue_upfs);
+			}
 			if (nissue_imfs) {
 				nlatest_imfs = f(latest_imfs, issue_imfs, nissue_imfs);
 			}
@@ -750,6 +785,7 @@ int main(int argc, char **argv)
 			free(issue_dms);
 			free(issue_pms);
 			free(issue_smcs);
+			free(issue_upfs);
 			free(issue_imfs);
 			free(issue_dmls);
 		} else {
@@ -773,6 +809,10 @@ int main(int argc, char **argv)
 				nissue_smcs = f(issue_smcs, smcs, nsmcs);
 				free(smcs);
 			}
+			if (nupfs) {
+				nissue_upfs = f(issue_upfs, upfs, nupfs);
+				free(upfs);
+			}
 			if (nimfs) {
 				nissue_imfs = f(issue_imfs, imfs, nimfs);
 				free(imfs);
@@ -792,6 +832,9 @@ int main(int argc, char **argv)
 				if (nissue_smcs) {
 					nlatest_smcs = extract_latest(latest_smcs, issue_smcs, nissue_smcs);
 				}
+				if (nissue_upfs) {
+					nlatest_upfs = extract_latest(latest_upfs, issue_upfs, nissue_upfs);
+				}
 				if (nissue_imfs) {
 					nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
 				}
@@ -805,6 +848,7 @@ int main(int argc, char **argv)
 				free(issue_dms);
 				free(issue_pms);
 				free(issue_smcs);
+				free(issue_upfs);
 				free(issue_imfs);
 				free(issue_dmls);
 				free(icns);
@@ -832,6 +876,10 @@ int main(int argc, char **argv)
 		if (nsmcs) {
 			nlatest_smcs = f(latest_smcs, smcs, nsmcs);
 			free(smcs);
+		}
+		if (nupfs) {
+			nlatest_upfs = f(latest_upfs, upfs, nupfs);
+			free(upfs);
 		}
 		if (nimfs) {
 			nlatest_imfs = f(latest_imfs, imfs, nimfs);
@@ -941,6 +989,19 @@ int main(int argc, char **argv)
 		} else {
 			printfiles(smcs, nsmcs);
 			free(smcs);
+		}
+	}
+
+	if (nupfs) {
+		if (only_latest || only_old) {
+			printfiles(latest_upfs, nlatest_upfs);
+			free(latest_upfs);
+		} else if (only_official_issue || only_inwork) {
+			printfiles(issue_upfs, nissue_upfs);
+			free(issue_upfs);
+		} else {
+			printfiles(upfs, nupfs);
+			free(upfs);
 		}
 	}
 

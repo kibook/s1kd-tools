@@ -6,7 +6,7 @@ s1kd-ls - List CSDB objects in a directory hierarchy
 SYNOPSIS
 ========
 
-    s1kd-ls [-0CDGIiLlMNoPRrSwX] [<object>|<dir> ...]
+    s1kd-ls [-0CDGIiLlMNoPRrSUwX] [<object>|<dir> ...]
 
 DESCRIPTION
 ===========
@@ -25,13 +25,14 @@ OPTIONS
 -0, --null  
 Output a null-delimited list of CSDB object paths.
 
--C, -D, -G, -L, -M, -P, -S, -X  
+-C, -D, -G, -L, -M, -P, -S, -U, -X  
 List comments, data modules, ICNs, data management lists, ICN metadata
-files, publication modules, SCORM content packages, and data dispatch
-notes respectively. If none are specified, -CDGLMPSX is assumed.
+files, publication modules, SCORM content packages, data update files,
+and data dispatch notes respectively. If none are specified, -CDGLMPSUX
+is assumed.
 
 The following long options can also be used for each: --com, --dm,
---icn, --dml, --imf, --pm, --smc, --ddn.
+--icn, --dml, --imf, --pm, --smc, --upf, --ddn.
 
 -h, -?, --help  
 Show the usage message.

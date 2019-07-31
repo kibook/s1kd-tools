@@ -863,3 +863,9 @@ bool is_smc(const char *name)
 {
 	return (strncmp(name, "SMC-", 4) == 0 || strncmp(name, "SME-", 4) == 0) && is_xml(name);
 }
+
+/* Determine if the file is a data update file. */
+bool is_upf(const char *name)
+{
+	return (strncmp(name, "UPF-", 4) == 0 || strncmp(name, "UPE-", 4) == 0) && is_xml(name);
+}

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="06" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="07" day="31"/>
         <dmTitle>
           <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -U option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-ls [-0CDGIiLlMNoPRrSwX] [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDGIiLlMNoPRrSUwX] [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -67,11 +70,11 @@
                 <para>Output a null-delimited list of CSDB object paths.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-C, -D, -G, -L, -M, -P, -S, -X</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-C, -D, -G, -L, -M, -P, -S, -U, -X</listItemTerm>
               <listItemDefinition>
-                <para>List comments, data modules, ICNs, data management lists, ICN metadata files, publication modules, SCORM content packages, and data dispatch notes respectively. If none are specified, -CDGLMPSX is assumed.</para>
-                <para>The following long options can also be used for each: --com, --dm, --icn, --dml, --imf, --pm, --smc, --ddn.</para>
+                <para>List comments, data modules, ICNs, data management lists, ICN metadata files, publication modules, SCORM content packages, data update files, and data dispatch notes respectively. If none are specified, -CDGLMPSUX is assumed.</para>
+                <para>The following long options can also be used for each: --com, --dm, --icn, --dml, --imf, --pm, --smc, --upf, --ddn.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
