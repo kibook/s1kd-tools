@@ -1101,13 +1101,14 @@ static xmlNodePtr add_object_node(xmlNodePtr parent, const char *name, const cha
 
 static int custom_check(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
 {
-	char actfname[PATH_MAX];
-	char cctfname[PATH_MAX];
 	xmlDocPtr act = NULL;
 	xmlDocPtr cct = NULL;
 	int err = 0;
 
 	if (opts->add_deps || opts->check_props) {
+		char actfname[PATH_MAX];
+		char cctfname[PATH_MAX];
+
 		if (find_act_fname(actfname, opts->useract, doc)) {
 			if ((act = read_xml_doc(actfname))) {
 				add_object_node(report, "act", actfname);
