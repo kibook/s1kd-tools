@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.0.0"
+#define VERSION "5.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1358,16 +1358,16 @@ static int check_object_props(xmlDocPtr doc, const char *path, struct appcheckop
 	return err;
 }
 
-/* Determine whether a property is used in an object. */
-static bool prop_is_used(const xmlChar *id, xmlDocPtr doc)
+/* Determine whether a property is used in the inline annotations of an object. */
+static bool prop_is_used(const xmlChar *id, const char *type, xmlDocPtr doc)
 {
 	xmlChar *xpath;
 	int n;
 	xmlNodePtr node;
 
-	n = xmlStrlen(id) * 2 + 50;
+	n = xmlStrlen(id) * 2 + strlen(type) * 2 + 126;
 	xpath = malloc(n * sizeof(xmlChar));
-	xmlStrPrintf(xpath, n, "//assert[@applicPropertyIdent='%s' or @actidref='%s']", id, id);
+	xmlStrPrintf(xpath, n, "(//content|//inlineapplics)//assert[(@applicPropertyIdent='%s' or @actidref='%s') and (@applicPropertyType='%s' or @actreftype='%s')]", id, id, type, type);
 	node = first_xpath_node(doc, NULL, xpath);
 	xmlFree(xpath);
 
@@ -1426,7 +1426,7 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 
 			id = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "id");
 
-			if (prop_is_used(id, doc)) {
+			if (prop_is_used(id, "prodattr", doc)) {
 				asserts = xmlNewNode(NULL, BAD_CAST "asserts");
 				extract_enumvals(asserts, obj->nodesetval->nodeTab[i], id, false);
 				xmlAddChild(propsets, asserts);
@@ -1451,7 +1451,7 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 
 				id = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "id");
 
-				if (prop_is_used(id, doc)) {
+				if (prop_is_used(id, "condition", doc)) {
 					xmlChar *typerefid;
 					xmlChar *xpath;
 					int n;
@@ -1487,10 +1487,8 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 		++err;
 	}
 
-	if (!err) {
-		transform_doc(psdoc, combos_xsl, combos_xsl_len, NULL);
-		err += check_prods(doc, path, psdoc, NULL, opts, report);
-	}
+	transform_doc(psdoc, combos_xsl, combos_xsl_len, NULL);
+	err += check_prods(doc, path, psdoc, NULL, opts, report);
 
 	xmlFreeDoc(psdoc);
 
