@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.11.0"
+#define VERSION "1.11.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -179,9 +179,9 @@ static void resize(char (**list)[PATH_MAX], unsigned *max)
 }
 
 /* Determine if file is not a CSDB object. */
-static int is_non(const char *path)
+static int is_non(const char *base)
 {
-	return !(path[0] == '.' || is_com(path) || is_ddn(path) || is_dm(path) || is_dml(path) || is_icn(path) || is_imf(path) || is_pm(path) || is_smc(path) || is_upf(path));
+	return !(base[0] == '.' || is_com(base) || is_ddn(base) || is_dm(base) || is_dml(base) || is_icn(base) || is_imf(base) || is_pm(base) || is_smc(base) || is_upf(base));
 }
 
 /* Find CSDB objects in a given directory. */
@@ -260,13 +260,13 @@ static void list_dir(const char *path, int only_writable, int only_readonly, int
 				resize(&upfs, &UPF_MAX);
 			}
 			strcpy(upfs[(nupfs)++], cpath);
+		} else if (recursive && isdir(cpath, recursive)) {
+			list_dir(cpath, only_writable, only_readonly, recursive);
 		} else if (nons && is_non(cur->d_name)) {
 			if (nnons == NON_MAX) {
 				resize(&nons, &NON_MAX);
 			}
 			strcpy(nons[nnons++], cpath);
-		} else if (recursive && isdir(cpath, recursive)) {
-			list_dir(cpath, only_writable, only_readonly, recursive);
 		}
 	}
 
@@ -678,13 +678,13 @@ int main(int argc, char **argv)
 					resize(&upfs, &UPF_MAX);
 				}
 				strcpy(upfs[nupfs++], argv[i]);
+			} else if (isdir(argv[i], 0)) {
+				list_dir(argv[i], only_writable, only_readonly, recursive);
 			} else if (nons && is_non(base)) {
 				if (nnons == NON_MAX) {
 					resize(&nons, &NON_MAX);
 				}
 				strcpy(nons[nnons++], argv[i]);
-			} else if (isdir(argv[i], 0)) {
-				list_dir(argv[i], only_writable, only_readonly, recursive);
 			}
 		}
 	} else {
