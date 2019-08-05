@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="00"/>
+        <issueInfo issueNumber="021" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="05"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -H, -J and -j options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,8 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aCcDEFfGIilmNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
-          [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGHIilmNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
+          [-J <ns=URL>] [-j <xpath>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -81,11 +84,11 @@
                 <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-C, -D, -E, -G, -P</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-C, -D, -E, -G, -H, -P</listItemTerm>
               <listItemDefinition>
-                <para>List references to comments, data modules, external publications, ICNs, and publication modules respectively. If none are specified, -CDEGP is assumed.</para>
-                <para>The following long options can also be used for each: --com, --dm, --epr, --icn, --pm.</para>
+                <para>List references to comments, data modules, external publications, ICNs, hotspots, and publication modules respectively. If none are specified, -CDEGHP is assumed.</para>
+                <para>The following long options can also be used for each: --com, --dm, --epr, --icn, --hotspot, --pm.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -134,6 +137,18 @@
               <listItemTerm>-i, --ignore-issue</listItemTerm>
               <listItemDefinition>
                 <para>Always match the latest issue of an object found, regardless of the issue and language specified in the reference.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-J &lt;ns=URL&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Registers an XML namespace prefix, which can then be used in the hotspot XPath expression (-j). Multiple namespaces can be registered by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-j &lt;xpath&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a custom XPath expression to use when matching hotspots (-H) in XML-based ICN formats.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -278,6 +293,34 @@
 </externalPubRef>
 </externalPubs>]]></verbatimText></para>
           <para>External publication references will be updated whether they are matched to a file or not.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Hotspot matching (-H)</title>
+          <para>Hotspots can be matched in XML-based ICN formats, such as SVG or X3D. By default, matching is based on the APS ID of the hotspot and the following attributes:</para>
+          <para>
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>SVG</listItemTerm>
+                <listItemDefinition>
+                  <para>
+                    <verbatimText verbatimStyle="vs13">@id</verbatimText>
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>X3D</listItemTerm>
+                <listItemDefinition>
+                  <para>
+                    <verbatimText verbatimStyle="vs13">@DEF</verbatimText>
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>If hotspots are identified in a different way in a project's ICNs, a custom XPath expression can be specified with the -j option. In this XPath expression, the variable <verbatimText verbatimStyle="vs01">$id</verbatimText> represents the hotspot APS ID:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -H -j "//*[@attr = $id]" <DM>]]></verbatimText>
+          </para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

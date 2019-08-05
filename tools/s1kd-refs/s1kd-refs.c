@@ -9,10 +9,11 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/debugXML.h>
+#include <libxml/xpathInternals.h>
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.10.2"
+#define VERSION "2.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -71,7 +72,7 @@ static bool overwriteUpdated = false;
 /* Remove unmatched references from the input objects. */
 static bool tagUnmatched = false;
 
-/* When listing references recursively, keep track of files which have already 
+/* When listing references recursively, keep track of files which have already
  * been listed to avoid loops.
  */
 static char (*listedFiles)[PATH_MAX] = NULL;
@@ -84,6 +85,7 @@ static long unsigned maxListedFiles = 1;
 #define SHOW_ICN 0x04 /* ICNs */
 #define SHOW_PMC 0x08 /* Publication modules */
 #define SHOW_EPR 0x10 /* External publications */
+#define SHOW_HOT 0x20 /* Hotspots */
 
 /* Which types of object references will be listed. */
 static int showObjects = 0;
@@ -107,6 +109,11 @@ static xmlDocPtr externalPubs = NULL;
  */
 static bool looseMatch = true;
 
+/* XPath for matching hotspots. */
+#define DEFAULT_HOTSPOT_XPATH BAD_CAST "/X3D//*[@DEF=$id]|//*[@id=$id]"
+static xmlChar *hotspotXPath = NULL;
+static xmlNodePtr hotspotNs = NULL;
+
 /* Return the first node matching an XPath expression. */
 static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
@@ -117,10 +124,10 @@ static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *
 
 	if (!doc && root)
 		doc = root->doc;
-	
+
 	if (!doc)
 		return NULL;
-	
+
 	ctx = xmlXPathNewContext(doc);
 
 	if (root)
@@ -242,6 +249,33 @@ static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 
 static void (*printMatchedFn)(xmlNodePtr, const char *, const char *) = printMatched;
 static void (*printUnmatchedFn)(xmlNodePtr, const char *, const char*) = printUnmatched;
+
+static bool exact_match(char *dst, const char *code)
+{
+	char *s, *base;
+	bool match;
+
+	s = strdup(dst);
+	base = basename(s);
+
+	match = strrchr(base, '.') - base == strlen(code);
+
+	free(s);
+
+	return match;
+}
+
+/* Match a code to a file name. */
+static bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
+{
+	return find_csdb_object(dst, dir, code, NULL, recursive) && (looseMatch || exact_match(dst, code));
+}
+
+/* Tag unmatched references in the source object. */
+static void tagUnmatchedRef(xmlNodePtr ref)
+{
+	add_first_child(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
+}
 
 /* Get the DMC as a string from a dmRef. */
 static void getDmCode(char *dst, xmlNodePtr dmRef)
@@ -521,6 +555,127 @@ static void getICNAttr(char *dst, xmlNodePtr ref)
 	}
 
 	xmlFree(icn);
+}
+
+/* Match each hotspot against the ICN. */
+static int matchHotspot(xmlNodePtr ref, xmlDocPtr doc, const char *code, const char *fname, const char *src)
+{
+	xmlChar *apsid;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+	char *s;
+	int err = doc == NULL;
+
+	apsid = xmlNodeGetContent(ref);
+
+	if (doc) {
+		xmlNodePtr cur;
+
+		ctx = xmlXPathNewContext(doc);
+
+		/* Register namespaces for the hotspot XPath. */
+		for (cur = hotspotNs->children; cur; cur = cur->next) {
+			xmlChar *prefix, *uri;
+
+			prefix = xmlGetProp(cur, BAD_CAST "prefix");
+			uri = xmlGetProp(cur, BAD_CAST "uri");
+
+			xmlXPathRegisterNs(ctx, prefix, uri);
+
+			xmlFree(prefix);
+			xmlFree(uri);
+		}
+
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(apsid));
+		obj = xmlXPathEvalExpression(hotspotXPath, ctx);
+
+		if (!obj || xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			node = NULL;
+		} else {
+			node = obj->nodesetval->nodeTab[0];
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+
+		if (node) {
+			if (showMatched && !tagUnmatched) {
+				s = malloc(strlen(fname) + strlen((char *) apsid) + 2);
+				strcpy(s, fname);
+				strcat(s, "#");
+				strcat(s, (char *) apsid);
+				printMatchedFn(ref, src, s);
+				free(s);
+			}
+		} else {
+			++err;
+		}
+	}
+
+	if (err) {
+		s = malloc(strlen(code) + strlen((char *) apsid) + 2);
+		strcpy(s, code);
+		strcat(s, "#");
+		strcat(s, (char *) apsid);
+
+		if (tagUnmatched) {
+			tagUnmatchedRef(ref);
+		} else if (showUnmatched) {
+			printMatchedFn(ref, src, s);
+		} else if (!quiet) {
+			printUnmatchedFn(ref, src, s);
+		}
+
+		free(s);
+	}
+
+	xmlFree(apsid);
+	return err;
+}
+
+/* Match the hotspots for an XML-based ICN. */
+static int getHotspots(xmlNodePtr ref, const char *src)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	int err = 0;
+
+	ctx = xmlXPathNewContext(ref->doc);
+	xmlXPathSetContextNode(ref, ctx);
+
+	/* Select all hotspots that have an APS ID, meaning they point to some
+	 * object in the ICN (vs. using coordinates).
+	 */
+	obj = xmlXPathEvalExpression(BAD_CAST ".//hotspot/@applicationStructureIdent|.//hotspot/@apsid", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		xmlNodePtr icn;
+		char code[PATH_MAX], fname[PATH_MAX];
+		int i;
+		xmlDocPtr doc;
+
+		icn = firstXPathNode(ref->doc, ref, BAD_CAST "@infoEntityIdent|@boardno");
+
+		getICNAttr(code, icn);
+
+		if (find_object_fname(fname, directory, code, recursive)) {
+			doc = read_xml_doc(fname);
+		} else {
+			doc = NULL;
+		}
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			err += matchHotspot(obj->nodesetval->nodeTab[i], doc, code, doc ? fname : code, src);
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return err;
 }
 
 /* Get the comment code as a string from a commentRef. */
@@ -886,35 +1041,7 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 	}
 }
 
-/* Tag unmatched references in the source object. */
-static void tagUnmatchedRef(xmlNodePtr ref)
-{
-	add_first_child(ref, xmlNewPI(BAD_CAST "unmatched", NULL));
-}
-
 static int listReferences(const char *path);
-
-static bool exact_match(char *dst, const char *code)
-{
-	char *s, *base;
-	bool match;
-
-	s = strdup(dst);
-	base = basename(s);
-
-	match = strrchr(base, '.') - base == strlen(code);
-
-	free(s);
-
-	return match;
-}
-
-
-/* Match a code to a file name. */
-static bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
-{
-	return find_csdb_object(dst, dir, code, NULL, recursive) && (looseMatch || exact_match(dst, code));
-}
 
 /* Print a reference found in an object. */
 static int printReference(xmlNodePtr *refptr, const char *src)
@@ -948,6 +1075,9 @@ static int printReference(xmlNodePtr *refptr, const char *src)
 	else if (xmlStrcmp(ref->name, BAD_CAST "dispatchFileName") == 0 ||
 	         xmlStrcmp(ref->name, BAD_CAST "ddnfilen") == 0)
 		getDispatchFileName(code, ref);
+	else if ((showObjects & SHOW_HOT) == SHOW_HOT &&
+		 xmlStrcmp(ref->name, BAD_CAST "graphic") == 0)
+		return getHotspots(ref, src);
 	else
 		return 0;
 
@@ -1042,7 +1172,7 @@ static int listReferences(const char *path)
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1107,42 +1237,59 @@ static int listReferencesInList(const char *path)
 	return unmatched;
 }
 
+/* Register a NS for the hotspot XPath expression. */
+static void addHotspotNs(char *s)
+{
+	char *prefix, *uri;
+	xmlNodePtr node;
+
+	prefix = strtok(s, "=");
+	uri = strtok(NULL, "");
+
+	node = xmlNewChild(hotspotNs, NULL, BAD_CAST "ns", NULL);
+	xmlSetProp(node, BAD_CAST "prefix", BAD_CAST prefix);
+	xmlSetProp(node, BAD_CAST "uri", BAD_CAST uri);
+}
+
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGIilmNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [-J <ns=URL> ...] [-j <xpath>] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -a, --all                  Print unmatched codes.");
-	puts("  -C, --com                  List commnent references.");
-	puts("  -c, --content              Only show references in content section.");
-	puts("  -D, --dm                   List data module references.");
-	puts("  -d, --dir                  Directory to search for matches in.");
-	puts("  -E, --epr                  List external pub refs.");
-	puts("  -e, --externalpubs <file>  Use custom .externalpubs file.");
-	puts("  -F, --overwrite            Overwrite updated (-U) or tagged (-X) objects.");
-	puts("  -f, --filename             Print the source filename for each reference.");
-	puts("  -G, --icn                  List ICN references.");
-	puts("  -h, -?, --help             Show help/usage message.");
-	puts("  -I, --update-issue         Update references to point to the latest matched object.");
-	puts("  -i, --ignore-issue         Ignore issue info/language when matching.");
-	puts("  -l, --list                 Treat input as list of CSDB objects.");
-	puts("  -m, --strict-match         Be more strict when matching filenames of objects.");
-	puts("  -N, --omit-issue           Assume filenames omit issue info.");
-	puts("  -n, --lineno               Print the source filename and line number for each reference.");
-	puts("  -o, --output-valid         Output valid CSDB objects to stdout.");
-	puts("  -P, --pm                   List publication module references.");
-	puts("  -q, --quiet                Quiet mode.");
-	puts("  -R, --recursively          List references in matched objects recursively.");
-	puts("  -r, --recursive            Search for matches in directories recursively.");
-	puts("  -s, --include-src          Include the source object as a reference.");
-	puts("  -U, --update               Update address items in matched references.");
-	puts("  -u, --unmatched            Show only unmatched references.");
-	puts("  -v, --verbose              Verbose output.");
-	puts("  -X, --tag-unmatched        Tag unmatched references.");
-	puts("  -x, --xml                  Output XML report.");
-	puts("  --version                  Show version information.");
-	puts("  <object>                   CSDB object to list references in.");
+	puts("  -a, --all                    Print unmatched codes.");
+	puts("  -C, --com                    List commnent references.");
+	puts("  -c, --content                Only show references in content section.");
+	puts("  -D, --dm                     List data module references.");
+	puts("  -d, --dir                    Directory to search for matches in.");
+	puts("  -E, --epr                    List external pub refs.");
+	puts("  -e, --externalpubs <file>    Use custom .externalpubs file.");
+	puts("  -F, --overwrite              Overwrite updated (-U) or tagged (-X) objects.");
+	puts("  -f, --filename               Print the source filename for each reference.");
+	puts("  -G, --icn                    List ICN references.");
+	puts("  -H, --hotspot                List hotspot matches in ICNs.");
+	puts("  -h, -?, --help               Show help/usage message.");
+	puts("  -I, --update-issue           Update references to point to the latest matched object.");
+	puts("  -i, --ignore-issue           Ignore issue info/language when matching.");
+	puts("  -J, --namespace <ns=URL>     Register a namespace for the hotspot XPath.");
+	puts("  -j, --hotspot-xpath <xpath>  XPath to use for matching hotspots (-H).");
+	puts("  -l, --list                   Treat input as list of CSDB objects.");
+	puts("  -m, --strict-match           Be more strict when matching filenames of objects.");
+	puts("  -N, --omit-issue             Assume filenames omit issue info.");
+	puts("  -n, --lineno                 Print the source filename and line number for each reference.");
+	puts("  -o, --output-valid           Output valid CSDB objects to stdout.");
+	puts("  -P, --pm                     List publication module references.");
+	puts("  -q, --quiet                  Quiet mode.");
+	puts("  -R, --recursively            List references in matched objects recursively.");
+	puts("  -r, --recursive              Search for matches in directories recursively.");
+	puts("  -s, --include-src            Include the source object as a reference.");
+	puts("  -U, --update                 Update address items in matched references.");
+	puts("  -u, --unmatched              Show only unmatched references.");
+	puts("  -v, --verbose                Verbose output.");
+	puts("  -X, --tag-unmatched          Tag unmatched references.");
+	puts("  -x, --xml                    Output XML report.");
+	puts("  --version                    Show version information.");
+	puts("  <object>                     CSDB object to list references in.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1163,7 +1310,7 @@ int main(int argc, char **argv)
 	bool inclLineNum = false;
 	char extpubsFname[PATH_MAX] = "";
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mh?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1194,12 +1341,17 @@ int main(int argc, char **argv)
 		{"output-valid" , no_argument      , 0, 'o'},
 		{"verbose"      , no_argument      , 0, 'v'},
 		{"strict-match" , no_argument      , 0, 'm'},
+		{"hotspot"      , no_argument      , 0, 'H'},
+		{"hotspot-xpath", required_argument, 0, 'j'},
+		{"namespace"    , required_argument, 0, 'J'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
 
 	directory = strdup(".");
+	hotspotXPath = xmlStrdup(DEFAULT_HOTSPOT_XPATH);
+	hotspotNs = xmlNewNode(NULL, BAD_CAST "hotspotNs");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -1230,6 +1382,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				inclSrcFname = true;
+				break;
+			case 'H':
+				showObjects |= SHOW_HOT;
 				break;
 			case 'l':
 				isList = true;
@@ -1295,6 +1450,13 @@ int main(int argc, char **argv)
 			case 'm':
 				looseMatch = false;
 				break;
+			case 'j':
+				xmlFree(hotspotXPath);
+				hotspotXPath = xmlStrdup(BAD_CAST optarg);
+				break;
+			case 'J':
+				addHotspotNs(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1304,7 +1466,7 @@ int main(int argc, char **argv)
 
 	/* If none of -CDEGP are given, show all types of objects. */
 	if (!showObjects) {
-		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR;
+		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT;
 	}
 
 	/* Load .externalpubs config file. */
@@ -1347,6 +1509,8 @@ int main(int argc, char **argv)
 	}
 
 	free(directory);
+	xmlFree(hotspotXPath);
+	xmlFreeNode(hotspotNs);
 	free(listedFiles);
 	xmlFreeDoc(externalPubs);
 	xmlCleanupParser();

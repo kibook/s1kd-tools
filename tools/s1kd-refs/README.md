@@ -6,8 +6,8 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGIilmNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
-              [<object>...]
+    s1kd-refs [-aCcDEFfGHIilmNnoPqRrsUuvXxh?] [-d <dir>] [-e <file>]
+              [-J <ns=URL>] [-j <xpath>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -31,13 +31,13 @@ OPTIONS
 -a, --all  
 List all references, both matched and unmatched.
 
--C, -D, -E, -G, -P  
+-C, -D, -E, -G, -H, -P  
 List references to comments, data modules, external publications, ICNs,
-and publication modules respectively. If none are specified, -CDEGP is
-assumed.
+hotspots, and publication modules respectively. If none are specified,
+-CDEGHP is assumed.
 
 The following long options can also be used for each: --com, --dm,
---epr, --icn, --pm.
+--epr, --icn, --hotspot, --pm.
 
 -c, --content  
 List references in the `content` section of a CSDB object only.
@@ -68,6 +68,15 @@ options.
 -i, --ignore-issue  
 Always match the latest issue of an object found, regardless of the
 issue and language specified in the reference.
+
+-J &lt;ns=URL&gt;  
+Registers an XML namespace prefix, which can then be used in the hotspot
+XPath expression (-j). Multiple namespaces can be registered by
+specifying this option multiple times.
+
+-j &lt;xpath&gt;  
+Specify a custom XPath expression to use when matching hotspots (-H) in
+XML-based ICN formats.
 
 -l, --list  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
@@ -172,6 +181,25 @@ Example of a `.externalpubs` file:
 
 External publication references will be updated whether they are matched
 to a file or not.
+
+Hotspot matching (-H)
+---------------------
+
+Hotspots can be matched in XML-based ICN formats, such as SVG or X3D. By
+default, matching is based on the APS ID of the hotspot and the
+following attributes:
+
+SVG  
+`@id`
+
+X3D  
+`@DEF`
+
+If hotspots are identified in a different way in a project's ICNs, a
+custom XPath expression can be specified with the -j option. In this
+XPath expression, the variable `$id` represents the hotspot APS ID:
+
+    $ s1kd-refs -H -j "//*[@attr = $id]" <DM>
 
 EXIT STATUS
 ===========
