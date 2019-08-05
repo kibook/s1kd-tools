@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.0.2"
+#define VERSION "5.1.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1606,6 +1606,12 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "yes");
 	} else {
 		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "no");
+	}
+
+	if (opts->check_nested) {
+		xmlSetProp(report, BAD_CAST "checkNestedApplic", BAD_CAST "yes");
+	} else {
+		xmlSetProp(report, BAD_CAST "checkNestedApplic", BAD_CAST "no");
 	}
 
 	if (opts->mode == CUSTOM) {
