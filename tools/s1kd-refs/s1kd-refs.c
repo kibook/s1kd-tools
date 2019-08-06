@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.11.0"
+#define VERSION "2.12.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -86,6 +86,7 @@ static long unsigned maxListedFiles = 1;
 #define SHOW_PMC 0x08 /* Publication modules */
 #define SHOW_EPR 0x10 /* External publications */
 #define SHOW_HOT 0x20 /* Hotspots */
+#define SHOW_FRG 0x40 /* Fragments */
 
 /* Which types of object references will be listed. */
 static int showObjects = 0;
@@ -678,6 +679,93 @@ static int getHotspots(xmlNodePtr ref, const char *src)
 	return err;
 }
 
+/* Match a single referred fragment in another DM. */
+static int matchFragment(xmlDocPtr doc, xmlNodePtr ref, const char *code, const char *fname, const char *src)
+{
+	xmlChar *id;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+	char *s;
+	int err = doc == NULL;
+
+	id = xmlNodeGetContent(ref);
+
+	if (doc) {
+		ctx = xmlXPathNewContext(doc);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(id));
+		obj = xmlXPathEvalExpression(BAD_CAST "//*[@id=$id]", ctx);
+
+		if (!obj || xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			node = NULL;
+		} else {
+			node = obj->nodesetval->nodeTab[0];
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+
+		if (node) {
+			if (showMatched && !tagUnmatched) {
+				s = malloc(strlen(fname) + strlen((char *) id) + 2);
+				strcpy(s, fname);
+				strcat(s, "#");
+				strcat(s, (char *) id);
+				printMatchedFn(ref, src, s);
+				free(s);
+			}
+		} else {
+			++err;
+		}
+	}
+
+	if (err) {
+		s = malloc(strlen(code) + strlen((char *) id) + 2);
+		strcpy(s, code);
+		strcat(s, "#");
+		strcat(s, (char *) id);
+
+		if (tagUnmatched) {
+			tagUnmatchedRef(ref);
+		} else if (showUnmatched) {
+			printMatchedFn(ref, src, s);
+		} else if (!quiet) {
+			printUnmatchedFn(ref, src, s);
+		}
+
+		free(s);
+	}
+
+	xmlFree(id);
+	return err;
+
+}
+
+/* Match the referred fragments in another DM. */
+static int getFragment(xmlNodePtr ref, const char *src)
+{
+	xmlNodePtr dmref;
+	char code[PATH_MAX], fname[PATH_MAX];
+	xmlDocPtr doc;
+	int err;
+
+	dmref = firstXPathNode(ref->doc, ref, BAD_CAST "ancestor::dmRef");
+
+	getDmCode(code, dmref);
+
+	if (find_object_fname(fname, directory, code, recursive)) {
+		doc = read_xml_doc(fname);
+	} else {
+		doc = NULL;
+	}
+
+	err = matchFragment(doc, ref, code, doc ? fname : code, src);
+
+	xmlFreeDoc(doc);
+
+	return err;
+}
+
 /* Get the comment code as a string from a commentRef. */
 static void getComCode(char *dst, xmlNodePtr ref)
 {
@@ -1078,6 +1166,10 @@ static int printReference(xmlNodePtr *refptr, const char *src)
 	else if ((showObjects & SHOW_HOT) == SHOW_HOT &&
 		 xmlStrcmp(ref->name, BAD_CAST "graphic") == 0)
 		return getHotspots(ref, src);
+	else if ((showObjects & SHOW_FRG) == SHOW_FRG &&
+		 (xmlStrcmp(ref->name, BAD_CAST "referredFragment") == 0 ||
+		  xmlStrcmp(ref->name, BAD_CAST "target") == 0))
+		return getFragment(ref, src);
 	else
 		return 0;
 
@@ -1172,7 +1264,7 @@ static int listReferences(const char *path)
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1254,7 +1346,7 @@ static void addHotspotNs(char *s)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsUuvXxh?] [-d <dir>] [-e <file>] [-J <ns=URL> ...] [-j <xpath>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsTUuvXxh?] [-d <dir>] [-e <file>] [-J <ns=URL> ...] [-j <xpath>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1283,6 +1375,7 @@ static void show_help(void)
 	puts("  -R, --recursively            List references in matched objects recursively.");
 	puts("  -r, --recursive              Search for matches in directories recursively.");
 	puts("  -s, --include-src            Include the source object as a reference.");
+	puts("  -T, --fragment               List referred fragments in other DMs.");
 	puts("  -U, --update                 Update address items in matched references.");
 	puts("  -u, --unmatched              Show only unmatched references.");
 	puts("  -v, --verbose                Verbose output.");
@@ -1302,7 +1395,7 @@ static void show_version(void)
 
 int main(int argc, char **argv)
 {
-	int i, unmatched;
+	int i, unmatched = 0;
 
 	bool isList = false;
 	bool xmlOutput = false;
@@ -1310,7 +1403,7 @@ int main(int argc, char **argv)
 	bool inclLineNum = false;
 	char extpubsFname[PATH_MAX] = "";
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:h?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:Th?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1344,6 +1437,7 @@ int main(int argc, char **argv)
 		{"hotspot"      , no_argument      , 0, 'H'},
 		{"hotspot-xpath", required_argument, 0, 'j'},
 		{"namespace"    , required_argument, 0, 'J'},
+		{"fragment"     , no_argument      , 0, 'T'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1457,6 +1551,9 @@ int main(int argc, char **argv)
 			case 'J':
 				addHotspotNs(optarg);
 				break;
+			case 'T':
+				showObjects |= SHOW_FRG;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1464,9 +1561,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* If none of -CDEGP are given, show all types of objects. */
+	/* If none of -CDEGHPT are given, show all types of objects. */
 	if (!showObjects) {
-		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT;
+		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG;
 	}
 
 	/* Load .externalpubs config file. */
@@ -1493,15 +1590,15 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (isList) {
-				unmatched = listReferencesInList(argv[i]);
+				unmatched += listReferencesInList(argv[i]);
 			} else {
-				unmatched = listReferences(argv[i]);
+				unmatched += listReferences(argv[i]);
 			}
 		}
 	} else if (isList) {
-		unmatched = listReferencesInList(NULL);
+		unmatched += listReferencesInList(NULL);
 	} else {
-		unmatched = listReferences("-");
+		unmatched += listReferences("-");
 	}
 
 	if (xmlOutput) {
