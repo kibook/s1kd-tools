@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-d <dir>] [-I <path>] [-cDfNpRrx] <PM> [<DM>...]
+    s1kd-flatten [-d <dir>] [-I <path>] [-cDfiNpRrx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -42,6 +42,10 @@ Show help/usage message.
 -I, --include &lt;path&gt;  
 Add &lt;path&gt; to the list of directories that the tool will search
 when resolving references.
+
+-i, --ignore-issue  
+Always match the latest issue of an object found, regardless of the
+issue specified in the reference.
 
 -N, --omit-issue  
 Assume that the files representing the referenced data modules do not

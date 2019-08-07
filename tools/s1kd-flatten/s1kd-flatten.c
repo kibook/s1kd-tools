@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.4.4"
+#define VERSION "2.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -23,6 +23,7 @@
 
 static int xinclude = 0;
 static int no_issue = 0;
+static int ignore_iss = 0;
 
 static int use_pub_fmt = 0;
 static xmlDocPtr pub_doc = NULL;
@@ -38,7 +39,7 @@ static int recursive_search = 0;
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfNpRrxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfiNpRrxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -c, --containers      Flatten referenced container data modules.");
@@ -47,6 +48,7 @@ static void show_help(void)
 	puts("  -f, --overwrite       Overwrite publication module.");
 	puts("  -h, -?, --help        Show help/usage message.");
 	puts("  -I, --include <path>  Search <path> for referenced objects.");
+	puts("  -i, --ignore-issue    Always match the latest issue of an object found.");
 	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
 	puts("  -p, --simple          Output a simple, flat XML file.");
 	puts("  -R, --recursively     Recursively flatten referenced PMs.");
@@ -129,7 +131,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref)
 	xmlNodePtr cur;
 
 	pm_code = first_xpath_node(NULL, pm_ref, ".//pmCode|.//pmc");
-	issue_info = first_xpath_node(NULL, pm_ref, ".//issueInfo|.//issno");
+	issue_info = ignore_iss ? NULL : first_xpath_node(NULL, pm_ref, ".//issueInfo|.//issno");
 	language = first_xpath_node(NULL, pm_ref, ".//language");
 
 	model_ident_code = first_xpath_string(NULL, pm_code, "@modelIdentCode|modelic");
@@ -280,7 +282,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref)
 	xmlNodePtr cur;
 
 	dm_code    = first_xpath_node(NULL, dm_ref, ".//dmCode|.//avee");
-	issue_info = first_xpath_node(NULL, dm_ref, ".//issueInfo|.//issno");
+	issue_info = ignore_iss ? NULL : first_xpath_node(NULL, dm_ref, ".//issueInfo|.//issno");
 	language   = first_xpath_node(NULL, dm_ref, ".//language");
 
 	model_ident_code     = first_xpath_string(NULL, dm_code, "@modelIdentCode|modelic");
@@ -473,7 +475,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "cDd:fxNpRrI:h?";
+	const char *sopts = "cDd:fxNpRrI:ih?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -487,6 +489,7 @@ int main(int argc, char **argv)
 		{"recursively" , no_argument      , 0, 'R'},
 		{"recursive"   , no_argument      , 0, 'r'},
 		{"include"     , required_argument, 0, 'I'},
+		{"ignore-issue", no_argument      , 0, 'i'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -516,6 +519,7 @@ int main(int argc, char **argv)
 			case 'R': recursive = 1; break;
 			case 'r': recursive_search = 1; break;
 			case 'I': xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST optarg); break;
+			case 'i': ignore_iss = 1; break;
 			case 'h':
 			case '?': show_help(); exit(0);
 		}
