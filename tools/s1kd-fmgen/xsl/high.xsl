@@ -31,7 +31,10 @@
             <xsl:apply-templates select="$issueDate" mode="text"/>
             <xsl:text>, of this publication.</xsl:text>
           </reducedPara>
-          <xsl:apply-templates select="content"/>
+          <frontMatterSubList>
+            <xsl:apply-templates select="." mode="rfus"/>
+            <xsl:apply-templates select="content"/>
+          </frontMatterSubList>
         </frontMatterList>
       </frontMatter>
     </content>
@@ -53,10 +56,35 @@
     <xsl:value-of select="@day"/>
   </xsl:template>
 
+  <xsl:template match="pm" mode="rfus">
+    <xsl:variable name="pm" select="."/>
+    <xsl:for-each select="$pm/identAndStatusSection/pmStatus/reasonForUpdate[@updateHighlight = 1]">
+      <frontMatterPmEntry>
+        <xsl:apply-templates select="$pm/identAndStatusSection/pmStatus/@issueType"/>
+        <pmRef>
+          <xsl:attribute name="applicRefId">
+            <xsl:value-of select="$pm-applic"/>
+          </xsl:attribute>
+          <pmRefIdent>
+            <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmIdent/pmCode"/>
+            <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmIdent/issueInfo"/>
+            <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmIdent/language"/>
+          </pmRefIdent>
+          <pmRefAddressItems>
+            <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmAddressItems/pmTitle"/>
+            <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmAddressItems/issueDate"/>
+          </pmRefAddressItems>
+        </pmRef>
+        <xsl:copy>
+          <xsl:apply-templates select="@updateReasonType"/>
+          <xsl:apply-templates select="*"/>
+        </xsl:copy>
+      </frontMatterPmEntry>
+    </xsl:for-each>
+  </xsl:template>
+
   <xsl:template match="content">
-    <frontMatterSubList>
-      <xsl:apply-templates select="//pmEntry/dmRef|//pmEntry/dmodule"/>
-    </frontMatterSubList>
+    <xsl:apply-templates select="//pmEntry/dmRef|//pmEntry/dmodule"/>
   </xsl:template>
 
   <xsl:template match="dmRef"/>
