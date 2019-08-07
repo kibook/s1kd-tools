@@ -66,8 +66,8 @@ to that of the latest matched object. This option implies the -U and -i
 options.
 
 -i, --ignore-issue  
-Always match the latest issue of an object found, regardless of the
-issue and language specified in the reference.
+Ignore issue info when matching. This will always match the latest issue
+of an object found, regardless of the issue specified in the reference.
 
 -J &lt;ns=URL&gt;  
 Registers an XML namespace prefix, which can then be used in the hotspot

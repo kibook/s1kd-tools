@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "2.12.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -51,8 +51,8 @@ static bool recursive = false;
 /* Directory to start search in. */
 static char *directory;
 
-/* Only match against code, ignore language/issue info even if present. */
-static bool fullMatch = true;
+/* Ignore issue info when matching. */
+static bool ignoreIss = false;
 
 /* Include the source object as a reference. */
 static bool listSrc = false;
@@ -300,13 +300,13 @@ static void getDmCode(char *dst, xmlNodePtr dmRef)
 	identExtension = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/identExtension|dmcextension");
 	dmCode = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/dmCode|dmc/avee|avee");
 
-	if (fullMatch) {
-		issueInfo = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/issueInfo|issno");
-		language  = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/language|language");
-	} else {
+	if (ignoreIss) {
 		issueInfo = NULL;
-		language = NULL;
+	} else {
+		issueInfo = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/issueInfo|issno");
 	}
+
+	language = firstXPathNode(NULL, dmRef, BAD_CAST "dmRefIdent/language|language");
 
 	strcpy(dst, "");
 
@@ -384,46 +384,44 @@ static void getDmCode(char *dst, xmlNodePtr dmRef)
 	xmlFree(learnCode);
 	xmlFree(learnEventCode);
 
-	if (fullMatch) {
-		if (!noIssue) {
-			if (issueInfo) {
-				char *issueNumber, *inWork;
+	if (!noIssue) {
+		if (issueInfo) {
+			char *issueNumber, *inWork;
 
-				issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
-				inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
+			issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
+			inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
 
-				if (!inWork) {
-					inWork = strdup("00");
-				}
-
-				strcat(dst, "_");
-				strcat(dst, issueNumber);
-				strcat(dst, "-");
-				strcat(dst, inWork);
-
-				xmlFree(issueNumber);
-				xmlFree(inWork);
-			} else if (language) {
-				strcat(dst, "_\?\?\?-\?\?");
+			if (!inWork) {
+				inWork = strdup("00");
 			}
-		}
-
-		if (language) {
-			char *languageIsoCode, *countryIsoCode;
-
-			languageIsoCode = (char *) firstXPathValue(NULL, language, BAD_CAST "@languageIsoCode|@language");
-			countryIsoCode  = (char *) firstXPathValue(NULL, language, BAD_CAST "@countryIsoCode|@country");
-
-			uppercase(languageIsoCode);
 
 			strcat(dst, "_");
-			strcat(dst, languageIsoCode);
+			strcat(dst, issueNumber);
 			strcat(dst, "-");
-			strcat(dst, countryIsoCode);
+			strcat(dst, inWork);
 
-			xmlFree(languageIsoCode);
-			xmlFree(countryIsoCode);
+			xmlFree(issueNumber);
+			xmlFree(inWork);
+		} else if (language) {
+			strcat(dst, "_\?\?\?-\?\?");
 		}
+	}
+
+	if (language) {
+		char *languageIsoCode, *countryIsoCode;
+
+		languageIsoCode = (char *) firstXPathValue(NULL, language, BAD_CAST "@languageIsoCode|@language");
+		countryIsoCode  = (char *) firstXPathValue(NULL, language, BAD_CAST "@countryIsoCode|@country");
+
+		uppercase(languageIsoCode);
+
+		strcat(dst, "_");
+		strcat(dst, languageIsoCode);
+		strcat(dst, "-");
+		strcat(dst, countryIsoCode);
+
+		xmlFree(languageIsoCode);
+		xmlFree(countryIsoCode);
 	}
 }
 
@@ -440,13 +438,13 @@ static void getPmCode(char *dst, xmlNodePtr pmRef)
 	identExtension = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/identExtension");
 	pmCode         = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/pmCode|pmc");
 
-	if (fullMatch) {
-		issueInfo = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/issueInfo|issno");
-		language  = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/language|language");
-	} else {
+	if (ignoreIss) {
 		issueInfo = NULL;
-		language = NULL;
+	} else {
+		issueInfo = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/issueInfo|issno");
 	}
+
+	language = firstXPathNode(NULL, pmRef, BAD_CAST "pmRefIdent/language|language");
 
 	strcpy(dst, "");
 
@@ -487,42 +485,40 @@ static void getPmCode(char *dst, xmlNodePtr pmRef)
 	xmlFree(pmNumber);
 	xmlFree(pmVolume);
 
-	if (fullMatch) {
-		if (!noIssue) {
-			if (issueInfo) {
-				char *issueNumber, *inWork;
+	if (!noIssue) {
+		if (issueInfo) {
+			char *issueNumber, *inWork;
 
-				issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
-				inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
-
-				strcat(dst, "_");
-				strcat(dst, issueNumber);
-				strcat(dst, "-");
-				strcat(dst, inWork);
-
-				xmlFree(issueNumber);
-				xmlFree(inWork);
-			} else if (language) {
-				strcat(dst, "_\?\?\?-\?\?");
-			}
-		}
-
-		if (language) {
-			char *languageIsoCode, *countryIsoCode;
-
-			languageIsoCode = (char *) firstXPathValue(NULL, language, BAD_CAST "@languageIsoCode|@language");
-			countryIsoCode  = (char *) firstXPathValue(NULL, language, BAD_CAST "@countryIsoCode|@country");
-
-			uppercase(languageIsoCode);
+			issueNumber = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@issueNumber|@issno");
+			inWork      = (char *) firstXPathValue(NULL, issueInfo, BAD_CAST "@inWork|@inwork");
 
 			strcat(dst, "_");
-			strcat(dst, languageIsoCode);
+			strcat(dst, issueNumber);
 			strcat(dst, "-");
-			strcat(dst, countryIsoCode);
+			strcat(dst, inWork);
 
-			xmlFree(languageIsoCode);
-			xmlFree(countryIsoCode);
+			xmlFree(issueNumber);
+			xmlFree(inWork);
+		} else if (language) {
+			strcat(dst, "_\?\?\?-\?\?");
 		}
+	}
+
+	if (language) {
+		char *languageIsoCode, *countryIsoCode;
+
+		languageIsoCode = (char *) firstXPathValue(NULL, language, BAD_CAST "@languageIsoCode|@language");
+		countryIsoCode  = (char *) firstXPathValue(NULL, language, BAD_CAST "@countryIsoCode|@country");
+
+		uppercase(languageIsoCode);
+
+		strcat(dst, "_");
+		strcat(dst, languageIsoCode);
+		strcat(dst, "-");
+		strcat(dst, countryIsoCode);
+
+		xmlFree(languageIsoCode);
+		xmlFree(countryIsoCode);
 	}
 }
 
@@ -551,7 +547,7 @@ static void getICNAttr(char *dst, xmlNodePtr ref)
 	}
 
 	/* Remove issue number when not doing a full match. */
-	if (!fullMatch) {
+	if (ignoreIss) {
 		*(strrchr(dst, '-') - 3) = 0;
 	}
 
@@ -779,11 +775,7 @@ static void getComCode(char *dst, xmlNodePtr ref)
 
 	commentCode = firstXPathNode(NULL, ref, BAD_CAST "commentRefIdent/commentCode");
 
-	if (fullMatch) {
-		language = firstXPathNode(NULL, ref, BAD_CAST "commentRefIdent/language");
-	} else {
-		language = NULL;
-	}
+	language = firstXPathNode(NULL, ref, BAD_CAST "commentRefIdent/language");
 
 	modelIdentCode  = (char *) xmlGetProp(commentCode, BAD_CAST "modelIdentCode");
 	senderIdent     = (char *) xmlGetProp(commentCode, BAD_CAST "senderIdent");
@@ -808,23 +800,21 @@ static void getComCode(char *dst, xmlNodePtr ref)
 	xmlFree(seqNumber);
 	xmlFree(commentType);
 
-	if (fullMatch) {
-		if (language) {
-			char *languageIsoCode, *countryIsoCode;
+	if (language) {
+		char *languageIsoCode, *countryIsoCode;
 
-			languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
-			countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
 
-			uppercase(languageIsoCode);
+		uppercase(languageIsoCode);
 
-			strcat(dst, "_");
-			strcat(dst, languageIsoCode);
-			strcat(dst, "-");
-			strcat(dst, countryIsoCode);
+		strcat(dst, "_");
+		strcat(dst, languageIsoCode);
+		strcat(dst, "-");
+		strcat(dst, countryIsoCode);
 
-			xmlFree(languageIsoCode);
-			xmlFree(countryIsoCode);
-		}
+		xmlFree(languageIsoCode);
+		xmlFree(countryIsoCode);
 	}
 }
 
@@ -1362,7 +1352,7 @@ static void show_help(void)
 	puts("  -H, --hotspot                List hotspot matches in ICNs.");
 	puts("  -h, -?, --help               Show help/usage message.");
 	puts("  -I, --update-issue           Update references to point to the latest matched object.");
-	puts("  -i, --ignore-issue           Ignore issue info/language when matching.");
+	puts("  -i, --ignore-issue           Ignore issue info when matching.");
 	puts("  -J, --namespace <ns=URL>     Register a namespace for the hotspot XPath.");
 	puts("  -j, --hotspot-xpath <xpath>  XPath to use for matching hotspots (-H).");
 	puts("  -l, --list                   Treat input as list of CSDB objects.");
@@ -1513,11 +1503,11 @@ int main(int argc, char **argv)
 				break;
 			case 'I':
 				updateRefs = true;
-				fullMatch = false;
+				ignoreIss = true;
 				updateRefIdent = true;
 				break;
 			case 'i':
-				fullMatch = false;
+				ignoreIss = true;
 				break;
 			case 'n':
 				inclSrcFname = true;
