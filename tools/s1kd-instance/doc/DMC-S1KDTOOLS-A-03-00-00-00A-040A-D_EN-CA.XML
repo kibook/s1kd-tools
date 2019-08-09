@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="00"/>
+        <issueInfo issueNumber="040" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="09"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -v to -V</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -v and -q options.</simplePara>
+        <simplePara>Add -Q option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -329,7 +326,14 @@
                 <para>The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". Multiple keys can be used by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-Q, --resolve-containers</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve references to container data modules, selecting the appropriate reference for the specified applicability. If zero or more than one references are applicable, the reference to the container will be left untouched.</para>
+                <para>Additionally, if the object being filtered is itself a container data module, the applicability of the referenced data modules will be copied in to it as inline annotations prior to filtering.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Errors are not printed.</para>
@@ -429,12 +433,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-V, --print</listItemTerm>
+              <listItemTerm>-V, --print</listItemTerm>
               <listItemDefinition>
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>

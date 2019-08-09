@@ -225,6 +225,16 @@ a unique assign of a product instance, e.g.,
 "`serialno:prodattr=12345`". Multiple keys can be used by specifying
 this option multiple times.
 
+-Q, --resolve-containers  
+Resolve references to container data modules, selecting the appropriate
+reference for the specified applicability. If zero or more than one
+references are applicable, the reference to the container will be left
+untouched.
+
+Additionally, if the object being filtered is itself a container data
+module, the applicability of the referenced data modules will be copied
+in to it as inline annotations prior to filtering.
+
 -q, --quiet  
 Quiet mode. Errors are not printed.
 

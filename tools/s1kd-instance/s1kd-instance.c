@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "4.0.2"
+#define VERSION "4.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -55,7 +55,8 @@
 #define S_NO_PRODUCT WRN_PREFIX "No product matching '%s' in PCT '%s'.\n"
 #define S_NO_XSLT WRN_PREFIX "No built-in XSLT for CIR type: %s\n"
 #define S_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
-#define S_MISSING_CIR WRN_PREFIX "Could not find CIR %s."
+#define S_MISSING_CIR WRN_PREFIX "Could not find CIR %s.\n"
+#define S_RESOLVE_CONTAINER WRN_PREFIX "Could not resolve container %s\n"
 
 /* Info messages */
 #define I_UPDATE_INST INF_PREFIX "Updating instance %s from source %s...\n"
@@ -2676,6 +2677,178 @@ static void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Create an applicability annotation in a container. */
+static xmlNodePtr add_container_applic(xmlNodePtr rag, xmlDocPtr doc, const xmlChar *id)
+{
+	xmlNodePtr app;
+
+	if (!(app = first_xpath_node(doc, NULL, BAD_CAST "//applic"))) {
+		return NULL;
+	}
+
+	xmlSetProp(app, BAD_CAST "id", id);
+
+	return xmlAddChild(rag, xmlCopyNode(app, 1));
+}
+
+/* Copy the applicability of the referenced DMs of a container into the
+ * container itself as inline annotations.
+ */
+static xmlNodePtr add_container_applics(xmlDocPtr doc, xmlNodePtr content, xmlNodePtr container)
+{
+	xmlNodePtr rag, refs;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	rag = xmlNewNode(NULL, BAD_CAST "referencedApplicGroup");
+
+	/* Insert the referencedApplicGroup element appropriately. */
+	if ((refs = first_xpath_node(doc, content, BAD_CAST "refs"))) {
+		xmlAddNextSibling(refs, rag);
+	} else {
+		add_first_child(content, rag);
+	}
+
+	ctx = xmlXPathNewContext(doc);
+	xmlXPathSetContextNode(container, ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST "refs/dmRef/dmRefIdent", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i, n = 1;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char path[PATH_MAX];
+
+			if (find_dmod_fname(path, obj->nodesetval->nodeTab[i], false)) {
+				xmlDocPtr doc;
+				xmlChar id[32];
+
+				if (!(doc = read_xml_doc(path))) {
+					continue;
+				}
+
+				/* Give each new annotation a sequential ID. */
+				xmlStrPrintf(id, 32, "app-%.4d", n);
+
+				if (add_container_applic(rag, doc, id)) {
+					xmlSetProp(obj->nodesetval->nodeTab[i]->parent, BAD_CAST "applicRefId", id);
+					++n;
+				}
+
+				xmlFreeDoc(doc);
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return rag;
+}
+
+/* Replace a reference to a container with the appropriate reference within
+ * the container for the given applicability. */
+static xmlNodePtr resolve_container_ref(xmlNodePtr refident, xmlDocPtr doc, const char *path)
+{
+	xmlNodePtr root, content, container, rag, ref;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	root = xmlDocGetRootElement(doc);
+
+	if (!(content = first_xpath_node(doc, root, BAD_CAST "//content"))) {
+		return NULL;
+	}
+
+	/* Referenced DM is not a container. */
+	if (!(container = first_xpath_node(doc, content, BAD_CAST "container"))) {
+		return NULL;
+	}
+
+	/* If container does not contain inline annotations, copy them from
+	 * the referenced DMs. */
+	if (!(rag = first_xpath_node(doc, content, BAD_CAST "//referencedApplicGroup"))) {
+		if (!(rag = add_container_applics(doc, content, container))) {
+			return NULL;
+		}
+	}
+
+	/* Filter the container. */
+	strip_applic(rag, root);
+
+	ctx = xmlXPathNewContext(doc);
+	xmlXPathSetContextNode(container, ctx);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "refs/dmRef", ctx);
+
+	/* If the container does not have exactly one ref after filtering, it
+	 * should not be resolved. */
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval) || obj->nodesetval->nodeNr > 1) {
+		ref = NULL;
+	} else {
+		ref = obj->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	/* Replace the ref to the container in the source. */
+	if (ref) {
+		xmlNodePtr old, new;
+
+		old = refident->parent;
+		new = xmlCopyNode(ref, 1);
+
+		xmlUnsetProp(new, BAD_CAST "applicRefId");
+
+		xmlAddNextSibling(old, new);
+
+		xmlUnlinkNode(old);
+		xmlFreeNode(old);
+	} else if (verbosity > QUIET) {
+		fprintf(stderr, S_RESOLVE_CONTAINER, path);
+	}
+
+	return ref;
+}
+
+/* Resolve references to containers, replacing them with the appropriate
+ * reference from within the container for the given applicability.
+ */
+static void resolve_containers(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//dmRef/dmRefIdent", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char path[PATH_MAX];
+
+			if (find_dmod_fname(path, obj->nodesetval->nodeTab[i], false)) {
+				xmlDocPtr doc;
+
+				if (!(doc = read_xml_doc(path))) {
+					continue;
+				}
+
+				if (resolve_container_ref(obj->nodesetval->nodeTab[i], doc, path)) {
+					obj->nodesetval->nodeTab[i] = NULL;
+				}
+
+				xmlFreeDoc(doc);
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Print a usage message */
 static void show_help(void)
 {
@@ -2710,6 +2883,7 @@ static void show_help(void)
 	puts("  -o, --out <file>                  Output instance to file instead of stdout.");
 	puts("  -P, --pct <PCT>                   PCT file to read products from.");
 	puts("  -p, --product <product>           ID/primary key of a product in the PCT to filter on.");
+	puts("  -Q, --resolve-containers          Resolve references to containers.");
 	puts("  -q, --quiet                       Quiet mode.");
 	puts("  -R, --cir <CIR>                   Resolve externalized items using the given CIR.");
 	puts("  -r, --recursive                   Search for referenced data modules recursively.");
@@ -2806,11 +2980,12 @@ int main(int argc, char **argv)
 	bool no_info_name = false;
 	bool add_deps = false;
 	bool print_fnames = false;
+	bool rslvcntrs = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:qR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:~";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:~";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -2866,6 +3041,7 @@ int main(int argc, char **argv)
 		{"act"               , required_argument, 0, '1'},
 		{"cct"               , required_argument, 0, '2'},
 		{"dependencies"      , no_argument      , 0, '~'},
+		{"resolve-containers", no_argument      , 0, 'Q'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2980,6 +3156,9 @@ int main(int argc, char **argv)
 				break;
 			case 'p':
 				strncpy(product, optarg, 63);
+				break;
+			case 'Q':
+				rslvcntrs = true;
 				break;
 			case 'q':
 				verbosity = QUIET;
@@ -3339,6 +3518,17 @@ int main(int argc, char **argv)
 				referencedApplicGroup = first_xpath_node(doc, NULL,
 					BAD_CAST "//referencedApplicGroup|//inlineapplics");
 
+				/* In -Q mode, add inline applicability to container DMs. */
+				if (rslvcntrs && !referencedApplicGroup) {
+					xmlNodePtr content;
+					if ((content = first_xpath_node(doc, root, BAD_CAST "//content"))) {
+						xmlNodePtr container;
+						if ((container = first_xpath_node(doc, content, BAD_CAST "container"))) {
+							referencedApplicGroup = add_container_applics(doc, content, container);
+						}
+					}
+				}
+
 				if (referencedApplicGroup) {
 					strip_applic(referencedApplicGroup, root);
 
@@ -3449,6 +3639,11 @@ int main(int argc, char **argv)
 
 				if (autocomp) {
 					autocomplete(doc);
+				}
+
+				/* Resolve references to containers. */
+				if (rslvcntrs) {
+					resolve_containers(doc);
 				}
 
 				if (use_stdout && force_overwrite) {
