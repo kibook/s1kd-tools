@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "4.1.0"
+#define VERSION "5.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -525,7 +525,7 @@ static void free_ident(struct ident *ident)
  *
  * If assume is false, undefined attributes or conditions will cause an applic
  * statement to evaluate as invalid. This is primarily useful for determining
- * which applic statements and references are unambigously true (they do not
+ * which applic statements and references are unambiguously true (they do not
  * rely on any undefined attributes or conditions) and therefore may be removed.
  *
  * An undefined attribute/condition is a product attribute (ACT) or
@@ -749,7 +749,7 @@ static void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	}
 }
 
-/* Remove unambigously true or false applic statements. */
+/* Remove unambiguously true or false applic statements. */
 static void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
 {
 	xmlNodePtr cur;
@@ -805,7 +805,7 @@ static void rem_disp_text(xmlNodePtr node)
 }
 
 /* Remove applic statements or parts of applic statements where all assertions
- * are unambigously true or false.
+ * are unambiguously true or false.
  *
  * Returns true if the whole annotation is removed, or false if only parts of
  * it are removed.
@@ -2855,8 +2855,8 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A, --simplify                    Simplify and remove unused applicability annotations.");
-	puts("  -a, --remove-unused               Remove unused applicability annotations.");
+	puts("  -A, --simplify                    Simplify and reduce applicability annotations.");
+	puts("  -a, --reduce                      Remove applicability annotations which are unambiguously valid or invalid.");
 	puts("  -C, --comment <comment>           Add an XML comment to the top of the instance.");
 	puts("  -c, --code <DMC>                  The new code of the instance.");
 	puts("  -D, --dump <CIR>                  Dump default XSLT for resolving CIR references.");
@@ -2989,7 +2989,7 @@ int main(int argc, char **argv)
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
-		{"remove-unused"     , no_argument      , 0, 'a'},
+		{"reduce"            , no_argument      , 0, 'a'},
 		{"simplify"          , no_argument      , 0, 'A'},
 		{"code"              , required_argument, 0, 'c'},
 		{"comment"           , required_argument, 0, 'C'},

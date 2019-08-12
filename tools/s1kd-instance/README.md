@@ -44,10 +44,12 @@ OPTIONS
 =======
 
 -A, --simplify  
-Simplify inline applicability annotations and remove unused ones.
+Simplify inline applicability annotations, and remove annotations which
+are unambiguously valid or invalid.
 
--a, --remove-unused  
-Remove unused inline applicability annotations.
+-a, --reduce  
+Remove applicability annotations which are unambiguously valid or
+invalid.
 
 -C, --comment &lt;comment&gt;  
 Add an XML comment to an instance. Useful as another way of identifying
@@ -418,10 +420,11 @@ the resulting instance. In some cases, though, it may be desirable to
 remove redundant applicability annotations on valid elements. The -a and
 -A options provide two methods of doing this.
 
-The -a option will remove applicability annotations (applicRefId) from
-elements which are deemed to be unambiguously valid (their validity does
-not rely on applicability values left undefined by the user). Unused
-occurrences of the corresponding applic elements are removed as well.
+The -a option will remove applicability annotations (`applicRefId`) from
+elements which are deemed to be unambiguously valid or invalid (their
+validity does not rely on applicability values left undefined by the
+user). The unused occurrences of the corresponding `<applic>` elements
+are removed as well.
 
 The -A option will do the same as the -a option, but will also attempt
 to simplify unused parts of applicability annotations. It simplifies an

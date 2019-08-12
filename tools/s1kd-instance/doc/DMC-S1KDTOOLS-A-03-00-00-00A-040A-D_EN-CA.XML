@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="01"/>
+        <issueInfo issueNumber="040" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="08" day="09"/>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -Q option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Rename --remove-unused to --reduce.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -94,13 +97,13 @@
             <definitionListItem>
               <listItemTerm>-A, --simplify</listItemTerm>
               <listItemDefinition>
-                <para>Simplify inline applicability annotations and remove unused ones.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Simplify inline applicability annotations, and remove annotations which are unambiguously valid or invalid.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-a, --remove-unused</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-a, --reduce</listItemTerm>
               <listItemDefinition>
-                <para>Remove unused inline applicability annotations.</para>
+                <para>Remove applicability annotations which are unambiguously valid or invalid.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -580,7 +583,7 @@
         <levelledPara>
           <title>Removing/simplifying applicability annotations (-a vs -A)</title>
           <para>By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a and -A options provide two methods of doing this.</para>
-          <para>The -a option will remove applicability annotations (applicRefId) from elements which are deemed to be unambiguously valid (their validity does not rely on applicability values left undefined by the user). Unused occurrences of the corresponding applic elements are removed as well.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">The -a option will remove applicability annotations (<verbatimText verbatimStyle="vs13">applicRefId</verbatimText>) from elements which are deemed to be unambiguously valid or invalid (their validity does not rely on applicability values left undefined by the user). The unused occurrences of the corresponding <verbatimText verbatimStyle="vs12">&lt;applic&gt;</verbatimText> elements are removed as well.</para>
           <para>The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded <verbatimText verbatimStyle="vs12">&lt;evaluate&gt;</verbatimText> elements when they contain only one remaining <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText>.</para>
           <para>For example, given the following input:</para>
           <para>
