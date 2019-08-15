@@ -138,6 +138,10 @@ code "`S1KDI`" and the name "`s1kd-instance tool`" are used by default
 to identify that the instance was produced by this tool. A different
 code and name can be specified with the -G option.
 
+-H, --list-properties  
+Create an XML report of all the applicability properties used in the
+specified CSDB objects.
+
 -h, -?, --help  
 Show help/usage message.
 

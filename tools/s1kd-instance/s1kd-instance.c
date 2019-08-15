@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "5.1.0"
+#define VERSION "5.2.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2855,6 +2855,120 @@ static void resolve_containers(xmlDocPtr doc)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Add a property used in an object to the properties report. */
+static void add_prop(xmlNodePtr object, xmlNodePtr assert)
+{
+	xmlChar *i, *t, *v, *c = NULL;
+	xmlNodePtr p = NULL, cur;
+
+	i = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	t = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+
+	for (cur = object->children; cur && !p; cur = cur->next) {
+		xmlChar *ci, *ct;
+
+		ci = first_xpath_value(NULL, cur, BAD_CAST "@id");
+		ct = first_xpath_value(NULL, cur, BAD_CAST "@type");
+
+		if (xmlStrcmp(i, ci) == 0 && xmlStrcmp(t, ct) == 0) {
+			p = cur;
+		}
+
+		xmlFree(ci);
+		xmlFree(ct);
+	}
+
+	if (!p) {
+		p = xmlNewChild(object, NULL, BAD_CAST "property", NULL);
+		xmlSetProp(p, BAD_CAST "id", i);
+		xmlSetProp(p, BAD_CAST "type", t);
+	}
+
+	v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+
+	while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|~"))) {
+		xmlNodePtr cur;
+		bool add = true;
+
+		for (cur = p->children; cur && add; cur = cur->next) {
+			xmlChar *cv;
+
+			cv = xmlNodeGetContent(cur);
+
+			add = xmlStrcmp(c, cv) != 0;
+
+			xmlFree(cv);
+		}
+
+		if (add) {
+			xmlNewTextChild(p, NULL, BAD_CAST "value", c);
+		}
+	}
+
+	xmlFree(i);
+	xmlFree(t);
+	xmlFree(v);
+}
+
+/* Add the properties used in an object to the properties report. */
+static void add_props(xmlNodePtr report, const char *path)
+{
+	xmlDocPtr doc;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr object;
+
+	if (!(doc = read_xml_doc(path))) {
+		return;
+	}
+
+	object = xmlNewChild(report, NULL, BAD_CAST "object", NULL);
+	xmlSetProp(object, BAD_CAST "path", BAD_CAST path);
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			add_prop(object, obj->nodesetval->nodeTab[i]);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	xmlFreeDoc(doc);
+}
+
+/* Add the properties used in objects in a list to the properties report. */
+static void add_props_list(xmlNodePtr report, const char *fname)
+{
+	FILE *f;
+	char path[PATH_MAX];
+
+	if (fname) {
+		if (!(f = fopen(fname, "r"))) {
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, S_MISSING_LIST, fname);
+			}
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(path, PATH_MAX, f)) {
+		strtok(path, "\t\r\n");
+		add_props(report, path);
+	}
+
+	if (fname) {
+		fclose(f);
+	}
+}
+
 /* Print a usage message */
 static void show_help(void)
 {
@@ -2873,6 +2987,7 @@ static void show_help(void)
 	puts("  -f, --overwrite                   Force overwriting of files.");
 	puts("  -G, --custom-orig <NCAGE/name>    Use custom NCAGE/name for originator.");
 	puts("  -g, --set-orig                    Set originator of the instance to identify this tool.");
+	puts("  -H, --list-properties             List the applicability properties used in objects.");
 	puts("  -h, -?, --help                    Show this help/usage message.");
 	puts("  -I, --date <date>                 Set the issue date of the instance (- for current date).");
 	puts("  -i, --infoname <infoName>         Give the data module instance a different infoName.");
@@ -2993,7 +3108,9 @@ int main(int argc, char **argv)
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:4~";
+	xmlDocPtr props_report = NULL;
+
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:4~H";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3051,12 +3168,13 @@ int main(int argc, char **argv)
 		{"dependencies"      , no_argument      , 0, '~'},
 		{"resolve-containers", no_argument      , 0, 'Q'},
 		{"flatten-alts-refs" , no_argument      , 0, '4'},
+		{"list-properties"   , no_argument      , 0, 'H'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
 
-	int err = 0;
+	int err = EXIT_SUCCESS;
 
 	exsltRegisterAll();
 
@@ -3073,7 +3191,7 @@ int main(int argc, char **argv)
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
-					return EXIT_SUCCESS;
+					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
@@ -3091,7 +3209,7 @@ int main(int argc, char **argv)
 				break;
 			case 'D':
 				dump_cir_xsl(optarg);
-				return EXIT_SUCCESS;
+				goto cleanup;
 			case 'd':
 				free(search_dir); search_dir = strdup(optarg);
 				break;
@@ -3247,11 +3365,44 @@ int main(int argc, char **argv)
 				flat_alts = true;
 				fix_alts_refs = true;
 				break;
+			case 'H':
+				props_report = xmlNewDoc(BAD_CAST "1.0");
+				break;
 			case 'h':
 			case '?':
 				show_help();
-				return EXIT_SUCCESS;
+				goto cleanup;
 		}
+	}
+
+	/* Create a report of all applicability properties. */
+	if (props_report) {
+		xmlNodePtr properties;
+
+		properties = xmlNewNode(NULL, BAD_CAST "properties");
+		xmlDocSetRootElement(props_report, properties);
+
+		if (optind < argc) {
+			int i;
+
+			for (i = optind; i < argc; ++i) {
+				if (dmlist) {
+					add_props_list(properties, argv[i]);
+				} else {
+					add_props(properties, argv[i]);
+				}
+			}
+		} else if (dmlist) {
+			add_props_list(properties, NULL);
+		} else {
+			add_props(properties, "-");
+		}
+
+		transform_doc(props_report, xsl_sort_props_xsl, xsl_sort_props_xsl_len, NULL);
+
+		save_xml_doc(props_report, "-");
+
+		goto cleanup;
 	}
 
 	if (optind >= argc) {
@@ -3745,6 +3896,7 @@ int main(int argc, char **argv)
 		free(userpct);
 	}
 
+cleanup:
 	free(origspec);
 	free(remarks);
 	free(skill);
@@ -3757,6 +3909,7 @@ int main(int argc, char **argv)
 	xmlFreeNode(cirs);
 	xmlFreeDoc(def_cir_xsl);
 	xmlFreeNode(applicability);
+	xmlFreeDoc(props_report);
 	xsltCleanupGlobals();
 	xmlCleanupParser();
 
