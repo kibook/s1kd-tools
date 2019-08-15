@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="04"/>
+        <issueInfo issueNumber="040" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="08" day="15"/>
@@ -513,7 +513,7 @@
                 <para>Specify the CCT to read dependency tests from (-~).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-4, --flatten-alts-refs</listItemTerm>
               <listItemDefinition>
                 <para>Same as the -F option, but in addition to flattening alts elements, the <verbatimText verbatimStyle="vs13">internalRefTargetType</verbatimText> of cross-references to them will be changed to the appropriate type (e.g., <verbatimText verbatimStyle="vs14">"irtt01"</verbatimText> for a <verbatimText verbatimStyle="vs12">&lt;figure&gt;</verbatimText> in a <verbatimText verbatimStyle="vs12">&lt;figureAlts&gt;</verbatimText>). This is specifically useful for S1000D Issue 4.1, where the Default BREX does not allow the standard <verbatimText verbatimStyle="vs13">internalRefTargetType</verbatimText> values to be used with the alts elements.</para>
