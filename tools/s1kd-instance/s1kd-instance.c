@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "5.0.0"
+#define VERSION "5.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2109,9 +2109,15 @@ static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, c
 }
 
 /* Flatten alts elements. */
-static void flatten_alts(xmlDocPtr doc)
+static void flatten_alts(xmlDocPtr doc, bool fix_alts_refs)
 {
-	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len, NULL);
+	char *params[3];
+
+	params[0] = "fix-alts-refs";
+	params[1] = fix_alts_refs ? "true()" : "false()";
+	params[2] = NULL;
+
+	transform_doc(doc, xsl_flatten_alts_xsl, xsl_flatten_alts_xsl_len, (const char **) params);
 }
 
 /* Removes invalid empty sections in a PM after all references have
@@ -2905,6 +2911,7 @@ static void show_help(void)
 	puts("  -z, --issue-type <type>           Set the issue type of the instance.");
 	puts("  -1, --act <file>                  Specify custom ACT.");
 	puts("  -2, --cct <file>                  Specify custom CCT.");
+	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
@@ -2967,6 +2974,7 @@ int main(int argc, char **argv)
 	bool setorig = false;
 	char *origspec = NULL;
 	bool flat_alts = false;
+	bool fix_alts_refs = false;
 	char *remarks = NULL;
 	char *skill_codes = NULL;
 	char *sec_classes = NULL;
@@ -2985,7 +2993,7 @@ int main(int argc, char **argv)
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:~";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:4~";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3042,6 +3050,7 @@ int main(int argc, char **argv)
 		{"cct"               , required_argument, 0, '2'},
 		{"dependencies"      , no_argument      , 0, '~'},
 		{"resolve-containers", no_argument      , 0, 'Q'},
+		{"flatten-alts-refs" , no_argument      , 0, '4'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -3233,6 +3242,10 @@ int main(int argc, char **argv)
 				break;
 			case '~':
 				add_deps = true;
+				break;
+			case '4':
+				flat_alts = true;
+				fix_alts_refs = true;
 				break;
 			case 'h':
 			case '?':
@@ -3630,7 +3643,7 @@ int main(int argc, char **argv)
 				}
 
 				if (flat_alts) {
-					flatten_alts(doc);
+					flatten_alts(doc, fix_alts_refs);
 				}
 
 				if (clean_ents) {

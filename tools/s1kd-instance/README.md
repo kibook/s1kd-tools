@@ -360,6 +360,14 @@ Specify the ACT to use to find the CCT and/or PCT.
 -2, --cct  
 Specify the CCT to read dependency tests from (-\~).
 
+-4, --flatten-alts-refs  
+Same as the -F option, but in addition to flattening alts elements, the
+`internalRefTargetType` of cross-references to them will be changed to
+the appropriate type (e.g., `"irtt01"` for a `<figure>` in a
+`<figureAlts>`). This is specifically useful for S1000D Issue 4.1, where
+the Default BREX does not allow the standard `internalRefTargetType`
+values to be used with the alts elements.
+
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances
 that will be updated.
