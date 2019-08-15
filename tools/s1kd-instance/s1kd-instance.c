@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "5.2.0"
+#define VERSION "5.2.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2993,8 +2993,8 @@ static void show_help(void)
 	puts("  -i, --infoname <infoName>         Give the data module instance a different infoName.");
 	puts("  -J, --clean-display-text          Remove display text from simplified annotations (-A).");
 	puts("  -j, --clean-ents                  Remove unused external entities (such as ICNs)");
-	puts("  -k, --skill <level>               Set the skill level of the instance.");
 	puts("  -K, --skill-levels <levels>       Filter on the specified skill levels.");
+	puts("  -k, --skill <level>               Set the skill level of the instance.");
 	puts("  -L, --list                        Treat input as a list of objects.");
 	puts("  -l, --language <lang>             Specify the language of the instance.");
 	puts("  -m, --remarks <remarks>           Set the remarks for the instance.");
