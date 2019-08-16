@@ -26,6 +26,8 @@
     -   [Publication module content](#publication-module-content)
     -   [Creating a customized
         publication](#creating-a-customized-publication)
+    -   [Creating a script for
+        publishing](#creating-a-script-for-publishing)
 -   [Use with other version control
     systems](#use-with-other-version-control-systems)
 
@@ -544,6 +546,40 @@ particular publication module:
 The above command will filter the publication module and all included
 data modules, and output the resulting objects to the `customerB`
 directory.
+
+Creating a script for publishing
+--------------------------------
+
+The publishing process will often involve many different steps, and many
+different tools, so it's a good idea to create a script to automate it.
+Below is an example of a script which publishes a CSDB for a given
+product serial number:
+
+    #!/bin/sh
+
+    # Usage: sh build.sh <zip> <csdb> <serialno>
+    zip="$1"
+    csdb="$2"
+    serialno="$3"
+
+    # Create a temporary directory.
+    tmp=$(mktemp -d)
+
+    # Copy all CSDB objects to the temp directory. The CSDB objects
+    # are filtered for a given serial number.
+    s1kd-ls -d "$csdb" |
+      xargs s1kd-instance -O "$tmp" -s serialno:prodattr="$serialno"
+
+    # Synchronize references in the filtered DMs. This is necessary
+    # since some references may have been removed during filtering.
+    s1kd-ls -D "$tmp" |
+      xargs s1kd-syncrefs -f
+
+    # Create the ZIP package.
+    zip -jr "$zip" "$tmp"
+
+    # Clean up the temp directory.
+    rm -r "$tmp"
 
 Use with other version control systems
 ======================================

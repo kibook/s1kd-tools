@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="00"/>
+        <issueInfo issueNumber="020" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="16"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -43,7 +43,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add s1kd-appcheck example</simplePara>
+        <simplePara>Add example of publishing script.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -248,7 +248,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
               <listItem>
                 <para>It is valid according to the relevant business rules</para>
               </listItem>
-              <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItem>
                 <para>Any applicability filtering applied will not affect the above</para>
               </listItem>
               <listItem>
@@ -298,7 +298,7 @@ or 02 (Classified).
             </para>
             <para>This will use the customized <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to generate a basic set of business rules.</para>
           </levelledPara>
-          <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <levelledPara>
             <title>Checking applicability</title>
             <para>The fourth point can be tested using the <emphasis>s1kd-appcheck</emphasis> tool:</para>
             <para>
@@ -469,6 +469,36 @@ This information only applies to version B.
 &gt; xargs s1kd-instance -s version:prodattr=B -O customerB</verbatimText>
           </para>
           <para>The above command will filter the publication module and all included data modules, and output the resulting objects to the <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory.</para>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Creating a script for publishing</title>
+          <para>The publishing process will often involve many different steps, and many different tools, so it's a good idea to create a script to automate it. Below is an example of a script which publishes a CSDB for a given product serial number:
+            <verbatimText verbatimStyle="vs24"><![CDATA[#!/bin/sh
+
+# Usage: sh build.sh <zip> <csdb> <serialno>
+zip="$1"
+csdb="$2"
+serialno="$3"
+
+# Create a temporary directory.
+tmp=$(mktemp -d)
+
+# Copy all CSDB objects to the temp directory. The CSDB objects
+# are filtered for a given serial number.
+s1kd-ls -d "$csdb" |
+  xargs s1kd-instance -O "$tmp" -s serialno:prodattr="$serialno"
+
+# Synchronize references in the filtered DMs. This is necessary
+# since some references may have been removed during filtering.
+s1kd-ls -D "$tmp" |
+  xargs s1kd-syncrefs -f
+
+# Create the ZIP package.
+zip -jr "$zip" "$tmp"
+
+# Clean up the temp directory.
+rm -r "$tmp"]]></verbatimText>
+          </para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
