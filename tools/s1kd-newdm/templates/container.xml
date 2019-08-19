@@ -13,6 +13,7 @@
         <dmTitle>
           <techName/>
           <infoName/>
+          <infoNameVariant/>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>

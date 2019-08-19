@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "2.0.0"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -98,6 +98,7 @@ static char originator_enterpriseCode[MAX_ENTERPRISE_CODE] = "";
 
 static char techName_content[MAX_TECH_NAME] = "";
 static char infoName_content[MAX_INFO_NAME] = "";
+static xmlChar *info_name_variant = NULL;
 
 static char dmtype[32] = "";
 
@@ -234,48 +235,49 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options]");
 	puts("");
 	puts("Options:");
-	puts("  -$, --issue <issue>         Specify which S1000D issue to use.");
-	puts("  -@, --out <path>            Output to specified file or directory.");
-	puts("  -%, --templates <dir>       Use templates in specified directory.");
-	puts("  -~, --dump-templates <dir>  Dump default templates to a directory.");
-	puts("  -,, --dump-dmtypes-xml      Dump default dmtypes XML.");
-	puts("  -., --dump-dmtypes          Dump default dmtypes text file.");
-	puts("  -!, --no-infoname           Do not include an info name.");
-	puts("  -B, --generate-brex-rules   Generate BREX rules from .defaults file.");
-	puts("  -D, --dmtypes <dmtypes>     Specify .dmtypes file name.");
-	puts("  -d, --defaults <defaults>   Specify .defaults file name.");
-	puts("  -f, --overwrite             Overwrite existing file.");
-	puts("  -j, --brexmap <map>         Use a custom .brexmap file.");
-	puts("  -M, --maintained-sns <SNS>  Use one of the maintained SNS.");
-	puts("  -N, --omit-issue            Omit issue/inwork from filename.");
-	puts("  -P, --two-sns-levels        Include previous level of SNS in tech name.");
-	puts("  -p, --prompt                Prompt the user for each value.");
-	puts("  -q, --quiet                 Don't report an error if file exists.");
-	puts("  -S, --sns <BREX>            Get tech name from BREX SNS.");
-	puts("  -v, --verbose               Print file name of new data module.");
-	puts("  --version                   Show version information.");
+	puts("  -$, --issue <issue>               Specify which S1000D issue to use.");
+	puts("  -@, --out <path>                  Output to specified file or directory.");
+	puts("  -%, --templates <dir>             Use templates in specified directory.");
+	puts("  -~, --dump-templates <dir>        Dump default templates to a directory.");
+	puts("  -,, --dump-dmtypes-xml            Dump default dmtypes XML.");
+	puts("  -., --dump-dmtypes                Dump default dmtypes text file.");
+	puts("  -!, --no-infoname                 Do not include an info name.");
+	puts("  -B, --generate-brex-rules         Generate BREX rules from .defaults file.");
+	puts("  -D, --dmtypes <dmtypes>           Specify .dmtypes file name.");
+	puts("  -d, --defaults <defaults>         Specify .defaults file name.");
+	puts("  -f, --overwrite                   Overwrite existing file.");
+	puts("  -j, --brexmap <map>               Use a custom .brexmap file.");
+	puts("  -M, --maintained-sns <SNS>        Use one of the maintained SNS.");
+	puts("  -N, --omit-issue                  Omit issue/inwork from filename.");
+	puts("  -P, --two-sns-levels              Include previous level of SNS in tech name.");
+	puts("  -p, --prompt                      Prompt the user for each value.");
+	puts("  -q, --quiet                       Don't report an error if file exists.");
+	puts("  -S, --sns <BREX>                  Get tech name from BREX SNS.");
+	puts("  -v, --verbose                     Print file name of new data module.");
+	puts("  --version                         Show version information.");
 	puts("");
 	puts("In addition, the following pieces of meta data can be set:");
-	puts("  -#, --code <code>           Data module code");
-	puts("  -a, --act <ACT>             ACT data module code");
-	puts("  -b, --brex <BREX>           BREX data module code");
-	puts("  -C, --country <country>     Country ISO code");
-	puts("  -c, --security <sec>        Security classification");
-	puts("  -I, --date <date>           Issue date");
-	puts("  -i, --infoname <info>       Info name");
-	puts("  -k, --skill <skill>         Skill level");
-	puts("  -L, --language <lang>       Language ISO code");
-	puts("  -m, --remarks <remarks>     Remarks");
-	puts("  -n, --issno <iss>           Issue number");
-	puts("  -O, --origcode <CAGE>       Originator CAGE code.");
-	puts("  -o, --origname <orig>       Originator enterprise name");
-	puts("  -R, --rpccode <CAGE>        Responsible partner company CAGE code.");
-	puts("  -r, --rpcname <RPC>         Responsible partner company enterprise name");
-	puts("  -s, --schema <schema>       Schema");
-	puts("  -T, --type <type>           DM type (descript, proced, frontmatter, etc.)");
-	puts("  -t, --techname <tech>       Tech name");
-	puts("  -w, --inwork <inwork>       Inwork issue");
-	puts("  -z, --issue-type <type>     Issue type");
+	puts("  -#, --code <code>                 Data module code");
+	puts("  -a, --act <ACT>                   ACT data module code");
+	puts("  -b, --brex <BREX>                 BREX data module code");
+	puts("  -C, --country <country>           Country ISO code");
+	puts("  -c, --security <sec>              Security classification");
+	puts("  -I, --date <date>                 Issue date");
+	puts("  -i, --infoname <info>             Info name");
+	puts("  -k, --skill <skill>               Skill level");
+	puts("  -L, --language <lang>             Language ISO code");
+	puts("  -m, --remarks <remarks>           Remarks");
+	puts("  -n, --issno <iss>                 Issue number");
+	puts("  -O, --origcode <CAGE>             Originator CAGE code.");
+	puts("  -o, --origname <orig>             Originator enterprise name");
+	puts("  -R, --rpccode <CAGE>              Responsible partner company CAGE code.");
+	puts("  -r, --rpcname <RPC>               Responsible partner company enterprise name");
+	puts("  -s, --schema <schema>             Schema");
+	puts("  -T, --type <type>                 DM type (descript, proced, frontmatter, etc.)");
+	puts("  -t, --techname <tech>             Tech name");
+	puts("  -V, --infoname-variant <variant>  Info name variant");
+	puts("  -w, --inwork <inwork>             Inwork issue");
+	puts("  -z, --issue-type <type>           Issue type");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -335,6 +337,8 @@ static void copy_default_value(const char *key, const char *val)
 		strncpy(techName_content, val, MAX_TECH_NAME - 2);
 	else if (strcmp(key, "infoName") == 0 && strcmp(infoName_content, "") == 0 && !no_info_name)
 		strncpy(infoName_content, val, MAX_INFO_CODE - 2);
+	else if (strcmp(key, "infoNameVariant") == 0 && !info_name_variant)
+		info_name_variant = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "schema") == 0 && strcmp(schema, "") == 0)
 		strncpy(schema, val, PATH_MAX - 1);
 	else if (strcmp(key, "brex") == 0 && strcmp(brex_dmcode, "") == 0)
@@ -1079,6 +1083,7 @@ static void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 
 	for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
 		char *def_key, *def_val, *infname;
+		xmlChar *infnamev;
 		char code[4], variant[2], itemloc[2], learn[4], levent[2];
 		int p;
 
@@ -1086,9 +1091,10 @@ static void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 		if (!xmlHasProp(cur, BAD_CAST "infoCode")) continue;
 		if (!xmlHasProp(cur, BAD_CAST "schema")) continue;
 
-		def_key = (char *) xmlGetProp(cur, BAD_CAST "infoCode");
-		def_val = (char *) xmlGetProp(cur, BAD_CAST "schema");
-		infname = (char *) xmlGetProp(cur, BAD_CAST "infoName");
+		def_key  = (char *) xmlGetProp(cur, BAD_CAST "infoCode");
+		def_val  = (char *) xmlGetProp(cur, BAD_CAST "schema");
+		infname  = (char *) xmlGetProp(cur, BAD_CAST "infoName");
+		infnamev = xmlGetProp(cur, BAD_CAST "infoNameVariant");
 
 		p = sscanf(def_key, "%3s%1s-%1s-%3s%1s", code, variant, itemloc, learn, levent);
 
@@ -1112,6 +1118,10 @@ static void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 		    (p < 4 || strcmp(learn, "***") == 0   || strcmp(learn, learnCode) == 0) &&
 		    (p < 5 || strcmp(levent, "*") == 0  || strcmp(levent, learnEventCode) == 0)) {
 			strcpy(infoName_content, infname);
+
+			if (infnamev && !info_name_variant) {
+				info_name_variant = xmlStrdup(infnamev);
+			}
 		}
 
 		if (brex_rules) {
@@ -1121,6 +1131,7 @@ static void process_dmtypes_xml(xmlDocPtr defaults_xml, xmlNodePtr brex_rules)
 		xmlFree(def_key);
 		xmlFree(def_val);
 		xmlFree(infname);
+		xmlFree(infnamev);
 	}
 }
 
@@ -1344,6 +1355,7 @@ int main(int argc, char **argv)
 	xmlNode *dmTitle;
 	xmlNode *techName;
 	xmlNode *infoName;
+	xmlNode *infoNameVariant;
 	xmlNode *responsiblePartnerCompany;
 	xmlNode *originator;
 
@@ -1375,7 +1387,7 @@ int main(int argc, char **argv)
 
 	char *outdir = NULL;
 
-	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:z:h?";
+	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:z:V:h?";
 	struct option lopts[] = {
 		{"version"               , no_argument      , 0, 0},
 		{"help"                  , no_argument      , 0, 'h'},
@@ -1418,6 +1430,7 @@ int main(int argc, char **argv)
 		{"brexmap"               , required_argument, 0, 'j'},
 		{"dump-templates"        , required_argument, 0, '~'},
 		{"issue-type"            , required_argument, 0, 'z'},
+		{"infoname-variant"      , required_argument, 0, 'V'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1455,6 +1468,7 @@ int main(int argc, char **argv)
 			case 'b': strcpy(brex_dmcode, optarg); break;
 			case 'S': sns_fname = strdup(optarg); break;
 			case 'I': strcpy(issue_date, optarg); break;
+			case 'V': info_name_variant = xmlStrdup(BAD_CAST optarg); break;
 			case 'v': verbose = true; break;
 			case 'f': overwrite = true; break;
 			case '$': issue = get_issue(optarg); break;
@@ -1723,6 +1737,7 @@ int main(int argc, char **argv)
 	dmTitle = find_child(dmAddressItems, "dmTitle");
 	techName = find_child(dmTitle, "techName");
 	infoName = find_child(dmTitle, "infoName");
+	infoNameVariant = find_child(dmTitle, "infoNameVariant");
 
 	if (strcmp(schema, "") != 0) {
 		xmlSetProp(dmodule, BAD_CAST "xsi:noNamespaceSchemaLocation", BAD_CAST schema);
@@ -1768,7 +1783,20 @@ int main(int argc, char **argv)
 		xmlUnlinkNode(infoName);
 		xmlFreeNode(infoName);
 	} else {
-		xmlNodeSetContent(infoName, BAD_CAST infoName_content);
+		xmlChar *s;
+		s = xmlEncodeEntitiesReentrant(dm, BAD_CAST infoName_content);
+		xmlNodeSetContent(infoName, s);
+		xmlFree(s);
+	}
+
+	if (info_name_variant) {
+		xmlChar *s;
+		s = xmlEncodeEntitiesReentrant(dm, info_name_variant);
+		xmlNodeSetContent(infoNameVariant, s);
+		xmlFree(s);
+	} else {
+		xmlUnlinkNode(infoNameVariant);
+		xmlFreeNode(infoNameVariant);
 	}
 
 	responsiblePartnerCompany = find_child(dmStatus, "responsiblePartnerCompany");
@@ -1925,6 +1953,7 @@ int main(int argc, char **argv)
 
 	xmlFree(issue_type);
 	xmlFree(remarks);
+	xmlFree(info_name_variant);
 
 	xmlFreeDoc(brexmap);
 	xmlFreeDoc(dm);

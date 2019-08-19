@@ -236,6 +236,9 @@ The type (schema) of the new data module. Supported schemas:
 -t, --techname &lt;tech&gt;  
 The tech name of the new data module.
 
+-V, --infoname-variant &lt;variant&gt;  
+The info name variant of the new data module.
+
 -v, --verbose  
 Print the file name of the newly created data module.
 

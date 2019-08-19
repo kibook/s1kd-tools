@@ -25,9 +25,9 @@
       <xsl:choose>
         <xsl:when test="infoNameVariant">
           <infoName>
-            <xsl:apply-templates select="infoName"/>
+            <xsl:apply-templates select="infoName/node()"/>
             <xsl:text>, </xsl:text>
-            <xsl:apply-templates select="infoNameVariant"/>
+            <xsl:apply-templates select="infoNameVariant/node()"/>
           </infoName>
         </xsl:when>
         <xsl:when test="infoName">
