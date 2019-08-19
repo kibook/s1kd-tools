@@ -9,10 +9,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="01"/>
+        <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="02" day="11"/>
+        <issueDate year="2019" month="08" day="19"/>
         <dmTitle>
           <techName>S1000D tools</techName>
           <infoName>Description</infoName>
@@ -132,7 +132,7 @@
           </listItem>
         </randomList>
       </para>
-      <para>These tools have been primarily developed around Issue 4.2 of the specification, and are generally compatibile with the previous 4.X issues. Support for Issue 3.0 and lower is a work-in-progress. Support for SGML schemas is not planned.</para>
+      <para>These tools are primarily developed around Issue 5.0 of the specification, and are generally compatibile with the previous 4.X issues. Support for Issue 3.0 and lower is a work-in-progress. Support for SGML schemas is not planned.</para>
       <para>
         <randomList>
           <listItem>
