@@ -18,9 +18,10 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-templates.h: update.xml ../common/42to41.xsl
+templates.h: update.xml ../common/to41.xsl ../common/to42.xsl
 	xxd -i update.xml > templates.h
-	xxd -i ../common/42to41.xsl >> templates.h
+	xxd -i ../common/to41.xsl >> templates.h
+	xxd -i ../common/to42.xsl >> templates.h
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)

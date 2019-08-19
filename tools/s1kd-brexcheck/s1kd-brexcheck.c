@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "2.12.4"
+#define VERSION "3.0.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -294,7 +294,8 @@ static bool is_xml_file(const char *fname)
 static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 {
 	return
-		(strcmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0 ||
+		(strcmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0 ||
+		 strcmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) &&
@@ -747,7 +748,10 @@ static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 		unsigned char *xml = NULL;
 		unsigned int len = 0;
 
-		if (strcmp(name, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
+		if (strcmp(name, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_G_04_10_0301_00A_022A_D_001_00_EN_US_XML;
+			len = brex_DMC_S1000D_G_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
 			xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
 			len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
 		} else if (strcmp(name, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
@@ -1149,7 +1153,9 @@ static const char *default_brex_dmc(xmlDocPtr doc)
 
 	schema = (char *) xmlGetProp(xmlDocGetRootElement(doc), BAD_CAST "noNamespaceSchemaLocation");
 
-	if (!schema || strstr(schema, "S1000D_4-2")) {
+	if (!schema || strstr(schema, "S1000D_5-0")) {
+		code = "DMC-S1000D-G-04-10-0301-00A-022A-D";
+	} else if (strstr(schema, "S1000D_5-0")) {
 		code = "DMC-S1000D-F-04-10-0301-00A-022A-D";
 	} else if (strstr(schema, "S1000D_4-1")) {
 		code = "DMC-S1000D-E-04-10-0301-00A-022A-D";

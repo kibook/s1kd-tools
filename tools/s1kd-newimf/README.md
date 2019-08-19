@@ -17,6 +17,13 @@ specified ICN files.
 OPTIONS
 =======
 
+-$, --issue &lt;issue&gt;  
+Specify which issue of S1000D to use. Currently supported issues are:
+
+-   5.0 (default)
+
+-   4.2
+
 -@, --out &lt;path&gt;  
 Save the new IMF to &lt;path&gt;. If &lt;path&gt; is an existing
 directory, the IMF will be created in it instead of the current

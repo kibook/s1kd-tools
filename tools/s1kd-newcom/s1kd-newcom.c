@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "1.9.4"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -66,17 +66,18 @@ static xmlChar *issue_type = NULL;
 
 static xmlChar *remarks = NULL;
 
-#define DEFAULT_S1000D_ISSUE ISS_42
+#define DEFAULT_S1000D_ISSUE ISS_50
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_23_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
+#define ISS_42_DEFAULT_BREX "S1000D-F-04-10-0301-00A-022A-D"
 
 #define DEFAULT_LANGUAGE_ISO_CODE "und"
 #define DEFAULT_COUNTRY_ISO_CODE "ZZ"
 
-static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50 } issue = NO_ISS;
 
 static char *template_dir = NULL;
 
@@ -99,7 +100,9 @@ static xmlDocPtr xml_skeleton(void)
 
 static enum issue get_issue(const char *iss)
 {
-	if (strcmp(iss, "4.2") == 0)
+	if (strcmp(iss, "5.0") == 0)
+		return ISS_50;
+	else if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
 	else if (strcmp(iss, "4.1") == 0)
 		return ISS_41;
@@ -130,33 +133,37 @@ static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	unsigned int len;
 
 	switch (iss) {
+		case ISS_42:
+			xml = ___common_to42_xsl;
+			len = ___common_to42_xsl_len;
+			break;
 		case ISS_41:
-			xml = ___common_42to41_xsl;
-			len = ___common_42to41_xsl_len;
+			xml = ___common_to41_xsl;
+			len = ___common_to41_xsl_len;
 			break;
 		case ISS_40:
-			xml = ___common_42to40_xsl;
-			len = ___common_42to40_xsl_len;
+			xml = ___common_to40_xsl;
+			len = ___common_to40_xsl_len;
 			break;
 		case ISS_30:
-			xml = ___common_42to30_xsl;
-			len = ___common_42to30_xsl_len;
+			xml = ___common_to30_xsl;
+			len = ___common_to30_xsl_len;
 			break;
 		case ISS_23:
-			xml = ___common_42to23_xsl;
-			len = ___common_42to23_xsl_len;
+			xml = ___common_to23_xsl;
+			len = ___common_to23_xsl_len;
 			break;
 		case ISS_22:
-			xml = ___common_42to22_xsl;
-			len = ___common_42to22_xsl_len;
+			xml = ___common_to22_xsl;
+			len = ___common_to22_xsl_len;
 			break;
 		case ISS_21:
-			xml = ___common_42to21_xsl;
-			len = ___common_42to21_xsl_len;
+			xml = ___common_to21_xsl;
+			len = ___common_to21_xsl_len;
 			break;
 		case ISS_20:
-			xml = ___common_42to20_xsl;
-			len = ___common_42to20_xsl_len;
+			xml = ___common_to20_xsl;
+			len = ___common_to20_xsl_len;
 			break;
 		default:
 			return NULL;
@@ -800,7 +807,7 @@ int main(int argc, char **argv)
 
 	for (i = 0; commentType[i]; ++i) commentType[i] = toupper(commentType[i]);
 
-	if (issue < ISS_42) {
+	if (issue < ISS_50) {
 		if (strcmp(brex_dmcode, "") == 0) {
 			switch (issue) {
 				case ISS_22:
@@ -817,6 +824,9 @@ int main(int argc, char **argv)
 					break;
 				case ISS_41:
 					set_brex(comment_doc, ISS_41_DEFAULT_BREX);
+					break;
+				case ISS_42:
+					set_brex(comment_doc, ISS_42_DEFAULT_BREX);
 					break;
 				default:
 					break;

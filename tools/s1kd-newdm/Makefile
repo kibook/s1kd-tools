@@ -18,16 +18,10 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-templates.h: templates/42/*.xml ../common/42to*.xsl ../common/brexmap.xml
+templates.h: templates/*.xml ../common/to*.xsl ../common/brexmap.xml
 	> templates.h
-	for t in templates/42/*.xml; do xxd -i $$t >> templates.h; done
-	xxd -i ../common/42to20.xsl >> templates.h
-	xxd -i ../common/42to21.xsl >> templates.h
-	xxd -i ../common/42to22.xsl >> templates.h
-	xxd -i ../common/42to23.xsl >> templates.h
-	xxd -i ../common/42to30.xsl >> templates.h
-	xxd -i ../common/42to40.xsl >> templates.h
-	xxd -i ../common/42to41.xsl >> templates.h
+	for t in templates/*.xml; do xxd -i $$t >> templates.h; done
+	for f in ../common/to*.xsl; do xxd -i $$f >> templates.h; done
 	xxd -i ../common/brexmap.xml >> templates.h
 
 dmtypes.h: dmtypes.xml dmtypes.txt

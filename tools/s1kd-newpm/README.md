@@ -23,7 +23,9 @@ The publication module code of the new publication module.
 -$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
--   4.2 (default)
+-   5.0 (default)
+
+-   4.2
 
 -   4.1
 
@@ -48,7 +50,7 @@ saved as the filename &lt;path&gt; instead of being automatically named.
 -%, --templates &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.
 The template must be named `pm.xml` in &lt;dir&gt; and must conform to
-the default S1000D issue (4.2).
+the default S1000D issue (5.0).
 
 -\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="17" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="024" inWork="00"/>
+        <issueInfo issueNumber="024" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="08" day="19"/>
         <dmTitle>
           <techName>s1kd-newddn(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change default issue to 5.0.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -72,8 +75,11 @@
                 <para>Specifiy which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
                   <randomList>
-                    <listItem>
-                      <para>4.2 (default)</para>
+                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>5.0 (default)</para>
+                    </listItem>
+                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                      <para>4.2</para>
                     </listItem>
                     <listItem>
                       <para>4.1</para>
@@ -109,7 +115,7 @@
             <definitionListItem>
               <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">ddn.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (4.2).</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">ddn.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (5.0).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

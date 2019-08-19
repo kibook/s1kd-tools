@@ -18,15 +18,9 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-template.h: comment.xml ../common/42to*.xsl
+template.h: comment.xml ../common/to*.xsl
 	xxd -i comment.xml > template.h
-	xxd -i ../common/42to20.xsl >> template.h
-	xxd -i ../common/42to21.xsl >> template.h
-	xxd -i ../common/42to22.xsl >> template.h
-	xxd -i ../common/42to23.xsl >> template.h
-	xxd -i ../common/42to30.xsl >> template.h
-	xxd -i ../common/42to40.xsl >> template.h
-	xxd -i ../common/42to41.xsl >> template.h
+	for f in ../common/to*.xsl; do xxd -i $$f >> template.h; done
 
 $(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)

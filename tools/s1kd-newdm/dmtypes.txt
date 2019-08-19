@@ -20,9 +20,11 @@
 019  descript             Supplier list
 020  descript             Configuration
 021  descript             Copyright
-022  brex                 Business rules
+022  brex                 Business rules exchange
 023  descript             Administrative forms and data
-024  descript             Business rules document
+024  brdoc                Business rules
+025  descript             Export control policy
+026  descript             Regulatory policy
 028  descript             General
 029  descript             Data structure
 030  descript             Technical data
@@ -145,7 +147,7 @@
 160  proced               Loading/Unloading procedure
 161  proced               Special operation
 162  proced               Non-tactical operation
-169  proced               Mass & Balance
+169  proced               Mass and Balance
 170  proced               Handling
 171  proced               Lifting
 172  proced               Jacking
@@ -191,6 +193,7 @@
 232  proced               Prime
 233  proced               Dry
 234  proced               Facility requirements associated with servicing
+235  proced               Flush
 236  proced               Fill with inert has/inert liquid
 237  proced               Evacuate
 240  proced               Lubrication

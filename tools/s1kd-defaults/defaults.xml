@@ -2,7 +2,7 @@
 <defaults>
   <default ident="countryIsoCode" value="ZZ"/>
   <default ident="inWork" value="01"/>
-  <default ident="issue" value="4.2"/>
+  <default ident="issue" value="5.0"/>
   <default ident="issueNumber" value="000"/>
   <default ident="languageIsoCode" value="und"/>
   <default ident="securityClassification" value="01"/>

@@ -8,12 +8,13 @@
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/transform.h>
 
 #include "template.h"
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "1.8.4"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -24,6 +25,7 @@
 #define EXIT_BAD_TEMPL_DIR 5
 #define EXIT_ENCODING_ERROR 6
 #define EXIT_OS_ERROR 7
+#define EXIT_BAD_ISSUE 8
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 #define E_ENCODING_ERROR ERR_PREFIX "Error encoding path name.\n"
@@ -41,6 +43,10 @@
 #define MAX_ITEM_LOCATION_CODE		 1	+ 2
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
+
+#define DEFAULT_S1000D_ISSUE ISS_50
+#define ISS_42_DEFAULT_BREX "S1000D-F-04-10-0301-00A-022A-D"
+static enum issue { NO_ISS, ISS_42, ISS_50 } issue = NO_ISS;
 
 static char issue_number[5] = "";
 static char in_work[4] = "";
@@ -74,6 +80,62 @@ static xmlDocPtr xml_skeleton(void)
 	} else {
 		return read_xml_mem((const char *) icnmetadata_xml, icnmetadata_xml_len);
 	}
+}
+
+static enum issue get_issue(const char *iss)
+{
+	if (strcmp(iss, "5.0") == 0)
+		return ISS_50;
+	else if (strcmp(iss, "4.2") == 0)
+		return ISS_42;
+
+	fprintf(stderr, ERR_PREFIX "Unsupported issue: %s\n", iss);
+	exit(EXIT_BAD_ISSUE);
+
+	return NO_ISS;
+}
+
+static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
+{
+	xmlDocPtr styledoc, src, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	src = xmlCopyDoc(doc, 1);
+
+	styledoc = read_xml_mem((const char *) xsl, len);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, src, params);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(src);
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
+{
+	xmlDocPtr orig;
+	unsigned char *xml = NULL;
+	unsigned int len;
+
+	switch (iss) {
+		case ISS_42:
+			xml = ___common_to42_xsl;
+			len = ___common_to42_xsl_len;
+			break;
+		default:
+			return NULL;
+	}
+
+	orig = xmlCopyDoc(doc, 1);
+	transform_doc(orig, xml, len, NULL);
+	xmlFreeDoc(doc);
+
+	return orig;
 }
 
 static void prompt(const char *prompt, char *str, int n)
@@ -200,6 +262,9 @@ static void copy_default_value(const char *def_key, const char *def_val)
 	}
 	if (strcmp(def_key, "remarks") == 0 && !remarks) {
 		remarks = xmlStrdup(BAD_CAST def_val);
+	}
+	if (strcmp(def_key, "issue") == 0 && issue == NO_ISS) {
+		issue = get_issue(def_val);
 	}
 }
 
@@ -334,7 +399,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr defaults_xml;
 
-	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:@:h?";
+	const char *sopts = "pd:n:w:c:r:R:o:O:Nt:b:I:vf%:qm:~:@:$:h?";
 	struct option lopts[] = {
 		{"version"       , no_argument      , 0, 0},
 		{"help"          , no_argument      , 0, 'h'},
@@ -358,6 +423,7 @@ int main(int argc, char **argv)
 		{"remarks"       , required_argument, 0, 'm'},
 		{"dump-templates", required_argument, 0, '~'},
 		{"out"           , required_argument, 0, '@'},
+		{"issue"         , required_argument, 0, '$'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -392,6 +458,7 @@ int main(int argc, char **argv)
 			case 'm': remarks = xmlStrdup(BAD_CAST optarg); break;
 			case '~': dump_template(optarg); return 0;
 			case '@': out = strdup(optarg); break;
+			case '$': issue = get_issue(optarg); break;
 			case 'h':
 			case '?': show_help(); return 0;
 		}
@@ -445,6 +512,7 @@ int main(int argc, char **argv)
 		prompt("ICN title", icn_title, 256);
 	}
 
+	if (issue == NO_ISS) issue = DEFAULT_S1000D_ISSUE;
 	if (strcmp(issue_number, "") == 0) strcpy(issue_number, "000");
 	if (strcmp(in_work, "") == 0) strcpy(in_work, "01");
 	if (strcmp(security_classification, "") == 0) strcpy(security_classification, "01");
@@ -517,6 +585,20 @@ int main(int argc, char **argv)
 			set_brex(template, brex_dmcode);
 
 		set_remarks(template, remarks);
+
+		if (issue < ISS_50) {
+			if (strcmp(brex_dmcode, "") == 0) {
+				switch (issue) {
+					case ISS_42:
+						set_brex(template, ISS_42_DEFAULT_BREX);
+						break;
+					default:
+						break;
+				}
+			}
+
+			template = toissue(template, issue);
+		}
 
 		if (out) {
 			strcpy(fname, out);

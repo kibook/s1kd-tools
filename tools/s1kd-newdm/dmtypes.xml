@@ -22,10 +22,12 @@
   <type infoCode="019" schema="descript" infoName="Supplier list"/>
   <type infoCode="020" schema="descript" infoName="Configuration"/>
   <type infoCode="021" schema="descript" infoName="Copyright"/>
-  <type infoCode="022" schema="brex" infoName="Business rules"/>
+  <type infoCode="022" schema="brex" infoName="Business rules exchange"/>
   <type infoCode="023" schema="descript" infoName="Administrative forms and data"/>
-  <type infoCode="024" schema="descript" infoName="Business rules document"/>
-  <!-- 025 thru 027 not available for projects  -->
+  <type infoCode="024" schema="brdoc" infoName="Business rules"/>
+  <type infoCode="025" schema="descript" infoName="Export control policy"/>
+  <type infoCode="026" schema="descript" infoName="Regulatory policy"/>
+  <!-- 027 not available for projects  -->
   <type infoCode="028" schema="descript" infoName="General"/>
   <type infoCode="029" schema="descript" infoName="Data structure"/>
   <type infoCode="030" schema="descript" infoName="Technical data"/>
@@ -169,7 +171,7 @@
   <type infoCode="161" schema="proced" infoName="Special operation"/>
   <type infoCode="162" schema="proced" infoName="Non-tactical operation"/>
   <!-- 163 thru 168 not available for projects -->
-  <type infoCode="169" schema="proced" infoName="Mass &amp; Balance"/>
+  <type infoCode="169" schema="proced" infoName="Mass and Balance"/>
   <type infoCode="170" schema="proced" infoName="Handling"/>
   <type infoCode="171" schema="proced" infoName="Lifting"/>
   <type infoCode="172" schema="proced" infoName="Jacking"/>
@@ -217,7 +219,7 @@
   <type infoCode="232" schema="proced" infoName="Prime"/>
   <type infoCode="233" schema="proced" infoName="Dry"/>
   <type infoCode="234" schema="proced" infoName="Facility requirements associated with servicing"/>
-  <!-- 235 not available for projects -->
+  <type infoCode="235" schema="proced" infoName="Flush"/>
   <type infoCode="236" schema="proced" infoName="Fill with inert has/inert liquid"/>
   <type infoCode="237" schema="proced" infoName="Evacuate"/>
   <!-- 238 thru 239 not available for projects -->

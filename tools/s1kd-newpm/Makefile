@@ -18,15 +18,9 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-template.h: pm.xml ../common/42to*.xsl
+template.h: pm.xml ../common/to*.xsl
 	xxd -i pm.xml > template.h
-	xxd -i ../common/42to20.xsl >> template.h
-	xxd -i ../common/42to21.xsl >> template.h
-	xxd -i ../common/42to22.xsl >> template.h
-	xxd -i ../common/42to23.xsl >> template.h
-	xxd -i ../common/42to30.xsl >> template.h
-	xxd -i ../common/42to40.xsl >> template.h
-	xxd -i ../common/42to41.xsl >> template.h
+	for f in ../common/to*.xsl; do xxd -i $$f >> template.h; done
 
 $(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)

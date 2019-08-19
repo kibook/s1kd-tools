@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "1.9.2"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -31,9 +31,9 @@
 #define OPT_INS   (int) 0x40
 #define OPT_URL   (int) 0x80
 
-enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42 };
+enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50 };
 
-#define DEFAULT_S1000D_ISSUE ISS_42
+#define DEFAULT_S1000D_ISSUE ISS_50
 
 static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
@@ -922,32 +922,36 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 
 		switch (iss) {
 			case ISS_20:
-				xsl = ___common_42to20_xsl;
-				len = ___common_42to20_xsl_len;
+				xsl = ___common_to20_xsl;
+				len = ___common_to20_xsl_len;
 				break;
 			case ISS_21:
-				xsl = ___common_42to21_xsl;
-				len = ___common_42to21_xsl_len;
+				xsl = ___common_to21_xsl;
+				len = ___common_to21_xsl_len;
 				break;
 			case ISS_22:
-				xsl = ___common_42to22_xsl;
-				len = ___common_42to22_xsl_len;
+				xsl = ___common_to22_xsl;
+				len = ___common_to22_xsl_len;
 				break;
 			case ISS_23:
-				xsl = ___common_42to23_xsl;
-				len = ___common_42to23_xsl_len;
+				xsl = ___common_to23_xsl;
+				len = ___common_to23_xsl_len;
 				break;
 			case ISS_30:
-				xsl = ___common_42to30_xsl;
-				len = ___common_42to30_xsl_len;
+				xsl = ___common_to30_xsl;
+				len = ___common_to30_xsl_len;
 				break;
 			case ISS_40:
-				xsl = ___common_42to40_xsl;
-				len = ___common_42to40_xsl_len;
+				xsl = ___common_to40_xsl;
+				len = ___common_to40_xsl_len;
 				break;
 			case ISS_41:
-				xsl = ___common_42to41_xsl;
-				len = ___common_42to41_xsl_len;
+				xsl = ___common_to41_xsl;
+				len = ___common_to41_xsl_len;
+				break;
+			case ISS_42:
+				xsl = ___common_to42_xsl;
+				len = ___common_to42_xsl_len;
 				break;
 			default:
 				xsl = NULL;
@@ -1016,6 +1020,8 @@ static enum issue spec_issue(const char *s)
 		return ISS_41;
 	} else if (strcmp(s, "4.2") == 0) {
 		return ISS_42;
+	} else if (strcmp(s, "5.0") == 0) {
+		return ISS_50;
 	}
 
 	if (verbosity > QUIET) {

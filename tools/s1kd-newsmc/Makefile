@@ -18,9 +18,10 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-template.h: scormcontentpackage.xml ../common/42to41.xsl
+template.h: scormcontentpackage.xml ../common/to41.xsl ../common/to42.xsl
 	xxd -i scormcontentpackage.xml > template.h
-	xxd -i ../common/42to41.xsl >> template.h
+	xxd -i ../common/to41.xsl >> template.h
+	xxd -i ../common/to42.xsl >> template.h
 
 $(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)

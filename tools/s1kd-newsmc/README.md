@@ -23,7 +23,9 @@ The SCORM content package code of the new SCORM content package.
 -$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
--   4.2 (default)
+-   5.0 (default)
+
+-   4.2
 
 -   4.1
 
@@ -37,7 +39,7 @@ automatically named.
 -%, --templates &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.
 The template must be named `scormcontentpackage.xml` in &lt;dir&gt; and
-must conform to the default S1000D issue (4.2).
+must conform to the default S1000D issue (5.0).
 
 -\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.

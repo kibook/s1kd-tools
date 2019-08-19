@@ -23,7 +23,9 @@ The data module code of the new data module.
 -$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
--   4.2 (default)
+-   5.0 (default)
+
+-   4.2
 
 -   4.1
 
@@ -380,7 +382,7 @@ the schema, matching one of the schema names in the `.dmtypes` file or
 the schema specified with the -T option.
 
 The templates must be written to conform to the default S1000D issue of
-this tool (currently 4.2). They will be automatically transformed when
+this tool (currently 5.0). They will be automatically transformed when
 another issue is specified with the -$ option.
 
 The `templates` default can also be specified in the `.defaults` file to

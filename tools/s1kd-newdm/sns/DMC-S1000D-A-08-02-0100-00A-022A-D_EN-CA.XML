@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/brex.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/brex.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
@@ -28,7 +28,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -47,34 +47,18 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>Product, Description</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Product, Description</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Product, General maintenance</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Product, General maintenance</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Product, Safety</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Product, Safety</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Safety and protective devices</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Safety and protective devices</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
@@ -95,19 +79,11 @@
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Material data</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Material data</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <!-- 60 thru 80 Available for projects -->
             <snsSubSystem>
               <snsCode>9</snsCode>
               <snsTitle>Battle damage repair</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Battle damage repair</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -116,26 +92,14 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Fatigue index calculations</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Fatigue index calculations</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Operating spectrums</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Operating spectrums</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -144,59 +108,31 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Time limits</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Time limits</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Scheduled maintenance checks lists</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Scheduled maintenance checks lists</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <!-- 30 Available for projects -->
             <snsSubSystem>
               <snsCode>4</snsCode>
               <snsTitle>Scheduled maintenance checks</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Scheduled maintenance checks</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Unscheduled maintenance checks</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Unscheduled maintenance checks</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>6</snsCode>
               <snsTitle>Acceptance and functional check usage</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Acceptance and functional check usage</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>8</snsCode>
               <snsTitle>Maintenance allocation</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Maintenacne allocation</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -205,42 +141,26 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Principal dimensions</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Principal dimensions</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Reference lines</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Reference lines</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Zones and areas</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Zones and areas</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
               <snsTitle>Access provisions</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Access provisions</snsTitle>
-              </snsSubSubSystem>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Master shapes</snsTitle>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -249,50 +169,26 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Jacking</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Jacking</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Shoring</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Shoring</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Slinging</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Slinging</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
               <snsTitle>Recovering</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Recovering</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Transporting</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Transporting</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -301,50 +197,26 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Mass and balance</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Mass and balance</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Leveling</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Leveling</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Weighing</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Weighing</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
               <snsTitle>Mass and c.g. data</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Mass and c.g. data</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Static stability</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Static stability</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -353,26 +225,14 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Handling</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Handling</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Maneuvering</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Maneuvering</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -381,42 +241,22 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Parking</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Parking</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Mooring</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Mooring</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Storing</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Storing</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
               <snsTitle>Return to Service</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Return to Service</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -425,34 +265,18 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Exterior color schemes and markings</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Exterior color schems and markings</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Exterior placards and markings</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Exterior placards and markings</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Interior placards and markings</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Interior placards and markings</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -461,34 +285,18 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Replenishing and depleting</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Replenishing and depleting</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Scheduled servicing</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Scheduled servicing</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Unscheduled servicing</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Unscheduled servicing</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -497,26 +305,14 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Support equipment</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Support equipment</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Cargo</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Cargo</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
@@ -589,10 +385,6 @@
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Nuclear munitions</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Nuclear munitions</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -601,34 +393,18 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Aircraft release/operating limitations</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Aircraft release/operating limitations</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Operational characteristics</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Operational characteristics</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Normal procedures</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Normal procedures</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
@@ -677,34 +453,18 @@
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Special conditions</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Special conditions</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>6</snsCode>
               <snsTitle>Performance data</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Performance data</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>7</snsCode>
               <snsTitle>Role Operation/Weapon system procedures</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Role Operation/Weapon system procedures</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>8</snsCode>
               <snsTitle>Configuration</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Configuration</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -713,18 +473,10 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Role changes</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Role changes</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <snsSystem>
@@ -733,58 +485,30 @@
             <snsSubSystem>
               <snsCode>0</snsCode>
               <snsTitle>General</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>General</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>1</snsCode>
               <snsTitle>Vibration analysis</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Vibration analysis</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>2</snsCode>
               <snsTitle>Noise analysis</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Noise analysis</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>3</snsCode>
               <snsTitle>Active attenuation/actuation</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Active attenuation/actuation</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>4</snsCode>
               <snsTitle>Sensing</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Sensing</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>5</snsCode>
               <snsTitle>Control/computing</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Control/computing</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
             <snsSubSystem>
               <snsCode>6</snsCode>
               <snsTitle>Passive attenuation</snsTitle>
-              <snsSubSubSystem>
-                <snsCode>0</snsCode>
-                <snsTitle>Passive attenuation</snsTitle>
-              </snsSubSubSystem>
             </snsSubSystem>
           </snsSystem>
           <!-- 19 Available for projects -->
