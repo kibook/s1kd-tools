@@ -354,6 +354,10 @@
       <xsl:text> - </xsl:text>
       <xsl:apply-templates select="infoName" mode="xlink"/>
     </xsl:if>
+    <xsl:if test="infoNameVariant">
+      <xsl:text>, </xsl:text>
+      <xsl:apply-templates select="infoNameVariant" mode="xlink"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="dmtitle" mode="xlink">

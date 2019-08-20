@@ -13,7 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.6.1"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "

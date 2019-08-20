@@ -201,6 +201,10 @@
       <xsl:text> - </xsl:text>
       <xsl:value-of select="infoName"/>
     </xsl:if>
+    <xsl:if test="infoNameVariant">
+      <xsl:text>, </xsl:text>
+      <xsl:value-of select="infoNameVariant"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="dmtitle" mode="dc">
