@@ -21,20 +21,21 @@
 
   <xsl:template match="dmTitle">
     <xsl:copy>
-      <xsl:apply-templates select="techName"/>
-      <xsl:choose>
-        <xsl:when test="infoNameVariant">
-          <infoName>
-            <xsl:apply-templates select="infoName/node()"/>
-            <xsl:text>, </xsl:text>
-            <xsl:apply-templates select="infoNameVariant/node()"/>
-          </infoName>
-        </xsl:when>
-        <xsl:when test="infoName">
-          <xsl:apply-templates select="infoName"/>
-        </xsl:when>
-      </xsl:choose>
+      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates select="techName|infoName"/>
     </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="infoName">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+      <xsl:apply-templates select="parent::dmTitle/infoNameVariant"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="infoNameVariant">
+    <xsl:text>, </xsl:text>
+    <xsl:apply-templates select="node()"/>
   </xsl:template>
 
 </xsl:stylesheet>

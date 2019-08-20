@@ -4,8 +4,6 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   exclude-result-prefixes="xsi">
 
-  <!-- S1000D 4.2 to 2.3 -->
-
   <xsl:variable name="schema-prefix">http://www.s1000d.org/S1000D_4-2/xml_schema_flat/</xsl:variable>
   
   <xsl:template match="@*|node()">
@@ -171,7 +169,8 @@
 
   <xsl:template match="dmTitle">
     <dmtitle>
-      <xsl:apply-templates select="@*|node()"/>
+      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates select="techName|infoName"/>
     </dmtitle>
   </xsl:template>
 
@@ -184,7 +183,13 @@
   <xsl:template match="infoName">
     <infoname>
       <xsl:apply-templates select="@*|node()"/>
+      <xsl:apply-templates select="parent::dmTitle/infoNameVariant"/>
     </infoname>
+  </xsl:template>
+
+  <xsl:template match="infoNameVariant">
+    <xsl:text>, </xsl:text>
+    <xsl:apply-templates select="node()"/>
   </xsl:template>
 
   <xsl:template match="issueDate">
