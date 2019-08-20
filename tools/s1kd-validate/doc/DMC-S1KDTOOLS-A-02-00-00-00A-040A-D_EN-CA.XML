@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-d <dir>] [-x <URI>] [-efloqvh?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-validate [-d &lt;dir&gt;] [-x &lt;URI&gt;] [-efloqvh?] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -162,13 +162,16 @@
           <title>Multi-spec directory with -d option</title>
           <para>The -d option can point either to a directory containing the XSD schema files for a single S1000D spec (i.e. the last part of the schema URI), or to a directory containing schemas for multiple specs. The latter must follow a particular format for the tool to locate the appropriate schemas for a given spec:</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[schemas/    <-- The directory passed to -d
+            <verbatimText verbatimStyle="vs23">schemas/    &lt;-- The directory passed to -d
     S1000D_4-1/
         xml_schema_flat/
             [4.1 XSD files...]
     S1000D_4-2/
         xml_schema_flat/
-            [4.2 XSD files...]]]></verbatimText>
+            [4.2 XSD files...]
+    S1000D_5-0/
+        xml_schema_flat/
+            [5.0 XSD files...]</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
@@ -176,10 +179,10 @@
           <para>XML catalogs provide a more standard method of redirecting public, network-based resources to local copies. As part of using libxml2, there are several locations and environment variables from which this tool will load catalogs.</para>
           <para>Below is an example of a catalog file which maps the S1000D schemas to a local directory:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-<rewriteURI uriStartString="http://www.s1000d.org/"
-rewritePrefix="/usr/share/s1kd/schemas/"/>
-</catalog>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"&gt;
+&lt;rewriteURI uriStartString="http://www.s1000d.org/"
+rewritePrefix="/usr/share/s1kd/schemas/"/&gt;
+&lt;/catalog&gt;</verbatimText>
           </para>
           <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>) to remove the need to use the -d option.</para>
         </levelledPara>

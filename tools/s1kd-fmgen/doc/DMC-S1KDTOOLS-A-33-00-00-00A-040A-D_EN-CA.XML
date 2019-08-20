@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,8 +49,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]]
-           [-,.flvh?] (-t <TYPE>|<DM>...)]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-fmgen [-F &lt;FMTYPES&gt;] [-P &lt;PM&gt;] [-x &lt;XSL&gt; [-p &lt;name&gt;=&lt;val&gt; ...]]
+           [-,.flvh?] (-t &lt;TYPE&gt;|&lt;DM&gt;...)</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -191,18 +191,18 @@
           <para>This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
           <para>Example of simple text format:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[001    TP
+            <verbatimText verbatimStyle="vs24">001    TP
 009    TOC
 00S    LOEDM
-00U    HIGH]]></verbatimText>
+00U    HIGH</verbatimText>
           </para>
           <para>Example of XML format:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<fmtypes>
-<fm infoCode="001" type="TP"/>
-<fm infoCode="009" type="TOC"/>
-<fm infoCode="00S" type="LOEDM"/>
-</fmtypes>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;fmtypes&gt;
+&lt;fm infoCode="001" type="TP"/&gt;
+&lt;fm infoCode="009" type="TOC"/&gt;
+&lt;fm infoCode="00S" type="LOEDM"/&gt;
+&lt;/fmtypes&gt;</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
@@ -214,8 +214,8 @@
         <title>EXAMPLE</title>
         <para>Generate the content for a title page front matter data module and overwrite the file:</para>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-flatten PMC-EX-12345-00001-00_001-00_EN-CA.XML |
-> s1kd-fmgen -f DMC-EX-A-00-00-00-00A-001A-D_001-00_EN-CA.XML]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">$ s1kd-flatten PMC-EX-12345-00001-00_001-00_EN-CA.XML |
+&gt; s1kd-fmgen -f DMC-EX-A-00-00-00-00A-001A-D_001-00_EN-CA.XML</verbatimText>
         </para>
       </levelledPara>
     </description>

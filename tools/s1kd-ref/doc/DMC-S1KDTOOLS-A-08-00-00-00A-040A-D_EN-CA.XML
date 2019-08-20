@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,8 +49,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-ref [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>]
-         [-o <dst>] [<code>|<file> ...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-ref [-dfilqRrStuvh?] [-$ &lt;issue&gt;] [-e &lt;file&gt;] [-s &lt;src&gt;]
+         [-o &lt;dst&gt;] [&lt;code&gt;|&lt;file&gt; ...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -204,14 +204,14 @@
           <title><verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file</title>
           <para>The <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file contains definitions of external publication references. This can be used to generate the XML for an external publication reference by specifying the external publication code.</para>
           <para>Example of a <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file:
-            <verbatimText verbatimStyle="vs11"><![CDATA[<externalPubs>
-<externalPubRef>
-<externalPubRefIdent>
-<externalPubCode>ABC</externalPubCode>
-<externalPubTitle>ABC Manual</externalPubTitle>
-</externalPubRefIdent>
-</externalPubRef>
-</externalPubs>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;externalPubs&gt;
+&lt;externalPubRef&gt;
+&lt;externalPubRefIdent&gt;
+&lt;externalPubCode&gt;ABC&lt;/externalPubCode&gt;
+&lt;externalPubTitle&gt;ABC Manual&lt;/externalPubTitle&gt;
+&lt;/externalPubRefIdent&gt;
+&lt;/externalPubRef&gt;
+&lt;/externalPubs&gt;</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>
@@ -219,146 +219,146 @@
         <title>EXAMPLES</title>
         <para>Reference to data module with data module code:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref DMC-EX-A-00-00-00-00A-040A-D
-<dmRef>
-<dmRefIdent>
-<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref DMC-EX-A-00-00-00-00A-040A-D
+&lt;dmRef&gt;
+&lt;dmRefIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
 subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
 disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
-itemLocationCode="D"/>
-</dmRefIdent>
-</dmRef>]]></verbatimText>
+itemLocationCode="D"/&gt;
+&lt;/dmRefIdent&gt;
+&lt;/dmRef&gt;</verbatimText>
         </para>
         <para>Reference to data module with data module code and issue/language:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -il DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA
-<dmRef>
-<dmRefIdent>
-<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref -il DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA
+&lt;dmRef&gt;
+&lt;dmRefIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
 subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
 disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
-itemLocationCode="D"/>
-<issueInfo issueNumber="001" inWork="03"/>
-<language languageIsoCode="en" countryIsoCode="CA"/>
-</dmRefIdent>
-</dmRef>]]></verbatimText>
+itemLocationCode="D"/&gt;
+&lt;issueInfo issueNumber="001" inWork="03"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;/dmRefIdent&gt;
+&lt;/dmRef&gt;</verbatimText>
         </para>
         <para>Reference to data module with all information, from a file:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -dilt DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA.XML
-<dmRef>
-<dmRefIdent>
-<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref -dilt DMC-EX-A-00-00-00-00A-040A-D_001-03_EN-CA.XML
+&lt;dmRef&gt;
+&lt;dmRefIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
 subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
 disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
-itemLocationCode="D"/>
-<issueInfo issueNumber="001" inWork="03"/>
-<language languageIsoCode="en" countryIsoCode="CA"/>
-</dmRefIdent>
-<dmRefAddressItems>
-<dmTitle>
-<techName>Example</techName>
-<infoName>Description</infoName>
-</dmTitle>
-<issueDate year="2018" month="06" day="25"/>
-</dmRefAddressItems>
-</dmRef>]]></verbatimText>
+itemLocationCode="D"/&gt;
+&lt;issueInfo issueNumber="001" inWork="03"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;/dmRefIdent&gt;
+&lt;dmRefAddressItems&gt;
+&lt;dmTitle&gt;
+&lt;techName&gt;Example&lt;/techName&gt;
+&lt;infoName&gt;Description&lt;/infoName&gt;
+&lt;/dmTitle&gt;
+&lt;issueDate year="2018" month="06" day="25"/&gt;
+&lt;/dmRefAddressItems&gt;
+&lt;/dmRef&gt;</verbatimText>
         </para>
         <para>Reference to a catalog sequence number:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref CSN-EX-A-00-00-00-01A-004A-D
-<catalogSeqNumberRef modelIdentCode="EX" systemDiffCode="A"
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref CSN-EX-A-00-00-00-01A-004A-D
+&lt;catalogSeqNumberRef modelIdentCode="EX" systemDiffCode="A"
 systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00"
 figureNumber="01" figureNumberVariant="A" item="004" itemVariant="A"
-itemLocationCode="D"/>]]></verbatimText>
+itemLocationCode="D"/&gt;</verbatimText>
         </para>
         <para>Reference to a comment:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref COM-EX-12345-2018-00001-Q
-<commentRef>
-<commentRefIdent>
-<commentCode modelIdentCode="EX" senderIdent="12345"
-yearOfDataIssue="2018" seqNumber="00001" commentType="q"/>
-</commentRefIdent>
-</commentRef>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref COM-EX-12345-2018-00001-Q
+&lt;commentRef&gt;
+&lt;commentRefIdent&gt;
+&lt;commentCode modelIdentCode="EX" senderIdent="12345"
+yearOfDataIssue="2018" seqNumber="00001" commentType="q"/&gt;
+&lt;/commentRefIdent&gt;
+&lt;/commentRef&gt;</verbatimText>
         </para>
         <para>Reference to a data management list:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref DML-EX-12345-C-2018-00001
-<dmlRef>
-<dmlRefIdent>
-<dmlCode modelIdentCode="EX" senderIdent="12345" dmlType="c"
-yearOfDataIssue="2018" seqNumber="00001"/>
-</dmlRefIdent>
-</dmlRef>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref DML-EX-12345-C-2018-00001
+&lt;dmlRef&gt;
+&lt;dmlRefIdent&gt;
+&lt;dmlCode modelIdentCode="EX" senderIdent="12345" dmlType="c"
+yearOfDataIssue="2018" seqNumber="00001"/&gt;
+&lt;/dmlRefIdent&gt;
+&lt;/dmlRef&gt;</verbatimText>
         </para>
         <para>Reference to an information control number:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref ICN-EX-A-000000-A-00001-A-001-01
-<infoEntityRef infoEntityRefIdent="ICN-EX-A-000000-A-00001-A-001-01"/>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref ICN-EX-A-000000-A-00001-A-001-01
+&lt;infoEntityRef infoEntityRefIdent="ICN-EX-A-000000-A-00001-A-001-01"/&gt;</verbatimText>
         </para>
         <para>Reference to a publication module:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref PMC-EX-12345-00001-00
-<pmRef>
-<pmRefIdent>
-<pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
-pmVolume="00"/>
-</pmRefIdent>
-</pmRef>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref PMC-EX-12345-00001-00
+&lt;pmRef&gt;
+&lt;pmRefIdent&gt;
+&lt;pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
+pmVolume="00"/&gt;
+&lt;/pmRefIdent&gt;
+&lt;/pmRef&gt;</verbatimText>
         </para>
         <para>Source identification for a data module:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -S DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
-<sourceDmIdent>
-<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref -S DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+&lt;sourceDmIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
 subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
 disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
-itemLocationCode="D"/>
-<language languageIsoCode="en" countryIsoCode="CA"/>
-<issueInfo issueNumber="001" inWork="00"/>
-</sourceDmIdent>]]></verbatimText>
+itemLocationCode="D"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;issueInfo issueNumber="001" inWork="00"/&gt;
+&lt;/sourceDmIdent&gt;</verbatimText>
         </para>
         <para>Source identification for a publication module:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -S PMC-EX-12345-00001-00_001-00_EN-CA.XML
-<sourcePmIdent>
-<pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
-pmVolume="00"/>
-<language languageIsoCode="en" countryIsoCode="CA"/>
-<issueInfo issueNumber="001" inWork="00"/>
-</sourcePmIdent>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref -S PMC-EX-12345-00001-00_001-00_EN-CA.XML
+&lt;sourcePmIdent&gt;
+&lt;pmCode modelIdentCode="EX" pmIssuer="12345" pmNumber="00001"
+pmVolume="00"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;issueInfo issueNumber="001" inWork="00"/&gt;
+&lt;/sourcePmIdent&gt;</verbatimText>
         </para>
         <para>Repository source identification for a CIR data module:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -R DMC-EX-A-00-00-00-00A-00GA-D_001-00_EN-CA.XML
-<repositorySourceDmIdent>
-<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref -R DMC-EX-A-00-00-00-00A-00GA-D_001-00_EN-CA.XML
+&lt;repositorySourceDmIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
 subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
 disassyCodeVariant="A" infoCode="00G" infoCodeVariant="A"
-itemLocationCode="D"/>
-<language languageIsoCode="en" countryIsoCode="CA"/>
-<issueInfo issueNumber="001" inWork="00"/>
-</repositorySourceDmIdent>]]></verbatimText>
+itemLocationCode="D"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;issueInfo issueNumber="001" inWork="00"/&gt;
+&lt;/repositorySourceDmIdent&gt;</verbatimText>
         </para>
         <para>Reference to an external publication:</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref ABC
-<externalPubRef>
-<externalPubRefIdent>
-<externalPubCode>ABC</externalPubCode>
-</externalPubRefIdent>
-</externalPubRef>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref ABC
+&lt;externalPubRef&gt;
+&lt;externalPubRefIdent&gt;
+&lt;externalPubCode&gt;ABC&lt;/externalPubCode&gt;
+&lt;/externalPubRefIdent&gt;
+&lt;/externalPubRef&gt;</verbatimText>
         </para>
         <para>Reference to an external publication (from the <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file):</para>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref ABC
-<externalPubRef>
-<externalPubRefIdent>
-<externalPubCode>ABC</externalPubCode>
-<externalPubTitle>ABC Manual</externalPubTitle>
-</externalPubRefIdent>
-</externalPubRef>]]></verbatimText>
+          <verbatimText verbatimStyle="vs23">$ s1kd-ref ABC
+&lt;externalPubRef&gt;
+&lt;externalPubRefIdent&gt;
+&lt;externalPubCode&gt;ABC&lt;/externalPubCode&gt;
+&lt;externalPubTitle&gt;ABC Manual&lt;/externalPubTitle&gt;
+&lt;/externalPubRefIdent&gt;
+&lt;/externalPubRef&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>

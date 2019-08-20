@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="05"/>
+        <issueInfo issueNumber="040" inWork="06"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="15"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -608,152 +608,152 @@
           <para>The -A option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded <verbatimText verbatimStyle="vs12">&lt;evaluate&gt;</verbatimText> elements when they contain only one remaining <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText>.</para>
           <para>For example, given the following input:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
-<applic id="app-0001">
-<assert
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0001"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-</applic>
-<applic id="app-0002">
-<assert
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0002"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-</applic>
-<applic id="app-0003">
-<evaluate andOr="or">
-<evaluate andOr="and">
-<assert
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0003"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-<assert
+applicPropertyValues="A"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="normal"/>
-</evaluate>
-<evaluate andOr="and">
-<assert
+applicPropertyValues="normal"/&gt;
+&lt;/evaluate&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-<assert
+applicPropertyValues="B"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="icy"/>
-</evaluate>
-</evaluate>
-</applic>
-</referencedApplicGroup>
-<!-- snip -->
-<para applicRefId="app-0001">This applies to version A.</para>
-<para applicRefId="app-0002">This applies to version B.</para>
-<para applicRefId="app-0003">
+applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para applicRefId="app-0001"&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0002"&gt;This applies to version B.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
 This applies to version A if the weather is normal, or version B if
 the weather is icy.
-</para>]]></verbatimText>
+&lt;/para&gt;</verbatimText>
           </para>
           <para>If this data is filtered for version A, without specifying a value for the weather, and neither the -a or -A option is used, the following will be the result:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
-<applic id="app-0001">
-<assert
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0001"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-</applic>
-<applic id="app-0002">
-<assert
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0002"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-</applic>
-<applic id="app-0003">
-<evaluate andOr="or">
-<evaluate andOr="and">
-<assert
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0003"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-<assert
+applicPropertyValues="A"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="normal"/>
-</evaluate>
-<evaluate andOr="and">
-<assert
+applicPropertyValues="normal"/&gt;
+&lt;/evaluate&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-<assert
+applicPropertyValues="B"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="icy"/>
-</evaluate>
-</evaluate>
-</applic>
-</referencedApplicGroup>
-<!-- snip -->
-<para applicRefId="app-0001">This applies to version A.</para>
-<para applicRefId="app-0003">
+applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para applicRefId="app-0001"&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
 This applies to version A if the weather is normal, or version B if
 the weather is icy.
-</para>]]></verbatimText>
+&lt;/para&gt;</verbatimText>
           </para>
           <para>The second paragraph is removed, because it only applies to version B.</para>
           <para>If the -a option is used, the following would be the result:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
-<applic id="app-0003">
-<evaluate andOr="or">
-<evaluate andOr="and">
-<assert
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0003"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-<assert
+applicPropertyValues="A"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="normal"/>
-</evaluate>
-<evaluate andOr="and">
-<assert
+applicPropertyValues="normal"/&gt;
+&lt;/evaluate&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-<assert
+applicPropertyValues="B"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="icy"/>
-</evaluate>
-</evaluate>
-</applic>
-</referencedApplicGroup>
-<!-- snip -->
-<para>This applies to version A.</para>
-<para applicRefId="app-0003">
+applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
 This applies to version A if the weather is normal, or version B if
 the weather is icy.
-</para>]]></verbatimText>
+&lt;/para&gt;</verbatimText>
           </para>
           <para>The applicability annotation reference for the first paragraph is removed because, given that the version is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A <emphasis>and</emphasis> the weather is normal, and no value has been given for the weather.</para>
           <para>If the -A option is used, the following would be the result:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
-<applic id="app-0003">
-<assert
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0003"&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="normal"/>
-</applic>
-</referencedApplicGroup>
-<!-- snip -->
-<para>This applies to version A.</para>
-<para applicRefId="app-0003">
+applicPropertyValues="normal"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
 This applies to version A if the weather is normal, or version B if
 the weather is icy.
-</para>]]></verbatimText>
+&lt;/para&gt;</verbatimText>
           </para>
           <para>The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is <emphasis>not</emphasis> A can be removed as invalid. This leaves only the assertion about the weather.</para>
           <note>
@@ -770,26 +770,26 @@ the weather is icy.
           </para>
           <para>The instance would contain the following annotation:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
-<!-- snip -->
-<applic>
-<assert applicPropertyIdent="version"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-</applic>
-<!-- snip -->
-</dmStatus>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
           </para>
           <para>regardless of what the applicability of the source object was.</para>
           <para>The -y option will create an applicability annotation for the instance by combining the user-defined applicability with the applicability of the source object. For example, given the following annotation in the source object:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
-<!-- snip -->
-<applic>
-<assert applicPropertyIdent="version"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-</applic>
-<!-- snip -->
-</dmStatus>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
           </para>
           <para>and the following command:</para>
           <para>
@@ -797,62 +797,62 @@ applicPropertyType="prodattr" applicPropertyValues="A"/>
           </para>
           <para>The annotation for the instance would be as follows:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
-<!-- snip -->
-<applic>
-<evaluate andOr="and">
-<assert applicPropertyIdent="version"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-<assert applicPropertyIdent="weather"
-applicPropertyType="condition" applicPropertyValues="icy"/>
-</evaluate>
-</applic>
-<!-- snip -->
-</dmStatus>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;assert applicPropertyIdent="weather"
+applicPropertyType="condition" applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
           </para>
           <para>The -Y option by itself works the same as the -y option, but allows custom display text to be set for the annotation. It can also be combined with the -W option to add custom display text to the overwriting annotation:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=A -WY "Version A" ...</verbatimText>
           </para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
-<!-- snip -->
-<applic>
-<displayText>
-<simplePara>Version A</simplePara>
-</displayText>
-<assert applicPropertyIdent="version"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-</applic>
-<!-- snip -->
-</dmStatus>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
           <title>Filtering for multiple values of a single property</title>
           <para>Though not usually the case, it is possible to create an instance which is filtered on multiple values of the same applicabilty property. Given the following:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
-<applic id="apA">
-<assert applicPropertyIdent="attr"
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="apA"&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-</applic>
-<applic id="apB">
-<assert applicPropertyIdent="attr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="apB"&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-</applic>
-<applic id="apC">
-<assert applicPropertyIdent="attr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;applic id="apC"&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="C"/>
-</applic>
-</referencedApplicGroup>
-<!-- ... -->
-<para applicRefId="apA">Applies to A</para>
-<para applicRefId="apB">Applies to B</para>
-<para applicRefId="apC">Applies to C</para>]]></verbatimText>
+applicPropertyValues="C"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- ... --&gt;
+&lt;para applicRefId="apA"&gt;Applies to A&lt;/para&gt;
+&lt;para applicRefId="apB"&gt;Applies to B&lt;/para&gt;
+&lt;para applicRefId="apC"&gt;Applies to C&lt;/para&gt;</verbatimText>
           </para>
           <para>filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property multiple times in the applicability definition arguments. For example:</para>
           <para>
@@ -860,39 +860,39 @@ applicPropertyValues="C"/>
           </para>
           <para>This would produce the following in the instance:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
-<!-- ... -->
-<applic>
-<displayText>
-<simplePara>A or C</simplePara>
-</displayText>
-<evaluate andOr="or">
-<assert applicPropertyIdent="attr"
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- ... --&gt;
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or C&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-<assert applicPropertyIdent="attr"
+applicPropertyValues="A"/&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="C"/>
-</evaluate>
-</applic>
-<!-- ... ->
-</dmStatus>
-<!-- ... -->
-<referencedApplicGroup>
-<applic id="apA">
-<assert applicPropertyIdent="attr"
+applicPropertyValues="C"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;!-- ... -&gt;
+&lt;/dmStatus&gt;
+&lt;!-- ... --&gt;
+&lt;referencedApplicGroup&gt;
+&lt;applic id="apA"&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-</applic>
-<applic id="apC">
-<assert applicPropertyIdent="attr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="apC"&gt;
+&lt;assert applicPropertyIdent="attr"
 applicPropertyType="prodattr"
-applicPropertyValues="C"/>
-</applic>
-</referencedApplicGroup>
-<!-- ... -->
-<para applicRefId="apA">Applies to A</para>
-<para applicRefId="apC">Applies to C</para>]]></verbatimText>
+applicPropertyValues="C"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- ... --&gt;
+&lt;para applicRefId="apA"&gt;Applies to A&lt;/para&gt;
+&lt;para applicRefId="apC"&gt;Applies to C&lt;/para&gt;</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
@@ -910,36 +910,36 @@ applicPropertyValues="C"/>
           </para>
           <para>A custom XSLT script can be supplied with the -x option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:stylesheet
+            <verbatimText verbatimStyle="vs11">&lt;xsl:stylesheet
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-version="1.0">
-<xsl:template match="functionalItemRef">
-<xsl:variable name="fin" select"@functionalItemNumber"/>
-<xsl:variable name="spec" select="//functionalItemSpec[
-functionalItemIdent/@functionalItemNumber = $fin]"/>
-<xsl:value-of select="$spec/name"/>
-</xsl:template>
-</xsl:stylesheet>]]></verbatimText>
+version="1.0"&gt;
+&lt;xsl:template match="functionalItemRef"&gt;
+&lt;xsl:variable name="fin" select"@functionalItemNumber"/&gt;
+&lt;xsl:variable name="spec" select="//functionalItemSpec[
+functionalItemIdent/@functionalItemNumber = $fin]"/&gt;
+&lt;xsl:value-of select="$spec/name"/&gt;
+&lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;</verbatimText>
           </para>
           <para>This script would resolve a <verbatimText verbatimStyle="vs12">functionalItemRef</verbatimText> by "flattening" it to the value of the <verbatimText verbatimStyle="vs12">name</verbatimText> element obtained from the CIR.</para>
           <para>The example CIR would contain a specification like:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<functionalItemSpec>
-<functionalItemIdent functionalItemNumber="ABC"
-functionalItemType="fit01"/>
-<name>Hydraulic pump</name>
-<functionalItemAlts>
-<functionalItem/>
-</functionalItemAlts>
-</functionalItemSpec>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;functionalItemSpec&gt;
+&lt;functionalItemIdent functionalItemNumber="ABC"
+functionalItemType="fit01"/&gt;
+&lt;name&gt;Hydraulic pump&lt;/name&gt;
+&lt;functionalItemAlts&gt;
+&lt;functionalItem/&gt;
+&lt;/functionalItemAlts&gt;
+&lt;/functionalItemSpec&gt;</verbatimText>
           </para>
           <para>The source data module would contain a reference:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<para>
+            <verbatimText verbatimStyle="vs11">&lt;para&gt;
 The
-<functionalItemRef functionalItemNumber="ABC"/>
+&lt;functionalItemRef functionalItemNumber="ABC"/&gt;
 is an item in the system.
-</para>]]></verbatimText>
+&lt;/para&gt;</verbatimText>
           </para>
           <para>The command would resemble:</para>
           <para>
@@ -947,16 +947,16 @@ is an item in the system.
           </para>
           <para>And the resulting XML would be:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<para>The Hydraulic pump is an item in the system.</para>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;para&gt;The Hydraulic pump is an item in the system.&lt;/para&gt;</verbatimText>
           </para>
           <para>The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element <verbatimText verbatimStyle="vs12">mux</verbatimText> contains two <verbatimText verbatimStyle="vs12">dmodule</verbatimText> elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.</para>
           <para>An "identity" template is automatically inserted in to the custom XSLT script, equivalent to the following:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="@*|node()">
-<xsl:copy>
-<xsl:apply-templates select="@*|node()"/>
-</xsl:copy>
-</xsl:template>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
+&lt;xsl:copy&gt;
+&lt;xsl:apply-templates select="@*|node()"/&gt;
+&lt;/xsl:copy&gt;
+&lt;/xsl:template&gt;</verbatimText>
           </para>
           <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -D option.</para>
@@ -972,11 +972,11 @@ is an item in the system.
           </para>
           <para>and you deliver to two customers, C1 and C2. The data module contains information for both:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<description>
-<para>This text applies to all customers.</para>
-<para applicRefId="app-C1">This only applies to Customer 1.</para>
-<para applicRefId="app-C2">This only applies to Customer 2.</para>
-</description>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;description&gt;
+&lt;para&gt;This text applies to all customers.&lt;/para&gt;
+&lt;para applicRefId="app-C1"&gt;This only applies to Customer 1.&lt;/para&gt;
+&lt;para applicRefId="app-C2"&gt;This only applies to Customer 2.&lt;/para&gt;
+&lt;/description&gt;</verbatimText>
           </para>
           <para>Neither customer wants to see information that applies only to the other, so you can create two customized instances of this data module, identified with the extended code:</para>
           <para>
@@ -986,25 +986,25 @@ DME-12345-C2-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
           </para>
           <para>Each instance data module identifies the original data module as its source:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<sourceDmIdent>
-<dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+            <verbatimText verbatimStyle="vs11">&lt;sourceDmIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
 subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
 disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
-itemLocationCode="D"/>
-<language languageIsoCode="en" countryIsoCode="CA"/>
-<issueInfo issueNumber="001" inWork="00"/>
-</sourceDmIdent>]]></verbatimText>
+itemLocationCode="D"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;issueInfo issueNumber="001" inWork="00"/&gt;
+&lt;/sourceDmIdent&gt;</verbatimText>
           </para>
           <para>and is set to apply only to the correct customer:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmStatus>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
 ...
-<applic>
-<assert applicPropertyIdent="customer" applicPropertyType="prodattr"
-applicPropertyValues="1"/>
-</applic>
+&lt;applic&gt;
+&lt;assert applicPropertyIdent="customer" applicPropertyType="prodattr"
+applicPropertyValues="1"/&gt;
+&lt;/applic&gt;
 ...
-</dmStatus>]]></verbatimText>
+&lt;/dmStatus&gt;</verbatimText>
           </para>
           <note>
             <notePara>The assertions in the applicability of an instance must use single values in order to work in this mode. Ranges (~) and sets (|) are not supported.</notePara>

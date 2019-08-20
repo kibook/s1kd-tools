@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="00"/>
+        <issueInfo issueNumber="020" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,8 +49,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-upissue [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
-             [-c <reason>] [-s <status>] [-t <urt>] [<file>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-upissue [-DdefHIilmNqRruvw] [-1 &lt;type&gt;] [-2 &lt;type&gt;]
+             [-c &lt;reason&gt;] [-s &lt;status&gt;] [-t &lt;urt&gt;] [&lt;file&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -246,7 +246,7 @@
         <levelledPara>
           <title>Data module with issue/inwork in filename</title>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[$ ls
+            <verbatimText verbatimStyle="vs23">$ ls
 DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 
 $ s1kd-upissue DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
@@ -259,13 +259,13 @@ $ s1kd-upissue \
 $ ls
 DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
-DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_001-00_EN-CA.XML]]></verbatimText>
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
           <title>Data module without issue/inwork in filename</title>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[$ ls
+            <verbatimText verbatimStyle="vs23">$ ls
 DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-US.XML
 
 $ s1kd-metadata DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
@@ -274,19 +274,19 @@ $ s1kd-metadata DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
 $ s1kd-upissue -N DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
 $ s1kd-metadata DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
   -n issueInfo
-000-02]]></verbatimText>
+000-02</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
           <title>Non-XML file with issue/inwork in filename</title>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[$ ls
+            <verbatimText verbatimStyle="vs23">$ ls
 TXT-S1KDTOOLS-KHZAE-FOOBAR_000-01_EN-CA.TXT
 
 $ s1kd-upissue TXT-S1KDTOOLS-KHZAE-00001_000-01_EN-CA.TXT
 $ ls
 TXT-S1KDTOOLS-KHZAE-FOOBAR_000-01_EN-CA.TXT
-TXT-S1KDTOOLS-KHZAE-FOOBAR_000-02_EN-CA.TXT]]></verbatimText>
+TXT-S1KDTOOLS-KHZAE-FOOBAR_000-02_EN-CA.TXT</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

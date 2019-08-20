@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,11 +49,11 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-aspp -h?
+          <verbatimText verbatimStyle="vs24">s1kd-aspp -h?
 s1kd-aspp -D
-s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
-             [-cfklNrv] [<object>...]
-s1kd-aspp -p [-a <ID>] [-flv] [<object>...]]]></verbatimText>
+s1kd-aspp -g [-A &lt;ACT&gt;] [-C &lt;CCT&gt;] [-d &lt;dir&gt;] [-F &lt;fmt&gt;] [-G &lt;XSL&gt;]
+             [-cfklNrv] [&lt;object&gt;...]
+s1kd-aspp -p [-a &lt;ID&gt;] [-flv] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -228,29 +228,29 @@ s1kd-aspp -p [-a <ID>] [-flv] [<object>...]]]></verbatimText>
           <title>Generating display text</title>
           <para>The built-in XSLT for generating display text follows the guidance in Chap 7.8 of the S1000D 4.2 specification. For example, given the following:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
-<assert applicPropertyIdent="prodversion"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-</applic>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;</verbatimText>
           </para>
           <para>The resulting XML would contain:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
-<displayText>
-<simplePara>prodversion: A</simplePara>
-</displayText>
-<assert applicPropertyIdent="prodversion"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-</applic>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;prodversion: A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;</verbatimText>
           </para>
           <para>If ACTs or CCTs are supplied which define display names for a property, this will be used instead of the ident. For example, the ACT defines the display name for the "<verbatimText verbatimStyle="vs14">prodversion</verbatimText>" product attribute:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<productAttribute id="prodversion">
-<name>Product version</name>
-<displayName>Version</displayName>
-<descr>The version of the product.</descr>
-<enumeration applicPropertyValues="A|B|C"/>
-</productAttribute>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;productAttribute id="prodversion"&gt;
+&lt;name&gt;Product version&lt;/name&gt;
+&lt;displayName&gt;Version&lt;/displayName&gt;
+&lt;descr&gt;The version of the product.&lt;/descr&gt;
+&lt;enumeration applicPropertyValues="A|B|C"/&gt;
+&lt;/productAttribute&gt;</verbatimText>
           </para>
           <para>When supplied with the -A option:</para>
           <para>
@@ -258,21 +258,21 @@ applicPropertyType="prodattr" applicPropertyValues="A"/>
           </para>
           <para>The resulting XML would instead contain:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
-<displayText>
-<simplePara>Version: A</simplePara>
-<assert applicPropertyIdent="prodversion"
-applicPropertyType="prodattr" applicPropertyValues="A"/>
-</displayText>
-</applic>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A&lt;/simplePara&gt;
+&lt;assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;</verbatimText>
           </para>
           <para>The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -D option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="@*|node()">
-<xsl:copy>
-<xsl:apply-templates select="@*|node()"/>
-</xsl:copy>
-</xsl:template>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
+&lt;xsl:copy&gt;
+&lt;xsl:apply-templates select="@*|node()"/&gt;
+&lt;/xsl:copy&gt;
+&lt;/xsl:template&gt;</verbatimText>
           </para>
           <para>This means any elements or attributes not matched by a more specific template in the script are copied.</para>
         </levelledPara>
@@ -296,74 +296,74 @@ applicPropertyType="prodattr" applicPropertyValues="A"/>
             </definitionList>
           </para>
           <para>For example:
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-aspp -g <DM>
+            <verbatimText verbatimStyle="vs24">$ s1kd-aspp -g &lt;DM&gt;
 ...
-<applic>
-<displayText>
-<simplePara>Version: A</simplePara>
-</displayText>
-<assert applicPropertyIdent="version" applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-</applic>
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
 ...
 
-$ s1kd-aspp -F '%name% = %values%' -g <DM>
+$ s1kd-aspp -F '%name% = %values%' -g &lt;DM&gt;
 ...
-<applic>
-<displayText>
-<simplePara>Version = A</simplePara>
-</displayText>
-<assert applicPropertyIdent="version" applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-</applic>
-...]]></verbatimText>
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version = A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+...</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
           <title>Creating presentation applicability statements</title>
           <para>Given the following:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
-<identAndStatusSection>
-<dmAddress>...</dmAddress>
-<dmStatus>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+&lt;identAndStatusSection&gt;
+&lt;dmAddress&gt;...&lt;/dmAddress&gt;
+&lt;dmStatus&gt;
 ...
-<applic>
-<displayText>
-<simplePara>A or B</simplePara>
-</displayText>
-</applic>
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
 ...
-</dmStatus>
-</identAndStatusSection>
-<content>
-<referencedApplicGroup>
-<applic id="app-B">
-<displayText>
-<simplePara>B</simplePara>
-</displayText>
-</applic>
-</referencedApplicGroup>
-<procedure>
-<preliminaryRqmts>...</preliminaryRqmts>
-<mainProcedure>
-<proceduralStep>
-<para>This step is applicable to A or B.</para>
-</proceduralStep>
-<proceduralStep applicRefId="app-B">
-<para>This step is applicable to B only.</para>
-</proceduralStep>
-<proceduralStep applicRefId="app-B">
-<para>This step is also applicable to B only.</para>
-</proceduralStep>
-<proceduralStep>
-<para>This step is also applicable to A or B.</para>
-</proceduralStep>
-</mainProcedure>
-<closeRqmts>...</closeRqmts>
-</procedure>
-</content>
-</dmodule>]]></verbatimText>
+&lt;/dmStatus&gt;
+&lt;/identAndStatusSection&gt;
+&lt;content&gt;
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-B"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;procedure&gt;
+&lt;preliminaryRqmts&gt;...&lt;/preliminaryRqmts&gt;
+&lt;mainProcedure&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-B"&gt;
+&lt;para&gt;This step is applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-B"&gt;
+&lt;para&gt;This step is also applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is also applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;/mainProcedure&gt;
+&lt;closeRqmts&gt;...&lt;/closeRqmts&gt;
+&lt;/procedure&gt;
+&lt;/content&gt;
+&lt;/dmodule&gt;</verbatimText>
           </para>
           <para>Applicability statements should be displayed whenever applicability changes:</para>
           <para>
@@ -401,51 +401,51 @@ applicPropertyValues="A"/>
           </para>
           <para>Using the s1kd-aspp tool, the above XML would produce the following output:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
-<identAndStatusSection>
-<dmAddress>...</dmAddress>
-<dmStatus>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+&lt;identAndStatusSection&gt;
+&lt;dmAddress&gt;...&lt;/dmAddress&gt;
+&lt;dmStatus&gt;
 ...
-<applic>
-<displayText>
-<simplePara>A or B</simplePara>
-</displayText>
-</applic>
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
 ...
-</dmStatus>
-</identAndStatusSection>
-<content>
-<referencedApplicGroup>
-<applic id="app-B">
-<displayText>
-<simplePara>B</simplePara>
-</displayText>
-</applic>
-<applic id="app-0000">
-<displayText>
-<simplePara>A or B</simplePara>
-</displayText>
-</applic>
-</referencedApplicGroup>
-<procedure>
-<preliminaryRqmts>...</preliminaryRqmts>
-<mainProcedure>
-<proceduralStep>
-<para>This step is applicable to A or B.</para>
-</proceduralStep>
-<proceduralStep applicRefId="app-B">
-<para>This step is applicable to B only.</para>
-</proceduralStep>
-<proceduralStep>
-<para>This step is also applicable to B only.</para>
-</proceduralStep>
-<proceduralStep applicRefId="app-0000">
-<para>This step is also applicable to A or B.</para>
-</proceduralStep>
-</mainProcedure>
-</procedure>
-</content>
-</dmodule>]]></verbatimText>
+&lt;/dmStatus&gt;
+&lt;/identAndStatusSection&gt;
+&lt;content&gt;
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-B"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0000"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;procedure&gt;
+&lt;preliminaryRqmts&gt;...&lt;/preliminaryRqmts&gt;
+&lt;mainProcedure&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-B"&gt;
+&lt;para&gt;This step is applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is also applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-0000"&gt;
+&lt;para&gt;This step is also applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;/mainProcedure&gt;
+&lt;/procedure&gt;
+&lt;/content&gt;
+&lt;/dmodule&gt;</verbatimText>
           </para>
           <para>With attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> only on those elements where a statement should be shown, and an additional inline applicability to represent the whole data module's applicability. This XML is semantically incorrect but easier for a stylesheet to transform for page-oriented output.</para>
         </levelledPara>

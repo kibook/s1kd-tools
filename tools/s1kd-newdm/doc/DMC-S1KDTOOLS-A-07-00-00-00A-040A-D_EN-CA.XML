@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="042" inWork="02"/>
+        <issueInfo issueNumber="042" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="19"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -503,24 +503,24 @@
           <para>All of the s1kd-new* commands use the same <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file format, so this file can contain default values for multiple types of metadata.</para>
           <para>Each line consists of the identifier of a piece of metadata and its default value, separated by whitespace. Lines which do not match a piece of metadata are ignored, and may be used as comments. Example:</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[# General
+            <verbatimText verbatimStyle="vs23"># General
 countryIsoCode               CA
 languageIsoCode              en
 originator                   khzae.net
 responsiblePartnerCompany    khzae.net
-securityClassification       01]]></verbatimText>
+securityClassification       01</verbatimText>
           </para>
           <para>Alternatively, the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file can be written using an XML format, containing a root element <verbatimText verbatimStyle="vs12">defaults</verbatimText> with child elements <verbatimText verbatimStyle="vs12">default</verbatimText> which each have an attribute <verbatimText verbatimStyle="vs13">ident</verbatimText> and an attribute <verbatimText verbatimStyle="vs13">value</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0"?>
-<defaults>
-<!-- General -->
-<default ident="countryIsoCode" value="CA"/>
-<default ident="languageIsoCode" value="en"/>
-<default ident="originator" value="khzae.net"/>
-<default ident="responsiblePartnerCompany" value="khzae.net"/>
-<default ident="securityClassification" value="01"/>
-</defaults>]]></verbatimText>
+            <verbatimText verbatimStyle="vs23">&lt;?xml version="1.0"?&gt;
+&lt;defaults&gt;
+&lt;!-- General --&gt;
+&lt;default ident="countryIsoCode" value="CA"/&gt;
+&lt;default ident="languageIsoCode" value="en"/&gt;
+&lt;default ident="originator" value="khzae.net"/&gt;
+&lt;default ident="responsiblePartnerCompany" value="khzae.net"/&gt;
+&lt;default ident="securityClassification" value="01"/&gt;
+&lt;/defaults&gt;</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
@@ -528,20 +528,20 @@ securityClassification       01]]></verbatimText>
           <para>This file sets the default schema and info name for data modules based on their info code. By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>, but any file can be specified by using the -D option.</para>
           <para>Each line consists of an info code, a schema identifier, and optionally a default info name. Example:</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[000    descript
+            <verbatimText verbatimStyle="vs23">000    descript
 022    brex        Business rules
 040    descript    Description
-520    proced      Remove procedure]]></verbatimText>
+520    proced      Remove procedure</verbatimText>
           </para>
           <para>Like the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file, the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file may also be written in an XML format, where each child has an attribute <verbatimText verbatimStyle="vs13">infoCode</verbatimText>, an attribute <verbatimText verbatimStyle="vs13">schema</verbatimText>, and optionally an attribute <verbatimText verbatimStyle="vs13">infoName</verbatimText>.</para>
           <para>
-            <verbatimText verbatimStyle="vs23"><![CDATA[<?xml version="1.0">
-<dmtypes>
-<type infoCode="000" schema="descript"/>
-<type infoCode="022" schema="brex" infoName="Business rules"/>
-<type infoCode="040" schema="descript" infoName="Description"/>
-<type infoCode="520" schema="proced" infoName="Remove procedure"/>
-</dmtypes>]]></verbatimText>
+            <verbatimText verbatimStyle="vs23">&lt;?xml version="1.0"&gt;
+&lt;dmtypes&gt;
+&lt;type infoCode="000" schema="descript"/&gt;
+&lt;type infoCode="022" schema="brex" infoName="Business rules"/&gt;
+&lt;type infoCode="040" schema="descript" infoName="Description"/&gt;
+&lt;type infoCode="520" schema="proced" infoName="Remove procedure"/&gt;
+&lt;/dmtypes&gt;</verbatimText>
           </para>
           <para>The info code field can also include an info code variant, item location code, learn code, and learn event code, which allows for more specific default schemas and info names.</para>
           <para>Example of info code variants:</para>

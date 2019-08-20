@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="033" inWork="00"/>
+        <issueInfo issueNumber="033" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,8 +49,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-               [-BcefLlnopqrS[tu]sTvxh?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-brexcheck [-b &lt;brex&gt;] [-d &lt;dir&gt;] [-I &lt;path&gt;] [-w &lt;severities&gt;]
+               [-BcefLlnopqrS[tu]sTvxh?] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -231,11 +231,11 @@
           <para>By default, the program will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>, but any file can be specified by using the -w option.</para>
           <para>An example of the format of this file is given below:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
-<brSeverityLevels>
-<brSeverityLevel value="brsl01" fail="yes">Error</brSeverityLevel>
-<brSeverityLevel value="brsl02" fail="no">Warning</brSeverityLevel>
-</brSeverityLevels>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+&lt;brSeverityLevels&gt;
+&lt;brSeverityLevel value="brsl01" fail="yes"&gt;Error&lt;/brSeverityLevel&gt;
+&lt;brSeverityLevel value="brsl02" fail="no"&gt;Warning&lt;/brSeverityLevel&gt;
+&lt;/brSeverityLevels&gt;</verbatimText>
           </para>
           <para>When the attribute <verbatimText verbatimStyle="vs13">fail</verbatimText> has a value of <verbatimText verbatimStyle="vs14">"yes"</verbatimText> (or is not included), BREX errors pertaining to rules with the given severity level value will be counted as errors. When it is <verbatimText verbatimStyle="vs14">"no"</verbatimText>, the errors are still displayed but are not counted as errors in the exit status code of the tool.</para>
         </levelledPara>
@@ -244,37 +244,37 @@
           <para>There are three modes for SNS checking: normal, strict, and unstrict. The main difference between them is how they handle the optional levels of an SNS description in the BREX.</para>
           <para>-St enables <emphasis>strict</emphasis> SNS checking. By default, the normal SNS check (-S) will assume optional elements snsSubSystem, snsSubSubSystem, and snsAssy exist with an snsCode of "0" ("00" or "0000" for snsAssy) when their parent element does not contain any of each. This provides a shorthand, such that</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
-</snsSystem>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;snsSystem&gt;
+&lt;snsCode&gt;00&lt;/snsCode&gt;
+&lt;snsTitle&gt;General&lt;/snsTitle&gt;
+&lt;/snsSystem&gt;</verbatimText>
           </para>
           <para>is equivalent to</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
-<snsSubSystem>
-<snsCode>0</snsCode>
-<snsTitle>General</snsTitle>
-<snsSubSubSystem>
-<snsCode>0</snsCode>
-<snsTitle>General</snsTitle>
-<snsAssy>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
-</snsAssy>
-</snsSubSubSystem>
-</snsSubSystem>
-</snsSystem>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;snsSystem&gt;
+&lt;snsCode&gt;00&lt;/snsCode&gt;
+&lt;snsTitle&gt;General&lt;/snsTitle&gt;
+&lt;snsSubSystem&gt;
+&lt;snsCode&gt;0&lt;/snsCode&gt;
+&lt;snsTitle&gt;General&lt;/snsTitle&gt;
+&lt;snsSubSubSystem&gt;
+&lt;snsCode&gt;0&lt;/snsCode&gt;
+&lt;snsTitle&gt;General&lt;/snsTitle&gt;
+&lt;snsAssy&gt;
+&lt;snsCode&gt;00&lt;/snsCode&gt;
+&lt;snsTitle&gt;General&lt;/snsTitle&gt;
+&lt;/snsAssy&gt;
+&lt;/snsSubSubSystem&gt;
+&lt;/snsSubSystem&gt;
+&lt;/snsSystem&gt;</verbatimText>
           </para>
           <para>Using strict checking will disable this shorthand, and missing optional elements will result in an error.</para>
           <para>-Su enables <emphasis>unstrict</emphasis> SNS checking. The normal SNS check (-S) shorthand mentioned above only allows SNS codes of "0" to be omitted from the SNS rules. Using unstrict checking, <emphasis>any</emphasis> code used will not produce an error when the relevant optional elements are omitted. This means that given the following...</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<snsSystem>
-<snsCode>00</snsCode>
-<snsTitle>General</snsTitle>
-</snsSystem>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;snsSystem&gt;
+&lt;snsCode&gt;00&lt;/snsCode&gt;
+&lt;snsTitle&gt;General&lt;/snsTitle&gt;
+&lt;/snsSystem&gt;</verbatimText>
           </para>
           <para>...SNS codes of 00-00-0000 through 00-ZZ-ZZZZ are considered valid.</para>
         </levelledPara>
@@ -282,22 +282,22 @@
           <title>Object value checking (-c)</title>
           <para>There are two ways to restrict the allowable values of an object in a BREX rule. One is to use the XPath expression itself. For example, this expression will match any <verbatimText verbatimStyle="vs13">securityClassification</verbatimText> attribute whose value is neither <verbatimText verbatimStyle="vs14">"01"</verbatimText> nor <verbatimText verbatimStyle="vs14">"02"</verbatimText>, and because the <verbatimText verbatimStyle="vs13">allowedObjectFlag</verbatimText> is <verbatimText verbatimStyle="vs14">"0"</verbatimText>, will generate a BREX error if any match is found:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<objectPath allowedObjectFlag="0">
+            <verbatimText verbatimStyle="vs11">&lt;objectPath allowedObjectFlag="0"&gt;
 //@securityClassification[
 . != '01' and
 . != '02'
 ]
-</objectPath>]]></verbatimText>
+&lt;/objectPath&gt;</verbatimText>
           </para>
           <para>However, this method can lead to fairly complex expressions and requires a reversal of logic. The BREX schema provides an alternative method using the element <verbatimText verbatimStyle="vs12">objectValue</verbatimText>:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
-<objectPath allowedObjectFlag="2">
+            <verbatimText verbatimStyle="vs11">&lt;structureObjectRule&gt;
+&lt;objectPath allowedObjectFlag="2"&gt;
 //@securityClassification
-</objectPath>
-<objectValue valueAllowed="01">Unclassified</objectValue>
-<objectValue valueAllowed="02">Classified</objectValue>
-</structureObjectRule>]]></verbatimText>
+&lt;/objectPath&gt;
+&lt;objectValue valueAllowed="01"&gt;Unclassified&lt;/objectValue&gt;
+&lt;objectValue valueAllowed="02"&gt;Classified&lt;/objectValue&gt;
+&lt;/structureObjectRule&gt;</verbatimText>
           </para>
           <para>Specifying the -c option will enable checking of these types of rules, and if the value is not within the allowed set a BREX error will be reported. The <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute can be used to specify what kind of notation the <verbatimText verbatimStyle="vs13">valueAllowed</verbatimText> attribute will contain:</para>
           <para>
@@ -362,16 +362,16 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23"><![CDATA[$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23">$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
-<listItem id="stp-0001">
-<para>List items shouldn't be used as steps...</para>
-</listItem>
+&lt;listItem id="stp-0001"&gt;
+&lt;para&gt;List items shouldn't be used as steps...&lt;/para&gt;
+&lt;/listItem&gt;
 [...]
-<para>Refer to <internalRef internalRefId="stp-0001"
-internalRefTargetType="irtt08"/>.</para>
+&lt;para&gt;Refer to &lt;internalRef internalRefId="stp-0001"
+internalRefTargetType="irtt08"/&gt;.&lt;/para&gt;
 [...]
 
 $ s1kd-brexcheck -b $BREX $DMOD
@@ -387,28 +387,28 @@ internalRef[1]):
           content=irtt08
       ATTRIBUTE internalRefId
         TEXT
-          content=stp-0001]]></verbatimText>
+          content=stp-0001</verbatimText>
         </para>
         <para>Example of XML report format for the above:</para>
         <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
-<brexCheck>
-<document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML">
-<brex path="DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML">
-<error fail="yes">
-<objectPath allowedObjectFlag="0">...</objectPath>
-<objectUse>Only when the refernce target is a step can the value of
+          <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+&lt;brexCheck&gt;
+&lt;document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML"&gt;
+&lt;brex path="DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML"&gt;
+&lt;error fail="yes"&gt;
+&lt;objectPath allowedObjectFlag="0"&gt;...&lt;/objectPath&gt;
+&lt;objectUse&gt;Only when the refernce target is a step can the value of
 attribute internalRefTargetType be irtt08
-(Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
-<object line="52"
-xpath="/dmodule[1]/content[1]/description[1]/para[2]/internalRef[1]">
-<internalRef internalRefId="stp-0001"
-internalRefTargetType="irtt08"/>
-</object>
-</error>
-</brex>
-</document>
-</brexCheck>]]></verbatimText>
+(Chap 3.9.5.2.1.2, Para 2.1).&lt;/objectUse&gt;
+&lt;object line="52"
+xpath="/dmodule[1]/content[1]/description[1]/para[2]/internalRef[1]"&gt;
+&lt;internalRef internalRefId="stp-0001"
+internalRefTargetType="irtt08"/&gt;
+&lt;/object&gt;
+&lt;/error&gt;
+&lt;/brex&gt;
+&lt;/document&gt;
+&lt;/brexCheck&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>

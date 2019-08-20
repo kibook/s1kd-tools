@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="32" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="015" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-icncatalog(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -170,16 +170,16 @@
           <title>Resolving ICNs to filenames</title>
           <para>A CSDB object may reference an ICN as follows:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
-NDATA png>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;!NOTATION png SYSTEM "png"&gt;
+&lt;!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
+NDATA png&gt;</verbatimText>
           </para>
           <para>The SYSTEM ID of this ENTITY indicates that the ICN file will be in the same directory relative to the CSDB object. However, the ICN files in this example are located in a separate folder called 'graphics'. Rather than manually updating every ENTITY declaration in every CSDB object, a catalog file can be used to map ICNs to actual filenames:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<icnCatalog>
-<icn infoEntityIdent="ICN-12345-00001-001-01"
-uri="graphics/ICN-12345-00001-001-01.PNG"/>
-</icnCatalog>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;icnCatalog&gt;
+&lt;icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="graphics/ICN-12345-00001-001-01.PNG"/&gt;
+&lt;/icnCatalog&gt;</verbatimText>
           </para>
           <para>Then, using this tool, the ICN can be resolved against the catalog:</para>
           <para>
@@ -187,51 +187,51 @@ uri="graphics/ICN-12345-00001-001-01.PNG"/>
           </para>
           <para>Producing the following output:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!ENTITY ICN-12345-00001-001-01 SYSTEM
-"graphics/ICN-12345-00001-001-01.PNG" NDATA png>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;!NOTATION png SYSTEM "png"&gt;
+&lt;!ENTITY ICN-12345-00001-001-01 SYSTEM
+"graphics/ICN-12345-00001-001-01.PNG" NDATA png&gt;</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
           <title>Alternative ICN formats</title>
           <para>A catalog can also be used to provide alternative file formats for an ICN depending on the intended output media. For example:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<icnCatalog>
-<notation name="jpg" systemId="jpg"/>
-<notation name="svg" systemId="svg"/>
-<media name="pdf">
-<icn infoEntityIdent="ICN-12345-00001-001-01"
-uri="ICN-12345-00001-001-01.JPG" notation="jpg"/>
-</media>
-<media name="web">
-<icn infoEntityIdent="ICN-12345-00001-001-01"
-uri="ICN-12345-00001-001-01.SVG" notation="svg"/>
-</media>
-</icnCatalog>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;icnCatalog&gt;
+&lt;notation name="jpg" systemId="jpg"/&gt;
+&lt;notation name="svg" systemId="svg"/&gt;
+&lt;media name="pdf"&gt;
+&lt;icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.JPG" notation="jpg"/&gt;
+&lt;/media&gt;
+&lt;media name="web"&gt;
+&lt;icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.SVG" notation="svg"/&gt;
+&lt;/media&gt;
+&lt;/icnCatalog&gt;</verbatimText>
           </para>
           <para>The -m option allows for specifying which type of media to resolve for:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
-NDATA png>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;!NOTATION png SYSTEM "png"&gt;
+&lt;!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.PNG"
+NDATA png&gt;</verbatimText>
           </para>
           <para>
             <verbatimText verbatimStyle="vs24">$ s1kd-icncatalog -c &lt;catalog&gt; -m pdf &lt;object&gt;</verbatimText>
           </para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!NOTATION jpg SYSTEM "jpg">
-<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.JPG"
-NDATA jpg>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;!NOTATION png SYSTEM "png"&gt;
+&lt;!NOTATION jpg SYSTEM "jpg"&gt;
+&lt;!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.JPG"
+NDATA jpg&gt;</verbatimText>
           </para>
           <para>
             <verbatimText verbatimStyle="vs24">$ s1kd-icncatalog -c &lt;catalog&gt; -m web &lt;object&gt;</verbatimText>
           </para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<!NOTATION png SYSTEM "png">
-<!NOTATION svg SYSTEM "svg">
-<!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.SVG"
-NDATA svg>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;!NOTATION png SYSTEM "png"&gt;
+&lt;!NOTATION svg SYSTEM "svg"&gt;
+&lt;!ENTITY ICN-12345-00001-001-01 SYSTEM "ICN-12345-00001-001-01.SVG"
+NDATA svg&gt;</verbatimText>
           </para>
         </levelledPara>
         <levelledPara>
@@ -400,21 +400,21 @@ value of the atomic type 'xs:ENTITY'.</verbatimText>
         <levelledPara>
           <title>Example ICN catalog</title>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<icnCatalog>
-<notation name="jpg" systemId="jpg"/>
-<notation name="png" systemId="png"/>
-<notation name="svg" systemId="svg"/>
-<media name="pdf">
-<icn infoEntityIdent="ICN-12345-00001-001-01"
-uri="ICN-12345-00001-001-01.JPG" notation="jpg"/>
-</media>
-<media name="web">
-<icn infoEntityIdent="ICN-12345-00001-001-01"
-uri="ICN-12345-00001-001-01.SVG" notation="svg"/>
-</media>
-<icn infoEntityIdent="ICN-12345-00001-001-01"
-uri="ICN-12345-00001-001-01.PNG" notation="png"/>
-</icnCatalog>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;icnCatalog&gt;
+&lt;notation name="jpg" systemId="jpg"/&gt;
+&lt;notation name="png" systemId="png"/&gt;
+&lt;notation name="svg" systemId="svg"/&gt;
+&lt;media name="pdf"&gt;
+&lt;icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.JPG" notation="jpg"/&gt;
+&lt;/media&gt;
+&lt;media name="web"&gt;
+&lt;icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.SVG" notation="svg"/&gt;
+&lt;/media&gt;
+&lt;icn infoEntityIdent="ICN-12345-00001-001-01"
+uri="ICN-12345-00001-001-01.PNG" notation="png"/&gt;
+&lt;/icnCatalog&gt;</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

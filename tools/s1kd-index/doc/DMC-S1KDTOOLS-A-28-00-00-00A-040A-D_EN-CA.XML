@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="28" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="06" day="21"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-index(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -49,9 +49,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-index -h?
-s1kd-index [-I <index>] [-filv] [<module>...]
-s1kd-index -D [-filv] [<module>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-index -h?
+s1kd-index [-I &lt;index&gt;] [-filv] [&lt;module&gt;...]
+s1kd-index -D [-filv] [&lt;module&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -146,10 +146,10 @@ s1kd-index -D [-filv] [<module>...]]]></verbatimText>
           <para>This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> in the current directory or parent directories, but any file can be specified using the -I option.</para>
           <para>Exmaple of <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> file format:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<indexFlags>
-<indexFlag indexLevelOne="bicycle"/>
-<indexFlag indexLevelOne="bicycle" indexLevelTwo="brake system"/>
-</indexFlags>]]></verbatimText>
+            <verbatimText verbatimStyle="vs11">&lt;indexFlags&gt;
+&lt;indexFlag indexLevelOne="bicycle"/&gt;
+&lt;indexFlag indexLevelOne="bicycle" indexLevelTwo="brake system"/&gt;
+&lt;/indexFlags&gt;</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>
@@ -157,22 +157,22 @@ s1kd-index -D [-filv] [<module>...]]]></verbatimText>
         <title>EXAMPLE</title>
         <para>Given the following in a data module:</para>
         <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
-<title>General</title>
-<para>
+          <verbatimText verbatimStyle="vs11">&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;
 The s1kd-tools are a set of small tools for manipulating S1000D XML
 data.
-</para>
-</levelledPara>]]></verbatimText>
+&lt;/para&gt;
+&lt;/levelledPara&gt;</verbatimText>
         </para>
         <para>And the following <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> file:</para>
         <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<indexFlags>
-<indexFlag indexLevelOne="S1000D"/>
-<indexFlag indexLevelTwo="S10000D" indexLevelTwo="s1kd-tools"/>
-<indexFlag indexLevelOne="data"/>
-<indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
-</indexFlags>]]></verbatimText>
+          <verbatimText verbatimStyle="vs11">&lt;indexFlags&gt;
+&lt;indexFlag indexLevelOne="S1000D"/&gt;
+&lt;indexFlag indexLevelTwo="S10000D" indexLevelTwo="s1kd-tools"/&gt;
+&lt;indexFlag indexLevelOne="data"/&gt;
+&lt;indexFlag indexLevelOne="data" indexLevelTwo="XML"/&gt;
+&lt;/indexFlags&gt;</verbatimText>
         </para>
         <para>Then the s1kd-index command:</para>
         <para>
@@ -180,16 +180,16 @@ data.
         </para>
         <para>Would result in the following:</para>
         <para>
-          <verbatimText verbatimStyle="vs11"><![CDATA[<levelledPara>
-<title>General</title>
-<para>
-The s1kd-tools<indexFlag indexLevelOne="S1000D"
-indexLevelTwo="s1kd-tools"/> are a set of small tools for
-manipulating S1000D<indexFlag indexLevelOne="S1000D"/>
-XML<indexFlag indexLevelOne="data" indexLevelTwo="XML"/>
-data<indexFlag indexLevelOne="data"/>.
-</para>
-</levelledPara>]]></verbatimText>
+          <verbatimText verbatimStyle="vs11">&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;
+The s1kd-tools&lt;indexFlag indexLevelOne="S1000D"
+indexLevelTwo="s1kd-tools"/&gt; are a set of small tools for
+manipulating S1000D&lt;indexFlag indexLevelOne="S1000D"/&gt;
+XML&lt;indexFlag indexLevelOne="data" indexLevelTwo="XML"/&gt;
+data&lt;indexFlag indexLevelOne="data"/&gt;.
+&lt;/para&gt;
+&lt;/levelledPara&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>

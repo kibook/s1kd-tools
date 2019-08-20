@@ -133,7 +133,7 @@ EXAMPLE
     originator                     khzae.net
     securityClassification         01
     schema                         descript
-    schemaUrl                      http://www.s1000d.org/S1000D_4-2/xml_
+    schemaUrl                      http://www.s1000d.org/S1000D_5-0/xml_
     schema_flat/descript.xsd
     type                           dmodule
     applic                         All

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="00"/>
+        <issueInfo issueNumber="002" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="02"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,22 +31,13 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -p to -t, add new -p option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -n option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -c option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -58,13 +49,13 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-appcheck [options] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24">s1kd-appcheck [options] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
         <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered.</para>
-        <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, the tool validates an object against only the product attribute and condition values which are explicitly used within the object. The products check (-t) and full check (-a) modes allow objects to be checked for issues with implicit applicability, that is, product attribute or condition values which are not explicitly used within an object, but may still affect it.</para>
+        <para>By default, the tool validates an object against only the product attribute and condition values which are explicitly used within the object. The products check (-t) and full check (-a) modes allow objects to be checked for issues with implicit applicability, that is, product attribute or condition values which are not explicitly used within an object, but may still affect it.</para>
         <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
       </levelledPara>
       <levelledPara>
@@ -95,7 +86,7 @@
                 <para>Specify the CCT to read conditions from. This will override the CCT reference within the ACT.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-c, --custom</listItemTerm>
               <listItemDefinition>
                 <para>Perform a customized check. The default standalone applicability check is disabled. This can then be combined with the -s option, to only check that all product attributes and conditions are defined in the ACT and CCT respectively, and/or the -n option, to only check nested applicability annotations. If neither of these options are specified, no checks will be performed.</para>
@@ -143,7 +134,7 @@
                 <para>Assume that the issue/inwork numbers are omitted from object filenames (they were created with the -N option).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-n, --nested</listItemTerm>
               <listItemDefinition>
                 <para>Check that all product attribute and condition values used in nested applicability annotations are subsets of the values used in their parents.</para>
@@ -161,7 +152,7 @@
                 <para>Specify the PCT to read product instances from. This will override the PCT reference in the ACT.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-p, --progress</listItemTerm>
               <listItemDefinition>
                 <para>Display a progress bar.</para>
@@ -191,7 +182,7 @@
                 <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-t, --products</listItemTerm>
               <listItemDefinition>
                 <para>Validate objects against the defined product instances within the PCT.</para>
@@ -281,7 +272,7 @@
                 <para>One or more CSDB objects could not be read.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>3</listItemTerm>
               <listItemDefinition>
                 <para>The number of CSDB objects specified exceeded the available memory.</para>
@@ -296,55 +287,55 @@
           <title>Standalone validation</title>
           <para>Consider the following data module snippet:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
 ...
-<applic>
-<displayText>
-<simplePara>Version: A or Version: B</simplePara>
-</displayText>
-<evaluate andOr="or">
-<assert
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A or Version: B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-<assert
+applicPropertyValues="A"/&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-</evaluate>
-</applic>
+applicPropertyValues="B"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
 ...
-<referencedApplicGroup>
-<applic id="app-VersionB">
-<assert applicPropertyIdent="version" applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-</applic>
-</referencedApplicGroup>
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-VersionB"&gt;
+&lt;assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
 ...
-<levelledPara id="par-0001" applicRefId="app-VersionB">
-<title>Features of version B</title>
-<para>...</para>
-</levelledPara>
+&lt;levelledPara id="par-0001" applicRefId="app-VersionB"&gt;
+&lt;title&gt;Features of version B&lt;/title&gt;
+&lt;para&gt;...&lt;/para&gt;
+&lt;/levelledPara&gt;
 ...
-<levelledPara>
-<title>More information</title>
-<para>...</para>
-<para>Refer to <internalRef internalRefId="par-0001"/>.</para>
-</levelledPara>
+&lt;levelledPara&gt;
+&lt;title&gt;More information&lt;/title&gt;
+&lt;para&gt;...&lt;/para&gt;
+&lt;para&gt;Refer to &lt;internalRef internalRefId="par-0001"/&gt;.&lt;/para&gt;
+&lt;/levelledPara&gt;
 ...
-</dmodule>]]></verbatimText>
+&lt;/dmodule&gt;</verbatimText>
           </para>
           <para>There are two versions of the product, A and B, and the data module is meant to apply to both.</para>
           <para>By itself, the data module is valid:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-validate -v <DM>
-s1kd-validate: SUCCESS: <DM> validates against schema <url>]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-validate -v &lt;DM&gt;
+s1kd-validate: SUCCESS: &lt;DM&gt; validates against schema &lt;url&gt;</verbatimText>
           </para>
           <para>Checking it with this tool, however, reveals an issue: </para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
-s1kd-appcheck: ERROR: <DM> is invalid when:
-s1kd-appcheck: ERROR:   prodattr version = A]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt; is invalid when:
+s1kd-appcheck: ERROR:   prodattr version = A</verbatimText>
           </para>
           <para>When the data module is filtered for version A, the first levelled paragraph will be removed, which causes the reference to it in the second levelled paragraph to become broken.</para>
         </levelledPara>
@@ -352,165 +343,165 @@ s1kd-appcheck: ERROR:   prodattr version = A]]></verbatimText>
           <title>Full validation</title>
           <para>Consider the following data module snippet:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
 ...
-<applic>
-<displayText>
-<simplePara>All</simplePara>
-</displayText>
-</applic>
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;All&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
 ...
-<referencedApplicGroup>
-<applic id="app-IcyOrHot">
-<evaluate andOr="or">
-<assert
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-IcyOrHot"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="Icy"/>
-<assert
+applicPropertyValues="Icy"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="Hot"/>
-</applic>
-</referencedApplicGroup>
+applicPropertyValues="Hot"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
 ...
-<proceduralStep>
-<para>Locate the handle.</para>
-</proceduralStep>
-<proceduralStep id="stp-0001" applicRefId="app-IcyOrHot">
-<para>Put on gloves prior to touching the handle.</para>
-</proceduralStep>
-<proceduralStep>
-<para>Grab the handle and turn it clockwise.</para>
-</proceduralStep>
+&lt;proceduralStep&gt;
+&lt;para&gt;Locate the handle.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep id="stp-0001" applicRefId="app-IcyOrHot"&gt;
+&lt;para&gt;Put on gloves prior to touching the handle.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;Grab the handle and turn it clockwise.&lt;/para&gt;
+&lt;/proceduralStep&gt;
 ...
-<proceduralStep>
-<para>Remove the gloves you put on in <internalRef internalRefId="stp-0001"/>.</para>
-</proceduralStep>
+&lt;proceduralStep&gt;
+&lt;para&gt;Remove the gloves you put on in &lt;internalRef internalRefId="stp-0001"/&gt;.&lt;/para&gt;
+&lt;/proceduralStep&gt;
 ...
-</dmodule>]]></verbatimText>
+&lt;/dmodule&gt;</verbatimText>
           </para>
           <para>Once again, this data module is valid by itself:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-validate -v <DM>
-s1kd-validate: SUCCESS: <DM> validates against schema <url>]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-validate -v &lt;DM&gt;
+s1kd-validate: SUCCESS: &lt;DM&gt; validates against schema &lt;url&gt;</verbatimText>
           </para>
           <para>This time, however, it also initially appears valid when this tool is used:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -v <DM>
-s1kd-appcheck: SUCCESS: <DM> passed the applicability check.]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -v &lt;DM&gt;
+s1kd-appcheck: SUCCESS: &lt;DM&gt; passed the applicability check.</verbatimText>
           </para>
           <para>However, now consider this snippet from the CCT:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<condCrossRefTable>
+            <verbatimText verbatimStyle="vs11">&lt;condCrossRefTable&gt;
 ...
-<condType id="weatherType">
-<name>Weather type</name>
-<descr>Possible types of weather conditions.</descr>
-<enumeration applicPropertyValues="Normal"/>
-<enumeration applicPropertyValues="Icy"/>
-<enumeration applicPropertyValues="Hot"/>
-</condType>
+&lt;condType id="weatherType"&gt;
+&lt;name&gt;Weather type&lt;/name&gt;
+&lt;descr&gt;Possible types of weather conditions.&lt;/descr&gt;
+&lt;enumeration applicPropertyValues="Normal"/&gt;
+&lt;enumeration applicPropertyValues="Icy"/&gt;
+&lt;enumeration applicPropertyValues="Hot"/&gt;
+&lt;/condType&gt;
 ...
-<cond id="weather" condTypeRefId="weatherType">
-<name>Weather</name>
-<descr>The current weather conditions.</descr>
-</cond>
+&lt;cond id="weather" condTypeRefId="weatherType"&gt;
+&lt;name&gt;Weather&lt;/name&gt;
+&lt;descr&gt;The current weather conditions.&lt;/descr&gt;
+&lt;/cond&gt;
 ...
-</condCrossRefTable>]]></verbatimText>
+&lt;/condCrossRefTable&gt;</verbatimText>
           </para>
           <para>There is a third value for the <verbatimText verbatimStyle="vs14">weather</verbatimText> condition which is not explicitly used within the data module, and therefore will not be validated against in the default standalone check. When <verbatimText verbatimStyle="vs14">weather</verbatimText> has a value of <verbatimText verbatimStyle="vs14">Normal</verbatimText>, the cross-reference in the last step in the example above becomes broken.</para>
           <para>To catch errors with implicit applicability, the full check (-a) can be used instead, which reads the values to check not from the data module itself, but from the ACT and CCT referenced by the data module:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -a <DM>
-s1kd-appcheck: ERROR: <DM> is invalid when:
-s1kd-appcheck: ERROR:   condition weather = Normal]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -a &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt; is invalid when:
+s1kd-appcheck: ERROR:   condition weather = Normal</verbatimText>
           </para>
           <para>This can also be fixed by making the applicability of the data module explicit:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<applic>
-<displayText>
-<simplePara>Weather: Normal or Weather: Icy or
-Weather: Hot</simplePara>
-</displayText>
-<evaluate andOr="or">
-<assert
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Weather: Normal or Weather: Icy or
+Weather: Hot&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="Normal"/>
-<assert
+applicPropertyValues="Normal"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="Icy"/>
-<assert
+applicPropertyValues="Icy"/&gt;
+&lt;assert
 applicPropertyIdent="weather"
 applicPropertyType="condition"
-applicPropertyValues="Hot"/>
-</evaluate>
-</applic>]]></verbatimText>
+applicPropertyValues="Hot"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;</verbatimText>
           </para>
           <para>In which case, the standalone check will now also detect the error:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck <DM>
-s1kd-appcheck: ERROR: <DM> is invalid when:
-s1kd-appcheck: ERROR:   condition weather = Normal]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt; is invalid when:
+s1kd-appcheck: ERROR:   condition weather = Normal</verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+        <levelledPara>
           <title>Nested applicability annotations</title>
           <para>Consider the following data module snippet:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<dmodule>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
 ...
-<applic>
-<displayText>
-<simplePara>Version: A, B</simplePara>
-</displayText>
-<assert
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A, B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="A"/>
-<assert
+applicPropertyValues="A"/&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="B"/>
-</applic>
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
 ...
-<referencedApplicGroup>
-<applic id="app-C">
-<displayText>
-<simplePara>Version: C</simplePara>
-</displayText>
-<assert
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-C"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: C&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert
 applicPropertyIdent="version"
 applicPropertyType="prodattr"
-applicPropertyValues="C"/>
-</applic>
-</referencedApplicGroup>
+applicPropertyValues="C"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
 ...
-<proceduralStep>
-<para>Step A</para>
-</proceduralStep>
-<proceduralStep applicRefId="app-C">
-<para>Step B</para>
-</proceduralStep>
-<proceduralStep>
-<para>Step C</para>
-</proceduralStep>
+&lt;proceduralStep&gt;
+&lt;para&gt;Step A&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-C"&gt;
+&lt;para&gt;Step B&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;Step C&lt;/para&gt;
+&lt;/proceduralStep&gt;
 ...
-</dmodule>]]></verbatimText>
+&lt;/dmodule&gt;</verbatimText>
           </para>
           <para>Here, the whole data module is applicable to versions A and B, but an individual step has been made applicable to version C. Normally, this is not reported as an error, since the removal of this step would not cause the data module to become invalid:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -v <DM>
-s1kd-appcheck: SUCCESS: <DM> passed the applicability check]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -v &lt;DM&gt;
+s1kd-appcheck: SUCCESS: &lt;DM&gt; passed the applicability check</verbatimText>
           </para>
           <para>However, the content is essentially useless, since it will never appear. The -n option will report when the applicability of an element is incompatible with the applicability of any parent elements or the whole object:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-appcheck -n <DM>
-s1kd-appcheck: ERROR: <DM>: proceduralStep on line 62 is applicable
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -n &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt;: proceduralStep on line 62 is applicable
 when prodattr version = C, which is not a subset of the applicability
-of the whole object.]]></verbatimText>
+of the whole object.</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

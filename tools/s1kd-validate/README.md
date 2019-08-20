@@ -91,6 +91,9 @@ schemas for a given spec:
         S1000D_4-2/
             xml_schema_flat/
                 [4.2 XSD files...]
+        S1000D_5-0/
+            xml_schema_flat/
+                [5.0 XSD files...]
 
 XML catalogs vs. -d option
 --------------------------

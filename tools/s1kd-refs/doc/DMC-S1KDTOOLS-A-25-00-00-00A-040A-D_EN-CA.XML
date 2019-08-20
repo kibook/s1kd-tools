@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="03"/>
+        <issueInfo issueNumber="021" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="07"/>
+        <issueDate year="2019" month="08" day="20"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -31,7 +31,7 @@
       <brexDmRef>
         <dmRef>
           <dmRefIdent>
-            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
           </dmRefIdent>
         </dmRef>
       </brexDmRef>
@@ -55,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d <dir>] [-e <file>]
-          [-J <ns=URL>] [-j <xpath>] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d &lt;dir&gt;] [-e &lt;file&gt;]
+          [-J &lt;ns=URL&gt;] [-j &lt;xpath&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -287,14 +287,14 @@
           <para>The <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file contains definitions of external publication references. This can be used to update external publication references in CSDB objects with -U.</para>
           <para>By default, the tool will search the current directory and parent directories for a file named .externalpubs, but any file can be specified by using the -e option.</para>
           <para>Example of a <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file:
-            <verbatimText verbatimStyle="vs11"><![CDATA[<externalPubs>
-<externalPubRef>
-<externalPubRefIdent>
-<externalPubCode>ABC</externalPubCode>
-<externalPubTitle>ABC Manual</externalPubTitle>
-</externalPubRefIdent>
-</externalPubRef>
-</externalPubs>]]></verbatimText></para>
+            <verbatimText verbatimStyle="vs11">&lt;externalPubs&gt;
+&lt;externalPubRef&gt;
+&lt;externalPubRefIdent&gt;
+&lt;externalPubCode&gt;ABC&lt;/externalPubCode&gt;
+&lt;externalPubTitle&gt;ABC Manual&lt;/externalPubTitle&gt;
+&lt;/externalPubRefIdent&gt;
+&lt;/externalPubRef&gt;
+&lt;/externalPubs&gt;</verbatimText></para>
           <para>External publication references will be updated whether they are matched to a file or not.</para>
         </levelledPara>
         <levelledPara>
@@ -322,7 +322,7 @@
           </para>
           <para>If hotspots are identified in a different way in a project's ICNs, a custom XPath expression can be specified with the -j option. In this XPath expression, the variable <verbatimText verbatimStyle="vs01">$id</verbatimText> represents the hotspot APS ID:</para>
           <para>
-            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -H -j "//*[@attr = $id]" <DM>]]></verbatimText>
+            <verbatimText verbatimStyle="vs24">$ s1kd-refs -H -j "//*[@attr = $id]" &lt;DM&gt;</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>
