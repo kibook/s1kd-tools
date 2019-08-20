@@ -206,6 +206,7 @@
         <xsl:text> -!</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:apply-templates select="infoNameVariant"/>
   </xsl:template>
 
   <xsl:template match="techName|techname">
@@ -216,6 +217,12 @@
 
   <xsl:template match="infoName|infoname">
     <xsl:text> -i "</xsl:text>
+    <xsl:value-of select="."/>
+    <xsl:text>"</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="infoNameVariant">
+    <xsl:text> -V "</xsl:text>
     <xsl:value-of select="."/>
     <xsl:text>"</xsl:text>
   </xsl:template>
