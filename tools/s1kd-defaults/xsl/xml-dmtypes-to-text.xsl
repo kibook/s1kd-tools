@@ -17,6 +17,10 @@
       <xsl:text>&#09;</xsl:text>
       <xsl:value-of select="@infoName"/>
     </xsl:if>
+    <xsl:if test="@infoNameVariant">
+      <xsl:text>, </xsl:text>
+      <xsl:value-of select="@infoNameVariant"/>
+    </xsl:if>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
