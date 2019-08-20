@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "3.0.0"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -855,7 +855,7 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0) {
 		xmlDocPtr doc;
 		xmlNodePtr dmRefAddressItems, dmTitle;
-		xmlChar *techName, *infoName;
+		xmlChar *techName, *infoName, *infoNameVariant;
 
 		if (!(doc = read_xml_doc(fname))) {
 			return;
@@ -914,11 +914,15 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 
 		techName = firstXPathValue(doc, NULL, BAD_CAST "//techName|//techname");
 		infoName = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
+		infoNameVariant = firstXPathValue(doc, NULL, BAD_CAST "//infoNameVariant");
 
 		dmTitle = xmlNewChild(dmRefAddressItems, NULL, BAD_CAST "dmTitle", NULL);
 		xmlNewTextChild(dmTitle, NULL, BAD_CAST "techName", techName);
 		if (infoName) {
 			xmlNewTextChild(dmTitle, NULL, BAD_CAST "infoName", infoName);
+		}
+		if (infoNameVariant) {
+			xmlNewTextChild(dmTitle, NULL, BAD_CAST "infoNameVariant", infoNameVariant);
 		}
 
 		xmlFree(techName);
