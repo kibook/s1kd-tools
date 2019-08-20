@@ -27,6 +27,7 @@ Alphabetic index
 | `infoCodeVariant`               | 1 alphanumeric character                 |
 | `infoCode`                      | 3 alphanumeric characters                |
 | `infoName`                      | string                                   |
+| `infoNameVariant`               | string                                   |
 | `inWork`                        | 2 digits                                 |
 | `issueNumber`                   | 3 digits                                 |
 | `issueType`                     | S1000D issue type (new, changed, ...)    |
@@ -87,8 +88,9 @@ Example - XML format
     <default ident="dmlType" value="C"/>
     <default ident="includePrevSnsTitle" value="true"/>
     <default ident="infoCodeVariant" value="A"/>
-    <default ident="infoCode" value="040"/>
-    <default ident="infoName" value="Description"/>
+    <default ident="infoCode" value="258"/>
+    <default ident="infoName" value="Other procedure to clean"/>
+    <default ident="infoNameVariant" value="Clean with water"/>
     <default ident="inWork" value="01"/>
     <default ident="issueNumber" value="000"/>
     <default ident="issueType" value="new"/>
@@ -143,8 +145,9 @@ Example - Simple text format
     dmlType                        C
     includePrevSnsTitle            true
     infoCodeVariant                A
-    infoCode                       040
-    infoName                       Description
+    infoCode                       258
+    infoName                       Other procedure to clean
+    infoNameVariant                Clean with water
     inWork                         01
     issueNumber                    000
     issueType                      new
