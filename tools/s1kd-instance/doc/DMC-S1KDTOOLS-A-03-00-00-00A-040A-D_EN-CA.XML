@@ -38,11 +38,14 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -H, -Q and -4 options.</simplePara>
-      </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Rename --remove-unused to --reduce.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Rename -V to -5.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -H, -Q, -V and -4 options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -441,10 +444,10 @@
                 <para>Set the security classification of the instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-V, --print</listItemTerm>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-V, --infoname-variant &lt;variant&gt;</listItemTerm>
               <listItemDefinition>
-                <para>When -O is used, print the automatically generated file name of the instance.</para>
+                <para>Give the instance a different info name variant.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -517,6 +520,12 @@
               <listItemTerm>-4, --flatten-alts-refs</listItemTerm>
               <listItemDefinition>
                 <para>Same as the -F option, but in addition to flattening alts elements, the <verbatimText verbatimStyle="vs13">internalRefTargetType</verbatimText> of cross-references to them will be changed to the appropriate type (e.g., <verbatimText verbatimStyle="vs14">"irtt01"</verbatimText> for a <verbatimText verbatimStyle="vs12">&lt;figure&gt;</verbatimText> in a <verbatimText verbatimStyle="vs12">&lt;figureAlts&gt;</verbatimText>). This is specifically useful for S1000D Issue 4.1, where the Default BREX does not allow the standard <verbatimText verbatimStyle="vs13">internalRefTargetType</verbatimText> values to be used with the alts elements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-5, --print</listItemTerm>
+              <listItemDefinition>
+                <para>When -O is used, print the automatically generated file name of the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

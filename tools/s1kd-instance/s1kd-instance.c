@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "5.2.1"
+#define VERSION "6.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1276,9 +1276,9 @@ static void set_code(xmlDocPtr doc, const char *new_code)
 }
 
 /* Set the techName and/or infoName of the data module instance */
-static void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no_info_name)
+static void set_title(xmlDocPtr doc, const char *tech, const char *info, const xmlChar *info_name_variant, bool no_info_name)
 {
-	xmlNodePtr dmTitle, techName, infoName;
+	xmlNodePtr dmTitle, techName, infoName, infoNameVariant;
 	enum issue iss;
 	
 	dmTitle  = first_xpath_node(doc, NULL, BAD_CAST
@@ -1294,6 +1294,8 @@ static void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no
 	infoName = first_xpath_node(doc, NULL, BAD_CAST
 		"//dmAddressItems/dmTitle/infoName|"
 		"//dmaddres/dmtitle/infoname");
+	infoNameVariant = first_xpath_node(doc, NULL, BAD_CAST
+		"//dmAddressItems/dmTitle/infoNameVariant");
 
 	if (!techName) {
 		return;
@@ -1321,6 +1323,20 @@ static void set_title(xmlDocPtr doc, const char *tech, const char *info, bool no
 	} else if (no_info_name && infoName) {
 		xmlUnlinkNode(infoName);
 		xmlFreeNode(infoName);
+	}
+
+	if (info_name_variant) {
+		if (infoNameVariant) {
+			xmlChar *s;
+			s = xmlEncodeEntitiesReentrant(doc, info_name_variant);
+			xmlNodeSetContent(infoNameVariant, s);
+			xmlFree(s);
+		} else {
+			infoNameVariant = xmlNewTextChild(dmTitle, NULL, BAD_CAST "infoNameVariant", info_name_variant);
+		}
+	} else if (no_info_name && infoNameVariant) {
+		xmlUnlinkNode(infoNameVariant);
+		xmlFreeNode(infoNameVariant);
 	}
 }
 
@@ -3014,7 +3030,7 @@ static void show_help(void)
 	puts("  -t, --techname <techName>         Give the instance a different techName/pmTitle.");
 	puts("  -U, --security-classes <classes>  Filter on the specified security classes.");
 	puts("  -u, --security <sec>              Set the security classification of the instance.");
-	puts("  -V, --print                       Print the file name of the instance when -O is used.");
+	puts("  -V, --infoname-variant <variant>  Give the instance a different info name variant.");
 	puts("  -v, --verbose                     Verbose output.");
 	puts("  -W, --set-applic                  Overwrite whole object applicability.");
 	puts("  -w, --whole-objects               Check the status of the whole object.");
@@ -3027,6 +3043,7 @@ static void show_help(void)
 	puts("  -1, --act <file>                  Specify custom ACT.");
 	puts("  -2, --cct <file>                  Specify custom CCT.");
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
+	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
@@ -3056,6 +3073,7 @@ int main(int argc, char **argv)
 	bool simpl = false;
 	char *tech = NULL;
 	char *info = NULL;
+	xmlChar *info_name_variant = NULL;
 	bool autoname = false;
 	char dir[PATH_MAX] = "";
 	bool new_applic = false;
@@ -3110,7 +3128,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr props_report = NULL;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:VvWwX:x:Y:yZz:@%!1:2:4~H";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:45~H";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3150,7 +3168,7 @@ int main(int argc, char **argv)
 		{"techname"          , required_argument, 0, 't'},
 		{"security-classes"  , required_argument, 0, 'U'},
 		{"security"          , required_argument, 0, 'u'},
-		{"print"             , no_argument      , 0, 'V'},
+		{"print"             , no_argument      , 0, '5'},
 		{"verbose"           , no_argument      , 0, 'v'},
 		{"set-applic"        , no_argument      , 0, 'W'},
 		{"whole-objects"     , no_argument      , 0, 'w'},
@@ -3169,6 +3187,7 @@ int main(int argc, char **argv)
 		{"resolve-containers", no_argument      , 0, 'Q'},
 		{"flatten-alts-refs" , no_argument      , 0, '4'},
 		{"list-properties"   , no_argument      , 0, 'H'},
+		{"infoname-variant"  , required_argument, 0, 'V'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -3315,7 +3334,7 @@ int main(int argc, char **argv)
 				strncpy(secu, optarg, 2);
 				break;
 			case 'V':
-				print_fnames = true;
+				info_name_variant = xmlStrdup(BAD_CAST optarg);
 				break;
 			case 'v':
 				verbosity = VERBOSE;
@@ -3364,6 +3383,9 @@ int main(int argc, char **argv)
 			case '4':
 				flat_alts = true;
 				fix_alts_refs = true;
+				break;
+			case '5':
+				print_fnames = true;
 				break;
 			case 'H':
 				props_report = xmlNewDoc(BAD_CAST "1.0");
@@ -3736,7 +3758,7 @@ int main(int argc, char **argv)
 					set_code(doc, code);
 				}
 
-				set_title(doc, tech, info, no_info_name);
+				set_title(doc, tech, info, info_name_variant, no_info_name);
 
 				if (strcmp(language, "") != 0) {
 					set_lang(doc, language);
@@ -3906,6 +3928,7 @@ cleanup:
 	free(tech);
 	free(info);
 	free(isstype);
+	xmlFree(info_name_variant);
 	xmlFreeNode(cirs);
 	xmlFreeDoc(def_cir_xsl);
 	xmlFreeNode(applicability);

@@ -313,9 +313,8 @@ Set the security classification of the instance. An instance may have a
 lower security classification than the source if classified information
 is removed for a particular customer.
 
--V, --print  
-When -O is used, print the automatically generated file name of the
-instance.
+-V, --infoname-variant &lt;variant&gt;  
+Give the instance a different info name variant.
 
 -v, --verbose  
 Verbose output.
@@ -371,6 +370,10 @@ the appropriate type (e.g., `"irtt01"` for a `<figure>` in a
 `<figureAlts>`). This is specifically useful for S1000D Issue 4.1, where
 the Default BREX does not allow the standard `internalRefTargetType`
 values to be used with the alts elements.
+
+-5, --print  
+When -O is used, print the automatically generated file name of the
+instance.
 
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances
