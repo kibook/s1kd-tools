@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.5.0"
+#define VERSION "2.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -149,6 +149,22 @@ static int create_info_name(xmlXPathContextPtr ctxt, const char *val)
 
 	info_name = xmlAddNextSibling(tech_name, info_name);
 	xmlNodeSetContent(info_name, BAD_CAST val);
+
+	return 0;
+}
+
+static int create_info_name_variant(xmlXPathContextPtr ctxt, const char *val)
+{
+	xmlNodePtr info_name, info_name_variant;
+
+	if (!(info_name = first_xpath_node("//infoName", ctxt))) {
+		return 1;
+	}
+
+	info_name_variant = xmlNewNode(NULL, BAD_CAST "infoNameVariant");
+
+	info_name_variant = xmlAddNextSibling(info_name, info_name_variant);
+	xmlNodeSetContent(info_name_variant, BAD_CAST val);
 
 	return 0;
 }
@@ -883,10 +899,11 @@ static void show_url(xmlNodePtr node, int endl)
 static void show_title(xmlNodePtr node, int endl)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0 || xmlStrcmp(node->name, BAD_CAST "dmtitle") == 0) {
-		xmlNodePtr tech, info;
+		xmlNodePtr tech, info, vari;
 		xmlChar *tech_content;
 		tech = first_xpath_node_local(node, "techName|techname");
 		info = first_xpath_node_local(node, "infoName|infoname");
+		vari = first_xpath_node_local(node, "infoNameVariant");
 		tech_content = xmlNodeGetContent(tech);
 		printf("%s", (char *) tech_content);
 		xmlFree(tech_content);
@@ -895,6 +912,13 @@ static void show_title(xmlNodePtr node, int endl)
 			info_content = xmlNodeGetContent(info);
 			printf(" - %s", info_content);
 			xmlFree(info_content);
+
+			if (vari) {
+				xmlChar *vari_content;
+				vari_content = xmlNodeGetContent(vari);
+				printf(", %s", vari_content);
+				xmlFree(vari_content);
+			}
 		}
 		if (endl > -1) putchar(endl);
 	} else {
@@ -1399,6 +1423,12 @@ static struct metadata metadata[] = {
 		edit_info_name,
 		create_info_name,
 		"Information name of a data module"},
+	{"infoNameVariant",
+		"//infoNameVariant",
+		show_simple_node,
+		edit_info_name,
+		create_info_name_variant,
+		"Information name variant of a data module"},
 	{"inWork",
 		"//issueInfo/@inWork|//issno",
 		show_in_work,
