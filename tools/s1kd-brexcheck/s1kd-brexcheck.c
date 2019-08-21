@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.0.0"
+#define VERSION "3.1.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -551,6 +551,14 @@ static void print_node(xmlNodePtr node)
 		char *type = (char *) xmlNodeGetContent(node);
 		fprintf(stderr, "  TYPE: %s\n", type);
 		xmlFree(type);
+	} else if (xmlStrcmp(node->name, BAD_CAST "brDecisionRef") == 0) {
+		xmlChar *brdp = xmlGetProp(node, BAD_CAST "brDecisionIdentNumber");
+		if (shortmsg) {
+			fprintf(stderr, "%s: ", (char *) brdp);
+		} else {
+			fprintf(stderr, "  %s\n", (char *) brdp);
+		}
+		xmlFree(brdp);
 	} else if (strcmp((char *) node->name, "objectUse") == 0) {
 		char *use = (char *) xmlNodeGetContent(node);
 		if (shortmsg) {
@@ -643,12 +651,14 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 		int i;
 
 		for (i = 0; i < rules->nodeNr; ++i) {
-			xmlNodePtr objectPath, objectUse;
-			xmlChar *allowedObjectFlag, *path, *use;
+			xmlNodePtr brDecisionRef, objectPath, objectUse;
+			xmlChar *allowedObjectFlag, *path, *use, *brdp;
 
+			brDecisionRef = firstXPathNode(brex_doc, rules->nodeTab[i], "brDecisionRef");
 			objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
 			objectUse  = firstXPathNode(brex_doc, rules->nodeTab[i], "objectUse|objuse");
 
+			brdp = xmlGetProp(brDecisionRef, BAD_CAST "brDecisionIdentNumber");
 			allowedObjectFlag = firstXPathValue(objectPath, "@allowedObjectFlag|@objappl");
 			path = xmlNodeGetContent(objectPath);
 			use  = xmlNodeGetContent(objectUse);
@@ -684,6 +694,10 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 					xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "yes");
 				}
 
+				if (brDecisionRef) {
+					xmlAddChild(brexError, xmlCopyNode(brDecisionRef, 1));
+				}
+
 				err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
 				xmlSetProp(err_path, BAD_CAST "allowedObjectFlag", allowedObjectFlag);
 				xmlNewChild(brexError, NULL, BAD_CAST "objectUse", use);
@@ -713,6 +727,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			}
 
 			xmlXPathFreeObject(object);
+			xmlFree(brdp);
 			xmlFree(allowedObjectFlag);
 			xmlFree(path);
 			xmlFree(use);

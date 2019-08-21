@@ -275,7 +275,7 @@ EXAMPLE
 =======
 
     $ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-    $ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+    $ BREX=DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML
     $ cat $DMOD
     [...]
     <listItem id="stp-0001">
@@ -288,7 +288,8 @@ EXAMPLE
 
     $ s1kd-brexcheck -b $BREX $DMOD
     BREX ERROR: DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-      BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+      BREX: DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML
+      BREX-S1-00052
       Only when the reference target is a step can the value of attribute
     internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
       line 52 (/dmodule[1]/content[1]/description[1]/para[2]/
@@ -306,8 +307,9 @@ Example of XML report format for the above:
     <?xml version="1.0"?>
     <brexCheck>
     <document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML">
-    <brex path="DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML">
+    <brex path="DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML">
     <error fail="yes">
+    <brDecisionRef brDecisionIdentNumber="BREX-S1-00052"/>
     <objectPath allowedObjectFlag="0">...</objectPath>
     <objectUse>Only when the refernce target is a step can the value of
     attribute internalRefTargetType be irtt08

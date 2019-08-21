@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="033" inWork="01"/>
+        <issueInfo issueNumber="033" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="08" day="21"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Include brDecisionRef in BREX error report.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -362,8 +365,8 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23">$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-$ BREX=DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+          <verbatimText verbatimStyle="vs23" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+$ BREX=DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
 &lt;listItem id="stp-0001"&gt;
@@ -376,7 +379,8 @@ internalRefTargetType="irtt08"/&gt;.&lt;/para&gt;
 
 $ s1kd-brexcheck -b $BREX $DMOD
 BREX ERROR: DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-  BREX: DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML
+  BREX: DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML
+  BREX-S1-00052
   Only when the reference target is a step can the value of attribute
 internalRefTargetType be irtt08 (Chap 3.9.5.2.1.2, Para 2.1).
   line 52 (/dmodule[1]/content[1]/description[1]/para[2]/
@@ -391,11 +395,12 @@ internalRef[1]):
         </para>
         <para>Example of XML report format for the above:</para>
         <para>
-          <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+          <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">&lt;?xml version="1.0"?&gt;
 &lt;brexCheck&gt;
 &lt;document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML"&gt;
-&lt;brex path="DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML"&gt;
+&lt;brex path="DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML"&gt;
 &lt;error fail="yes"&gt;
+&lt;brDecisionRef brDecisionIdentNumber="BREX-S1-00052"/&gt;
 &lt;objectPath allowedObjectFlag="0"&gt;...&lt;/objectPath&gt;
 &lt;objectUse&gt;Only when the refernce target is a step can the value of
 attribute internalRefTargetType be irtt08
