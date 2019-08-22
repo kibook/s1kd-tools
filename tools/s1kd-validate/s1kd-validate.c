@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.1.2"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -38,7 +38,7 @@
 	"//@xrefid[not(//@id=.)]"
 
 #define INVALID_IDS_XPATH BAD_CAST \
-	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs"
+	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs|//@controlAuthorityRefs"
 
 static enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
 
