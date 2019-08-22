@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "2.1.1"
+#define VERSION "2.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

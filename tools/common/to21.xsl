@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   exclude-result-prefixes="xsi">
 
-  <xsl:variable name="schema-prefix">http://www.s1000d.org/S1000D_4-2/xml_schema_flat/</xsl:variable>
+  <xsl:variable name="schema-prefix">http://www.s1000d.org/S1000D_5-0/xml_schema_flat/</xsl:variable>
   
   <xsl:template match="@*|node()">
     <xsl:copy>
