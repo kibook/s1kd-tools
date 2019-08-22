@@ -362,6 +362,27 @@ Example of learn codes:
     100A-A-T5CC  learning  Operation: Simulation
     100A-A-T80E  learning  Operation: Assessment
 
+The XML format additionally supports the use of the attribute
+`infoNameVariant`, for use with S1000D Issue 5.0 and up, allowing
+extensions of the info name to be encoded separately:
+
+    <dmtypes>
+    <type
+    infoCode="258A"
+    schema="proced"
+    infoName="Other procedure to clean"/>
+    <type
+    infoCode="258B"
+    schema="proced"
+    infoName="Other procedure to clean"
+    infoNameVariant="Clean with air"/>
+    <type
+    infoCode="258C"
+    schema="proced"
+    infoName="Other procedure to clean"
+    infoNameVariant="Clean with water"/>
+    </dmtypes>
+
 Defaults are chosen in the order they are listed in the `.dmtypes` file.
 An info code which does not specify a variant, item location code, learn
 code or learn event code, or uses asterisks in their place, matches all
