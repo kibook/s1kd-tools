@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "6.1.2"
+#define VERSION "6.1.3"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3073,7 +3073,7 @@ static xmlNodePtr get_applic_def(xmlNodePtr defs, const xmlChar *id, const xmlCh
 }
 
 /* Determine whether an annotation is a superset of the user-defined applicability. */
-static bool annotation_is_superset(xmlNodePtr applic)
+static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -3082,6 +3082,11 @@ static bool annotation_is_superset(xmlNodePtr applic)
 
 	defs = xmlCopyNode(applicability, 1);
 	app  = xmlCopyNode(applic, 1);
+
+	if (simpl) {
+		simpl_applic(defs, app);
+		simpl_applic_evals(app);
+	}
 
 	ctx = xmlXPathNewContext(NULL);
 	xmlXPathSetContextNode(app, ctx);
@@ -3116,13 +3121,9 @@ static bool annotation_is_superset(xmlNodePtr applic)
 				}
 
 				/* Do not remove assertions from AND evaluations,
-				 * as these may apply additional conditions to a
-				 * value that must be evaluated later. Simply
-				 * tag them for potential removal.
+				 * unless they are unambiguously true.
 				 */
-				if (xmlStrcmp(op, BAD_CAST "and") == 0) {
-					xmlSetProp(obj->nodesetval->nodeTab[i], BAD_CAST "DELETE", BAD_CAST "DELETE");
-				} else {
+				if (xmlStrcmp(op, BAD_CAST "and") != 0 || eval_assert(defs, obj->nodesetval->nodeTab[i], false)) {
 					xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 					xmlFreeNode(obj->nodesetval->nodeTab[i]);
 					obj->nodesetval->nodeTab[i] = NULL;
@@ -3154,19 +3155,6 @@ static bool annotation_is_superset(xmlNodePtr applic)
 	}
 	xmlXPathFreeObject(obj);
 
-	/* Remove AND evaluations only if all their assertions were resolved. */
-	obj = xmlXPathEvalExpression(BAD_CAST ".//evaluate[(@andOr='and' or @operator='and') and not(assert[not(@DELETE)])]", ctx);
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
-	xmlXPathFreeObject(obj);
-
 	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
@@ -3185,7 +3173,7 @@ static bool annotation_is_superset(xmlNodePtr applic)
 }
 
 /* Remove annotations which are supersets of the user-defined applicability. */
-static void rem_supersets(xmlNodePtr referencedApplicGroup)
+static xmlNodePtr rem_supersets(xmlNodePtr referencedApplicGroup, xmlNodePtr root, bool simpl)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -3199,7 +3187,7 @@ static void rem_supersets(xmlNodePtr referencedApplicGroup)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			if (annotation_is_superset(obj->nodesetval->nodeTab[i])) {
+			if (annotation_is_superset(obj->nodesetval->nodeTab[i], simpl)) {
 				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 				xmlFreeNode(obj->nodesetval->nodeTab[i]);
 				obj->nodesetval->nodeTab[i] = NULL;
@@ -3209,6 +3197,16 @@ static void rem_supersets(xmlNodePtr referencedApplicGroup)
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
+
+	clean_applic(referencedApplicGroup, root);
+
+	if (xmlChildElementCount(referencedApplicGroup) == 0) {
+		xmlUnlinkNode(referencedApplicGroup);
+		xmlFreeNode(referencedApplicGroup);
+		return NULL;
+	}
+
+	return referencedApplicGroup;
 }
 
 /* Print a usage message */
@@ -3954,10 +3952,6 @@ int main(int argc, char **argv)
 						if (clean || simpl) {
 							clean_applic_stmts(applicability, referencedApplicGroup);
 
-							if (xmlChildElementCount(referencedApplicGroup) != 0) {
-								rem_supersets(referencedApplicGroup);
-							}
-
 							if (xmlChildElementCount(referencedApplicGroup) == 0) {
 								xmlUnlinkNode(referencedApplicGroup);
 								xmlFreeNode(referencedApplicGroup);
@@ -3965,10 +3959,14 @@ int main(int argc, char **argv)
 							}
 
 							clean_applic(referencedApplicGroup, root);
-						}
 
-						if (simpl) {
-							simpl_applic_clean(applicability, referencedApplicGroup);
+							if (simpl && xmlChildElementCount(referencedApplicGroup) != 0) {
+								simpl_applic_clean(applicability, referencedApplicGroup);
+							}
+
+							if (xmlChildElementCount(referencedApplicGroup) != 0) {
+								referencedApplicGroup = rem_supersets(referencedApplicGroup, root, !simpl);
+							}
 						}
 					}
 
