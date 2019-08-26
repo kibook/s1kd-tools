@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "6.1.1"
+#define VERSION "6.1.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3107,19 +3107,28 @@ static bool annotation_is_superset(xmlNodePtr applic)
 					BAD_CAST "parent::evaluate/@andOr|parent::evaluate/@operator");
 
 				/* Tag any OR evaluations which have assertions
-				 * removed from them, as they can be removed
-				 * after processing.
+				 * removed from them. The other assertions can
+				 * be removed as well after processing.
 				 */
 				if (xmlStrcmp(op, BAD_CAST "or") == 0) {
 					xmlSetProp(obj->nodesetval->nodeTab[i]->parent,
 						BAD_CAST "DELETE", BAD_CAST "DELETE");
 				}
 
-				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-				xmlFreeNode(obj->nodesetval->nodeTab[i]);
-				obj->nodesetval->nodeTab[i] = NULL;
+				/* Do not remove assertions from AND evaluations,
+				 * as these may apply additional conditions to a
+				 * value that must be evaluated later. Simply
+				 * tag them for potential removal.
+				 */
+				if (xmlStrcmp(op, BAD_CAST "and") == 0) {
+					xmlSetProp(obj->nodesetval->nodeTab[i], BAD_CAST "DELETE", BAD_CAST "DELETE");
+				} else {
+					xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+					xmlFreeNode(obj->nodesetval->nodeTab[i]);
+					obj->nodesetval->nodeTab[i] = NULL;
 
-				undefine_applic(a, vals);
+					undefine_applic(a, vals);
+				}
 
 				xmlFree(vals);
 				xmlFree(op);
@@ -3132,8 +3141,21 @@ static bool annotation_is_superset(xmlNodePtr applic)
 
 	xmlXPathFreeObject(obj);
 
-	/* Remove OR evaluations that had any assertions removed from them. */
-	obj = xmlXPathEvalExpression(BAD_CAST ".//evaluate[@DELETE]", ctx);
+	/* Remove assertions from OR evaluations if any of their assertions were resolved. */
+	obj = xmlXPathEvalExpression(BAD_CAST ".//evaluate[@DELETE]/assert", ctx);
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+	xmlXPathFreeObject(obj);
+
+	/* Remove AND evaluations only if all their assertions were resolved. */
+	obj = xmlXPathEvalExpression(BAD_CAST ".//evaluate[(@andOr='and' or @operator='and') and not(assert[not(@DELETE)])]", ctx);
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 
