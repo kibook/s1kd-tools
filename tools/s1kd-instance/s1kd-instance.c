@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "6.1.0"
+#define VERSION "6.1.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3926,24 +3926,28 @@ int main(int argc, char **argv)
 				}
 
 				if (referencedApplicGroup) {
-					strip_applic(applicability, referencedApplicGroup, root);
+					if (applicability->children) {
+						strip_applic(applicability, referencedApplicGroup, root);
 
-					if (clean || simpl) {
-						clean_applic_stmts(applicability, referencedApplicGroup);
+						if (clean || simpl) {
+							clean_applic_stmts(applicability, referencedApplicGroup);
 
-						if (xmlChildElementCount(referencedApplicGroup) == 0) {
-							xmlUnlinkNode(referencedApplicGroup);
-							xmlFreeNode(referencedApplicGroup);
-							referencedApplicGroup = NULL;
-						} else if (applicability->children) {
-							rem_supersets(referencedApplicGroup);
+							if (xmlChildElementCount(referencedApplicGroup) != 0) {
+								rem_supersets(referencedApplicGroup);
+							}
+
+							if (xmlChildElementCount(referencedApplicGroup) == 0) {
+								xmlUnlinkNode(referencedApplicGroup);
+								xmlFreeNode(referencedApplicGroup);
+								referencedApplicGroup = NULL;
+							}
+
+							clean_applic(referencedApplicGroup, root);
 						}
 
-						clean_applic(referencedApplicGroup, root);
-					}
-
-					if (simpl) {
-						simpl_applic_clean(applicability, referencedApplicGroup);
+						if (simpl) {
+							simpl_applic_clean(applicability, referencedApplicGroup);
+						}
 					}
 
 					if (rem_unused) {
