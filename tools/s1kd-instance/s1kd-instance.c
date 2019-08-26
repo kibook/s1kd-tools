@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "6.0.0"
+#define VERSION "6.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -532,7 +532,7 @@ static void free_ident(struct ident *ident)
  * condition (CCT) for which a value is asserted in the applic statement but
  * for which no value was supplied by the user.
  */
-static bool eval_applic(xmlNodePtr node, bool assume);
+static bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume);
 
 /* Evaluate multiple values for a property */
 static bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const char *value)
@@ -558,7 +558,7 @@ static bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, co
 }
 
 /* Tests whether ident:type=value was defined by the user */
-static bool is_applic(const char *ident, const char *type, const char *value, bool assume)
+static bool is_applic(xmlNodePtr defs, const char *ident, const char *type, const char *value, bool assume)
 {
 	xmlNodePtr cur;
 
@@ -568,7 +568,7 @@ static bool is_applic(const char *ident, const char *type, const char *value, bo
 		return assume;
 	}
 
-	for (cur = applicability->children; cur; cur = cur->next) {
+	for (cur = defs->children; cur; cur = cur->next) {
 		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
 		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
 		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
@@ -578,8 +578,8 @@ static bool is_applic(const char *ident, const char *type, const char *value, bo
 		if (match) {
 			if (cur_value) {
 				result = is_in_set(cur_value, value);
-			} else {
-				result = result && eval_multi(cur, ident, type, value);
+			} else if (assume) {
+				result = eval_multi(cur, ident, type, value);
 			}
 		}
 
@@ -597,7 +597,7 @@ static bool is_applic(const char *ident, const char *type, const char *value, bo
 }
 
 /* Tests whether an <assert> element is applicable */
-static bool eval_assert(xmlNodePtr assert, bool assume)
+static bool eval_assert(xmlNodePtr defs, xmlNodePtr assert, bool assume)
 {
 	xmlNodePtr ident_attr, type_attr, values_attr;
 	char *ident, *type, *values;
@@ -612,7 +612,7 @@ static bool eval_assert(xmlNodePtr assert, bool assume)
 	type   = (char *) xmlNodeGetContent(type_attr);
 	values = (char *) xmlNodeGetContent(values_attr);
 
-	ret = is_applic(ident, type, values, assume);
+	ret = is_applic(defs, ident, type, values, assume);
 
 	xmlFree(ident);
 	xmlFree(type);
@@ -621,53 +621,60 @@ static bool eval_assert(xmlNodePtr assert, bool assume)
 	return ret;
 }
 
+enum operator { AND, OR };
+
 /* Test whether an <evaluate> element is applicable. */
-static bool eval_evaluate(xmlNodePtr evaluate, bool assume)
+static bool eval_evaluate(xmlNodePtr defs, xmlNodePtr evaluate, bool assume)
 {
-	xmlChar *op;
-	bool ret;
+	xmlChar *andOr;
+	enum operator op;
+	bool ret = assume;
 	xmlNodePtr cur;
 
-	op = first_xpath_value(NULL, evaluate, BAD_CAST "@andOr|@operator");
+	andOr = first_xpath_value(NULL, evaluate, BAD_CAST "@andOr|@operator");
 
-	if (!op) {
+	if (!andOr) {
 		if (verbosity > QUIET) {
 			fprintf(stderr, S_MISSING_ANDOR);
 		}
 		exit(EXIT_BAD_XML);
 	}
 
-	ret = xmlStrcmp(op, BAD_CAST "and") == 0;
+	if (xmlStrcmp(andOr, BAD_CAST "and") == 0) {
+		op = AND;
+	} else {
+		op = OR;
+	}
+
+	xmlFree(andOr);
 
 	for (cur = evaluate->children; cur; cur = cur->next) {
 		if (xmlStrcmp(cur->name, BAD_CAST "assert") == 0 || xmlStrcmp(cur->name, BAD_CAST "evaluate") == 0) {
-			if (xmlStrcmp(op, BAD_CAST "and") == 0) {
-				ret = ret && eval_applic(cur, assume);
-			} else if (xmlStrcmp(op, BAD_CAST "or") == 0) {
-				ret = ret || eval_applic(cur, assume);
+			ret = eval_applic(defs, cur, assume);
+
+			if ((op == AND && !ret) || (op == OR && ret)) {
+				break;
 			}
 		}
 	}
-
-	xmlFree(op);
 
 	return ret;
 }
 
 /* Generic test for either <assert> or <evaluate> */
-static bool eval_applic(xmlNodePtr node, bool assume)
+static bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume)
 {
 	if (strcmp((char *) node->name, "assert") == 0) {
-		return eval_assert(node, assume);
+		return eval_assert(defs, node, assume);
 	} else if (strcmp((char *) node->name, "evaluate") == 0) {
-		return eval_evaluate(node, assume);
+		return eval_evaluate(defs, node, assume);
 	}
 
 	return false;
 }
 
 /* Tests whether an <applic> element is true. */
-static bool eval_applic_stmt(xmlNodePtr applic, bool assume)
+static bool eval_applic_stmt(xmlNodePtr defs, xmlNodePtr applic, bool assume)
 {
 	xmlNodePtr stmt;
 
@@ -681,7 +688,7 @@ static bool eval_applic_stmt(xmlNodePtr applic, bool assume)
 		return assume;
 	}
 
-	return eval_applic(stmt, assume);
+	return eval_applic(defs, stmt, assume);
 }
 
 /* Search recursively for a descendant element with the given id */
@@ -715,7 +722,7 @@ static xmlNodePtr get_element_by_id(xmlNodePtr root, const char *id)
 }
 
 /* Remove non-applicable elements from content */
-static void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
+static void strip_applic(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 	xmlNodePtr attr;
@@ -730,7 +737,7 @@ static void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 		applic = get_element_by_id(referencedApplicGroup, (char *) applicRefId);
 		xmlFree(applicRefId);
 
-		if (applic && !eval_applic_stmt(applic, true)) {
+		if (applic && !eval_applic_stmt(defs, applic, true)) {
 			if (tag_non_applic) {
 				add_first_child(node, xmlNewPI(BAD_CAST "notApplicable", NULL));
 			} else {
@@ -744,13 +751,13 @@ static void strip_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	cur = node->children;
 	while (cur) {
 		next = cur->next;
-		strip_applic(referencedApplicGroup, cur);
+		strip_applic(defs, referencedApplicGroup, cur);
 		cur = next;
 	}
 }
 
 /* Remove unambiguously true or false applic statements. */
-static void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
+static void clean_applic_stmts(xmlNodePtr defs, xmlNodePtr referencedApplicGroup)
 {
 	xmlNodePtr cur;
 
@@ -759,7 +766,7 @@ static void clean_applic_stmts(xmlNodePtr referencedApplicGroup)
 	while (cur) {
 		xmlNodePtr next = cur->next;
 
-		if (cur->type == XML_ELEMENT_NODE && (eval_applic_stmt(cur, false) || !eval_applic_stmt(cur, true))) {
+		if (cur->type == XML_ELEMENT_NODE && (eval_applic_stmt(defs, cur, false) || !eval_applic_stmt(defs, cur, true))) {
 			xmlUnlinkNode(cur);
 			xmlFreeNode(cur);
 		}
@@ -791,6 +798,39 @@ static void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	}
 }
 
+/* Remove unused applicability annotations. */
+static void rem_unused_annotations(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroup/applic[not(@id=//@applicRefId)]", ctx);
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+	xmlXPathFreeObject(obj);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//inlineapplics/applic[not(@id=//@refapplic)]", ctx);
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+	xmlXPathFreeObject(obj);
+
+	xmlXPathFreeContext(ctx);
+}
+
 /* Remove display text from the containing annotation. */
 static void rem_disp_text(xmlNodePtr node)
 {
@@ -810,18 +850,18 @@ static void rem_disp_text(xmlNodePtr node)
  * Returns true if the whole annotation is removed, or false if only parts of
  * it are removed.
  */
-static bool simpl_applic(xmlNodePtr node)
+static bool simpl_applic(xmlNodePtr defs, xmlNodePtr node)
 {
 	xmlNodePtr cur, next;
 
 	if (xmlStrcmp(node->name, BAD_CAST "applic") == 0) {
-		if (eval_applic_stmt(node, false) || !eval_applic_stmt(node, true)) {
+		if (eval_applic_stmt(defs, node, false) || !eval_applic_stmt(defs, node, true)) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
 			return true;
 		}
 	} else if (xmlStrcmp(node->name, BAD_CAST "evaluate") == 0) {
-		if (eval_applic(node, false) || !eval_applic(node, true)) {
+		if (eval_applic(defs, node, false) || !eval_applic(defs, node, true)) {
 			if (clean_disp_text) {
 				rem_disp_text(node);
 			}
@@ -832,21 +872,7 @@ static bool simpl_applic(xmlNodePtr node)
 			return false;
 		}
 	} else if (xmlStrcmp(node->name, BAD_CAST "assert") == 0) {
-		xmlNodePtr ident_attr  = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyIdent|@actidref");
-		xmlNodePtr type_attr   = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyType|@actreftype");
-		xmlNodePtr values_attr = first_xpath_node(NULL, node, BAD_CAST "@applicPropertyValues|@actvalues");
-
-		char *ident  = (char *) xmlNodeGetContent(ident_attr);
-		char *type   = (char *) xmlNodeGetContent(type_attr);
-		char *values = (char *) xmlNodeGetContent(values_attr);
-
-		bool uneeded = is_applic(ident, type, values, false) || !is_applic(ident, type, values, true);
-
-		xmlFree(ident);
-		xmlFree(type);
-		xmlFree(values);
-
-		if (uneeded) {
+		if (eval_assert(defs, node, false) || !eval_assert(defs, node, true)) {
 			if (clean_disp_text) {
 				rem_disp_text(node);
 			}
@@ -861,7 +887,7 @@ static bool simpl_applic(xmlNodePtr node)
 	cur = node->children;
 	while (cur) {
 		next = cur->next;
-		simpl_applic(cur);
+		simpl_applic(defs, cur);
 		cur = next;
 	}
 
@@ -915,7 +941,7 @@ static void simpl_applic_evals(xmlNodePtr node)
 }
 
 /* Remove <referencedApplicGroup> if all applic statements are removed */
-static void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
+static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup)
 {
 	bool has_applic = false;
 	xmlNodePtr cur;
@@ -924,7 +950,7 @@ static void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
 		return;
 	}
 
-	simpl_applic(referencedApplicGroup);
+	simpl_applic(defs, referencedApplicGroup);
 	simpl_applic_evals(referencedApplicGroup);
 
 	for (cur = referencedApplicGroup->children; cur; cur = cur->next) {
@@ -939,7 +965,7 @@ static void simpl_applic_clean(xmlNodePtr referencedApplicGroup)
 	}
 }
 
-static xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
+static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc)
 {
 	xmlNodePtr applic, orig;
 
@@ -951,7 +977,7 @@ static xmlNodePtr simpl_whole_applic(xmlDocPtr doc)
 
 	applic = xmlCopyNode(orig, 1);
 
-	if (simpl_applic(applic)) {
+	if (simpl_applic(defs, applic)) {
 		xmlNodePtr disptext;
 		applic = xmlNewNode(NULL, BAD_CAST "applic");
 		disptext = xmlNewChild(applic, NULL, BAD_CAST "displayText", NULL);
@@ -1727,7 +1753,7 @@ static void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr styl
 
 /* Apply the user-defined applicability to the CIR data module, then call the
  * appropriate function for the specific type of CIR. */
-static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_src, const char *cir_xsl, xmlDocPtr def_cir_xsl)
+static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdocfname, bool add_src, const char *cir_xsl, xmlDocPtr def_cir_xsl)
 {
 	xmlDocPtr cir;
 	xmlXPathContextPtr ctxt;
@@ -1760,7 +1786,7 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, const char *cirdocfname, bool add_s
 
 	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
 		referencedApplicGroup = results->nodesetval->nodeTab[0];
-		strip_applic(referencedApplicGroup, content);
+		strip_applic(defs, referencedApplicGroup, content);
 	}
 
 	xmlXPathFreeObject(results);
@@ -2008,7 +2034,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 }
 
 /* Determine if the whole object is applicable. */
-static bool check_wholedm_applic(xmlDocPtr dm)
+static bool check_wholedm_applic(xmlDocPtr dm, xmlNodePtr defs)
 {
 	xmlNodePtr applic;
 
@@ -2018,7 +2044,7 @@ static bool check_wholedm_applic(xmlDocPtr dm)
 		return true;
 	}
 
-	return eval_applic_stmt(applic, true);
+	return eval_applic_stmt(defs, applic, true);
 }
 
 /* Read applicability definitions from the <assign> elements of a
@@ -2284,9 +2310,9 @@ static void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *c
  * - Skill level
  * - Security classification
  */
-static bool create_instance(xmlDocPtr doc, const char *skills, const char *securities)
+static bool create_instance(xmlDocPtr doc, xmlNodePtr defs, const char *skills, const char *securities)
 {
-	if (!check_wholedm_applic(doc)) {
+	if (!check_wholedm_applic(doc, defs)) {
 		return false;
 	}
 
@@ -2770,7 +2796,7 @@ static xmlNodePtr add_container_applics(xmlDocPtr doc, xmlNodePtr content, xmlNo
 
 /* Replace a reference to a container with the appropriate reference within
  * the container for the given applicability. */
-static xmlNodePtr resolve_container_ref(xmlNodePtr refident, xmlDocPtr doc, const char *path)
+static xmlNodePtr resolve_container_ref(xmlNodePtr refident, xmlDocPtr doc, const char *path, xmlNodePtr defs)
 {
 	xmlNodePtr root, content, container, rag, ref;
 	xmlXPathContextPtr ctx;
@@ -2796,7 +2822,7 @@ static xmlNodePtr resolve_container_ref(xmlNodePtr refident, xmlDocPtr doc, cons
 	}
 
 	/* Filter the container. */
-	strip_applic(rag, root);
+	strip_applic(defs, rag, root);
 
 	ctx = xmlXPathNewContext(doc);
 	xmlXPathSetContextNode(container, ctx);
@@ -2837,7 +2863,7 @@ static xmlNodePtr resolve_container_ref(xmlNodePtr refident, xmlDocPtr doc, cons
 /* Resolve references to containers, replacing them with the appropriate
  * reference from within the container for the given applicability.
  */
-static void resolve_containers(xmlDocPtr doc)
+static void resolve_containers(xmlDocPtr doc, xmlNodePtr defs)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2858,7 +2884,7 @@ static void resolve_containers(xmlDocPtr doc)
 					continue;
 				}
 
-				if (resolve_container_ref(obj->nodesetval->nodeTab[i], doc, path)) {
+				if (resolve_container_ref(obj->nodesetval->nodeTab[i], doc, path, defs)) {
 					obj->nodesetval->nodeTab[i] = NULL;
 				}
 
@@ -2985,6 +3011,184 @@ static void add_props_list(xmlNodePtr report, const char *fname)
 	}
 }
 
+/* Remove an applicability definition from a set. */
+static void undefine_applic(xmlNodePtr def, const xmlChar *vals)
+{
+	xmlChar *cur_val;
+
+	cur_val = xmlGetProp(def, BAD_CAST "applicPropertyValues");
+
+	if (cur_val) {
+		if (is_in_set((char *) cur_val, (char *) vals)) {
+			xmlUnlinkNode(def);
+			xmlFreeNode(def);
+		}
+	} else {
+		xmlNodePtr cur;
+		bool match = false;
+
+		for (cur = def->children; cur && !match; cur = cur->next) {
+			xmlChar *v;
+
+			v = xmlNodeGetContent(cur);
+
+			if (is_in_set((char *) v, (char *) vals)) {
+				xmlUnlinkNode(cur);
+				xmlFreeNode(cur);
+				match = true;
+			}
+
+			xmlFree(v);
+		}
+
+		if (!def->children) {
+			xmlUnlinkNode(def);
+			xmlFreeNode(def);
+		}
+	}
+
+	xmlFree(cur_val);
+}
+
+/* Find an applicability definition in a set. */
+static xmlNodePtr get_applic_def(xmlNodePtr defs, const xmlChar *id, const xmlChar *type)
+{
+	xmlNodePtr cur, node = NULL;
+
+	for (cur = defs->children; cur && !node; cur = cur->next) {
+		xmlChar *cur_id, *cur_type;
+
+		cur_id   = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		cur_type = xmlGetProp(cur, BAD_CAST "applicPropertyType");
+
+		if (xmlStrcmp(cur_id, id) == 0 && xmlStrcmp(cur_type, type) == 0) {
+			node = cur;
+		}
+
+		xmlFree(cur_id);
+		xmlFree(cur_type);
+	}
+
+	return node;
+}
+
+/* Determine whether an annotation is a superset of the user-defined applicability. */
+static bool annotation_is_superset(xmlNodePtr applic)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr defs, app;
+	bool result;
+
+	defs = xmlCopyNode(applicability, 1);
+	app  = xmlCopyNode(applic, 1);
+
+	ctx = xmlXPathNewContext(NULL);
+	xmlXPathSetContextNode(app, ctx);
+
+	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlNodePtr a;
+			xmlChar *id, *type;
+
+			id   = first_xpath_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyIdent|@actidref");
+			type = first_xpath_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType|@actreftype");
+
+			if ((a = get_applic_def(defs, id, type)) && eval_assert(defs, obj->nodesetval->nodeTab[i], true)) {
+				xmlChar *vals, *op;
+
+				vals = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
+					BAD_CAST "@applicPropertyValues|@actvalues");
+				op   = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
+					BAD_CAST "parent::evaluate/@andOr|parent::evaluate/@operator");
+
+				/* Tag any OR evaluations which have assertions
+				 * removed from them, as they can be removed
+				 * after processing.
+				 */
+				if (xmlStrcmp(op, BAD_CAST "or") == 0) {
+					xmlSetProp(obj->nodesetval->nodeTab[i]->parent,
+						BAD_CAST "DELETE", BAD_CAST "DELETE");
+				}
+
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
+
+				undefine_applic(a, vals);
+
+				xmlFree(vals);
+				xmlFree(op);
+			}
+
+			xmlFree(id);
+			xmlFree(type);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+
+	/* Remove OR evaluations that had any assertions removed from them. */
+	obj = xmlXPathEvalExpression(BAD_CAST ".//evaluate[@DELETE]", ctx);
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+	xmlXPathFreeObject(obj);
+
+	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		result = eval_applic_stmt(defs, applic, true);
+	} else {
+		result = eval_applic_stmt(defs, app, false);
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	xmlFreeNode(app);
+	xmlFreeNode(defs);
+
+	return result;
+}
+
+/* Remove annotations which are supersets of the user-defined applicability. */
+static void rem_supersets(xmlNodePtr referencedApplicGroup)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(referencedApplicGroup->doc);
+	xmlXPathSetContextNode(referencedApplicGroup, ctx);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "applic", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			if (annotation_is_superset(obj->nodesetval->nodeTab[i])) {
+				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+				xmlFreeNode(obj->nodesetval->nodeTab[i]);
+				obj->nodesetval->nodeTab[i] = NULL;
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Print a usage message */
 static void show_help(void)
 {
@@ -3044,6 +3248,7 @@ static void show_help(void)
 	puts("  -2, --cct <file>                  Specify custom CCT.");
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
+	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
@@ -3122,13 +3327,14 @@ int main(int argc, char **argv)
 	bool add_deps = false;
 	bool print_fnames = false;
 	bool rslvcntrs = false;
+	bool rem_unused = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
 
 	xmlDocPtr props_report = NULL;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:45~H";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:456~H";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3188,6 +3394,7 @@ int main(int argc, char **argv)
 		{"flatten-alts-refs" , no_argument      , 0, '4'},
 		{"list-properties"   , no_argument      , 0, 'H'},
 		{"infoname-variant"  , required_argument, 0, 'V'},
+		{"clean-annotations" , no_argument      , 0, '6'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -3386,6 +3593,9 @@ int main(int argc, char **argv)
 				break;
 			case '5':
 				print_fnames = true;
+				break;
+			case '6':
+				rem_unused = true;
 				break;
 			case 'H':
 				props_report = xmlNewDoc(BAD_CAST "1.0");
@@ -3648,7 +3858,7 @@ int main(int argc, char **argv)
 				act = NULL;
 			}
 
-			if (!wholedm || create_instance(doc, skill_codes, sec_classes)) {
+			if (!wholedm || create_instance(doc, applicability, skill_codes, sec_classes)) {
 				bool ispm;
 				xmlNodePtr root;
 
@@ -3692,9 +3902,9 @@ int main(int argc, char **argv)
 					}
 
 					if (ispm) {
-						root = undepend_cir(doc, cirdocfname, false, cirxsl, def_cir_xsl);
+						root = undepend_cir(doc, applicability, cirdocfname, false, cirxsl, def_cir_xsl);
 					} else {
-						root = undepend_cir(doc, cirdocfname, add_source_ident, cirxsl, def_cir_xsl);
+						root = undepend_cir(doc, applicability, cirdocfname, add_source_ident, cirxsl, def_cir_xsl);
 					}
 
 					xmlFree(cirdocfname);
@@ -3716,22 +3926,28 @@ int main(int argc, char **argv)
 				}
 
 				if (referencedApplicGroup) {
-					strip_applic(referencedApplicGroup, root);
+					strip_applic(applicability, referencedApplicGroup, root);
 
 					if (clean || simpl) {
-						clean_applic_stmts(referencedApplicGroup);
+						clean_applic_stmts(applicability, referencedApplicGroup);
 
 						if (xmlChildElementCount(referencedApplicGroup) == 0) {
 							xmlUnlinkNode(referencedApplicGroup);
 							xmlFreeNode(referencedApplicGroup);
 							referencedApplicGroup = NULL;
+						} else if (applicability->children) {
+							rem_supersets(referencedApplicGroup);
 						}
 
 						clean_applic(referencedApplicGroup, root);
 					}
 
 					if (simpl) {
-						simpl_applic_clean(referencedApplicGroup);
+						simpl_applic_clean(applicability, referencedApplicGroup);
+					}
+
+					if (rem_unused) {
+						rem_unused_annotations(doc);
 					}
 				}
 
@@ -3773,7 +3989,7 @@ int main(int argc, char **argv)
 					 * it, there's no need to do this.
 					 */
 					if (combine_applic) {
-						simpl_whole_applic(doc);
+						simpl_whole_applic(applicability, doc);
 					}
 
 					set_applic(doc, new_display_text, combine_applic);
@@ -3829,7 +4045,7 @@ int main(int argc, char **argv)
 
 				/* Resolve references to containers. */
 				if (rslvcntrs) {
-					resolve_containers(doc);
+					resolve_containers(doc, applicability);
 				}
 
 				if (use_stdout && force_overwrite) {

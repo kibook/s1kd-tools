@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="06"/>
+        <issueInfo issueNumber="040" inWork="07"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="08" day="26"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -45,7 +45,7 @@
         <simplePara>Rename -V to -5.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -H, -Q, -V and -4 options.</simplePara>
+        <simplePara>Add -H, -Q, -V, -4 and -6 options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -526,6 +526,12 @@
               <listItemTerm>-5, --print</listItemTerm>
               <listItemDefinition>
                 <para>When -O is used, print the automatically generated file name of the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-6, --clean-annotations</listItemTerm>
+              <listItemDefinition>
+                <para>Remove unused applicability annotations.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

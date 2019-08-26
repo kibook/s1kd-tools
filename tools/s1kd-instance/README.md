@@ -375,6 +375,9 @@ values to be used with the alts elements.
 When -O is used, print the automatically generated file name of the
 instance.
 
+-6, --clean-annotations  
+Remove unused applicability annotations.
+
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances
 that will be updated.
