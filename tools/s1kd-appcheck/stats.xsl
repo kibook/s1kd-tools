@@ -6,6 +6,15 @@
   <xsl:output method="text"/>
  
   <xsl:template match="appCheck">
+    <xsl:text>Type of check: </xsl:text>
+    <xsl:value-of select="@type"/>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:text>Strict: </xsl:text>
+    <xsl:value-of select="@strict"/>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:text>Check nested applicability: </xsl:text>
+    <xsl:value-of select="@checkNestedApplic"/>
+    <xsl:text>&#10;</xsl:text>
     <xsl:variable name="total" select="count(object)"/>
     <xsl:text>Total objects checked: </xsl:text>
     <xsl:value-of select="$total"/>
