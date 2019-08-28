@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.1.0"
+#define VERSION "3.2.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1378,6 +1378,37 @@ int main(int argc, char *argv[])
 	outdoc = xmlNewDoc(BAD_CAST "1.0");
 	brexCheck = xmlNewNode(NULL, BAD_CAST "brexCheck");
 	xmlDocSetRootElement(outdoc, brexCheck);
+
+	/* Add configuration info to XML report. */
+	if (layered) {
+		xmlSetProp(brexCheck, BAD_CAST "layered", BAD_CAST "yes");
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "layered", BAD_CAST "no");
+	}
+
+	if (check_values) {
+		xmlSetProp(brexCheck, BAD_CAST "checkObjectValues", BAD_CAST "yes");
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "checkObjectValues", BAD_CAST "no");
+	}
+
+	if (check_sns) {
+		if (strict_sns) {
+			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "strict");
+		} else if (unstrict_sns) {
+			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "unstrict");
+		} else {
+			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "normal");
+		}
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "no");
+	}
+
+	if (check_notation) {
+		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "yes");
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "no");
+	}
 
 	for (i = 0; i < num_dmod_fnames; ++i) {
 		/* Indicates if a referenced BREX data module is used as

@@ -6,6 +6,18 @@
   <xsl:output method="text"/>
  
   <xsl:template match="brexCheck">
+    <xsl:text>Layered check: </xsl:text>
+    <xsl:value-of select="@layered"/>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:text>Check object values: </xsl:text>
+    <xsl:value-of select="@checkObjectValues"/>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:text>SNS check: </xsl:text>
+    <xsl:value-of select="@snsCheck"/>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:text>Notation check: </xsl:text>
+    <xsl:value-of select="@notationCheck"/>
+    <xsl:text>&#10;</xsl:text>
     <xsl:variable name="total" select="count(document)"/>
     <xsl:text>Total documents checked: </xsl:text>
     <xsl:value-of select="$total"/>
