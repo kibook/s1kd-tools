@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.2.0"
+#define VERSION "3.2.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -62,7 +62,7 @@ static unsigned DMOD_MAX = 1;
 static unsigned BREX_PATH_MAX = 1;
 
 /* Verbosity of the tool's output. */
-static enum verbosity {SILENT, NORMAL, VERBOSE} verbose = NORMAL;
+static enum verbosity {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
 
 /* Whether to use short, single-line error messages. */
 static bool shortmsg = false;
@@ -422,7 +422,7 @@ static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[P
 		found = search_brex_fname_from_default_brex(fname, dmcode, len);
 	}
 
-	if (verbose > SILENT && !found) {
+	if (verbosity > SILENT && !found) {
 		fprintf(stderr, E_BREX_NOT_FOUND, dmcode);
 	}
 
@@ -666,7 +666,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			object = xmlXPathEvalExpression(BAD_CAST path, context);
 
 			if (!object) {
-				if (verbose > SILENT) {
+				if (verbosity > SILENT) {
 					fprintf(stderr, E_INVOBJPATH);
 				}
 				exit(EXIT_INVALID_OBJ_PATH);
@@ -721,7 +721,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 
 				xmlFree(severity);
 
-				if (verbose > SILENT) {
+				if (verbosity > SILENT) {
 					print_node(brexError);
 				}
 			}
@@ -899,7 +899,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 	if (correct) {
 		xmlFreeNode(snsError);
 		xmlNewChild(snsCheck, NULL, BAD_CAST "noErrors", NULL);
-	} else {
+	} else if (verbosity > SILENT) {
 		print_node(snsError);
 	}
 
@@ -933,7 +933,9 @@ static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 	xmlNewChild(notationError, NULL, BAD_CAST "invalidNotation", entity->content);
 	xmlAddChild(notationError, xmlCopyNode(firstXPathNode(notationRuleDoc, rule, "objectUse"), 1));
 
-	print_node(notationError);
+	if (verbosity > SILENT) {
+		print_node(notationError);
+	}
 
 	return 1;
 }
@@ -1039,7 +1041,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		brex_doc = load_brex(brex_fnames[i], dmod_doc);
 
 		if (!brex_doc) {
-			if (verbose > SILENT) {
+			if (verbosity > SILENT) {
 				fprintf(stderr, E_NODMOD, brex_fnames[i]);
 			}
 			exit(EXIT_BAD_DMODULE);
@@ -1052,7 +1054,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
 			brex_fnames[i], documentNode);
 
-		if (verbose >= VERBOSE) {
+		if (verbosity >= VERBOSE) {
 			fprintf(stderr,
 				status || !valid_sns || invalid_notations ?
 				F_INVALIDDOC :
@@ -1096,7 +1098,7 @@ static void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char 
 {
 	if ((*n) == (*max)) {
 		if (!(*list = realloc(*list, (*max *= 2) * PATH_MAX))) {
-			if (verbose > SILENT) {
+			if (verbosity > SILENT) {
 				fprintf(stderr, E_MAXOBJS);
 			}
 			exit(EXIT_MAX_OBJS);
@@ -1325,8 +1327,8 @@ int main(int argc, char *argv[])
 				add_path(&brex_search_paths, &num_brex_search_paths, &BREX_PATH_MAX, optarg);
 				break;
 			case 'x': xmlout = true; break;
-			case 'q': verbose = SILENT; break;
-			case 'v': verbose = VERBOSE; break;
+			case 'q': verbosity = SILENT; break;
+			case 'v': verbosity = VERBOSE; break;
 			case 's': shortmsg = true; break;
 			case 'l': layered = true; break;
 			case 'w': brsl_fname = strdup(optarg); break;
@@ -1426,9 +1428,9 @@ int main(int argc, char *argv[])
 			if (ignore_empty) {
 				continue;
 			} else if (use_stdin) {
-				if (verbose > SILENT) fprintf(stderr, E_NODMOD_STDIN);
+				if (verbosity > SILENT) fprintf(stderr, E_NODMOD_STDIN);
 			} else {
-				if (verbose > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
+				if (verbosity > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
 			}
 			exit(EXIT_BAD_DMODULE);
 		}
@@ -1460,9 +1462,9 @@ int main(int argc, char *argv[])
 					dmod_fnames,
 					num_dmod_fnames))) {
 				if (use_stdin) {
-					if (verbose > SILENT) fprintf(stderr, err == 1 ? E_NOBREX_STDIN : W_NOBREX_STDIN);
+					if (verbosity > SILENT) fprintf(stderr, err == 1 ? E_NOBREX_STDIN : W_NOBREX_STDIN);
 				} else {
-					if (verbose > SILENT) fprintf(stderr, err == 1 ? E_NOBREX : W_NOBREX, dmod_fnames[i]);
+					if (verbosity > SILENT) fprintf(stderr, err == 1 ? E_NOBREX : W_NOBREX, dmod_fnames[i]);
 				}
 
 				/* BREX DM was referenced but not found. */
