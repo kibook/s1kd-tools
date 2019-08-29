@@ -8,12 +8,13 @@
 #include <libxml/tree.h>
 #include <libxml/valid.h>
 #include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 
 #include "templates.h"
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "2.0.1"
+#define VERSION "2.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -22,26 +23,6 @@
 #define I_RESOLVE INF_PREFIX "Resolving ICN references in %s...\n"
 
 static bool verbose = false;
-
-/* Return the first node matching an XPath expression. */
-static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	xmlNodePtr first;
-
-	ctx = xmlXPathNewContext(doc ? doc : node->doc);
-	ctx->node = node;
-
-	obj = xmlXPathEvalExpression(expr, ctx);
-
-	first = xmlXPathNodeSetIsEmpty(obj->nodesetval) ? NULL : obj->nodesetval->nodeTab[0];
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return first;
-}
 
 /* Add a notation by its reference in the catalog file. */
 static void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
@@ -86,9 +67,20 @@ static void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notat
 /* Check whether an ICN is used in an object. */
 static bool icn_is_used(xmlDocPtr doc, const xmlChar *ident)
 {
-	xmlChar xpath[256];
-	xmlStrPrintf(xpath, 256, "//@*[.='%s']", ident);
-	return first_xpath_node(doc, NULL, xpath) != NULL;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	bool used;
+
+	ctx = xmlXPathNewContext(doc);
+	xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(ident));
+	obj = xmlXPathEvalExpression(BAD_CAST "//@*[.=$id]", ctx);
+
+	used = !xmlXPathNodeSetIsEmpty(obj->nodesetval);
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return used;
 }
 
 /* Resolve the ICNs in a document against the ICN catalog. */
@@ -135,7 +127,7 @@ static void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwri
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	xmlChar xpath[256];
+	xmlChar *xpath;
 
 	if (verbose) {
 		fprintf(stderr, I_RESOLVE, fname);
@@ -148,9 +140,10 @@ static void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwri
 	ctx = xmlXPathNewContext(icns);
 
 	if (media) {
-		xmlStrPrintf(xpath, 256, "/icnCatalog/media[@name='%s']/icn", media);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "media", xmlXPathNewString(BAD_CAST media));
+		xpath = BAD_CAST "/icnCatalog/media[@name=$media]/icn";
 	} else {
-		xmlStrPrintf(xpath, 256, "/icnCatalog/icn");
+		xpath = BAD_CAST "/icnCatalog/icn";
 	}
 
 	obj = xmlXPathEvalExpression(xpath, ctx);
@@ -216,13 +209,25 @@ static void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
 	xmlNodePtr root, cur;
 
 	if (media) {
-		xmlChar xpath[256];
-		xmlStrPrintf(xpath, 256, "/icnCatalog/media[@name='%s']", media);
-		root = first_xpath_node(icns, NULL, xpath);
+		xmlXPathContextPtr ctx;
+		xmlXPathObjectPtr obj;
+
+		ctx = xmlXPathNewContext(icns);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "media", xmlXPathNewString(BAD_CAST media));
+
+		obj = xmlXPathEvalExpression(BAD_CAST "/icnCatalog/media[@name=$media]", ctx);
+
+		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			root = NULL;
+		} else {
+			root = obj->nodesetval->nodeTab[0];
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
 	} else {
 		root = xmlDocGetRootElement(icns);
 	}
-
 
 	for (cur = add->children; cur; cur = cur->next) {
 		xmlAddChild(root, xmlCopyNode(cur, 1));
@@ -233,25 +238,37 @@ static void add_icns(xmlDocPtr icns, xmlNodePtr add, const char *media)
 static void del_icns(xmlDocPtr icns, xmlNodePtr del, const char *media)
 {
 	xmlNodePtr cur;
+	xmlXPathContextPtr ctx;
+
+	ctx = xmlXPathNewContext(icns);
 
 	for (cur = del->children; cur; cur = cur->next) {
-		xmlChar xpath[256];
-		xmlChar *ident;
-		xmlNodePtr icn;
+		xmlChar *ident, *xpath;
+		xmlXPathObjectPtr obj;
 
 		ident = xmlGetProp(cur, BAD_CAST "infoEntityIdent");
-		if (media) {
-			xmlStrPrintf(xpath, 256, "/icnCatalog/media[@name='%s']/icn[@infoEntityIdent='%s']", media, ident);
-		} else {
-			xmlStrPrintf(xpath, 256, "/icnCatalog/icn[@infoEntityIdent='%s']", ident);
-		}
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(ident));
 		xmlFree(ident);
 
-		if ((icn = first_xpath_node(icns, NULL, xpath))) {
-			xmlUnlinkNode(icn);
-			xmlFreeNode(icn);
+		if (media) {
+			xmlXPathRegisterVariable(ctx, BAD_CAST "media", xmlXPathNewString(BAD_CAST media));
+			xpath = BAD_CAST "/icnCatalog/media[@name=$media]/icn[@infoEntityIdent=$id]";
+		} else {
+			xpath = BAD_CAST "/icnCatalog/icn[@infoEntityIdent=$id]";
 		}
+
+		obj = xmlXPathEvalExpression(xpath, ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[0]);
+			xmlFreeNode(obj->nodesetval->nodeTab[0]);
+			obj->nodesetval->nodeTab[0] = NULL;
+		}
+
+		xmlXPathFreeObject(obj);
 	}
+
+	xmlXPathFreeContext(ctx);
 }
 
 /* Help/usage message. */
