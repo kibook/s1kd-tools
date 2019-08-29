@@ -10,8 +10,7 @@
       <xsl:choose>
         <xsl:when test="$toolSpec">
           <xsl:apply-templates select="@*"/>
-          <xsl:apply-templates select="$toolSpec/itemIdentData/name"/>
-          <xsl:apply-templates select="$toolSpec/itemIdentData/descrForPart"/>
+          <xsl:apply-templates select="$toolSpec/itemIdentData/descrForPart" mode="name"/>
           <xsl:apply-templates select="$toolSpec/itemIdentData/shortName"/>
           <xsl:apply-templates select="catalogSeqNumberRef|natoStockNumber|identNumber|toolRef|materialSetRef"/>
           <xsl:apply-templates select="reqQuantity"/>
@@ -25,7 +24,7 @@
     </supportEquipDescr>
   </xsl:template>
 
-  <xsl:template match="descrForPart">
+  <xsl:template match="descrForPart" mode="name">
     <name>
       <xsl:apply-templates/>
     </name>

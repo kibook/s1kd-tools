@@ -46,7 +46,7 @@
       <xsl:choose>
         <xsl:when test="$catalogSeqNumber">
           <xsl:apply-templates select="@*"/>
-          <xsl:apply-templates select="$catalogSeqNumber/itemSeqNumber/partSegment/itemIdentData/descrForPart"/>
+          <xsl:apply-templates select="$catalogSeqNumber/itemSeqNumber/partSegment/itemIdentData/descrForPart" mode="name"/>
           <xsl:apply-templates select="$catalogSeqNumber/itemSeqNumber/partSegment/itemIdentData/shortName"/>
           <xsl:apply-templates select="catalogSeqNumberRef|natoStockNumber|identNumber|partRef|functionalItemRef|materialSetRef"/>
           <xsl:apply-templates select="reqQuantity"/>
@@ -58,7 +58,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="descrForPart">
+  <xsl:template match="descrForPart" mode="name">
     <name>
       <xsl:apply-templates/>
     </name>

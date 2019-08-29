@@ -8,7 +8,7 @@
       <xsl:apply-templates select="@*"/>
       <xsl:choose>
         <xsl:when test="$controlIndicatorSpec">
-          <xsl:apply-templates select="$controlIndicatorSpec/controlIndicatorName"/>
+          <xsl:apply-templates select="$controlIndicatorSpec/controlIndicatorName" mode="name"/>
           <xsl:apply-templates select="$controlIndicatorSpec/shortName"/>
         </xsl:when>
         <xsl:otherwise>
@@ -19,7 +19,7 @@
     </controlIndicatorRef>
   </xsl:template>
 
-  <xsl:template match="controlIndicatorName">
+  <xsl:template match="controlIndicatorName" mode="name">
     <name>
       <xsl:apply-templates select="@*|node()"/>
     </name>

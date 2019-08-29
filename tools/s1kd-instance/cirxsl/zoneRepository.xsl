@@ -10,7 +10,7 @@
       <xsl:apply-templates select="@*"/>
       <xsl:choose>
         <xsl:when test="$zone">
-          <xsl:apply-templates select="$zone/itemDescr"/>
+          <xsl:apply-templates select="$zone/itemDescr" mode="name"/>
           <xsl:apply-templates select="$zone/shortName"/>
         </xsl:when>
         <xsl:otherwise>
@@ -21,7 +21,7 @@
     </zoneRef>
   </xsl:template>
 
-  <xsl:template match="itemDescr">
+  <xsl:template match="itemDescr" mode="name">
     <name>
       <xsl:apply-templates/>
     </name>
