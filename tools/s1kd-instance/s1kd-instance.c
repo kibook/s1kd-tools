@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "6.1.4"
+#define VERSION "6.1.5"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3111,15 +3111,6 @@ static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 				op   = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
 					BAD_CAST "parent::evaluate/@andOr|parent::evaluate/@operator");
 
-				/* Tag any OR evaluations which have assertions
-				 * removed from them. The other assertions can
-				 * be removed as well after processing.
-				 */
-				if (xmlStrcmp(op, BAD_CAST "or") == 0) {
-					xmlSetProp(obj->nodesetval->nodeTab[i]->parent,
-						BAD_CAST "DELETE", BAD_CAST "DELETE");
-				}
-
 				/* Do not remove assertions from AND evaluations,
 				 * unless they are unambiguously true.
 				 */
@@ -3140,19 +3131,6 @@ static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 		}
 	}
 
-	xmlXPathFreeObject(obj);
-
-	/* Remove assertions from OR evaluations if any of their assertions were resolved. */
-	obj = xmlXPathEvalExpression(BAD_CAST ".//evaluate[@DELETE]/assert", ctx);
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
 	xmlXPathFreeObject(obj);
 
 	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
