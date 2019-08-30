@@ -24,6 +24,9 @@ Add an ICN to the catalog. Follow with the -u and -n options to specify
 the URI and notation to use for this ICN. The -m option specifies a
 media group to add the ICN to.
 
+-C, --create  
+Create a new empty catalog.
+
 -c, --catalog &lt;catalog&gt;  
 Specify the catalog file to manage or resolve against. By default, the
 file `.icncatalog` in the current directory is used. If the current
@@ -53,8 +56,8 @@ media.
 -n, --ndata &lt;notation&gt;  
 Specify the notation to reference when adding an ICN with the -a option.
 
--t, --new  
-Create a new empty catalog.
+-t, --type &lt;type&gt;  
+Specify the type of catalog entry when adding an ICN with the -a option.
 
 -u, --uri &lt;URI&gt;  
 Specify the URI when adding an ICN with the -a option.
@@ -185,6 +188,50 @@ will reconstruct the required external entity declarations in the DTD.
 > s1kd-transform tool), so this is only necessary when using more
 > generic XML tools.
 
+ICN pattern rules
+-----------------
+
+By default, each catalog entry matches a single ICN, but multiple ICNs
+can be resolved with a single entry by using a pattern rule. An entry
+with attribute `type="pattern"` specifies a regular expression to use to
+match ICNs and a template used to construct the resolved URI:
+
+    <icn
+    type="pattern"
+    infoEntityIdent="ICN-(.{5})-(.*)"
+    uri="graphics/\1/ICN-\1-\2.PNG"
+    notation="PNG"/>
+
+The above entry would match a series of CAGE-based ICNs, resolving them
+to a subfolder of 'graphics' based on their CAGE code. Using this entry,
+the following input:
+
+    <!DOCTYPE dmodule [
+    <!NOTATION PNG SYSTEM PNG>
+    <!ENTITY ICN-12345-00001-001-01
+    SYSTEM "ICN-12345-00001-001-01"
+    NDATA PNG>
+    <!ENTITY ICN-54321-00001-001-01
+    SYSTEM "ICN-54321-00001-001-01"
+    NDATA PNG>
+    ]>
+
+would be resolved as follows:
+
+    <!DOCTYPE dmodule [
+    <!NOTATION PNG SYSTEM PNG>
+    <!ENTITY ICN-12345-00001-001-01
+    SYSTEM "graphics/12345/ICN-12345-00001-001-01.PNG"
+    NDATA PNG>
+    <!ENTITY ICN-54321-00001-001-01
+    SYSTEM "graphics/54321/ICN-54321-00001-001-01.PNG"
+    NDATA PNG>
+    ]>
+
+The regular expressions must conform to the extended POSIX regular
+expression syntax. Backreferences \\1 through \\9 can be used in the URI
+template to substitute captured groups.
+
 CATALOG SCHEMA
 ==============
 
@@ -255,9 +302,15 @@ specified.
 
 *Attributes:*
 
--   `infoEntityIdent`, the ICN
+-   `type`, the type of ICN entry, with one of the following values:
 
--   `uri`, the filename the ICN will resolve to
+    -   `"single"` (D) - Specifies a single ICN to resolve.
+
+    -   `"pattern"` - Specifies a pattern to resolve one or more ICNs.
+
+-   `infoEntityIdent`, the ICN, or pattern used to match ICNs.
+
+-   `uri`, the filename the ICN will resolve to.
 
 -   `notation`, a reference to a previously declared `<notation>`
     element.

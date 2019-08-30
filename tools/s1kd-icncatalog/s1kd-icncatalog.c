@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <libgen.h>
+#include <regex.h>
 
 #include <libxml/tree.h>
 #include <libxml/valid.h>
@@ -14,12 +15,14 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "2.0.2"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_REGEX_INVALID ERR_PREFIX "Invalid regular expression: %s\n"
+#define E_REGEX_BADREF ERR_PREFIX "Undefined reference in URI template: \\%c\n"
 #define I_RESOLVE INF_PREFIX "Resolving ICN references in %s...\n"
 
 static bool verbose = false;
@@ -83,6 +86,135 @@ static bool icn_is_used(xmlDocPtr doc, const xmlChar *ident)
 	return used;
 }
 
+/* Replace the SYSTEM URI of an entity, adding a notation if necessary. */
+static void replace_entity(xmlDocPtr doc, xmlDocPtr icns, xmlEntityPtr e, const xmlChar *ident, const xmlChar *uri, const xmlChar *notation)
+{
+	xmlChar *ndata;
+
+	if (!notation) {
+		ndata = xmlStrdup(e->content);
+	}
+
+	xmlUnlinkNode((xmlNodePtr) e);
+	xmlFreeEntity(e);
+
+	if (notation) {
+		xmlAddDocEntity(doc, ident, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, uri, notation);
+	} else {
+		xmlAddDocEntity(doc, ident, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, uri, ndata);
+	}
+
+	if (notation) {
+		add_notation_ref(doc, icns, notation);
+	} else {
+		xmlFree(ndata);
+	}
+}
+
+/* Fill in backreferences in a string from a set of regex matches. */
+#define BUF_MAX 256
+static xmlChar *regex_replace(const xmlChar *icn, const xmlChar *uri, size_t nmatch, regmatch_t pmatch[])
+{
+	int i, n = 0;
+	xmlChar buf[BUF_MAX];
+	xmlChar *s;
+
+	s = xmlStrdup(BAD_CAST "");
+
+	for (i = 0; uri[i]; ++i) {
+		if (uri[i] == '\\') {
+			int ref = uri[++i] - '0';
+
+			if (ref >= 0 && ref < nmatch && pmatch[ref].rm_so != -1) {
+				s = xmlStrncat(s, buf, n);
+				n = 0;
+				s = xmlStrncat(s, icn + pmatch[ref].rm_so, pmatch[ref].rm_eo - pmatch[ref].rm_so);
+			} else {
+				fprintf(stderr, E_REGEX_BADREF, ref + '0');
+			}
+		} else {
+			buf[n++] = uri[i];
+
+			if (n == BUF_MAX) {
+				s = xmlStrncat(s, buf, n);
+				n = 0;
+			}
+		}
+	}
+
+	s = xmlStrncat(s, buf, n);
+
+	return s;
+}
+
+/* Resolve an ICN using regular expressions. */
+static void resolve_icn_regex(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *pattern, const xmlChar *icn, const xmlChar *uri, const xmlChar *notation)
+{
+	regex_t re;
+	regmatch_t *pmatch;
+	size_t nmatch;
+
+	if (regcomp(&re, (char *) pattern, REG_EXTENDED) != 0) {
+		fprintf(stderr, E_REGEX_INVALID, (char *) pattern);
+		return;
+	}
+
+	nmatch = re.re_nsub + 1;
+
+	pmatch = malloc(sizeof(regmatch_t) * nmatch);
+
+	if (regexec(&re, (char *) icn, nmatch, pmatch, 0) == 0) {
+		xmlChar *s;
+		xmlEntityPtr e;
+
+		s = regex_replace(icn, uri, nmatch, pmatch);
+
+		e = xmlGetDocEntity(doc, icn);
+
+		if (e) {
+			replace_entity(doc, icns, e, icn, s, notation);
+		} else if (notation) {
+			add_notation_ref(doc, icns, notation);
+			xmlAddDocEntity(doc, icn, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, s, notation);
+		} else {
+			add_icn(doc, (char *) s, true);
+		}
+
+		xmlFree(s);
+	}
+
+	free(pmatch);
+
+	regfree(&re);
+}
+
+/* Resolve an ICN pattern rule from the catalog. */
+static void resolve_pattern_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *pattern, const xmlChar *uri, const xmlChar *notation)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//@infoEntityIdent", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *icn;
+
+			icn = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+
+			resolve_icn_regex(doc, icns, pattern, icn, uri, notation);
+
+			xmlFree(icn);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Resolve the ICNs in a document against the ICN catalog. */
 static void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, const xmlChar *uri, const xmlChar *notation)
 {
@@ -91,26 +223,7 @@ static void resolve_icn(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *ident, con
 	e = xmlGetDocEntity(doc, ident);
 
 	if (e) {
-		xmlChar *ndata;
-
-		if (!notation) {
-			ndata = xmlStrdup(e->content);
-		}
-
-		xmlUnlinkNode((xmlNodePtr) e);
-		xmlFreeEntity(e);
-
-		if (notation) {
-			xmlAddDocEntity(doc, ident, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, uri, notation);
-		} else {
-			xmlAddDocEntity(doc, ident, XML_EXTERNAL_GENERAL_UNPARSED_ENTITY, NULL, uri, ndata);
-		}
-
-		if (notation) {
-			add_notation_ref(doc, icns, notation);
-		} else {
-			xmlFree(ndata);
-		}
+		replace_entity(doc, icns, e, ident, uri, notation);
 	} else if (icn_is_used(doc, ident)) {
 		if (notation) {
 			add_notation_ref(doc, icns, notation);
@@ -152,14 +265,20 @@ static void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwri
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlChar *ident, *uri, *notation;
+			xmlChar *type, *ident, *uri, *notation;
 
+			type     = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "type");
 			ident    = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "infoEntityIdent");
 			uri      = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "uri");
 			notation = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "notation");
 
-			resolve_icn(doc, icns, ident, uri, notation);
+			if (xmlStrcmp(type, BAD_CAST "pattern") == 0) {
+				resolve_pattern_icn(doc, icns, ident, uri, notation);
+			} else {
+				resolve_icn(doc, icns, ident, uri, notation);
+			}
 
+			xmlFree(type);
 			xmlFree(ident);
 			xmlFree(uri);
 			xmlFree(notation);
@@ -278,6 +397,7 @@ static void show_help(void)
 	puts("");
 	puts("Options:");
 	puts("  -a, --add <icn>         Add an ICN to the catalog.");
+	puts("  -C, --create            Create a new ICN catalog.");
 	puts("  -c, --catalog <catalog> Use <catalog> as the ICN catalog.");
 	puts("  -d, --del <icn>         Delete an ICN from the catalog.");
 	puts("  -f, --overwrite         Overwrite input objects.");
@@ -285,7 +405,7 @@ static void show_help(void)
 	puts("  -l, --list              Treat input as list of objects.");
 	puts("  -m, --media <media>     Specify intended output media.");
 	puts("  -n, --ndata <notation>  Set the notation of the new ICN.");
-	puts("  -t, --new               Create new ICN catalog.");
+	puts("  -t, --type <type>       Set the type of the new catalog entry.");
 	puts("  -u, --uri <uri>         Set the URI of the new ICN.");
 	puts("  -v, --verbose           Verbose output.");
 	puts("  --version               Show version information.");
@@ -310,18 +430,19 @@ int main(int argc, char **argv)
 	xmlNodePtr add, del, cur = NULL;
 	bool islist = false;
 
-	const char *sopts = "a:c:d:flm:n:tu:vxh?";
+	const char *sopts = "a:Cc:d:flm:n:t:u:vxh?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
 		{"add"      , required_argument, 0, 'a'},
+		{"create"   , no_argument      , 0, 'C'},
 		{"catalog"  , required_argument, 0, 'c'},
 		{"del"      , required_argument, 0, 'd'},
 		{"overwrite", no_argument      , 0, 'f'},
 		{"list"     , no_argument      , 0, 'l'},
 		{"media"    , required_argument, 0, 'm'},
 		{"ndata"    , required_argument, 0, 'n'},
-		{"new"      , no_argument      , 0, 't'},
+		{"type"     , required_argument, 0, 't'},
 		{"uri"      , required_argument, 0, 'u'},
 		{"verbose"  , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -344,6 +465,9 @@ int main(int argc, char **argv)
 			case 'a':
 				cur = xmlNewChild(add, NULL, BAD_CAST "icn", NULL);
 				xmlSetProp(cur, BAD_CAST "infoEntityIdent", BAD_CAST optarg);
+				break;
+			case 'C':
+				createnew = true;
 				break;
 			case 'c':
 				if (!icns_fname) {
@@ -371,7 +495,9 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 't':
-				createnew = true;
+				if (cur) {
+					xmlSetProp(cur, BAD_CAST "type", BAD_CAST optarg);
+				}
 				break;
 			case 'u':
 				if (cur) {
