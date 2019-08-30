@@ -12,6 +12,10 @@ endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
+ifeq ($(OS),Windows_NT)
+	LDFLAGS+=-lregex
+endif
+
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
