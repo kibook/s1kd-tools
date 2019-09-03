@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -785,7 +785,7 @@ int main(int argc, char **argv)
 		xmlAddChild(update, replaceObjectGroup);
 	}
 
-	if (issue < ISS_42) {
+	if (issue < ISS_50) {
 		xmlXPathFreeContext(updateFileContext);
 		updateFile = toIssue(updateFile, issue);
 		updateFileContext = xmlXPathNewContext(updateFile);

@@ -22,7 +22,9 @@ OPTIONS
 -$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
--   4.2 (default)
+-   5.0 (default)
+
+-   4.2
 
 -   4.1
 
@@ -36,7 +38,7 @@ directory. Otherwise, the update file will be saved as the filename
 Use XML template in the specified directory instead of the built-in
 template. The template must be named `update.xml` in the directory
 &lt;dir&gt;, and must conform to the default S1000D issue of this tool
-(4.2).
+(5.0).
 
 -\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
