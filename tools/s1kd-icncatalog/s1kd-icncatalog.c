@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "3.0.0"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -25,7 +25,7 @@
 #define E_REGEX_BADREF ERR_PREFIX "Undefined reference in URI template: \\%c\n"
 #define I_RESOLVE INF_PREFIX "Resolving ICN references in %s...\n"
 
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 /* Add a notation by its reference in the catalog file. */
 static void add_notation_ref(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *notation)
@@ -129,7 +129,7 @@ static xmlChar *regex_replace(const xmlChar *icn, const xmlChar *uri, size_t nma
 				s = xmlStrncat(s, buf, n);
 				n = 0;
 				s = xmlStrncat(s, icn + pmatch[ref].rm_so, pmatch[ref].rm_eo - pmatch[ref].rm_so);
-			} else {
+			} else if (verbosity > QUIET) {
 				fprintf(stderr, E_REGEX_BADREF, ref + '0');
 			}
 		} else {
@@ -155,7 +155,9 @@ static void resolve_icn_regex(xmlDocPtr doc, xmlDocPtr icns, const xmlChar *patt
 	size_t nmatch;
 
 	if (regcomp(&re, (char *) pattern, REG_EXTENDED) != 0) {
-		fprintf(stderr, E_REGEX_INVALID, (char *) pattern);
+		if (verbosity > QUIET) {
+			fprintf(stderr, E_REGEX_INVALID, (char *) pattern);
+		}
 		return;
 	}
 
@@ -242,7 +244,7 @@ static void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwri
 	xmlXPathObjectPtr obj;
 	xmlChar *xpath;
 
-	if (verbose) {
+	if (verbosity == VERBOSE) {
 		fprintf(stderr, I_RESOLVE, fname);
 	}
 
@@ -305,7 +307,9 @@ static void resolve_icns_in_list(const char *path, xmlDocPtr icns, bool overwrit
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity > QUIET) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -405,6 +409,7 @@ static void show_help(void)
 	puts("  -l, --list              Treat input as list of objects.");
 	puts("  -m, --media <media>     Specify intended output media.");
 	puts("  -n, --ndata <notation>  Set the notation of the new ICN.");
+	puts("  -q, --quiet             Quiet mode.");
 	puts("  -t, --type <type>       Set the type of the new catalog entry.");
 	puts("  -u, --uri <uri>         Set the URI of the new ICN.");
 	puts("  -v, --verbose           Verbose output.");
@@ -430,7 +435,7 @@ int main(int argc, char **argv)
 	xmlNodePtr add, del, cur = NULL;
 	bool islist = false;
 
-	const char *sopts = "a:Cc:d:flm:n:t:u:vxh?";
+	const char *sopts = "a:Cc:d:flm:n:qt:u:vxh?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
@@ -442,6 +447,7 @@ int main(int argc, char **argv)
 		{"list"     , no_argument      , 0, 'l'},
 		{"media"    , required_argument, 0, 'm'},
 		{"ndata"    , required_argument, 0, 'n'},
+		{"quiet"    , no_argument      , 0, 'q'},
 		{"type"     , required_argument, 0, 't'},
 		{"uri"      , required_argument, 0, 'u'},
 		{"verbose"  , no_argument      , 0, 'v'},
@@ -494,6 +500,9 @@ int main(int argc, char **argv)
 					xmlSetProp(cur, BAD_CAST "notation", BAD_CAST optarg);
 				}
 				break;
+			case 'q':
+				verbosity = QUIET;
+				break;
 			case 't':
 				if (cur) {
 					xmlSetProp(cur, BAD_CAST "type", BAD_CAST optarg);
@@ -505,7 +514,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'v':
-				verbose = true;
+				verbosity = VERBOSE;
 				break;
 			case 'h':
 			case '?':

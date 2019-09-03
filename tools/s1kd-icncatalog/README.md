@@ -56,6 +56,9 @@ media.
 -n, --ndata &lt;notation&gt;  
 Specify the notation to reference when adding an ICN with the -a option.
 
+-q, --quiet  
+Quiet mode. Errors are not printed.
+
 -t, --type &lt;type&gt;  
 Specify the type of catalog entry when adding an ICN with the -a option.
 
