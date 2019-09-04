@@ -10,13 +10,12 @@
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
-#include <libxml/debugXML.h>
 
 #include "stylesheets.h"
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.8.1"
+#define VERSION "1.8.2"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -262,7 +261,7 @@ static xmlNodePtr firstXPathNode(char *xpath, xmlNodePtr from)
 	return node;
 }
 
-static xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *content)
+static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const xmlChar *content)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -323,13 +322,13 @@ static xmlNodePtr chooseAcronym(xmlNodePtr acronym, xmlChar *term, xmlChar *cont
 	return acronym;
 }
 
-static bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term, int termLen)
+static bool isAcronymTerm(const xmlChar *content, int contentLen, int i, const xmlChar *term, int termLen)
 {
 	bool isTerm;
 	xmlChar s, e;
 
 	s = i == 0 ? ' ' : content[i - 1];
-	e = i + termLen >= contentLen - 1 ? ' ' : content[i + termLen];
+	e = i + termLen >= contentLen ? ' ' : content[i + termLen];
 
 	isTerm = xmlStrchr(PRE_ACRONYM_DELIM, s) &&
 	         xmlStrncmp(content + i, term, termLen) == 0 &&
@@ -338,18 +337,20 @@ static bool isAcronymTerm(xmlChar *content, int contentLen, int i, xmlChar *term
 	return isTerm;
 }
 
-static void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
+static void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym, const xmlChar *term, int termLen)
 {
 	xmlChar *content;
-	xmlChar *term;
-	int termLen, contentLen;
+	int contentLen;
 	int i;
 
-	content = xmlNodeGetContent(node);
-	contentLen = xmlStrlen(content);
-
-	term = xmlNodeGetContent(firstXPathNode("acronymTerm", acronym));
-	termLen = xmlStrlen(term);
+	/* Skip empty nodes. */
+	if (!(content = xmlNodeGetContent(node))) {
+		return;
+	}
+	if ((contentLen = xmlStrlen(content)) == 0) {
+		xmlFree(content);
+		return;
+	}
 
 	i = 0;
 	while (i + termLen <= contentLen) {
@@ -384,7 +385,6 @@ static void markupAcronymInNode(xmlNodePtr node, xmlNodePtr acronym)
 		}
 	}
 
-	xmlFree(term);
 	xmlFree(content);
 }
 
@@ -396,21 +396,33 @@ static void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 		if (xmlStrcmp(cur->name, BAD_CAST "acronym") == 0) {
 			xmlXPathContextPtr ctx;
 			xmlXPathObjectPtr obj;
+			xmlChar *term;
+			int termLen;
+
+			/* Skip acronyms with empty terms. */
+			if (!(term = xmlNodeGetContent(firstXPathNode("acronymTerm", cur)))) {
+				continue;
+			}
+			if ((termLen = xmlStrlen(term)) == 0) {
+				xmlFree(term);
+				continue;
+			}
 
 			ctx = xmlXPathNewContext(doc);
-
 			obj = xmlXPathEvalExpression(acro_markup_xpath, ctx);
 
 			if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 				int i;
 
 				for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-					markupAcronymInNode(obj->nodesetval->nodeTab[i], cur);
+					markupAcronymInNode(obj->nodesetval->nodeTab[i], cur, term, termLen);
 				}
 			}
 
 			xmlXPathFreeObject(obj);
 			xmlXPathFreeContext(ctx);
+
+			xmlFree(term);
 		}
 	}
 }
