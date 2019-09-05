@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "2.0.3"
+#define VERSION "2.0.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -443,8 +443,8 @@ int main(int argc, char **argv)
 				break;
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); custom_defaults = true; break;
-			case 'n': strncpy(issue_number, optarg, MAX_ISSUE_NUMBER); break;
-			case 'w': strncpy(in_work, optarg, MAX_IN_WORK); break;
+			case 'n': strncpy(issue_number, optarg, MAX_ISSUE_NUMBER - 1); break;
+			case 'w': strncpy(in_work, optarg, MAX_IN_WORK - 1); break;
 			case 'c': strncpy(security_classification, optarg, 2); break;
 			case 'r': strncpy(responsible_partner_company, optarg, 255); break;
 			case 'R': strncpy(responsible_partner_company_code, optarg, 5); break;
