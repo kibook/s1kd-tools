@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -48,14 +48,17 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
+#define MAX_ISSUE_NUMBER		 5	+ 2
+#define MAX_IN_WORK			 2	+ 2
+
 static char model_ident_code[MAX_MODEL_IDENT_CODE] = "";
 static char pm_issuer[7] = "";
 static char pm_number[7] = "";
 static char pm_volume[4] = "";
 static char language_iso_code[5] = "";
 static char country_iso_code[4] = "";
-static char issue_number[5] = "";
-static char in_work[4] = "";
+static char issue_number[MAX_ISSUE_NUMBER] = "";
+static char in_work[MAX_IN_WORK] = "";
 static char pm_title[256] = "";
 static char short_pm_title[256] = "";
 static char security_classification[4] = "";
@@ -797,8 +800,8 @@ int main(int argc, char **argv)
 		}
 		prompt("Language ISO code", language_iso_code, 5);
 		prompt("Country ISO code", country_iso_code, 4);
-		prompt("Issue number", issue_number, 5);
-		prompt("In work", in_work, 4);
+		prompt("Issue number", issue_number, MAX_ISSUE_NUMBER);
+		prompt("In work", in_work, MAX_IN_WORK);
 		prompt("PM title", pm_title, 256);
 		prompt("Short PM title", short_pm_title, 256);
 		prompt("Security classification", security_classification, 4);

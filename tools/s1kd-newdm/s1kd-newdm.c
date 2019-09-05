@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "2.1.2"
+#define VERSION "2.1.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -46,7 +46,7 @@
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 #define MAX_LANGUAGE_ISO_CODE		 3	+ 2
 #define MAX_COUNTRY_ISO_CODE		 2	+ 2
-#define MAX_ISSUE_NUMBER		 3	+ 2
+#define MAX_ISSUE_NUMBER		 5	+ 2
 #define MAX_IN_WORK			 2	+ 2
 #define MAX_SECURITY_CLASSIFICATION	 2	+ 2
 

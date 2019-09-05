@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -50,14 +50,17 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
+#define MAX_ISSUE_NUMBER		 5	+ 2
+#define MAX_IN_WORK			 2	+ 2
+
 static char model_ident_code[MAX_MODEL_IDENT_CODE] = "";
 static char sender_ident[7] = "";
 static char dml_type[3] = "";
 static char year_of_data_issue[6] = "";
 static char seq_number[7] = "";
 static char security_classification[4] = "";
-static char issue_number[5] = "";
-static char in_work[4] = "";
+static char issue_number[MAX_ISSUE_NUMBER] = "";
+static char in_work[MAX_IN_WORK] = "";
 
 static char brex_dmcode[256] = "";
 

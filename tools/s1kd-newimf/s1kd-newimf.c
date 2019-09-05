@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -44,12 +44,15 @@
 #define MAX_LEARN_CODE                   3      + 2
 #define MAX_LEARN_EVENT_CODE		 1	+ 2
 
+#define MAX_ISSUE_NUMBER		 5	+ 2
+#define MAX_IN_WORK			 2	+ 2
+
 #define DEFAULT_S1000D_ISSUE ISS_50
 #define ISS_42_DEFAULT_BREX "S1000D-F-04-10-0301-00A-022A-D"
 static enum issue { NO_ISS, ISS_42, ISS_50 } issue = NO_ISS;
 
-static char issue_number[5] = "";
-static char in_work[4] = "";
+static char issue_number[MAX_ISSUE_NUMBER] = "";
+static char in_work[MAX_IN_WORK] = "";
 static char security_classification[4] = "";
 static char responsible_partner_company[256] = "";
 static char responsible_partner_company_code[7] = "";
@@ -440,8 +443,8 @@ int main(int argc, char **argv)
 				break;
 			case 'p': show_prompts = true; break;
 			case 'd': strncpy(defaults_fname, optarg, PATH_MAX - 1); custom_defaults = true; break;
-			case 'n': strncpy(issue_number, optarg, 3); break;
-			case 'w': strncpy(in_work, optarg, 2); break;
+			case 'n': strncpy(issue_number, optarg, MAX_ISSUE_NUMBER); break;
+			case 'w': strncpy(in_work, optarg, MAX_IN_WORK); break;
 			case 'c': strncpy(security_classification, optarg, 2); break;
 			case 'r': strncpy(responsible_partner_company, optarg, 255); break;
 			case 'R': strncpy(responsible_partner_company_code, optarg, 5); break;
@@ -504,8 +507,8 @@ int main(int argc, char **argv)
 	}
 
 	if (show_prompts) {
-		prompt("Issue number", issue_number, 5);
-		prompt("In-work issue", in_work, 4);
+		prompt("Issue number", issue_number, MAX_ISSUE_NUMBER);
+		prompt("In-work issue", in_work, MAX_IN_WORK);
 		prompt("Security classification", security_classification, 4);
 		prompt("Responsible partner company", responsible_partner_company, 256);
 		prompt("Originator", originator, 256);
