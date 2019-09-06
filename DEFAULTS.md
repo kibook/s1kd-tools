@@ -31,7 +31,7 @@ Alphabetic index
 | `inWork`                        | 2 digits                                 |
 | `issueNumber`                   | 3 digits                                 |
 | `issueType`                     | S1000D issue type (new, changed, ...)    |
-| `issue`                         | S1000D issue number (4.2, 4.1, 4.0, 3.0) |
+| `issue`                         | S1000D issue number (5.0, 4.2, 4.1, ...) |
 | `itemLocationCode`              | A, B, C, D, or T                         |
 | `languageIsoCode`               | 2 to 3 character ISO language code       |
 | `learnCode`                     | 3 alphanumeric characters                |
