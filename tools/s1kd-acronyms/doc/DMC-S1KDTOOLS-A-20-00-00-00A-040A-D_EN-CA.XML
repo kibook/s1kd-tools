@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="20" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="01"/>
+        <issueInfo issueNumber="021" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="09" day="06"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
