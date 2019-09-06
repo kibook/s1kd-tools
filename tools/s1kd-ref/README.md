@@ -206,6 +206,19 @@ Reference to a publication module:
     </pmRefIdent>
     </pmRef>
 
+Reference to a SCORM content package:
+
+    $ s1kd-ref SMC-EX-12345-00001-00
+    <scormContentPackageRef>
+    <scormContentPackageRefIdent>
+    <scormContentPackageCode
+    modelIdentCode="EX"
+    scormContentPackageIssuer="12345"
+    scormContentPackageNumber="00001"
+    scormContentPackageVolume="00"/>
+    </scormContentPackageRefIdent>
+    </scormContentPackageRef>
+
 Source identification for a data module:
 
     $ s1kd-ref -S DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
@@ -227,6 +240,19 @@ Source identification for a publication module:
     <language languageIsoCode="en" countryIsoCode="CA"/>
     <issueInfo issueNumber="001" inWork="00"/>
     </sourcePmIdent>
+
+Source identification for a SCORM content package:
+
+    $ s1kd-ref -S SMC-EX-12345-00001-00_001-00_EN-CA.XML
+    <sourceScormContentPackageIdent>
+    <scormContentPackageCode
+    modelIdentCode="EX"
+    scormContentPackageIssuer="12345"
+    scormContentPackageNumber="00001"
+    scormContentPackageVolume="00"/>
+    <language languageIsoCode="en" countryIsoCode="CA"/>
+    <issueInfo issueNumber="000" inWork="01"/>
+    </sourceScormContentPackageIdent>
 
 Repository source identification for a CIR data module:
 

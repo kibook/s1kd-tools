@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="01"/>
+        <issueInfo issueNumber="019" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="09" day="06"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add support for SCORM content package references.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -307,6 +310,19 @@ pmVolume="00"/&gt;
 &lt;/pmRefIdent&gt;
 &lt;/pmRef&gt;</verbatimText>
         </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Reference to a SCORM content package:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref SMC-EX-12345-00001-00
+<scormContentPackageRef>
+<scormContentPackageRefIdent>
+<scormContentPackageCode
+modelIdentCode="EX"
+scormContentPackageIssuer="12345"
+scormContentPackageNumber="00001"
+scormContentPackageVolume="00"/>
+</scormContentPackageRefIdent>
+</scormContentPackageRef>]]></verbatimText>
+        </para>
         <para>Source identification for a data module:</para>
         <para>
           <verbatimText verbatimStyle="vs23">$ s1kd-ref -S DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
@@ -328,6 +344,19 @@ pmVolume="00"/&gt;
 &lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
 &lt;issueInfo issueNumber="001" inWork="00"/&gt;
 &lt;/sourcePmIdent&gt;</verbatimText>
+        </para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Source identification for a SCORM content package:</para>
+        <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <verbatimText verbatimStyle="vs23"><![CDATA[$ s1kd-ref -S SMC-EX-12345-00001-00_001-00_EN-CA.XML
+<sourceScormContentPackageIdent>
+<scormContentPackageCode
+modelIdentCode="EX"
+scormContentPackageIssuer="12345"
+scormContentPackageNumber="00001"
+scormContentPackageVolume="00"/>
+<language languageIsoCode="en" countryIsoCode="CA"/>
+<issueInfo issueNumber="000" inWork="01"/>
+</sourceScormContentPackageIdent>]]></verbatimText>
         </para>
         <para>Repository source identification for a CIR data module:</para>
         <para>

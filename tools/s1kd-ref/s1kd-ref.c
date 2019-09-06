@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "2.0.2"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -146,6 +146,179 @@ static void set_xlink(xmlNodePtr node, const char *href)
 	xmlNsPtr xlink;
 	xlink = xmlNewNs(node, BAD_CAST "http://www.w3.org/1999/xlink", BAD_CAST "xlink");
 	xmlSetNsProp(node, xlink, BAD_CAST "href", BAD_CAST href);
+}
+
+#define SME_FMT "SME-%255[^-]-%255[^-]-%14[^-]-%5s-%5s-%2s"
+#define SMC_FMT "SMC-%14[^-]-%5s-%5s-%2s"
+
+static xmlNodePtr new_smc_ref(const char *ref, const char *fname, int opts)
+{
+	char extension_producer[256] = "";
+	char extension_code[256]     = "";
+	char model_ident_code[15]    = "";
+	char smc_issuer[6]            = "";
+	char smc_number[6]            = "";
+	char smc_volume[3]            = "";
+	xmlNode *smc_ref;
+	xmlNode *smc_ref_ident;
+	xmlNode *smc_code;
+	bool is_extended;
+	int n;
+
+	is_extended = strncmp(ref, "SME-", 4) == 0;
+
+	if (is_extended) {
+		n = sscanf(ref, SME_FMT,
+			extension_producer,
+			extension_code,
+			model_ident_code,
+			smc_issuer,
+			smc_number,
+			smc_volume);
+		if (n != 6) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "SCORM content package extended code invalid: %s\n", ref);
+			}
+			exit(EXIT_BAD_INPUT);
+		}
+	} else {
+		n = sscanf(ref, SMC_FMT,
+			model_ident_code,
+			smc_issuer,
+			smc_number,
+			smc_volume);
+		if (n != 4) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "SCORM content package code invalid: %s\n", ref);
+			}
+			exit(EXIT_BAD_INPUT);
+		}
+	}
+
+	smc_ref = xmlNewNode(NULL, BAD_CAST "scormContentPackageRef");
+	smc_ref_ident = xmlNewChild(smc_ref, NULL, BAD_CAST "scormContentPackageRefIdent", NULL);
+
+	if (is_extended) {
+		xmlNode *ident_extension;
+		ident_extension = xmlNewChild(smc_ref_ident, NULL, BAD_CAST "identExtension", NULL);
+		xmlSetProp(ident_extension, BAD_CAST "extensionProducer", BAD_CAST extension_producer);
+		xmlSetProp(ident_extension, BAD_CAST "extensionCode", BAD_CAST extension_code);
+	}
+
+	smc_code = xmlNewChild(smc_ref_ident, NULL, BAD_CAST "scormContentPackageCode", NULL);
+
+	xmlSetProp(smc_code, BAD_CAST "modelIdentCode", BAD_CAST model_ident_code);
+	xmlSetProp(smc_code, BAD_CAST "scormContentPackageIssuer", BAD_CAST smc_issuer);
+	xmlSetProp(smc_code, BAD_CAST "scormContentPackageNumber", BAD_CAST smc_number);
+	xmlSetProp(smc_code, BAD_CAST "scormContentPackageVolume", BAD_CAST smc_volume);
+
+	if (opts) {
+		xmlDocPtr doc;
+		xmlNodePtr ref_smc_address = NULL;
+		xmlNodePtr ref_smc_ident = NULL;
+		xmlNodePtr ref_smc_address_items = NULL;
+		xmlNodePtr ref_smc_title = NULL;
+		xmlNodePtr ref_smc_issue_date = NULL;
+		xmlNodePtr issue_info = NULL;
+		xmlNodePtr language = NULL;
+		char *s;
+
+		if ((doc = read_xml_doc(fname))) {
+			ref_smc_address = first_xpath_node(doc, NULL, BAD_CAST "//scormContentPackageAddress");
+			ref_smc_ident = find_child(ref_smc_address, "scormContentPackageIdent");
+			ref_smc_address_items = find_child(ref_smc_address, "scormContentPackageAddressItems");
+			ref_smc_title = find_child(ref_smc_address_items, "scormContentPackageTitle");
+			ref_smc_issue_date = find_child(ref_smc_address_items, "issueDate");
+		}
+
+		s = strchr(ref, '_');
+
+		if (optset(opts, OPT_ISSUE)) {
+			if (doc) {
+				issue_info = xmlCopyNode(find_child(ref_smc_ident, "issueInfo"), 1);
+			} else if (s && isdigit(s[1])) {
+				issue_info = new_issue_info(s);
+			} else {
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read issue info from SCORM content package: %s\n", ref);
+				}
+				issue_info = NULL;
+			}
+
+			xmlAddChild(smc_ref_ident, issue_info);
+		}
+
+		if (optset(opts, OPT_LANG)) {
+			if (doc) {
+				language = xmlCopyNode(find_child(ref_smc_ident, "language"), 1);
+			} else if (s && (s = strchr(s + 1, '_'))) {
+				language = new_language(s);
+			} else {
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Could not read language from SCORM content package: %s\n", ref);
+				}
+				language = NULL;
+			}
+
+			xmlAddChild(smc_ref_ident, language);
+		}
+
+		if (optset(opts, OPT_TITLE) || optset(opts, OPT_DATE)) {
+			xmlNodePtr smc_ref_address_items = NULL, smc_title, issue_date;
+
+			if (doc) {
+				smc_ref_address_items = xmlNewChild(smc_ref, NULL, BAD_CAST "scormContentPackageRefAddressItems", NULL);
+				smc_title = xmlCopyNode(ref_smc_title, 1);
+				issue_date = xmlCopyNode(ref_smc_issue_date, 1);
+			} else {
+				smc_title = NULL;
+				issue_date = NULL;
+			}
+
+			if (optset(opts, OPT_TITLE)) {
+				if (smc_title) {
+					xmlAddChild(smc_ref_address_items, smc_title);
+				} else {
+					if (verbosity > QUIET) {
+						fprintf(stderr, WRN_PREFIX "Could not read title from SCORM content package: %s\n", ref);
+					}
+				}
+			}
+			if (optset(opts, OPT_DATE)) {
+				if (issue_date) {
+					xmlAddChild(smc_ref_address_items, issue_date);
+				} else {
+					if (verbosity > QUIET) {
+						fprintf(stderr, WRN_PREFIX "Could not read date from SCORM content package: %s\n", ref);
+					}
+				}
+			}
+		}
+
+		xmlFreeDoc(doc);
+
+		if (optset(opts, OPT_SRCID)) {
+			xmlNodePtr smc, issno, lang, src;
+
+			smc   = xmlCopyNode(smc_code, 1);
+			issno = xmlCopyNode(issue_info, 1);
+			lang  = xmlCopyNode(language, 1);
+
+			src = xmlNewNode(NULL, BAD_CAST "sourceScormContentPackageIdent");
+			xmlAddChild(src, smc);
+			xmlAddChild(src, lang);
+			xmlAddChild(src, issno);
+
+			xmlFreeNode(smc_ref);
+			smc_ref = src;
+		}
+
+		if (optset(opts, OPT_URL)) {
+			set_xlink(smc_ref, fname);
+		}
+	}
+
+	return smc_ref;
 }
 
 #define PME_FMT "PME-%255[^-]-%255[^-]-%14[^-]-%5s-%5s-%2s"
@@ -762,6 +935,11 @@ static xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 	return csn_ref;
 }
 
+static bool is_smc_ref(const char *ref)
+{
+	return strncmp(ref, "SMC-", 4) == 0 || strncmp(ref, "SME-", 4) == 0;
+}
+
 static bool is_pm_ref(const char *ref)
 {
 	return strncmp(ref, "PMC-", 4) == 0 || strncmp(ref, "PME-", 4) == 0;
@@ -897,6 +1075,8 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 		f = new_dm_ref;
 	} else if (is_pm_ref(ref)) {
 		f = new_pm_ref;
+	} else if (is_smc_ref(ref)) {
+		f = new_smc_ref;
 	} else if (is_com_ref(ref)) {
 		f = new_com_ref;
 	} else if (is_dml_ref(ref)) {
