@@ -94,7 +94,7 @@ Example - XML format
     <default ident="inWork" value="01"/>
     <default ident="issueNumber" value="000"/>
     <default ident="issueType" value="new"/>
-    <default ident="issue" value="4.2"/>
+    <default ident="issue" value="5.0"/>
     <default ident="itemLocationCode" value="D"/>
     <default ident="languageIsoCode" value="en"/>
     <default ident="learnCode" value="H10"/>
@@ -151,7 +151,7 @@ Example - Simple text format
     inWork                         01
     issueNumber                    000
     issueType                      new
-    issue                          4.2
+    issue                          5.0
     itemLocationCode               D
     languageIsoCode                en
     learnCode                      H10
