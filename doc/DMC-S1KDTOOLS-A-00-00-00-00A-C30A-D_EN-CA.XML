@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="01"/>
+        <issueInfo issueNumber="015" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="09" day="06"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -39,6 +39,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add support for issue 5.0.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -79,7 +82,7 @@
           <notePara>For example, the s1kd-brexcheck tool is said not to support Issue 2.0 or Issue 2.1, because the BREX data module schema was not introduced until Issue 2.2. However, an Issue 2.2 or greater BREX data module can still be used to check Issue 2.0 or Issue 2.1 CSDB objects.</notePara>
         </note>
       </levelledPara>
-      <table pgwide="1">
+      <table pgwide="1" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
         <title>Compatibility with supported issues of S1000D</title>
         <tgroup cols="10">
           <colspec colname="c1" colwidth="2*"/>
