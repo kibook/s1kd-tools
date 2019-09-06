@@ -133,7 +133,7 @@ Generating display text
 -----------------------
 
 The built-in XSLT for generating display text follows the guidance in
-Chap 7.8 of the S1000D 4.2 specification. For example, given the
+Chap 7.8 of the S1000D 5.0 specification. For example, given the
 following:
 
     <applic>

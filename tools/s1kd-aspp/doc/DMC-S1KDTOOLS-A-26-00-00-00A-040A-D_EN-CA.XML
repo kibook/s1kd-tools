@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="01"/>
+        <issueInfo issueNumber="019" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="09" day="06"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Reference Issue 5.0</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -226,7 +229,7 @@ s1kd-aspp -p [-a &lt;ID&gt;] [-flv] [&lt;object&gt;...]</verbatimText>
         <title>EXAMPLES</title>
         <levelledPara>
           <title>Generating display text</title>
-          <para>The built-in XSLT for generating display text follows the guidance in Chap 7.8 of the S1000D 4.2 specification. For example, given the following:</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The built-in XSLT for generating display text follows the guidance in Chap 7.8 of the S1000D 5.0 specification. For example, given the following:</para>
           <para>
             <verbatimText verbatimStyle="vs11">&lt;applic&gt;
 &lt;assert applicPropertyIdent="prodversion"
