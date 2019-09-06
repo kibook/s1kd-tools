@@ -23,7 +23,9 @@ The data management list code of the new DML.
 -$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:
 
--   4.2 (default)
+-   5.0 (default)
+
+-   4.2
 
 -   4.1
 
@@ -48,7 +50,7 @@ instead of being automatically named.
 -%, --templates &lt;dir&gt;  
 Use the XML template in the specified directory instead of the built-in
 template. The template must be named `dml.xml` inside &lt;dir&gt; and
-must conform to the default S1000D issue (4.2).
+must conform to the default S1000D issue (5.0).
 
 -\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
