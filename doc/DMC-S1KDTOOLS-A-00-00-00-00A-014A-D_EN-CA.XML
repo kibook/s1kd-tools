@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="04"/>
+        <issueInfo issueNumber="008" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="09" day="06"/>
@@ -647,7 +647,7 @@
       <levelledPara>
         <title>Example - XML format</title>
         <para>
-          <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
+          <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[<?xml version="1.0"?>
 <defaults>
 <default ident="act" value="MYPRJ-A-00-00-00-00A-00WA-D"/>
 <default ident="assyCode" value="00"/>
@@ -707,7 +707,7 @@
       <levelledPara>
         <title>Example - Simple text format</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">act                            MYPRJ-A-00-00-00-00A-00WA-D
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002">act                            MYPRJ-A-00-00-00-00A-00WA-D
 assyCode                       00
 authorization                  khzae.net
 brex                           MYPRJ-A-00-00-00-00A-022A-D
