@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -268,8 +268,8 @@ static xmlNodePtr new_smc_ref(const char *ref, const char *fname, int opts)
 
 			if (doc) {
 				smc_ref_address_items = xmlNewChild(smc_ref, NULL, BAD_CAST "scormContentPackageRefAddressItems", NULL);
-				smc_title = xmlCopyNode(ref_smc_title, 1);
-				issue_date = xmlCopyNode(ref_smc_issue_date, 1);
+				smc_title = ref_smc_title;
+				issue_date = ref_smc_issue_date;
 			} else {
 				smc_title = NULL;
 				issue_date = NULL;
@@ -277,7 +277,7 @@ static xmlNodePtr new_smc_ref(const char *ref, const char *fname, int opts)
 
 			if (optset(opts, OPT_TITLE)) {
 				if (smc_title) {
-					xmlAddChild(smc_ref_address_items, smc_title);
+					xmlAddChild(smc_ref_address_items, xmlCopyNode(smc_title, 1));
 				} else {
 					if (verbosity > QUIET) {
 						fprintf(stderr, WRN_PREFIX "Could not read title from SCORM content package: %s\n", ref);
@@ -286,7 +286,7 @@ static xmlNodePtr new_smc_ref(const char *ref, const char *fname, int opts)
 			}
 			if (optset(opts, OPT_DATE)) {
 				if (issue_date) {
-					xmlAddChild(smc_ref_address_items, issue_date);
+					xmlAddChild(smc_ref_address_items, xmlCopyNode(issue_date, 1));
 				} else {
 					if (verbosity > QUIET) {
 						fprintf(stderr, WRN_PREFIX "Could not read date from SCORM content package: %s\n", ref);
@@ -441,8 +441,8 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 			if (doc) {
 				pm_ref_address_items = xmlNewChild(pm_ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
-				pm_title = xmlCopyNode(ref_pm_title, 1);
-				issue_date = xmlCopyNode(ref_pm_issue_date, 1);
+				pm_title = ref_pm_title;
+				issue_date = ref_pm_issue_date;
 			} else {
 				pm_title = NULL;
 				issue_date = NULL;
@@ -450,7 +450,7 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 			if (optset(opts, OPT_TITLE)) {
 				if (pm_title) {
-					xmlAddChild(pm_ref_address_items, pm_title);
+					xmlAddChild(pm_ref_address_items, xmlCopyNode(pm_title, 1));
 				} else {
 					if (verbosity > QUIET) {
 						fprintf(stderr, WRN_PREFIX "Could not read title from publication module: %s\n", ref);
@@ -459,7 +459,7 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			}
 			if (optset(opts, OPT_DATE)) {
 				if (issue_date) {
-					xmlAddChild(pm_ref_address_items, issue_date);
+					xmlAddChild(pm_ref_address_items, xmlCopyNode(issue_date, 1));
 				} else {
 					if (verbosity > QUIET) {
 						fprintf(stderr, WRN_PREFIX "Could not read date from publication module: %s\n", ref);
