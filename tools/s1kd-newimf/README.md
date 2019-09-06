@@ -33,7 +33,7 @@ instead of being automatically named.
 -%, --templates &lt;dir&gt;  
 Use the XML template in &lt;dir&gt; instead of the built-in template.
 The template must be named `icnmetadata.xml` inside &lt;dir&gt; and must
-conform to the default S1000D issue (4.2).
+conform to the default S1000D issue (5.0).
 
 -\~, --dump-templates &lt;dir&gt;  
 Dump the built-in XML template to the specified directory.
