@@ -67,7 +67,7 @@ clean:
 maintainer-clean:
 	rm -f s1kd-tools.1 s1kd-defaults.5 $(README) $(INTRO) $(DEFAULTS) $(INSTALL_DOC) $(EXAMPLE) $(COMPAT)
 
-install: s1kd-tools.1 s1kd-defaults.5
+install:
 	$(INSTALL) s1kd-tools.1 $(MAN1_PREFIX)
 	$(INSTALL) s1kd-defaults.5 $(MAN5_PREFIX)
 
