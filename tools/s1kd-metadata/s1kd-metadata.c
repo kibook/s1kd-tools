@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <regex.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -9,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.6.0"
+#define VERSION "2.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -279,6 +280,111 @@ static int edit_sec_class(xmlNodePtr node, const char *val)
 	} else {
 		return edit_simple_attr(node, "class", val);
 	}
+}
+
+static char *get_issue(xmlNodePtr node)
+{
+	xmlChar *url;
+	regex_t re;
+	regmatch_t pmatch[3];
+	char *iss;
+
+	regcomp(&re, "S1000D_([0-9]+)-([0-9]+)", REG_EXTENDED);
+
+	url = xmlGetNsProp(node, BAD_CAST "noNamespaceSchemaLocation", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
+
+	if (regexec(&re, (char *) url, 3, pmatch, 0) == 0) {
+		int len1, len2;
+
+		len1 = pmatch[1].rm_eo - pmatch[1].rm_so;
+		len2 = pmatch[2].rm_eo - pmatch[2].rm_so;
+
+		iss = malloc(len1 + len2 + 2);
+
+		sprintf(iss, "%.*s.%.*s",
+			len1, url + pmatch[1].rm_so,
+			len2, url + pmatch[2].rm_so);
+	} else {
+		iss = NULL;
+	}
+
+	regfree(&re);
+	xmlFree(url);
+
+	return iss;
+}
+
+static void show_issue(xmlNodePtr node, int endl)
+{
+	char *iss;
+	iss = get_issue(node);
+	if (iss) {
+		printf("%s", iss);
+	}
+	if (endl > -1) putchar(endl);
+	free(iss);
+}
+
+static int edit_issue(xmlNodePtr node, const char *val)
+{
+	xmlAttrPtr attr;
+	char *url;
+	regex_t re;
+	regmatch_t pmatch[1];
+	int err = 0;
+
+	regcomp(&re, "[^/]+\\.xsd$", REG_EXTENDED);
+
+	attr = xmlHasNsProp(node, BAD_CAST "noNamespaceSchemaLocation", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
+
+	url = (char *) xmlNodeGetContent((xmlNodePtr) attr);
+
+	if (regexec(&re, url, 1, pmatch, 0) == 0) {
+		xmlChar *schema, *xsi;
+
+		schema = xmlCharStrndup(url + pmatch[0].rm_so, pmatch[0].rm_eo - pmatch[0].rm_so);
+
+		xsi = xmlStrdup(BAD_CAST "http://www.s1000d.org/S1000D_");
+
+		if (strcmp(val, "2.0") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "2-0");
+		} else if (strcmp(val, "2.1") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "2-1");
+		} else if (strcmp(val, "2.2") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "2-2");
+		} else if (strcmp(val, "2.3") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "2-3");
+		} else if (strcmp(val, "3.0") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "3-0");
+		} else if (strcmp(val, "4.0") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "4-0");
+		} else if (strcmp(val, "4.1") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "4-1");
+		} else if (strcmp(val, "4.2") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "4-2");
+		} else if (strcmp(val, "5.0") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "5-0");
+		} else {
+			err = EXIT_INVALID_VALUE;
+		}
+
+		if (!err) {
+			xsi = xmlStrcat(xsi, BAD_CAST "/xml_schema_flat/");
+			xsi = xmlStrcat(xsi, schema);
+
+			xmlSetNsProp(node, attr->ns, BAD_CAST "noNamespaceSchemaLocation", xsi);
+		}
+
+		xmlFree(schema);
+		xmlFree(xsi);
+	} else {
+		err = EXIT_MISSING_METADATA;
+	}
+
+	regfree(&re);
+	xmlFree(url);
+
+	return err;
 }
 
 static void show_schema_url(xmlNodePtr node, int endl)
@@ -1435,6 +1541,12 @@ static struct metadata metadata[] = {
 		edit_in_work,
 		NULL,
 		"Inwork issue number (NN)"},
+	{"issue",
+		"//*",
+		show_issue,
+		edit_issue,
+		NULL,
+		"Issue of S1000D"},
 	{"issueDate",
 	 	"//issueDate|//issdate",
 		show_issue_date,
@@ -2065,6 +2177,8 @@ static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fnam
 			return BAD_CAST get_dmcode(node);
 		} else if (metadata[i].show == show_schema) {
 			return BAD_CAST get_schema(node);
+		} else if (metadata[i].show == show_issue) {
+			return BAD_CAST get_issue(node);
 		} else {
 			return xmlNodeGetContent(node);
 		}
