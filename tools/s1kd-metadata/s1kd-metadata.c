@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,6 +32,7 @@ static enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
 struct metadata {
 	char *key;
 	char *path;
+	xmlChar *(*get)(xmlNodePtr);
 	void (*show)(xmlNodePtr, int endl);
 	int (*edit)(xmlNodePtr, const char *);
 	int (*create)(xmlXPathContextPtr, const char *val);
@@ -61,7 +62,7 @@ static xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
 	return node;
 }
 
-static xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
+static xmlNodePtr first_xpath_node_local(xmlNodePtr node, const xmlChar *expr)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -84,27 +85,36 @@ static xmlNodePtr first_xpath_node_local(xmlNodePtr node, const char *expr)
 	return first;
 }
 
-static char *first_xpath_string(xmlNodePtr node, const char *expr)
+static xmlChar *first_xpath_string(xmlNodePtr node, const xmlChar *expr)
 {
-	xmlNodePtr first;
-	first = first_xpath_node_local(node, expr);
-	return (char *) xmlNodeGetContent(first);
+	return xmlNodeGetContent(first_xpath_node_local(node, expr));
 }
 
-static void show_issue_date(xmlNodePtr issue_date, int endl)
+static xmlChar *get_issue_date(xmlNodePtr node)
 {
-	char *year, *month, *day;
+	xmlChar *year, *month, *day, *date;
 
-	year  = (char *) xmlGetProp(issue_date, BAD_CAST "year");
-	month = (char *) xmlGetProp(issue_date, BAD_CAST "month");
-	day   = (char *) xmlGetProp(issue_date, BAD_CAST "day");
+	year  = xmlGetProp(node, BAD_CAST "year");
+	month = xmlGetProp(node, BAD_CAST "month");
+	day   = xmlGetProp(node, BAD_CAST "day");
 
-	printf("%s-%s-%s", year, month, day);
-	if (endl > -1) putchar(endl);
+	date = malloc(11);
+	xmlStrPrintf(date, 11, "%s-%s-%s", year, month, day);
 
 	xmlFree(year);
 	xmlFree(month);
 	xmlFree(day);
+
+	return date;
+}
+
+static void show_issue_date(xmlNodePtr issue_date, int endl)
+{
+	xmlChar *date;
+	date = get_issue_date(issue_date);
+	printf("%s", (char *) date);
+	if (endl > -1) putchar(endl);
+	xmlFree(date);
 }
 
 static int edit_issue_date(xmlNodePtr issue_date, const char *val)
@@ -282,26 +292,28 @@ static int edit_sec_class(xmlNodePtr node, const char *val)
 	}
 }
 
-static char *get_issue(xmlNodePtr node)
+static xmlChar *get_issue(xmlNodePtr node)
 {
 	xmlChar *url;
 	regex_t re;
 	regmatch_t pmatch[3];
-	char *iss;
+	xmlChar *iss;
 
 	regcomp(&re, "S1000D_([0-9]+)-([0-9]+)", REG_EXTENDED);
 
 	url = xmlGetNsProp(node, BAD_CAST "noNamespaceSchemaLocation", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
 
 	if (regexec(&re, (char *) url, 3, pmatch, 0) == 0) {
-		int len1, len2;
+		int len1, len2, n;
 
 		len1 = pmatch[1].rm_eo - pmatch[1].rm_so;
 		len2 = pmatch[2].rm_eo - pmatch[2].rm_so;
 
-		iss = malloc(len1 + len2 + 2);
+		n = len1 + len2 + 2;
 
-		sprintf(iss, "%.*s.%.*s",
+		iss = malloc(n);
+
+		xmlStrPrintf(iss, n, "%.*s.%.*s",
 			len1, url + pmatch[1].rm_so,
 			len2, url + pmatch[2].rm_so);
 	} else {
@@ -316,10 +328,10 @@ static char *get_issue(xmlNodePtr node)
 
 static void show_issue(xmlNodePtr node, int endl)
 {
-	char *iss;
+	xmlChar *iss;
 	iss = get_issue(node);
 	if (iss) {
-		printf("%s", iss);
+		printf("%s", (char *) iss);
 	}
 	if (endl > -1) putchar(endl);
 	free(iss);
@@ -397,9 +409,10 @@ static int edit_schema_url(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "xsi:noNamespaceSchemaLocation", val);
 }
 
-static char *get_schema(xmlNodePtr node)
+static xmlChar *get_schema(xmlNodePtr node)
 {
-	char *url, *s, *e, *r;
+	char *url, *s, *e;
+	xmlChar *r;
 
 	url = (char *) xmlGetProp(node, BAD_CAST "noNamespaceSchemaLocation");
 
@@ -407,7 +420,7 @@ static char *get_schema(xmlNodePtr node)
 	s = s ? s + 1 : url;
 	e = strrchr(s, '.');
 	if (e) *e = '\0';
-	r = strdup(s);
+	r = xmlCharStrdup(s);
 
 	xmlFree(url);
 
@@ -416,9 +429,9 @@ static char *get_schema(xmlNodePtr node)
 
 static void show_schema(xmlNodePtr node, int endl)
 {
-	char *s;
+	xmlChar *s;
 	s = get_schema(node);
-	printf("%s", s);
+	printf("%s", (char *) s);
 	if (endl > -1) putchar(endl);
 	free(s);
 }
@@ -440,59 +453,59 @@ static void show_type(xmlNodePtr node, int endl)
 	if (endl > -1) putchar(endl);
 }
 
-static char *get_dmcode(xmlNodePtr node)
+static xmlChar *get_dmcode(xmlNodePtr node)
 {
-	char *model_ident_code;
-	char *system_diff_code;
-	char *system_code;
-	char *sub_system_code;
-	char *sub_sub_system_code;
-	char *assy_code;
-	char *disassy_code;
-	char *disassy_code_variant;
-	char *info_code;
-	char *info_code_variant;
-	char *item_location_code;
-	char *learn_code;
-	char *learn_event_code;
-	char learn[6] = "";
-	char *code;
+	xmlChar *model_ident_code;
+	xmlChar *system_diff_code;
+	xmlChar *system_code;
+	xmlChar *sub_system_code;
+	xmlChar *sub_sub_system_code;
+	xmlChar *assy_code;
+	xmlChar *disassy_code;
+	xmlChar *disassy_code_variant;
+	xmlChar *info_code;
+	xmlChar *info_code_variant;
+	xmlChar *item_location_code;
+	xmlChar *learn_code;
+	xmlChar *learn_event_code;
+	xmlChar learn[6] = "";
+	xmlChar *code;
 
 	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0) {
-		model_ident_code      = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
-		system_diff_code      = (char *) xmlGetProp(node, BAD_CAST "systemDiffCode");
-		system_code           = (char *) xmlGetProp(node, BAD_CAST "systemCode");
-		sub_system_code       = (char *) xmlGetProp(node, BAD_CAST "subSystemCode");
-		sub_sub_system_code   = (char *) xmlGetProp(node, BAD_CAST "subSubSystemCode");
-		assy_code             = (char *) xmlGetProp(node, BAD_CAST "assyCode");
-		disassy_code          = (char *) xmlGetProp(node, BAD_CAST "disassyCode");
-		disassy_code_variant  = (char *) xmlGetProp(node, BAD_CAST "disassyCodeVariant");
-		info_code             = (char *) xmlGetProp(node, BAD_CAST "infoCode");
-		info_code_variant     = (char *) xmlGetProp(node, BAD_CAST "infoCodeVariant");
-		item_location_code    = (char *) xmlGetProp(node, BAD_CAST "itemLocationCode");
-		learn_code            = (char *) xmlGetProp(node, BAD_CAST "learnCode");
-		learn_event_code      = (char *) xmlGetProp(node, BAD_CAST "learnEventCode");
+		model_ident_code      = xmlGetProp(node, BAD_CAST "modelIdentCode");
+		system_diff_code      = xmlGetProp(node, BAD_CAST "systemDiffCode");
+		system_code           = xmlGetProp(node, BAD_CAST "systemCode");
+		sub_system_code       = xmlGetProp(node, BAD_CAST "subSystemCode");
+		sub_sub_system_code   = xmlGetProp(node, BAD_CAST "subSubSystemCode");
+		assy_code             = xmlGetProp(node, BAD_CAST "assyCode");
+		disassy_code          = xmlGetProp(node, BAD_CAST "disassyCode");
+		disassy_code_variant  = xmlGetProp(node, BAD_CAST "disassyCodeVariant");
+		info_code             = xmlGetProp(node, BAD_CAST "infoCode");
+		info_code_variant     = xmlGetProp(node, BAD_CAST "infoCodeVariant");
+		item_location_code    = xmlGetProp(node, BAD_CAST "itemLocationCode");
+		learn_code            = xmlGetProp(node, BAD_CAST "learnCode");
+		learn_event_code      = xmlGetProp(node, BAD_CAST "learnEventCode");
 
-		if (learn_code && learn_event_code) sprintf(learn, "-%s%s", learn_code, learn_event_code);
+		if (learn_code && learn_event_code) xmlStrPrintf(learn, 6, "-%s%s", learn_code, learn_event_code);
 	} else {
-		model_ident_code     = first_xpath_string(node, "modelic");
-		system_diff_code     = first_xpath_string(node, "sdc");
-		system_code          = first_xpath_string(node, "chapnum");
-		sub_system_code      = first_xpath_string(node, "section");
-		sub_sub_system_code  = first_xpath_string(node, "subsect");
-		assy_code            = first_xpath_string(node, "subject");
-		disassy_code         = first_xpath_string(node, "discode");
-		disassy_code_variant = first_xpath_string(node, "discodev");
-		info_code            = first_xpath_string(node, "incode");
-		info_code_variant    = first_xpath_string(node, "incodev");
-		item_location_code   = first_xpath_string(node, "itemloc");
+		model_ident_code     = first_xpath_string(node, BAD_CAST "modelic");
+		system_diff_code     = first_xpath_string(node, BAD_CAST "sdc");
+		system_code          = first_xpath_string(node, BAD_CAST "chapnum");
+		sub_system_code      = first_xpath_string(node, BAD_CAST "section");
+		sub_sub_system_code  = first_xpath_string(node, BAD_CAST "subsect");
+		assy_code            = first_xpath_string(node, BAD_CAST "subject");
+		disassy_code         = first_xpath_string(node, BAD_CAST "discode");
+		disassy_code_variant = first_xpath_string(node, BAD_CAST "discodev");
+		info_code            = first_xpath_string(node, BAD_CAST "incode");
+		info_code_variant    = first_xpath_string(node, BAD_CAST "incodev");
+		item_location_code   = first_xpath_string(node, BAD_CAST "itemloc");
 		learn_code = NULL;
 		learn_event_code = NULL;
 	}
 
 	code = malloc(256);
 
-	snprintf(code, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
+	xmlStrPrintf(code, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
 		model_ident_code,
 		system_diff_code,
 		system_code,
@@ -525,9 +538,9 @@ static char *get_dmcode(xmlNodePtr node)
 
 static void show_dmcode(xmlNodePtr node, int endl)
 {
-	char *code;
+	xmlChar *code;
 	code = get_dmcode(node);
-	printf("%s", code);
+	printf("%s", (char *) code);
 	if (endl > -1) putchar(endl);
 	free(code);
 }
@@ -588,17 +601,17 @@ static int edit_dmcode(xmlNodePtr node, const char *val)
 			edit_simple_attr(node, "learnEventCode", learn_event_code);
 		}
 	} else {
-		edit_simple_node(first_xpath_node_local(node, "modelic"), model_ident_code);
-		edit_simple_node(first_xpath_node_local(node, "sdc"), system_diff_code);
-		edit_simple_node(first_xpath_node_local(node, "chapnum"), system_code);
-		edit_simple_node(first_xpath_node_local(node, "section"), sub_system_code);
-		edit_simple_node(first_xpath_node_local(node, "subsect"), sub_sub_system_code);
-		edit_simple_node(first_xpath_node_local(node, "subject"), assy_code);
-		edit_simple_node(first_xpath_node_local(node, "discode"), disassy_code);
-		edit_simple_node(first_xpath_node_local(node, "discodev"), disassy_code_variant);
-		edit_simple_node(first_xpath_node_local(node, "incode"), info_code);
-		edit_simple_node(first_xpath_node_local(node, "incodev"), info_code_variant);
-		edit_simple_node(first_xpath_node_local(node, "itemloc"), item_location_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "modelic"), model_ident_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "sdc"), system_diff_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "chapnum"), system_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "section"), sub_system_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "subsect"), sub_sub_system_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "subject"), assy_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "discode"), disassy_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "discodev"), disassy_code_variant);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "incode"), info_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "incodev"), info_code_variant);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "itemloc"), item_location_code);
 	}
 
 	return 0;
@@ -608,11 +621,11 @@ static void show_ddncode(xmlNodePtr node, int endl)
 {
 	char *modelic, *sendid, *recvid, *diyear, *seqnum;
 
-	modelic = first_xpath_string(node, "@modelIdentCode|modelic");
-	sendid  = first_xpath_string(node, "@senderIdent|sendid");
-	recvid  = first_xpath_string(node, "@receiverIdent|recvid");
-	diyear  = first_xpath_string(node, "@yearOfDataIssue|diyear");
-	seqnum  = first_xpath_string(node, "@seqNumber|seqnum");
+	modelic = (char *) first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
+	sendid  = (char *) first_xpath_string(node, BAD_CAST "@senderIdent|sendid");
+	recvid  = (char *) first_xpath_string(node, BAD_CAST "@receiverIdent|recvid");
+	diyear  = (char *) first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
+	seqnum  = (char *) first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
 
 	printf("%s-%s-%s-%s-%s",
 		modelic,
@@ -633,11 +646,11 @@ static void show_dmlcode(xmlNodePtr node, int endl)
 {
 	char *modelic, *sendid, *dmltype, *diyear, *seqnum;
 
-	modelic = first_xpath_string(node, "@modelIdentCode|modelic");
-	sendid  = first_xpath_string(node, "@senderIdent|sendid");
-	dmltype = first_xpath_string(node, "@dmlType|dmltype/@type");
-	diyear  = first_xpath_string(node, "@yearOfDataIssue|diyear");
-	seqnum  = first_xpath_string(node, "@seqNumber|seqnum");
+	modelic = (char *) first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
+	sendid  = (char *) first_xpath_string(node, BAD_CAST "@senderIdent|sendid");
+	dmltype = (char *) first_xpath_string(node, BAD_CAST "@dmlType|dmltype/@type");
+	diyear  = (char *) first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
+	seqnum  = (char *) first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
 
 	printf("%s-%s-%s-%s-%s",
 		modelic,
@@ -658,10 +671,10 @@ static void show_pmcode(xmlNodePtr node, int endl)
 {
 	char *modelic, *pmissuer, *pmnumber, *pmvolume;
 
-	modelic  = first_xpath_string(node, "@modelIdentCode|modelic");
-	pmissuer = first_xpath_string(node, "@pmIssuer|pmissuer");
-	pmnumber = first_xpath_string(node, "@pmNumber|pmnumber");
-	pmvolume = first_xpath_string(node, "@pmVolume|pmvolume");
+	modelic  = (char *) first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
+	pmissuer = (char *) first_xpath_string(node, BAD_CAST "@pmIssuer|pmissuer");
+	pmnumber = (char *) first_xpath_string(node, BAD_CAST "@pmNumber|pmnumber");
+	pmvolume = (char *) first_xpath_string(node, BAD_CAST "@pmVolume|pmvolume");
 
 	printf("%s-%s-%s-%s",
 		modelic,
@@ -702,10 +715,10 @@ static int edit_pmcode(xmlNodePtr node, const char *val)
 		edit_simple_attr(node, "pmNumber", pm_number);
 		edit_simple_attr(node, "pmVolume", pm_volume);
 	} else {
-		edit_simple_node(first_xpath_node_local(node, "modelic"), model_ident_code);
-		edit_simple_node(first_xpath_node_local(node, "pmissuer"), pm_issuer);
-		edit_simple_node(first_xpath_node_local(node, "pmnumber"), pm_number);
-		edit_simple_node(first_xpath_node_local(node, "pmvolume"), pm_volume);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "modelic"), model_ident_code);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "pmissuer"), pm_issuer);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "pmnumber"), pm_number);
+		edit_simple_node(first_xpath_node_local(node, BAD_CAST "pmvolume"), pm_volume);
 	}
 
 	return 0;
@@ -780,11 +793,11 @@ static void show_comment_code(xmlNodePtr node, int endl)
 		seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
 		comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
 	} else {
-		model_ident_code   = first_xpath_string(node, "modelic");
-		sender_ident       = first_xpath_string(node, "sendid");
-		year_of_data_issue = first_xpath_string(node, "diyear");
-		seq_number         = first_xpath_string(node, "seqnum");
-		comment_type       = first_xpath_string(node, "ctype/@type");
+		model_ident_code   = (char *) first_xpath_string(node, BAD_CAST "modelic");
+		sender_ident       = (char *) first_xpath_string(node, BAD_CAST "sendid");
+		year_of_data_issue = (char *) first_xpath_string(node, BAD_CAST "diyear");
+		seq_number         = (char *) first_xpath_string(node, BAD_CAST "seqnum");
+		comment_type       = (char *) first_xpath_string(node, BAD_CAST "ctype/@type");
 	}
 
 	printf("%s-%s-%s-%s-%s",
@@ -1007,9 +1020,9 @@ static void show_title(xmlNodePtr node, int endl)
 	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0 || xmlStrcmp(node->name, BAD_CAST "dmtitle") == 0) {
 		xmlNodePtr tech, info, vari;
 		xmlChar *tech_content;
-		tech = first_xpath_node_local(node, "techName|techname");
-		info = first_xpath_node_local(node, "infoName|infoname");
-		vari = first_xpath_node_local(node, "infoNameVariant");
+		tech = first_xpath_node_local(node, BAD_CAST "techName|techname");
+		info = first_xpath_node_local(node, BAD_CAST "infoName|infoname");
+		vari = first_xpath_node_local(node, BAD_CAST "infoNameVariant");
 		tech_content = xmlNodeGetContent(tech);
 		printf("%s", (char *) tech_content);
 		xmlFree(tech_content);
@@ -1379,9 +1392,9 @@ static void show_source(xmlNodePtr node, int endl)
 {
 	xmlNodePtr dmc, issno, lang;
 
-	dmc = first_xpath_node_local(node, "dmCode|pmCode|dmc/avee");
-	issno = first_xpath_node_local(node, "issueInfo|issno");
-	lang = first_xpath_node_local(node, "language");
+	dmc   = first_xpath_node_local(node, BAD_CAST "dmCode|pmCode|dmc/avee");
+	issno = first_xpath_node_local(node, BAD_CAST "issueInfo|issno");
+	lang  = first_xpath_node_local(node, BAD_CAST "language");
 
 	if (xmlStrcmp(dmc->name, BAD_CAST "pmCode") == 0) {
 		printf("PMC-");
@@ -1399,102 +1412,119 @@ static void show_source(xmlNodePtr node, int endl)
 static struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
+		get_dmcode,
 		show_dmcode,
 		edit_dmcode,
 		create_act_ref,
 		"ACT data module code"},
 	{"applic",
 		"//applic/displayText/simplePara|//applic/displaytext/p",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Whole data module applicability"},
 	{"assyCode",
 		"//@assyCode|//avee/subject",
+		NULL,
 		show_assy_code,
 		edit_assy_code,
 		NULL,
 		"Assembly code"},
 	{"authorization",
 		"//authorization|//authrtn",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Authorization for a DDN"},
 	{"brex",
 		"//brexDmRef/dmRef/dmRefIdent/dmCode|//brexref/refdm/avee",
+		get_dmcode,
 		show_dmcode,
 		edit_dmcode,
 		NULL,
 		"BREX data module code"},
 	{"code",
 		"//dmCode|//avee|//pmCode|//pmc|//commentCode|//ccode|//ddnCode|//ddnc|//dmlCode|//dmlc",
+		NULL,
 		show_code,
 		NULL,
 		NULL,
 		"CSDB object code"},
 	{"commentCode",
 		"//commentCode|//ccode",
+		NULL,
 		show_comment_code,
 		NULL,
 		NULL,
 		"Comment code"},
 	{"commentPriority",
 		"//commentPriority/@commentPriorityCode|//priority/@cprio",
+		NULL,
 		show_comment_priority,
 		edit_comment_priority,
 		NULL,
 		"Priority code of a comment"},
 	{"commentResponse",
 		"//commentResponse/@responseType|//response/@rsptype",
+		NULL,
 		show_comment_response,
 		edit_comment_response,
 		NULL,
 		"Response type of a comment"},
 	{"commentTitle",
 		"//commentTitle|//ctitle",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		create_comment_title,
 		"Title of a comment"},
 	{"commentType",
 		"//@commentType|//ctype/@type",
+		NULL,
 		show_comment_type,
 		edit_comment_type,
 		NULL,
 		"Type of a comment"},
 	{"countryIsoCode",
 		"//language/@countryIsoCode|//language/@country",
+		NULL,
 		show_country_iso_code,
 		edit_country_iso_code,
 		NULL,
 		"Country ISO code (CA, US, GB...)"},
 	{"ddnCode",
 		"//ddnCode|//ddnc",
+		NULL,
 		show_ddncode,
 		NULL,
 		NULL,
 		"Data dispatch note code"},
 	{"disassyCode",
 		"//@disassyCode|//discode",
+		NULL,
 		show_disassy_code,
 		edit_disassy_code,
 		NULL,
 		"Disassembly code"},
 	{"disassyCodeVariant",
 		"//@disassyCodeVariant|//discodev",
+		NULL,
 		show_disassy_code_variant,
 		edit_disassy_code_variant,
 		NULL,
 		"Disassembly code variant"},
 	{"dmCode",
 		"//dmCode|//avee",
+		get_dmcode,
 		show_dmcode,
 		NULL,
 		NULL,
 		"Data module code"},
 	{"dmlCode",
 		"//dmlCode|//dmlc",
+		NULL,
 		show_dmlcode,
 		NULL,
 		NULL,
@@ -1504,105 +1534,123 @@ static struct metadata metadata[] = {
 		NULL,
 		NULL,
 		NULL,
+		NULL,
 		"File format of the object"},
 	{"icnTitle",
 		"//imfAddressItems/icnTitle",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Title of an IMF"},
 	{"infoCode",
 		"//@infoCode|//incode",
+		NULL,
 		show_info_code,
 		edit_info_code,
 		NULL,
 		"Information code"},
 	{"infoCodeVariant",
 		"//@infoCodeVariant|//incodev",
+		NULL,
 		show_info_code_variant,
 		edit_info_code_variant,
 		NULL,
 		"Information code variant"},
 	{"infoName",
 		"//infoName|//infoname",
+		NULL,
 		show_simple_node,
 		edit_info_name,
 		create_info_name,
 		"Information name of a data module"},
 	{"infoNameVariant",
 		"//infoNameVariant",
+		NULL,
 		show_simple_node,
 		edit_info_name,
 		create_info_name_variant,
 		"Information name variant of a data module"},
 	{"inWork",
 		"//issueInfo/@inWork|//issno",
+		NULL,
 		show_in_work,
 		edit_in_work,
 		NULL,
 		"Inwork issue number (NN)"},
 	{"issue",
 		"//*",
+		get_issue,
 		show_issue,
 		edit_issue,
 		NULL,
 		"Issue of S1000D"},
 	{"issueDate",
 	 	"//issueDate|//issdate",
+		get_issue_date,
 		show_issue_date,
 		edit_issue_date,
 		NULL,
 		"Issue date in ISO 8601 format (YYYY-MM-DD)"},
 	{"issueNumber",
 		"//issueInfo/@issueNumber|//issno/@issno",
+		NULL,
 		show_issue_number,
 		edit_issue_number,
 		NULL,
 		"Issue number (NNN)"},
 	{"issueType",
 		"//dmStatus/@issueType|//pmStatus/@issueType|//issno/@type",
+		NULL,
 		show_issue_type,
 		edit_issue_type,
 		NULL,
 		"Issue type (new, changed, deleted...)"},
 	{"itemLocationCode",
 		"//@itemLocationCode|//itemloc",
+		NULL,
 		show_item_location_code,
 		edit_item_location_code,
 		NULL,
 		"Item location code"},
 	{"languageIsoCode",
 		"//language/@languageIsoCode|//language/@language",
+		NULL,
 		show_language_iso_code,
 		edit_language_iso_code,
 		NULL,
 		"Language ISO code (en, fr, es...)"},
 	{"learnCode",
 		"//@learnCode",
+		NULL,
 		show_learn_code,
 		edit_learn_code,
 		NULL,
 		"Learn code"},
 	{"learnEventCode",
 		"//@learnEventCode",
+		NULL,
 		show_learn_event_code,
 		edit_learn_event_code,
 		NULL,
 		"Learn event code"},
 	{"modelIdentCode",
 		"//@modelIdentCode|//modelic",
+		NULL,
 		show_model_ident_code,
 		edit_model_ident_code,
 		NULL,
 		"Model identification code"},
 	{"originator",
 		"//originator/enterpriseName|//orig/@origname",
+		NULL,
 		show_orig_name,
 		edit_orig_name,
 		create_orig_name,
 		"Name of the originator"},
 	{"originatorCode",
 		"//originator/@enterpriseCode|//orig[. != '']",
+		NULL,
 		show_ent_code,
 		edit_ent_code,
 		create_orig_ent_code,
@@ -1612,189 +1660,221 @@ static struct metadata metadata[] = {
 		NULL,
 		NULL,
 		NULL,
+		NULL,
 		"Filesystem path of object"},
 	{"pmCode",
 		"//pmCode|//pmc",
+		NULL,
 		show_pmcode,
 		NULL,
 		NULL,
 		"Publication module code"},
 	{"pmIssuer",
 		"//@pmIssuer|//pmissuer",
+		NULL,
 		show_pm_issuer,
 		edit_pm_issuer,
 		NULL,
 		"Issuing authority of the PM"},
 	{"pmNumber",
 		"//@pmNumber|//pmnumber",
+		NULL,
 		show_pm_number,
 		edit_pm_number,
 		NULL,
 		"PM number"},
 	{"pmTitle",
 		"//pmTitle|//pmtitle",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Title of a publication module"},
 	{"pmVolume",
 		"//@pmVolume|//pmvolume",
+		NULL,
 		show_pm_volume,
 		edit_pm_volume,
 		NULL,
 		"Volume of the PM"},
 	{"receiverIdent",
 		"//@receiverIdent|//recvid",
+		NULL,
 		show_receiver_ident,
 		edit_receiver_ident,
 		NULL,
 		"Receiving authority"},
 	{"responsiblePartnerCompany",
 		"//responsiblePartnerCompany/enterpriseName|//rpc/@rpcname",
+		NULL,
 		show_rpc_name,
 		edit_rpc_name,
 		create_rpc_name,
 		"Name of the RPC"},
 	{"responsiblePartnerCompanyCode",
 		"//responsiblePartnerCompany/@enterpriseCode|//rpc[. != '']",
+		NULL,
 		show_ent_code,
 		edit_ent_code,
 		create_rpc_ent_code,
 		"NCAGE code of the RPC"},
 	{"schema",
 		"/*",
+		get_schema,
 		show_schema,
 		NULL,
 		NULL,
 		"S1000D schema name"},
 	{"schemaUrl",
 		"/*",
+		NULL,
 		show_schema_url,
 		edit_schema_url,
 		NULL,
 		"XML schema URL"},
 	{"securityClassification",
 		"//security/@securityClassification|//security/@class",
+		NULL,
 		show_sec_class,
 		edit_sec_class,
 		NULL,
 		"Security classification (01, 02...)"},
 	{"senderIdent",
 		"//@senderIdent|//sendid",
+		NULL,
 		show_sender_ident,
 		edit_sender_ident,
 		NULL,
 		"Issuing authority"},
 	{"seqNumber",
 		"//@seqNumber|//seqnum",
+		NULL,
 		show_seq_number,
 		edit_seq_number,
 		NULL,
 		"Sequence number"},
 	{"shortPmTitle",
 		"//shortPmTitle",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Short title of a publication module"},
 	{"skillLevelCode",
 		"//dmStatus/skillLevel/@skillLevelCode|//status/skill/@skill",
+		NULL,
 		show_skill_level,
 		edit_skill_level,
 		create_skill_level,
 		"Skill level code of the data module"},
 	{"source",
 		"//sourceDmIdent|//sourcePmIdent|//srcdmaddres",
+		NULL,
 		show_source,
 		NULL,
 		NULL,
 		"Full source DM or PM identification"},
 	{"sourceDmCode",
 		"//sourceDmIdent/dmCode|//srcdmaddres/dmc/avee",
+		get_dmcode,
 		show_dmcode,
 		edit_dmcode,
 		NULL,
 		"Source DM code"},
 	{"sourcePmCode",
 		"//sourcePmIdent/pmCode",
+		NULL,
 		show_pmcode,
 		edit_pmcode,
 		NULL,
 		"Source PM code"},
 	{"sourceIssueNumber",
 		"//sourceDmIdent/issueInfo/@issueNumber|//sourcePmIdent/issueInfo/@issueNumber|//srcdmaddres/issno/@issno",
+		NULL,
 		show_issue_number,
 		edit_issue_number,
 		NULL,
 		"Source DM or PM issue number"},
 	{"sourceInWork",
 		"//sourceDmIdent/issueInfo/@inWork|//sourcePmIdent/issueInfo/@inWork|//srcdmaddres/issno",
+		NULL,
 		show_in_work,
 		edit_in_work,
 		NULL,
 		"Source DM or PM inwork issue number"},
 	{"sourceLanguageIsoCode",
 		"//sourceDmIdent/language/@languageIsoCode|//sourcePmIdent/language/@languageIsoCode|//srcdmaddres/language/@language",
+		NULL,
 		show_language_iso_code,
 		edit_language_iso_code,
 		NULL,
 		"Source DM or PM language ISO code"},
 	{"sourceCountryIsoCode",
 		"//sourceDmIdent/language/@countryIsoCode|//sourcePmIdent/language/@countryIsoCode|//srcdmaddres/language/@country",
+		NULL,
 		show_country_iso_code,
 		edit_country_iso_code,
 		NULL,
 		"Source DM or PM country ISO code"},
 	{"subSubSystemCode",
 		"//@subSubSystemCode|//subsect",
+		NULL,
 		show_sub_sub_system_code,
 		edit_sub_sub_system_code,
 		NULL,
 		"Subsubsystem code"},
 	{"subSystemCode",
 		"//@subSystemCode|//section",
+		NULL,
 		show_sub_system_code,
 		edit_sub_system_code,
 		NULL,
 		"Subsystem code"},
 	{"systemCode",
 		"//@systemCode|//chapnum",
+		NULL,
 		show_system_code,
 		edit_system_code,
 		NULL,
 		"System code"},
 	{"systemDiffCode",
 		"//@systemDiffCode|//sdc",
+		NULL,
 		show_system_diff_code,
 		edit_system_diff_code,
 		NULL,
 		"System difference code"},
 	{"techName",
 		"//techName|//techname",
+		NULL,
 		show_simple_node,
 		edit_simple_node,
 		NULL,
 		"Technical name of a data module"},
 	{"title",
 		"//dmTitle|//dmtitle|//pmTitle|//pmtitle|//commentTitle|//ctitle|//icnTitle",
+		NULL,
 		show_title,
 		NULL,
 		NULL,
 		"Title of a CSDB object"},
 	{"type",
 		"/*",
+		NULL,
 		show_type,
 		NULL,
 		NULL,
 		"Name of the root element of the document"},
 	{"url",
 		"/",
+		NULL,
 		show_url,
 		NULL,
 		NULL,
 		"URL of the document"},
 	{"yearOfDataIssue",
 		"//@yearOfDataIssue|//diyear",
+		NULL,
 		show_year_of_data_issue,
 		edit_year_of_data_issue,
 		NULL,
@@ -2174,12 +2254,8 @@ static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fnam
 	if (strcmp(metadata[i].key, "format") == 0) {
 		return xmlStrdup(BAD_CAST get_format(fname));
 	} else if ((node = first_xpath_node(metadata[i].path, ctx))) {
-		if (metadata[i].show == show_dmcode) {
-			return BAD_CAST get_dmcode(node);
-		} else if (metadata[i].show == show_schema) {
-			return BAD_CAST get_schema(node);
-		} else if (metadata[i].show == show_issue) {
-			return BAD_CAST get_issue(node);
+		if (metadata[i].get) {
+			return BAD_CAST metadata[i].get(node);
 		} else {
 			return xmlNodeGetContent(node);
 		}
