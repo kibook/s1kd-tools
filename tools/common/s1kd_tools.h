@@ -157,4 +157,7 @@ bool is_smc(const char *name);
 /* Determine if the file is a data update file. */
 bool is_upf(const char *name);
 
+/* Interpolate a command string with a file name and execute it. */
+int execfile(const char *execstr, const char *path);
+
 #endif

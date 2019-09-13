@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "2.7.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1991,7 +1991,8 @@ static void show_help(void)
 	puts("Options:");
 	puts("  -0, --null             Use null-delimited fields.");
 	puts("  -c, --set <file>       Set metadata using definitions in <file> (- for stdin).");
-	puts("  -e, --editable         Include only editable metadata when showing all.");
+	puts("  -E, --editable         Include only editable metadata when showing all.");
+	puts("  -e, --exec <cmd>       Execute <cmd> for each CSDB object.");
 	puts("  -F, --format <fmt>     Print a formatted line for each CSDB object.");
 	puts("  -f, --overwrite        Overwrite modules when editing metadata.");
 	puts("  -H, --info             List information on available metadata.");
@@ -2270,7 +2271,8 @@ static int show_all_icn_metadata(const char *fname, int formatall, int endl)
 
 static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
-	int only_editable, const char *fmtstr, xmlNodePtr conds)
+	int only_editable, const char *fmtstr, xmlNodePtr conds,
+	const char *execstr)
 {
 	int err = 0;
 	xmlDocPtr doc;
@@ -2294,7 +2296,9 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		s = strdup(fname);
 		bname = basename(s);
 
-		if (fmtstr) {
+		if (execstr) {
+			err = execfile(execstr, fname) != 0;
+		} else if (fmtstr) {
 			err = show_metadata_fmtstr(fname, ctxt, fmtstr);
 		} else if (keys->children) {
 			xmlNodePtr cur;
@@ -2401,7 +2405,8 @@ static void add_cond_val(xmlNodePtr conds, const char *v, bool regex)
 
 static int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
-	int only_editable, const char *fmtstr, xmlNodePtr conds)
+	int only_editable, const char *fmtstr, xmlNodePtr conds,
+	const char *execstr)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -2419,7 +2424,8 @@ static int show_or_edit_metadata_list(const char *fname, const char *metadata_fn
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
 		err += show_or_edit_metadata(path, metadata_fname, keys,
-			formatall, overwrite, endl, only_editable, fmtstr, conds);
+			formatall, overwrite, endl, only_editable, fmtstr, conds,
+			execstr);
 	}
 
 	if (fname) {
@@ -2443,14 +2449,16 @@ int main(int argc, char **argv)
 	int islist = 0;
 	int only_editable = 0;
 	char *fmtstr = NULL;
+	char *execstr = NULL;
 
-	const char *sopts = "0c:eF:fHlm:n:Ttv:qW:w:h?";
+	const char *sopts = "0c:Ee:F:fHlm:n:Ttv:qW:w:h?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
 		{"null"     , no_argument      , 0, '0'},
 		{"set"      , required_argument, 0, 'c'},
-		{"editable" , no_argument      , 0, 'e'},
+		{"editable" , no_argument      , 0, 'E'},
+		{"exec"     , required_argument, 0, 'e'},
 		{"format"   , required_argument, 0, 'F'},
 		{"overwrite", no_argument      , 0, 'f'},
 		{"info"     , no_argument      , 0, 'H'},
@@ -2482,7 +2490,8 @@ int main(int argc, char **argv)
 				break;
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
-			case 'e': only_editable = 1; break;
+			case 'E': only_editable = 1; break;
+			case 'e': execstr = strdup(optarg); break;
 			case 'F': fmtstr = strdup(optarg); endl = -1; break;
 			case 'f': overwrite = 1; break;
 			case 'H': list_keys = 1; break;
@@ -2517,24 +2526,25 @@ int main(int argc, char **argv)
 				err += show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr,
-					conds);
+					conds, execstr);
 			} else {
 				err += show_or_edit_metadata(argv[i],
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr,
-					conds);
+					conds, execstr);
 			}
 		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr, conds);
+			overwrite, endl, only_editable, fmtstr, conds, execstr);
 	} else {
 		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr, conds);
+			overwrite, endl, only_editable, fmtstr, conds, execstr);
 	}
 
 	free(metadata_fname);
 	free(fmtstr);
+	free(execstr);
 	xmlFreeNode(keys);
 	xmlFreeNode(conds);
 

@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.12.0"
+#define VERSION "1.12.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -68,54 +68,11 @@ static int no_issue = 0;
 /* Command string to execute with the -e option. */
 static char *execstr = NULL;
 
-/* Execute a command for a file. */
-static int execfile(const char *path)
-{
-	int i, j, n, e;
-	char *fmtstr, *cmd;
-
-	n = strlen(execstr);
-
-	fmtstr = malloc(n * 2);
-
-	for (i = 0, j = 0; i < n; ++i) {
-		switch (execstr[i]) {
-			case '{':
-				if (execstr[i+1] && execstr[i+1] == '}') {
-					fmtstr[j++] = '%';
-					fmtstr[j++] = 's';
-					i++;
-				}
-				break;
-			case '%':
-			case '\\':
-				fmtstr[j++] = execstr[i];
-				fmtstr[j++] = execstr[i];
-				break;
-			default:
-				fmtstr[j++] = execstr[i];
-		}
-	}
-
-	fmtstr[j] = 0;
-
-	n = strlen(fmtstr) + strlen(path);
-	cmd = malloc(n);
-	snprintf(cmd, n, fmtstr, path);
-	free(fmtstr);
-
-	e = system(cmd);
-
-	free(cmd);
-
-	return e;
-}
-
 static void printfiles(char (*files)[PATH_MAX], int n)
 {
 	int i;
 	if (execstr) {
-		for (i = 0; i < n; ++i) execfile(files[i]);
+		for (i = 0; i < n; ++i) execfile(execstr, files[i]);
 	} else {
 		for (i = 0; i < n; ++i) printf("%s%c", files[i], sep);
 	}

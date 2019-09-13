@@ -869,3 +869,46 @@ bool is_upf(const char *name)
 {
 	return (strncmp(name, "UPF-", 4) == 0 || strncmp(name, "UPE-", 4) == 0) && is_xml(name);
 }
+
+/* Interpolate a command string with a file name and execute it. */
+int execfile(const char *execstr, const char *path)
+{
+	int i, j, n, e;
+	char *fmtstr, *cmd;
+
+	n = strlen(execstr);
+
+	fmtstr = malloc(n * 2);
+
+	for (i = 0, j = 0; i < n; ++i) {
+		switch (execstr[i]) {
+			case '{':
+				if (execstr[i+1] && execstr[i+1] == '}') {
+					fmtstr[j++] = '%';
+					fmtstr[j++] = 's';
+					i++;
+				}
+				break;
+			case '%':
+			case '\\':
+				fmtstr[j++] = execstr[i];
+				fmtstr[j++] = execstr[i];
+				break;
+			default:
+				fmtstr[j++] = execstr[i];
+		}
+	}
+
+	fmtstr[j] = 0;
+
+	n = strlen(fmtstr) + strlen(path);
+	cmd = malloc(n);
+	snprintf(cmd, n, fmtstr, path);
+	free(fmtstr);
+
+	e = system(cmd);
+
+	free(cmd);
+
+	return e;
+}

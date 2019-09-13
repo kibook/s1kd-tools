@@ -27,9 +27,14 @@ starting with a metadata name, followed by whitespace, followed by the
 new value for the metadata (the program uses this same format when
 outputting all metadata if no &lt;name&gt; is specified).
 
--e, --editable  
+-E, --editable  
 When showing all metadata, only list editable items. This is useful when
 creating a file for use with the -c option.
+
+-e, --exec &lt;cmd&gt;  
+Execute a command for each CSDB object. The string "{}" is replaced by
+the current CSDB object file name everywhere it occurs in the arguments
+to the command.
 
 -F, --format &lt;fmt&gt;  
 Print a formatted line for each CSDB object. Metadata names surrounded
