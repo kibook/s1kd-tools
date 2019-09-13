@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.11.1"
+#define VERSION "1.12.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -65,11 +65,59 @@ static char sep = '\n';
 /* Whether the CSDB objects were created with the -N option. */
 static int no_issue = 0;
 
+/* Command string to execute with the -e option. */
+static char *execstr = NULL;
+
+/* Execute a command for a file. */
+static int execfile(const char *path)
+{
+	int i, j, n, e;
+	char *fmtstr, *cmd;
+
+	n = strlen(execstr);
+
+	fmtstr = malloc(n * 2);
+
+	for (i = 0, j = 0; i < n; ++i) {
+		switch (execstr[i]) {
+			case '{':
+				if (execstr[i+1] && execstr[i+1] == '}') {
+					fmtstr[j++] = '%';
+					fmtstr[j++] = 's';
+					i++;
+				}
+				break;
+			case '%':
+			case '\\':
+				fmtstr[j++] = execstr[i];
+				fmtstr[j++] = execstr[i];
+				break;
+			default:
+				fmtstr[j++] = execstr[i];
+		}
+	}
+
+	fmtstr[j] = 0;
+
+	n = strlen(fmtstr) + strlen(path);
+	cmd = malloc(n);
+	snprintf(cmd, n, fmtstr, path);
+	free(fmtstr);
+
+	e = system(cmd);
+
+	free(cmd);
+
+	return e;
+}
+
 static void printfiles(char (*files)[PATH_MAX], int n)
 {
 	int i;
-	for (i = 0; i < n; ++i) {
-		printf("%s%c", files[i], sep);
+	if (execstr) {
+		for (i = 0; i < n; ++i) execfile(files[i]);
+	} else {
+		for (i = 0; i < n; ++i) printf("%s%c", files[i], sep);
 	}
 }
 
@@ -140,6 +188,7 @@ static void show_help(void)
 	puts("  -0, --null        Output null-delimited list.");
 	puts("  -C, --com         List comments.");
 	puts("  -D, --dm          List data modules.");
+	puts("  -e, --exec <cmd>  Execute <cmd> for each CSDB object.");
 	puts("  -G, --icn         List ICN files.");
 	puts("  -I, --inwork      Show only inwork issues.");
 	puts("  -i, --official    Show only official issues.");
@@ -524,29 +573,30 @@ int main(int argc, char **argv)
 
 	int i;
 
-	const char *sopts = "0CDGiLlMPRrSwXoINnUh?";
+	const char *sopts = "0CDe:GiLlMPRrSwXoINnUh?";
 	struct option lopts[] = {
-		{"version"   , no_argument, 0, 0},
-		{"help"      , no_argument, 0, 'h'},
-		{"null"      , no_argument, 0, '0'},
-		{"com"       , no_argument, 0, 'C'},
-		{"dm"        , no_argument, 0, 'D'},
-		{"icn"       , no_argument, 0, 'G'},
-		{"official"  , no_argument, 0, 'i'},
-		{"dml"       , no_argument, 0, 'L'},
-		{"latest"    , no_argument, 0, 'l'},
-		{"imf"       , no_argument, 0, 'M'},
-		{"pm"        , no_argument, 0, 'P'},
-		{"read-only" , no_argument, 0, 'R'},
-		{"recursive" , no_argument, 0, 'r'},
-		{"smc"       , no_argument, 0, 'S'},
-		{"writable"  , no_argument, 0, 'w'},
-		{"ddn"       , no_argument, 0, 'X'},
-		{"old"       , no_argument, 0, 'o'},
-		{"inwork"    , no_argument, 0, 'I'},
-		{"omit-issue", no_argument, 0, 'N'},
-		{"upf"       , no_argument, 0, 'U'},
-		{"other"     , no_argument, 0, 'n'},
+		{"version"   , no_argument      , 0, 0},
+		{"help"      , no_argument      , 0, 'h'},
+		{"null"      , no_argument      , 0, '0'},
+		{"com"       , no_argument      , 0, 'C'},
+		{"dm"        , no_argument      , 0, 'D'},
+		{"exec"      , required_argument, 0, 'e'},
+		{"icn"       , no_argument      , 0, 'G'},
+		{"official"  , no_argument      , 0, 'i'},
+		{"dml"       , no_argument      , 0, 'L'},
+		{"latest"    , no_argument      , 0, 'l'},
+		{"imf"       , no_argument      , 0, 'M'},
+		{"pm"        , no_argument      , 0, 'P'},
+		{"read-only" , no_argument      , 0, 'R'},
+		{"recursive" , no_argument      , 0, 'r'},
+		{"smc"       , no_argument      , 0, 'S'},
+		{"writable"  , no_argument      , 0, 'w'},
+		{"ddn"       , no_argument      , 0, 'X'},
+		{"old"       , no_argument      , 0, 'o'},
+		{"inwork"    , no_argument      , 0, 'I'},
+		{"omit-issue", no_argument      , 0, 'N'},
+		{"upf"       , no_argument      , 0, 'U'},
+		{"other"     , no_argument      , 0, 'n'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -564,6 +614,7 @@ int main(int argc, char **argv)
 			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;
 			case 'D': show |= SHOW_DM; break;
+			case 'e': execstr = strdup(optarg); break;
 			case 'G': show |= SHOW_ICN; break;
 			case 'i': only_official_issue = 1; break;
 			case 'L': show |= SHOW_DML; break;
@@ -1038,6 +1089,8 @@ int main(int argc, char **argv)
 	if (dir) {
 		closedir(dir);
 	}
+
+	free(execstr);
 
 	xmlCleanupParser();
 

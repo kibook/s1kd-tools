@@ -6,7 +6,8 @@ s1kd-ls - List CSDB objects in a directory hierarchy
 SYNOPSIS
 ========
 
-    s1kd-ls [-0CDGIiLlMNnoPRrSUwX] [<object>|<dir> ...]
+    s1kd-ls [-0CDGIiLlMNnoPRrSUwX] [-e <cmd>]
+            [<object>|<dir> ...]
 
 DESCRIPTION
 ===========
@@ -33,6 +34,11 @@ is assumed.
 
 The following long options can also be used for each: --com, --dm,
 --icn, --dml, --imf, --pm, --smc, --upf, --ddn.
+
+-e, --exec &lt;cmd&gt;  
+Execute a command for each CSDB object instead of listing them. The
+string "{}" is replaced by the current CSDB object file name everywhere
+it occurs in the arguments to the command.
 
 -h, -?, --help  
 Show the usage message.
@@ -114,3 +120,7 @@ EXAMPLE
     Example A    Description    2018-03-20
     Example A    Description    2018-03-29
     Example B    Description    2018-03-29
+
+    $ s1kd-ls -Dl -e 'stat --printf="%n %Y\n" {}'
+    DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML 1553738720
+    DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML 1553738751
