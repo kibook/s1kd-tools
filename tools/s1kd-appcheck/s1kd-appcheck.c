@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.2.0"
+#define VERSION "5.3.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -56,6 +56,11 @@
 #define EXIT_BAD_OBJECT 2
 #define EXIT_MAX_OBJECTS 3
 
+/* Default commands used to filter and validate. */
+#define DEFAULT_FILTER "s1kd-instance"
+#define DEFAULT_VALIDATE "s1kd-validate"
+#define DEFAULT_BREXCHECK "s1kd-brexcheck"
+
 /* Initial maximum number of CSDB object paths. */
 static int OBJECT_MAX = 1;
 /* List of CSDB object paths. */
@@ -82,6 +87,7 @@ struct appcheckopts {
 	char *useract;
 	char *usercct;
 	char *userpct;
+	char *filter;
 	char *args;
 	xmlNodePtr validators;
 	bool output_tree;
@@ -108,6 +114,7 @@ static void show_help(void)
 	puts("  -e, --exec <cmd>    Commands used to validate objects.");
 	puts("  -f, --filenames     List invalid files.");
 	puts("  -h, -?, --help      Show help/usage message.");
+	puts("  -K, --filter <cmd>  Command used to create objects.");
 	puts("  -k, --args <args>   Arguments used to create objects.");
 	puts("  -l, --list          Treat input as list of CSDB objects.");
 	puts("  -N, --omit-issue    Assume issue/inwork numbers are omitted.");
@@ -883,7 +890,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 {
 	xmlNodePtr cur;
 	int err = 0, e = 0;
-	char filter_cmd[1024] = "s1kd-instance";
+	char filter_cmd[1024] = "";
 	char cmd[4096];
 	FILE *p;
 
@@ -895,6 +902,12 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		} else {
 			fprintf(stderr, I_CHECK_PROD_LINENO, path, xmlGetLineNo(product), pctfname);
 		}
+	}
+
+	if (opts->filter) {
+		memcpy(filter_cmd, opts->filter, 1023);
+	} else {
+		memcpy(filter_cmd, DEFAULT_FILTER, 1023);
 	}
 
 	if (opts->args) {
@@ -949,7 +962,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		strcpy(cmd, filter_cmd);
 
 		/* Schema validation */
-		strcat(cmd, "|s1kd-validate -e");
+		strcat(cmd, "|" DEFAULT_VALIDATE " -e");
 
 		switch (verbosity) {
 			case QUIET:
@@ -970,7 +983,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		/* BREX validation */
 		if (opts->brexcheck) {
 			strcpy(cmd, filter_cmd);
-			strcat(cmd, "|s1kd-brexcheck -cel");
+			strcat(cmd, "|" DEFAULT_BREXCHECK " -cel");
 
 			strcat(cmd, " -d '");
 			strcat(cmd, search_dir);
@@ -1727,7 +1740,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cd:e:fNnk:loP:pqrsTtvx~h?";
+	const char *sopts = "A:abC:cd:e:fNnK:k:loP:pqrsTtvx~h?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -1739,6 +1752,7 @@ int main(int argc, char **argv)
 		{"dir"         , required_argument, 0, 'd'},
 		{"exec"        , required_argument, 0, 'e'},
 		{"filenames"   , no_argument      , 0, 'f'},
+		{"filter"      , required_argument, 0, 'K'},
 		{"args"        , required_argument, 0, 'k'},
 		{"list"        , no_argument      , 0, 'l'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
@@ -1769,6 +1783,7 @@ int main(int argc, char **argv)
 		/* usercct */      NULL,
 		/* userpct */      NULL,
 		/* args */         NULL,
+		/* filter */       NULL,
 		/* validators */   NULL,
 		/* output_tree */  false,
 		/* filenames */    false,
@@ -1828,6 +1843,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				opts.filenames = true;
+				break;
+			case 'K':
+				opts.filter = strdup(optarg);
 				break;
 			case 'k':
 				opts.args = strdup(optarg);
@@ -1920,6 +1938,7 @@ cleanup:
 	free(opts.userpct);
 	free(opts.useract);
 	free(opts.usercct);
+	free(opts.filter);
 	free(opts.args);
 	xmlFreeNode(opts.validators);
 	free(search_dir);

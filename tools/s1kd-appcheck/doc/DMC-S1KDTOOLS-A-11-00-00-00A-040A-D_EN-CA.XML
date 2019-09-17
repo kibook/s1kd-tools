@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="00"/>
+        <issueInfo issueNumber="003" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2019" month="09" day="17"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -K option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -116,10 +119,16 @@
                 <para>Show help/usage message.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-K, --filter &lt;cmd&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The command used to filter objects prior to validation. The objects will be passed to the command on stdin, and the filters will be supplied as arguments in the form of "<verbatimText>-s &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</verbatimText>". This overrides the default command (s1kd-instance).</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-k, --args &lt;args&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The arguments to the s1kd-instance tool when filtering objects prior to validation.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The arguments to the filter command when filtering objects prior to validation.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

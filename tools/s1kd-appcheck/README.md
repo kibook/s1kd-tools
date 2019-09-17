@@ -73,8 +73,14 @@ Print the filenames of invalid objects.
 -h, -?, --help  
 Show help/usage message.
 
+-K, --filter &lt;cmd&gt;  
+The command used to filter objects prior to validation. The objects will
+be passed to the command on stdin, and the filters will be supplied as
+arguments in the form of "`-s <ident>:<type>=<value>`". This overrides
+the default command (s1kd-instance).
+
 -k, --args &lt;args&gt;  
-The arguments to the s1kd-instance tool when filtering objects prior to
+The arguments to the filter command when filtering objects prior to
 validation.
 
 -l, --list  
