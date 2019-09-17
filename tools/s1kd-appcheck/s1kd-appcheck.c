@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.3.0"
+#define VERSION "5.3.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -905,9 +905,9 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 	}
 
 	if (opts->filter) {
-		memcpy(filter_cmd, opts->filter, 1023);
+		strncpy(filter_cmd, opts->filter, 1023);
 	} else {
-		memcpy(filter_cmd, DEFAULT_FILTER, 1023);
+		strncpy(filter_cmd, DEFAULT_FILTER, 1023);
 	}
 
 	if (opts->args) {
