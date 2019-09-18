@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "6.1.5"
+#define VERSION "7.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -994,18 +994,14 @@ static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc)
 }
 
 /* Add metadata linking the data module instance with the source data module */
-static void add_source(xmlDocPtr source, xmlDocPtr inst)
+static void add_source(xmlDocPtr source)
 {
 	xmlNodePtr ident, sourceIdent, node, cur;
 	const xmlChar *type;
 
-	if (!inst) {
-		inst = source;
-	}
-
 	ident       = first_xpath_node(source, NULL, BAD_CAST "//dmIdent|//pmIdent|//dmaddres");
-	sourceIdent = first_xpath_node(inst, NULL, BAD_CAST "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
-	node        = first_xpath_node(inst, NULL, BAD_CAST "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
+	sourceIdent = first_xpath_node(source, NULL, BAD_CAST "//dmStatus/sourceDmIdent|//pmStatus/sourcePmIdent|//status/srcdmaddres");
+	node        = first_xpath_node(source, NULL, BAD_CAST "(//dmStatus/repositorySourceDmIdent|//dmStatus/security|//pmStatus/security|//status/security)[1]");
 
 	if (!node) {
 		return;
@@ -2006,7 +2002,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 		iss = ISS_4X;
 	}
 
-	if (code) {
+	if (code && strcmp(code, "-") != 0) {
 		if (iss == ISS_30) {
 			xmlNodeSetContent(originator, BAD_CAST code);
 		} else {
@@ -2725,6 +2721,224 @@ static void add_cirs_from_inst(xmlDocPtr doc, xmlNodePtr cirs)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Load all other metadata settings from the instance. */
+static void load_metadata_from_inst(xmlDocPtr doc,
+	char *extension,
+	char *code,
+	char *lang,
+	char *issinfo,
+	char **techname,
+	char **infoname,
+	xmlChar **infonamevar,
+	bool *no_infoname,
+	char *security,
+	char **orig,
+	bool *setorig,
+	char **skill,
+	char **remarks,
+	bool *new_applic,
+	char *new_display_text)
+{
+	xmlNodePtr node;
+
+	if ((node = first_xpath_node(doc, NULL, EXTENSION_XPATH))) {
+		xmlChar *p, *c;
+		p = first_xpath_value(doc, node, BAD_CAST "@extensionProducer|dmeproducer");
+		c = first_xpath_value(doc, node, BAD_CAST "@extensionCode|dmecode");
+		sprintf(extension, "%s-%s", (char *) p, (char *) c);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, CODE_XPATH))) {
+		if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
+			char *model_ident_code;
+			char *system_diff_code;
+			char *system_code;
+			char *sub_system_code;
+			char *sub_sub_system_code;
+			char *assy_code;
+			char *disassy_code;
+			char *disassy_code_variant;
+			char *info_code;
+			char *info_code_variant;
+			char *item_location_code;
+			char *learn_code;
+			char *learn_event_code;
+
+			model_ident_code     = (char *) first_xpath_value(NULL, node, BAD_CAST "modelic|@modelIdentCode");
+			system_diff_code     = (char *) first_xpath_value(NULL, node, BAD_CAST "sdc|@systemDiffCode");
+			system_code          = (char *) first_xpath_value(NULL, node, BAD_CAST "chapnum|@systemCode");
+			sub_system_code      = (char *) first_xpath_value(NULL, node, BAD_CAST "section|@subSystemCode");
+			sub_sub_system_code  = (char *) first_xpath_value(NULL, node, BAD_CAST "subsect|@subSubSystemCode");
+			assy_code            = (char *) first_xpath_value(NULL, node, BAD_CAST "subject|@assyCode");
+			disassy_code         = (char *) first_xpath_value(NULL, node, BAD_CAST "discode|@disassyCode");
+			disassy_code_variant = (char *) first_xpath_value(NULL, node, BAD_CAST "discodev|@disassyCodeVariant");
+			info_code            = (char *) first_xpath_value(NULL, node, BAD_CAST "incode|@infoCode");
+			info_code_variant    = (char *) first_xpath_value(NULL, node, BAD_CAST "incodev|@infoCodeVariant");
+			item_location_code   = (char *) first_xpath_value(NULL, node, BAD_CAST "itemloc|@itemLocationCode");
+			learn_code           = (char *) first_xpath_value(NULL, node, BAD_CAST "@learnCode");
+			learn_event_code     = (char *) first_xpath_value(NULL, node, BAD_CAST "@learnEventCode");
+
+			sprintf(code, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s",
+				model_ident_code,
+				system_diff_code,
+				system_code,
+				sub_system_code,
+				sub_sub_system_code,
+				assy_code,
+				disassy_code,
+				disassy_code_variant,
+				info_code,
+				info_code_variant,
+				item_location_code);
+
+			xmlFree(model_ident_code);
+			xmlFree(system_diff_code);
+			xmlFree(system_code);
+			xmlFree(sub_system_code);
+			xmlFree(sub_sub_system_code);
+			xmlFree(assy_code);
+			xmlFree(disassy_code);
+			xmlFree(disassy_code_variant);
+			xmlFree(info_code);
+			xmlFree(info_code_variant);
+			xmlFree(item_location_code);
+
+			if (learn_code) {
+				char learn[8];
+				snprintf(learn, 8, "-%s%s", learn_code, learn_event_code);
+				strcat(code, learn);
+			}
+
+			xmlFree(learn_code);
+			xmlFree(learn_event_code);
+		} else if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "pmc") == 0) {
+			char *model_ident_code;
+			char *pm_issuer;
+			char *pm_number;
+			char *pm_volume;
+
+			model_ident_code = (char *) first_xpath_value(NULL, node, BAD_CAST "modelic|@modelIdentCode");
+			pm_issuer        = (char *) first_xpath_value(NULL, node, BAD_CAST "pmissuer|@pmIssuer");
+			pm_number        = (char *) first_xpath_value(NULL, node, BAD_CAST "pmnumber|@pmNumber");
+			pm_volume        = (char *) first_xpath_value(NULL, node, BAD_CAST "pmvolume|@pmVolume");
+
+			sprintf(code, "%s-%s-%s-%s",
+				model_ident_code,
+				pm_issuer,
+				pm_number,
+				pm_volume);
+
+			xmlFree(model_ident_code);
+			xmlFree(pm_issuer);
+			xmlFree(pm_number);
+			xmlFree(pm_volume);
+		}
+	}
+
+	if ((node = first_xpath_node(doc, NULL, LANGUAGE_XPATH))) {
+		xmlChar *l, *c;
+		l = first_xpath_value(doc, node, BAD_CAST "@languageIsoCode|@language");
+		c = first_xpath_value(doc, node, BAD_CAST "@countryIsoCode|@country");
+		sprintf(lang, "%s-%s", (char *) l, (char *) c);
+		xmlFree(l);
+		xmlFree(c);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, ISSUE_INFO_XPATH))) {
+		char *i, *w;
+		i = (char *) first_xpath_value(doc, node, BAD_CAST "@issueNumber|@issno");
+		w = (char *) first_xpath_value(doc, node, BAD_CAST "@inWork|@inwork");
+
+		if (!w) {
+			w = strdup("00");
+		}
+
+		if (strcmp(issinfo, "+") == 0) {
+			int inwork_i;
+			inwork_i = atoi(w);
+			free(w);
+			w = malloc(32);
+			snprintf(w, 32, "%.2d", inwork_i + 1);
+		}
+
+		sprintf(issinfo, "%s-%s", i, w);
+
+		xmlFree(i);
+		xmlFree(w);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/techName|//dmaddres/dmtitle/techname|//pmAddressItems/pmTitle|//pmaddres/pmtitle"))) {
+		free(*techname);
+		*techname = (char *) xmlNodeGetContent(node);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/infoName|//dmaddres/dmtitle/infoname"))) {
+		free(*infoname);
+		*infoname = (char *) xmlNodeGetContent(node);
+		*no_infoname = false;
+	} else {
+		*no_infoname = true;
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/infoNameVariant"))) {
+		*infonamevar = xmlNodeGetContent(node);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/security|//status/security|//pmStatus/security|//pmstatus/security"))) {
+		xmlChar *s;
+		s = first_xpath_value(doc, node, BAD_CAST "@securityClassification|@class");
+		strcpy(security, (char *) s);
+		xmlFree(s);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/originator|//pmStatus/originator"))) {
+		char *c, *n;
+		*setorig = true;
+		c = (char *) first_xpath_value(doc, node, BAD_CAST "@enterpriseCode");
+		n = (char *) first_xpath_value(doc, node, BAD_CAST "enterpriseName");
+		free(*orig);
+		if (c && n) {
+			*orig = malloc(strlen(c) + strlen(n) + 2);
+			sprintf(*orig, "%s/%s", c, n);
+		} else if (c) {
+			*orig = malloc(strlen(c) + 1);
+			sprintf(*orig, "%s", c);
+		} else if (n) {
+			*orig = malloc(strlen(n) + 3);
+			sprintf(*orig, "-/%s", n);
+		} else {
+			*setorig = false;
+		}
+		xmlFree(c);
+		xmlFree(n);
+	} else {
+		*setorig = false;
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/skillLevel"))) {
+		xmlChar *c;
+		c = first_xpath_value(doc, node, BAD_CAST "@skillLevelCode");
+		free(*skill);
+		*skill = strdup((char *) c);
+		xmlFree(c);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/remarks|//pmStatus/remarks"))) {
+		xmlChar *p;
+		p = first_xpath_value(doc, node, BAD_CAST "simplePara");
+		free(*remarks);
+		*remarks = strdup((char *) p);
+		xmlFree(p);
+	}
+
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/applic/displayText|//pmStatus/applic/displayText"))) {
+		xmlChar *d;
+		d = first_xpath_value(doc, node, BAD_CAST "simplePara");
+		strcpy(new_display_text, (char *) d);
+		xmlFree(d);
+	}
+}
+
 /* Create an applicability annotation in a container. */
 static xmlNodePtr add_container_applic(xmlNodePtr rag, xmlDocPtr doc, const xmlChar *id)
 {
@@ -3288,7 +3502,7 @@ int main(int argc, char **argv)
 	bool add_source_ident = true;
 	bool force_overwrite = false;
 	bool use_stdin = false;
-	char issinfo[8] = "";
+	char issinfo[16] = "";
 	char secu[4] = "";
 	bool wholedm = false;
 	char *useract = NULL;
@@ -3486,7 +3700,7 @@ int main(int argc, char **argv)
 				no_issue = true;
 				break;
 			case 'n':
-				strncpy(issinfo, optarg, 6);
+				strncpy(issinfo, optarg, 15);
 				break;
 			case 'O':
 				autoname = true; strncpy(dir, optarg, PATH_MAX - 1);
@@ -3575,6 +3789,7 @@ int main(int argc, char **argv)
 			case '@':
 				update_inst = true;
 				load_applic_per_dm = true;
+				new_applic = true;
 				break;
 			case '%':
 				lock = true;
@@ -3735,7 +3950,6 @@ int main(int argc, char **argv)
 	while (1) {
 		xmlDocPtr doc;
 		char src[PATH_MAX] = "";
-		xmlDocPtr inst = NULL;
 		char *inst_src = NULL;
 
 		if (dmlist) {
@@ -3776,6 +3990,7 @@ int main(int argc, char **argv)
 		/* Get the source from the sourceDmIdent/sourcePmIdent of the object. */
 		if (update_inst) {
 			int e;
+			xmlDocPtr inst = NULL;
 
 			inst_src = strdup(src);
 
@@ -3803,7 +4018,25 @@ int main(int argc, char **argv)
 			load_applic_from_inst(inst);
 			load_skill_from_inst(inst, &skill_codes);
 			load_sec_from_inst(inst, &sec_classes);
+			load_metadata_from_inst(inst,
+				extension,
+				code,
+				language,
+				issinfo,
+				&tech,
+				&info,
+				&info_name_variant,
+				&no_info_name,
+				secu,
+				&origspec,
+				&setorig,
+				&skill,
+				&remarks,
+				&new_applic,
+				new_display_text);
 			add_cirs_from_inst(inst, cirs);
+
+			xmlFreeDoc(inst);
 		}
 
 		if ((doc = read_xml_doc(src))) {
@@ -3861,26 +4094,14 @@ int main(int argc, char **argv)
 				xmlNodePtr root;
 
 				if (add_source_ident) {
-					add_source(doc, inst);
+					add_source(doc);
 				}
 
-				/* Updating an instance, so use the metadata section of
-				 * the instance instead of the source as a base. Then,
-				 * reset the source to the instance in case we want to
-				 * overwrite it.*/
+				/* Updating an instance, so reset the source
+				 * to the instance in case we want to
+				 * overwrite it.
+				 */
 				if (update_inst) {
-					xmlNodePtr src_content, dst_content;
-
-					src_content = first_xpath_node(doc, NULL, BAD_CAST "//content");
-					dst_content = first_xpath_node(inst, NULL, BAD_CAST "//content");
-
-					xmlAddNextSibling(dst_content, xmlCopyNode(src_content, 1));
-					xmlUnlinkNode(dst_content);
-					xmlFreeNode(dst_content);
-
-					xmlFreeDoc(doc);
-
-					doc = inst;
 					strcpy(src, inst_src);
 					free(inst_src);
 				}
