@@ -13,7 +13,7 @@ endif
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
 ifeq ($(OS),Windows_NT)
-	LDFLAGS+=-lregex
+	LDFLAGS+=-lregex2
 endif
 
 PREFIX=/usr/local
