@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "7.0.1"
+#define VERSION "7.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1863,6 +1863,29 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 	return xmlDocGetRootElement(dm);
 }
 
+/* Remove all change markup from the instance. */
+static void remove_change_markup(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//@changeMark|//@mark|//@changeType|//@change|//@reasonForUpdateRefIds|//@rfc|//reasonForUpdate", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Set the issue and inwork numbers of the instance. */
 static void set_issue(xmlDocPtr dm, char *issinfo)
 {
@@ -1898,6 +1921,11 @@ static void set_issue(xmlDocPtr dm, char *issinfo)
 			fprintf(stderr, ERR_PREFIX S_INVALID_ISSFMT);
 		}
 		exit(EXIT_MISSING_ARGS);
+	}
+
+	/* If the issue is set below 001-01, there cannot be change marks. */
+	if (strcmp(issue, "000") == 0 || (strcmp(issue, "001") == 0 && strcmp(inwork, "00") == 0)) {
+		remove_change_markup(dm);
 	}
 
 	if (xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") == 0) {
