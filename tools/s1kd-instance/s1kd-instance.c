@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "7.0.0"
+#define VERSION "7.0.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2731,6 +2731,7 @@ static void load_metadata_from_inst(xmlDocPtr doc,
 	char **infoname,
 	xmlChar **infonamevar,
 	bool *no_infoname,
+	char **isstype,
 	char *security,
 	char **orig,
 	bool *setorig,
@@ -2884,6 +2885,13 @@ static void load_metadata_from_inst(xmlDocPtr doc,
 		*infonamevar = xmlNodeGetContent(node);
 	}
 
+	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/@issueType|//dmaddres/issno/@type|//pmStatus/@issueType|//pmaddres/issno/@type"))) {
+		xmlChar *t;
+		t = xmlNodeGetContent(node);
+		free(*isstype);
+		*isstype = (char *) t;
+	}
+
 	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/security|//status/security|//pmStatus/security|//pmstatus/security"))) {
 		xmlChar *s;
 		s = first_xpath_value(doc, node, BAD_CAST "@securityClassification|@class");
@@ -2919,16 +2927,14 @@ static void load_metadata_from_inst(xmlDocPtr doc,
 		xmlChar *c;
 		c = first_xpath_value(doc, node, BAD_CAST "@skillLevelCode");
 		free(*skill);
-		*skill = strdup((char *) c);
-		xmlFree(c);
+		*skill = (char *) c;
 	}
 
 	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/remarks|//pmStatus/remarks"))) {
 		xmlChar *p;
 		p = first_xpath_value(doc, node, BAD_CAST "simplePara");
 		free(*remarks);
-		*remarks = strdup((char *) p);
-		xmlFree(p);
+		*remarks = (char *) p;
 	}
 
 	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/applic/displayText|//pmStatus/applic/displayText"))) {
@@ -4027,6 +4033,7 @@ int main(int argc, char **argv)
 				&info,
 				&info_name_variant,
 				&no_info_name,
+				&isstype,
 				secu,
 				&origspec,
 				&setorig,
