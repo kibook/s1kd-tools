@@ -9,6 +9,7 @@
 #include <libgen.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
@@ -16,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "7.1.0"
+#define VERSION "8.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -57,6 +58,8 @@
 #define S_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
 #define S_MISSING_CIR WRN_PREFIX "Could not find CIR %s.\n"
 #define S_RESOLVE_CONTAINER WRN_PREFIX "Could not resolve container %s\n"
+#define S_NO_CT WRN_PREFIX "%s is a %s, but no %s was found.\n"
+#define S_NO_CT_PROP WRN_PREFIX "Could not find definition of %s %s\n"
 
 /* Info messages */
 #define I_UPDATE_INST INF_PREFIX "Updating instance %s from source %s...\n"
@@ -3145,10 +3148,126 @@ static void resolve_containers(xmlDocPtr doc, xmlNodePtr defs)
 	xmlXPathFreeContext(ctx);
 }
 
-/* Add a property used in an object to the properties report. */
-static void add_prop(xmlNodePtr object, xmlNodePtr assert)
+static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, const xmlChar *type, xmlNodePtr p)
 {
-	xmlChar *i, *t, *v, *c = NULL;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr property = NULL;
+
+	if (act && xmlStrcmp(type, BAD_CAST "prodattr") == 0) {
+		ctx = xmlXPathNewContext(act);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(id));
+		obj = xmlXPathEvalExpression(BAD_CAST "//productAttribute[@id=$id]|//prodattr[@id=$id]", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			property = obj->nodesetval->nodeTab[0];
+		}
+	} else if (cct && xmlStrcmp(type, BAD_CAST "condition") == 0) {
+		xmlChar *condtype;
+
+		ctx = xmlXPathNewContext(cct);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(id));
+		obj = xmlXPathEvalExpression(BAD_CAST "//cond[@id=$id]/@condTypeRefId|//condition[@id=$id]/@condtyperef", ctx);
+
+		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			fprintf(stderr, S_NO_CT_PROP, (char *) type, (char *) id);
+			return;
+		}
+
+		condtype = xmlNodeGetContent(obj->nodesetval->nodeTab[0]);
+		xmlXPathFreeObject(obj);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(condtype));
+		xmlFree(condtype);
+
+		obj = xmlXPathEvalExpression(BAD_CAST "//condType[@id=$id]|//conditiontype[@id=$id]", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			property = obj->nodesetval->nodeTab[0];
+		}
+	} else {
+		fprintf(stderr, S_NO_CT, (char *) id, (char *) type, xmlStrcmp(type, BAD_CAST "prodattr") == 0 ? "ACT" : "CCT");
+		return;
+	}
+
+	xmlXPathFreeObject(obj);
+
+	if (property) {
+		xmlChar *s;
+
+		/* Copy information about the property from ACT/CCT. */
+		if ((s = first_xpath_value(NULL, property, BAD_CAST "@valuePattern|@pattern"))) {
+			xmlSetProp(p, BAD_CAST "pattern", s);
+			xmlFree(s);
+		}
+
+		if ((s = first_xpath_value(NULL, property, BAD_CAST "name"))) {
+			xmlNewTextChild(p, p->ns, BAD_CAST "name", s);
+			xmlFree(s);
+		}
+
+		if ((s = first_xpath_value(NULL, property, BAD_CAST "descr|description"))) {
+			xmlNewTextChild(p, p->ns, BAD_CAST "descr", s);
+			xmlFree(s);
+		}
+
+		if ((s = first_xpath_value(NULL, property, BAD_CAST "displayName|displayname"))) {
+			xmlNewTextChild(p, p->ns, BAD_CAST "displayName", s);
+			xmlFree(s);
+		}
+
+		xmlXPathSetContextNode(property, ctx);
+
+		obj = xmlXPathEvalExpression(BAD_CAST "enumeration|enum", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			int i;
+
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlChar *v, *l, *c = NULL;
+
+				v = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
+					BAD_CAST "@applicPropertyValues|@actvalues");
+				l = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
+					BAD_CAST "@enumerationLabel");
+
+				while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|"))) {
+					xmlNodePtr cur;
+					bool add = true;
+
+					for (cur = p->children; cur && add; cur = cur->next) {
+						xmlChar *cv;
+						cv = xmlNodeGetContent(cur);
+						add = xmlStrcmp(c, cv) != 0;
+						xmlFree(cv);
+					}
+
+					if (add) {
+						xmlNodePtr n;
+
+						n = xmlNewTextChild(p, NULL, BAD_CAST "value", c);
+
+						if (l) {
+							xmlSetProp(n, BAD_CAST "label", l);
+						}
+					}
+				}
+
+				xmlFree(v);
+				xmlFree(l);
+			}
+		}
+	} else {
+		fprintf(stderr, S_NO_CT_PROP, (char *) type, (char *) id);
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+/* Add a property used in an object to the properties report. */
+static void add_prop(xmlNodePtr object, xmlNodePtr assert, bool all, xmlDocPtr act, xmlDocPtr cct)
+{
+	xmlChar *i, *t;
 	xmlNodePtr p = NULL, cur;
 
 	i = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
@@ -3172,44 +3291,87 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert)
 		p = xmlNewChild(object, NULL, BAD_CAST "property", NULL);
 		xmlSetProp(p, BAD_CAST "id", i);
 		xmlSetProp(p, BAD_CAST "type", t);
+
+		if (all) {
+			add_ct_prop_vals(act, cct, i, t, p);
+		}
 	}
 
-	v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+	if (!all) {
+		xmlChar *v, *c = NULL;
 
-	while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|~"))) {
-		xmlNodePtr cur;
-		bool add = true;
+		v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
-		for (cur = p->children; cur && add; cur = cur->next) {
-			xmlChar *cv;
+		while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|"))) {
+			xmlNodePtr cur;
+			bool add = true;
 
-			cv = xmlNodeGetContent(cur);
+			for (cur = p->children; cur && add; cur = cur->next) {
+				xmlChar *cv;
 
-			add = xmlStrcmp(c, cv) != 0;
+				cv = xmlNodeGetContent(cur);
 
-			xmlFree(cv);
+				add = xmlStrcmp(c, cv) != 0;
+
+				xmlFree(cv);
+			}
+
+			if (add) {
+				xmlNewTextChild(p, NULL, BAD_CAST "value", c);
+			}
 		}
 
-		if (add) {
-			xmlNewTextChild(p, NULL, BAD_CAST "value", c);
-		}
+		xmlFree(v);
 	}
 
 	xmlFree(i);
 	xmlFree(t);
-	xmlFree(v);
 }
 
 /* Add the properties used in an object to the properties report. */
-static void add_props(xmlNodePtr report, const char *path)
+static void add_props(xmlNodePtr report, const char *path, bool all, const char *useract, const char *usercct)
 {
-	xmlDocPtr doc;
+	xmlDocPtr doc, act = NULL, cct = NULL;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlNodePtr object;
 
 	if (!(doc = read_xml_doc(path))) {
 		return;
+	}
+
+	if (all) {
+		char fname[PATH_MAX];
+
+		if (useract) {
+			if (!(act = read_xml_doc(useract))) {
+				if (verbosity > QUIET) {
+					fprintf(stderr, S_MISSING_ACT, useract);
+				}
+			}
+		} else if (find_act_fname(fname, doc)) {
+			if (!(act = read_xml_doc(fname))) {
+				if (verbosity > QUIET) {
+					fprintf(stderr, S_MISSING_ACT, fname);
+				}
+			}
+		}
+
+		if (act) {
+			if (usercct) {
+				if (!(cct = read_xml_doc(usercct))) {
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_MISSING_CCT, usercct);
+					}
+				}
+			} else if (find_cct_fname(fname, act)) {
+				if (!(cct = read_xml_doc(fname))) {
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_MISSING_CCT, fname);
+					}
+				}
+			}
+		}
 	}
 
 	object = xmlNewChild(report, NULL, BAD_CAST "object", NULL);
@@ -3222,18 +3384,20 @@ static void add_props(xmlNodePtr report, const char *path)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			add_prop(object, obj->nodesetval->nodeTab[i]);
+			add_prop(object, obj->nodesetval->nodeTab[i], all, act, cct);
 		}
 	}
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 
+	xmlFreeDoc(act);
+	xmlFreeDoc(cct);
 	xmlFreeDoc(doc);
 }
 
 /* Add the properties used in objects in a list to the properties report. */
-static void add_props_list(xmlNodePtr report, const char *fname)
+static void add_props_list(xmlNodePtr report, const char *fname, bool all, const char *useract, const char *usercct)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -3251,7 +3415,7 @@ static void add_props_list(xmlNodePtr report, const char *fname)
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		add_props(report, path);
+		add_props(report, path, all, useract, usercct);
 	}
 
 	if (fname) {
@@ -3453,7 +3617,7 @@ static void show_help(void)
 	puts("  -f, --overwrite                   Force overwriting of files.");
 	puts("  -G, --custom-orig <NCAGE/name>    Use custom NCAGE/name for originator.");
 	puts("  -g, --set-orig                    Set originator of the instance to identify this tool.");
-	puts("  -H, --list-properties             List the applicability properties used in objects.");
+	puts("  -H, --list-properties <method>    List the applicability properties used in objects.");
 	puts("  -h, -?, --help                    Show this help/usage message.");
 	puts("  -I, --date <date>                 Set the issue date of the instance (- for current date).");
 	puts("  -i, --infoname <infoName>         Give the data module instance a different infoName.");
@@ -3579,8 +3743,9 @@ int main(int argc, char **argv)
 	xmlDocPtr def_cir_xsl = NULL;
 
 	xmlDocPtr props_report = NULL;
+	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:456~H";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:456~H:";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3638,7 +3803,7 @@ int main(int argc, char **argv)
 		{"dependencies"      , no_argument      , 0, '~'},
 		{"resolve-containers", no_argument      , 0, 'Q'},
 		{"flatten-alts-refs" , no_argument      , 0, '4'},
-		{"list-properties"   , no_argument      , 0, 'H'},
+		{"list-properties"   , required_argument, 0, 'H'},
 		{"infoname-variant"  , required_argument, 0, 'V'},
 		{"clean-annotations" , no_argument      , 0, '6'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -3845,7 +4010,13 @@ int main(int argc, char **argv)
 				rem_unused = true;
 				break;
 			case 'H':
-				props_report = xmlNewDoc(BAD_CAST "1.0");
+				if (!props_report) {
+					props_report = xmlNewDoc(BAD_CAST "1.0");
+
+					if (strcmp(optarg, "all") == 0) {
+						all_props = true;
+					}
+				}
 				break;
 			case 'h':
 			case '?':
@@ -3866,15 +4037,15 @@ int main(int argc, char **argv)
 
 			for (i = optind; i < argc; ++i) {
 				if (dmlist) {
-					add_props_list(properties, argv[i]);
+					add_props_list(properties, argv[i], all_props, useract, usercct);
 				} else {
-					add_props(properties, argv[i]);
+					add_props(properties, argv[i], all_props, useract, usercct);
 				}
 			}
 		} else if (dmlist) {
-			add_props_list(properties, NULL);
+			add_props_list(properties, NULL, all_props, useract, usercct);
 		} else {
-			add_props(properties, "-");
+			add_props(properties, "-", all_props, useract, usercct);
 		}
 
 		transform_doc(props_report, xsl_sort_props_xsl, xsl_sort_props_xsl_len, NULL);
@@ -4379,6 +4550,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+cleanup:
 	if (useract) {
 		xmlFreeDoc(act);
 		free(useract);
@@ -4392,7 +4564,6 @@ int main(int argc, char **argv)
 		free(userpct);
 	}
 
-cleanup:
 	free(origspec);
 	free(remarks);
 	free(skill);
