@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.13.0"
+#define VERSION "1.13.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -140,7 +140,7 @@ static int compare_icn(const void *a, const void *b)
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-0CDGIiLlMNnoPRrSUwX] [<object>|<dir> ...]");
+	puts("Usage: " PROG_NAME " [-0CDGIiLlMNnoPRrSUwX7] [<object>|<dir> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -0, --null        Output null-delimited list.");
