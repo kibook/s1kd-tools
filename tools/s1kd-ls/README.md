@@ -6,7 +6,7 @@ s1kd-ls - List CSDB objects in a directory hierarchy
 SYNOPSIS
 ========
 
-    s1kd-ls [-0CDGIiLlMNnoPRrSUwX] [-e <cmd>]
+    s1kd-ls [-0CDGIiLlMNnoPRrSUwX7] [-e <cmd>]
             [<object>|<dir> ...]
 
 DESCRIPTION
@@ -71,6 +71,9 @@ Recursively descend in to directories.
 
 -w, --writable  
 Show only writable object files.
+
+-7, --list  
+Treat input as a list of CSDB objects to process.
 
 --version  
 Show version information.

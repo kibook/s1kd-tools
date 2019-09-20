@@ -26,13 +26,14 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.12.1"
+#define VERSION "1.13.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
 #define EXIT_OBJECT_MAX 1 /* Cannot allocate memory for more objects. */
 
 #define E_MAX_OBJECT ERR_PREFIX "Maximum CSDB objects reached: %d\n"
+#define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 
 /* Set of CSDB object types to list. */
 #define SHOW_DM  0x001
@@ -163,6 +164,7 @@ static void show_help(void)
 	puts("  -U, --upf         List data update files.");
 	puts("  -w, --writable    Show only writable object files.");
 	puts("  -X, --ddn         List DDNs.");
+	puts("  -7, --list        Treat input as list of CSDB objects.");
 	puts("  --version         Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -498,6 +500,99 @@ static int remove_official(char (*official)[PATH_MAX], char (*files)[PATH_MAX], 
 	return nofficial;
 }
 
+/* Add a CSDB object to the appropriate list. */
+static void list_path(const char *path, int only_writable, int only_readonly, int recursive)
+{
+	char tmp[PATH_MAX], *base;
+
+	strcpy(tmp, path);
+	base = basename(tmp);
+
+	if (access(path, R_OK) != 0) {
+		return;
+	} else if (only_writable && access(path, W_OK) != 0) {
+		return;
+	} else if (only_readonly && access(path, W_OK) == 0) {
+		return;
+	} else if (dms && is_dm(base)) {
+		if (ndms == DM_MAX) {
+			resize(&dms, &DM_MAX);
+		}
+		strcpy(dms[ndms++], path);
+	} else if (pms && is_pm(base)) {
+		if (npms == PM_MAX) {
+			resize(&pms, &PM_MAX);
+		}
+		strcpy(pms[npms++], path);
+	} else if (coms && is_com(base)) {
+		if (ncoms == COM_MAX) {
+			resize(&coms, &COM_MAX);
+		}
+		strcpy(coms[ncoms++], path);
+	} else if (icns && is_icn(base)) {
+		if (nicns == ICN_MAX) {
+			resize(&icns, &ICN_MAX);
+		}
+		strcpy(icns[nicns++], path);
+	} else if (imfs && is_imf(base)) {
+		if (nimfs == IMF_MAX) {
+			resize(&imfs, &IMF_MAX);
+		}
+		strcpy(imfs[nimfs++], path);
+	} else if (ddns && is_ddn(base)) {
+		if (nddns == DDN_MAX) {
+			resize(&ddns, &DDN_MAX);
+		}
+		strcpy(ddns[nddns++], path);
+	} else if (dmls && is_dml(base)) {
+		if (ndmls == DML_MAX) {
+			resize(&dmls, &DML_MAX);
+		}
+		strcpy(dmls[ndmls++], path);
+	} else if (smcs && is_smc(base)) {
+		if (nsmcs == SMC_MAX) {
+			resize(&smcs, &SMC_MAX);
+		}
+		strcpy(smcs[nsmcs++], path);
+	} else if (upfs && is_upf(base)) {
+		if (nupfs == UPF_MAX) {
+			resize(&upfs, &UPF_MAX);
+		}
+		strcpy(upfs[nupfs++], path);
+	} else if (isdir(path, 0)) {
+		list_dir(path, only_writable, only_readonly, recursive);
+	} else if (nons && is_non(base)) {
+		if (nnons == NON_MAX) {
+			resize(&nons, &NON_MAX);
+		}
+		strcpy(nons[nnons++], path);
+	}
+}
+
+static void read_list(const char *path, int only_writable, int only_readonly, int recursive)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		list_path(line, only_writable, only_readonly, recursive);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	DIR *dir = NULL;
@@ -527,10 +622,11 @@ int main(int argc, char **argv)
 	int only_inwork = 0;
 	int recursive = 0;
 	int show = 0;
+	int list = 0;
 
 	int i;
 
-	const char *sopts = "0CDe:GiLlMPRrSwXoINnUh?";
+	const char *sopts = "0CDe:GiLlMPRrSwXoINnU7h?";
 	struct option lopts[] = {
 		{"version"   , no_argument      , 0, 0},
 		{"help"      , no_argument      , 0, 'h'},
@@ -554,6 +650,7 @@ int main(int argc, char **argv)
 		{"omit-issue", no_argument      , 0, 'N'},
 		{"upf"       , no_argument      , 0, 'U'},
 		{"other"     , no_argument      , 0, 'n'},
+		{"list"      , no_argument      , 0, '7'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -588,6 +685,7 @@ int main(int argc, char **argv)
 			case 'N': no_issue = 1; break;
 			case 'n': show |= SHOW_NON; break;
 			case 'U': show |= SHOW_UPF; break;
+			case '7': list = 1; break;
 			case 'h':
 			case '?': show_help();
 				  return 0;
@@ -628,78 +726,18 @@ int main(int argc, char **argv)
 	}
 
 	if (optind < argc) {
-		/* Read dms to list from arguments */
 		for (i = optind; i < argc; ++i) {
-			char path[PATH_MAX], *base;
-
-			strcpy(path, argv[i]);
-			base = basename(path);
-
-			if (access(argv[i], R_OK) != 0) {
-				continue;
-			} else if (only_writable && access(argv[i], W_OK) != 0) {
-				continue;
-			} else if (only_readonly && access(argv[i], W_OK) == 0) {
-				continue;
-			} else if (dms && is_dm(base)) {
-				if (ndms == DM_MAX) {
-					resize(&dms, &DM_MAX);
-				}
-				strcpy(dms[ndms++], argv[i]);
-			} else if (pms && is_pm(base)) {
-				if (npms == PM_MAX) {
-					resize(&pms, &PM_MAX);
-				}
-				strcpy(pms[npms++], argv[i]);
-			} else if (coms && is_com(base)) {
-				if (ncoms == COM_MAX) {
-					resize(&coms, &COM_MAX);
-				}
-				strcpy(coms[ncoms++], argv[i]);
-			} else if (icns && is_icn(base)) {
-				if (nicns == ICN_MAX) {
-					resize(&icns, &ICN_MAX);
-				}
-				strcpy(icns[nicns++], argv[i]);
-			} else if (imfs && is_imf(base)) {
-				if (nimfs == IMF_MAX) {
-					resize(&imfs, &IMF_MAX);
-				}
-				strcpy(imfs[nimfs++], argv[i]);
-			} else if (ddns && is_ddn(base)) {
-				if (nddns == DDN_MAX) {
-					resize(&ddns, &DDN_MAX);
-				}
-				strcpy(ddns[nddns++], argv[i]);
-			} else if (dmls && is_dml(base)) {
-				if (ndmls == DML_MAX) {
-					resize(&dmls, &DML_MAX);
-				}
-				strcpy(dmls[ndmls++], argv[i]);
-			} else if (smcs && is_smc(base)) {
-				if (nsmcs == SMC_MAX) {
-					resize(&smcs, &SMC_MAX);
-				}
-				strcpy(smcs[nsmcs++], argv[i]);
-			} else if (upfs && is_upf(base)) {
-				if (nupfs == UPF_MAX) {
-					resize(&upfs, &UPF_MAX);
-				}
-				strcpy(upfs[nupfs++], argv[i]);
-			} else if (isdir(argv[i], 0)) {
-				list_dir(argv[i], only_writable, only_readonly, recursive);
-			} else if (nons && is_non(base)) {
-				if (nnons == NON_MAX) {
-					resize(&nons, &NON_MAX);
-				}
-				strcpy(nons[nnons++], argv[i]);
+			if (list) {
+				read_list(argv[i], only_writable, only_readonly, recursive);
+			} else {
+				list_path(argv[i], only_writable, only_readonly, recursive);
 			}
 		}
+	} else if (list) {
+		read_list(NULL, only_writable, only_readonly, recursive);
 	} else {
-		/* Read dms to list from current directory */
 		list_dir(".", only_writable, only_readonly, recursive);
 	}
-
 
 	if (ndms) {
 		qsort(dms, ndms, PATH_MAX, compare);

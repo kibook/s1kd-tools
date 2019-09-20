@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="06" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="01"/>
+        <issueInfo issueNumber="021" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="12"/>
+        <issueDate year="2019" month="09" day="20"/>
         <dmTitle>
           <techName>s1kd-ls(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -e option.</simplePara>
+        <simplePara>Add -e and -7 options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDGIiLlMNnoPRrSUwX] [-e &lt;cmd&gt;]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ls [-0CDGIiLlMNnoPRrSUwX7] [-e &lt;cmd&gt;]
         [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
         </para>
       </levelledPara>
@@ -142,6 +142,12 @@
               <listItemTerm>-w, --writable</listItemTerm>
               <listItemDefinition>
                 <para>Show only writable object files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-7, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of CSDB objects to process.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
