@@ -6,7 +6,7 @@ s1kd-neutralize - S1000D IETP neutral translation of CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-neutralize [-o <file>] [-flnvh?] [<object>...]
+    s1kd-neutralize [-o <file>] [-Dflnvh?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -20,6 +20,9 @@ includes:
 
 OPTIONS
 =======
+
+-D, --delete  
+Remove neutral metadata from the CSDB object.
 
 -f, --overwrite  
 Overwrite specified CSDB object(s) automatically.

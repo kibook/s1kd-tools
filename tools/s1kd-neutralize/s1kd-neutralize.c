@@ -13,7 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -103,11 +103,72 @@ static void neutralizeList(const char *path, const char *outfile, bool overwrite
 	}
 }
 
+static void deneutralizeFile(const char *fname, const char *outfile, bool overwrite)
+{
+	xmlDocPtr doc, res, styledoc, orig;
+	xsltStylesheetPtr style;
+	xmlNodePtr oldroot;
+
+	if (verbose) {
+		fprintf(stderr, I_NEUTRALIZE, fname);
+	}
+
+	orig = read_xml_doc(fname);
+
+	doc = xmlCopyDoc(orig, 1);
+
+	styledoc = read_xml_mem((const char *) stylesheets_delete_xsl, stylesheets_delete_xsl_len);
+	style = xsltParseStylesheetDoc(styledoc);
+	res = xsltApplyStylesheet(style, doc, NULL);
+	xmlFreeDoc(doc);
+	xsltFreeStylesheet(style);
+
+	oldroot = xmlDocGetRootElement(orig);
+	xmlUnlinkNode(oldroot);
+	xmlFreeNode(oldroot);
+
+	xmlDocSetRootElement(orig, xmlCopyNode(xmlDocGetRootElement(res), 1));
+
+	if (overwrite) {
+		save_xml_doc(orig, fname);
+	} else {
+		save_xml_doc(orig, outfile);
+	}
+
+	xmlFreeDoc(res);
+	xmlFreeDoc(orig);
+}
+
+static void deneutralizeList(const char *path, const char *outfile, bool overwrite)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		deneutralizeFile(line, outfile, overwrite);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-o <file>] [-flnvh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-o <file>] [-Dflnvh?] [<object>...]");
 	puts("");
 	puts("Options:");
+	puts("  -D, --delete      Remove neutral metadata.");
 	puts("  -f, --overwrite   Overwrite CSDB objects automatically.");
 	puts("  -h, -?, --help    Show usage message.");
 	puts("  -l, --list        Treat input as list of CSDB objects.");
@@ -131,11 +192,13 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool islist = false;
 	bool namesp = false;
+	bool delete = false;
 
-	const char *sopts = "flno:vh?";
+	const char *sopts = "Dflno:vh?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
+		{"delete"   , no_argument      , 0, 'D'},
 		{"overwrite", no_argument      , 0, 'f'},
 		{"list"     , no_argument      , 0, 'l'},
 		{"namespace", no_argument      , 0, 'n'},
@@ -154,6 +217,9 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				break;
+			case 'D':
+				delete = true;
 				break;
 			case 'f':
 				overwrite = true;
@@ -178,18 +244,34 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (optind < argc) {
-		for (i = optind; i < argc; ++i) {
-			if (islist) {
-				neutralizeList(argv[i], outfile, overwrite, namesp);
-			} else {
-				neutralizeFile(argv[i], outfile, overwrite, namesp);
+	if (delete) {
+		if (optind < argc) {
+			for (i = optind; i < argc; ++i) {
+				if (islist) {
+					deneutralizeList(argv[i], outfile, overwrite);
+				} else {
+					deneutralizeFile(argv[i], outfile, overwrite);
+				}
 			}
+		} else if (islist) {
+			deneutralizeList(NULL, outfile, overwrite);
+		} else {
+			deneutralizeFile("-", outfile, false);
 		}
-	} else if (islist) {
-		neutralizeList(NULL, outfile, overwrite, namesp);
 	} else {
-		neutralizeFile("-", outfile, false, namesp);
+		if (optind < argc) {
+			for (i = optind; i < argc; ++i) {
+				if (islist) {
+					neutralizeList(argv[i], outfile, overwrite, namesp);
+				} else {
+					neutralizeFile(argv[i], outfile, overwrite, namesp);
+				}
+			}
+		} else if (islist) {
+			neutralizeList(NULL, outfile, overwrite, namesp);
+		} else {
+			neutralizeFile("-", outfile, false, namesp);
+		}
 	}
 
 	free(outfile);

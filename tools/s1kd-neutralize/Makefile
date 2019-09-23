@@ -22,6 +22,7 @@ stylesheets.h: stylesheets/*.xsl
 	xxd -i stylesheets/rdf.xsl > stylesheets.h
 	xxd -i stylesheets/xlink.xsl >> stylesheets.h
 	xxd -i stylesheets/namespace.xsl >> stylesheets.h
+	xxd -i stylesheets/delete.xsl >> stylesheets.h
 
 $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
