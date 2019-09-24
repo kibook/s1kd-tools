@@ -910,5 +910,9 @@ int execfile(const char *execstr, const char *path)
 
 	free(cmd);
 
-	return e;
+	if (WIFSIGNALED(e)) {
+		raise(WTERMSIG(e));
+	}
+
+	return WEXITSTATUS(e);
 }

@@ -9,7 +9,9 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <dirent.h>
+#include <signal.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <libxml/tree.h>
 #include <libxml/xinclude.h>
 #include <libxml/xpath.h>
