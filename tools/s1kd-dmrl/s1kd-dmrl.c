@@ -3,9 +3,6 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
-#ifdef _WIN32
-#include <string.h>
-#endif
 #include <libxml/tree.h>
 #include <libxml/debugXML.h>
 #include <libxslt/xslt.h>
@@ -15,7 +12,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 static void showHelp(void)
 {
