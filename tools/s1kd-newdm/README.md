@@ -18,7 +18,14 @@ OPTIONS
 =======
 
 -\#, --code &lt;DMC&gt;  
-The data module code of the new data module.
+The data module code of the new data module. The prefix "DMC-" is
+optional.
+
+If - is given for the code, a random data module code will be generated.
+If only a model identification code is given instead (e.g., `-# TEST`),
+or the `.defaults` file specifies a default model identification code,
+this will be used as part of the random code. The information type of
+the random code will be 000A-D.
 
 -$, --issue &lt;issue&gt;  
 Specify which issue of S1000D to use. Currently supported issues are:

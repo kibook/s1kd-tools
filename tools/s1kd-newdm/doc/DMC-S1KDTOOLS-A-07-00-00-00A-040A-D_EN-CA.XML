@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="043" inWork="00"/>
+        <issueInfo issueNumber="043" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2019" month="09" day="24"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,13 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change default issue to 5.0.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -V option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add infoNameVariant support to .dmtypes file.</simplePara>
+        <simplePara>Add random code generation.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -72,7 +66,8 @@
             <definitionListItem>
               <listItemTerm>-#, --code &lt;DMC&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The data module code of the new data module.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The data module code of the new data module. The prefix "DMC-" is optional.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">If - is given for the code, a random data module code will be generated. If only a model identification code is given instead (e.g., <verbatimText>-# TEST</verbatimText>), or the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file specifies a default model identification code, this will be used as part of the random code. The information type of the random code will be 000A-D.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -81,10 +76,10 @@
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
                   <randomList>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>5.0 (default)</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>4.2</para>
                     </listItem>
                     <listItem>
@@ -435,7 +430,7 @@
                 <para>The tech name of the new data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-V, --infoname-variant &lt;variant&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The info name variant of the new data module.</para>
@@ -565,7 +560,7 @@ securityClassification       01</verbatimText>
 100A-A-T5CC  learning  Operation: Simulation
 100A-A-T80E  learning  Operation: Assessment</verbatimText>
           </para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">The XML format additionally supports the use of the attribute <verbatimText verbatimStyle="vs13">infoNameVariant</verbatimText>, for use with S1000D Issue 5.0 and up, allowing extensions of the info name to be encoded separately:
+          <para>The XML format additionally supports the use of the attribute <verbatimText verbatimStyle="vs13">infoNameVariant</verbatimText>, for use with S1000D Issue 5.0 and up, allowing extensions of the info name to be encoded separately:
             <verbatimText verbatimStyle="vs11"><![CDATA[<dmtypes>
 <type
 infoCode="258A"
@@ -592,7 +587,7 @@ infoNameVariant="Clean with water"/>
         <levelledPara>
           <title>Custom XML templates (-%)</title>
           <para>A minimal set of S1000D templates are built-in to this tool, but customized templates may be used with the -% option. This option takes a path to a directory where the custom templates are located. Each template should be named <verbatimText verbatimStyle="vs02">&lt;schema&gt;.xml</verbatimText>, where <verbatimText verbatimStyle="vs02">&lt;schema&gt;</verbatimText> is the name of the schema, matching one of the schema names in the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file or the schema specified with the -T option.</para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The templates must be written to conform to the default S1000D issue of this tool (currently 5.0). They will be automatically transformed when another issue is specified with the -$ option.</para>
+          <para>The templates must be written to conform to the default S1000D issue of this tool (currently 5.0). They will be automatically transformed when another issue is specified with the -$ option.</para>
           <para>The <verbatimText>templates</verbatimText> default can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file to use these custom templates by default.</para>
         </levelledPara>
       </levelledPara>

@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "2.1.3"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1335,6 +1335,67 @@ static void dump_templates(const char *path)
 		templates_wrngflds_xml_len);
 }
 
+/* Generate a random code. */
+static void random_code(char *dst, size_t n, const char *modelid)
+{
+	static const char alphanum[] = "ABCDEFGHIJKLMNOPQRSTUVXWYZ0123456789";
+
+	if (strcmp(modelid, "") != 0) {
+		snprintf(dst, n, "%s-%c%c%c%c-%c%c-%c%c-%c%c%c%c-%c%c%c%c%c-000A-D",
+			modelid,
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)]);
+	} else {
+		snprintf(dst, n, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c-%c%c%c%c-%c%c-%c%c-%c%c%c%c-%c%c%c%c%c-000A-D",
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)],
+			alphanum[rand() % (sizeof(alphanum) - 1)]);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	char learn[8] = "";
@@ -1436,6 +1497,8 @@ int main(int argc, char **argv)
 	};
 	int loptind = 0;
 
+	srand(time(NULL) + getpid());
+
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
 			case 0:
@@ -1461,7 +1524,13 @@ int main(int argc, char **argv)
 			case 't': strcpy(techName_content, optarg); tech_name_flag = true; break;
 			case 'i': strcpy(infoName_content, optarg); break;
 			case 'T': strcpy(dmtype, optarg); break;
-			case '#': strcpy(dmcode, optarg); skipdmc = true; break;
+			case '#': if (strchr(optarg, '-')) {
+					  strncpy(dmcode, optarg, 255);
+				  } else {
+					  random_code(dmcode, 256, optarg);
+				  }
+				  skipdmc = true;
+				  break;
 			case 'N': no_issue = true; no_issue_set = true; break;
 			case 's': strcpy(schema, optarg); break;
 			case 'B': if (!brex_rules) brex_rules = xmlNewNode(NULL, BAD_CAST "structureObjectRuleGroup"); break;
@@ -1561,6 +1630,10 @@ int main(int argc, char **argv)
 		}
 
 		fclose(defaults);
+	}
+
+	if (strcmp(dmcode, "-") == 0) {
+		random_code(dmcode, 256, modelIdentCode);
 	}
 
 	if (strcmp(dmcode, "") != 0) {
