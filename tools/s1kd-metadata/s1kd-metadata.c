@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.0.1"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1409,6 +1409,146 @@ static void show_source(xmlNodePtr node, int endl)
 	show_country_iso_code(lang, endl);
 }
 
+static xmlChar *get_qa(xmlNodePtr node)
+{
+	xmlNodePtr first, sec;
+
+	first = first_xpath_node_local(node, BAD_CAST "firstVerification|firstver");
+	sec   = first_xpath_node_local(node, BAD_CAST "secondVerification|secver");
+
+	if (sec) {
+		return xmlStrdup(BAD_CAST "secondVerification");
+	}
+	if (first) {
+		return xmlStrdup(BAD_CAST "firstVerification");
+	}
+
+	return xmlStrdup(BAD_CAST "unverified");
+}
+
+static void show_qa(xmlNodePtr node, int endl)
+{
+	xmlChar *qa;
+
+	qa = get_qa(node);
+	printf("%s", (char *) qa);
+	xmlFree(qa);
+
+	if (endl > -1) {
+		putchar(endl);
+	}
+}
+
+static void show_verification_type(xmlNodePtr node, int endl)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "firstVerification") == 0 ||
+	    xmlStrcmp(node->name, BAD_CAST "secondVerification") == 0)
+	{
+		show_simple_attr(node, "verificationType", endl);
+	} else {
+		show_simple_attr(node, "type", endl);
+	}
+}
+
+static int edit_first_verification_type(xmlNodePtr node, const char *val)
+{
+	if (strcmp(val, "unverified") == 0) {
+		xmlNodePtr qa, cur;
+
+		qa = node->parent;
+
+		cur = qa->children;
+		while (cur) {
+			xmlNodePtr next;
+			next = cur->next;
+			xmlUnlinkNode(cur);
+			xmlFreeNode(cur);
+			cur = next;
+		}
+
+		if (xmlStrcmp(node->name, BAD_CAST "firstVerification") == 0) {
+			xmlNewChild(qa, qa->ns, BAD_CAST "unverified", NULL);
+		} else {
+			xmlNewChild(qa, qa->ns, BAD_CAST "unverif", NULL);
+		}
+
+		return 0;
+	}
+
+	if (xmlStrcmp(node->name, BAD_CAST "firstVerification") == 0) {
+		return edit_simple_attr(node, "verificationType", val);
+	} else {
+		return edit_simple_attr(node, "type", val);
+	}
+}
+
+static int edit_second_verification_type(xmlNodePtr node, const char *val)
+{
+	if (strcmp(val, "unverified") == 0) {
+		xmlUnlinkNode(node);
+		xmlFreeNode(node);
+		return 0;
+	}
+
+	if (xmlStrcmp(node->name, BAD_CAST "secondVerification") == 0) {
+		return edit_simple_attr(node, "verificationType", val);
+	} else {
+		return edit_simple_attr(node, "type", val);
+	}
+}
+
+static int create_first_verification(xmlXPathContextPtr ctx, const char *val)
+{
+	xmlNodePtr unverif, first;
+
+	if (!(strcmp(val, "tabtop") == 0 || strcmp(val, "onobject") == 0 || strcmp(val, "ttandoo") == 0)) {
+		return 0;
+	}
+
+	if (!(unverif = first_xpath_node("//unverified|//unverif", ctx))) {
+		return EXIT_INVALID_CREATE;
+	}
+
+	if (xmlStrcmp(unverif->name, BAD_CAST "unverified") == 0) {
+		first = xmlNewNode(unverif->ns, BAD_CAST "firstVerification");
+		xmlSetProp(first, BAD_CAST "verificationType", BAD_CAST val);
+	} else {
+		first = xmlNewNode(unverif->ns, BAD_CAST "firstver");
+		xmlSetProp(first, BAD_CAST "type", BAD_CAST val);
+	}
+
+	xmlAddNextSibling(unverif, first);
+	xmlUnlinkNode(unverif);
+	xmlFreeNode(unverif);
+
+	return 0;
+}
+
+static int create_second_verification(xmlXPathContextPtr ctx, const char *val)
+{
+	xmlNodePtr first, sec;
+
+	if (!(strcmp(val, "tabtop") == 0 || strcmp(val, "onobject") == 0 || strcmp(val, "ttandoo") == 0)) {
+		return 0;
+	}
+
+	if (!(first = first_xpath_node("//firstVerification|//firstver", ctx))) {
+		return EXIT_INVALID_CREATE;
+	}
+
+	if (xmlStrcmp(first->name, BAD_CAST "firstVerification") == 0) {
+		sec = xmlNewNode(first->ns, BAD_CAST "secondVerification");
+		xmlSetProp(sec, BAD_CAST "verificationType", BAD_CAST val);
+	} else {
+		sec = xmlNewNode(first->ns, BAD_CAST "secver");
+		xmlSetProp(sec, BAD_CAST "type", BAD_CAST val);
+	}
+
+	xmlAddNextSibling(first, sec);
+
+	return 0;
+}
+
 static struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -1529,6 +1669,13 @@ static struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Data management list code"},
+	{"firstVerificationType",
+		"//firstVerification/@verificationType|//firstver/@type",
+		NULL,
+		show_verification_type,
+		edit_first_verification_type,
+		create_first_verification,
+		"First verification type"},
 	{"format",
 		"false()",
 		NULL,
@@ -1697,6 +1844,13 @@ static struct metadata metadata[] = {
 		edit_pm_volume,
 		NULL,
 		"Volume of the PM"},
+	{"qualityAssurance",
+		"//qualityAssurance|//qa",
+		get_qa,
+		show_qa,
+		NULL,
+		NULL,
+		"Quality assurance status"},
 	{"receiverIdent",
 		"//@receiverIdent|//recvid",
 		NULL,
@@ -1732,6 +1886,13 @@ static struct metadata metadata[] = {
 		edit_schema_url,
 		NULL,
 		"XML schema URL"},
+	{"secondVerificationType",
+		"//secondVerification/@verificationType|//secver/@type",
+		NULL,
+		show_verification_type,
+		edit_second_verification_type,
+		create_second_verification,
+		"Second verification type"},
 	{"securityClassification",
 		"//security/@securityClassification|//security/@class",
 		NULL,
