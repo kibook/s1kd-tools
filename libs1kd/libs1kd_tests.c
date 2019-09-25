@@ -5,7 +5,7 @@
 
 void test_metadata(void)
 {
-	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
+	xmlDocPtr doc = xmlReadFile("libs1kd_tests.xml", NULL, 0);
 	xmlChar *date;
 
 	date = s1kdGetMetadata(doc, BAD_CAST "issueDate");
@@ -23,7 +23,7 @@ void test_metadata(void)
 
 void test_instance(void)
 {
-	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
+	xmlDocPtr doc = xmlReadFile("libs1kd_tests.xml", NULL, 0);
 	xmlNodePtr defs = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlNodePtr a;
 
