@@ -18,9 +18,7 @@
     </dmAddress>
     <dmStatus issueType="new">
       <security securityClassification="01"/>
-      <responsiblePartnerCompany>
-        <enterpriseName>khzae.net</enterpriseName>
-      </responsiblePartnerCompany>
+      <responsiblePartnerCompany/>
       <originator>
         <enterpriseName>khzae.net</enterpriseName>
       </originator>

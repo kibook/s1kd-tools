@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.2.1"
+#define VERSION "3.3.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -663,7 +663,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			path = xmlNodeGetContent(objectPath);
 			use  = xmlNodeGetContent(objectUse);
 
-			object = xmlXPathEvalExpression(BAD_CAST path, context);
+			object = xmlXPathEvalExpression(path, context);
 
 			if (!object) {
 				if (verbosity > SILENT) {
@@ -1204,6 +1204,39 @@ static void print_stats(xmlDocPtr doc)
 	xsltFreeStylesheet(style);
 }
 
+#ifdef LIBS1KD
+int s1kdCheckDefaultBREX(xmlDocPtr doc)
+{
+	int err;
+	xmlDocPtr brex, report;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+	const char *brex_dmc;
+
+	report = xmlNewDoc(BAD_CAST "1.0");
+	node = xmlNewNode(NULL, BAD_CAST "brexCheck");
+	xmlDocSetRootElement(report, node);
+
+	node = xmlNewChild(node, NULL, BAD_CAST "document", NULL);
+	xmlSetProp(node, BAD_CAST "path", doc->URL);
+
+	brex_dmc = default_brex_dmc(doc);
+	brex = load_brex(brex_dmc, doc);
+
+	ctx = xmlXPathNewContext(brex);
+	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
+
+	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node);
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+	xmlFreeDoc(report);
+	xmlFreeDoc(brex);
+
+	return err;
+}
+#else
 /* Show usage message. */
 static void show_help(void)
 {
@@ -1542,3 +1575,4 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 }
+#endif

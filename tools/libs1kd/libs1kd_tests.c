@@ -1,7 +1,20 @@
 #include <stdbool.h>
 #include <libxml/tree.h>
+#include <s1kd/brexcheck.h>
 #include <s1kd/instance.h>
 #include <s1kd/metadata.h>
+
+void test_brexcheck(void)
+{
+	int err;
+	xmlDocPtr doc = xmlReadFile("libs1kd_tests.xml", NULL, 0);
+
+	err = s1kdCheckDefaultBREX(doc);
+
+	printf("BREXCHECK: %s\n", err ? "FAIL" : "PASS");
+
+	xmlFreeDoc(doc);
+}
 
 void test_metadata(void)
 {
@@ -42,6 +55,7 @@ void test_instance(void)
 
 int main()
 {
+	test_brexcheck();
 	test_metadata();
 	test_instance();
 
