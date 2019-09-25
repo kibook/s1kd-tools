@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.3.0"
+#define VERSION "3.3.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1172,7 +1172,7 @@ static const char *default_brex_dmc(xmlDocPtr doc)
 
 	if (!schema || strstr(schema, "S1000D_5-0")) {
 		code = "DMC-S1000D-G-04-10-0301-00A-022A-D";
-	} else if (strstr(schema, "S1000D_5-0")) {
+	} else if (strstr(schema, "S1000D_4-2")) {
 		code = "DMC-S1000D-F-04-10-0301-00A-022A-D";
 	} else if (strstr(schema, "S1000D_4-1")) {
 		code = "DMC-S1000D-E-04-10-0301-00A-022A-D";
