@@ -1,11 +1,11 @@
 .PHONY: all clean
 
-CFLAGS=-g -DLIBS1KD -shared -fPIC -I ../tools/common `pkg-config --cflags libxml-2.0 libxslt libexslt`
+CFLAGS=-g -DLIBS1KD -shared -fPIC -I ../common `pkg-config --cflags libxml-2.0 libxslt libexslt`
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 all: libs1kd.so
 
-libs1kd.so: ../tools/common/s1kd_tools.c ../tools/s1kd-instance/s1kd-instance.c ../tools/s1kd-metadata/s1kd-metadata.c
+libs1kd.so: ../common/s1kd_tools.c ../s1kd-instance/s1kd-instance.c ../s1kd-metadata/s1kd-metadata.c
 	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
 clean:
