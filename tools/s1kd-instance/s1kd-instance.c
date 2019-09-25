@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.0.0"
+#define VERSION "8.0.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3599,6 +3599,41 @@ static xmlNodePtr rem_supersets(xmlNodePtr referencedApplicGroup, xmlNodePtr roo
 	return referencedApplicGroup;
 }
 
+#ifdef LIBS1KD
+void s1kdFilter(xmlDocPtr doc, xmlNodePtr defs, bool reduce)
+{
+	xmlNodePtr root, referencedApplicGroup;
+
+	if (xmlChildElementCount(defs) == 0) {
+		return;
+	}
+
+	root = xmlDocGetRootElement(doc);
+	referencedApplicGroup = first_xpath_node(doc, NULL, BAD_CAST "//referencedApplicGroup");
+
+	if (xmlChildElementCount(referencedApplicGroup) == 0) {
+		return;
+	}
+
+	strip_applic(defs, referencedApplicGroup, root);
+
+	if (reduce) {
+		clean_applic_stmts(defs, referencedApplicGroup);
+
+		if (xmlChildElementCount(referencedApplicGroup) == 0) {
+			xmlUnlinkNode(referencedApplicGroup);
+			xmlFreeNode(referencedApplicGroup);
+			referencedApplicGroup = NULL;
+		}
+
+		clean_applic(referencedApplicGroup, root);
+
+		if (xmlChildElementCount(referencedApplicGroup) != 0) {
+			referencedApplicGroup = rem_supersets(referencedApplicGroup, root, true);
+		}
+	}
+}
+#else
 /* Print a usage message */
 static void show_help(void)
 {
@@ -4583,3 +4618,4 @@ cleanup:
 
 	return err;
 }
+#endif

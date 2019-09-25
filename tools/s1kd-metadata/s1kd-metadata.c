@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.1.1"
+#define VERSION "3.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -2225,38 +2225,6 @@ static void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable
 	}
 }
 
-static void show_help(void)
-{
-	puts("Usage: " PROG_NAME " [options] [<object>...]");
-	puts("");
-	puts("Options:");
-	puts("  -0, --null             Use null-delimited fields.");
-	puts("  -c, --set <file>       Set metadata using definitions in <file> (- for stdin).");
-	puts("  -E, --editable         Include only editable metadata when showing all.");
-	puts("  -e, --exec <cmd>       Execute <cmd> for each CSDB object.");
-	puts("  -F, --format <fmt>     Print a formatted line for each CSDB object.");
-	puts("  -f, --overwrite        Overwrite modules when editing metadata.");
-	puts("  -H, --info             List information on available metadata.");
-	puts("  -l, --list             Input is a list of filenames.");
-	puts("  -m, --matches <regex>  Use a pattern instead of a literal value (-v) with -w/-W.");
-	puts("  -n, --name <name>      Specific metadata name to view/edit.");
-	puts("  -q, --quiet            Quiet mode, do not show non-fatal errors.");
-	puts("  -T, --raw              Do not format columns in output.");
-	puts("  -t, --tab              Use tab-delimited fields.");
-	puts("  -v, --value <value>    The value to set or match.");
-	puts("  -W, --not-when <name>  Only list/edit when metadata <name> does not equal a value.");
-	puts("  -w, --when <name>      Only list/edit when metadata <name> equals a value.");
-	puts("  --version              Show version information.");
-	puts("  <object>               CSDB object(s) to view/edit metadata on.");
-	LIBXML2_PARSE_LONGOPT_HELP
-}
-
-static void show_version(void)
-{
-	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
-	printf("Using libxml %s\n", xmlParserVersion);
-}
-
 static int show_err(int err, const char *key, const char *val, const char *fname)
 {
 	if (verbosity < NORMAL) return err;
@@ -2672,6 +2640,78 @@ static int show_or_edit_metadata_list(const char *fname, const char *metadata_fn
 	return err;
 }
 
+#ifdef LIBS1KD
+xmlChar *s1kdGetMetadata(xmlDocPtr doc, const xmlChar *name)
+{
+	int i;
+	xmlChar *value = NULL;
+
+	for (i = 0; metadata[i].key && !value; ++i) {
+		if (strcmp(metadata[i].key, name) == 0) {
+			xmlXPathContextPtr ctx;
+			xmlNodePtr node;
+
+			ctx = xmlXPathNewContext(doc);
+
+			if ((node = first_xpath_node(metadata[i].path, ctx))) {
+				if (metadata[i].get) {
+					value = metadata[i].get(node);
+				} else {
+					value = xmlNodeGetContent(node);
+				}
+			}
+
+			xmlXPathFreeContext(ctx);
+
+			break;
+		}
+	}
+
+	return value;
+}
+
+int s1kdSetMetadata(xmlDocPtr doc, const xmlChar *name, const xmlChar *value)
+{
+	xmlXPathContextPtr ctx;
+	int err;
+	ctx = xmlXPathNewContext(doc);
+	err = edit_metadata(ctx, (char *) name, (char *) value);
+	xmlXPathFreeContext(ctx);
+	return err;
+}
+#else
+static void show_help(void)
+{
+	puts("Usage: " PROG_NAME " [options] [<object>...]");
+	puts("");
+	puts("Options:");
+	puts("  -0, --null             Use null-delimited fields.");
+	puts("  -c, --set <file>       Set metadata using definitions in <file> (- for stdin).");
+	puts("  -E, --editable         Include only editable metadata when showing all.");
+	puts("  -e, --exec <cmd>       Execute <cmd> for each CSDB object.");
+	puts("  -F, --format <fmt>     Print a formatted line for each CSDB object.");
+	puts("  -f, --overwrite        Overwrite modules when editing metadata.");
+	puts("  -H, --info             List information on available metadata.");
+	puts("  -l, --list             Input is a list of filenames.");
+	puts("  -m, --matches <regex>  Use a pattern instead of a literal value (-v) with -w/-W.");
+	puts("  -n, --name <name>      Specific metadata name to view/edit.");
+	puts("  -q, --quiet            Quiet mode, do not show non-fatal errors.");
+	puts("  -T, --raw              Do not format columns in output.");
+	puts("  -t, --tab              Use tab-delimited fields.");
+	puts("  -v, --value <value>    The value to set or match.");
+	puts("  -W, --not-when <name>  Only list/edit when metadata <name> does not equal a value.");
+	puts("  -w, --when <name>      Only list/edit when metadata <name> equals a value.");
+	puts("  --version              Show version information.");
+	puts("  <object>               CSDB object(s) to view/edit metadata on.");
+	LIBXML2_PARSE_LONGOPT_HELP
+}
+
+static void show_version(void)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s\n", xmlParserVersion);
+}
+
 int main(int argc, char **argv)
 {
 	xmlNodePtr keys, conds, last = NULL;
@@ -2789,3 +2829,4 @@ int main(int argc, char **argv)
 
 	return err;
 }
+#endif
