@@ -8,11 +8,19 @@ void test_brexcheck(void)
 {
 	int err;
 	xmlDocPtr doc = xmlReadFile("libs1kd_tests.xml", NULL, 0);
+	xmlDocPtr brex;
 
 	err = s1kdCheckDefaultBREX(doc);
 
-	printf("BREXCHECK: %s\n", err ? "FAIL" : "PASS");
+	printf("Default BREX: %s\n", err ? "FAIL" : "PASS");
 
+	brex = xmlReadFile("brex.xml", NULL, 0);
+
+	err = s1kdCheckBREX(doc, brex);
+
+	printf("Custom BREX: %s\n", err ? "FAIL" : "PASS");
+
+	xmlFreeDoc(brex);
 	xmlFreeDoc(doc);
 }
 

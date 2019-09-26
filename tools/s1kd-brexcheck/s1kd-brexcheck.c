@@ -1236,6 +1236,33 @@ int s1kdCheckDefaultBREX(xmlDocPtr doc)
 
 	return err;
 }
+
+int s1kdCheckBREX(xmlDocPtr doc, xmlDocPtr brex)
+{
+	int err;
+	xmlDocPtr report;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+
+	report = xmlNewDoc(BAD_CAST "1.0");
+	node = xmlNewNode(NULL, BAD_CAST "brexCheck");
+	xmlDocSetRootElement(report, node);
+
+	node = xmlNewChild(node, NULL, BAD_CAST "document", NULL);
+	xmlSetProp(node, BAD_CAST "path", doc->URL);
+
+	ctx = xmlXPathNewContext(brex);
+	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
+
+	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node);
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+	xmlFreeDoc(report);
+
+	return err;
+}
 #else
 /* Show usage message. */
 static void show_help(void)
