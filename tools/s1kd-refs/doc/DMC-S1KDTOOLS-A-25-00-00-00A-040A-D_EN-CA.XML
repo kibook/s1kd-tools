@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2019" month="09" day="26"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -H, -J, -j and -T options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -i option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d &lt;dir&gt;] [-e &lt;file&gt;]
+          <verbatimText verbatimStyle="vs24">s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d &lt;dir&gt;] [-e &lt;file&gt;]
           [-J &lt;ns=URL&gt;] [-j &lt;xpath&gt;] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
@@ -87,7 +81,7 @@
                 <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-C, -D, -E, -G, -H, -P, -T</listItemTerm>
               <listItemDefinition>
                 <para>List references to comments, data modules, external publications, ICNs, hotspots, publication modules and referred fragments respectively. If none are specified, -CDEGHPT is assumed.</para>
@@ -139,16 +133,16 @@
             <definitionListItem>
               <listItemTerm>-i, --ignore-issue</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Ignore issue info when matching. This will always match the latest issue of an object found, regardless of the issue specified in the reference.</para>
+                <para>Ignore issue info when matching. This will always match the latest issue of an object found, regardless of the issue specified in the reference.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-J &lt;ns=URL&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Registers an XML namespace prefix, which can then be used in the hotspot XPath expression (-j). Multiple namespaces can be registered by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-j &lt;xpath&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a custom XPath expression to use when matching hotspots (-H) in XML-based ICN formats.</para>

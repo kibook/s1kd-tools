@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="034" inWork="00"/>
+        <issueInfo issueNumber="034" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2019" month="09" day="26"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Include brDecisionRef in BREX error report.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -365,7 +362,7 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs23" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs23">$ DMOD=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 $ BREX=DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML
 $ cat $DMOD
 [...]
@@ -395,7 +392,7 @@ internalRef[1]):
         </para>
         <para>Example of XML report format for the above:</para>
         <para>
-          <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">&lt;?xml version="1.0"?&gt;
+          <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
 &lt;brexCheck&gt;
 &lt;document path="DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML"&gt;
 &lt;brex path="DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US.XML"&gt;
