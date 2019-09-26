@@ -14,4 +14,13 @@
  */
 int s1kdCheckDefaultBREX(xmlDocPtr doc);
 
+/**
+ * Check a CSDB object against a BREX data module.
+ *
+ * @param doc The CSDB object
+ * @param brex The BREX data module
+ * @return 0 if there are no BREX error,s non-zero otherwise
+ */
+int s1kdCheckBREX(xmlDocPtr doc, xmlDocPtr brex);
+
 #endif
