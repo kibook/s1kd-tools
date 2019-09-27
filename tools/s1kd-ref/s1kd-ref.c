@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "2.1.1"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1212,12 +1212,11 @@ static enum issue spec_issue(const char *s)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>] [-o <dst>] [<code>|<file> ...]");
+	puts("Usage: " PROG_NAME " [-dfilqRrStuvh?] [-$ <issue>] [-s <src>] [-o <dst>] [-3 <file>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -$, --issue <issue>        Output XML for the specified issue of S1000D.");
 	puts("  -d, --include-date         Include issue date (target must be file)");
-	puts("  -e, --externalpubs <file>  Use a custom .externalpubs file.");
 	puts("  -f, --overwrite            Overwrite source data module instead of writing to stdout.");
 	puts("  -h, -?, --help             Show this help message.");
 	puts("  -i, --include-issue        Include issue info.");
@@ -1231,6 +1230,7 @@ static void show_help(void)
 	puts("  -t, --include-title        Include title (target must be file)");
 	puts("  -u, --include-url          Include xlink:href to the full URL/filename.");
 	puts("  -v, --verbose              Verbose output.");
+	puts("  -3, --externalpubs <file>  Use a custom .externalpubs file.");
 	puts("  --version                  Show version information.");
 	puts("  <code>                     The code of the reference (must include prefix DMC/PMC/etc.).");
 	puts("  <file>                     A file to reference.");
@@ -1255,11 +1255,11 @@ int main(int argc, char **argv)
 	char extpubs_fname[PATH_MAX] = "";
 	xmlDocPtr extpubs = NULL;
 
-	const char *sopts = "e:filo:qRrSs:tvd$:uh?";
+	const char *sopts = "3:filo:qRrSs:tvd$:uh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
-		{"externalpubs" , required_argument, 0, 'e'},
+		{"externalpubs" , required_argument, 0, '3'},
 		{"overwrite"    , no_argument      , 0, 'f'},
 		{"include-issue", no_argument      , 0, 'i'},
 		{"include-lang" , no_argument      , 0, 'l'},
@@ -1288,7 +1288,7 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
-			case 'e': strncpy(extpubs_fname, optarg, PATH_MAX - 1); break;
+			case '3': strncpy(extpubs_fname, optarg, PATH_MAX - 1); break;
 			case 'f': overwrite = true; break;
 			case 'i': opts |= OPT_ISSUE; break;
 			case 'l': opts |= OPT_LANG; break;

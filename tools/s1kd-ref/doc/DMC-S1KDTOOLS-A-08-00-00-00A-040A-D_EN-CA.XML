@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="01"/>
+        <issueInfo issueNumber="020" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="09" day="26"/>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change -e option to -3.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-ref [-dfilqRrStuvh?] [-$ &lt;issue&gt;] [-e &lt;file&gt;] [-s &lt;src&gt;]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-ref [-dfilqRrStuvh?] [-$ &lt;issue&gt;] [-s &lt;src&gt;] [-3 &lt;file&gt;]
          [-o &lt;dst&gt;] [&lt;code&gt;|&lt;file&gt; ...]</verbatimText>
         </para>
       </levelledPara>
@@ -71,12 +74,6 @@
               <listItemTerm>-d, --include-date</listItemTerm>
               <listItemDefinition>
                 <para>Include the issue date in the reference (target must be a file)</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-e, --externalpubs &lt;file&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Use a custom <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -155,6 +152,12 @@
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-3, --externalpubs &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

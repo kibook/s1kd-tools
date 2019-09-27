@@ -9,7 +9,7 @@ s1kd\-ref \- Generate XML to reference CSDB objects
 .IP
 .nf
 \f[C]
-s1kd\-ref\ [\-dfilqRrStuvh?]\ [\-$\ <issue>]\ [\-e\ <file>]\ [\-s\ <src>]
+s1kd\-ref\ [\-dfilqRrStuvh?]\ [\-$\ <issue>]\ [\-s\ <src>]\ [\-3\ <file>]
 \ \ \ \ \ \ \ \ \ [\-o\ <dst>]\ [<code>|<file>\ ...]
 \f[]
 .fi
@@ -28,11 +28,6 @@ Output XML for the specified issue of S1000D.
 .TP
 .B \-d, \-\-include\-date
 Include the issue date in the reference (target must be a file)
-.RS
-.RE
-.TP
-.B \-e, \-\-externalpubs <file>
-Use a custom \f[C]\&.externalpubs\f[] file.
 .RS
 .RE
 .TP
@@ -104,6 +99,11 @@ Include the full URL/filename of the reference with the
 .TP
 .B \-v, \-\-verbose
 Verbose output.
+.RS
+.RE
+.TP
+.B \-3, \-\-externalpubs <file>
+Use a custom \f[C]\&.externalpubs\f[] file.
 .RS
 .RE
 .TP

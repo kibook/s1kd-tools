@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-dfilqRrStuvh?] [-$ <issue>] [-e <file>] [-s <src>]
+    s1kd-ref [-dfilqRrStuvh?] [-$ <issue>] [-s <src>] [-3 <file>]
              [-o <dst>] [<code>|<file> ...]
 
 DESCRIPTION
@@ -25,9 +25,6 @@ Output XML for the specified issue of S1000D.
 
 -d, --include-date  
 Include the issue date in the reference (target must be a file)
-
--e, --externalpubs &lt;file&gt;  
-Use a custom `.externalpubs` file.
 
 -f, --overwrite  
 Overwrite source data module instead of writing to stdout.
@@ -72,6 +69,9 @@ attribute.
 
 -v, --verbose  
 Verbose output.
+
+-3, --externalpubs &lt;file&gt;  
+Use a custom `.externalpubs` file.
 
 --version  
 Show version information.
