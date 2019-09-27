@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "3.1.0"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -71,6 +71,8 @@ static bool overwriteUpdated = false;
 
 /* Remove unmatched references from the input objects. */
 static bool tagUnmatched = false;
+
+static char *execStr = NULL;
 
 /* When listing references recursively, keep track of files which have already
  * been listed to avoid loops.
@@ -201,6 +203,11 @@ static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	xmlFree(s);
 	xmlFree(r);
 	xmlFree(xpath);
+}
+
+static void execMatched(xmlNodePtr node, const char *src, const char *ref)
+{
+	execfile(execStr, ref);
 }
 
 /* Print an error for references which are unmatched. */
@@ -1340,7 +1347,7 @@ static void addHotspotNs(char *s)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsTUuvXxh?] [-d <dir>] [-e <file>] [-J <ns=URL> ...] [-j <xpath>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsTUuvXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1349,7 +1356,7 @@ static void show_help(void)
 	puts("  -D, --dm                     List data module references.");
 	puts("  -d, --dir                    Directory to search for matches in.");
 	puts("  -E, --epr                    List external pub refs.");
-	puts("  -e, --externalpubs <file>    Use custom .externalpubs file.");
+	puts("  -e, --exec <cmd>             Execute <cmd> for each CSDB object matched.");
 	puts("  -F, --overwrite              Overwrite updated (-U) or tagged (-X) objects.");
 	puts("  -f, --filename               Print the source filename for each reference.");
 	puts("  -G, --icn                    List ICN references.");
@@ -1375,6 +1382,7 @@ static void show_help(void)
 	puts("  -v, --verbose                Verbose output.");
 	puts("  -X, --tag-unmatched          Tag unmatched references.");
 	puts("  -x, --xml                    Output XML report.");
+	puts("  -3, --externalpubs <file>    Use custom .externalpubs file.");
 	puts("  --version                    Show version information.");
 	puts("  <object>                     CSDB object to list references in.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -1397,13 +1405,13 @@ int main(int argc, char **argv)
 	bool inclLineNum = false;
 	char extpubsFname[PATH_MAX] = "";
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:Th?";
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:T3:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
 		{"quiet"        , no_argument      , 0, 'q'},
 		{"content"      , no_argument      , 0, 'c'},
-		{"externalpubs" , required_argument, 0, 'e'},
+		{"externalpubs" , required_argument, 0, '3'},
 		{"omit-issue"   , no_argument      , 0, 'N'},
 		{"all"          , no_argument      , 0, 'a'},
 		{"overwrite"    , no_argument      , 0, 'F'},
@@ -1422,6 +1430,7 @@ int main(int argc, char **argv)
 		{"ignore-issue" , no_argument      , 0, 'i'},
 		{"lineno"       , no_argument      , 0, 'n'},
 		{"epr"          , no_argument      , 0, 'E'},
+		{"exec"         , required_argument, 0, 'e'},
 		{"tag-unmatched", no_argument      , 0, 'X'},
 		{"xml"          , no_argument      , 0, 'x'},
 		{"include-src"  , no_argument      , 0, 's'},
@@ -1456,7 +1465,7 @@ int main(int argc, char **argv)
 			case 'c':
 				contentOnly = true;
 				break;
-			case 'e':
+			case '3':
 				strncpy(extpubsFname, optarg, PATH_MAX - 1);
 				break;
 			case 'N':
@@ -1548,6 +1557,9 @@ int main(int argc, char **argv)
 			case 'T':
 				showObjects |= SHOW_FRG;
 				break;
+			case 'e':
+				execStr = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1565,12 +1577,18 @@ int main(int argc, char **argv)
 		externalPubs = read_xml_doc(extpubsFname);
 	}
 
-	/* Set the functions for printing matched/unmatched refs. */
+	/* Print opening of XML report. */
 	if (xmlOutput) {
-		printMatchedFn = printMatchedXml;
-		printUnmatchedFn = printUnmatchedXml;
 		puts("<?xml version=\"1.0\"?>");
 		printf("<results>");
+	}
+
+	/* Set the functions for printing matched/unmatched refs. */
+	if (execStr) {
+		printMatchedFn = execMatched;
+	} else if (xmlOutput) {
+		printMatchedFn = printMatchedXml;
+		printUnmatchedFn = printUnmatchedXml;
 	} else if (inclSrcFname) {
 		if (inclLineNum) {
 			printMatchedFn = printMatchedSrcLine;
@@ -1603,6 +1621,7 @@ int main(int argc, char **argv)
 	xmlFree(hotspotXPath);
 	xmlFreeNode(hotspotNs);
 	free(listedFiles);
+	free(execStr);
 	xmlFreeDoc(externalPubs);
 	xmlCleanupParser();
 

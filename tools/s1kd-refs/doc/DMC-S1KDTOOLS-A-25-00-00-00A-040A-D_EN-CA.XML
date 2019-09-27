@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="01"/>
+        <issueInfo issueNumber="022" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="09" day="26"/>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change -e option to -3.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -e option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d &lt;dir&gt;] [-e &lt;file&gt;]
-          [-J &lt;ns=URL&gt;] [-j &lt;xpath&gt;] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002"><![CDATA[s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d <dir>] [-e <cmd>]
+          [-J <ns=URL>] [-j <xpath>] [-3 <file>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -91,7 +97,7 @@
             <definitionListItem>
               <listItemTerm>-c, --content</listItemTerm>
               <listItemDefinition>
-                <para>List references in the <verbatimText verbatimStyle="vs12">content</verbatimText> section of a CSDB object only.</para>
+                <para>List references in the <verbatimText verbatimStyle="vs12"><![CDATA[content]]></verbatimText> section of a CSDB object only.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -100,10 +106,10 @@
                 <para>Directory to search for matches to references in. By default, the current directory is used.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-e, --externalpubs &lt;file&gt;</listItemTerm>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Use a custom <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file.</para>
+                <para>Execute a command for each referenced CSDB object matched. The string "{}" is replaced by the current CSDB object file name everywhere it occurs in the arguments to the command.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -224,13 +230,19 @@
             <definitionListItem>
               <listItemTerm>-X, --tag-unmatched</listItemTerm>
               <listItemDefinition>
-                <para>Tag unmatched references with the processing instruction <verbatimText>&lt;?unmatched?&gt;</verbatimText>.</para>
+                <para>Tag unmatched references with the processing instruction <verbatimText><![CDATA[<?unmatched?>]]></verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para>Output a detailed XML report instead of plain text messages.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-3, --externalpubs &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -277,18 +289,18 @@
           </definitionList>
         </para>
         <levelledPara>
-          <title><verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file</title>
-          <para>The <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file contains definitions of external publication references. This can be used to update external publication references in CSDB objects with -U.</para>
+          <title><verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file</title>
+          <para>The <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file contains definitions of external publication references. This can be used to update external publication references in CSDB objects with -U.</para>
           <para>By default, the tool will search the current directory and parent directories for a file named .externalpubs, but any file can be specified by using the -e option.</para>
-          <para>Example of a <verbatimText verbatimStyle="vs02">.externalpubs</verbatimText> file:
-            <verbatimText verbatimStyle="vs11">&lt;externalPubs&gt;
-&lt;externalPubRef&gt;
-&lt;externalPubRefIdent&gt;
-&lt;externalPubCode&gt;ABC&lt;/externalPubCode&gt;
-&lt;externalPubTitle&gt;ABC Manual&lt;/externalPubTitle&gt;
-&lt;/externalPubRefIdent&gt;
-&lt;/externalPubRef&gt;
-&lt;/externalPubs&gt;</verbatimText></para>
+          <para>Example of a <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<externalPubs>
+<externalPubRef>
+<externalPubRefIdent>
+<externalPubCode>ABC</externalPubCode>
+<externalPubTitle>ABC Manual</externalPubTitle>
+</externalPubRefIdent>
+</externalPubRef>
+</externalPubs>]]></verbatimText></para>
           <para>External publication references will be updated whether they are matched to a file or not.</para>
         </levelledPara>
         <levelledPara>
@@ -300,7 +312,7 @@
                 <listItemTerm>SVG</listItemTerm>
                 <listItemDefinition>
                   <para>
-                    <verbatimText verbatimStyle="vs13">@id</verbatimText>
+                    <verbatimText verbatimStyle="vs13"><![CDATA[@id]]></verbatimText>
                   </para>
                 </listItemDefinition>
               </definitionListItem>
@@ -308,15 +320,15 @@
                 <listItemTerm>X3D</listItemTerm>
                 <listItemDefinition>
                   <para>
-                    <verbatimText verbatimStyle="vs13">@DEF</verbatimText>
+                    <verbatimText verbatimStyle="vs13"><![CDATA[@DEF]]></verbatimText>
                   </para>
                 </listItemDefinition>
               </definitionListItem>
             </definitionList>
           </para>
-          <para>If hotspots are identified in a different way in a project's ICNs, a custom XPath expression can be specified with the -j option. In this XPath expression, the variable <verbatimText verbatimStyle="vs01">$id</verbatimText> represents the hotspot APS ID:</para>
+          <para>If hotspots are identified in a different way in a project's ICNs, a custom XPath expression can be specified with the -j option. In this XPath expression, the variable <verbatimText verbatimStyle="vs01"><![CDATA[$id]]></verbatimText> represents the hotspot APS ID:</para>
           <para>
-            <verbatimText verbatimStyle="vs24">$ s1kd-refs -H -j "//*[@attr = $id]" &lt;DM&gt;</verbatimText>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -H -j "//*[@attr = $id]" <DM>]]></verbatimText>
           </para>
         </levelledPara>
       </levelledPara>
@@ -354,10 +366,10 @@
       <levelledPara>
         <title>EXAMPLE</title>
         <para>
-          <verbatimText verbatimStyle="vs24">$ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
 DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
 DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
-ICN-12345-00001-001-01.JPG</verbatimText>
+ICN-12345-00001-001-01.JPG]]></verbatimText>
         </para>
       </levelledPara>
     </description>

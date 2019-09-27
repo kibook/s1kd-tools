@@ -6,8 +6,8 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d <dir>] [-e <file>]
-              [-J <ns=URL>] [-j <xpath>] [<object>...]
+    s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d <dir>] [-e <cmd>]
+              [-J <ns=URL>] [-j <xpath>] [-3 <file>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -46,8 +46,10 @@ List references in the `content` section of a CSDB object only.
 Directory to search for matches to references in. By default, the
 current directory is used.
 
--e, --externalpubs &lt;file&gt;  
-Use a custom `.externalpubs` file.
+-e, --exec &lt;cmd&gt;  
+Execute a command for each referenced CSDB object matched. The string
+"{}" is replaced by the current CSDB object file name everywhere it
+occurs in the arguments to the command.
 
 -F, --overwrite  
 When using the -U or -X options, overwrite the input objects that have
@@ -134,6 +136,9 @@ Tag unmatched references with the processing instruction
 
 -x, --xml  
 Output a detailed XML report instead of plain text messages.
+
+-3, --externalpubs &lt;file&gt;  
+Use a custom `.externalpubs` file.
 
 --version  
 Show version information.

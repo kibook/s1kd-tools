@@ -9,8 +9,8 @@ s1kd\-refs \- Manage references between CSDB objects
 .IP
 .nf
 \f[C]
-s1kd\-refs\ [\-aCcDEFfGHIilmNnoPqRrsTUuvXxh?]\ [\-d\ <dir>]\ [\-e\ <file>]
-\ \ \ \ \ \ \ \ \ \ [\-J\ <ns=URL>]\ [\-j\ <xpath>]\ [<object>...]
+s1kd\-refs\ [\-aCcDEFfGHIilmNnoPqRrsTUuvXxh?]\ [\-d\ <dir>]\ [\-e\ <cmd>]
+\ \ \ \ \ \ \ \ \ \ [\-J\ <ns=URL>]\ [\-j\ <xpath>]\ [\-3\ <file>]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -54,8 +54,10 @@ By default, the current directory is used.
 .RS
 .RE
 .TP
-.B \-e, \-\-externalpubs <file>
-Use a custom \f[C]\&.externalpubs\f[] file.
+.B \-e, \-\-exec <cmd>
+Execute a command for each referenced CSDB object matched.
+The string "{}" is replaced by the current CSDB object file name
+everywhere it occurs in the arguments to the command.
 .RS
 .RE
 .TP
@@ -187,6 +189,11 @@ Tag unmatched references with the processing instruction
 .TP
 .B \-x, \-\-xml
 Output a detailed XML report instead of plain text messages.
+.RS
+.RE
+.TP
+.B \-3, \-\-externalpubs <file>
+Use a custom \f[C]\&.externalpubs\f[] file.
 .RS
 .RE
 .TP
