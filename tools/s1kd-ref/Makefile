@@ -21,9 +21,10 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) xslt.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-xslt.h: ../common/to*.xsl
+xslt.h: ../common/to*.xsl ref.xsl
 	>xslt.h
 	for f in ../common/to*.xsl; do xxd -i "$$f" >> xslt.h; done
+	xxd -i ref.xsl >> xslt.h
 
 .PHONY: docs clean maintainer-clean install uninstall
 

@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.0.0"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1064,6 +1064,54 @@ static xmlNodePtr new_ext_pub(const char *ref, const char *fname, int opts)
 	return epr;
 }
 
+static xmlNodePtr find_ref_type(const char *fname, int opts)
+{
+	xmlDocPtr doc, styledoc, res;
+	xsltStylesheetPtr style;
+	xmlNodePtr node = NULL;
+
+	if (!(doc = read_xml_doc(fname))) {
+		return NULL;
+	}
+
+	styledoc = read_xml_mem((const char *) ref_xsl, ref_xsl_len);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, doc, NULL);
+
+	if (res->children) {
+		const char *ref;
+		xmlNodePtr (*f)(const char *, const char *, int) = NULL;
+
+		ref = (char *) res->children->content;
+
+		if (is_dm_ref(ref)) {
+			f = new_dm_ref;
+		} else if (is_pm_ref(ref)) {
+			f = new_pm_ref;
+		} else if (is_smc_ref(ref)) {
+			f = new_smc_ref;
+		} else if (is_com_ref(ref)) {
+			f = new_com_ref;
+		} else if (is_dml_ref(ref)) {
+			f = new_dml_ref;
+		} else if (is_icn_ref(ref)) {
+			f = new_icn_ref;
+		}
+
+		if (f) {
+			node = f(ref, fname, opts);
+		}
+	}
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+
+	xmlFreeDoc(doc);
+
+	return node;
+}
+
 static void print_ref(const char *src, const char *dst, const char *ref,
 	const char *fname, int opts, bool overwrite, enum issue iss,
 	xmlDocPtr extpubs)
@@ -1086,6 +1134,8 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 	} else if (is_csn_ref(ref)) {
 		f = new_csn_ref;
 	} else if (extpubs && (node = find_ext_pub(extpubs, ref))) {
+		f = NULL;
+	} else if ((node = find_ref_type(fname, opts))) {
 		f = NULL;
 	} else {
 		f = new_ext_pub;
@@ -1333,6 +1383,7 @@ int main(int argc, char **argv)
 	}
 
 	xmlFreeDoc(extpubs);
+	xsltCleanupGlobals();
 	xmlCleanupParser();
 
 	return 0;
