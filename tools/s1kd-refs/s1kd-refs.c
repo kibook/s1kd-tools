@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.0.0"
+#define VERSION "4.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1245,7 +1245,7 @@ static int listReferences(const char *path)
 	}
 
 	if (listSrc) {
-		printMatched(NULL, path, path);
+		printMatchedFn(NULL, path, path);
 	}
 
 	if (!(doc = read_xml_doc(path))) {
