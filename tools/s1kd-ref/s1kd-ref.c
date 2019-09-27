@@ -12,7 +12,7 @@
 #include "xslt.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.1.0"
+#define VERSION "3.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -68,6 +68,11 @@ static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, xmlChar *xpat
 	xmlXPathFreeContext(ctx);
 
 	return first;
+}
+
+static xmlChar *first_xpath_value(xmlDocPtr doc, xmlNodePtr node, xmlChar *xpath)
+{
+	return xmlNodeGetContent(first_xpath_node(doc, node, xpath));
 }
 
 static xmlNodePtr find_or_create_refs(xmlDocPtr doc)
@@ -397,18 +402,39 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		char *s;
 
 		if ((doc = read_xml_doc(fname))) {
-			ref_pm_address = first_xpath_node(doc, NULL, BAD_CAST "//pmAddress");
-			ref_pm_ident = find_child(ref_pm_address, "pmIdent");
-			ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
-			ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
-			ref_pm_issue_date = find_child(ref_pm_address_items, "issueDate");
+			ref_pm_address = first_xpath_node(doc, NULL, BAD_CAST "//pmAddress|//pmaddres");
+
+			if (xmlStrcmp(ref_pm_address->name, BAD_CAST "pmaddres") == 0) {
+				ref_pm_ident = ref_pm_address;
+				ref_pm_address_items = ref_pm_address;
+				ref_pm_title = find_child(ref_pm_address_items, "pmtitle");
+				ref_pm_issue_date = find_child(ref_pm_address_items, "issdate");
+			} else {
+				ref_pm_ident = find_child(ref_pm_address, "pmIdent");
+				ref_pm_address_items = find_child(ref_pm_address, "pmAddressItems");
+				ref_pm_title = find_child(ref_pm_address_items, "pmTitle");
+				ref_pm_issue_date = find_child(ref_pm_address_items, "issueDate");
+			}
 		}
 
 		s = strchr(ref, '_');
 
 		if (optset(opts, OPT_ISSUE)) {
 			if (doc) {
-				issue_info = xmlCopyNode(find_child(ref_pm_ident, "issueInfo"), 1);
+				xmlNodePtr node;
+				xmlChar *issno, *inwork;
+
+				node   = first_xpath_node(doc, ref_pm_ident, BAD_CAST "issueInfo|issno");
+				issno  = first_xpath_value(doc, node, BAD_CAST "@issueNumber|@issno");
+				inwork = first_xpath_value(doc, node, BAD_CAST "@inWork|@inwork");
+				if (!inwork) inwork = xmlStrdup(BAD_CAST "00");
+
+				issue_info = xmlNewNode(NULL, BAD_CAST "issueInfo");
+				xmlSetProp(issue_info, BAD_CAST "issueNumber", issno);
+				xmlSetProp(issue_info, BAD_CAST "inWork", inwork);
+
+				xmlFree(issno);
+				xmlFree(inwork);
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
@@ -423,7 +449,19 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 		if (optset(opts, OPT_LANG)) {
 			if (doc) {
-				language = xmlCopyNode(find_child(ref_pm_ident, "language"), 1);
+				xmlNodePtr node;
+				xmlChar *l, *c;
+
+				node = find_child(ref_pm_ident, "language");
+				l    = first_xpath_value(doc, node, BAD_CAST "@languageIsoCode|@language");
+				c    = first_xpath_value(doc, node, BAD_CAST "@countryIsoCode|@country");
+
+				language = xmlNewNode(NULL, BAD_CAST "language");
+				xmlSetProp(language, BAD_CAST "languageIsoCode", l);
+				xmlSetProp(language, BAD_CAST "countryIsoCode", c);
+
+				xmlFree(l);
+				xmlFree(c);
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
@@ -450,7 +488,8 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 			if (optset(opts, OPT_TITLE)) {
 				if (pm_title) {
-					xmlAddChild(pm_ref_address_items, xmlCopyNode(pm_title, 1));
+					pm_title = xmlAddChild(pm_ref_address_items, xmlCopyNode(pm_title, 1));
+					xmlNodeSetName(pm_title, BAD_CAST "pmTitle");
 				} else {
 					if (verbosity > QUIET) {
 						fprintf(stderr, WRN_PREFIX "Could not read title from publication module: %s\n", ref);
@@ -459,7 +498,8 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 			}
 			if (optset(opts, OPT_DATE)) {
 				if (issue_date) {
-					xmlAddChild(pm_ref_address_items, xmlCopyNode(issue_date, 1));
+					issue_date = xmlAddChild(pm_ref_address_items, xmlCopyNode(issue_date, 1));
+					xmlNodeSetName(issue_date, BAD_CAST "issueDate");
 				} else {
 					if (verbosity > QUIET) {
 						fprintf(stderr, WRN_PREFIX "Could not read date from publication module: %s\n", ref);
@@ -611,18 +651,39 @@ static xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		char *s;
 
 		if ((doc = read_xml_doc(fname))) {
-			ref_dm_address = first_xpath_node(doc, NULL, BAD_CAST "//dmAddress");
-			ref_dm_ident = find_child(ref_dm_address, "dmIdent");
-			ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
-			ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
-			ref_dm_issue_date = find_child(ref_dm_address_items, "issueDate");
+			ref_dm_address = first_xpath_node(doc, NULL, BAD_CAST "//dmAddress|//dmaddres");
+
+			if (xmlStrcmp(ref_dm_address->name, BAD_CAST "dmaddres") == 0) {
+				ref_dm_ident = ref_dm_address;
+				ref_dm_address_items = ref_dm_address;
+				ref_dm_title = find_child(ref_dm_address_items, "dmtitle");
+				ref_dm_issue_date = find_child(ref_dm_address_items, "issdate");
+			} else {
+				ref_dm_ident = find_child(ref_dm_address, "dmIdent");
+				ref_dm_address_items = find_child(ref_dm_address, "dmAddressItems");
+				ref_dm_title = find_child(ref_dm_address_items, "dmTitle");
+				ref_dm_issue_date = find_child(ref_dm_address_items, "issueDate");
+			}
 		}
 
 		s = strchr(ref, '_');
 
 		if (optset(opts, OPT_ISSUE)) {
 			if (doc) {
-				issue_info = xmlCopyNode(find_child(ref_dm_ident, "issueInfo"), 1);
+				xmlNodePtr node;
+				xmlChar *issno, *inwork;
+
+				node   = first_xpath_node(doc, ref_dm_ident, BAD_CAST "issueInfo|issno");
+				issno  = first_xpath_value(doc, node, BAD_CAST "@issueNumber|@issno");
+				inwork = first_xpath_value(doc, node, BAD_CAST "@inWork|@inwork");
+				if (!inwork) inwork = xmlStrdup(BAD_CAST "00");
+
+				issue_info = xmlNewNode(NULL, BAD_CAST "issueInfo");
+				xmlSetProp(issue_info, BAD_CAST "issueNumber", issno);
+				xmlSetProp(issue_info, BAD_CAST "inWork", inwork);
+
+				xmlFree(issno);
+				xmlFree(inwork);
 			} else if (s && isdigit(s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
@@ -637,7 +698,19 @@ static xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 
 		if (optset(opts, OPT_LANG)) {
 			if (doc) {
-				language = xmlCopyNode(find_child(ref_dm_ident, "language"), 1);
+				xmlNodePtr node;
+				xmlChar *l, *c;
+
+				node = find_child(ref_dm_ident, "language");
+				l    = first_xpath_value(doc, node, BAD_CAST "@languageIsoCode|@language");
+				c    = first_xpath_value(doc, node, BAD_CAST "@countryIsoCode|@country");
+
+				language = xmlNewNode(NULL, BAD_CAST "language");
+				xmlSetProp(language, BAD_CAST "languageIsoCode", l);
+				xmlSetProp(language, BAD_CAST "countryIsoCode", c);
+
+				xmlFree(l);
+				xmlFree(c);
 			} else if (s && (s = strchr(s + 1, '_'))) {
 				language = new_language(s);
 			} else {
@@ -651,15 +724,33 @@ static xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		}
 
 		if (optset(opts, OPT_TITLE) || optset(opts, OPT_DATE)) {
-			xmlNodePtr dm_ref_address_items = NULL, dm_title, issue_date;
+			xmlNodePtr dm_ref_address_items = NULL, dm_title = NULL, issue_date = NULL;
 
 			if (doc) {
 				dm_ref_address_items = xmlNewChild(dm_ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
-				dm_title = xmlCopyNode(ref_dm_title, 1);
-				issue_date = xmlCopyNode(ref_dm_issue_date, 1);
-			} else {
-				dm_title = NULL;
-				issue_date = NULL;
+
+				if (optset(opts, OPT_TITLE)) {
+					xmlChar *tech, *info, *infv;
+
+					tech = first_xpath_value(doc, ref_dm_title, BAD_CAST "techName|techname");
+					info = first_xpath_value(doc, ref_dm_title, BAD_CAST "infoName|infoname");
+					infv = first_xpath_value(doc, ref_dm_title, BAD_CAST "infoNameVariant");
+
+					dm_title = xmlNewNode(NULL, BAD_CAST "dmTitle");
+					xmlNewTextChild(dm_title, NULL, BAD_CAST "techName", tech);
+					if (info) xmlNewTextChild(dm_title, NULL, BAD_CAST "infoName", info);
+					if (infv) xmlNewTextChild(dm_title, NULL, BAD_CAST "infoNameVariant", infv);
+
+					xmlFree(tech);
+					xmlFree(info);
+					xmlFree(infv);
+				}
+
+				if (optset(opts, OPT_DATE)) {
+					issue_date = xmlCopyNode(ref_dm_issue_date, 1);
+					xmlNodeSetName(issue_date, BAD_CAST "issueDate");
+				}
+
 			}
 
 			if (optset(opts, OPT_TITLE)) {
