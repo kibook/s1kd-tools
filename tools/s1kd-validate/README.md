@@ -6,7 +6,8 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-x <URI>] [-efloqvh?] [<object>...]
+    s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-efloqvh?]
+                  [<object>...]
 
 DESCRIPTION
 ===========
@@ -44,6 +45,10 @@ Output valid CSDB objects to stdout.
 -q, --quiet  
 Quiet mode. The tool will not output anything to stdout or stderr.
 Success/failure will only be indicated through the exit status.
+
+-s, --schema &lt;path&gt;  
+Validate the objects against the specified schema, rather than the one
+that they reference.
 
 -v, --verbose  
 Verbose mode. Success/failure will be explicitly reported on top of any
