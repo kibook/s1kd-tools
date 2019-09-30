@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.3.1"
+#define VERSION "5.3.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -41,7 +41,7 @@
 #define E_PROPCHECK_VAL ERR_PREFIX "%s: %s is not a defined value of %s %s (line %ld)\n"
 #define E_NESTEDCHECK ERR_PREFIX "%s: %s on line %ld is applicable when %s %s = %s, which is not a subset of the applicability of the parent %s on line %ld\n"
 #define E_NESTEDCHECK_WHOLE ERR_PREFIX "%s: %s on line %ld is applicable when %s %s = %s, which is not a subset of the applicability of the whole object.\n"
-#define E_MAX_OBJECTS "Out of memory\n"
+#define E_MAX_OBJECTS ERR_PREFIX "Out of memory\n"
 
 /* Warning messages. */
 #define W_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
