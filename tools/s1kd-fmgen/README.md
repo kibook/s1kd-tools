@@ -54,7 +54,7 @@ Publication module or s1kd-flatten(1) PM format file to generate
 contents from. If none is specified, the tool will read from stdin.
 
 -p, --param &lt;name&gt;=&lt;value&gt;  
-Pass a parameter to the XSLT specified with the -X option.
+Pass a parameter to the XSLT specified with the -x option.
 
 -t, --type &lt;TYPE&gt;  
 Generate content for this type of front matter when no data modules are

@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="01"/>
+        <issueInfo issueNumber="017" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="10" day="02"/>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -D option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Fix references to old -X option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -119,7 +122,7 @@
             <definitionListItem>
               <listItemTerm>-p, --param &lt;name&gt;=&lt;value&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Pass a parameter to the XSLT specified with the -X option.</para>
+                <para changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0003">Pass a parameter to the XSLT specified with the -x option.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

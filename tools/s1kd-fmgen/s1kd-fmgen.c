@@ -12,7 +12,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.2.0"
+#define VERSION "2.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -448,7 +448,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.D:F:flP:p:t:vX:xh?";
+	const char *sopts = ",.D:F:flP:p:t:vx:h?";
 	struct option lopts[] = {
 		{"version"         , no_argument      , 0, 0},
 		{"help"            , no_argument      , 0, 'h'},
@@ -462,7 +462,7 @@ int main(int argc, char **argv)
 		{"param"           , required_argument, 0, 'p'},
 		{"type"            , required_argument, 0, 't'},
 		{"verbose"         , no_argument      , 0, 'v'},
-		{"xsl"             , required_argument, 0, 'X'},
+		{"xsl"             , required_argument, 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -524,7 +524,7 @@ int main(int argc, char **argv)
 			case 'v':
 				verbose = true;
 				break;
-			case 'X':
+			case 'x':
 				xslpath = strdup(optarg);
 				break;
 			case 'h':
