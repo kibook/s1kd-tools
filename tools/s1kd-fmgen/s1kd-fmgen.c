@@ -12,7 +12,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.2.1"
+#define VERSION "2.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -213,7 +213,9 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 	char *type, *fmxsl = NULL;
 	xmlNodePtr content;
 
-	doc = read_xml_doc(dmpath);
+	if (!(doc = read_xml_doc(dmpath))) {
+		return;
+	}
 
 	if (fmtype) {
 		type = strdup(fmtype);
