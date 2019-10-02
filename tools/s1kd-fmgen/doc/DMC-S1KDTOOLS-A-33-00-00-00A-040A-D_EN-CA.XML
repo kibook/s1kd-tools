@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="00"/>
+        <issueInfo issueNumber="017" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2019" month="10" day="02"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add custom XSL path to .fmtypes file.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,8 +55,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-fmgen [-F &lt;FMTYPES&gt;] [-P &lt;PM&gt;] [-x &lt;XSL&gt; [-p &lt;name&gt;=&lt;val&gt; ...]]
-           [-,.flvh?] (-t &lt;TYPE&gt;|&lt;DM&gt;...)</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
+           [-x <XSL> [-p <name>=<val> ...]] [-,.flvh?]
+           (-t <TYPE>|<DM>...)]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -73,10 +80,10 @@
                 <para>Dump the built-in <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> simple text format.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-h, -?, --help</listItemTerm>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-D, --dump-xsl &lt;TYPE&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Show usage message.</para>
+                <para>Dump the built-in XSLT used to generate the specified type of front matter.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -89,6 +96,12 @@
               <listItemTerm>-f, --overwrite</listItemTerm>
               <listItemDefinition>
                 <para>Overwrite the specified front matter data module files after generating their content.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show usage message.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -188,20 +201,23 @@
         </para>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file</title>
-          <para>This file specifies a list of info codes to associate with a particular type of front matter. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
+          <para>This file specifies a list of info codes to associate with a particular type of front matter.</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001 rfu-0002">Optionally, a path to an XSLT script can be given for each info code, which will be used to generate the front matter instead of the built-in XSLT. The path to an XSLT script will be interpreted relative to the location of the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file (typically, the top directory of the CSDB). The -D option can be used to dump the built-in XSLT for a type of front matter as a starting point for a custom script.</para>
+          <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
           <para>Example of simple text format:</para>
           <para>
-            <verbatimText verbatimStyle="vs24">001    TP
+            <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">001    TP
 009    TOC
 00S    LOEDM
-00U    HIGH</verbatimText>
+00U    HIGH    fm/high.xsl</verbatimText>
           </para>
           <para>Example of XML format:</para>
           <para>
-            <verbatimText verbatimStyle="vs11">&lt;fmtypes&gt;
+            <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">&lt;fmtypes&gt;
 &lt;fm infoCode="001" type="TP"/&gt;
 &lt;fm infoCode="009" type="TOC"/&gt;
 &lt;fm infoCode="00S" type="LOEDM"/&gt;
+&lt;fm infoCode="00U" type="HIGH" xsl="fm/high.xsl"/&gt;
 &lt;/fmtypes&gt;</verbatimText>
           </para>
         </levelledPara>

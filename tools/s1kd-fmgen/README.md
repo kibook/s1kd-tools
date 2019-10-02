@@ -6,8 +6,9 @@ s1kd-fmgen - Generate front matter data module contents
 SYNOPSIS
 ========
 
-    s1kd-fmgen [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]]
-               [-,.flvh?] (-t <TYPE>|<DM>...)
+    s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
+               [-x <XSL> [-p <name>=<val> ...]] [-,.flvh?]
+               (-t <TYPE>|<DM>...)
 
 DESCRIPTION
 ===========
@@ -28,8 +29,9 @@ Dump the built-in `.fmtypes` XML format.
 -., --dump-fmtypes  
 Dump the built-in `.fmtypes` simple text format.
 
--h, -?, --help  
-Show usage message.
+-D, --dump-xsl &lt;TYPE&gt;  
+Dump the built-in XSLT used to generate the specified type of front
+matter.
 
 -F, --fmtypes &lt;FMTYPES&gt;  
 Specify a custom `.fmtypes` file.
@@ -37,6 +39,9 @@ Specify a custom `.fmtypes` file.
 -f, --overwrite  
 Overwrite the specified front matter data module files after generating
 their content.
+
+-h, -?, --help  
+Show usage message.
 
 -l, --list  
 Treat input (stdin or arguments) as lists of front matter data modules
@@ -98,16 +103,25 @@ Do XInclude processing.
 ---------------
 
 This file specifies a list of info codes to associate with a particular
-type of front matter. By default, the program will search for a file
-named `.fmtypes` in the current directory and parent directories, but
-any file can be specified using the -F option.
+type of front matter.
+
+Optionally, a path to an XSLT script can be given for each info code,
+which will be used to generate the front matter instead of the built-in
+XSLT. The path to an XSLT script will be interpreted relative to the
+location of the `.fmtypes` file (typically, the top directory of the
+CSDB). The -D option can be used to dump the built-in XSLT for a type of
+front matter as a starting point for a custom script.
+
+By default, the program will search for a file named `.fmtypes` in the
+current directory and parent directories, but any file can be specified
+using the -F option.
 
 Example of simple text format:
 
     001    TP
     009    TOC
     00S    LOEDM
-    00U    HIGH
+    00U    HIGH    fm/high.xsl
 
 Example of XML format:
 
@@ -115,6 +129,7 @@ Example of XML format:
     <fm infoCode="001" type="TP"/>
     <fm infoCode="009" type="TOC"/>
     <fm infoCode="00S" type="LOEDM"/>
+    <fm infoCode="00U" type="HIGH" xsl="fm/high.xsl"/>
     </fmtypes>
 
 Optional title page elements

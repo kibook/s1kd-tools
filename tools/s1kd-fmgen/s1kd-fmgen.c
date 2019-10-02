@@ -12,7 +12,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.1.0"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -106,11 +106,13 @@ static xmlDocPtr generate_loedm(xmlDocPtr doc)
 	return transform_doc_builtin(doc, xsl_loedm_xsl, xsl_loedm_xsl_len);
 }
 
-static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *xslpath, const char **params)
+static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *fmxsl, const char *xslpath, const char **params)
 {
 	xmlDocPtr res = NULL;
 
-	if (strcasecmp(type, "TP") == 0) {
+	if (fmxsl) {
+		res = transform_doc(doc, fmxsl, NULL);
+	} else if (strcasecmp(type, "TP") == 0) {
 		res = generate_tp(doc);
 	} else if (strcasecmp(type, "TOC") == 0) {
 		res = generate_toc(doc);
@@ -139,6 +141,13 @@ static char *find_fmtype(xmlDocPtr fmtypes, char *incode)
 {
 	xmlChar xpath[256];
 	xmlStrPrintf(xpath, 256, "//fm[@infoCode='%s']/@type", incode);
+	return first_xpath_string(fmtypes, NULL, xpath);
+}
+
+static char *find_fmxsl(xmlDocPtr fmtypes, char *incode)
+{
+	xmlChar xpath[256];
+	xmlStrPrintf(xpath, 256, "//fm[@infoCode='%s']/@xsl", incode);
 	return first_xpath_string(fmtypes, NULL, xpath);
 }
 
@@ -201,7 +210,7 @@ static void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
 {
 	xmlDocPtr doc, res = NULL;
-	char *type;
+	char *type, *fmxsl = NULL;
 	xmlNodePtr content;
 
 	doc = read_xml_doc(dmpath);
@@ -213,7 +222,8 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 
 		incode = first_xpath_string(doc, NULL, BAD_CAST "//@infoCode|//incode");
 
-		type = find_fmtype(fmtypes, incode);
+		type  = find_fmtype(fmtypes, incode);
+		fmxsl = find_fmxsl(fmtypes, incode);
 
 		if (!type) {
 			fprintf(stderr, S_NO_INFOCODE_ERR, incode);
@@ -227,13 +237,14 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 		fprintf(stderr, I_GENERATE, dmpath, type);
 	}
 
-	res = generate_fm_content_for_type(pm, type, xslpath, params);
+	res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params);
 
 	if (strcmp(type, "TP") == 0) {
 		copy_tp_elems(res, doc);
 	}
 
 	xmlFree(type);
+	xmlFree(fmxsl);
 
 	content = first_xpath_node(doc, NULL, BAD_CAST "//content");
 	xmlAddNextSibling(content, xmlCopyNode(xmlDocGetRootElement(res), 1));
@@ -287,6 +298,73 @@ static void dump_fmtypes_txt(void)
 	printf("%.*s", fmtypes_txt_len, fmtypes_txt);
 }
 
+static void dump_builtin_xsl(const char *type)
+{
+	unsigned char *xsl;
+	unsigned int len;
+
+	if (strcasecmp(type, "TP") == 0) {
+		xsl = xsl_tp_xsl;
+		len = xsl_tp_xsl_len;
+	} else if (strcasecmp(type, "TOC") == 0) {
+		xsl = xsl_toc_xsl;
+		len = xsl_toc_xsl_len;
+	} else if (strcasecmp(type, "HIGH") == 0) {
+		xsl = xsl_high_xsl;
+		len = xsl_high_xsl_len;
+	} else if (strcasecmp(type, "LOEDM") == 0) {
+		xsl = xsl_loedm_xsl;
+		len = xsl_loedm_xsl_len;
+	} else {
+		fprintf(stderr, S_BAD_TYPE_ERR, type);
+		exit(EXIT_BAD_TYPE);
+	}
+
+	printf("%.*s", len, xsl);
+}
+
+static void fix_fmxsl_paths(xmlDocPtr doc, const char *path)
+{
+	char *s, *dir;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	s = strdup(path);
+	dir = dirname(s);
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//@xsl", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *old_xsl;
+
+			old_xsl = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+
+			if (old_xsl[0] != '/') {
+				xmlChar *new_xsl;
+				int n;
+
+				n = xmlStrlen(old_xsl) + strlen(dir) + 2;
+				new_xsl = malloc(n * sizeof(xmlChar));
+				xmlStrPrintf(new_xsl, n, "%s/%s", dir, old_xsl);
+
+				xmlNodeSetContent(obj->nodesetval->nodeTab[i], new_xsl);
+
+				free(new_xsl);
+			}
+
+			xmlFree(old_xsl);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+	free(s);
+}
+
 static xmlDocPtr read_fmtypes(const char *path)
 {
 	xmlDocPtr doc;
@@ -303,19 +381,24 @@ static xmlDocPtr read_fmtypes(const char *path)
 		f = fopen(path, "r");
 
 		while (fgets(line, 256, f)) {
-			char *incode, *type;
+			char incode[4] = "", type[32] = "", xsl[1024] = "";
 			xmlNodePtr fm;
+			int n;
 
-			incode = strtok(line, " \t");
-			type   = strtok(NULL, "\r\n");
+			n = sscanf(line, "%3s %31s %1023[^\n]", incode, type, xsl);
 
 			fm = xmlNewChild(root, NULL, BAD_CAST "fm", NULL);
 			xmlSetProp(fm, BAD_CAST "infoCode", BAD_CAST incode);
 			xmlSetProp(fm, BAD_CAST "type", BAD_CAST type);
+			if (n == 3) {
+				xmlSetProp(fm, BAD_CAST "xsl", BAD_CAST xsl);
+			}
 		}
 
 		fclose(f);
 	}
+
+	fix_fmxsl_paths(doc, path);
 
 	return doc;
 }
@@ -335,11 +418,12 @@ static void add_param(xmlNodePtr params, char *s)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]] [-,flvh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]] [-,flvh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
 	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");
 	puts("  -., --dump-fmtypes          Dump the built-in .fmtypes file in simple text format.");
+	puts("  -D, --dump-xsl <TYPE>       Dump the built-in XSLT for a type of front matter.");
 	puts("  -F, --fmtypes <FMTYPES>     Specify .fmtypes file.");
 	puts("  -f, --overwrite             Overwrite input data modules.");
 	puts("  -h, -?, --help              Show usage message.");
@@ -364,12 +448,13 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.F:flP:p:t:vX:xh?";
+	const char *sopts = ",.D:F:flP:p:t:vX:xh?";
 	struct option lopts[] = {
 		{"version"         , no_argument      , 0, 0},
 		{"help"            , no_argument      , 0, 'h'},
 		{"dump-fmtypes-xml", no_argument      , 0, ','},
 		{"dump-fmtypes"    , no_argument      , 0, '.'},
+		{"dump-xsl"        , required_argument, 0, 'D'},
 		{"fmtypes"         , required_argument, 0, 'F'},
 		{"overwrite"       , no_argument      , 0, 'f'},
 		{"list"            , no_argument      , 0, 'l'},
@@ -411,6 +496,9 @@ int main(int argc, char **argv)
 				return 0;
 			case '.':
 				dump_fmtypes_txt();
+				return 0;
+			case 'D':
+				dump_builtin_xsl(optarg);
 				return 0;
 			case 'F':
 				if (!fmtypes) {
@@ -497,7 +585,7 @@ int main(int argc, char **argv)
 		}
 	} else if (fmtype) {
 		xmlDocPtr res;
-		res = generate_fm_content_for_type(pm, fmtype, xslpath, params);
+		res = generate_fm_content_for_type(pm, fmtype, NULL, xslpath, params);
 		save_xml_doc(res, "-");
 		xmlFreeDoc(res);
 	} else if (islist) {
