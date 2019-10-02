@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <!-- Identifier for the annotation capturing the whole PM's applicability. -->
-  <xsl:param name="pm-applic">app-0000</xsl:param>
-  
   <xsl:template match="@*|node()">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
@@ -15,7 +12,7 @@
     <xsl:variable name="issueDate" select="identAndStatusSection/pmAddress/pmAddressItems/issueDate"/>
     <content>
       <referencedApplicGroup>
-        <applic id="{$pm-applic}">
+        <applic id="{generate-id()}">
           <xsl:apply-templates select="identAndStatusSection/pmStatus/applic/*"/>
         </applic>
         <xsl:apply-templates select="content/referencedApplicGroup/applic"/>
@@ -40,6 +37,16 @@
     </content>
   </xsl:template>
 
+  <xsl:template match="applic">
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:attribute name="id">
+        <xsl:value-of select="generate-id()"/>
+      </xsl:attribute>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+
   <xsl:template match="issueInfo" mode="text">
     <xsl:value-of select="@issueNumber"/>
     <xsl:if test="@inWork != '00'">
@@ -61,10 +68,7 @@
     <xsl:for-each select="$pm/identAndStatusSection/pmStatus/reasonForUpdate[@updateHighlight = 1]">
       <frontMatterPmEntry>
         <xsl:apply-templates select="$pm/identAndStatusSection/pmStatus/@issueType"/>
-        <pmRef>
-          <xsl:attribute name="applicRefId">
-            <xsl:value-of select="$pm-applic"/>
-          </xsl:attribute>
+        <pmRef applicRefId="{generate-id($pm)}">
           <pmRefIdent>
             <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmIdent/pmCode"/>
             <xsl:apply-templates select="$pm/identAndStatusSection/pmAddress/pmIdent/issueInfo"/>
@@ -99,10 +103,10 @@
           <xsl:attribute name="applicRefId">
             <xsl:choose>
               <xsl:when test="$last-app">
-                <xsl:value-of select="$last-app/@applicRefId"/>
+                <xsl:value-of select="generate-id(//*[@id = $last-app/@applicRefId])"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="$pm-applic"/>
+                <xsl:value-of select="generate-id(ancestor::pm)"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
