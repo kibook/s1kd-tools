@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "2.1.0"
+#define VERSION "2.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define EXIT_NO_FILE 2
@@ -210,11 +210,11 @@ static xmlDocPtr text_fmtypes_to_xml(const char *path)
 	xmlDocSetRootElement(doc, fmtypes);
 
 	while (fgets(line, 1024, f)) {
-		char code[6], type[64];
+		char code[4] = "", type[32] = "", xsl[1024] = "";
 		int n;
 		xmlNodePtr fm;
 
-		n = sscanf(line, "%5s %63[^\n]", code, type);
+		n = sscanf(line, "%3s %31s %1023[^\n]", code, type, xsl);
 
 		if (n < 2) {
 			continue;
@@ -223,6 +223,9 @@ static xmlDocPtr text_fmtypes_to_xml(const char *path)
 		fm = xmlNewChild(fmtypes, NULL, BAD_CAST "fm", NULL);
 		xmlSetProp(fm, BAD_CAST "infoCode", BAD_CAST code);
 		xmlSetProp(fm, BAD_CAST "type", BAD_CAST type);
+		if (n == 3) {
+			xmlSetProp(fm, BAD_CAST "xsl", BAD_CAST xsl);
+		}
 	}
 
 	fclose(f);

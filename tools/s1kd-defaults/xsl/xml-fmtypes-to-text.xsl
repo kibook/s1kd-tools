@@ -13,6 +13,10 @@
     <xsl:value-of select="@infoCode"/>
     <xsl:text>&#09;</xsl:text>
     <xsl:value-of select="@type"/>
+    <xsl:if test="@xsl">
+      <xsl:text>&#09;</xsl:text>
+      <xsl:value-of select="@xsl"/>
+    </xsl:if>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
 
