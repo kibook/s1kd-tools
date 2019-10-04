@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.0.1"
+#define VERSION "8.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3773,6 +3773,7 @@ int main(int argc, char **argv)
 	bool print_fnames = false;
 	bool rslvcntrs = false;
 	bool rem_unused = false;
+	bool re_applic = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -3780,7 +3781,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:456~H:";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4568~H:";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3841,6 +3842,7 @@ int main(int argc, char **argv)
 		{"list-properties"   , required_argument, 0, 'H'},
 		{"infoname-variant"  , required_argument, 0, 'V'},
 		{"clean-annotations" , no_argument      , 0, '6'},
+		{"reapply"           , no_argument      , 0, '8'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -4043,6 +4045,9 @@ int main(int argc, char **argv)
 				break;
 			case '6':
 				rem_unused = true;
+				break;
+			case '8':
+				re_applic = true;
 				break;
 			case 'H':
 				if (!props_report) {
@@ -4287,6 +4292,10 @@ int main(int argc, char **argv)
 				} else {
 					fprintf(stderr, I_CUSTOMIZE, src);
 				}
+			}
+
+			if (re_applic) {
+				load_applic_from_inst(doc);
 			}
 
 			/* Load the ACT to find the CCT and/or PCT. */

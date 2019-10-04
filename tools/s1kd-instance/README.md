@@ -384,6 +384,10 @@ instance.
 -6, --clean-annotations  
 Remove unused applicability annotations.
 
+-8, --reapply  
+Automatically reapply the applicability of the source object when
+filtering.
+
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances
 that will be updated.
