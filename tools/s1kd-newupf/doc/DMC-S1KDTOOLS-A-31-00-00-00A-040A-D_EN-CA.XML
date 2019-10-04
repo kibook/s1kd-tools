@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="31" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="01"/>
+        <issueInfo issueNumber="016" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="26"/>
+        <issueDate year="2019" month="10" day="04"/>
         <dmTitle>
           <techName>s1kd-newupf(1) | s1kd-tools</techName>
         </dmTitle>
