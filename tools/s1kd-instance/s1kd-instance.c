@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.1.0"
+#define VERSION "8.1.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3694,6 +3694,7 @@ static void show_help(void)
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
+	puts("  -8, --reapply                     Reapply the source object's applicability.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
