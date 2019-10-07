@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.3.0"
+#define VERSION "2.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -26,7 +26,7 @@
 #define S_NO_PM_ERR ERR_PREFIX "No publication module.\n"
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
-#define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s\n"
+#define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s%s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 
@@ -222,7 +222,7 @@ static void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
 {
 	xmlDocPtr doc, res = NULL;
-	char *type, *fmxsl = NULL;
+	char *type, *fmxsl;
 	xmlNodePtr content;
 
 	if (!(doc = read_xml_doc(dmpath))) {
@@ -230,7 +230,8 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 	}
 
 	if (fmtype) {
-		type = strdup(fmtype);
+		type  = strdup(fmtype);
+		fmxsl = NULL;
 	} else {
 		xmlChar *incode, *incodev;
 		xmlNodePtr fm;
@@ -240,13 +241,13 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 
 		fm = find_fm(fmtypes, incode, incodev);
 
-		type  = (char *) xmlGetProp(fm, BAD_CAST "type");
-		fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
-
-		if (!type) {
-			fprintf(stderr, S_NO_INFOCODE_ERR, incode);
+		if (!fm) {
+			fprintf(stderr, S_NO_INFOCODE_ERR, incode, incodev);
 			exit(EXIT_NO_INFOCODE);
 		}
+
+		type  = (char *) xmlGetProp(fm, BAD_CAST "type");
+		fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
 
 		xmlFree(incode);
 		xmlFree(incodev);
