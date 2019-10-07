@@ -62,7 +62,19 @@ specified. Supported types are:
 
 -   HIGH - Highlights
 
+-   LOA - List of abbreviations
+
+-   LOASD - List of applicable specifications and documentation
+
 -   LOEDM - List of effective data modules
+
+-   LOI - List of illustrations
+
+-   LOS - List of symbols
+
+-   LOT - List of terms
+
+-   LOTBL - List of tables
 
 -   TOC - Table of contents
 
@@ -119,17 +131,29 @@ using the -F option.
 Example of simple text format:
 
     001    TP
+    005    LOA
+    006    LOT
+    007    LOS
     009    TOC
+    00A    LOA
     00S    LOEDM
     00U    HIGH    fm/high.xsl
+    00V    LOASD
+    00Z    LOTBL
 
 Example of XML format:
 
     <fmtypes>
     <fm infoCode="001" type="TP"/>
+    <fm infoCode="005" type="LOA"/>
+    <fm infoCode="006" type="LOT"/>
+    <fm infoCode="007" type="LOS"/>
     <fm infoCode="009" type="TOC"/>
+    <fm infoCode="00A" type="LOI"/>
     <fm infoCode="00S" type="LOEDM"/>
     <fm infoCode="00U" type="HIGH" xsl="fm/high.xsl"/>
+    <fm infoCode="00V" type="LOASD"/>
+    <fm infoCode="00Z" type="LOTBL"/>
     </fmtypes>
 
 The info code of each entry in the `.fmtypes` file may also include an

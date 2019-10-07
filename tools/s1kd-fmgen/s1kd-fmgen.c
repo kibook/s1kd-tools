@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.3.1"
+#define VERSION "2.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -88,24 +88,52 @@ static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsign
 	return res;
 }
 
-static xmlDocPtr generate_tp(xmlDocPtr doc)
+static void get_builtin_xsl(const char *type, unsigned char **xsl, unsigned int *len)
 {
-	return transform_doc_builtin(doc, xsl_tp_xsl, xsl_tp_xsl_len);
+	if (strcasecmp(type, "TP") == 0) {
+		*xsl = xsl_tp_xsl;
+		*len = xsl_tp_xsl_len;
+	} else if (strcasecmp(type, "TOC") == 0) {
+		*xsl = xsl_toc_xsl;
+		*len = xsl_toc_xsl_len;
+	} else if (strcasecmp(type, "HIGH") == 0) {
+		*xsl = xsl_high_xsl;
+		*len = xsl_high_xsl_len;
+	} else if (strcasecmp(type, "LOEDM") == 0) {
+		*xsl = xsl_loedm_xsl;
+		*len = xsl_loedm_xsl_len;
+	} else if (strcasecmp(type, "LOA") == 0) {
+		*xsl = xsl_loa_xsl;
+		*len = xsl_loa_xsl_len;
+	} else if (strcasecmp(type, "LOASD") == 0) {
+		*xsl = xsl_loasd_xsl;
+		*len = xsl_loasd_xsl_len;
+	} else if (strcasecmp(type, "LOI") == 0) {
+		*xsl = xsl_loi_xsl;
+		*len = xsl_loi_xsl_len;
+	} else if (strcasecmp(type, "LOS") == 0) {
+		*xsl = xsl_los_xsl;
+		*len = xsl_los_xsl_len;
+	} else if (strcasecmp(type, "LOT") == 0) {
+		*xsl = xsl_lot_xsl;
+		*len = xsl_lot_xsl_len;
+	} else if (strcasecmp(type, "LOTBL") == 0) {
+		*xsl = xsl_lotbl_xsl;
+		*len = xsl_lotbl_xsl_len;
+	} else {
+		fprintf(stderr, S_BAD_TYPE_ERR, type);
+		exit(EXIT_BAD_TYPE);
+	}
 }
 
-static xmlDocPtr generate_toc(xmlDocPtr doc)
+static xmlDocPtr generate_fm(xmlDocPtr doc, const char *type)
 {
-	return transform_doc_builtin(doc, xsl_toc_xsl, xsl_toc_xsl_len);
-}
+	unsigned char *xsl;
+	unsigned int len;
 
-static xmlDocPtr generate_high(xmlDocPtr doc)
-{
-	return transform_doc_builtin(doc, xsl_high_xsl, xsl_high_xsl_len);
-}
+	get_builtin_xsl(type, &xsl, &len);
 
-static xmlDocPtr generate_loedm(xmlDocPtr doc)
-{
-	return transform_doc_builtin(doc, xsl_loedm_xsl, xsl_loedm_xsl_len);
+	return transform_doc_builtin(doc, xsl, len);
 }
 
 static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *fmxsl, const char *xslpath, const char **params)
@@ -114,17 +142,8 @@ static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, c
 
 	if (fmxsl) {
 		res = transform_doc(doc, fmxsl, NULL);
-	} else if (strcasecmp(type, "TP") == 0) {
-		res = generate_tp(doc);
-	} else if (strcasecmp(type, "TOC") == 0) {
-		res = generate_toc(doc);
-	} else if (strcasecmp(type, "HIGH") == 0) {
-		res = generate_high(doc);
-	} else if (strcasecmp(type, "LOEDM") == 0) {
-		res = generate_loedm(doc);
 	} else {
-		fprintf(stderr, S_BAD_TYPE_ERR, type);
-		exit(EXIT_BAD_TYPE);
+		res = generate_fm(doc, type);
 	}
 
 	if (xslpath) {
@@ -323,22 +342,7 @@ static void dump_builtin_xsl(const char *type)
 	unsigned char *xsl;
 	unsigned int len;
 
-	if (strcasecmp(type, "TP") == 0) {
-		xsl = xsl_tp_xsl;
-		len = xsl_tp_xsl_len;
-	} else if (strcasecmp(type, "TOC") == 0) {
-		xsl = xsl_toc_xsl;
-		len = xsl_toc_xsl_len;
-	} else if (strcasecmp(type, "HIGH") == 0) {
-		xsl = xsl_high_xsl;
-		len = xsl_high_xsl_len;
-	} else if (strcasecmp(type, "LOEDM") == 0) {
-		xsl = xsl_loedm_xsl;
-		len = xsl_loedm_xsl_len;
-	} else {
-		fprintf(stderr, S_BAD_TYPE_ERR, type);
-		exit(EXIT_BAD_TYPE);
-	}
+	get_builtin_xsl(type, &xsl, &len);
 
 	printf("%.*s", len, xsl);
 }

@@ -84,7 +84,19 @@ Supported types are:
 .IP \[bu] 2
 HIGH \- Highlights
 .IP \[bu] 2
+LOA \- List of abbreviations
+.IP \[bu] 2
+LOASD \- List of applicable specifications and documentation
+.IP \[bu] 2
 LOEDM \- List of effective data modules
+.IP \[bu] 2
+LOI \- List of illustrations
+.IP \[bu] 2
+LOS \- List of symbols
+.IP \[bu] 2
+LOT \- List of terms
+.IP \[bu] 2
+LOTBL \- List of tables
 .IP \[bu] 2
 TOC \- Table of contents
 .IP \[bu] 2
@@ -161,9 +173,15 @@ Example of simple text format:
 .nf
 \f[C]
 001\ \ \ \ TP
+005\ \ \ \ LOA
+006\ \ \ \ LOT
+007\ \ \ \ LOS
 009\ \ \ \ TOC
+00A\ \ \ \ LOA
 00S\ \ \ \ LOEDM
 00U\ \ \ \ HIGH\ \ \ \ fm/high.xsl
+00V\ \ \ \ LOASD
+00Z\ \ \ \ LOTBL
 \f[]
 .fi
 .PP
@@ -173,9 +191,15 @@ Example of XML format:
 \f[C]
 <fmtypes>
 <fm\ infoCode="001"\ type="TP"/>
+<fm\ infoCode="005"\ type="LOA"/>
+<fm\ infoCode="006"\ type="LOT"/>
+<fm\ infoCode="007"\ type="LOS"/>
 <fm\ infoCode="009"\ type="TOC"/>
+<fm\ infoCode="00A"\ type="LOI"/>
 <fm\ infoCode="00S"\ type="LOEDM"/>
 <fm\ infoCode="00U"\ type="HIGH"\ xsl="fm/high.xsl"/>
+<fm\ infoCode="00V"\ type="LOASD"/>
+<fm\ infoCode="00Z"\ type="LOTBL"/>
 </fmtypes>
 \f[]
 .fi
