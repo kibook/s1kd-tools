@@ -6,13 +6,15 @@
 #include <stdbool.h>
 
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 #include <libxslt/transform.h>
 
 #include "s1kd_tools.h"
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.2.3"
+#define VERSION "2.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -49,9 +51,9 @@ static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar
 	return first;
 }
 
-static char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
+static xmlChar *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
-	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
+	return xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
 static xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
@@ -137,18 +139,28 @@ static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, c
 	return res;
 }
 
-static char *find_fmtype(xmlDocPtr fmtypes, char *incode)
+static xmlNodePtr find_fm(xmlDocPtr fmtypes, const xmlChar *incode, const xmlChar *incodev)
 {
-	xmlChar xpath[256];
-	xmlStrPrintf(xpath, 256, "//fm[@infoCode='%s']/@type", incode);
-	return first_xpath_string(fmtypes, NULL, xpath);
-}
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
 
-static char *find_fmxsl(xmlDocPtr fmtypes, char *incode)
-{
-	xmlChar xpath[256];
-	xmlStrPrintf(xpath, 256, "//fm[@infoCode='%s']/@xsl", incode);
-	return first_xpath_string(fmtypes, NULL, xpath);
+	ctx = xmlXPathNewContext(fmtypes);
+	xmlXPathRegisterVariable(ctx, BAD_CAST "c", xmlXPathNewString(BAD_CAST incode));
+	xmlXPathRegisterVariable(ctx, BAD_CAST "v", xmlXPathNewString(BAD_CAST incodev));
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//fm[starts-with(concat($c,$v),@infoCode)]", ctx);
+
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		node = NULL;
+	} else {
+		node = obj->nodesetval->nodeTab[0];
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	return node;
 }
 
 /* Copy elements from the source TP DM that can't be derived from the PM. */
@@ -220,12 +232,16 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 	if (fmtype) {
 		type = strdup(fmtype);
 	} else {
-		char *incode;
+		xmlChar *incode, *incodev;
+		xmlNodePtr fm;
 
-		incode = first_xpath_string(doc, NULL, BAD_CAST "//@infoCode|//incode");
+		incode  = first_xpath_string(doc, NULL, BAD_CAST "//@infoCode|//incode");
+		incodev = first_xpath_string(doc, NULL, BAD_CAST "//@infoCodeVariant|//incodev");
 
-		type  = find_fmtype(fmtypes, incode);
-		fmxsl = find_fmxsl(fmtypes, incode);
+		fm = find_fm(fmtypes, incode, incodev);
+
+		type  = (char *) xmlGetProp(fm, BAD_CAST "type");
+		fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
 
 		if (!type) {
 			fprintf(stderr, S_NO_INFOCODE_ERR, incode);
@@ -233,6 +249,7 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 		}
 
 		xmlFree(incode);
+		xmlFree(incodev);
 	}
 
 	if (verbose) {
@@ -383,11 +400,11 @@ static xmlDocPtr read_fmtypes(const char *path)
 		f = fopen(path, "r");
 
 		while (fgets(line, 256, f)) {
-			char incode[4] = "", type[32] = "", xsl[1024] = "";
+			char incode[5] = "", type[32] = "", xsl[1024] = "";
 			xmlNodePtr fm;
 			int n;
 
-			n = sscanf(line, "%3s %31s %1023[^\n]", incode, type, xsl);
+			n = sscanf(line, "%4s %31s %1023[^\n]", incode, type, xsl);
 
 			fm = xmlNewChild(root, NULL, BAD_CAST "fm", NULL);
 			xmlSetProp(fm, BAD_CAST "infoCode", BAD_CAST incode);

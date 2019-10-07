@@ -132,6 +132,26 @@ Example of XML format:
     <fm infoCode="00U" type="HIGH" xsl="fm/high.xsl"/>
     </fmtypes>
 
+The info code of each entry in the `.fmtypes` file may also include an
+info code variant. This allows different transformations to be used
+based on the variant:
+
+    <fmtypes>
+    <fm infoCode="00UA" type="HIGH" xsl="fm/high.xsl"/>
+    <fm infoCode="00UB" type="HIGH" xsl="fm/high-updates.xsl"/>
+    <fm infoCode="00U"  type="HIGH"/>
+    </fmtypes>
+
+In the example above, a highlights data module (00U) with info code
+variant A will use an XSL transformation that creates a simple
+highlights, while a highlights data module with info code variant B will
+use an XSL transformation that creates a highlights with update
+instructions. All other variants will use the built-in XSLT.
+
+Entries are chosen in the order they are listed in the `.fmtypes` file.
+An info code which does not specify a variant matches all possible
+variants.
+
 Optional title page elements
 ----------------------------
 
