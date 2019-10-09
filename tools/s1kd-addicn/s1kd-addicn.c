@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 static void show_help(void)
 {
@@ -88,19 +88,20 @@ int main(int argc, char **argv)
 		}
 	}
 
-	doc = read_xml_doc(src);
+	if ((doc = read_xml_doc(src))) {
+		for (i = optind; i < argc; ++i) {
+			add_icn(doc, argv[i], fullpath);
+		}
 
-	for (i = optind; i < argc; ++i) {
-		add_icn(doc, argv[i], fullpath);
+		if (overwrite) {
+			save_xml_doc(doc, src);
+		} else {
+			save_xml_doc(doc, out);
+		}
+
+		xmlFreeDoc(doc);
 	}
 
-	if (overwrite) {
-		save_xml_doc(doc, src);
-	} else {
-		save_xml_doc(doc, out);
-	}
-
-	xmlFreeDoc(doc);
 	free(src);
 	free(out);
 
