@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="05"/>
+        <issueInfo issueNumber="018" inWork="06"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="10" day="11"/>
@@ -53,6 +53,9 @@
       <reasonForUpdate id="rfu-0005" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Correct usage of -t option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0006" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -q option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -64,9 +67,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0005"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0005 rfu-0006"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
            [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
-           [-,.flvh?] [<DM>...]]]></verbatimText>
+           [-,.flqvh?] [<DM>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -139,6 +142,12 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0006">
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Do not print errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-t, --type &lt;TYPE&gt;</listItemTerm>
               <listItemDefinition>
@@ -182,7 +191,7 @@
             <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
-                <para>Verbose output.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0006">Verbose output. Specify multiple times to increase the verbosity.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

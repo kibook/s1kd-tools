@@ -11,7 +11,7 @@ s1kd\-fmgen \- Generate front matter data module contents
 \f[C]
 s1kd\-fmgen\ [\-D\ <TYPE>]\ [\-F\ <FMTYPES>]\ [\-P\ <PM>]
 \ \ \ \ \ \ \ \ \ \ \ [\-p\ <name>=<val>\ ...]\ [\-t\ <TYPE>]\ [\-x\ <XSL>]
-\ \ \ \ \ \ \ \ \ \ \ [\-,.flvh?]\ [<DM>...]
+\ \ \ \ \ \ \ \ \ \ \ [\-,.flqvh?]\ [<DM>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -86,6 +86,12 @@ matched in the \f[C]\&.fmtypes\f[] file or specified by the user with
 the \-t option.
 .RE
 .TP
+.B \-q, \-\-quiet
+Quiet mode.
+Do not print errors.
+.RS
+.RE
+.TP
 .B \-t, \-\-type <TYPE>
 Generate content for this type of front matter.
 Supported types are:
@@ -114,6 +120,7 @@ TP \- Title page
 .TP
 .B \-v, \-\-verbose
 Verbose output.
+Specify multiple times to increase the verbosity.
 .RS
 .RE
 .TP

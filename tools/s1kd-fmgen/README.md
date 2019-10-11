@@ -8,7 +8,7 @@ SYNOPSIS
 
     s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
                [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
-               [-,.flvh?] [<DM>...]
+               [-,.flqvh?] [<DM>...]
 
 DESCRIPTION
 ===========
@@ -64,6 +64,9 @@ and therefore their names should be considered reserved:
 -   `"type"` - The front matter type name (e.g., HIGH) that was matched
     in the `.fmtypes` file or specified by the user with the -t option.
 
+-q, --quiet  
+Quiet mode. Do not print errors.
+
 -t, --type &lt;TYPE&gt;  
 Generate content for this type of front matter. Supported types are:
 
@@ -88,7 +91,7 @@ Generate content for this type of front matter. Supported types are:
 -   TP - Title page
 
 -v, --verbose  
-Verbose output.
+Verbose output. Specify multiple times to increase the verbosity.
 
 -x, --xsl &lt;XSL&gt;  
 Use the specified XSLT script to generate the front matter contents

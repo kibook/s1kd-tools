@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.0.1"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -29,7 +29,7 @@
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 #define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
 
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
@@ -120,7 +120,9 @@ static void get_builtin_xsl(const char *type, unsigned char **xsl, unsigned int 
 		*xsl = xsl_lotbl_xsl;
 		*len = xsl_lotbl_xsl_len;
 	} else {
-		fprintf(stderr, S_BAD_TYPE_ERR, type);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, S_BAD_TYPE_ERR, type);
+		}
 		exit(EXIT_BAD_TYPE);
 	}
 }
@@ -274,7 +276,7 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 			type  = (char *) xmlGetProp(fm, BAD_CAST "type");
 			fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
 		} else {
-			if (verbose) {
+			if (verbosity >= DEBUG) {
 				fprintf(stderr, I_NO_INFOCODE, dmpath, incode, incodev);
 			}
 
@@ -287,7 +289,7 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 	}
 
 	if (type) {
-		if (verbose) {
+		if (verbosity >= VERBOSE) {
 			fprintf(stderr, I_GENERATE, dmpath, type);
 		}
 
@@ -322,7 +324,9 @@ static void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocP
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -477,6 +481,7 @@ static void show_help(void)
 	puts("  -l, --list                  Treat input as list of data modules.");
 	puts("  -P, --pm <PM>               Generate front matter from the specified PM.");
 	puts("  -p, --param <name>=<value>  Pass parameters to the XSLT used to generate the front matter.");
+	puts("  -q, --quiet                 Quiet mode.");
 	puts("  -t, --type <TYPE>           Generate the specified type of front matter.");
 	puts("  -v, --verbose               Verbose output.");
 	puts("  -x, --xsl <XSL>             Override built-in or user-configured XSLT.");
@@ -495,7 +500,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.D:F:flP:p:t:vx:h?";
+	const char *sopts = ",.D:F:flP:p:qt:vx:h?";
 	struct option lopts[] = {
 		{"version"         , no_argument      , 0, 0},
 		{"help"            , no_argument      , 0, 'h'},
@@ -507,6 +512,7 @@ int main(int argc, char **argv)
 		{"list"            , no_argument      , 0, 'l'},
 		{"pm"              , required_argument, 0, 'P'},
 		{"param"           , required_argument, 0, 'p'},
+		{"quiet"           , no_argument      , 0, 'q'},
 		{"type"            , required_argument, 0, 't'},
 		{"verbose"         , no_argument      , 0, 'v'},
 		{"xsl"             , required_argument, 0, 'x'},
@@ -568,11 +574,14 @@ int main(int argc, char **argv)
 				add_param(params_node, optarg);
 				++nparams;
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 't':
 				fmtype = strdup(optarg);
 				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'x':
 				xslpath = strdup(optarg);
@@ -641,7 +650,9 @@ int main(int argc, char **argv)
 	} else if (islist) {
 		generate_fm_content_for_list(pm, NULL, fmtypes, fmtype, overwrite, xslpath, params);
 	} else {
-		fprintf(stderr, S_NO_TYPE_ERR);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, S_NO_TYPE_ERR);
+		}
 		exit(EXIT_NO_TYPE);
 	}
 
