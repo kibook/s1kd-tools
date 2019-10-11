@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.1.0"
+#define VERSION "3.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -469,7 +469,7 @@ static void add_def_param(xmlNodePtr params, const char *s)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>] [-,flvh?] [<DM>...]");
+	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>] [-,flqvh?] [<DM>...]");
 	puts("");
 	puts("Options:");
 	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");
