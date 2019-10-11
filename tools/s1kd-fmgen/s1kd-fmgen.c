@@ -14,7 +14,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "2.4.1"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -72,7 +72,7 @@ static xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **
 	return res;
 }
 
-static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int len)
+static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsigned int len, const char **params)
 {
 	xmlDocPtr styledoc, res;
 	xsltStylesheetPtr style;
@@ -81,7 +81,7 @@ static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsign
 
 	style = xsltParseStylesheetDoc(styledoc);
 
-	res = xsltApplyStylesheet(style, doc, NULL);
+	res = xsltApplyStylesheet(style, doc, params);
 
 	xsltFreeStylesheet(style);
 
@@ -90,34 +90,34 @@ static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsign
 
 static void get_builtin_xsl(const char *type, unsigned char **xsl, unsigned int *len)
 {
-	if (strcasecmp(type, "TP") == 0) {
+	if (strcmp(type, "TP") == 0) {
 		*xsl = xsl_tp_xsl;
 		*len = xsl_tp_xsl_len;
-	} else if (strcasecmp(type, "TOC") == 0) {
+	} else if (strcmp(type, "TOC") == 0) {
 		*xsl = xsl_toc_xsl;
 		*len = xsl_toc_xsl_len;
-	} else if (strcasecmp(type, "HIGH") == 0) {
+	} else if (strcmp(type, "HIGH") == 0) {
 		*xsl = xsl_high_xsl;
 		*len = xsl_high_xsl_len;
-	} else if (strcasecmp(type, "LOEDM") == 0) {
+	} else if (strcmp(type, "LOEDM") == 0) {
 		*xsl = xsl_loedm_xsl;
 		*len = xsl_loedm_xsl_len;
-	} else if (strcasecmp(type, "LOA") == 0) {
+	} else if (strcmp(type, "LOA") == 0) {
 		*xsl = xsl_loa_xsl;
 		*len = xsl_loa_xsl_len;
-	} else if (strcasecmp(type, "LOASD") == 0) {
+	} else if (strcmp(type, "LOASD") == 0) {
 		*xsl = xsl_loasd_xsl;
 		*len = xsl_loasd_xsl_len;
-	} else if (strcasecmp(type, "LOI") == 0) {
+	} else if (strcmp(type, "LOI") == 0) {
 		*xsl = xsl_loi_xsl;
 		*len = xsl_loi_xsl_len;
-	} else if (strcasecmp(type, "LOS") == 0) {
+	} else if (strcmp(type, "LOS") == 0) {
 		*xsl = xsl_los_xsl;
 		*len = xsl_los_xsl_len;
-	} else if (strcasecmp(type, "LOT") == 0) {
+	} else if (strcmp(type, "LOT") == 0) {
 		*xsl = xsl_lot_xsl;
 		*len = xsl_lot_xsl_len;
-	} else if (strcasecmp(type, "LOTBL") == 0) {
+	} else if (strcmp(type, "LOTBL") == 0) {
 		*xsl = xsl_lotbl_xsl;
 		*len = xsl_lotbl_xsl_len;
 	} else {
@@ -126,33 +126,44 @@ static void get_builtin_xsl(const char *type, unsigned char **xsl, unsigned int 
 	}
 }
 
-static xmlDocPtr generate_fm(xmlDocPtr doc, const char *type)
+static xmlDocPtr generate_fm(xmlDocPtr doc, const char *type, const char **params)
 {
 	unsigned char *xsl;
 	unsigned int len;
 
 	get_builtin_xsl(type, &xsl, &len);
 
-	return transform_doc_builtin(doc, xsl, len);
+	return transform_doc_builtin(doc, xsl, len, params);
+}
+
+static void set_def_param(const char **params, int i, const char *val)
+{
+	char *s;
+	s = malloc(strlen(val) + 3);
+	sprintf(s, "'%s'", val);
+	free((char *) params[i]);
+	params[i] = s;
 }
 
 static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *fmxsl, const char *xslpath, const char **params)
 {
 	xmlDocPtr res = NULL;
+	int i = 0;
 
-	if (fmxsl) {
-		res = transform_doc(doc, fmxsl, NULL);
-	} else {
-		res = generate_fm(doc, type);
+	/* Supply values to default parameters. */
+	for (i = 0; params[i]; i += 2) {
+		if (strcmp(params[i], "type") == 0) {
+			set_def_param(params, i + 1, type);
+		}
 	}
 
+	/* Generate contents. */
 	if (xslpath) {
-		xmlDocPtr old;
-
-		old = res;
-		res = transform_doc(old, xslpath, params);
-
-		xmlFreeDoc(old);
+		res = transform_doc(doc, xslpath, params);
+	} else if (fmxsl) {
+		res = transform_doc(doc, fmxsl, params);
+	} else {
+		res = generate_fm(doc, type, params);
 	}
 
 	return res;
@@ -440,9 +451,17 @@ static void add_param(xmlNodePtr params, char *s)
 	xmlSetProp(p, BAD_CAST "value", BAD_CAST v);
 }
 
+static void add_def_param(xmlNodePtr params, const char *s)
+{
+	xmlNodePtr p;
+	p = xmlNewChild(params, NULL, BAD_CAST "param", NULL);
+	xmlSetProp(p, BAD_CAST "name", BAD_CAST s);
+	xmlSetProp(p, BAD_CAST "value", BAD_CAST "");
+}
+
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-x <XSL> [-p <name>=<val> ...]] [-,flvh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-p <name>=<val> ...] [-x <XSL>] [-,flvh?] (-t <TYPE>|<DM>...)");
 	puts("");
 	puts("Options:");
 	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");
@@ -453,10 +472,10 @@ static void show_help(void)
 	puts("  -h, -?, --help              Show usage message.");
 	puts("  -l, --list                  Treat input as list of data modules.");
 	puts("  -P, --pm <PM>               Generate front matter from the specified PM.");
-	puts("  -p, --param <name>=<value>  Pass parameters to the XSLT specified with -X.");
+	puts("  -p, --param <name>=<value>  Pass parameters to the XSLT used to generate the front matter.");
 	puts("  -t, --type <TYPE>           Generate the specified type of front matter.");
 	puts("  -v, --verbose               Verbose output.");
-	puts("  -x, --xsl <XSL>             Transform generated contents.");
+	puts("  -x, --xsl <XSL>             Override built-in or user-configured XSLT.");
 	puts("  --version                   Show version information.");
 	puts("  <DM>                        Generate front matter content based on the specified data modules.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -505,6 +524,9 @@ int main(int argc, char **argv)
 	const char **params = NULL;
 
 	params_node = xmlNewNode(NULL, BAD_CAST "params");
+
+	/* Default parameter placeholders. */
+	add_def_param(params_node, "type"); ++nparams;
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -620,8 +642,8 @@ int main(int argc, char **argv)
 	}
 
 	for (i = 0; i < nparams; ++i) {
-		xmlFree((char *) params[i]);
-		xmlFree((char *) params[i + 1]);
+		xmlFree((char *) params[i * 2]);
+		xmlFree((char *) params[i * 2 + 1]);
 	}
 	free(params);
 

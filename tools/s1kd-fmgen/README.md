@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
-               [-x <XSL> [-p <name>=<val> ...]] [-,.flvh?]
+               [-p <name>=<val> ...] [-x <XSL>] [-,.flvh?]
                (-t <TYPE>|<DM>...)
 
 DESCRIPTION
@@ -54,7 +54,15 @@ Publication module or s1kd-flatten(1) PM format file to generate
 contents from. If none is specified, the tool will read from stdin.
 
 -p, --param &lt;name&gt;=&lt;value&gt;  
-Pass a parameter to the XSLT specified with the -x option.
+Pass a parameter to the XSLT stylesheets used to generate the front
+matter content. Multiple parameters can be specified by using this
+option multiple times.
+
+The following parameters are automatically supplied to any stylesheet,
+and therefore their names should be considered reserved:
+
+-   `"type"` - The front matter type name (e.g., HIGH) that was matched
+    in the `.fmtypes` file or specified by the user with the -t option.
 
 -t, --type &lt;TYPE&gt;  
 Generate content for this type of front matter when no data modules are
@@ -84,11 +92,9 @@ specified. Supported types are:
 Verbose output.
 
 -x, --xsl &lt;XSL&gt;  
-Transform the front matter contents after generating them using the
-specified XSLT. This can be used, for example, to generate content for a
-descriptive schema data module instead, to support older issues of the
-specification, or for types of generated front matter not covered by the
-frontmatter schema.
+Use the specified XSLT script to generate the front matter contents
+instead of the built-in XSLT or the user-configured XSLT from the
+`.fmtypes` file.
 
 --version  
 Show version information.

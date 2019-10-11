@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="02"/>
+        <issueInfo issueNumber="018" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="07"/>
+        <issueDate year="2019" month="10" day="11"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add LOA, LOASD, LOI, LOS, LOT and LOTBL FM types.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of -x and -p options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -56,7 +59,7 @@
         <title>SYNOPSIS</title>
         <para>
           <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
-           [-x <XSL> [-p <name>=<val> ...]] [-,.flvh?]
+           [-p <name>=<val> ...] [-x <XSL>] [-,.flvh?]
            (-t <TYPE>|<DM>...)]]></verbatimText>
         </para>
       </levelledPara>
@@ -119,7 +122,15 @@
             <definitionListItem>
               <listItemTerm>-p, --param &lt;name&gt;=&lt;value&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Pass a parameter to the XSLT specified with the -x option.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Pass a parameter to the XSLT stylesheets used to generate the front matter content. Multiple parameters can be specified by using this option multiple times.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+                  The following parameters are automatically supplied to any stylesheet, and therefore their names should be considered reserved:
+                  <randomList>
+                    <listItem>
+                      <para><verbatimText verbatimStyle="vs14">"type"</verbatimText> - The front matter type name (e.g., HIGH) that was matched in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file or specified by the user with the -t option.</para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -171,7 +182,7 @@
             <definitionListItem>
               <listItemTerm>-x, --xsl &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Transform the front matter contents after generating them using the specified XSLT. This can be used, for example, to generate content for a descriptive schema data module instead, to support older issues of the specification, or for types of generated front matter not covered by the frontmatter schema.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Use the specified XSLT script to generate the front matter contents instead of the built-in XSLT or the user-configured XSLT from the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
