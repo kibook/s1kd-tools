@@ -465,7 +465,7 @@ static void add_def_param(xmlNodePtr params, const char *s)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-p <name>=<val> ...] [-x <XSL>] [-,flvh?] (-t <TYPE>|<DM>...)");
+	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>] [-,flvh?] [<DM>...]");
 	puts("");
 	puts("Options:");
 	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");

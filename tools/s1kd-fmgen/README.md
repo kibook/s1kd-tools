@@ -7,8 +7,8 @@ SYNOPSIS
 ========
 
     s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
-               [-p <name>=<val> ...] [-x <XSL>] [-,.flvh?]
-               (-t <TYPE>|<DM>...)
+               [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
+               [-,.flvh?] [<DM>...]
 
 DESCRIPTION
 ===========
@@ -65,8 +65,7 @@ and therefore their names should be considered reserved:
     in the `.fmtypes` file or specified by the user with the -t option.
 
 -t, --type &lt;TYPE&gt;  
-Generate content for this type of front matter when no data modules are
-specified. Supported types are:
+Generate content for this type of front matter. Supported types are:
 
 -   HIGH - Highlights
 
