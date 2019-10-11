@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="03"/>
+        <issueInfo issueNumber="018" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="10" day="11"/>
@@ -46,6 +46,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Change behaviour of -x and -p options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Ignore non-FM data modules.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -194,7 +197,7 @@
             <definitionListItem>
               <listItemTerm>&lt;DM&gt;...</listItemTerm>
               <listItemDefinition>
-                <para>Front matter data modules to generate content for.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0004">Front matter data modules to generate content for. If no front matter type can be determined for a data module, it will be ignored.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

@@ -100,7 +100,8 @@ instead of the built-in XSLT or the user-configured XSLT from the
 Show version information.
 
 &lt;DM&gt;...  
-Front matter data modules to generate content for.
+Front matter data modules to generate content for. If no front matter
+type can be determined for a data module, it will be ignored.
 
 In addition, the following options enable features of the XML parser
 that are disabled as a precaution by default:

@@ -14,21 +14,20 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
-#define EXIT_NO_INFOCODE 4
 
 #define S_NO_PM_ERR ERR_PREFIX "No publication module.\n"
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
-#define S_NO_INFOCODE_ERR ERR_PREFIX "No FM type associated with info code: %s%s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
+#define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
 
 static bool verbose = false;
 
@@ -271,42 +270,47 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 
 		fm = find_fm(fmtypes, incode, incodev);
 
-		if (!fm) {
-			fprintf(stderr, S_NO_INFOCODE_ERR, incode, incodev);
-			exit(EXIT_NO_INFOCODE);
-		}
+		if (fm) {
+			type  = (char *) xmlGetProp(fm, BAD_CAST "type");
+			fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
+		} else {
+			if (verbose) {
+				fprintf(stderr, I_NO_INFOCODE, dmpath, incode, incodev);
+			}
 
-		type  = (char *) xmlGetProp(fm, BAD_CAST "type");
-		fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
+			type = NULL;
+			fmxsl = NULL;
+		}
 
 		xmlFree(incode);
 		xmlFree(incodev);
 	}
 
-	if (verbose) {
-		fprintf(stderr, I_GENERATE, dmpath, type);
-	}
+	if (type) {
+		if (verbose) {
+			fprintf(stderr, I_GENERATE, dmpath, type);
+		}
 
-	res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params);
+		res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params);
 
-	if (strcmp(type, "TP") == 0) {
-		copy_tp_elems(res, doc);
+		if (strcmp(type, "TP") == 0) {
+			copy_tp_elems(res, doc);
+		}
+
+		content = first_xpath_node(doc, NULL, BAD_CAST "//content");
+		xmlAddNextSibling(content, xmlCopyNode(xmlDocGetRootElement(res), 1));
+		xmlUnlinkNode(content);
+		xmlFreeNode(content);
+
+		if (overwrite) {
+			save_xml_doc(doc, dmpath);
+		} else {
+			save_xml_doc(doc, "-");
+		}
 	}
 
 	xmlFree(type);
 	xmlFree(fmxsl);
-
-	content = first_xpath_node(doc, NULL, BAD_CAST "//content");
-	xmlAddNextSibling(content, xmlCopyNode(xmlDocGetRootElement(res), 1));
-	xmlUnlinkNode(content);
-	xmlFreeNode(content);
-
-	if (overwrite) {
-		save_xml_doc(doc, dmpath);
-	} else {
-		save_xml_doc(doc, "-");
-	}
-
 	xmlFreeDoc(doc);
 	xmlFreeDoc(res);
 }
