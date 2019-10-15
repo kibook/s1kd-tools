@@ -6,7 +6,7 @@ s1kd-fmgen - Generate front matter data module contents
 SYNOPSIS
 ========
 
-    s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
+    s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-I <date>] [-P <PM>]
                [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
                [-,.flqvh?] [<DM>...]
 
@@ -42,6 +42,11 @@ their content.
 
 -h, -?, --help  
 Show usage message.
+
+-I, --date &lt;date&gt;  
+Set the issue date of the generated front matter data modules. This can
+be a specific date in the form of "YYYY-MM-DD", "-" for the current
+date, or "pm" to use the issue date of the publication module.
 
 -l, --list  
 Treat input (stdin or arguments) as lists of front matter data modules

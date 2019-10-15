@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="06"/>
+        <issueInfo issueNumber="018" inWork="07"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="11"/>
+        <issueDate year="2019" month="10" day="15"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -54,7 +54,7 @@
         <simplePara>Correct usage of -t option.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0006" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -q option.</simplePara>
+        <simplePara>Add -I and -q options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -67,7 +67,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0005 rfu-0006"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-P <PM>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0005 rfu-0006"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-I <date>] [-P <PM>]
            [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
            [-,.flqvh?] [<DM>...]]]></verbatimText>
         </para>
@@ -114,6 +114,12 @@
               <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0006">
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue date of the generated front matter data modules. This can be a specific date in the form of "YYYY-MM-DD", "-" for the current date, or "pm" to use the issue date of the publication module.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

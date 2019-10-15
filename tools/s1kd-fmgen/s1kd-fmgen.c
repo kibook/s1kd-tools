@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -14,11 +15,12 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.1.1"
+#define VERSION "3.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 
+#define EXIT_BAD_DATE 1
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
 
@@ -26,6 +28,7 @@
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
+#define E_BAD_DATE ERR_PREFIX "Bad date: %s\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 #define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
 
@@ -250,7 +253,72 @@ static void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 	}
 }
 
-static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
+static void set_issue_date(xmlDocPtr doc, xmlDocPtr pm, const char *issdate)
+{
+	xmlNodePtr dm_issue_date;
+	xmlChar *year, *month, *day;
+
+	if (!(dm_issue_date = first_xpath_node(doc, NULL, BAD_CAST "//issueDate|//issdate"))) {
+		return;
+	}
+
+	if (strcasecmp(issdate, "pm") == 0) {
+		xmlNodePtr pm_issue_date;
+
+		if (!(pm_issue_date = first_xpath_node(pm, NULL, BAD_CAST "//issueDate|//issdate"))) {
+			return;
+		}
+
+		year  = xmlGetProp(pm_issue_date, BAD_CAST "year");
+		month = xmlGetProp(pm_issue_date, BAD_CAST "month");
+		day   = xmlGetProp(pm_issue_date, BAD_CAST "day");
+	} else {
+		year  = malloc(5 * sizeof(xmlChar));
+		month = malloc(3 * sizeof(xmlChar));
+		day   = malloc(3 * sizeof(xmlChar));
+
+		if (strcmp(issdate, "-") == 0) {
+			time_t now;
+			struct tm *local;
+
+			time(&now);
+			local = localtime(&now);
+
+			xmlStrPrintf(year, 5, "%.4d", local->tm_year + 1900);
+			xmlStrPrintf(month, 3, "%.2d", local->tm_mon + 1);
+			xmlStrPrintf(day, 3, "%.2d", local->tm_mday);
+		} else {
+			int n;
+
+			n = sscanf(issdate, "%4s-%2s-%2s", year, month, day);
+
+			if (n != 3) {
+				if (verbosity >= NORMAL) {
+					fprintf(stderr, E_BAD_DATE, issdate);
+				}
+				exit(EXIT_BAD_DATE);
+			}
+		}
+	}
+
+	xmlSetProp(dm_issue_date, BAD_CAST "year", year);
+	xmlSetProp(dm_issue_date, BAD_CAST "month", month);
+	xmlSetProp(dm_issue_date, BAD_CAST "day", day);
+
+	xmlFree(year);
+	xmlFree(month);
+	xmlFree(day);
+}
+
+static void generate_fm_content_for_dm(
+	xmlDocPtr pm,
+	const char *dmpath,
+	xmlDocPtr fmtypes,
+	const char *fmtype,
+	bool overwrite,
+	const char *xslpath,
+	const char **params,
+	const char *issdate)
 {
 	xmlDocPtr doc, res = NULL;
 	char *type, *fmxsl;
@@ -304,6 +372,10 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 		xmlUnlinkNode(content);
 		xmlFreeNode(content);
 
+		if (issdate) {
+			set_issue_date(doc, pm, issdate);
+		}
+
 		if (overwrite) {
 			save_xml_doc(doc, dmpath);
 		} else {
@@ -317,7 +389,15 @@ static void generate_fm_content_for_dm(xmlDocPtr pm, const char *dmpath, xmlDocP
 	xmlFreeDoc(res);
 }
 
-static void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocPtr fmtypes, const char *fmtype, bool overwrite, const char *xslpath, const char **params)
+static void generate_fm_content_for_list(
+	xmlDocPtr pm,
+	const char *path,
+	xmlDocPtr fmtypes,
+	const char *fmtype,
+	bool overwrite,
+	const char *xslpath,
+	const char **params,
+	const char *issdate)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -335,7 +415,7 @@ static void generate_fm_content_for_list(xmlDocPtr pm, const char *path, xmlDocP
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		generate_fm_content_for_dm(pm, line, fmtypes, fmtype, overwrite, xslpath, params);
+		generate_fm_content_for_dm(pm, line, fmtypes, fmtype, overwrite, xslpath, params, issdate);
 	}
 
 	if (path) {
@@ -469,7 +549,7 @@ static void add_def_param(xmlNodePtr params, const char *s)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-P <PM>] [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>] [-,flqvh?] [<DM>...]");
+	puts("Usage: " PROG_NAME " [-D <TYPE>] [-F <FMTYPES>] [-I <date>] [-P <PM>] [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>] [-,flqvh?] [<DM>...]");
 	puts("");
 	puts("Options:");
 	puts("  -,, --dump-fmtypes-xml      Dump the built-in .fmtypes file in XML format.");
@@ -478,6 +558,7 @@ static void show_help(void)
 	puts("  -F, --fmtypes <FMTYPES>     Specify .fmtypes file.");
 	puts("  -f, --overwrite             Overwrite input data modules.");
 	puts("  -h, -?, --help              Show usage message.");
+	puts("  -I, --date <date>           Set the issue date of the generated front matter.");
 	puts("  -l, --list                  Treat input as list of data modules.");
 	puts("  -P, --pm <PM>               Generate front matter from the specified PM.");
 	puts("  -p, --param <name>=<value>  Pass parameters to the XSLT used to generate the front matter.");
@@ -500,7 +581,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = ",.D:F:flP:p:qt:vx:h?";
+	const char *sopts = ",.D:F:fI:lP:p:qt:vx:h?";
 	struct option lopts[] = {
 		{"version"         , no_argument      , 0, 0},
 		{"help"            , no_argument      , 0, 'h'},
@@ -508,6 +589,7 @@ int main(int argc, char **argv)
 		{"dump-fmtypes"    , no_argument      , 0, '.'},
 		{"dump-xsl"        , required_argument, 0, 'D'},
 		{"fmtypes"         , required_argument, 0, 'F'},
+		{"date"            , required_argument, 0, 'I'},
 		{"overwrite"       , no_argument      , 0, 'f'},
 		{"list"            , no_argument      , 0, 'l'},
 		{"pm"              , required_argument, 0, 'P'},
@@ -532,6 +614,7 @@ int main(int argc, char **argv)
 	xmlNodePtr params_node;
 	int nparams = 0;
 	const char **params = NULL;
+	char *issdate = NULL;
 
 	params_node = xmlNewNode(NULL, BAD_CAST "params");
 
@@ -563,6 +646,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				overwrite = true;
+				break;
+			case 'I':
+				issdate = strdup(optarg);
 				break;
 			case 'l':
 				islist = true;
@@ -631,7 +717,7 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		void (*gen_fn)(xmlDocPtr, const char *, xmlDocPtr, const char *,
-			bool, const char *, const char **);
+			bool, const char *, const char **, const char *);
 
 		if (islist) {
 			gen_fn = generate_fm_content_for_list;
@@ -640,7 +726,7 @@ int main(int argc, char **argv)
 		}
 
 		for (i = optind; i < argc; ++i) {
-			gen_fn(pm, argv[i], fmtypes, fmtype, overwrite, xslpath, params);
+			gen_fn(pm, argv[i], fmtypes, fmtype, overwrite, xslpath, params, issdate);
 		}
 	} else if (fmtype) {
 		xmlDocPtr res;
@@ -648,7 +734,7 @@ int main(int argc, char **argv)
 		save_xml_doc(res, "-");
 		xmlFreeDoc(res);
 	} else if (islist) {
-		generate_fm_content_for_list(pm, NULL, fmtypes, fmtype, overwrite, xslpath, params);
+		generate_fm_content_for_list(pm, NULL, fmtypes, fmtype, overwrite, xslpath, params, issdate);
 	} else {
 		if (verbosity >= NORMAL) {
 			fprintf(stderr, S_NO_TYPE_ERR);
@@ -668,6 +754,8 @@ int main(int argc, char **argv)
 	free(pmpath);
 	free(fmtype);
 	free(xslpath);
+
+	xmlFree(issdate);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();
