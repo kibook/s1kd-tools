@@ -44,6 +44,9 @@ Overwrite existing CSDB objects.
 -h, -?, --help  
 Show help/usage message.
 
+-m, --use-remarks  
+Use the remarks for an entry as the remarks for the new CSDB object.
+
 -N, --omit-issue  
 Omit issue/in-work numbers from the filenames of created CSDB objects.
 

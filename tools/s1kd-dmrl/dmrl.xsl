@@ -12,6 +12,7 @@
   <xsl:param name="outdir"/>
   <xsl:param name="defaults"/>
   <xsl:param name="dmtypes"/>
+  <xsl:param name="use-remarks" select="false()"/>
 
   <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -266,6 +267,14 @@
   <xsl:template match="security">
     <xsl:text> -c </xsl:text>
     <xsl:value-of select="@securityClassification|@class"/>
+  </xsl:template>
+
+  <xsl:template match="remarks">
+    <xsl:if test="$use-remarks">
+      <xsl:text> -m "</xsl:text>
+      <xsl:value-of select="simplePara|p"/>
+      <xsl:text>"</xsl:text>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

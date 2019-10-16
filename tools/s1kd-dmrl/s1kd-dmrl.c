@@ -12,7 +12,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.9.1"
+#define VERSION "1.10.0"
 
 static void showHelp(void)
 {
@@ -29,6 +29,7 @@ static void showHelp(void)
 	#endif
 	puts("  -f, --overwrite        Overwrite existing CSDB objects.");
 	puts("  -h, -?, --help         Show usage message.");
+	puts("  -m, --use-remarks      Use the remarks for entries in the objects.");
 	puts("  -N, --omit-issue       Omit issue/inwork numbers.");
 	puts("  -q, --quiet            Don't report errors if objects exist.");
 	puts("  -s, --commands         Output s1kd-new* commands only.");
@@ -62,22 +63,24 @@ int main(int argc, char **argv)
 	char *outDir = NULL;
 	char *defaultsFname = NULL;
 	char *dmtypesFname = NULL;
+	bool use_remarks = false;
 
-	const char *sopts = "D:d:sNfFq$:%:@:vh?";
+	const char *sopts = "D:d:smNfFq$:%:@:vh?";
 	struct option lopts[] = {
-		{"version"   , no_argument      , 0, 0},
-		{"help"      , no_argument      , 0, 'h'},
-		{"defaults"  , required_argument, 0, 'd'},
-		{"dmtypes"   , required_argument, 0, 'D'},
-		{"commands"  , no_argument      , 0, 's'},
-		{"omit-issue", no_argument      , 0, 'N'},
-		{"overwrite" , no_argument      , 0, 'f'},
-		{"fail"      , no_argument      , 0, 'F'},
-		{"quiet"     , no_argument      , 0, 'q'},
-		{"issue"     , required_argument, 0, '$'},
-		{"verbose"   , no_argument      , 0, 'v'},
-		{"templates" , required_argument, 0, '%'},
-		{"out"       , required_argument, 0, '@'},
+		{"version"    , no_argument      , 0, 0},
+		{"help"       , no_argument      , 0, 'h'},
+		{"defaults"   , required_argument, 0, 'd'},
+		{"dmtypes"    , required_argument, 0, 'D'},
+		{"commands"   , no_argument      , 0, 's'},
+		{"use-remarks", no_argument      , 0, 'm'},
+		{"omit-issue" , no_argument      , 0, 'N'},
+		{"overwrite"  , no_argument      , 0, 'f'},
+		{"fail"       , no_argument      , 0, 'F'},
+		{"quiet"      , no_argument      , 0, 'q'},
+		{"issue"      , required_argument, 0, '$'},
+		{"verbose"    , no_argument      , 0, 'v'},
+		{"templates"  , required_argument, 0, '%'},
+		{"out"        , required_argument, 0, '@'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -103,6 +106,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				execute = false;
+				break;
+			case 'm':
+				use_remarks = true;
 				break;
 			case 'N':
 				noIssue = true;
@@ -140,7 +146,7 @@ int main(int argc, char **argv)
 	for (i = optind; i < argc; ++i) {
 		xmlDocPtr in, out;
 		xmlChar *content;
-		const char *params[19];
+		const char *params[21];
 		char iss[8];
 		char *templs = NULL;
 		char *outd = NULL;
@@ -207,7 +213,10 @@ int main(int argc, char **argv)
 			params[17] = "false()";
 		}
 
-		params[18] = NULL;
+		params[18] = "use-remarks";
+		params[19] = use_remarks ? "true()" : "false()";
+
+		params[20] = NULL;
 
 		out = xsltApplyStylesheet(dmrlStylesheet, in, params);
 
