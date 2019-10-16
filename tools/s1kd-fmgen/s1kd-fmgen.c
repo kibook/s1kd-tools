@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.2.0"
+#define VERSION "3.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -23,12 +23,15 @@
 #define EXIT_BAD_DATE 1
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
+#define EXIT_MERGE 4
 
 #define S_NO_PM_ERR ERR_PREFIX "No publication module.\n"
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
 #define S_BAD_TYPE_ERR ERR_PREFIX "Unknown front matter type: %s\n"
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_BAD_DATE ERR_PREFIX "Bad date: %s\n"
+#define E_MERGE_NAME ERR_PREFIX "Failed to update %s: no <%s> element to merge on.\n"
+#define E_MERGE_ELEM ERR_PREFIX "Failed to update %s: no front matter contents generated.\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 #define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
 
@@ -322,7 +325,6 @@ static void generate_fm_content_for_dm(
 {
 	xmlDocPtr doc, res = NULL;
 	char *type, *fmxsl;
-	xmlNodePtr content;
 
 	if (!(doc = read_xml_doc(dmpath))) {
 		return;
@@ -357,6 +359,8 @@ static void generate_fm_content_for_dm(
 	}
 
 	if (type) {
+		xmlNodePtr root;
+
 		if (verbosity >= VERBOSE) {
 			fprintf(stderr, I_GENERATE, dmpath, type);
 		}
@@ -367,10 +371,36 @@ static void generate_fm_content_for_dm(
 			copy_tp_elems(res, doc);
 		}
 
-		content = first_xpath_node(doc, NULL, BAD_CAST "//content");
-		xmlAddNextSibling(content, xmlCopyNode(xmlDocGetRootElement(res), 1));
-		xmlUnlinkNode(content);
-		xmlFreeNode(content);
+		/* Merge the results of the transformation with the original DM
+		 * based on the name of the root element. */
+		if ((root = xmlDocGetRootElement(res))) {
+			xmlXPathContextPtr ctx;
+			xmlXPathObjectPtr obj;
+
+			ctx = xmlXPathNewContext(doc);
+			xmlXPathRegisterVariable(ctx, BAD_CAST "name", xmlXPathNewString(root->name));
+			obj = xmlXPathEvalExpression(BAD_CAST "//*[name()=$name]", ctx);
+
+			if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+				if (verbosity >= NORMAL) {
+					fprintf(stderr, E_MERGE_NAME, dmpath, (char *) root->name);
+				}
+				exit(EXIT_MERGE);
+			} else {
+				xmlAddNextSibling(obj->nodesetval->nodeTab[0], xmlCopyNode(root, 1));
+				xmlUnlinkNode(obj->nodesetval->nodeTab[0]);
+				xmlFreeNode(obj->nodesetval->nodeTab[0]);
+				obj->nodesetval->nodeTab[0] = NULL;
+			}
+
+			xmlXPathFreeObject(obj);
+			xmlXPathFreeContext(ctx);
+		} else {
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_MERGE_ELEM, dmpath);
+			}
+			exit(EXIT_MERGE);
+		}
 
 		if (issdate) {
 			set_issue_date(doc, pm, issdate);

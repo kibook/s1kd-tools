@@ -198,6 +198,25 @@ module, optional elements which cannot be derived from the publication
 module (such as the product illustration or bar code) will be copied
 from the source data module when updating it.
 
+EXIT STATUS
+===========
+
+0  
+No errors.
+
+1  
+The date specified with -I is invalid.
+
+2  
+No front matter types were specified.
+
+3  
+An unknown front matter type was specified.
+
+4  
+The resulting front matter content could not be merged in to a data
+module.
+
 EXAMPLE
 =======
 
