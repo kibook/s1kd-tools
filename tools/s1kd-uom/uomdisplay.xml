@@ -379,6 +379,7 @@
     <uom name="N/m3"> N/m<superScript>3</superScript></uom>
     <uom name="N/mm2"> N/mm<superScript>2</superScript></uom>
     <uom name="N4/kg.m7"> N<superScript>4</superScript>/kg.m7</uom>
+    <uom name="nautmi"> nmi</uom>
     <uom name="Pa.s/m3"> Pa.s/m<superScript>3</superScript></uom>
     <uom name="Pa.s2/m3"> Pa.s<superScript>2</superScript>/m<superScript>3</superScript></uom>
     <uom name="Pa/m3"> Pa/m<superScript>3</superScript></uom>
