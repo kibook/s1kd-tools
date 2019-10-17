@@ -21,8 +21,10 @@
   <convert from="in3" to="in3"/>
   <convert from="kg" to="kg"/>
   <convert from="km" to="km"/>
+  <convert from="km/h" to="km/h"/>
   <convert from="km2" to="km2"/>
   <convert from="km3" to="km3"/>
+  <convert from="knot" to="knot"/>
   <convert from="lbm" to="lbm"/>
   <convert from="m" to="m"/>
   <convert from="m2" to="m2"/>
@@ -30,6 +32,7 @@
   <convert from="mL" to="mL"/>
   <convert from="mg" to="mg"/>
   <convert from="mi" to="mi"/>
+  <convert from="mi/h" to="mi/h"/>
   <convert from="mi2" to="mi2"/>
   <convert from="mi3" to="mi3"/>
   <convert from="mm" to="mm"/>
@@ -141,6 +144,8 @@
   <convert from="km" to="mm" formula="$value * 1e+6"/>
   <convert from="km" to="nautmi" formula="$value div 1.852"/>
   <convert from="km" to="yd" formula="$value * 1093.613"/>
+  <convert from="km/h" to="knot" formula="$value div 1.852"/>
+  <convert from="km/h" to="mi/h" formula="$value div 1.609"/>
   <convert from="km2" to="cm2" formula="$value * 1e+10"/>
   <convert from="km2" to="ft2" formula="$value * 1.076e+7"/>
   <convert from="km2" to="in2" formula="$value * 1.55e+9"/>
@@ -155,6 +160,8 @@
   <convert from="km3" to="mi3" formula="$value div 4.168"/>
   <convert from="km3" to="mm3" formula="$value * 1e+18"/>
   <convert from="km3" to="yd3" formula="$value * 1.308e+9"/>
+  <convert from="knot" to="km/h" formula="$value * 1.852"/>
+  <convert from="knot" to="mi/h" formula="$value * 1.151"/>
   <convert from="lbm" to="g" formula="$value * 453.592"/>
   <convert from="lbm" to="kg" formula="$value div 2.205"/>
   <convert from="lbm" to="mg" formula="$value * 453592.37"/>
@@ -196,6 +203,8 @@
   <convert from="mi" to="mm" formula="$value * 1609344"/>
   <convert from="mi" to="nautmi" formula="$value div 1.151"/>
   <convert from="mi" to="yd" formula="$value * 1760"/>
+  <convert from="mi/h" to="km/h" formula="$value * 1.609"/>
+  <convert from="mi/h" to="knot" formula="$value div 1.151"/>
   <convert from="mi2" to="cm2" formula="$value * 2.59e+10"/>
   <convert from="mi2" to="ft2" formula="$value * 2.788e+7"/>
   <convert from="mi2" to="in2" formula="$value * 4.014e+9"/>

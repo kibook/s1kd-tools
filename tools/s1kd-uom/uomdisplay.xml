@@ -241,6 +241,7 @@
     <uom name="km3"> km<superScript>3</superScript></uom>
     <uom name="kN.m2"> kN.m<superScript>2</superScript></uom>
     <uom name="kN/m2"> kN/m<superScript>2</superScript></uom>
+    <uom name="knot"> kn</uom>
     <uom name="kPa2"> kPa<superScript>2</superScript></uom>
     <uom name="kPa2/cP"> kPa<superScript>2</superScript>/cP</uom>
     <uom name="kPa2/kcP"> kPa<superScript>2</superScript>/kcP</uom>
