@@ -1383,7 +1383,7 @@
   <xs:complexType name="convertElemType">
     <xs:attribute ref="from" use="required"/>
     <xs:attribute ref="to" use="required"/>
-    <xs:attribute ref="formula" use="required"/>
+    <xs:attribute ref="formula"/>
     <xs:attribute ref="format"/>
   </xs:complexType>
   <xs:element name="uom" type="uomElemType"/>
