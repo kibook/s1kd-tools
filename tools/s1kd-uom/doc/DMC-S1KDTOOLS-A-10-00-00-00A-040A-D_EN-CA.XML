@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="01"/>
+        <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="10" day="18"/>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Allow use of XSLT in .uomdisplay for complex UOM display.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add currency configuration.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -283,15 +286,25 @@ bolt.&lt;/para&gt;</verbatimText>
           <para>Custom formats for values or UOMs can be defined in the <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file. By default, the tool will search the current directory and parent directories for a file named <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText>, but any file can be specified by using the -P option.</para>
           <para>Example of a <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file:</para>
           <para>
-            <verbatimText verbatimStyle="vs11">&lt;uomDisplay&gt;
-&lt;format name="custom" decimalSeparator="," groupingSeparator="."/&gt;
-&lt;uoms&gt;
-&lt;uom name="cm"&gt; cm&lt;/uom&gt;
-&lt;uom name="cm2"&gt; cm&lt;superScript&gt;2&lt;/superScript&gt;&lt;/uom&gt;
-&lt;/uoms&gt;
-&lt;/uomDisplay&gt;</verbatimText>
+            <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<uomDisplay>
+<format name="custom" decimalSeparator="," groupingSeparator="."/>
+<uoms>
+<uom name="cm"> cm</uom>
+<uom name="cm2"> cm<superScript>2</superScript></uom>
+</uoms>
+<currencies>
+<currency name="CAD">
+<prefix>$</prefix>
+<postfix> CAD</postfix>
+</currency>
+<currency name="GBP">
+<prefix>£</prefix>
+<postfix> GBP</postfix>
+</currency>
+</currencies>
+</uomDisplay>]]></verbatimText>
           </para>
-          <para>Units of measure that are not defined will be presented as their name (e.g., "cm2") separated from the value by a space.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Units of measure and currencies that are not defined will be presented as their name (e.g., "cm2") separated from the value by a space.</para>
           <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
             More complex UOM display, such as pluralization of units of measure, can be accomplished with embedded XSLT in the <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file:
             <verbatimText verbatimStyle="vs11"><![CDATA[<uoms
@@ -477,6 +490,11 @@ quantityTypeSpecifics="USD"&gt;7.36&lt;/quantity&gt;</verbatimText>
                   <verbatimText verbatimStyle="vs12">&lt;uoms&gt;</verbatimText>
                 </para>
               </listItem>
+              <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;currencies&gt;</verbatimText>
+                </para>
+              </listItem>
             </randomList>
           </para>
         </levelledPara>
@@ -623,7 +641,68 @@ quantityTypeSpecifics="USD"&gt;7.36&lt;/quantity&gt;</verbatimText>
           <para>
             <emphasis>Child elements:</emphasis>
           </para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The element &lt;uom&gt; may contain mixed content, which will be used for the display of the unit of measure. This can include XSLT elements, which allows for handling complex cases of UOM display, such as pluralization.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The element <verbatimText verbatimStyle="vs12">&lt;uom&gt;</verbatimText> may contain mixed content, which will be used for the display of the unit of measure. This can include XSLT elements, which allows for handling complex cases of UOM display, such as pluralization.</para>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+          <title>Currencies</title>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;currencies&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;currency&gt;</verbatimText>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;currencies&gt;</verbatimText> may also contain arbitrary XSLT elements which will be processed for all currencies.</para>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+          <title>Display of a currency</title>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;currency&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">name</verbatimText> (M), the name of the currency.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;prefix&gt;</verbatimText>, text placed before the currency value.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;postfix&gt;</verbatimText>, text placed after the currency value.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The child elements of <verbatimText verbatimStyle="vs12">&lt;currency&gt;</verbatimText> may contain mixed content, which will be used for the display of the unit of measure. This can include XSLT elements, which allows for handling complex cases of currency display.</para>
         </levelledPara>
       </levelledPara>
     </description>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <uomDisplay>
   <format name="SI" decimalSeparator="," groupingSeparator=" "/>
   <format name="euro" decimalSeparator="," groupingSeparator="."/>
@@ -429,4 +429,437 @@
     <uom name="yd2"> yd<superScript>2</superScript></uom>
     <uom name="yd3"> yd<superScript>3</superScript></uom>
   </uoms>
+  <!--<currencies>
+    <currency name="AFN">
+      <prefix>؋</prefix>
+      <postfix> AFN</postfix>
+    </currency>
+    <currency name="ARS">
+      <prefix>$</prefix>
+      <postfix> ARS</postfix>
+    </currency>
+    <currency name="AWG">
+      <prefix>ƒ</prefix>
+      <postfix> AWG</postfix>
+    </currency>
+    <currency name="AUD">
+      <prefix>$</prefix>
+      <postfix> AUD</postfix>
+    </currency>
+    <currency name="AZN">
+      <prefix>₼</prefix>
+      <postfix> AZN</postfix>
+    </currency>
+    <currency name="BSD">
+      <prefix>$</prefix>
+      <postfix> BSD</postfix>
+    </currency>
+    <currency name="BBD">
+      <prefix>$</prefix>
+      <postfix> BBD</postfix>
+    </currency>
+    <currency name="BYN">
+      <prefix>Br</prefix>
+      <postfix>BYN</postfix>
+    </currency>
+    <currency name="BZD">
+      <prefix>BZ$</prefix>
+      <postfix> BZD</postfix>
+    </currency>
+    <currency name="BMD">
+      <prefix>$</prefix>
+      <postfox> BMD</postfox>
+    </currency>
+    <currency name="BOB">
+      <prefix>$b</prefix>
+      <postfix> BOB</postfix>
+    </currency>
+    <currency name="BAM">
+      <prefix>KM</prefix>
+      <postfix> BAM</postfix>
+    </currency>
+    <currency name="BWP">
+      <prefix>P</prefix>
+      <postfix> BWP</postfix>
+    </currency>
+    <currency name="BGN">
+      <prefix>лв</prefix>
+      <postfix> BGN</postfix>
+    </currency>
+    <currency name="BRL">
+      <prefix>R$</prefix>
+      <postfix> BRL</postfix>
+    </currency>
+    <currency name="BND">
+      <prefix>$</prefix>
+      <postfix> BND</postfix>
+    </currency>
+    <currency name="KHR">
+      <prefix>៛</prefix>
+      <postfix> KHR</postfix>
+    </currency>
+    <currency name="CAD">
+      <prefix>$</prefix>
+      <postfix> CAD</postfix>
+    </currency>
+    <currency name="KYD">
+      <prefix>$</prefix>
+      <postfix> KYD</postfix>
+    </currency>
+    <currency name="CLP">
+      <prefix>$</prefix>
+      <postfix> CLP</postfix>
+    </currency>
+    <currency name="CNY">
+      <prefix>¥</prefix>
+      <postfix> CNY</postfix>
+    </currency>
+    <currency name="COP">
+      <prefix>$</prefix>
+      <postfix> COP</postfix>
+    </currency>
+    <currency name="CRC">
+      <prefix>₡</prefix>
+      <postfix> CRC</postfix>
+    </currency>
+    <currency name="HRK">
+      <prefix>kn</prefix>
+      <postfix> HRK</postfix>
+    </currency>
+    <currency name="CUP">
+      <prefix>₱</prefix>
+      <postfix> CUP</postfix>
+    </currency>
+    <currency name="CZK">
+      <prefix>Kč</prefix>
+      <postfix> CZK</postfix>
+    </currency>
+    <currency name="DKK">
+      <prefix>kr</prefix>
+      <postfix> DKK</postfix>
+    </currency>
+    <currency name="DOP">
+      <prefix>RD$</prefix>
+      <postfix> DOP</postfix>
+    </currency>
+    <currency name="XCD">
+      <prefix>$</prefix>
+      <postfix> XCD</postfix>
+    </currency>
+    <currency name="EGP">
+      <prefix>£</prefix>
+      <postfix> EGP</postfix>
+    </currency>
+    <currency name="SVC">
+      <prefix>$</prefix>
+      <postfix> SVC</postfix>
+    </currency>
+    <currency name="EUR">
+      <prefix>€</prefix>
+      <postfix> EUR</postfix>
+    </currency>
+    <currency name="FKP">
+      <prefix>£</prefix>
+      <postfix> FKP</postfix>
+    </currency>
+    <currency name="FJD">
+      <prefix>$</prefix>
+      <postfix> FJD</postfix>
+    </currency>
+    <currency name="GHS">
+      <prefix>¢</prefix>
+      <postfix> GHS</postfix>
+    </currency>
+    <currency name="GIP">
+      <prefix>£</prefix>
+      <postfix> GIP</postfix>
+    </currency>
+    <currency name="GTQ">
+      <prefix>Q</prefix>
+      <postfix> GTQ</postfix>
+    </currency>
+    <currency name="GGP">
+      <prefix>£</prefix>
+      <postfix> GGP</postfix>
+    </currency>
+    <currency name="GYD">
+      <prefix>$</prefix>
+      <postfix> GYD</postfix>
+    </currency>
+    <currency name="HNL">
+      <prefix>L</prefix>
+      <postfix> HNL</postfix>
+    </currency>
+    <currency name="HKD">
+      <prefix>$</prefix>
+      <postfix> HKD</postfix>
+    </currency>
+    <currency name="HUF">
+      <prefix>Ft</prefix>
+      <postfix> HUF</postfix>
+    </currency>
+    <currency name="ISK">
+      <prefix>kr</prefix>
+      <postfix> ISK</postfix>
+    </currency>
+    <currency name="INR">
+      <prefix>₹</prefix>
+      <postfix> INR</postfix>
+    </currency>
+    <currency name="IDR">
+      <prefix>Rp</prefix>
+      <postfix> IDR</postfix>
+    </currency>
+    <currency name="IRR">
+      <prefix>﷼</prefix>
+      <postfix> IRR</postfix>
+    </currency>
+    <currency name="IMP">
+      <prefix>£</prefix>
+      <postfix> IMP</postfix>
+    </currency>
+    <currency name="ILS">
+      <prefix>₪</prefix>
+      <postfix> ILS</postfix>
+    </currency>
+    <currency name="JMD">
+      <prefix>J$</prefix>
+      <postfix> JMD</postfix>
+    </currency>
+    <currency name="JPY">
+      <prefix>¥</prefix>
+      <postfix> JPY</postfix>
+    </currency>
+    <currency name="JEP">
+      <prefix>£</prefix>
+      <postfix> JEP</postfix>
+    </currency>
+    <currency name="KZT">
+      <prefix>лв</prefix>
+      <postfix> KZT</postfix>
+    </currency>
+    <currency name="KPW">
+      <prefix>₩</prefix>
+      <postfix> KPW</postfix>
+    </currency>
+    <currency name="KRW">
+      <prefix>₩</prefix>
+      <postfix> KRW</postfix>
+    </currency>
+    <currency name="KGS">
+      <prefix>лв</prefix>
+      <postfix> KGS</postfix>
+    </currency>
+    <currency name="LAK">
+      <prefix>₭</prefix>
+      <postfix> LAK</postfix>
+    </currency>
+    <currency name="LBP">
+      <prefix>£</prefix>
+      <postfix> LBP</postfix>
+    </currency>
+    <currency name="LRD">
+      <prefix>$</prefix>
+      <postfix> LRD</postfix>
+    </currency>
+    <currency name="MKD">
+      <prefix>ден</prefix>
+      <postfix> MKD</postfix>
+    </currency>
+    <currency name="MYR">
+      <prefix>RM</prefix>
+      <postfix> MYR</postfix>
+    </currency>
+    <currency name="MUR">
+      <prefix>₨</prefix>
+      <postfix> MUR</postfix>
+    </currency>
+    <currency name="MXN">
+      <prefix>$</prefix>
+      <postfix> MXN</postfix>
+    </currency>
+    <currency name="MNT">
+      <prefix>₮</prefix>
+      <postfix> MNT</postfix>
+    </currency>
+    <currency name="MZN">
+      <prefix>MT</prefix>
+      <postfix> MZN</postfix>
+    </currency>
+    <currency name="NAD">
+      <prefix>$</prefix>
+      <postfix> NAD</postfix>
+    </currency>
+    <currency name="NPR">
+      <prefix>₨</prefix>
+      <postfix> NPR</postfix>
+    </currency>
+    <currency name="ANG">
+      <prefix>ƒ</prefix>
+      <postfix> ANG</postfix>
+    </currency>
+    <currency name="NZD">
+      <prefix>$</prefix>
+      <postfix> NZD</postfix>
+    </currency>
+    <currency name="NIO">
+      <prefix>C$</prefix>
+      <postfix> NIO</postfix>
+    </currency>
+    <currency name="NGN">
+      <prefix>₦</prefix>
+      <postfix> NGN</postfix>
+    </currency>
+    <currency name="NOK">
+      <prefix>kr</prefix>
+      <postfix> NOK</postfix>
+    </currency>
+    <currency name="OMR">
+      <prefix>﷼</prefix>
+      <postfix> OMR</postfix>
+    </currency>
+    <currency name="PKR">
+      <prefix>₨</prefix>
+      <postfix> PKR</postfix>
+    </currency>
+    <currency name="PAB">
+      <prefix>B/.</prefix>
+      <postfix> PAB</postfix>
+    </currency>
+    <currency name="PYG">
+      <prefix>Gs</prefix>
+      <postfix> PYG</postfix>
+    </currency>
+    <currency name="PEN">
+      <prefix>S/.</prefix>
+      <postfix> PEN</postfix>
+    </currency>
+    <currency name="PHP">
+      <prefix>₱</prefix>
+      <postfix> PHP</postfix>
+    </currency>
+    <currency name="PLN">
+      <prefix>zł</prefix>
+      <postfix> PLN</postfix>
+    </currency>
+    <currency name="QAR">
+      <prefix>﷼</prefix>
+      <postfix> QAR</postfix>
+    </currency>
+    <currency name="RON">
+      <prefix>lei</prefix>
+      <prefix> RON</prefix>
+    </currency>
+    <currency name="RUB">
+      <prefix>₽</prefix>
+      <postfix> RUB</postfix>
+    </currency>
+    <currency name="SHP">
+      <prefix>£</prefix>
+      <postfix> SHP</postfix>
+    </currency>
+    <currency name="SAR">
+      <prefix>﷼</prefix>
+      <postfix> SAR</postfix>
+    </currency>
+    <currency name="RSD">
+      <prefix>дин.</prefix>
+      <postfix> RSD</postfix>
+    </currency>
+    <currency name="SCR">
+      <prefix>₨</prefix>
+      <postfix> SCR</postfix>
+    </currency>
+    <currency name="SGD">
+      <prefix>$</prefix>
+      <postfix> SGD</postfix>
+    </currency>
+    <currency name="SBD">
+      <prefix>$</prefix>
+      <postfix> SBD</postfix>
+    </currency>
+    <currency name="SOS">
+      <prefix>S</prefix>
+      <postfix> SOS</postfix>
+    </currency>
+    <currency name="ZAR">
+      <prefix>R</prefix>
+      <postfix> ZAR</postfix>
+    </currency>
+    <currency name="LKR">
+      <prefix>₨</prefix>
+      <postfix> LKR</postfix>
+    </currency>
+    <currency name="SEK">
+      <prefix>kr</prefix>
+      <postfix> SEK</postfix>
+    </currency>
+    <currency name="CHF">
+      <postfix> CHF</postfix>
+    </currency>
+    <currency name="SRD">
+      <prefix>$</prefix>
+      <postfix> SRD</postfix>
+    </currency>
+    <currency name="SYP">
+      <prefix>£</prefix>
+      <postfix> SYP</postfix>
+    </currency>
+    <currency name="TWD">
+      <prefix>NT$</prefix>
+      <postfix> TWD</postfix>
+    </currency>
+    <currency name="THB">
+      <prefix>฿</prefix>
+      <postfix> THB</postfix>
+    </currency>
+    <currency name="TTD">
+      <prefix>TT$</prefix>
+      <postfix> TTD</postfix>
+    </currency>
+    <currency name="TRY">
+      <prefix>₺</prefix>
+      <postfix> TRY</postfix>
+    </currency>
+    <currency name="TVD">
+      <prefix>$</prefix>
+      <postfix> TVD</postfix>
+    </currency>
+    <currency name="UAH">
+      <prefix>₴</prefix>
+      <postfix> UAH</postfix>
+    </currency>
+    <currency name="GBP">
+      <prefix>£</prefix>
+      <postfix> GBP</postfix>
+    </currency>
+    <currency name="USD">
+      <prefix>$</prefix>
+      <postfix> USD</postfix>
+    </currency>
+    <currency name="UYU">
+      <prefix>$U</prefix>
+      <postfix> UYU</postfix>
+    </currency>
+    <currency name="UZS">
+      <prefix>лв</prefix>
+      <postfix> UZS</postfix>
+    </currency>
+    <currency name="VEF">
+      <prefix>Bs</prefix>
+      <postfix> VEF</postfix>
+    </currency>
+    <currency name="VND">
+      <prefix>₫</prefix>
+      <postfix> VND</postfix>
+    </currency>
+    <currency name="YER">
+      <prefix>﷼</prefix>
+      <postfix> YER</postfix>
+    </currency>
+    <currency name="ZWD">
+      <prefix>Z$</prefix>
+      <postfix> ZWD</postfix>
+    </currency>
+  </currencies>-->
 </uomDisplay>

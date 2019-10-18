@@ -280,21 +280,62 @@
           </xsl:element>
         </xsl:element>
       </xsl:element>
-      <xsl:apply-templates select="uoms"/>
+      <xsl:choose>
+        <xsl:when test="uoms">
+          <xsl:apply-templates select="uoms"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:element name="xsl:template">
+            <xsl:attribute name="match">@quantityUnitOfMeasure</xsl:attribute>
+            <xsl:element name="xsl:text">
+              <xsl:text> </xsl:text>
+            </xsl:element>
+            <xsl:element name="xsl:value-of">
+              <xsl:attribute name="select">.</xsl:attribute>
+            </xsl:element>
+          </xsl:element>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="currencies">
+          <xsl:apply-templates select="currencies"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:element name="xsl:template">
+            <xsl:attribute name="match">@quantityTypeSpecifics</xsl:attribute>
+            <xsl:attribute name="mode">prefix</xsl:attribute>
+          </xsl:element>
+          <xsl:element name="xsl:template">
+            <xsl:attribute name="match">@quantityTypeSpecifics</xsl:attribute>
+            <xsl:attribute name="mode">postfix</xsl:attribute>
+            <xsl:element name="xsl:text">
+              <xsl:text> </xsl:text>
+            </xsl:element>
+            <xsl:element name="xsl:value-of">
+              <xsl:attribute name="select">.</xsl:attribute>
+            </xsl:element>
+          </xsl:element>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:element>
   </xsl:template>
 
   <xsl:template name="quantity">
+    <xsl:element name="xsl:if">
+      <xsl:attribute name="test">@quantityTypeSpecifics</xsl:attribute>
+      <xsl:element name="xsl:apply-templates">
+        <xsl:attribute name="select">@quantityTypeSpecifics</xsl:attribute>
+        <xsl:attribute name="mode">prefix</xsl:attribute>
+      </xsl:element>
+    </xsl:element>
     <xsl:element name="xsl:apply-templates">
       <xsl:attribute name="select">*|text()[normalize-space(.)!='']</xsl:attribute>
     </xsl:element>
     <xsl:element name="xsl:if">
       <xsl:attribute name="test">@quantityTypeSpecifics</xsl:attribute>
-      <xsl:element name="xsl:text">
-        <xsl:text> </xsl:text>
-      </xsl:element>
-      <xsl:element name="xsl:value-of">
+      <xsl:element name="xsl:apply-templates">
         <xsl:attribute name="select">@quantityTypeSpecifics</xsl:attribute>
+        <xsl:attribute name="mode">postfix</xsl:attribute>
       </xsl:element>
     </xsl:element>
   </xsl:template>
@@ -310,17 +351,29 @@
     <xsl:element name="xsl:template">
       <xsl:attribute name="match">@quantityUnitOfMeasure</xsl:attribute>
       <xsl:copy-of select="xsl:*"/>
-      <xsl:element name="xsl:choose">
-        <xsl:apply-templates select="uom"/>
-        <xsl:element name="xsl:otherwise">
+      <xsl:choose>
+        <xsl:when test="uom">
+          <xsl:element name="xsl:choose">
+            <xsl:apply-templates select="uom"/>
+            <xsl:element name="xsl:otherwise">
+              <xsl:element name="xsl:text">
+                <xsl:text> </xsl:text>
+              </xsl:element>
+              <xsl:element name="xsl:value-of">
+                <xsl:attribute name="select">.</xsl:attribute>
+              </xsl:element>
+            </xsl:element>
+          </xsl:element>
+        </xsl:when>
+        <xsl:otherwise>
           <xsl:element name="xsl:text">
             <xsl:text> </xsl:text>
           </xsl:element>
           <xsl:element name="xsl:value-of">
             <xsl:attribute name="select">.</xsl:attribute>
           </xsl:element>
-        </xsl:element>
-      </xsl:element>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:element>
   </xsl:template>
 
@@ -332,6 +385,71 @@
         <xsl:text>'</xsl:text>
       </xsl:attribute>
       <xsl:copy-of select="node()"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="currencies">
+    <xsl:element name="xsl:template">
+      <xsl:attribute name="match">@quantityTypeSpecifics</xsl:attribute>
+      <xsl:attribute name="mode">prefix</xsl:attribute>
+      <xsl:copy-of select="xsl:*"/>
+      <xsl:choose>
+        <xsl:when test="currency">
+          <xsl:element name="xsl:choose">
+            <xsl:apply-templates select="currency" mode="prefix"/>
+          </xsl:element>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:element>
+    <xsl:element name="xsl:template">
+      <xsl:attribute name="match">@quantityTypeSpecifics</xsl:attribute>
+      <xsl:attribute name="mode">postfix</xsl:attribute>
+      <xsl:copy-of select="xsl:*"/>
+      <xsl:choose>
+        <xsl:when test="currency">
+          <xsl:element name="xsl:choose">
+            <xsl:apply-templates select="currency" mode="postfix"/>
+            <xsl:element name="xsl:otherwise">
+              <xsl:element name="xsl:text">
+                <xsl:text> </xsl:text>
+              </xsl:element>
+              <xsl:element name="xsl:value-of">
+                <xsl:attribute name="select">.</xsl:attribute>
+              </xsl:element>
+            </xsl:element>
+          </xsl:element>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:element name="xsl:text">
+            <xsl:text> </xsl:text>
+          </xsl:element>
+          <xsl:element name="xsl:value-of">
+            <xsl:attribute name="select">.</xsl:attribute>
+          </xsl:element>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="currency" mode="prefix">
+    <xsl:element name="xsl:when">
+      <xsl:attribute name="test">
+        <xsl:text>. = '</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>'</xsl:text>
+      </xsl:attribute>
+      <xsl:copy-of select="prefix/node()"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="currency" mode="postfix">
+    <xsl:element name="xsl:when">
+      <xsl:attribute name="test">
+        <xsl:text>. = '</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>'</xsl:text>
+      </xsl:attribute>
+      <xsl:copy-of select="postfix/node()"/>
     </xsl:element>
   </xsl:template>
 

@@ -183,10 +183,20 @@ Example of a `.uomdisplay` file:
     <uom name="cm"> cm</uom>
     <uom name="cm2"> cm<superScript>2</superScript></uom>
     </uoms>
+    <currencies>
+    <currency name="CAD">
+    <prefix>$</prefix>
+    <postfix> CAD</postfix>
+    </currency>
+    <currency name="GBP">
+    <prefix>£</prefix>
+    <postfix> GBP</postfix>
+    </currency>
+    </currencies>
     </uomDisplay>
 
-Units of measure that are not defined will be presented as their name
-(e.g., "cm2") separated from the value by a space.
+Units of measure and currencies that are not defined will be presented
+as their name (e.g., "cm2") separated from the value by a space.
 
 More complex UOM display, such as pluralization of units of measure, can
 be accomplished with embedded XSLT in the `.uomdisplay` file:
@@ -325,6 +335,8 @@ UOM display
 
 -   `<uoms>`
 
+-   `<currencies>`
+
 Quantity value format
 ---------------------
 
@@ -409,7 +421,42 @@ Display of a unit of measure
 
 *Child elements:*
 
-The element &lt;uom&gt; may contain mixed content, which will be used
-for the display of the unit of measure. This can include XSLT elements,
+The element `<uom>` may contain mixed content, which will be used for
+the display of the unit of measure. This can include XSLT elements,
 which allows for handling complex cases of UOM display, such as
 pluralization.
+
+Currencies
+----------
+
+*Markup element:* `<currencies>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<currency>`
+
+The element `<currencies>` may also contain arbitrary XSLT elements
+which will be processed for all currencies.
+
+Display of a currency
+---------------------
+
+*Markup element:* `<currency>`
+
+*Attributes:*
+
+-   `name` (M), the name of the currency.
+
+*Child elements:*
+
+-   `<prefix>`, text placed before the currency value.
+
+-   `<postfix>`, text placed after the currency value.
+
+The child elements of `<currency>` may contain mixed content, which will
+be used for the display of the unit of measure. This can include XSLT
+elements, which allows for handling complex cases of currency display.
