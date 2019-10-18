@@ -188,6 +188,33 @@ Example of a `.uomdisplay` file:
 Units of measure that are not defined will be presented as their name
 (e.g., "cm2") separated from the value by a space.
 
+More complex UOM display, such as pluralization of units of measure, can
+be accomplished with embedded XSLT in the `.uomdisplay` file:
+
+    <uoms
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:variable name="value" select="parent::*/>
+    <uom name="in">
+    <xsl:text> </xsl:text>
+    <xsl:choose>
+    <xsl:when test="$value = 1">inch</xsl:when>
+    <xsl:otherwise>inches</xsl:otherwise>
+    </xsl:choose>
+    </uom>
+    <uom name="ft">
+    <xsl:text> </xsl:text>
+    <xsl:choose>
+    <xsl:when test="$value = 1">foot</xsl:when>
+    <xsl:otherwise>feet</xsl:otherwise>
+    </xsl:choose>
+    </uom>
+    </uoms>
+
+The context for the embedded XSLT is the unit of measure attribute on
+the value, tolerance or group. XSLT elements in the `<uoms>` element
+will be processed for all units of measure, while XSLT elements in
+`<uom>` elements will only apply to an individual unit of measure.
+
 The tool contains a default set of formats and displays. These can be
 used to create a default `.uomdisplay` file by use of the -. option:
 
@@ -368,6 +395,9 @@ Units of measure
 
 -   `<uom>`
 
+The element `<uoms>` may also contain arbitrary XSLT elements which will
+be processed for all units of measure.
+
 Display of a unit of measure
 ----------------------------
 
@@ -380,4 +410,6 @@ Display of a unit of measure
 *Child elements:*
 
 The element &lt;uom&gt; may contain mixed content, which will be used
-for the display of the unit of measure.
+for the display of the unit of measure. This can include XSLT elements,
+which allows for handling complex cases of UOM display, such as
+pluralization.

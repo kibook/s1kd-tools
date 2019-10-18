@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="00"/>
+        <issueInfo issueNumber="010" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2019" month="10" day="18"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Allow use of XSLT in .uomdisplay for complex UOM display.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -289,6 +292,28 @@ bolt.&lt;/para&gt;</verbatimText>
 &lt;/uomDisplay&gt;</verbatimText>
           </para>
           <para>Units of measure that are not defined will be presented as their name (e.g., "cm2") separated from the value by a space.</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            More complex UOM display, such as pluralization of units of measure, can be accomplished with embedded XSLT in the <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<uoms
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:variable name="value" select="parent::*/>
+<uom name="in">
+<xsl:text> </xsl:text>
+<xsl:choose>
+<xsl:when test="$value = 1">inch</xsl:when>
+<xsl:otherwise>inches</xsl:otherwise>
+</xsl:choose>
+</uom>
+<uom name="ft">
+<xsl:text> </xsl:text>
+<xsl:choose>
+<xsl:when test="$value = 1">foot</xsl:when>
+<xsl:otherwise>feet</xsl:otherwise>
+</xsl:choose>
+</uom>
+</uoms>]]></verbatimText>
+            The context for the embedded XSLT is the unit of measure attribute on the value, tolerance or group. XSLT elements in the <verbatimText verbatimStyle="vs12">&lt;uoms&gt;</verbatimText> element will be processed for all units of measure, while XSLT elements in <verbatimText verbatimStyle="vs12">&lt;uom&gt;</verbatimText> elements will only apply to an individual unit of measure.
+          </para>
           <para>The tool contains a default set of formats and displays. These can be used to create a default <verbatimText verbatimStyle="vs02">.uomdisplay</verbatimText> file by use of the -. option:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-uom -. &gt; .uomdisplay</verbatimText>
@@ -577,6 +602,7 @@ quantityTypeSpecifics="USD"&gt;7.36&lt;/quantity&gt;</verbatimText>
               </listItem>
             </randomList>
           </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">The element <verbatimText verbatimStyle="vs12">&lt;uoms&gt;</verbatimText> may also contain arbitrary XSLT elements which will be processed for all units of measure.</para>
         </levelledPara>
         <levelledPara>
           <title>Display of a unit of measure</title>
@@ -597,7 +623,7 @@ quantityTypeSpecifics="USD"&gt;7.36&lt;/quantity&gt;</verbatimText>
           <para>
             <emphasis>Child elements:</emphasis>
           </para>
-          <para>The element &lt;uom&gt; may contain mixed content, which will be used for the display of the unit of measure.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The element &lt;uom&gt; may contain mixed content, which will be used for the display of the unit of measure. This can include XSLT elements, which allows for handling complex cases of UOM display, such as pluralization.</para>
         </levelledPara>
       </levelledPara>
     </description>

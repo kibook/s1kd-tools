@@ -309,6 +309,7 @@
   <xsl:template match="uoms">
     <xsl:element name="xsl:template">
       <xsl:attribute name="match">@quantityUnitOfMeasure</xsl:attribute>
+      <xsl:copy-of select="xsl:*"/>
       <xsl:element name="xsl:choose">
         <xsl:apply-templates select="uom"/>
         <xsl:element name="xsl:otherwise">
