@@ -18,9 +18,11 @@
         <para>
           <xsl:choose>
             <xsl:when test="$acronyms">
-              <xsl:apply-templates select="$acronyms">
-                <xsl:sort select="acronymTerm"/>
-              </xsl:apply-templates>
+              <definitionList>
+                <xsl:apply-templates select="$acronyms">
+                  <xsl:sort select="acronymTerm"/>
+                </xsl:apply-templates>
+              </definitionList>
             </xsl:when>
             <xsl:otherwise>None</xsl:otherwise>
           </xsl:choose>
