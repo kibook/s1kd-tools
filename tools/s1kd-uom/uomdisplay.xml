@@ -179,12 +179,14 @@
     <uom name="g/cm4"> g/cm<superScript>4</superScript></uom>
     <uom name="g/dm3"> g/dm<superScript>3</superScript></uom>
     <uom name="g/m3"> g/m<superScript>3</superScript></uom>
+    <uom name="galUK"> gal</uom>
     <uom name="galUK/ft3"> galUK/ft<superScript>3</superScript></uom>
     <uom name="galUK/hr.ft2"> galUK/hr.ft<superScript>2</superScript></uom>
     <uom name="galUK/hr.in2"> galUK/hr.in<superScript>2</superScript></uom>
     <uom name="galUK/hr2"> galUK/hr<superScript>2</superScript></uom>
     <uom name="galUK/min.ft2"> galUK/min.ft<superScript>2</superScript></uom>
     <uom name="galUK/min2"> galUK/min<superScript>2</superScript></uom>
+    <uom name="galUS"> gal</uom>
     <uom name="galUS/ft3"> galUS/ft<superScript>3</superScript></uom>
     <uom name="galUS/hr.ft2"> galUS/hr.ft<superScript>2</superScript></uom>
     <uom name="galUS/hr.in2"> galUS/hr.in<superScript>2</superScript></uom>

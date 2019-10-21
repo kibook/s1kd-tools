@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.14.0"
+#define VERSION "1.15.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -18,6 +18,8 @@
 #define W_BAD_LIST WRN_PREFIX "Could not read list: %s\n"
 #define W_NO_CONV WRN_PREFIX "No conversion defined for %s -> %s.\n"
 #define W_NO_CONV_TO WRN_PREFIX "No target UOM given for %s.\n"
+#define W_NO_PRESET WRN_PREFIX "No such preset: %s.\n"
+#define W_BAD_PRESET WRN_PREFIX "Could not read set of conversions: %s\n"
 #define I_CONVERT INF_PREFIX "Converting units in %s...\n"
 #define EXIT_NO_CONV 1
 #define EXIT_NO_UOM 2
@@ -27,7 +29,7 @@ static bool verbose = false;
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dflv,.h?] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-U <path>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-dflv,.h?] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-s <name>|-S <path> ...] [-U <path>] [<object>...]");
 	puts("");
 	puts("  -d, --duplicate          Include conversions as duplicate quantities in parenthesis.");
 	puts("  -e, --formula <expr>     Specify formula for a conversion.");
@@ -37,6 +39,8 @@ static void show_help(void)
 	puts("  -l, --list               Treat input as list of CSDB objects.");
 	puts("  -P, --uomdisplay <path>  Use custom UOM display file.");
 	puts("  -p, --preformat <fmt>    Preformat quantity data.");
+	puts("  -S, --set <path>         Apply a custom set of conversions.");
+	puts("  -s, --preset <name>      Apply a predefined set of conversions.");
 	puts("  -t, --to <uom>           UOM to convert to.");
 	puts("  -U, --uom <path>         Use custom .uom file.");
 	puts("  -u, --from <uom>         UOM to convert from.");
@@ -291,11 +295,54 @@ static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *forma
 	}
 }
 
+/* Load a predefined set of conversions. */
+static void load_presets(xmlNodePtr convs, const char *preset, bool file)
+{
+	xmlDocPtr doc;
+	xmlNodePtr cur;
+
+	if (file) {
+		doc = read_xml_doc(preset);
+	} else {
+		unsigned char *xml;
+		unsigned int len;
+
+		if (strcmp(preset, "SI") == 0) {
+			xml = presets_SI_xml;
+			len = presets_SI_xml_len;
+		} else if (strcmp(preset, "imperial") == 0) {
+			xml = presets_imperial_xml;
+			len = presets_imperial_xml_len;
+		} else if (strcmp(preset, "US") == 0) {
+			xml = presets_US_xml;
+			len = presets_US_xml_len;
+		} else {
+			fprintf(stderr, W_NO_PRESET, preset);
+			return;
+		}
+
+		doc = read_xml_mem((const char *) xml, len);
+	}
+
+	if (!doc) {
+		fprintf(stderr, W_BAD_PRESET, preset);
+		return;
+	}
+
+	for (cur = xmlDocGetRootElement(doc)->children; cur; cur = cur->next) {
+		if (xmlStrcmp(cur->name, BAD_CAST "convert") == 0) {
+			xmlAddChild(convs, xmlCopyNode(cur, 1));
+		}
+	}
+
+	xmlFreeDoc(doc);
+}
+
 int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "de:F:flP:p:t:U:u:v,.h?";
+	const char *sopts = "de:F:flP:p:S:s:t:U:u:v,.h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -309,6 +356,8 @@ int main(int argc, char **argv)
 		{"to"             , required_argument, 0, 't'},
 		{"uom"            , required_argument, 0, 'U'},
 		{"from"           , required_argument, 0, 'u'},
+		{"set"            , required_argument, 0, 'S'},
+		{"preset"         , required_argument, 0, 's'},
 		{"verbose"        , no_argument      , 0, 'v'},
 		{"dump-uom"       , no_argument      , 0, ','},
 		{"dump-uomdisplay", no_argument      , 0 ,'.'},
@@ -389,6 +438,12 @@ int main(int argc, char **argv)
 			case 'u':
 				cur = xmlNewChild(conversions, NULL, BAD_CAST "convert", NULL);
 				xmlSetProp(cur, BAD_CAST "from", BAD_CAST optarg);
+				break;
+			case 'S':
+				load_presets(conversions, optarg, true);
+				break;
+			case 's':
+				load_presets(conversions, optarg, false);
 				break;
 			case 'v':
 				verbose = true;

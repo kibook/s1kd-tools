@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<uom>
+  <convert from="degF" to="degC"/>
+  <convert from="ft" to="m"/>
+  <convert from="ft2" to="m2"/>
+  <convert from="ft3" to="m3"/>
+  <convert from="in" to="cm"/>
+  <convert from="in2" to="cm2"/>
+  <convert from="in3" to="cm3"/>
+  <convert from="in4" to="cm4"/>
+  <convert from="lbm" to="kg"/>
+  <convert from="mi" to="km"/>
+  <convert from="mi/h" to="km/h"/>
+  <convert from="mi2" to="km2"/>
+  <convert from="mi3" to="km3"/>
+  <convert from="tonUK" to="kg"/>
+  <convert from="tonUS" to="kg"/>
+  <convert from="yd" to="m"/>
+  <convert from="yd2" to="m2"/>
+  <convert from="yd3" to="m3"/>
+</uom>

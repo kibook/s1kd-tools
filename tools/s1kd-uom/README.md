@@ -8,7 +8,8 @@ SYNOPSIS
 
     s1kd-uom [-dflv,.h?] [-F <fmt>]
              [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
-             [-U <path>] [-p <fmt> [-P <path>]] [<object>...]
+             [-s <name>|-S <path> ...] [-U <path>] [-p <fmt> [-P <path>]]
+             [<object>...]
 
 DESCRIPTION
 ===========
@@ -55,6 +56,18 @@ formats are:
 -   euro - comma for decimal separator, full-stop for grouping
 
 -   imperial - full-stop for decimal separator, comma for grouping
+
+-S, --set &lt;path&gt;  
+Apply a set of conversions defined in an XML file.
+
+-s, --preset &lt;name&gt;  
+Apply a set of predefined conversions. The available presets are:
+
+-   SI - convert imperial/US customary units to SI units.
+
+-   imperial - convert SI units to British imperial units.
+
+-   US - convert SI units to US customary units.
 
 -t, --to &lt;uom&gt;  
 Unit of measure to convert to.
@@ -127,6 +140,11 @@ To select only certain common rules when generating a `.uom` file, the
 
 This will generate a `.uom` file containing rules to convert inches to
 centimetres, and degrees Fahrenheit to degrees Celsius.
+
+The same file format is used with the -S option to specify a set of
+conversions to perform. In this case, the attribute `formula` is
+optional, as the default formula or the formula in the `.uom` file will
+be used if it is not specified.
 
 Conversion formula variables (-e)
 ---------------------------------

@@ -9,7 +9,7 @@
         <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="18"/>
+        <issueDate year="2019" month="10" day="21"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add currency configuration.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -S and -s options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,9 +58,10 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-uom [-dflv,.h?] [-F &lt;fmt&gt;]
-         [-u &lt;uom&gt; -t &lt;uom&gt; [-e &lt;expr&gt;] [-F &lt;fmt&gt;] ...]
-         [-U &lt;path&gt;] [-p &lt;fmt&gt; [-P &lt;path&gt;]] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003"><![CDATA[s1kd-uom [-dflv,.h?] [-F <fmt>]
+         [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
+         [-s <name>|-S <path> ...] [-U <path>] [-p <fmt> [-P <path>]]
+         [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -124,6 +128,31 @@
                     </listItem>
                     <listItem>
                       <para>imperial - full-stop for decimal separator, comma for grouping</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-S, --set &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Apply a set of conversions defined in an XML file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-s, --preset &lt;name&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>
+                  Apply a set of predefined conversions. The available presets are:
+                  <randomList>
+                    <listItem>
+                      <para>SI - convert imperial/US customary units to SI units.</para>
+                    </listItem>
+                    <listItem>
+                      <para>imperial - convert SI units to British imperial units.</para>
+                    </listItem>
+                    <listItem>
+                      <para>US - convert SI units to US customary units.</para>
                     </listItem>
                   </randomList>
                 </para>
@@ -229,6 +258,7 @@
             <verbatimText verbatimStyle="vs23">$ s1kd-uom -, -u in -t cm -u degF -t degC &gt; .uom</verbatimText>
           </para>
           <para>This will generate a <verbatimText verbatimStyle="vs02">.uom</verbatimText> file containing rules to convert inches to centimetres, and degrees Fahrenheit to degrees Celsius.</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">The same file format is used with the -S option to specify a set of conversions to perform. In this case, the attribute <verbatimText verbatimStyle="vs13">formula</verbatimText> is optional, as the default formula or the formula in the <verbatimText verbatimStyle="vs02">.uom</verbatimText> file will be used if it is not specified.</para>
         </levelledPara>
         <levelledPara>
           <title>Conversion formula variables (-e)</title>
