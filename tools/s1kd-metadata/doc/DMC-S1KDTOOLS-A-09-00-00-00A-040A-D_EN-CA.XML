@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="09" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="00"/>
+        <issueInfo issueNumber="028" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="04"/>
+        <issueDate year="2019" month="10" day="21"/>
         <dmTitle>
           <techName>s1kd-metadata(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Rename -e option to -E.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -e option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -79,12 +73,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">-E, --editable</listItemTerm>
+              <listItemTerm>-E, --editable</listItemTerm>
               <listItemDefinition>
                 <para>When showing all metadata, only list editable items. This is useful when creating a file for use with the -c option.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Execute a command for each CSDB object. The string "{}" is replaced by the current CSDB object file name everywhere it occurs in the arguments to the command.</para>

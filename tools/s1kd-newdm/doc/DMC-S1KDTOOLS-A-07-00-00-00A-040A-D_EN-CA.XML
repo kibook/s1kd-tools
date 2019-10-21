@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="044" inWork="00"/>
+        <issueInfo issueNumber="044" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="04"/>
+        <issueDate year="2019" month="10" day="21"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add random code generation.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -66,8 +63,8 @@
             <definitionListItem>
               <listItemTerm>-#, --code &lt;DMC&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The data module code of the new data module. The prefix "DMC-" is optional.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">If - is given for the code, a random data module code will be generated. If only a model identification code is given instead (e.g., <verbatimText>-# TEST</verbatimText>), or the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file specifies a default model identification code, this will be used as part of the random code. The information type of the random code will be 000A-D.</para>
+                <para>The data module code of the new data module. The prefix "DMC-" is optional.</para>
+                <para>If - is given for the code, a random data module code will be generated. If only a model identification code is given instead (e.g., <verbatimText>-# TEST</verbatimText>), or the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file specifies a default model identification code, this will be used as part of the random code. The information type of the random code will be 000A-D.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

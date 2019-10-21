@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="042" inWork="00"/>
+        <issueInfo issueNumber="042" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="04"/>
+        <issueDate year="2019" month="10" day="21"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add "standalone" and "all" modes to -H option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -8 option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -212,7 +206,7 @@
                 <para>Set the originator of the instance. When this option is specified, the code "<verbatimText verbatimStyle="vs14">S1KDI</verbatimText>" and the name "<verbatimText verbatimStyle="vs14">s1kd-instance tool</verbatimText>" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-H, --list-properties &lt;method&gt;</listItemTerm>
               <listItemDefinition>
                 <para>
@@ -541,7 +535,7 @@
                 <para>Remove unused applicability annotations.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-8, --reapply</listItemTerm>
               <listItemDefinition>
                 <para>Automatically reapply the applicability of the source object when filtering.</para>
