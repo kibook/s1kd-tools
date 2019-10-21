@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="006" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2019" month="10" day="21"/>
+        <dmTitle>
+          <techName>Test</techName>
+          <infoName>List of terms</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <para>
+        <definitionList>
+          <definitionListItem>
+            <listItemTerm>Bare engine</listItemTerm>
+            <listItemDefinition>
+              <para>An engine which is fully completed internally, but on which no external parts or components have been installed.</para>
+            </listItemDefinition>
+          </definitionListItem>
+          <definitionListItem>
+            <listItemTerm>Engine</listItemTerm>
+            <listItemDefinition>
+              <para>An engine which is equipped with external parts and components supplied by the engine manufacturer.</para>
+            </listItemDefinition>
+          </definitionListItem>
+          <definitionListItem>
+            <listItemTerm>Maximum conversion assembly</listItemTerm>
+            <listItemDefinition>
+              <para>Two or more components, fittings and/or packings, or any externally mounted accessories which, for practical reasons, shall be assembled prior to being installed on the power plant.</para>
+            </listItemDefinition>
+          </definitionListItem>
+          <definitionListItem>
+            <listItemTerm>Sequential grouping</listItemTerm>
+            <listItemDefinition>
+              <para>Any coherent package of logically sequenced information which describes a complete action. The action may consist of the completion of either a maximum convenience assembly or the installation of an accessory or system.</para>
+            </listItemDefinition>
+          </definitionListItem>
+        </definitionList>
+      </para>
+    </description>
+  </content>
+</dmodule>

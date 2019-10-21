@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<dmtypes>
+  <type infoCode="001" schema="frontmatter" infoName="Title page"/>
+  <type infoCode="005" schema="descript" infoName="List of abbreviations"/>
+  <type infoCode="006" schema="descript" infoName="List of terms"/>
+  <type infoCode="00S" schema="frontmatter" infoName="List of effective data modules"/>
+  <type infoCode="00U" schema="frontmatter" infoName="Highlights"/>
+  <type infoCode="00V" schema="descript" infoName="List of applicabile specifications and documentation"/>
+  <type infoCode="040" schema="descript" infoName="Description"/>
+</dmtypes>
