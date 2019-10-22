@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.13.1"
+#define VERSION "1.14.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1, --first-ver <type>       Set first verification type.");
@@ -53,6 +53,7 @@ static void show_help(void)
 	puts("  -H, --highlight              Highlight the last RFU.");
 	puts("  -v, --verbose                Print filename of upissued objects.");
 	puts("  -w, --lock                   Make old and official issues read-only.");
+	puts("  -z, --date <date>            The issue date to use for the upissued objects.");
 	puts("  --version                    Show version information");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -404,27 +405,32 @@ static void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 	}
 }
 
-static void set_iss_date(xmlDocPtr dmdoc)
+static void set_iss_date(xmlDocPtr dmdoc, const char *issdate)
 {
-	time_t now;
-	struct tm *local;
-	unsigned short year, month, day;
 	char year_s[5], month_s[3], day_s[3];
 	xmlNodePtr issueDate;
 
 	issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
 
-	time(&now);
-	local = localtime(&now);
+	if (issdate) {
+		sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s);
+	} else {
+		time_t now;
+		struct tm *local;
+		unsigned short year, month, day;
 
-	year = local->tm_year + 1900;
-	month = local->tm_mon + 1;
-	day = local->tm_mday;
+		time(&now);
+		local = localtime(&now);
 
-	if (snprintf(year_s, 5, "%u", year) < 0 ||
-	    snprintf(month_s, 3, "%.2u", month) < 0 ||
-	    snprintf(day_s, 3, "%.2u", day) < 0)
-		exit(EXIT_BAD_DATE);
+		year = local->tm_year + 1900;
+		month = local->tm_mon + 1;
+		day = local->tm_mday;
+
+		if (snprintf(year_s, 5, "%u", year) < 0 ||
+		    snprintf(month_s, 3, "%.2u", month) < 0 ||
+		    snprintf(day_s, 3, "%.2u", day) < 0)
+			exit(EXIT_BAD_DATE);
+	}
 
 	xmlSetProp(issueDate, (xmlChar *) "year",  (xmlChar *) year_s);
 	xmlSetProp(issueDate, (xmlChar *) "month", (xmlChar *) month_s);
@@ -463,6 +469,7 @@ static bool remdel= false;
 static bool remold = false;
 static bool only_mod = false;
 static bool clean_rfus = false;
+static char *issdate = NULL;
 
 static void upissue(const char *path)
 {
@@ -523,7 +530,7 @@ static void upissue(const char *path)
 		 * -q sets the QA status to unverified
 		 */
 		if (!set_date) {
-			set_iss_date(dmdoc);
+			set_iss_date(dmdoc, issdate);
 		}
 		if (keep_rfus) {
 			del_rfus(dmdoc, only_assoc_rfus, iss30);
@@ -665,7 +672,7 @@ static void upissue(const char *path)
 		}
 
 		if (set_date) {
-			set_iss_date(dmdoc);
+			set_iss_date(dmdoc, issdate);
 		}
 
 		set_qa(dmdoc, firstver, secondver, iss30);
@@ -765,7 +772,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmuh?";
+	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmuz:h?";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -793,6 +800,7 @@ int main(int argc, char **argv)
 		{"highlight"         , no_argument      , 0, 'H'},
 		{"verbose"           , no_argument      , 0, 'v'},
 		{"lock"              , no_argument      , 0, 'w'},
+		{"date"              , required_argument, 0, 'z'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -875,6 +883,9 @@ int main(int argc, char **argv)
 			case 'w':
 				lock = true;
 				break;
+			case 'z':
+				issdate = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -901,6 +912,7 @@ int main(int argc, char **argv)
 	free(firstver);
 	free(secondver);
 	free(status);
+	free(issdate);
 	xmlFreeNode(rfus);
 
 	xmlCleanupParser();

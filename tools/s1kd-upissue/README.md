@@ -7,7 +7,8 @@ SYNOPSIS
 ========
 
     s1kd-upissue [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
-                 [-c <reason>] [-s <status>] [-t <urt>] [<file>...]
+                 [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
+                 [<file>...]
 
 DESCRIPTION
 ===========
@@ -58,13 +59,14 @@ Show help/usage message.
 
 -I, --(keep\|change)-date  
 Do not change issue date. Normally, when upissuing to the next inwork or
-official issue, the issue date is changed to the current date. This
-option will keep the date of the previous inwork or official issue.
+official issue, the issue date is changed to the current date, or the
+date specified with the -z option. This option will keep the date of the
+previous inwork or official issue.
 
 In -m mode, this option has the opposite effect, causing the date to be
-changed to the current date. The two alternative long option names,
---keep-date and --change-date, allow for the intended meaning of this
-option to be expressed clearly in each mode.
+changed. The two alternative long option names, --keep-date and
+--change-date, allow for the intended meaning of this option to be
+expressed clearly in each mode.
 
 -i, --official  
 Increase the issue number of the CSDB object. By default, the in-work
@@ -128,6 +130,10 @@ Print the file name of the upissued CSDB object.
 -w, --lock  
 Make the old issue file read-only after upissuing. Official issues (-i)
 will also be made read-only when they are created.
+
+-z, --date &lt;date&gt;  
+Specify the issue to use for the upissued object(s). Otherwise, the
+current date will be used.
 
 --version  
 Show version information.
