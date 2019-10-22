@@ -15,14 +15,16 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
 #define W_MISSING_REF WRN_PREFIX "Could not read referenced object: %s\n"
-#define I_PROCESS INF_PREFIX "Processing %s...\n"
+#define I_INCLUDE INF_PREFIX "Including %s...\n"
+#define I_FOUND INF_PREFIX "Found %s\n"
+#define I_REMOVE INF_PREFIX "Removing %s...\n"
 #define I_SEARCH INF_PREFIX "Searching for %s in '%s' ...\n"
 #define I_REMDUPS INF_PREFIX "Removing duplicate references...\n"
 #define EXIT_BAD_PM 1
@@ -144,6 +146,11 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 	bool found = false;
 	xmlNodePtr cur;
 
+	/* Skip PM refs if they do not need to be processed. */
+	if (!(flatten_ref || remove_unresolved || recursive)) {
+		return;
+	}
+
 	pm_code = first_xpath_node(NULL, pm_ref, ".//pmCode|.//pmc");
 	issue_info = ignore_iss ? NULL : first_xpath_node(NULL, pm_ref, ".//issueInfo|.//issno");
 	language = first_xpath_node(NULL, pm_ref, ".//language");
@@ -212,8 +219,8 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 		}
 
 		if (find_csdb_object(fs_pm_fname, path, pm_fname, is_pm, recursive_search)) {
-			if (verbosity >= VERBOSE) {
-				fprintf(stderr, I_PROCESS, fs_pm_fname);
+			if (verbosity >= DEBUG) {
+				fprintf(stderr, I_FOUND, fs_pm_fname);
 			}
 
 			found = true;
@@ -221,6 +228,10 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 			if (recursive) {
 				xmlDocPtr subpm;
 				xmlNodePtr content;
+
+				if (verbosity >= VERBOSE) {
+					fprintf(stderr, I_INCLUDE, fs_pm_fname);
+				}
 
 				subpm = read_xml_doc(fs_pm_fname);
 				content = first_xpath_node(subpm, NULL, "//content");
@@ -240,6 +251,10 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 
 				xmlFreeDoc(subpm);
 			} else if (flatten_ref) {
+				if (verbosity >= VERBOSE) {
+					fprintf(stderr, I_INCLUDE, fs_pm_fname);
+				}
+
 				if (xinclude) {
 					xi = xmlNewNode(xiNs, BAD_CAST "include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
@@ -256,14 +271,20 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 					xmlFreeDoc(doc);
 				}
 			}
-		} else if (verbosity >= NORMAL) {
-			fprintf(stderr, W_MISSING_REF, pm_fname);
+		} else if (remove_unresolved) {
+			if (verbosity >= VERBOSE) {
+				fprintf(stderr, I_REMOVE, pm_fname);
+			}
+		} else {
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, W_MISSING_REF, pm_fname);
+			}
 		}
 
 		xmlFree(path);
 	}
 
-	if ((found && flatten_ref) || (!found && remove_unresolved)) {
+	if ((found && (flatten_ref || recursive)) || (!found && remove_unresolved)) {
 		xmlUnlinkNode(pm_ref);
 		xmlFreeNode(pm_ref);
 	}
@@ -302,6 +323,11 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 
 	bool found = false;
 	xmlNodePtr cur;
+
+	/* Skip DM refs if they do not need to be processed. */
+	if (!(flatten_ref || remove_unresolved || flatten_container)) {
+		return;
+	}
 
 	dm_code    = first_xpath_node(NULL, dm_ref, ".//dmCode|.//avee");
 	issue_info = ignore_iss ? NULL : first_xpath_node(NULL, dm_ref, ".//issueInfo|.//issno");
@@ -392,8 +418,8 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 		}
 
 		if (find_csdb_object(fs_dm_fname, path, dm_fname, is_dm, recursive_search)) {
-			if (verbosity >= VERBOSE) {
-				fprintf(stderr, I_PROCESS, fs_dm_fname);
+			if (verbosity >= DEBUG) {
+				fprintf(stderr, I_FOUND, fs_dm_fname);
 			}
 
 			found = true;
@@ -418,7 +444,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 
 					/* Copy each dmRef from the container
 					 * into the PM. */
-					for (c = refs->children; c; c = c->next) {
+					for (c = refs->last; c; c = c->prev) {
 						if (c->type != XML_ELEMENT_NODE) {
 							continue;
 						}
@@ -430,6 +456,10 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 			}
 
 			if (flatten_ref) {
+				if (verbosity >= VERBOSE) {
+					fprintf(stderr, I_INCLUDE, fs_dm_fname);
+				}
+
 				if (xinclude) {
 					xi = xmlNewNode(xiNs, BAD_CAST "include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
@@ -451,8 +481,14 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 					xmlFreeDoc(doc);
 				}
 			}
-		} else if (verbosity >= NORMAL) {
-			fprintf(stderr, W_MISSING_REF, dm_fname);
+		} else if (remove_unresolved) {
+			if (verbosity >= VERBOSE) {
+				fprintf(stderr, I_REMOVE, dm_fname);
+			}
+		} else {
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, W_MISSING_REF, dm_fname);
+			}
 		}
 
 		xmlFree(path);
