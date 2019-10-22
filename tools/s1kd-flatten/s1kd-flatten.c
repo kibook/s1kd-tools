@@ -8,16 +8,23 @@
 #include <sys/stat.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxslt/transform.h>
 
 #include "s1kd_tools.h"
 
+#include "xsl.h"
+
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "2.5.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
 #define W_MISSING_REF WRN_PREFIX "Could not read referenced object: %s\n"
+#define I_PROCESS INF_PREFIX "Processing %s...\n"
+#define I_SEARCH INF_PREFIX "Searching for %s in '%s' ...\n"
+#define I_REMDUPS INF_PREFIX "Removing duplicate references...\n"
 #define EXIT_BAD_PM 1
 #define EXIT_BAD_CODE 2
 
@@ -36,23 +43,30 @@ static int flatten_ref = 1;
 static int flatten_container = 0;
 static int recursive = 0;
 static int recursive_search = 0;
+static int remove_unresolved = 0;
+
+static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfiNpRrxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfimNpqRruvxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -c, --containers      Flatten referenced container data modules.");
-	puts("  -D, --remove          Remove unresolved refs without flattening.");
+	puts("  -D, --remove          Remove unresolved references.");
 	puts("  -d, --dir <dir>       Directory to start search in.");
 	puts("  -f, --overwrite       Overwrite publication module.");
 	puts("  -h, -?, --help        Show help/usage message.");
 	puts("  -I, --include <path>  Search <path> for referenced objects.");
 	puts("  -i, --ignore-issue    Always match the latest issue of an object found.");
+	puts("  -m, --modify          Modiy references without flattening them.");
 	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
 	puts("  -p, --simple          Output a simple, flat XML file.");
+	puts("  -q, --quiet           Quiet mode.");
 	puts("  -R, --recursively     Recursively flatten referenced PMs.");
 	puts("  -r, --recursive       Search directories recursively.");
+	puts("  -u, --unique          Remove duplicate references.");
+	puts("  -v, --verbose         Verbose output.");
 	puts("  -x, --use-xinclude    Use XInclude references.");
 	puts("  --version  Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -61,7 +75,7 @@ static void show_help(void)
 static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
-	printf("Using libxml %s\n", xmlParserVersion);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 static xmlNodePtr find_child(xmlNodePtr parent, const char *child_name)
@@ -101,9 +115,9 @@ static char *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const char *expr
 	return (char *) xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
-static void flatten_pm_entry(xmlNodePtr pm_entry);
+static void flatten_pm_entry(xmlNodePtr pm_entry, xmlNsPtr xiNs);
 
-static void flatten_pm_ref(xmlNodePtr pm_ref)
+static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 {
 	xmlNodePtr pm_code;
 	xmlNodePtr issue_info;
@@ -193,7 +207,15 @@ static void flatten_pm_ref(xmlNodePtr pm_ref)
 
 		path = (char *) xmlNodeGetContent(cur);
 
+		if (verbosity >= DEBUG) {
+			fprintf(stderr, I_SEARCH, pm_fname, path);
+		}
+
 		if (find_csdb_object(fs_pm_fname, path, pm_fname, is_pm, recursive_search)) {
+			if (verbosity >= VERBOSE) {
+				fprintf(stderr, I_PROCESS, fs_pm_fname);
+			}
+
 			found = true;
 
 			if (recursive) {
@@ -206,7 +228,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref)
 				if (content) {
 					xmlNodePtr c;
 
-					flatten_pm_entry(content);
+					flatten_pm_entry(content, xiNs);
 
 					for (c = content->children; c; c = c->next) {
 						if (xmlStrcmp(c->name, BAD_CAST "pmEntry") != 0) {
@@ -219,7 +241,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref)
 				xmlFreeDoc(subpm);
 			} else if (flatten_ref) {
 				if (xinclude) {
-					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
+					xi = xmlNewNode(xiNs, BAD_CAST "include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_pm_fname);
 
 					if (use_pub_fmt) {
@@ -234,20 +256,20 @@ static void flatten_pm_ref(xmlNodePtr pm_ref)
 					xmlFreeDoc(doc);
 				}
 			}
-		} else if (flatten_ref) {
+		} else if (verbosity >= NORMAL) {
 			fprintf(stderr, W_MISSING_REF, pm_fname);
 		}
 
 		xmlFree(path);
 	}
 
-	if (flatten_ref || recursive || !found) {
+	if ((found && flatten_ref) || (!found && remove_unresolved)) {
 		xmlUnlinkNode(pm_ref);
 		xmlFreeNode(pm_ref);
 	}
 }
 
-static void flatten_dm_ref(xmlNodePtr dm_ref)
+static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 {
 	xmlNodePtr dm_code;
 	xmlNodePtr issue_info;
@@ -365,7 +387,15 @@ static void flatten_dm_ref(xmlNodePtr dm_ref)
 
 		path = (char *) xmlNodeGetContent(cur);
 
+		if (verbosity >= DEBUG) {
+			fprintf(stderr, I_SEARCH, dm_fname, path);
+		}
+
 		if (find_csdb_object(fs_dm_fname, path, dm_fname, is_dm, recursive_search)) {
+			if (verbosity >= VERBOSE) {
+				fprintf(stderr, I_PROCESS, fs_dm_fname);
+			}
+
 			found = true;
 
 			/* Flatten a container data module by copying the
@@ -384,7 +414,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref)
 
 					/* First, flatten the dmRefs in the
 					 * container itself. */
-					flatten_pm_entry(refs);
+					flatten_pm_entry(refs, xiNs);
 
 					/* Copy each dmRef from the container
 					 * into the PM. */
@@ -401,7 +431,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref)
 
 			if (flatten_ref) {
 				if (xinclude) {
-					xi = xmlNewNode(NULL, BAD_CAST "xi:include");
+					xi = xmlNewNode(xiNs, BAD_CAST "include");
 					xmlSetProp(xi, BAD_CAST "href", BAD_CAST fs_dm_fname);
 
 					if (use_pub_fmt) {
@@ -421,20 +451,20 @@ static void flatten_dm_ref(xmlNodePtr dm_ref)
 					xmlFreeDoc(doc);
 				}
 			}
-		} else if (flatten_ref) {
+		} else if (verbosity >= NORMAL) {
 			fprintf(stderr, W_MISSING_REF, dm_fname);
 		}
 
 		xmlFree(path);
 	}
 
-	if (flatten_ref || !found) {
+	if ((found && flatten_ref) || (!found && remove_unresolved)) {
 		xmlUnlinkNode(dm_ref);
 		xmlFreeNode(dm_ref);
 	}
 }
 
-static void flatten_pm_entry(xmlNodePtr pm_entry)
+static void flatten_pm_entry(xmlNodePtr pm_entry, xmlNsPtr xiNs)
 {
 	xmlNodePtr cur, next;
 
@@ -444,11 +474,11 @@ static void flatten_pm_entry(xmlNodePtr pm_entry)
 		next = cur->next;
 
 		if (xmlStrcmp(cur->name, BAD_CAST "dmRef") == 0 || xmlStrcmp(cur->name, BAD_CAST "refdm") == 0) {
-			flatten_dm_ref(cur);
+			flatten_dm_ref(cur, xiNs);
 		} else if (xmlStrcmp(cur->name, BAD_CAST "pmRef") == 0 || xmlStrcmp(cur->name, BAD_CAST "refpm") == 0) {
-			flatten_pm_ref(cur);
+			flatten_pm_ref(cur, xiNs);
 		} else if (xmlStrcmp(cur->name, BAD_CAST "pmEntry") == 0 || xmlStrcmp(cur->name, BAD_CAST "pmentry") == 0) {
-			flatten_pm_entry(cur);
+			flatten_pm_entry(cur, xiNs);
 		}
 
 		cur = next;
@@ -460,6 +490,50 @@ static void flatten_pm_entry(xmlNodePtr pm_entry)
 		xmlUnlinkNode(pm_entry);
 		xmlFreeNode(pm_entry);
 	}
+}
+
+static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
+{
+	xmlDocPtr styledoc, res, src;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	styledoc = read_xml_mem((const char *) xml, len);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	src = xmlCopyDoc(doc, 1);
+	res = xsltApplyStylesheet(style, src, params);
+	xmlFreeDoc(src);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
+static void remove_dup_refs(xmlDocPtr pm)
+{
+	const char *params[5];
+
+	params[0] = "INF_PREFIX";
+	params[1] = "\"" INF_PREFIX "\"";
+	params[2] = "verbosity";
+	switch (verbosity) {
+		case QUIET:	params[3] = "0"; break;
+		case NORMAL:	params[3] = "1"; break;
+		case VERBOSE:	params[3] = "2"; break;
+		case DEBUG:	params[3] = "3"; break;
+	}
+	params[4] = NULL;
+
+	if (verbosity >= VERBOSE) {
+		fprintf(stderr, I_REMDUPS);
+	}
+
+	transform_doc(pm, xsl_remdups1_xsl, xsl_remdups1_xsl_len, NULL);
+	transform_doc(pm, xsl_remdups2_xsl, xsl_remdups2_xsl_len, params);
+	transform_doc(pm, xsl_remdups3_xsl, xsl_remdups3_xsl_len, NULL);
 }
 
 int main(int argc, char **argv)
@@ -475,7 +549,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "cDd:fxNpRrI:ih?";
+	const char *sopts = "cDd:fxmNpqRruvI:ih?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -484,10 +558,14 @@ int main(int argc, char **argv)
 		{"dir"         , required_argument, 0, 'd'},
 		{"overwrite"   , no_argument      , 0, 'f'},
 		{"use-xinclude", no_argument      , 0, 'x'},
+		{"modify"      , no_argument      , 0, 'm'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
 		{"simple"      , no_argument      , 0, 'p'},
+		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursively" , no_argument      , 0, 'R'},
 		{"recursive"   , no_argument      , 0, 'r'},
+		{"unique"      , no_argument      , 0, 'u'},
+		{"verbose"     , no_argument      , 0, 'v'},
 		{"include"     , required_argument, 0, 'I'},
 		{"ignore-issue", no_argument      , 0, 'i'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -496,6 +574,9 @@ int main(int argc, char **argv)
 	int loptind = 0;
 
 	int overwrite = 0;
+	int remove_dups = 0;
+
+	xmlNsPtr xiNs = NULL;
 
 	search_paths = xmlNewNode(NULL, BAD_CAST "searchPaths");
 	search_dir = strdup(".");
@@ -510,14 +591,18 @@ int main(int argc, char **argv)
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'c': flatten_container = 1; break;
-			case 'D': flatten_ref = 0; break;
+			case 'D': remove_unresolved = 1; break;
 			case 'd': free(search_dir); search_dir = strdup(optarg); break;
 			case 'f': overwrite = 1; break;
 			case 'x': xinclude = 1; break;
+			case 'm': flatten_ref = 0; break;
 			case 'N': no_issue = 1; break;
 			case 'p': use_pub_fmt = 1; break;
+			case 'q': --verbosity; break;
 			case 'R': recursive = 1; break;
 			case 'r': recursive_search = 1; break;
+			case 'u': remove_dups = 1; break;
+			case 'v': ++verbosity; break;
 			case 'I': xmlNewChild(search_paths, NULL, BAD_CAST "path", BAD_CAST optarg); break;
 			case 'i': ignore_iss = 1; break;
 			case 'h':
@@ -535,13 +620,7 @@ int main(int argc, char **argv)
 	}
 
 	pm_doc = read_xml_doc(pm_fname);
-
 	pm = xmlDocGetRootElement(pm_doc);
-
-	if (xinclude && !use_pub_fmt) {
-		xmlSetProp(pm, BAD_CAST "xmlns:xi", BAD_CAST "http://www.w3.org/2001/XInclude");
-	}
-
 	content = find_child(pm, "content");
 
 	if (use_pub_fmt) {
@@ -551,8 +630,8 @@ int main(int argc, char **argv)
 
 		if (xinclude) {
 			xmlNodePtr xi;
-			xmlSetProp(pub, BAD_CAST "xmlns:xi", BAD_CAST "http://www.w3.org/2001/XInclude");
-			xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
+			xiNs = xmlNewNs(pub, BAD_CAST "http://www.w3.org/2001/XInclude", BAD_CAST "xi");
+			xi = xmlNewChild(pub, xiNs, BAD_CAST "include", NULL);
 			xmlSetProp(xi, BAD_CAST "href", BAD_CAST pm_fname);
 		} else {
 			xmlDocPtr doc;
@@ -560,7 +639,11 @@ int main(int argc, char **argv)
 			xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
 			xmlFreeDoc(doc);
 		}
-	} else if (!content) {
+	} else if (content) {
+		if (xinclude) {
+			xiNs = xmlNewNs(pm, BAD_CAST "http://www.w3.org/2001/XInclude", BAD_CAST "xi");
+		}
+	} else {
 		fprintf(stderr, E_BAD_PM, pm_fname);
 		exit(EXIT_BAD_PM);
 	}
@@ -574,7 +657,7 @@ int main(int argc, char **argv)
 			next = cur->next;
 
 			if (xmlStrcmp(cur->name, BAD_CAST "pmEntry") == 0 || xmlStrcmp(cur->name, BAD_CAST "pmentry") == 0) {
-				flatten_pm_entry(cur);
+				flatten_pm_entry(cur, xiNs);
 			}
 
 			cur = next;
@@ -585,7 +668,7 @@ int main(int argc, char **argv)
 		for (i = optind + 1; i < argc; ++i) {
 			if (xinclude) {
 				xmlNodePtr xi;
-				xi = xmlNewChild(pub, NULL, BAD_CAST "xi:include", NULL);
+				xi = xmlNewChild(pub, xiNs, BAD_CAST "include", NULL);
 				xmlSetProp(xi, BAD_CAST "href", BAD_CAST argv[i]);
 			} else {
 				xmlDocPtr doc;
@@ -596,12 +679,18 @@ int main(int argc, char **argv)
 		}
 	}
 
+	/* Remove duplicate entries from the flattened PM. */
+	if (remove_dups) {
+		remove_dup_refs(use_pub_fmt ? pub_doc : pm_doc);
+	}
+
 	save_xml_doc(use_pub_fmt ? pub_doc : pm_doc, overwrite ? pm_fname : "-");
 
 	xmlFreeDoc(pm_doc);
 	xmlFreeNode(search_paths);
 	xmlFreeDoc(pub_doc);
 
+	xsltCleanupGlobals();
 	xmlCleanupParser();
 
 	return 0;

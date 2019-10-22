@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-d <dir>] [-I <path>] [-cDfiNpRrx] <PM> [<DM>...]
+    s1kd-flatten [-d <dir>] [-I <path>] [-cDfimNpqRruvx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -25,10 +25,10 @@ OPTIONS
 -c, --containers  
 Flatten referenced container data modules by copying the references
 inside the container directly in to the publication module. The copied
-references will also be flattened, unless the -D option is specified.
+references will also be flattened, unless the -m option is specified.
 
 -D, --remove  
-Remove unresolved references, but do not flatten resolved ones.
+Remove unresolved references.
 
 -d, --dir &lt;dir&gt;  
 Directory to start search in. By default, the current directory is used.
@@ -47,6 +47,9 @@ when resolving references.
 Always match the latest issue of an object found, regardless of the
 issue specified in the reference.
 
+-m, --modify  
+Modify the references in the publication module without flattening them.
+
 -N, --omit-issue  
 Assume that the files representing the referenced data modules do not
 include the issue info in their filenames, i.e. they were created using
@@ -56,12 +59,21 @@ the -N option of the s1kd-new\* tools.
 Instead of the hierarchical PM-based format, use a simpler "flat"
 format.
 
+-q, --quiet  
+Quiet mode. Errors are not printed.
+
 -R, --recursively  
 Recursively flatten referenced publication modules, copying their
 content in to the "master" publication module.
 
 -r, --recursive  
 Search directories recursively.
+
+-u, --unique  
+Remove duplicate references within the PM content.
+
+-v, --verbose  
+Verbose output. Specify multiple times to increase the verbosity.
 
 -x, --use-xinclude  
 Use XInclude rather than copying each data module's contents directly
