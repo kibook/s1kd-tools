@@ -126,4 +126,19 @@
     </dmRef>
   </xsl:template>
 
+  <!-- Bug in S1000D Issue 4.1 - 5.0 Default BREX, BREX-S1-00120:
+       dmTitle must contain an infoName despite it being optional.
+       Workaround: add an empty infoName element. -->
+  <xsl:template match="dmTitle">
+    <xsl:apply-templates select="techName"/>
+    <xsl:choose>
+      <xsl:when test="infoName">
+        <xsl:apply-templates select="infoName"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <infoName/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet>
