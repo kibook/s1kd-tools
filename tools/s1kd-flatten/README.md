@@ -108,6 +108,18 @@ Resolve entities.
 --xinclude  
 Do XInclude processing.
 
+EXIT STATUS
+===========
+
+0  
+No errors.
+
+1  
+The publication module specified is malformed.
+
+2  
+An encoding error occurred.
+
 EXAMPLE
 =======
 
