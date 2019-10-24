@@ -130,15 +130,17 @@
        dmTitle must contain an infoName despite it being optional.
        Workaround: add an empty infoName element. -->
   <xsl:template match="dmTitle">
-    <xsl:apply-templates select="techName"/>
-    <xsl:choose>
-      <xsl:when test="infoName">
-        <xsl:apply-templates select="infoName"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <infoName/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:copy>
+      <xsl:apply-templates select="techName"/>
+      <xsl:choose>
+        <xsl:when test="infoName">
+          <xsl:apply-templates select="infoName"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <infoName/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:copy>
   </xsl:template>
 
 </xsl:stylesheet>
