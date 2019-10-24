@@ -15,12 +15,13 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.1"
+#define VERSION "3.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
 #define INF_PREFIX PROG_NAME ": INFO: "
 #define E_BAD_PM ERR_PREFIX "Bad publication module: %s\n"
+#define E_ENCODING_ERROR ERR_PREFIX "An encoding error occurred: %s (%d)\n"
 #define W_MISSING_REF WRN_PREFIX "Could not read referenced object: %s\n"
 #define I_INCLUDE INF_PREFIX "Including %s...\n"
 #define I_FOUND INF_PREFIX "Found %s\n"
@@ -28,7 +29,12 @@
 #define I_SEARCH INF_PREFIX "Searching for %s in '%s' ...\n"
 #define I_REMDUPS INF_PREFIX "Removing duplicate references...\n"
 #define EXIT_BAD_PM 1
-#define EXIT_BAD_CODE 2
+#define EXIT_ENCODING_ERROR 2
+
+#define ENCODING_ERROR {\
+	fprintf(stderr, "An encoding error occurred: %s (%d)\n", __FILE__, __LINE__);\
+	exit(EXIT_ENCODING_ERROR);\
+}
 
 static int xinclude = 0;
 static int no_issue = 0;
@@ -176,11 +182,11 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 			in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 
 			if (snprintf(pm_fname, PATH_MAX, "%s_%s-%s", pm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
-				exit(EXIT_BAD_CODE);
+				ENCODING_ERROR
 			}
 		} else if (language) {
 			if (snprintf(pm_fname, PATH_MAX, "%s_\?\?\?-\?\?", pm_fname_temp) < 0) {
-				exit(EXIT_BAD_CODE);
+				ENCODING_ERROR
 			}
 		}
 	}
@@ -196,7 +202,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 		strcpy(pm_fname_temp, pm_fname);
 
 		if (snprintf(pm_fname, PATH_MAX, "%s_%s-%s", pm_fname_temp, language_iso_code, country_iso_code) < 0) {
-			exit(EXIT_BAD_CODE);
+			ENCODING_ERROR
 		}
 	}
 
@@ -368,11 +374,11 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 			in_work      = first_xpath_string(NULL, issue_info, "@inWork|@inwork");
 
 			if (snprintf(dm_fname, PATH_MAX, "%s_%s-%s", dm_fname_temp, issue_number, in_work ? in_work : "00") < 0) {
-				exit(EXIT_BAD_CODE);
+				ENCODING_ERROR
 			}
 		} else if (language) {
 			if (snprintf(dm_fname, PATH_MAX, "%s_\?\?\?-\?\?", dm_fname_temp) < 0) {
-				exit(EXIT_BAD_CODE);
+				ENCODING_ERROR
 			}
 		}
 	}
@@ -388,7 +394,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 		strcpy(dm_fname_temp, dm_fname);
 
 		if (snprintf(dm_fname, PATH_MAX, "%s_%s-%s", dm_fname_temp, language_iso_code, country_iso_code) < 0) {
-			exit(EXIT_BAD_CODE);
+			ENCODING_ERROR
 		}
 	}
 
