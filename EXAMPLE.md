@@ -47,6 +47,8 @@ MuPDF](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG)
 Initial setup
 =============
 
+![Initial setup](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF)
+
 This first step is to create a folder for the new S1000D project.
 Example:
 
@@ -137,6 +139,9 @@ project.
 
 Creating the DMRL and populating the CSDB
 =========================================
+
+![Creating the DMRL and populating the
+CSDB](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF)
 
 The next step is to prepare the Data Management Requirements List (DMRL)
 for the project. The DMRL will contain a list of all the CSDB objects
@@ -507,6 +512,9 @@ modules in a publication:
 
 Creating a customized publication
 ---------------------------------
+
+![Applicability filtering
+example](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01.GIF)
 
 The S1000D applicability model and the **s1kd-instance** tool enable the
 creation of customized publications, which are filtered for a particular

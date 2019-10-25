@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
 <!NOTATION PNG SYSTEM "PNG" >
+<!NOTATION GIF SYSTEM "GIF" >
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG" NDATA PNG>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF" NDATA GIF>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF" NDATA GIF>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01.GIF" NDATA GIF>
 ]>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
@@ -9,10 +13,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="04"/>
+        <issueDate year="2019" month="10" day="24"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -42,6 +46,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
+        <simplePara>Add animated examples.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -57,6 +64,10 @@
       </levelledPara>
       <levelledPara>
         <title>Initial setup</title>
+        <figure>
+          <title>Initial setup</title>
+          <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01"/>
+        </figure>
         <para>This first step is to create a folder for the new S1000D project. Example:</para>
         <para>
           <verbatimText verbatimStyle="vs23">$ mkdir myproject
@@ -136,6 +147,10 @@ schema="proced"/&gt;
       </levelledPara>
       <levelledPara>
         <title>Creating the DMRL and populating the CSDB</title>
+        <figure>
+          <title>Creating the DMRL and populating the CSDB</title>
+          <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01"/>
+        </figure>
         <para>The next step is to prepare the Data Management Requirements List (DMRL) for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.</para>
         <para>If you do not already have a DMRL, the <emphasis>s1kd-newdml</emphasis> tool can be used to create a new one:</para>
         <para>
@@ -439,6 +454,10 @@ itemLocationCode="D"/>
         </levelledPara>
         <levelledPara>
           <title>Creating a customized publication</title>
+          <figure>
+            <title>Applicability filtering example</title>
+            <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01"/>
+          </figure>
           <para>The S1000D applicability model and the <emphasis>s1kd-instance</emphasis> tool enable the creation of customized publications, which are filtered for a particular customer or product. For example, a data module may contain applicabilty for two versions of a product:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<para>
