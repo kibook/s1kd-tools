@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
-<!NOTATION GIF SYSTEM "GIF" >
 <!NOTATION PNG SYSTEM "PNG" >
+<!NOTATION GIF SYSTEM "GIF" >
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG" NDATA PNG>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF" NDATA GIF>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF" NDATA GIF>
@@ -14,7 +14,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="02"/>
+        <issueInfo issueNumber="023" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="10" day="25"/>
