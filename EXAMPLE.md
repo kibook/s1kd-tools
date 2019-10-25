@@ -289,7 +289,7 @@ means:
 -   The actual narrative (content) is correct
 
 ![Data module validation
-tests](ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF)
+tests](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF)
 
 ### Validating against the schema
 
