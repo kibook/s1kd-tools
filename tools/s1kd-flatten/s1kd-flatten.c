@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.2"
+#define VERSION "3.0.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -661,7 +661,11 @@ int main(int argc, char **argv)
 		pm_fname = "-";
 	}
 
-	pm_doc = read_xml_doc(pm_fname);
+	if (!(pm_doc = read_xml_doc(pm_fname))) {
+		fprintf(stderr, E_BAD_PM, pm_fname);
+		exit(EXIT_BAD_PM);
+	}
+
 	pm = xmlDocGetRootElement(pm_doc);
 	content = find_child(pm, "content");
 
