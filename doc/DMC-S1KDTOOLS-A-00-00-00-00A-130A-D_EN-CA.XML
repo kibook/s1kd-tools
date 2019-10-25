@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
-<!NOTATION PNG SYSTEM "PNG" >
 <!NOTATION GIF SYSTEM "GIF" >
+<!NOTATION PNG SYSTEM "PNG" >
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG" NDATA PNG>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF" NDATA GIF>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF" NDATA GIF>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01.GIF" NDATA GIF>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF" NDATA GIF>
 ]>
 <dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
@@ -13,10 +14,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="01"/>
+        <issueInfo issueNumber="022" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="24"/>
+        <issueDate year="2019" month="10" day="25"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -46,12 +47,17 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt01" applicRefId="app-Web">
         <simplePara>Add animated examples.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
+    <referencedApplicGroup>
+      <applic id="app-Web">
+        <assert applicPropertyIdent="media" applicPropertyType="prodattr" applicPropertyValues="web"/>
+      </applic>
+    </referencedApplicGroup>
     <description>
       <levelledPara>
         <title>General</title>
@@ -64,7 +70,7 @@
       </levelledPara>
       <levelledPara>
         <title>Initial setup</title>
-        <figure>
+        <figure applicRefId="app-Web" changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
           <title>Initial setup</title>
           <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01"/>
         </figure>
@@ -147,7 +153,7 @@ schema="proced"/&gt;
       </levelledPara>
       <levelledPara>
         <title>Creating the DMRL and populating the CSDB</title>
-        <figure>
+        <figure applicRefId="app-Web" changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
           <title>Creating the DMRL and populating the CSDB</title>
           <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01"/>
         </figure>
@@ -268,6 +274,10 @@ infoCodeVariant="A" itemLocationCode="D"/>
               </listItem>
             </randomList>
           </para>
+          <figure applicRefId="app-Web" changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <title>Data module validation tests</title>
+            <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01"/>
+          </figure>
           <levelledPara>
             <title>Validating against the schema</title>
             <para>The first two points can be verified with the <emphasis>s1kd-validate</emphasis> tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:</para>
@@ -454,7 +464,7 @@ itemLocationCode="D"/>
         </levelledPara>
         <levelledPara>
           <title>Creating a customized publication</title>
-          <figure>
+          <figure applicRefId="app-Web" changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
             <title>Applicability filtering example</title>
             <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01"/>
           </figure>
