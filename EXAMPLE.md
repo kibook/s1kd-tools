@@ -288,6 +288,9 @@ means:
 
 -   The actual narrative (content) is correct
 
+![Data module validation
+tests](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF)
+
 ### Validating against the schema
 
 The first two points can be verified with the **s1kd-validate** tool.
