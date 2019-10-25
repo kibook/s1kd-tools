@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.3"
+#define VERSION "3.0.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
