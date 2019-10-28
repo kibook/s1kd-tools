@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.4"
+#define VERSION "3.0.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -575,7 +575,7 @@ static void remove_dup_refs(xmlDocPtr pm)
 
 	transform_doc(pm, xsl_remdups1_xsl, xsl_remdups1_xsl_len, NULL);
 	transform_doc(pm, xsl_remdups2_xsl, xsl_remdups2_xsl_len, params);
-	transform_doc(pm, xsl_remdups3_xsl, xsl_remdups3_xsl_len, NULL);
+	transform_doc(pm, ___common_remove_empty_pmentries_xsl, ___common_remove_empty_pmentries_xsl_len, NULL);
 }
 
 int main(int argc, char **argv)

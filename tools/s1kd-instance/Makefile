@@ -18,9 +18,9 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-xsl.h: xsl/*.xsl cirxsl/*.xsl
+xsl.h: ../common/remove-empty-pmentries.xsl xsl/*.xsl cirxsl/*.xsl
 	> xsl.h
-	for f in xsl/*.xsl cirxsl/*.xsl ../common/identity.xsl; do xxd -i "$$f" >> xsl.h; done
+	for f in $+ ../common/identity.xsl; do xxd -i "$$f" >> xsl.h; done
 
 $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)

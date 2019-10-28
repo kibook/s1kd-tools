@@ -21,10 +21,10 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-xsl.h: xsl/remdups1.xsl xsl/remdups2.xsl xsl/remdups3.xsl
+xsl.h: xsl/remdups1.xsl xsl/remdups2.xsl ../common/remove-empty-pmentries.xsl
 	xxd -i xsl/remdups1.xsl > $@
 	xxd -i xsl/remdups2.xsl >> $@
-	xxd -i xsl/remdups3.xsl >> $@
+	xxd -i ../common/remove-empty-pmentries.xsl >> $@
 
 .PHONY: docs clean maintainer-clean install uninstall
 

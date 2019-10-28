@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.1.1"
+#define VERSION "8.1.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2194,7 +2194,7 @@ static void flatten_alts(xmlDocPtr doc, bool fix_alts_refs)
  */
 static void remove_empty_pmentries(xmlDocPtr doc)
 {
-	transform_doc(doc, xsl_remove_empty_pmentries_xsl, xsl_remove_empty_pmentries_xsl_len, NULL);
+	transform_doc(doc, ___common_remove_empty_pmentries_xsl, ___common_remove_empty_pmentries_xsl_len, NULL);
 }
 
 /* Fix certain elements automatically after filtering. */
