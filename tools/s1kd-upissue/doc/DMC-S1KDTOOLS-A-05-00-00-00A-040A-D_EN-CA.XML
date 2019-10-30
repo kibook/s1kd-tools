@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="25"/>
+        <issueDate year="2019" month="10" day="29"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -z option.</simplePara>
+        <simplePara>Add -4 option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-upissue [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-upissue [-4DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
              [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
              [<file>...]]]></verbatimText>
         </para>
@@ -76,6 +76,12 @@
               <listItemTerm>-2, --second-ver &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set second verification type (tabtop, onobject, ttandoo).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-4, --remove-marks</listItemTerm>
+              <listItemDefinition>
+                <para>Remove change markup on elements, but not RFUs, in the upissued object. This is automatically applied if the issue type (-s) is not <verbatimText verbatimStyle="vs14">"changed"</verbatimText> or <verbatimText verbatimStyle="vs14">"rinstate-changed"</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -123,8 +129,8 @@
             <definitionListItem>
               <listItemTerm>-I, --(keep|change)-date</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date, or the date specified with the -z option. This option will keep the date of the previous inwork or official issue.</para>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">In -m mode, this option has the opposite effect, causing the date to be changed. The two alternative long option names, --keep-date and --change-date, allow for the intended meaning of this option to be expressed clearly in each mode.</para>
+                <para>Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date, or the date specified with the -z option. This option will keep the date of the previous inwork or official issue.</para>
+                <para>In -m mode, this option has the opposite effect, causing the date to be changed. The two alternative long option names, --keep-date and --change-date, allow for the intended meaning of this option to be expressed clearly in each mode.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -201,7 +207,7 @@
                 <para>Make the old issue file read-only after upissuing. Official issues (-i) will also be made read-only when they are created.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-z, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the issue to use for the upissued object(s). Otherwise, the current date will be used.</para>

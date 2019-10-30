@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-4DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
                  [<file>...]
 
@@ -29,6 +29,11 @@ Set first verification type (tabtop, onobject, ttandoo).
 
 -2, --second-ver &lt;type&gt;  
 Set second verification type (tabtop, onobject, ttandoo).
+
+-4, --remove-marks  
+Remove change markup on elements, but not RFUs, in the upissued object.
+This is automatically applied if the issue type (-s) is not `"changed"`
+or `"rinstate-changed"`.
 
 -c, --reason &lt;reason&gt;  
 Add a reason for update to the upissued objects. Multiple RFUs can be

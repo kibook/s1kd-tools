@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.14.0"
+#define VERSION "1.15.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,11 +29,12 @@
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-4DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1, --first-ver <type>       Set first verification type.");
 	puts("  -2, --second-ver <type>      Set second verification type.");
+	puts("  -4, --remove-marks           Remove change marks (but not RFUs).");
 	puts("  -c, --reason <reason>        Add an RFU to the upissued object.");
 	puts("  -D, --remove-deleted         Remove \"delete\"d elements.");
 	puts("  -d, --dry-run                Do not write anything, only print new filename.");
@@ -298,6 +299,14 @@ static void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 	xmlXPathFreeContext(ctx);
 }
 
+static void del_marks(xmlDocPtr doc, bool iss30)
+{
+	xmlXPathContextPtr ctx;
+	ctx = xmlXPathNewContext(doc);
+	del_rfu_attrs(ctx, iss30);
+	xmlXPathFreeContext(ctx);
+}
+
 static void set_unverified(xmlDocPtr doc, bool iss30)
 {
 	xmlNodePtr qa, cur;
@@ -470,6 +479,7 @@ static bool remold = false;
 static bool only_mod = false;
 static bool clean_rfus = false;
 static char *issdate = NULL;
+static bool remove_marks = false;
 
 static void upissue(const char *path)
 {
@@ -524,7 +534,7 @@ static void upissue(const char *path)
 			set_status(dmdoc, status, iss30, issueInfo);
 		}
 
-		/* The following options have the opposite effect in -k mode:
+		/* The following options have the opposite effect in -m mode:
 		 * -I sets the date
 		 * -r removes RFUs
 		 * -q sets the QA status to unverified
@@ -534,6 +544,8 @@ static void upissue(const char *path)
 		}
 		if (keep_rfus) {
 			del_rfus(dmdoc, only_assoc_rfus, iss30);
+		} else if (remove_marks) {
+			del_marks(dmdoc, iss30);
 		}
 		if (!set_unverif) {
 			set_unverified(dmdoc, iss30);
@@ -686,6 +698,10 @@ static void upissue(const char *path)
 		}
 
 		set_status(dmdoc, status, iss30, issueInfo);
+
+		if (remove_marks) {
+			del_marks(dmdoc, iss30);
+		}
 	}
 
 	xmlFree(issueNumber);
@@ -772,12 +788,13 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:Ddelc:t:Hwmuz:h?";
+	const char *sopts = "ivs:NfrRIq1:2:4Ddelc:t:Hwmuz:h?";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
 		{"first-ver"         , required_argument, 0, '1'},
 		{"second-ver"        , required_argument, 0, '2'},
+		{"remove-marks"      , no_argument      , 0, '4'},
 		{"reason"            , required_argument, 0, 'c'},
 		{"remove-deleted"    , no_argument      , 0, 'D'},
 		{"dry-run"           , no_argument      , 0, 'd'},
@@ -823,6 +840,9 @@ int main(int argc, char **argv)
 			case '2':
 				secondver = strdup(optarg);
 				break;
+			case '4':
+				remove_marks = true;
+				break;
 			case 'c':
 				xmlNewChild(rfus, NULL, BAD_CAST "reasonForUpdate", BAD_CAST optarg);
 				break;
@@ -867,6 +887,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				status = strdup(optarg);
+				if (!(strcmp(status, "changed") == 0 || strcmp(status, "rinstate-changed") == 0)) {
+					remove_marks = true;
+				}
 				break;
 			case 't':
 				xmlSetProp(rfus->last, BAD_CAST "updateReasonType", BAD_CAST optarg);
