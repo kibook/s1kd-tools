@@ -6,6 +6,7 @@
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
@@ -15,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.8.2"
+#define VERSION "1.9.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -43,6 +44,7 @@ static bool interactive = false;
 static bool alwaysAsk = false;
 static bool deferChoice = false;
 static bool verbose = false;
+static xmlNodePtr defaultChoices;
 
 static xsltStylesheetPtr termStylesheet, idStylesheet;
 
@@ -265,14 +267,28 @@ static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const x
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+	bool noDefault = true;
 
-	xmlChar xpath[256];
+	ctx = xmlXPathNewContext(defaultChoices->doc);
+	xmlXPathRegisterVariable(ctx, BAD_CAST "term", xmlXPathNewString(BAD_CAST term));
+	obj = xmlXPathEvalExpression(BAD_CAST "//acronym[acronymTerm=$term]", ctx);
 
-	ctx = xmlXPathNewContext(acronym->doc);
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
 
-	xmlStrPrintf(xpath, 256, "//acronym[acronymTerm = '%s']", term);
+		ctx = xmlXPathNewContext(acronym->doc);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "term", xmlXPathNewString(BAD_CAST term));
+		obj = xmlXPathEvalExpression(BAD_CAST "//acronym[acronymTerm=$term]", ctx);
+	} else {
+		noDefault = false;
 
-	obj = xmlXPathEvalExpression(xpath, ctx);
+		if (xmlHasProp(obj->nodesetval->nodeTab[0], BAD_CAST "ignore")) {
+			acronym = NULL;
+		} else {
+			acronym = obj->nodesetval->nodeTab[0];
+		}
+	}
 
 	if (deferChoice) {
 		int i;
@@ -282,7 +298,7 @@ static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const x
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			xmlAddChild(acronym, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
 		}
-	} else if (alwaysAsk || obj->nodesetval->nodeNr > 1) {
+	} else if (noDefault && (alwaysAsk || obj->nodesetval->nodeNr > 1)) {
 		int i;
 
 		printf("Found acronym term %s in the following context:\n\n", (char *) term);
@@ -301,18 +317,39 @@ static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const x
 		}
 
 		puts("s) Ignore this one");
+		puts("");
+		puts("Add 'a' after your choice to apply to all remaining acronyms");
+		puts("");
+		printf("Choice: ");
 
 		fflush(stdout);
 
 		i = getchar();
 
-		if (i < '1' || i > '9') {
-			acronym = NULL;
+		if (isdigit(i)) {
+			acronym = obj->nodesetval->nodeTab[i - '0' - 1];
 		} else {
-			acronym = obj->nodesetval->nodeTab[i - 49];
+			acronym = NULL;
+		}
+
+		/* If the choice is followed by 'a', apply to all remaining acronyms. */
+		if ((i = getchar()) == 'a') {
+			/* If a definition was chosen, use that as the default. */
+			if (acronym) {
+				xmlAddChild(defaultChoices, xmlCopyNode(acronym, 1));
+			/* If the acronym was ignored, ignore all remaining same acronyms. */
+			} else {
+				xmlNodePtr n;
+				n = xmlNewChild(defaultChoices, NULL, BAD_CAST "acronym", NULL);
+				xmlSetProp(n, BAD_CAST "ignore", BAD_CAST "1");
+				xmlNewTextChild(n, NULL, BAD_CAST "acronymTerm", term);
+			}
+		} else {
+			ungetc(i, stdin);
 		}
 
 		while ((i = getchar()) != EOF && i != '\n');
+
 		putchar('\n');
 	}
 
@@ -655,6 +692,8 @@ int main(int argc, char **argv)
 	xmlDocPtr doc = NULL;
 	xmlNodePtr acronyms;
 
+	xmlDocPtr defaultChoicesDoc;
+
 	bool xmlOut = false;
 	char *types = NULL;
 	char *out = strdup("-");
@@ -688,6 +727,10 @@ int main(int argc, char **argv)
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	defaultChoicesDoc = xmlNewDoc(BAD_CAST "1.0");
+	defaultChoices = xmlNewNode(NULL, BAD_CAST "acronyms");
+	xmlDocSetRootElement(defaultChoicesDoc, defaultChoices);
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -880,6 +923,8 @@ int main(int argc, char **argv)
 	xmlFreeDoc(doc);
 
 	xmlFree(acro_markup_xpath);
+
+	xmlFreeDoc(defaultChoicesDoc);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();
