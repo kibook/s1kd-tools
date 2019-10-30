@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.1.2"
+#define VERSION "8.2.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -760,7 +760,7 @@ static void strip_applic(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, xmlN
 }
 
 /* Remove unambiguously true or false applic statements. */
-static void clean_applic_stmts(xmlNodePtr defs, xmlNodePtr referencedApplicGroup)
+static void clean_applic_stmts(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, bool remtrue)
 {
 	xmlNodePtr cur;
 
@@ -769,7 +769,7 @@ static void clean_applic_stmts(xmlNodePtr defs, xmlNodePtr referencedApplicGroup
 	while (cur) {
 		xmlNodePtr next = cur->next;
 
-		if (cur->type == XML_ELEMENT_NODE && (eval_applic_stmt(defs, cur, false) || !eval_applic_stmt(defs, cur, true))) {
+		if (cur->type == XML_ELEMENT_NODE && ((remtrue && eval_applic_stmt(defs, cur, false)) || !eval_applic_stmt(defs, cur, true))) {
 			xmlUnlinkNode(cur);
 			xmlFreeNode(cur);
 		}
@@ -853,18 +853,18 @@ static void rem_disp_text(xmlNodePtr node)
  * Returns true if the whole annotation is removed, or false if only parts of
  * it are removed.
  */
-static bool simpl_applic(xmlNodePtr defs, xmlNodePtr node)
+static bool simpl_applic(xmlNodePtr defs, xmlNodePtr node, bool remtrue)
 {
 	xmlNodePtr cur, next;
 
 	if (xmlStrcmp(node->name, BAD_CAST "applic") == 0) {
-		if (eval_applic_stmt(defs, node, false) || !eval_applic_stmt(defs, node, true)) {
+		if ((remtrue && eval_applic_stmt(defs, node, false)) || !eval_applic_stmt(defs, node, true)) {
 			xmlUnlinkNode(node);
 			xmlFreeNode(node);
 			return true;
 		}
 	} else if (xmlStrcmp(node->name, BAD_CAST "evaluate") == 0) {
-		if (eval_applic(defs, node, false) || !eval_applic(defs, node, true)) {
+		if ((remtrue && eval_applic(defs, node, false)) || !eval_applic(defs, node, true)) {
 			if (clean_disp_text) {
 				rem_disp_text(node);
 			}
@@ -875,7 +875,7 @@ static bool simpl_applic(xmlNodePtr defs, xmlNodePtr node)
 			return false;
 		}
 	} else if (xmlStrcmp(node->name, BAD_CAST "assert") == 0) {
-		if (eval_assert(defs, node, false) || !eval_assert(defs, node, true)) {
+		if ((remtrue && eval_assert(defs, node, false)) || !eval_assert(defs, node, true)) {
 			if (clean_disp_text) {
 				rem_disp_text(node);
 			}
@@ -890,7 +890,7 @@ static bool simpl_applic(xmlNodePtr defs, xmlNodePtr node)
 	cur = node->children;
 	while (cur) {
 		next = cur->next;
-		simpl_applic(defs, cur);
+		simpl_applic(defs, cur, remtrue);
 		cur = next;
 	}
 
@@ -944,7 +944,7 @@ static void simpl_applic_evals(xmlNodePtr node)
 }
 
 /* Remove <referencedApplicGroup> if all applic statements are removed */
-static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup)
+static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, bool remtrue)
 {
 	bool has_applic = false;
 	xmlNodePtr cur;
@@ -953,7 +953,7 @@ static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup
 		return;
 	}
 
-	simpl_applic(defs, referencedApplicGroup);
+	simpl_applic(defs, referencedApplicGroup, remtrue);
 	simpl_applic_evals(referencedApplicGroup);
 
 	for (cur = referencedApplicGroup->children; cur; cur = cur->next) {
@@ -968,7 +968,7 @@ static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup
 	}
 }
 
-static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc)
+static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc, bool remtrue)
 {
 	xmlNodePtr applic, orig;
 
@@ -980,7 +980,7 @@ static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc)
 
 	applic = xmlCopyNode(orig, 1);
 
-	if (simpl_applic(defs, applic)) {
+	if (simpl_applic(defs, applic, remtrue)) {
 		xmlNodePtr disptext;
 		applic = xmlNewNode(NULL, BAD_CAST "applic");
 		disptext = xmlNewChild(applic, NULL, BAD_CAST "displayText", NULL);
@@ -3496,7 +3496,7 @@ static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 	app  = xmlCopyNode(applic, 1);
 
 	if (simpl) {
-		simpl_applic(defs, app);
+		simpl_applic(defs, app, true);
 		simpl_applic_evals(app);
 	}
 
@@ -3695,6 +3695,7 @@ static void show_help(void)
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
 	puts("  -8, --reapply                     Reapply the source object's applicability.");
+	puts("  -9, --prune                       Simplify by removing only false assertions.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
@@ -3775,6 +3776,7 @@ int main(int argc, char **argv)
 	bool rslvcntrs = false;
 	bool rem_unused = false;
 	bool re_applic = false;
+	bool remtrue = true;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -3782,7 +3784,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4568~H:";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:45689~H:";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3844,6 +3846,7 @@ int main(int argc, char **argv)
 		{"infoname-variant"  , required_argument, 0, 'V'},
 		{"clean-annotations" , no_argument      , 0, '6'},
 		{"reapply"           , no_argument      , 0, '8'},
+		{"prune"             , no_argument      , 0, '9'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -4049,6 +4052,10 @@ int main(int argc, char **argv)
 				break;
 			case '8':
 				re_applic = true;
+				break;
+			case '9':
+				simpl = true;
+				remtrue = false;
 				break;
 			case 'H':
 				if (!props_report) {
@@ -4400,7 +4407,7 @@ int main(int argc, char **argv)
 						strip_applic(applicability, referencedApplicGroup, root);
 
 						if (clean || simpl) {
-							clean_applic_stmts(applicability, referencedApplicGroup);
+							clean_applic_stmts(applicability, referencedApplicGroup, remtrue);
 
 							if (xmlChildElementCount(referencedApplicGroup) == 0) {
 								xmlUnlinkNode(referencedApplicGroup);
@@ -4411,10 +4418,10 @@ int main(int argc, char **argv)
 							clean_applic(referencedApplicGroup, root);
 
 							if (simpl && xmlChildElementCount(referencedApplicGroup) != 0) {
-								simpl_applic_clean(applicability, referencedApplicGroup);
+								simpl_applic_clean(applicability, referencedApplicGroup, remtrue);
 							}
 
-							if (xmlChildElementCount(referencedApplicGroup) != 0) {
+							if (remtrue && xmlChildElementCount(referencedApplicGroup) != 0) {
 								referencedApplicGroup = rem_supersets(referencedApplicGroup, root, !simpl);
 							}
 						}
@@ -4463,7 +4470,7 @@ int main(int argc, char **argv)
 					 * it, there's no need to do this.
 					 */
 					if (combine_applic) {
-						simpl_whole_applic(applicability, doc);
+						simpl_whole_applic(applicability, doc, remtrue);
 					}
 
 					set_applic(doc, new_display_text, combine_applic);

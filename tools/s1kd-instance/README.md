@@ -388,6 +388,9 @@ Remove unused applicability annotations.
 Automatically reapply the applicability of the source object when
 filtering.
 
+-9, --prune  
+Remove only invalid parts of applicability annotations.
+
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances
 that will be updated.
@@ -440,26 +443,30 @@ If the -S option is used, neither the
 this tool is not used to make an "instance" per se, but more generally
 to make a module based on an existing module.
 
-Removing/simplifying applicability annotations (-a vs -A)
----------------------------------------------------------
+Removing/simplifying/pruning applicability annotations
+------------------------------------------------------
 
 By default, filtering on applicability will remove invalid elements from
 the resulting instance. In some cases, though, it may be desirable to
-remove redundant applicability annotations on valid elements. The -a and
--A options provide two methods of doing this.
+remove redundant applicability annotations on valid elements. The -a
+(--reduce), -A (--simplify) and -9 (--prune) options provide different
+methods of doing this.
 
-The -a option will remove applicability annotations (`applicRefId`) from
-elements which are deemed to be unambiguously valid or invalid (their
-validity does not rely on applicability values left undefined by the
-user). The unused occurrences of the corresponding `<applic>` elements
-are removed as well.
+The -a (--reduce) option will remove applicability annotations
+(`applicRefId`) from elements which are deemed to be unambiguously valid
+or invalid (their validity does not rely on applicability values left
+undefined by the user). The unused occurrences of the corresponding
+`<applic>` elements are removed as well.
 
-The -A option will do the same as the -a option, but will also attempt
-to simplify unused parts of applicability annotations. It simplifies an
-annotation by removing `<assert>` elements determined to be either
-unambiguously valid or invalid given the user-defined values, and
-removing unneeded `<evaluate>` elements when they contain only one
+The -A (--simplify) option will do the same as the -a option, but will
+also attempt to simplify unused parts of applicability annotations. It
+simplifies an annotation by removing `<assert>` elements determined to
+be either unambiguously valid or invalid given the user-defined values,
+and removing unneeded `<evaluate>` elements when they contain only one
 remaining `<assert>`.
+
+The -9 (--prune) option works similarly to the -A option, except that
+only invalid parts of applicability annotations are removed.
 
 For example, given the following input:
 
@@ -510,8 +517,8 @@ For example, given the following input:
     </para>
 
 If this data is filtered for version A, without specifying a value for
-the weather, and neither the -a or -A option is used, the following will
-be the result:
+the weather, and the -a, -A or -9 options are not used, the following
+will be the result:
 
     <referencedApplicGroup>
     <applic id="app-0001">
@@ -625,14 +632,47 @@ redundant, and any portions of the annotation in which the version is
 *not* A can be removed as invalid. This leaves only the assertion about
 the weather.
 
+If the -9 option is used, the following would be the result:
+
+    <referencedApplicGroup>
+    <applic id="app-0001">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="app-0003">
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="normal"/>
+    </evaluate>
+    </applic>
+    </referencedApplicGroup>
+    <!-- snip -->
+    <para applicRefId="app-0001">This applies to version A.</para>
+    <para applicRefId="app-0003">
+    This applies to version A if the weather is normal, or version B if
+    the weather is icy.
+    </para>
+
+The first annotation is kept because it is entirely valid. The third
+annotation is simplified by removing the invalid assertions, but the
+valid assertions are perserved.
+
 > **Note**
 >
-> The -A option may change the *meaning* of certain applicability
-> annotations without changing the *display text*. Display text is
-> always left untouched, so using this option may cause display text to
-> be technically incorrect.
+> The -A and -9 options may change the *meaning* of certain
+> applicability annotations without changing the *display text*. Display
+> text is always left untouched, so using this option may cause display
+> text to be technically incorrect.
 >
-> This option is best used when display text will be automatically
+> These options are best used when display text will be automatically
 > generated after filtering, such as with the s1kd-aspp tool. The -J
 > option of this tool can be combined with the -k option of the
 > s1kd-aspp tool to only generate display text for annotations which are
