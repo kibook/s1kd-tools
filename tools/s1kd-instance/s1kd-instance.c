@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.2.0"
+#define VERSION "8.2.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -43,7 +43,7 @@
 #define S_INVALID_CIR ERR_PREFIX "%s is not a valid CIR data module.\n"
 #define S_INVALID_ISSFMT ERR_PREFIX "Invalid format for issue/in-work number.\n"
 #define S_BAD_DATE ERR_PREFIX "Bad issue date: %s\n"
-#define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: %s\n"
+#define S_BAD_ASSIGN ERR_PREFIX "Malformed applicability definition: \"%s\". Definitions must be in the form of \"<ident>:<type>=<value>\".\n"
 #define S_MISSING_ACT ERR_PREFIX "Could not read ACT %s\n"
 #define S_MISSING_CCT ERR_PREFIX "Could not read CCT %s\n"
 #define S_MISSING_PCT ERR_PREFIX "Could not read PCT %s\n"
@@ -2224,10 +2224,9 @@ static void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 /* Read an applicability assign in the form of ident:type=value */
 static void read_applic(char *s)
 {
-
 	char *ident, *type, *value;
 
-	if (!strchr(s, ':') || !strchr(s, '=')) {
+	if (!match_pattern(BAD_CAST s, BAD_CAST "[^:]+:(prodattr|condition)=[^|~]+")) {
 		if (verbosity > QUIET) {
 			fprintf(stderr, S_BAD_ASSIGN, s);
 		}
