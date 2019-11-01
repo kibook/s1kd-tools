@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="23" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="00"/>
+        <issueInfo issueNumber="020" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="25"/>
+        <issueDate year="2019" month="11" day="01"/>
         <dmTitle>
           <techName>s1kd-flatten(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,15 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -m, -q, -u and -v options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -D option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add EXIT STATUS section.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -58,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-flatten [-d <dir>] [-I <path>] [-cDfimNpqRruvx] <PM> [<DM>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-flatten [-d <dir>] [-I <path>] [-cDfimNpqRruvx] <PM> [<DM>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -73,13 +64,13 @@
             <definitionListItem>
               <listItemTerm>-c, --containers</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Flatten referenced container data modules by copying the references inside the container directly in to the publication module. The copied references will also be flattened, unless the -m option is specified.</para>
+                <para>Flatten referenced container data modules by copying the references inside the container directly in to the publication module. The copied references will also be flattened, unless the -m option is specified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-D, --remove</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Remove unresolved references.</para>
+                <para>Remove unresolved references.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -112,7 +103,7 @@
                 <para>Always match the latest issue of an object found, regardless of the issue specified in the reference.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-m, --modify</listItemTerm>
               <listItemDefinition>
                 <para>Modify the references in the publication module without flattening them.</para>
@@ -130,7 +121,7 @@
                 <para>Instead of the hierarchical PM-based format, use a simpler "flat" format.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Errors are not printed.</para>
@@ -148,13 +139,13 @@
                 <para>Search directories recursively.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-u, --unique</listItemTerm>
               <listItemDefinition>
                 <para>Remove duplicate references within the PM content.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output. Specify multiple times to increase the verbosity.</para>
@@ -216,7 +207,7 @@
           </definitionList>
         </para>
       </levelledPara>
-      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+      <levelledPara>
         <title>EXIT STATUS</title>
         <para>
           <definitionList>

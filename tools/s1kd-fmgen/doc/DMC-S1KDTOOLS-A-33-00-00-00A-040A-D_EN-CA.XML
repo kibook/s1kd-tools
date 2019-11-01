@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="019" inWork="00"/>
+        <issueInfo issueNumber="019" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="25"/>
+        <issueDate year="2019" month="11" day="01"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,27 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add support for infoCodeVariant in .fmtypes file.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add LOA, LOASD, LOI, LOS, LOT and LOTBL FM types.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -x and -p options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Ignore non-FM data modules.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0005" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Correct usage of -t option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0006" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -I and -q options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0007" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add EXIT STATUS section.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -70,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003 rfu-0005 rfu-0006"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-I <date>] [-P <PM>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-I <date>] [-P <PM>]
            [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
            [-,.flqvh?] [<DM>...]]]></verbatimText>
         </para>
@@ -119,7 +98,7 @@
                 <para>Show usage message.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0006">
+            <definitionListItem>
               <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue date of the generated front matter data modules. This can be a specific date in the form of "YYYY-MM-DD", "-" for the current date, or "pm" to use the issue date of the publication module.</para>
@@ -140,8 +119,8 @@
             <definitionListItem>
               <listItemTerm>-p, --param &lt;name&gt;=&lt;value&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Pass a parameter to the XSLT stylesheets used to generate the front matter content. Multiple parameters can be specified by using this option multiple times.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+                <para>Pass a parameter to the XSLT stylesheets used to generate the front matter content. Multiple parameters can be specified by using this option multiple times.</para>
+                <para>
                   The following parameters are automatically supplied to any stylesheet, and therefore their names should be considered reserved:
                   <randomList>
                     <listItem>
@@ -151,7 +130,7 @@
                 </para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0006">
+            <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Do not print errors.</para>
@@ -160,31 +139,31 @@
             <definitionListItem>
               <listItemTerm>-t, --type &lt;TYPE&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0005">Generate content for this type of front matter. Supported types are:</para>
+                <para>Generate content for this type of front matter. Supported types are:</para>
                 <para>
                   <randomList>
                     <listItem>
                       <para>HIGH - Highlights</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>LOA - List of abbreviations</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>LOASD - List of applicable specifications and documentation</para>
                     </listItem>
                     <listItem>
                       <para>LOEDM - List of effective data modules</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>LOI - List of illustrations</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>LOS - List of symbols</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>LOT - List of terms</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>LOTBL - List of tables</para>
                     </listItem>
                     <listItem>
@@ -200,13 +179,13 @@
             <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0006">Verbose output. Specify multiple times to increase the verbosity.</para>
+                <para>Verbose output. Specify multiple times to increase the verbosity.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-x, --xsl &lt;XSL&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Use the specified XSLT script to generate the front matter contents instead of the built-in XSLT or the user-configured XSLT from the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
+                <para>Use the specified XSLT script to generate the front matter contents instead of the built-in XSLT or the user-configured XSLT from the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -218,7 +197,7 @@
             <definitionListItem>
               <listItemTerm>&lt;DM&gt;...</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0004">Front matter data modules to generate content for. If no front matter type can be determined for a data module, it will be ignored.</para>
+                <para>Front matter data modules to generate content for. If no front matter type can be determined for a data module, it will be ignored.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -259,7 +238,7 @@
           <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
           <para>Example of simple text format:</para>
           <para>
-            <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">001    TP
+            <verbatimText verbatimStyle="vs24">001    TP
 005    LOA
 006    LOT
 007    LOS
@@ -272,7 +251,7 @@
           </para>
           <para>Example of XML format:</para>
           <para>
-            <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[<fmtypes>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<fmtypes>
 <fm infoCode="001" type="TP"/>
 <fm infoCode="005" type="LOA"/>
 <fm infoCode="006" type="LOT"/>
@@ -285,7 +264,7 @@
 <fm infoCode="00Z" type="LOTBL"/>
 </fmtypes>]]></verbatimText>
           </para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>
             The info code of each entry in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file may also include an info code variant. This allows different transformations to be used based on the variant:
             <verbatimText verbatimStyle="vs11"><![CDATA[<fmtypes>
 <fm infoCode="00UA" type="HIGH" xsl="fm/high.xsl"/>
@@ -294,7 +273,7 @@
 </fmtypes>]]></verbatimText>
             In the example above, a highlights data module (00U) with info code variant A will use an XSL transformation that creates a simple highlights, while a highlights data module with info code variant B will use an XSL transformation that creates a highlights with update instructions. All other variants will use the built-in XSLT.
           </para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">Entries are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file. An info code which does not specify a variant matches all possible variants.</para>
+          <para>Entries are chosen in the order they are listed in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file. An info code which does not specify a variant matches all possible variants.</para>
         </levelledPara>
         <levelledPara>
           <title>Optional title page elements</title>
