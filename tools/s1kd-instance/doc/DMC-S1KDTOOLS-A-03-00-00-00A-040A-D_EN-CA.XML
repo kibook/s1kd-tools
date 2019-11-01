@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="043" inWork="01"/>
+        <issueInfo issueNumber="043" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="30"/>
+        <issueDate year="2019" month="11" day="01"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -807,7 +807,7 @@ applicPropertyValues="normal"/>
 This applies to version A if the weather is normal, or version B if
 the weather is icy.
 </para>]]></verbatimText>
-            The first annotation is kept because it is entirely valid. The third annotation is simplified by removing the invalid assertions, but the valid assertions are perserved.
+            The first annotation is kept because it is entirely valid. The third annotation is simplified by removing the invalid assertions, but the valid assertions are preserved.
           </para>
           <note>
             <notePara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The -A and -9 options may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect.</notePara>

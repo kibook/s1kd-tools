@@ -663,7 +663,7 @@ If the -9 option is used, the following would be the result:
 
 The first annotation is kept because it is entirely valid. The third
 annotation is simplified by removing the invalid assertions, but the
-valid assertions are perserved.
+valid assertions are preserved.
 
 > **Note**
 >
