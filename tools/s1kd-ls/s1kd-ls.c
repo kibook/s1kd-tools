@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.13.2"
+#define VERSION "1.13.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -914,6 +914,7 @@ int main(int argc, char **argv)
 				}
 				if (nicns) {
 					nlatest_icns = extract_latest_icns(latest_icns, icns, nicns);
+					free(icns);
 				}
 
 				free(issue_dms);
@@ -922,7 +923,6 @@ int main(int argc, char **argv)
 				free(issue_upfs);
 				free(issue_imfs);
 				free(issue_dmls);
-				free(icns);
 			}
 		}
 	} else if (only_latest || only_old) {
