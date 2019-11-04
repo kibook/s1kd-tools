@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.3.1"
+#define VERSION "3.3.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -37,7 +37,7 @@
 /* Error message templates. */
 #define E_NODMOD E_PREFIX "Could not read file \"%s\".\n"
 #define E_NODMOD_STDIN E_PREFIX "stdin does not contain valid XML.\n"
-#define E_INVOBJPATH E_PREFIX "Invalid object path.\n"
+#define E_INVOBJPATH E_PREFIX "Invalid object path in BREX %s (%ld): %s\n"
 #define E_BAD_LIST E_PREFIX "Could not read list: %s\n"
 #define E_MAXOBJS E_PREFIX "Out of memory\n"
 #define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
@@ -667,8 +667,9 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 
 			if (!object) {
 				if (verbosity > SILENT) {
-					fprintf(stderr, E_INVOBJPATH);
+					fprintf(stderr, E_INVOBJPATH, brexfname, xmlGetLineNo(objectPath), path);
 				}
+
 				exit(EXIT_INVALID_OBJ_PATH);
 			}
 
