@@ -9,8 +9,8 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="accessPointRef[@accessPointNumber]">
-    <xsl:variable name="apn" select="@accessPointNumber"/>
+  <xsl:template match="accessPointRef[@accessPointNumber]|accpnl[@accpnlnbr]">
+    <xsl:variable name="apn" select="@accessPointNumber|@accpnlnbr"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
@@ -19,6 +19,8 @@
       </xsl:attribute>
       <xsl:attribute name="repcheck_test">
         <xsl:text>//accessPointIdent[@accessPointNumber='</xsl:text>
+        <xsl:value-of select="$apn"/>
+        <xsl:text>']|//accpnlid[@accpnlnbr='</xsl:text>
         <xsl:value-of select="$apn"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
@@ -60,8 +62,8 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="circuitBreakerRef">
-    <xsl:variable name="cbn" select="@circuitBreakerNumber"/>
+  <xsl:template match="circuitBreakerRef|cb">
+    <xsl:variable name="cbn" select="@circuitBreakerNumber|@cbnbr"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
@@ -70,6 +72,8 @@
       </xsl:attribute>
       <xsl:attribute name="repcheck_test">
         <xsl:text>//circuitBreakerIdent[@circuitBreakerNumber='</xsl:text>
+        <xsl:value-of select="$cbn"/>
+        <xsl:text>']|//cbid[@cbnbr='</xsl:text>
         <xsl:value-of select="$cbn"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
@@ -94,8 +98,8 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="functionalItemRef">
-    <xsl:variable name="fin" select="@functionalItemNumber"/>
+  <xsl:template match="functionalItemRef|ein">
+    <xsl:variable name="fin" select="@functionalItemNumber|@einnbr"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
@@ -104,6 +108,8 @@
       </xsl:attribute>
       <xsl:attribute name="repcheck_test">
         <xsl:text>//functionalItemIdent[@functionalItemNumber='</xsl:text>
+        <xsl:value-of select="$fin"/>
+        <xsl:text>']|//einid[@einnbr='</xsl:text>
         <xsl:value-of select="$fin"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
@@ -127,38 +133,48 @@
         <xsl:value-of select="$mcv"/>
         <xsl:text>' and @partNumberValue='</xsl:text>
         <xsl:value-of select="$pnv"/>
+        <xsl:text>']|//partid[@mfc='</xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>' and @pnr='</xsl:text>
+        <xsl:value-of select="pnv"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="node()"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="supplyRef">
-    <xsl:variable name="sn" select="@supplyNumber"/>
+  <xsl:template match="supplyRef|con">
+    <xsl:variable name="sn" select="@supplyNumber|@connbr"/>
     <xsl:variable name="snt" select="@supplyNumberType"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
         <xsl:text>Supply </xsl:text>
         <xsl:value-of select="$sn"/>
-        <xsl:text> (</xsl:text>
-        <xsl:value-of select="$snt"/>
-        <xsl:text>)</xsl:text>
+        <xsl:if test="$snt">
+          <xsl:text> (</xsl:text>
+          <xsl:value-of select="$snt"/>
+          <xsl:text>)</xsl:text>
+        </xsl:if>
       </xsl:attribute>
       <xsl:attribute name="repcheck_test">
         <xsl:text>//supplyIdent[@supplyNumber='</xsl:text>
         <xsl:value-of select="$sn"/>
-        <xsl:text>' and @supplyNumberType='</xsl:text>
-        <xsl:value-of select="$snt"/>
+        <xsl:if test="$snt">
+          <xsl:text>' and @supplyNumberType='</xsl:text>
+          <xsl:value-of select="$snt"/>
+        </xsl:if>
+        <xsl:text>']|//conitemid[@itemnbr='</xsl:text>
+        <xsl:value-of select="$sn"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="node()"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="toolRef">
-    <xsl:variable name="mcv" select="@manufacturerCodeValue"/>
-    <xsl:variable name="tn" select="@toolNumber"/>
+  <xsl:template match="toolRef|tool[@toolnbr]">
+    <xsl:variable name="mcv" select="@manufacturerCodeValue|@mfc"/>
+    <xsl:variable name="tn" select="@toolNumber|@toolnbr"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
@@ -177,6 +193,14 @@
           <xsl:text>' and </xsl:text>
         </xsl:if>
         <xsl:text>@toolNumber='</xsl:text>
+        <xsl:value-of select="$tn"/>
+        <xsl:text>']|//toolid[</xsl:text>
+        <xsl:if test="$mcv">
+          <xsl:text>@mfc='</xsl:text>
+          <xsl:value-of select="$mcv"/>
+          <xsl:text>' and</xsl:text>
+        </xsl:if>
+        <xsl:text>@toolnbr='</xsl:text>
         <xsl:value-of select="$tn"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
@@ -201,8 +225,8 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="zoneRef[@zoneNumber]">
-    <xsl:variable name="zn" select="@zoneNumber"/>
+  <xsl:template match="zoneRef[@zoneNumber]|zone[@zonenbr]">
+    <xsl:variable name="zn" select="@zoneNumber|@zonenbr"/>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
@@ -212,14 +236,25 @@
       <xsl:attribute name="repcheck_test">
         <xsl:text>//zoneIdent[@zoneNumber='</xsl:text>
         <xsl:value-of select="$zn"/>
+        <xsl:text>']|//zoneid[@zonenbr='</xsl:text>
+        <xsl:value-of select="$zn"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="node()"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="responsiblePartnerCompany[@enterpriseCode]|originator[@enterpriseCode]">
-    <xsl:variable name="ent" select="@enterpriseCode"/>
+  <xsl:template match="responsiblePartnerCompany[@enterpriseCode]|originator[@enterpriseCode]|rpc[text()]|orig[text()]">
+    <xsl:variable name="ent">
+      <xsl:choose>
+        <xsl:when test="self::responsiblePartnerCompany|self::originator">
+          <xsl:value-of select="@enterpriseCode"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="."/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
@@ -228,6 +263,8 @@
       </xsl:attribute>
       <xsl:attribute name="repcheck_test">
         <xsl:text>//enterpriseIdent[@manufacturerCodeValue='</xsl:text>
+        <xsl:value-of select="$ent"/>
+        <xsl:text>']|//organizationid[@mfc='</xsl:text>
         <xsl:value-of select="$ent"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>

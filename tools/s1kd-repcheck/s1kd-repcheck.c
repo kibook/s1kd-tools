@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.4.0"
+#define VERSION "0.5.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -277,7 +277,7 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 	/* Check if there is an explicit CIR reference. */
 	ctx = xmlXPathNewContext(ref->doc);
 	xmlXPathSetContextNode(ref, ctx);
-	obj = xmlXPathEvalExpression(BAD_CAST "refs/dmRef/dmRefIdent", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST "refs/dmRef/dmRefIdent|refs/refdm", ctx);
 
 	/* If there is not, use any of the specified/found CIRs. */
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
@@ -479,7 +479,7 @@ static bool is_cir(const char *path)
 		return false;
 	}
 
-	is = xpath_first_node(doc, NULL, BAD_CAST "//commonRepository") != NULL;
+	is = xpath_first_node(doc, NULL, BAD_CAST "//commonRepository|//techRepository|//techrep") != NULL;
 
 	xmlFreeDoc(doc);
 

@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="01"/>
+        <issueInfo issueNumber="017" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="06"/>
@@ -975,9 +975,15 @@
               <entry>
                 <para>X</para>
               </entry>
-              <entry/>
-              <entry/>
-              <entry/>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
+              <entry>
+                <para>X</para>
+              </entry>
               <entry>
                 <para>~</para>
               </entry>
