@@ -41,6 +41,9 @@ Treat input as a list of CSDB objects to check.
 Assume that the issue/inwork numbers are omitted from object filenames
 (they were created with the -N option).
 
+-o, --output-valid  
+Output valid CSDB objects to stdout.
+
 -p, --progress  
 Display a progress bar.
 

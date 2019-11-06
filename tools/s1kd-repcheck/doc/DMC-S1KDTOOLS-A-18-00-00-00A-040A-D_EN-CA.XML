@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="02"/>
+        <issueInfo issueNumber="000" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="06"/>
@@ -94,6 +94,12 @@
               <listItemTerm>-N, --omit-issue</listItemTerm>
               <listItemDefinition>
                 <para>Assume that the issue/inwork numbers are omitted from object filenames (they were created with the -N option).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --output-valid</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
