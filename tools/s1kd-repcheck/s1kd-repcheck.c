@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.3.0"
+#define VERSION "0.3.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -720,6 +720,10 @@ int main(int argc, char **argv)
 		if (show_progress) {
 			print_progress_bar(i, opts.objects.count);
 		}
+	}
+
+	if (show_progress && opts.objects.count > 0) {
+		print_progress_bar(i, opts.objects.count);
 	}
 
 	if (xml_report) {
