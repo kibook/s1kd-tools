@@ -528,7 +528,7 @@ int save_xml_doc(xmlDocPtr doc, const char *path)
 }
 
 /* Return the first node matching an XPath expression. */
-static xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -554,6 +554,12 @@ static xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar
 	xmlXPathFreeContext(ctx);
 
 	return first;
+}
+
+/* Return the value of the first node matching an XPath expression. */
+xmlChar *xpath_first_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
+{
+	return xmlNodeGetContent(xpath_first_node(doc, node, path));
 }
 
 /* Add a dependency test to an assertion if it contains any of the dependent

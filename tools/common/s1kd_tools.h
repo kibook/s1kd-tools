@@ -123,6 +123,12 @@ xmlDocPtr read_xml_mem(const char *buffer, int size);
 /* Save an XML document to a file. */
 int save_xml_doc(xmlDocPtr doc, const char *path);
 
+/* Return the first node matching an XPath expression. */
+xmlNodePtr xpath_first_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path);
+
+/* Return the value of the first node matching an XPath expression. */
+xmlChar *xpath_first_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path);
+
 /* Add CCT dependencies to an object's annotations. */
 void add_cct_depends(xmlDocPtr doc, xmlDocPtr cct, xmlChar *id);
 
