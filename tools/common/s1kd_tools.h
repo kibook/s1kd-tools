@@ -168,4 +168,10 @@ bool is_upf(const char *name);
 /* Interpolate a command string with a file name and execute it. */
 int execfile(const char *execstr, const char *path);
 
+/* Copy only the latest issues of CSDB objects. */
+int extract_latest_csdb_objects(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles);
+
+/* Compare the base names of two files. */
+int compare_basename(const void *a, const void *b);
+
 #endif

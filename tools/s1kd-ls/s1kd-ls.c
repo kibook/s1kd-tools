@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.13.3"
+#define VERSION "1.13.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -77,25 +77,6 @@ static void printfiles(char (*files)[PATH_MAX], int n)
 	} else {
 		for (i = 0; i < n; ++i) printf("%s%c", files[i], sep);
 	}
-}
-
-/* Compare the base names of two files. */
-static int compare(const void *a, const void *b)
-{
-	char *sa, *sb, *ba, *bb;
-	int d;
-
-	sa = strdup((const char *) a);
-	sb = strdup((const char *) b);
-	ba = basename(sa);
-	bb = basename(sb);
-
-	d = strcasecmp(ba, bb);
-
-	free(sa);
-	free(sb);
-
-	return d;
 }
 
 /* Compare two ICN files, grouped by file extension. */
@@ -341,33 +322,6 @@ static int is_official_issue(const char *fname, const char *path)
 	}
 }
 
-/* Copy only the latest issues of CSDB objects. */
-static int extract_latest(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
-{
-	int i, nlatest = 0;
-	for (i = 0; i < nfiles; ++i) {
-		char *name1, *name2, *base1, *base2;
-
-		name1 = strdup(files[i]);
-		base1 = basename(name1);
-		if (i > 0) {
-			name2 = strdup(files[i - 1]);
-			base2 = basename(name2);
-		} else {
-			name2 = NULL;
-		}
-
-		if (i == 0 || strncmp(base1, base2, strchr(base1, '_') - base1) != 0) {
-			strcpy(latest[nlatest++], files[i]);
-		} else {
-			strcpy(latest[nlatest - 1], files[i]);
-		}
-
-		free(name1);
-		free(name2);
-	}
-	return nlatest;
-}
 static int extract_latest_icns(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
 {
 	int i, nlatest = 0;
@@ -740,42 +694,42 @@ int main(int argc, char **argv)
 	}
 
 	if (ndms) {
-		qsort(dms, ndms, PATH_MAX, compare);
+		qsort(dms, ndms, PATH_MAX, compare_basename);
 		if (only_latest || only_old) latest_dms = malloc(ndms * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_dms = malloc(ndms * PATH_MAX);
 	} else {
 		free(dms);
 	}
 	if (npms) {
-		qsort(pms, npms, PATH_MAX, compare);
+		qsort(pms, npms, PATH_MAX, compare_basename);
 		if (only_latest || only_old) latest_pms = malloc(npms * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_pms = malloc(npms * PATH_MAX);
 	} else {
 		free(pms);
 	}
 	if (nsmcs) {
-		qsort(smcs, nsmcs, PATH_MAX, compare);
+		qsort(smcs, nsmcs, PATH_MAX, compare_basename);
 		if (only_latest || only_old) latest_smcs = malloc(nsmcs * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_smcs = malloc(nsmcs * PATH_MAX);
 	} else {
 		free(smcs);
 	}
 	if (nupfs) {
-		qsort(upfs, nupfs, PATH_MAX, compare);
+		qsort(upfs, nupfs, PATH_MAX, compare_basename);
 		if (only_latest || only_old) latest_upfs = malloc(nupfs * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_upfs = malloc(nupfs * PATH_MAX);
 	} else {
 		free(upfs);
 	}
 	if (nimfs) {
-		qsort(imfs, nimfs, PATH_MAX, compare);
+		qsort(imfs, nimfs, PATH_MAX, compare_basename);
 		if (only_latest || only_old) latest_imfs = malloc(nimfs * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_imfs = malloc(nimfs * PATH_MAX);
 	} else {
 		free(imfs);
 	}
 	if (ndmls) {
-		qsort(dmls, ndmls, PATH_MAX, compare);
+		qsort(dmls, ndmls, PATH_MAX, compare_basename);
 		if (only_latest || only_old) latest_dmls = malloc(ndmls * PATH_MAX);
 		if (only_official_issue || only_inwork) issue_dmls = malloc(ndmls * PATH_MAX);
 	} else {
@@ -895,22 +849,22 @@ int main(int argc, char **argv)
 
 			if (only_latest) {
 				if (nissue_dms) {
-					nlatest_dms = extract_latest(latest_dms, issue_dms, nissue_dms);
+					nlatest_dms = extract_latest_csdb_objects(latest_dms, issue_dms, nissue_dms);
 				}
 				if (nissue_pms) {
-					nlatest_pms = extract_latest(latest_pms, issue_pms, nissue_pms);
+					nlatest_pms = extract_latest_csdb_objects(latest_pms, issue_pms, nissue_pms);
 				}
 				if (nissue_smcs) {
-					nlatest_smcs = extract_latest(latest_smcs, issue_smcs, nissue_smcs);
+					nlatest_smcs = extract_latest_csdb_objects(latest_smcs, issue_smcs, nissue_smcs);
 				}
 				if (nissue_upfs) {
-					nlatest_upfs = extract_latest(latest_upfs, issue_upfs, nissue_upfs);
+					nlatest_upfs = extract_latest_csdb_objects(latest_upfs, issue_upfs, nissue_upfs);
 				}
 				if (nissue_imfs) {
-					nlatest_imfs = extract_latest(latest_imfs, issue_imfs, nissue_imfs);
+					nlatest_imfs = extract_latest_csdb_objects(latest_imfs, issue_imfs, nissue_imfs);
 				}
 				if (nissue_dmls) {
-					nlatest_dmls = extract_latest(latest_dmls, issue_dmls, nissue_dmls);
+					nlatest_dmls = extract_latest_csdb_objects(latest_dmls, issue_dmls, nissue_dmls);
 				}
 				if (nicns) {
 					nlatest_icns = extract_latest_icns(latest_icns, icns, nicns);
@@ -930,7 +884,7 @@ int main(int argc, char **argv)
 		int (*icnf)(char (*)[PATH_MAX], char (*)[PATH_MAX], int);
 
 		if (only_latest) {
-			f = extract_latest;
+			f = extract_latest_csdb_objects;
 			icnf = extract_latest_icns;
 		} else {
 			f = remove_latest;

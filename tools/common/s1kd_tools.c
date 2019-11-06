@@ -922,3 +922,50 @@ int execfile(const char *execstr, const char *path)
 
 	return WEXITSTATUS(e);
 }
+
+/* Copy only the latest issues of CSDB objects. */
+int extract_latest_csdb_objects(char (*latest)[PATH_MAX], char (*files)[PATH_MAX], int nfiles)
+{
+	int i, nlatest = 0;
+	for (i = 0; i < nfiles; ++i) {
+		char *name1, *name2, *base1, *base2;
+
+		name1 = strdup(files[i]);
+		base1 = basename(name1);
+		if (i > 0) {
+			name2 = strdup(files[i - 1]);
+			base2 = basename(name2);
+		} else {
+			name2 = NULL;
+		}
+
+		if (i == 0 || strncmp(base1, base2, strchr(base1, '_') - base1) != 0) {
+			strcpy(latest[nlatest++], files[i]);
+		} else {
+			strcpy(latest[nlatest - 1], files[i]);
+		}
+
+		free(name1);
+		free(name2);
+	}
+	return nlatest;
+}
+
+/* Compare the base names of two files. */
+int compare_basename(const void *a, const void *b)
+{
+	char *sa, *sb, *ba, *bb;
+	int d;
+
+	sa = strdup((const char *) a);
+	sb = strdup((const char *) b);
+	ba = basename(sa);
+	bb = basename(sb);
+
+	d = strcasecmp(ba, bb);
+
+	free(sa);
+	free(sb);
+
+	return d;
+}

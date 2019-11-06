@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.1.0"
+#define VERSION "0.2.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -37,7 +37,8 @@
 #define I_FOUND INF_PREFIX "Found %s in CIR %s\n"
 #define I_NOT_FOUND INF_PREFIX "Not found in CIR %s\n"
 #define I_FIND_CIR INF_PREFIX "Searching for CIRs in \"%s\"...\n"
-#define I_FIND_CIR_ADD INF_PREFIX "Adding CIR %s...\n"
+#define I_FIND_CIR_FOUND INF_PREFIX "Found CIR %s...\n"
+#define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s...\n"
 
 /* Success messages. */
 #define S_VALID SUC_PREFIX "All CIR references were resolved in %s.\n"
@@ -481,11 +482,13 @@ static void find_cirs(struct objects *cirs, char *search_dir, struct opts *opts)
 	DIR *dir;
 	struct dirent *cur;
 	char fpath[PATH_MAX], cpath[PATH_MAX];
+	struct objects latest;
 
 	if (!(dir = opendir(search_dir))) {
 		return;
 	}
 
+	/* Clean up the directory string. */
 	if (strcmp(search_dir, ".") == 0) {
 		strcpy(fpath, "");
 	} else if (search_dir[strlen(search_dir) - 1] != '/') {
@@ -495,6 +498,7 @@ static void find_cirs(struct objects *cirs, char *search_dir, struct opts *opts)
 		strcpy(fpath, search_dir);
 	}
 
+	/* Search for CIRs. */
 	while ((cur = readdir(dir))) {
 		strcpy(cpath, fpath);
 		strcat(cpath, cur->d_name);
@@ -503,13 +507,29 @@ static void find_cirs(struct objects *cirs, char *search_dir, struct opts *opts)
 			find_cirs(cirs, cpath, opts);
 		} else if (is_dm(cur->d_name) && is_cir(cpath)) {
 			if (opts->verbosity >= DEBUG) {
-				fprintf(stderr, I_FIND_CIR_ADD, cpath);
+				fprintf(stderr, I_FIND_CIR_FOUND, cpath);
 			}
 			add_object(cirs, cpath, opts);
 		}
 	}
 
 	closedir(dir);
+
+	/* Use only the latest issue of a CIR. */
+	qsort(cirs->paths, cirs->count, PATH_MAX, compare_basename);
+	latest.paths = malloc(cirs->count * PATH_MAX);
+	latest.count = extract_latest_csdb_objects(latest.paths, cirs->paths, cirs->count);
+	free(cirs->paths);
+	cirs->paths = latest.paths;
+	cirs->count = latest.count;
+
+	/* Print the final CIR list in DEBUG mode. */
+	if (opts->verbosity >= DEBUG) {
+		int i;
+		for (i = 0; i < cirs->count; ++i) {
+			fprintf(stderr, I_FIND_CIR_ADD, cirs->paths[i]);
+		}
+	}
 }
 
 /* Show a summary of the check. */
