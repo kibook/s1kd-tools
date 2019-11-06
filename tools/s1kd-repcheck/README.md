@@ -19,6 +19,11 @@ will cause the tool to report an error.
 OPTIONS
 =======
 
+-a, --all  
+In addition to CIR data modules specified with -R or explicitly linked
+in CIR references, allow CIR references to be resolved against any CIR
+data modules that were specified as objects to check.
+
 -d, --dir &lt;dir&gt;  
 The directory to start searching for CIR data modules in. By default,
 the current directory is used.

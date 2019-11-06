@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.2.0"
+#define VERSION "0.3.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -66,6 +66,7 @@ struct opts {
 	char *search_dir;
 	bool recursive;
 	bool no_issue;
+	bool search_all_objs;
 	struct objects objects;
 	struct objects cirs;
 	xmlNodePtr report;
@@ -287,11 +288,13 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 			}
 		}
 
-		/* Search in all other specified objects. */
-		for (i = 0; i < opts->objects.count; ++i) {
-			if (find_ref_in_cir(ref, ident, xpath, opts->objects.paths[i], opts)) {
-				add_ref_to_report(rpt, ref, lineno, opts->objects.paths[i], opts);
-				goto done;
+		/* Search in all other specified objects, if allowed. */
+		if (opts->search_all_objs) {
+			for (i = 0; i < opts->objects.count; ++i) {
+				if (find_ref_in_cir(ref, ident, xpath, opts->objects.paths[i], opts)) {
+					add_ref_to_report(rpt, ref, lineno, opts->objects.paths[i], opts);
+					goto done;
+				}
 			}
 		}
 	/* If there is an explicit reference, only check against that. */
@@ -556,6 +559,7 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
+	puts("  -a, --all         Resolve against CIRs specified as objects to check.");
 	puts("  -d, --dir <dir>   Search for CIRs in <dir>.");
 	puts("  -f, --filenames   List invalid files.");
 	puts("  -h, -?, --help    Show help/usage message.");
@@ -584,10 +588,11 @@ int main(int argc, char **argv)
 {
 	int i, err = 0;
 
-	const char *sopts = "d:flNpqR:rTvxh?";
+	const char *sopts = "ad:flNpqR:rTvxh?";
 	struct option lopts[] = {
 		{"version"   , no_argument      , 0, 0},
 		{"help"      , no_argument      , 0, 'h'},
+		{"all"       , no_argument      , 0, 'a'},
 		{"dir"       , required_argument, 0, 'd'},
 		{"filenames" , no_argument      , 0, 'f'},
 		{"list"      , no_argument      , 0, 'l'},
@@ -617,6 +622,7 @@ int main(int argc, char **argv)
 	opts.show_filenames = false;
 	opts.recursive = false;
 	opts.no_issue = false;
+	opts.search_all_objs = false;
 
 	init_objects(&opts.objects);
 	init_objects(&opts.cirs);
@@ -634,6 +640,9 @@ int main(int argc, char **argv)
 					show_version();
 					goto cleanup;
 				}
+				break;
+			case 'a':
+				opts.search_all_objs = true;
 				break;
 			case 'd':
 				free(opts.search_dir);

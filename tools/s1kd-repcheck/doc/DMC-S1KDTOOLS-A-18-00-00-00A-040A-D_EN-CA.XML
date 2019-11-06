@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="000" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="06"/>
@@ -60,6 +60,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem>
+              <listItemTerm>-a, --all</listItemTerm>
+              <listItemDefinition>
+                <para>In addition to CIR data modules specified with -R or explicitly linked in CIR references, allow CIR references to be resolved against any CIR data modules that were specified as objects to check.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
