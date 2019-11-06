@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -318,7 +318,7 @@ static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const x
 
 		puts("s) Ignore this one");
 		puts("");
-		puts("Add 'a' after your choice to apply to all remaining acronyms");
+		puts("Add 'a' after your choice to apply to all remaining occurrences of this acronym");
 		puts("");
 		printf("Choice: ");
 
