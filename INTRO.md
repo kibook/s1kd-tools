@@ -93,6 +93,8 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     The **s1kd-refs** tool lists references in a CSDB object to generate
     a list of dependencies on other CSDB objects.
 
+    The **s1kd-repcheck** tool validates CIR references in CSDB objects.
+
     The **s1kd-validate** tool validates CSDB objects according to their
     S1000D schema and general correctness as XML documents.
 
@@ -190,6 +192,8 @@ Manpages for each tool:
 -   s1kd-ref(1)
 
 -   s1kd-refs(1)
+
+-   s1kd-repcheck(1)
 
 -   s1kd-sns(1)
 
