@@ -163,14 +163,20 @@
       <xsl:apply-templates select="@*"/>
       <xsl:attribute name="repcheck_name">
         <xsl:text>Tool </xsl:text>
-        <xsl:value-of select="$mcv"/>
-        <xsl:text>/</xsl:text>
+        <xsl:if test="$mcv">
+          <xsl:value-of select="$mcv"/>
+          <xsl:text>/</xsl:text>
+        </xsl:if>
         <xsl:value-of select="$tn"/>
       </xsl:attribute>
       <xsl:attribute name="repcheck_test">
-        <xsl:text>//toolIdent[@manufacturerCodeValue='</xsl:text>
-        <xsl:value-of select="$mcv"/>
-        <xsl:text>' and @toolNumber='</xsl:text>
+        <xsl:text>//toolIdent[</xsl:text>
+        <xsl:if test="$mcv">
+          <xsl:text>@manufacturerCodeValue='</xsl:text>
+          <xsl:value-of select="$mcv"/>
+          <xsl:text>' and </xsl:text>
+        </xsl:if>
+        <xsl:text>@toolNumber='</xsl:text>
         <xsl:value-of select="$tn"/>
         <xsl:text>']</xsl:text>
       </xsl:attribute>
