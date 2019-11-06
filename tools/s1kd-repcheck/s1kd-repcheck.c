@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.3.1"
+#define VERSION "0.3.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -38,7 +38,7 @@
 #define I_NOT_FOUND INF_PREFIX "Not found in CIR %s\n"
 #define I_FIND_CIR INF_PREFIX "Searching for CIRs in \"%s\"...\n"
 #define I_FIND_CIR_FOUND INF_PREFIX "Found CIR %s...\n"
-#define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s...\n"
+#define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s\n"
 
 /* Success messages. */
 #define S_VALID SUC_PREFIX "All CIR references were resolved in %s.\n"
