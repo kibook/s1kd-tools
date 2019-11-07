@@ -78,7 +78,7 @@
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-d, --date-format &lt;fmt&gt;</listItemTerm>
               <listItemDefinition>
-                <para>The format to use for dates in certain metadata (currently, only the "modified" metadata).</para>
+                <para>The format to use when printing dates, such as the "issueDate" or "modified" metadata. &lt;fmt&gt; should conform to the format used by strftime. The default is "%Y-%m-%d".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

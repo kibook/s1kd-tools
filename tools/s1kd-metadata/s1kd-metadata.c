@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.2.1"
+#define VERSION "3.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -30,7 +30,7 @@
 
 #define FMTSTR_DELIM '%'
 
-#define DEFAULT_TIMEFMT "%Y:%m:%dT%H:%M:%S"
+#define DEFAULT_TIMEFMT "%Y-%m-%d"
 
 enum verbosity {SILENT, NORMAL};
 
@@ -112,13 +112,23 @@ static xmlChar *first_xpath_string(xmlNodePtr node, const xmlChar *expr)
 static xmlChar *get_issue_date(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *year, *month, *day, *date;
+	int y, m, d;
+	struct tm t = {0};
 
 	year  = xmlGetProp(node, BAD_CAST "year");
 	month = xmlGetProp(node, BAD_CAST "month");
 	day   = xmlGetProp(node, BAD_CAST "day");
 
-	date = malloc(11);
-	xmlStrPrintf(date, 11, "%s-%s-%s", year, month, day);
+	y = atoi((char *) year);
+	m = atoi((char *) month);
+	d = atoi((char *) day);
+
+	t.tm_mday = d;
+	t.tm_mon = m - 1;
+	t.tm_year = y - 1900;
+
+	date = malloc(256);
+	strftime((char *) date, 256, opts->timefmt, &t);
 
 	xmlFree(year);
 	xmlFree(month);
@@ -2289,9 +2299,12 @@ static char *get_modtime(const char *fname, struct opts *opts)
 {
 	struct stat st;
 	char *buf;
+
 	stat(fname, &st);
 	buf = malloc(256);
+
 	strftime(buf, 256, opts->timefmt, localtime(&st.st_mtime));
+
 	return buf;
 }
 
@@ -2716,7 +2729,7 @@ static void show_help(void)
 	puts("Options:");
 	puts("  -0, --null               Use null-delimited fields.");
 	puts("  -c, --set <file>         Set metadata using definitions in <file> (- for stdin).");
-	puts("  -d, --date-format <fmt>  Format to use for dates in certain metadata.");
+	puts("  -d, --date-format <fmt>  Format to use for printing dates.");
 	puts("  -E, --editable           Include only editable metadata when showing all.");
 	puts("  -e, --exec <cmd>         Execute <cmd> for each CSDB object.");
 	puts("  -F, --format <fmt>       Print a formatted line for each CSDB object.");

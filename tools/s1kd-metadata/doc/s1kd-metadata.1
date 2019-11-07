@@ -34,8 +34,10 @@ specified).
 .RE
 .TP
 .B \-d, \-\-date\-format <fmt>
-The format to use for dates in certain metadata (currently, only the
-"modified" metadata).
+The format to use when printing dates, such as the "issueDate" or
+"modified" metadata.
+<fmt> should conform to the format used by strftime.
+The default is "%Y\-%m\-%d".
 .RS
 .RE
 .TP

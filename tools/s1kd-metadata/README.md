@@ -28,8 +28,9 @@ new value for the metadata (the program uses this same format when
 outputting all metadata if no &lt;name&gt; is specified).
 
 -d, --date-format &lt;fmt&gt;  
-The format to use for dates in certain metadata (currently, only the
-"modified" metadata).
+The format to use when printing dates, such as the "issueDate" or
+"modified" metadata. &lt;fmt&gt; should conform to the format used by
+strftime. The default is "%Y-%m-%d".
 
 -E, --editable  
 When showing all metadata, only list editable items. This is useful when
