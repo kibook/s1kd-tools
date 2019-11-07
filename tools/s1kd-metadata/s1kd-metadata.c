@@ -3,6 +3,9 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <regex.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -10,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.1.2"
+#define VERSION "3.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -27,6 +30,8 @@
 
 #define FMTSTR_DELIM '%'
 
+#define DEFAULT_TIMEFMT "%Y:%m:%dT%H:%M:%S"
+
 static enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
 
 struct metadata {
@@ -42,6 +47,10 @@ struct metadata {
 struct icn_metadata {
 	char *key;
 	void (*show)(const char *, int);
+};
+
+struct opts {
+	char *timefmt;
 };
 
 static xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
@@ -1788,6 +1797,13 @@ static struct metadata metadata[] = {
 		edit_model_ident_code,
 		NULL,
 		"Model identification code"},
+	{"modified",
+		"false()",
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		"File modification time"},
 	{"originator",
 		"//originator/enterpriseName|//orig/@origname",
 		NULL,
@@ -2278,6 +2294,26 @@ static int show_format(const char *bname, int endl)
 	return 0;
 }
 
+static char *get_modtime(const char *fname, const char *timefmt)
+{
+	struct stat st;
+	char *buf;
+	stat(fname, &st);
+	buf = malloc(256);
+	strftime(buf, 256, timefmt, localtime(&st.st_mtime));
+	return buf;
+}
+
+static int show_modtime(const char *fname, const char *timefmt, int endl)
+{
+	char *s;
+	s = get_modtime(fname, timefmt);
+	printf("%s", s);
+	free(s);
+	if (endl > -1) putchar(endl);
+	return 0;
+}
+
 static int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
 {
 	int i;
@@ -2327,7 +2363,7 @@ static int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
 	return EXIT_INVALID_METADATA;
 }
 
-static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt)
+static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt, struct opts *opts)
 {
 	int i;
 	for (i = 0; fmt[i]; ++i) {
@@ -2352,6 +2388,8 @@ static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const
 					show_path(fname, -1);
 				} else if (strncmp(k, "format", n) == 0) {
 					show_format(bname, -1);
+				} else if (strncmp(k, "modified", n) == 0) {
+					show_modtime(fname, opts->timefmt, -1);
 				} else if (is_icn(bname)) {
 					show_icn_metadata_fmtstr_key(bname, k, n);
 				} else {
@@ -2376,12 +2414,16 @@ static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const
 	return 0;
 }
 
-static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fname)
+static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fname, struct opts *opts)
 {
 	xmlNodePtr node;
 
-	if (strcmp(metadata[i].key, "format") == 0) {
-		return xmlStrdup(BAD_CAST get_format(fname));
+	if (strcmp(metadata[i].key, "path") == 0) {
+		return xmlCharStrdup(fname);
+	} else if (strcmp(metadata[i].key, "format") == 0) {
+		return xmlCharStrdup(get_format(fname));
+	} else if (strcmp(metadata[i].key, "modified") == 0) {
+		return xmlCharStrdup(get_modtime(fname, opts->timefmt));
 	} else if ((node = first_xpath_node(metadata[i].path, ctx))) {
 		if (metadata[i].get) {
 			return BAD_CAST metadata[i].get(node);
@@ -2393,7 +2435,7 @@ static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fnam
 	return NULL;
 }
 
-static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname)
+static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname, struct opts *opts)
 {
 	xmlChar *key, *val, *op, *regex;
 	int i, cmp = 0;
@@ -2407,7 +2449,7 @@ static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fn
 		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
 			xmlChar *content;
 
-			content = get_cond_content(i, ctx, fname);
+			content = get_cond_content(i, ctx, fname, opts);
 
 			if (regex) {
 				switch (op[0]) {
@@ -2477,7 +2519,7 @@ static int show_all_icn_metadata(const char *fname, int formatall, int endl)
 static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
 	int only_editable, const char *fmtstr, xmlNodePtr conds,
-	const char *execstr)
+	const char *execstr, struct opts *opts)
 {
 	int err = 0;
 	xmlDocPtr doc;
@@ -2490,7 +2532,7 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	ctxt = xmlXPathNewContext(doc);
 
 	for (cond = conds->children; cond; cond = cond->next) {
-		if (!condition_met(ctxt, cond, fname)) {
+		if (!condition_met(ctxt, cond, fname, opts)) {
 			err = EXIT_CONDITION_UNMET;
 		}
 	}
@@ -2504,7 +2546,7 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		if (execstr) {
 			err = execfile(execstr, fname) != 0;
 		} else if (fmtstr) {
-			err = show_metadata_fmtstr(fname, ctxt, fmtstr);
+			err = show_metadata_fmtstr(fname, ctxt, fmtstr, opts);
 		} else if (keys->children) {
 			xmlNodePtr cur;
 			for (cur = keys->children; cur; cur = cur->next) {
@@ -2520,6 +2562,8 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 					err = show_path(fname, endl);
 				} else if (strcmp(key, "format") == 0) {
 					err = show_format(bname, endl);
+				} else if (strcmp(key, "modified") == 0) {
+					err = show_modtime(fname, opts->timefmt, endl);
 				} else if (is_icn(bname)) {
 					err = show_icn_metadata(bname, key, endl);
 				} else {
@@ -2611,7 +2655,7 @@ static void add_cond_val(xmlNodePtr conds, const char *v, bool regex)
 static int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
 	xmlNodePtr keys, int formatall, int overwrite, int endl,
 	int only_editable, const char *fmtstr, xmlNodePtr conds,
-	const char *execstr)
+	const char *execstr, struct opts *opts)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -2630,7 +2674,7 @@ static int show_or_edit_metadata_list(const char *fname, const char *metadata_fn
 		strtok(path, "\t\r\n");
 		err += show_or_edit_metadata(path, metadata_fname, keys,
 			formatall, overwrite, endl, only_editable, fmtstr, conds,
-			execstr);
+			execstr, opts);
 	}
 
 	if (fname) {
@@ -2685,24 +2729,25 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -0, --null             Use null-delimited fields.");
-	puts("  -c, --set <file>       Set metadata using definitions in <file> (- for stdin).");
-	puts("  -E, --editable         Include only editable metadata when showing all.");
-	puts("  -e, --exec <cmd>       Execute <cmd> for each CSDB object.");
-	puts("  -F, --format <fmt>     Print a formatted line for each CSDB object.");
-	puts("  -f, --overwrite        Overwrite modules when editing metadata.");
-	puts("  -H, --info             List information on available metadata.");
-	puts("  -l, --list             Input is a list of filenames.");
-	puts("  -m, --matches <regex>  Use a pattern instead of a literal value (-v) with -w/-W.");
-	puts("  -n, --name <name>      Specific metadata name to view/edit.");
-	puts("  -q, --quiet            Quiet mode, do not show non-fatal errors.");
-	puts("  -T, --raw              Do not format columns in output.");
-	puts("  -t, --tab              Use tab-delimited fields.");
-	puts("  -v, --value <value>    The value to set or match.");
-	puts("  -W, --not-when <name>  Only list/edit when metadata <name> does not equal a value.");
-	puts("  -w, --when <name>      Only list/edit when metadata <name> equals a value.");
-	puts("  --version              Show version information.");
-	puts("  <object>               CSDB object(s) to view/edit metadata on.");
+	puts("  -0, --null               Use null-delimited fields.");
+	puts("  -c, --set <file>         Set metadata using definitions in <file> (- for stdin).");
+	puts("  -d, --date-format <fmt>  Format to use for dates in certain metadata.");
+	puts("  -E, --editable           Include only editable metadata when showing all.");
+	puts("  -e, --exec <cmd>         Execute <cmd> for each CSDB object.");
+	puts("  -F, --format <fmt>       Print a formatted line for each CSDB object.");
+	puts("  -f, --overwrite          Overwrite modules when editing metadata.");
+	puts("  -H, --info               List information on available metadata.");
+	puts("  -l, --list               Input is a list of filenames.");
+	puts("  -m, --matches <regex>    Use a pattern instead of a literal value (-v) with -w/-W.");
+	puts("  -n, --name <name>        Specific metadata name to view/edit.");
+	puts("  -q, --quiet              Quiet mode, do not show non-fatal errors.");
+	puts("  -T, --raw                Do not format columns in output.");
+	puts("  -t, --tab                Use tab-delimited fields.");
+	puts("  -v, --value <value>      The value to set or match.");
+	puts("  -W, --not-when <name>    Only list/edit when metadata <name> does not equal a value.");
+	puts("  -w, --when <name>        Only list/edit when metadata <name> equals a value.");
+	puts("  --version                Show version information.");
+	puts("  <object>                 CSDB object(s) to view/edit metadata on.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -2727,27 +2772,29 @@ int main(int argc, char **argv)
 	int only_editable = 0;
 	char *fmtstr = NULL;
 	char *execstr = NULL;
+	struct opts opts;
 
-	const char *sopts = "0c:Ee:F:fHlm:n:Ttv:qW:w:h?";
+	const char *sopts = "0d:c:Ee:F:fHlm:n:Ttv:qW:w:h?";
 	struct option lopts[] = {
-		{"version"  , no_argument      , 0, 0},
-		{"help"     , no_argument      , 0, 'h'},
-		{"null"     , no_argument      , 0, '0'},
-		{"set"      , required_argument, 0, 'c'},
-		{"editable" , no_argument      , 0, 'E'},
-		{"exec"     , required_argument, 0, 'e'},
-		{"format"   , required_argument, 0, 'F'},
-		{"overwrite", no_argument      , 0, 'f'},
-		{"info"     , no_argument      , 0, 'H'},
-		{"list"     , no_argument      , 0, 'l'},
-		{"matches"  , required_argument, 0, 'm'},
-		{"name"     , required_argument, 0, 'n'},
-		{"raw"      , no_argument      , 0, 'T'},
-		{"tab"      , no_argument      , 0, 't'},
-		{"value"    , required_argument, 0, 'v'},
-		{"quiet"    , no_argument      , 0, 'q'},
-		{"when"     , required_argument, 0, 'w'},
-		{"not-when" , required_argument, 0, 'W'},
+		{"version"    , no_argument      , 0, 0},
+		{"help"       , no_argument      , 0, 'h'},
+		{"null"       , no_argument      , 0, '0'},
+		{"set"        , required_argument, 0, 'c'},
+		{"date-format", required_argument, 0, 'd'},
+		{"editable"   , no_argument      , 0, 'E'},
+		{"exec"       , required_argument, 0, 'e'},
+		{"format"     , required_argument, 0, 'F'},
+		{"overwrite"  , no_argument      , 0, 'f'},
+		{"info"       , no_argument      , 0, 'H'},
+		{"list"       , no_argument      , 0, 'l'},
+		{"matches"    , required_argument, 0, 'm'},
+		{"name"       , required_argument, 0, 'n'},
+		{"raw"        , no_argument      , 0, 'T'},
+		{"tab"        , no_argument      , 0, 't'},
+		{"value"      , required_argument, 0, 'v'},
+		{"quiet"      , no_argument      , 0, 'q'},
+		{"when"       , required_argument, 0, 'w'},
+		{"not-when"   , required_argument, 0, 'W'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2756,17 +2803,20 @@ int main(int argc, char **argv)
 	keys = xmlNewNode(NULL, BAD_CAST "keys");
 	conds = xmlNewNode(NULL, BAD_CAST "conds");
 
+	opts.timefmt = strdup(DEFAULT_TIMEFMT);
+
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
-					return 0;
+					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case '0': endl = '\0'; break;
 			case 'c': metadata_fname = strdup(optarg); break;
+			case 'd': free(opts.timefmt); opts.timefmt = strdup(optarg); break;
 			case 'E': only_editable = 1; break;
 			case 'e': execstr = strdup(optarg); break;
 			case 'F': fmtstr = strdup(optarg); endl = -1; break;
@@ -2791,7 +2841,7 @@ int main(int argc, char **argv)
 			case 'w': add_cond(conds, optarg, "="); last = conds; break;
 			case 'W': add_cond(conds, optarg, "~"); last = conds; break;
 			case 'h':
-			case '?': show_help(); return 0;
+			case '?': show_help(); goto cleanup;
 		}
 	}
 
@@ -2803,25 +2853,27 @@ int main(int argc, char **argv)
 				err += show_or_edit_metadata_list(argv[i],
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr,
-					conds, execstr);
+					conds, execstr, &opts);
 			} else {
 				err += show_or_edit_metadata(argv[i],
 					metadata_fname, keys, formatall,
 					overwrite, endl, only_editable, fmtstr,
-					conds, execstr);
+					conds, execstr, &opts);
 			}
 		}
 	} else if (islist) {
 		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr, conds, execstr);
+			overwrite, endl, only_editable, fmtstr, conds, execstr, &opts);
 	} else {
 		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr, conds, execstr);
+			overwrite, endl, only_editable, fmtstr, conds, execstr, &opts);
 	}
 
+cleanup:
 	free(metadata_fname);
 	free(fmtstr);
 	free(execstr);
+	free(opts.timefmt);
 	xmlFreeNode(keys);
 	xmlFreeNode(conds);
 

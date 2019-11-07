@@ -27,6 +27,10 @@ starting with a metadata name, followed by whitespace, followed by the
 new value for the metadata (the program uses this same format when
 outputting all metadata if no &lt;name&gt; is specified).
 
+-d, --date-format &lt;fmt&gt;  
+The format to use for dates in certain metadata (currently, only the
+"modified" metadata).
+
 -E, --editable  
 When showing all metadata, only list editable items. This is useful when
 creating a file for use with the -c option.
