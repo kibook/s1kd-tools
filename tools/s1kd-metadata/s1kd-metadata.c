@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.2.0"
+#define VERSION "3.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -32,25 +32,35 @@
 
 #define DEFAULT_TIMEFMT "%Y:%m:%dT%H:%M:%S"
 
-static enum verbosity {SILENT, NORMAL} verbosity = NORMAL;
+enum verbosity {SILENT, NORMAL};
+
+struct opts {
+	xmlNodePtr conds;
+	int endl;
+	char *execstr;
+	char *fmtstr;
+	int format_all;
+	xmlNodePtr keys;
+	char *metadata_fname;
+	int only_editable;
+	int overwrite;
+	char *timefmt;
+	enum verbosity verbosity;
+};
 
 struct metadata {
 	char *key;
 	char *path;
-	xmlChar *(*get)(xmlNodePtr);
-	void (*show)(xmlNodePtr, int endl);
+	xmlChar *(*get)(xmlNodePtr, struct opts *);
+	void (*show)(xmlNodePtr, struct opts *);
 	int (*edit)(xmlNodePtr, const char *);
-	int (*create)(xmlXPathContextPtr, const char *val);
+	int (*create)(xmlXPathContextPtr, const char *);
 	char *descr;
 };
 
 struct icn_metadata {
 	char *key;
-	void (*show)(const char *, int);
-};
-
-struct opts {
-	char *timefmt;
+	void (*show)(const char *, struct opts *);
 };
 
 static xmlNodePtr first_xpath_node(char *expr, xmlXPathContextPtr ctxt)
@@ -99,7 +109,7 @@ static xmlChar *first_xpath_string(xmlNodePtr node, const xmlChar *expr)
 	return xmlNodeGetContent(first_xpath_node_local(node, expr));
 }
 
-static xmlChar *get_issue_date(xmlNodePtr node)
+static xmlChar *get_issue_date(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *year, *month, *day, *date;
 
@@ -117,12 +127,11 @@ static xmlChar *get_issue_date(xmlNodePtr node)
 	return date;
 }
 
-static void show_issue_date(xmlNodePtr issue_date, int endl)
+static void show_issue_date(xmlNodePtr issue_date, struct opts *opts)
 {
 	xmlChar *date;
-	date = get_issue_date(issue_date);
+	date = get_issue_date(issue_date, opts);
 	printf("%s", (char *) date);
-	if (endl > -1) putchar(endl);
 	xmlFree(date);
 }
 
@@ -141,11 +150,10 @@ static int edit_issue_date(xmlNodePtr issue_date, const char *val)
 	return 0;
 }
 
-static void show_simple_node(xmlNodePtr node, int endl)
+static void show_simple_node(xmlNodePtr node, struct opts *opts)
 {
 	char *content = (char *) xmlNodeGetContent(node);
 	printf("%s", content);
-	if (endl > -1) putchar(endl);
 	xmlFree(content);
 }
 
@@ -189,11 +197,10 @@ static int create_info_name_variant(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-static void show_simple_attr(xmlNodePtr node, const char *attr, int endl)
+static void show_simple_attr(xmlNodePtr node, const char *attr, struct opts *opts)
 {
 	char *text = (char *) xmlGetProp(node, BAD_CAST attr);
 	printf("%s", text);
-	if (endl > -1) putchar(endl);
 	xmlFree(text);
 }
 
@@ -203,12 +210,12 @@ static int edit_simple_attr(xmlNodePtr node, const char *attr, const char *val)
 	return 0;
 }
 
-static void show_rpc_name(xmlNodePtr node, int endl)
+static void show_rpc_name(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
-		show_simple_attr(node, "rpcname", endl);
+		show_simple_attr(node, "rpcname", opts);
 	} else {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	}
 }
 
@@ -221,12 +228,12 @@ static int edit_rpc_name(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_orig_name(xmlNodePtr node, int endl)
+static void show_orig_name(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0) {
-		show_simple_attr(node, "origname", endl);
+		show_simple_attr(node, "origname", opts);
 	} else {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	}
 }
 
@@ -239,12 +246,12 @@ static int edit_orig_name(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_ent_code(xmlNodePtr node, int endl)
+static void show_ent_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "orig") == 0 || xmlStrcmp(node->name, BAD_CAST "rpc") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "enterpriseCode", endl);
+		show_simple_attr(node, "enterpriseCode", opts);
 	}
 }
 
@@ -283,12 +290,12 @@ static int create_orig_ent_code(xmlXPathContextPtr ctxt, const char *val)
 	return 0;
 }
 
-static void show_sec_class(xmlNodePtr node, int endl)
+static void show_sec_class(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlHasProp(node, BAD_CAST "securityClassification")) {
-		show_simple_attr(node, "securityClassification", endl);
+		show_simple_attr(node, "securityClassification", opts);
 	} else {
-		show_simple_attr(node, "class", endl);
+		show_simple_attr(node, "class", opts);
 	}
 }
 
@@ -301,7 +308,7 @@ static int edit_sec_class(xmlNodePtr node, const char *val)
 	}
 }
 
-static xmlChar *get_issue(xmlNodePtr node)
+static xmlChar *get_issue(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *url;
 	regex_t re;
@@ -335,14 +342,13 @@ static xmlChar *get_issue(xmlNodePtr node)
 	return iss;
 }
 
-static void show_issue(xmlNodePtr node, int endl)
+static void show_issue(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *iss;
-	iss = get_issue(node);
+	iss = get_issue(node, opts);
 	if (iss) {
 		printf("%s", (char *) iss);
 	}
-	if (endl > -1) putchar(endl);
 	free(iss);
 }
 
@@ -408,9 +414,9 @@ static int edit_issue(xmlNodePtr node, const char *val)
 	return err;
 }
 
-static void show_schema_url(xmlNodePtr node, int endl)
+static void show_schema_url(xmlNodePtr node, struct opts *opts)
 {
-	show_simple_attr(node, "noNamespaceSchemaLocation", endl);
+	show_simple_attr(node, "noNamespaceSchemaLocation", opts);
 }
 
 static int edit_schema_url(xmlNodePtr node, const char *val)
@@ -418,7 +424,7 @@ static int edit_schema_url(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "xsi:noNamespaceSchemaLocation", val);
 }
 
-static xmlChar *get_schema(xmlNodePtr node)
+static xmlChar *get_schema(xmlNodePtr node, struct opts *opts)
 {
 	char *url, *s, *e;
 	xmlChar *r;
@@ -436,12 +442,11 @@ static xmlChar *get_schema(xmlNodePtr node)
 	return r;
 }
 
-static void show_schema(xmlNodePtr node, int endl)
+static void show_schema(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *s;
-	s = get_schema(node);
+	s = get_schema(node, opts);
 	printf("%s", (char *) s);
-	if (endl > -1) putchar(endl);
 	free(s);
 }
 
@@ -456,13 +461,12 @@ static int edit_info_name(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_type(xmlNodePtr node, int endl)
+static void show_type(xmlNodePtr node, struct opts *opts)
 {
 	printf("%s", node->name);
-	if (endl > -1) putchar(endl);
 }
 
-static xmlChar *get_dmcode(xmlNodePtr node)
+static xmlChar *get_dmcode(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *model_ident_code;
 	xmlChar *system_diff_code;
@@ -545,12 +549,11 @@ static xmlChar *get_dmcode(xmlNodePtr node)
 	return code;
 }
 
-static void show_dmcode(xmlNodePtr node, int endl)
+static void show_dmcode(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *code;
-	code = get_dmcode(node);
+	code = get_dmcode(node, opts);
 	printf("%s", (char *) code);
-	if (endl > -1) putchar(endl);
 	free(code);
 }
 
@@ -626,7 +629,7 @@ static int edit_dmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-static void show_ddncode(xmlNodePtr node, int endl)
+static void show_ddncode(xmlNodePtr node, struct opts *opts)
 {
 	char *modelic, *sendid, *recvid, *diyear, *seqnum;
 
@@ -642,7 +645,6 @@ static void show_ddncode(xmlNodePtr node, int endl)
 		recvid,
 		diyear,
 		seqnum);
-	if (endl > -1) putchar(endl);
 
 	xmlFree(modelic);
 	xmlFree(sendid);
@@ -651,7 +653,7 @@ static void show_ddncode(xmlNodePtr node, int endl)
 	xmlFree(seqnum);
 }
 
-static void show_dmlcode(xmlNodePtr node, int endl)
+static void show_dmlcode(xmlNodePtr node, struct opts *opts)
 {
 	char *modelic, *sendid, *dmltype, *diyear, *seqnum;
 
@@ -667,7 +669,6 @@ static void show_dmlcode(xmlNodePtr node, int endl)
 		dmltype,
 		diyear,
 		seqnum);
-	if (endl > -1) putchar(endl);
 
 	xmlFree(modelic);
 	xmlFree(sendid);
@@ -676,7 +677,7 @@ static void show_dmlcode(xmlNodePtr node, int endl)
 	xmlFree(seqnum);
 }
 
-static void show_pmcode(xmlNodePtr node, int endl)
+static void show_pmcode(xmlNodePtr node, struct opts *opts)
 {
 	char *modelic, *pmissuer, *pmnumber, *pmvolume;
 
@@ -690,7 +691,6 @@ static void show_pmcode(xmlNodePtr node, int endl)
 		pmissuer,
 		pmnumber,
 		pmvolume);
-	if (endl > -1) putchar(endl);
 
 	xmlFree(modelic);
 	xmlFree(pmissuer);
@@ -733,12 +733,12 @@ static int edit_pmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-static void show_pm_issuer(xmlNodePtr node, int endl)
+static void show_pm_issuer(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmissuer") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "pmIssuer", endl);
+		show_simple_attr(node, "pmIssuer", opts);
 	}
 }
 
@@ -751,12 +751,12 @@ static int edit_pm_issuer(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_pm_number(xmlNodePtr node, int endl)
+static void show_pm_number(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmnumber") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "pmNumber", endl);
+		show_simple_attr(node, "pmNumber", opts);
 	}
 }
 
@@ -769,12 +769,12 @@ static int edit_pm_number(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_pm_volume(xmlNodePtr node, int endl)
+static void show_pm_volume(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "pmvolume") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "pmVolume", endl);
+		show_simple_attr(node, "pmVolume", opts);
 	}
 }
 
@@ -787,7 +787,7 @@ static int edit_pm_volume(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_comment_code(xmlNodePtr node, int endl)
+static void show_comment_code(xmlNodePtr node, struct opts *opts)
 {
 	char *model_ident_code;
 	char *sender_ident;
@@ -815,7 +815,6 @@ static void show_comment_code(xmlNodePtr node, int endl)
 		year_of_data_issue,
 		seq_number,
 		comment_type);
-	if (endl > -1) putchar(endl);
 
 	xmlFree(model_ident_code);
 	xmlFree(sender_ident);
@@ -824,27 +823,27 @@ static void show_comment_code(xmlNodePtr node, int endl)
 	xmlFree(comment_type);
 }
 
-static void show_code(xmlNodePtr node, int endl)
+static void show_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
-		show_dmcode(node, endl);
+		show_dmcode(node, opts);
 	} else if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "pmc") == 0) {
-		show_pmcode(node, endl);
+		show_pmcode(node, opts);
 	} else if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ccode") == 0) {
-		show_comment_code(node, endl);
+		show_comment_code(node, opts);
 	} else if (xmlStrcmp(node->name, BAD_CAST "ddnCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ddnc") == 0) {
-		show_ddncode(node, endl);
+		show_ddncode(node, opts);
 	} else if (xmlStrcmp(node->name, BAD_CAST "dmlCode") == 0 || xmlStrcmp(node->name, BAD_CAST "dmlc") == 0) {
-		show_dmlcode(node, endl);
+		show_dmlcode(node, opts);
 	}
 }
 
-static void show_issue_type(xmlNodePtr node, int endl)
+static void show_issue_type(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
-		show_simple_attr(node, "type", endl);
+		show_simple_attr(node, "type", opts);
 	} else {
-		show_simple_attr(node, "issueType", endl);
+		show_simple_attr(node, "issueType", opts);
 	}
 }
 
@@ -857,12 +856,12 @@ static int edit_issue_type(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_language_iso_code(xmlNodePtr node, int endl)
+static void show_language_iso_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlHasProp(node, BAD_CAST "languageIsoCode")) {
-		show_simple_attr(node, "languageIsoCode", endl);
+		show_simple_attr(node, "languageIsoCode", opts);
 	} else {
-		show_simple_attr(node, "language", endl);
+		show_simple_attr(node, "language", opts);
 	}
 }
 
@@ -875,12 +874,12 @@ static int edit_language_iso_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_country_iso_code(xmlNodePtr node, int endl)
+static void show_country_iso_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlHasProp(node, BAD_CAST "countryIsoCode")) {
-		show_simple_attr(node, "countryIsoCode", endl);
+		show_simple_attr(node, "countryIsoCode", opts);
 	} else {
-		show_simple_attr(node, "country", endl);
+		show_simple_attr(node, "country", opts);
 	}
 }
 
@@ -893,12 +892,12 @@ static int edit_country_iso_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_issue_number(xmlNodePtr node, int endl)
+static void show_issue_number(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlHasProp(node, BAD_CAST "issueNumber")) {
-		show_simple_attr(node, "issueNumber", endl);
+		show_simple_attr(node, "issueNumber", opts);
 	} else {
-		show_simple_attr(node, "issno", endl);
+		show_simple_attr(node, "issno", opts);
 	}
 }
 
@@ -907,15 +906,14 @@ static int edit_issue_number(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "issueNumber", val);
 }
 
-static void show_in_work(xmlNodePtr node, int endl)
+static void show_in_work(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlHasProp(node, BAD_CAST "inWork")) {
-		show_simple_attr(node, "inWork", endl);
+		show_simple_attr(node, "inWork", opts);
 	} else if (xmlHasProp(node, BAD_CAST "inwork")) {
-		show_simple_attr(node, "inwork", endl);
+		show_simple_attr(node, "inwork", opts);
 	} else {
 		printf("00");
-		if (endl > -1) putchar(endl);
 	}
 }
 
@@ -951,12 +949,12 @@ static int create_comment_title(xmlXPathContextPtr ctxt, const char *val)
 	return edit_simple_node(node, val);
 }
 
-static void show_comment_priority(xmlNodePtr node, int endl)
+static void show_comment_priority(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "priority") == 0) {
-		show_simple_attr(node, "cprio", endl);
+		show_simple_attr(node, "cprio", opts);
 	} else {
-		show_simple_attr(node, "commentPriorityCode", endl);
+		show_simple_attr(node, "commentPriorityCode", opts);
 	}
 }
 
@@ -969,12 +967,12 @@ static int edit_comment_priority(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_comment_response(xmlNodePtr node, int endl)
+static void show_comment_response(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "response") == 0) {
-		show_simple_attr(node, "rsptype", endl);
+		show_simple_attr(node, "rsptype", opts);
 	} else {
-		show_simple_attr(node, "responseType", endl);
+		show_simple_attr(node, "responseType", opts);
 	}
 }
 
@@ -1018,13 +1016,12 @@ static int create_orig_name(xmlXPathContextPtr ctxt, const char *val)
 	}
 }
 
-static void show_url(xmlNodePtr node, int endl)
+static void show_url(xmlNodePtr node, struct opts *opts)
 {
 	printf("%s", node->doc->URL);
-	if (endl > -1) putchar(endl);
 }
 
-static void show_title(xmlNodePtr node, int endl)
+static void show_title(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "dmTitle") == 0 || xmlStrcmp(node->name, BAD_CAST "dmtitle") == 0) {
 		xmlNodePtr tech, info, vari;
@@ -1048,18 +1045,17 @@ static void show_title(xmlNodePtr node, int endl)
 				xmlFree(vari_content);
 			}
 		}
-		if (endl > -1) putchar(endl);
 	} else {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	}
 }
 
-static void show_model_ident_code(xmlNodePtr node, int endl)
+static void show_model_ident_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "modelic") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "modelIdentCode", endl);
+		show_simple_attr(node, "modelIdentCode", opts);
 	}
 }
 
@@ -1072,12 +1068,12 @@ static int edit_model_ident_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_system_diff_code(xmlNodePtr node, int endl)
+static void show_system_diff_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sdc") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "systemDiffCode", endl);
+		show_simple_attr(node, "systemDiffCode", opts);
 	}
 }
 
@@ -1090,12 +1086,12 @@ static int edit_system_diff_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_system_code(xmlNodePtr node, int endl)
+static void show_system_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "chapnum") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "systemCode", endl);
+		show_simple_attr(node, "systemCode", opts);
 	}
 }
 
@@ -1108,12 +1104,12 @@ static int edit_system_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_sub_system_code(xmlNodePtr node, int endl)
+static void show_sub_system_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "section") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "subSystemCode", endl);
+		show_simple_attr(node, "subSystemCode", opts);
 	}
 }
 
@@ -1126,12 +1122,12 @@ static int edit_sub_system_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_sub_sub_system_code(xmlNodePtr node, int endl)
+static void show_sub_sub_system_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subsect") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "subSubSystemCode", endl);
+		show_simple_attr(node, "subSubSystemCode", opts);
 	}
 }
 
@@ -1144,12 +1140,12 @@ static int edit_sub_sub_system_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_assy_code(xmlNodePtr node, int endl)
+static void show_assy_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "subject") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "assyCode", endl);
+		show_simple_attr(node, "assyCode", opts);
 	}
 }
 
@@ -1162,12 +1158,12 @@ static int edit_assy_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_disassy_code(xmlNodePtr node, int endl)
+static void show_disassy_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discode") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "disassyCode", endl);
+		show_simple_attr(node, "disassyCode", opts);
 	}
 }
 
@@ -1180,12 +1176,12 @@ static int edit_disassy_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_disassy_code_variant(xmlNodePtr node, int endl)
+static void show_disassy_code_variant(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "discodev") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "disassyCodeVariant", endl);
+		show_simple_attr(node, "disassyCodeVariant", opts);
 	}
 }
 
@@ -1198,12 +1194,12 @@ static int edit_disassy_code_variant(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_info_code(xmlNodePtr node, int endl)
+static void show_info_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incode") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "infoCode", endl);
+		show_simple_attr(node, "infoCode", opts);
 	}
 }
 
@@ -1216,12 +1212,12 @@ static int edit_info_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_info_code_variant(xmlNodePtr node, int endl)
+static void show_info_code_variant(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "incodev") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "infoCodeVariant", endl);
+		show_simple_attr(node, "infoCodeVariant", opts);
 	}
 }
 
@@ -1234,12 +1230,12 @@ static int edit_info_code_variant(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_item_location_code(xmlNodePtr node, int endl)
+static void show_item_location_code(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "itemloc") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "itemLocationCode", endl);
+		show_simple_attr(node, "itemLocationCode", opts);
 	}
 }
 
@@ -1252,9 +1248,9 @@ static int edit_item_location_code(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_learn_code(xmlNodePtr node, int endl)
+static void show_learn_code(xmlNodePtr node, struct opts *opts)
 {
-	show_simple_attr(node, "learnCode", endl);
+	show_simple_attr(node, "learnCode", opts);
 }
 
 static int edit_learn_code(xmlNodePtr node, const char *val)
@@ -1262,9 +1258,9 @@ static int edit_learn_code(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "learnCode", val);
 }
 
-static void show_learn_event_code(xmlNodePtr node, int endl)
+static void show_learn_event_code(xmlNodePtr node, struct opts *opts)
 {
-	show_simple_attr(node, "learnEventCode", endl);
+	show_simple_attr(node, "learnEventCode", opts);
 }
 
 static int edit_learn_event_code(xmlNodePtr node, const char *val)
@@ -1272,12 +1268,12 @@ static int edit_learn_event_code(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "learnEventCode", val);
 }
 
-static void show_skill_level(xmlNodePtr node, int endl)
+static void show_skill_level(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "skill") == 0) {
-		show_simple_attr(node, "skill", endl);
+		show_simple_attr(node, "skill", opts);
 	} else {
-		show_simple_attr(node, "skillLevelCode", endl);
+		show_simple_attr(node, "skillLevelCode", opts);
 	}
 }
 
@@ -1307,12 +1303,12 @@ static int create_skill_level(xmlXPathContextPtr ctx, const char *val)
 	return 0;
 }
 
-static void show_comment_type(xmlNodePtr node, int endl)
+static void show_comment_type(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "ctype") == 0) {
-		show_simple_attr(node, "type", endl);
+		show_simple_attr(node, "type", opts);
 	} else {
-		show_simple_attr(node, "commentType", endl);
+		show_simple_attr(node, "commentType", opts);
 	}
 }
 
@@ -1325,12 +1321,12 @@ static int edit_comment_type(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_seq_number(xmlNodePtr node, int endl)
+static void show_seq_number(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "seqnum") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "seqNumber", endl);
+		show_simple_attr(node, "seqNumber", opts);
 	}
 }
 
@@ -1343,12 +1339,12 @@ static int edit_seq_number(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_year_of_data_issue(xmlNodePtr node, int endl)
+static void show_year_of_data_issue(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "diyear") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "yearOfDataIssue", endl);
+		show_simple_attr(node, "yearOfDataIssue", opts);
 	}
 }
 
@@ -1361,12 +1357,12 @@ static int edit_year_of_data_issue(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_sender_ident(xmlNodePtr node, int endl)
+static void show_sender_ident(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "sendid") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "senderIdent", endl);
+		show_simple_attr(node, "senderIdent", opts);
 	}
 }
 
@@ -1379,12 +1375,12 @@ static int edit_sender_ident(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_receiver_ident(xmlNodePtr node, int endl)
+static void show_receiver_ident(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "recvid") == 0) {
-		show_simple_node(node, endl);
+		show_simple_node(node, opts);
 	} else {
-		show_simple_attr(node, "receiverIdent", endl);
+		show_simple_attr(node, "receiverIdent", opts);
 	}
 }
 
@@ -1397,7 +1393,7 @@ static int edit_receiver_ident(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_source(xmlNodePtr node, int endl)
+static void show_source(xmlNodePtr node, struct opts *opts)
 {
 	xmlNodePtr dmc, issno, lang;
 
@@ -1407,18 +1403,22 @@ static void show_source(xmlNodePtr node, int endl)
 
 	if (xmlStrcmp(dmc->name, BAD_CAST "pmCode") == 0) {
 		printf("PMC-");
-		show_pmcode(dmc, '_');
+		show_pmcode(dmc, opts);
 	} else {
 		printf("DMC-");
-		show_dmcode(dmc, '_');
+		show_dmcode(dmc, opts);
 	}
-	show_issue_number(issno, '-');
-	show_in_work(issno, '_');
-	show_language_iso_code(lang, '-');
-	show_country_iso_code(lang, endl);
+	putchar('_');
+	show_issue_number(issno, opts);
+	putchar('-');
+	show_in_work(issno, opts);
+	putchar('_');
+	show_language_iso_code(lang, opts);
+	putchar('-');
+	show_country_iso_code(lang, opts);
 }
 
-static xmlChar *get_qa(xmlNodePtr node)
+static xmlChar *get_qa(xmlNodePtr node, struct opts *opts)
 {
 	xmlNodePtr first, sec;
 
@@ -1435,27 +1435,23 @@ static xmlChar *get_qa(xmlNodePtr node)
 	return xmlStrdup(BAD_CAST "unverified");
 }
 
-static void show_qa(xmlNodePtr node, int endl)
+static void show_qa(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *qa;
 
-	qa = get_qa(node);
+	qa = get_qa(node, opts);
 	printf("%s", (char *) qa);
 	xmlFree(qa);
-
-	if (endl > -1) {
-		putchar(endl);
-	}
 }
 
-static void show_verification_type(xmlNodePtr node, int endl)
+static void show_verification_type(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "firstVerification") == 0 ||
 	    xmlStrcmp(node->name, BAD_CAST "secondVerification") == 0)
 	{
-		show_simple_attr(node, "verificationType", endl);
+		show_simple_attr(node, "verificationType", opts);
 	} else {
-		show_simple_attr(node, "type", endl);
+		show_simple_attr(node, "type", opts);
 	}
 }
 
@@ -2059,15 +2055,14 @@ static struct metadata metadata[] = {
 	{NULL}
 };
 
-static void show_icn_code(const char *bname, int endl)
+static void show_icn_code(const char *bname, struct opts *opts)
 {
 	int n;
 	n = strchr(bname, '.') - bname;
 	printf("%.*s", n, bname);
-	if (endl > -1) putchar(endl);
 }
 
-static void show_icn_sec(const char *bname, int endl)
+static void show_icn_sec(const char *bname, struct opts *opts)
 {
 	char *s, *e;
 	int n;
@@ -2076,10 +2071,9 @@ static void show_icn_sec(const char *bname, int endl)
 	e = strchr(s, '.');
 	n = e - s;
 	printf("%.*s", n, s);
-	if (endl > -1) putchar(endl);
 }
 
-static void show_icn_iss(const char *bname, int endl)
+static void show_icn_iss(const char *bname, struct opts *opts)
 {
 	char *s, *e;
 	int n;
@@ -2088,13 +2082,11 @@ static void show_icn_iss(const char *bname, int endl)
 	e = strchr(s, '-');
 	n = e - s;
 	printf("%.*s", n, s);
-	if (endl > -1) putchar(endl);
 }
 
-static void show_icn_type(const char *bname, int endl)
+static void show_icn_type(const char *bname, struct opts *opts)
 {
 	printf("icn");
-	if (endl > -1) putchar(endl);
 }
 
 static struct icn_metadata icn_metadata[] = {
@@ -2105,7 +2097,7 @@ static struct icn_metadata icn_metadata[] = {
 	{NULL}
 };
 
-static int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
+static int show_metadata(xmlXPathContextPtr ctxt, const char *key, struct opts *opts)
 {
 	int i;
 
@@ -2113,16 +2105,16 @@ static int show_metadata(xmlXPathContextPtr ctxt, const char *key, int endl)
 		if (strcmp(key, metadata[i].key) == 0) {
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctxt))) {
-				if (endl > -1) putchar(endl);
+				if (opts->endl > -1) putchar(opts->endl);
 				return EXIT_MISSING_METADATA;
 			}
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
-			metadata[i].show(node, endl);
+			metadata[i].show(node, opts);
 			return EXIT_SUCCESS;
 		}
 	}
 
-	if (endl > -1) putchar(endl);
+	if (opts->endl > -1) putchar(opts->endl);
 
 	return EXIT_INVALID_METADATA;
 }
@@ -2154,22 +2146,22 @@ static int edit_metadata(xmlXPathContextPtr ctxt, const char *key, const char *v
 	return EXIT_INVALID_METADATA;
 }
 
-static int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, int endl, int only_editable)
+static int show_all_metadata(xmlXPathContextPtr ctxt, struct opts *opts)
 {
 	int i;
 
 	for (i = 0; metadata[i].key; ++i) {
 		xmlNodePtr node;
 
-		if (only_editable && !metadata[i].edit) continue;
+		if (opts->only_editable && !metadata[i].edit) continue;
 
 		if ((node = first_xpath_node(metadata[i].path, ctxt))) {
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
-			if (endl == '\n') {
+			if (opts->endl == '\n') {
 				printf("%s", metadata[i].key);
 
-				if (formatall) {
+				if (opts->format_all) {
 					int n = KEY_COLUMN_WIDTH - strlen(metadata[i].key);
 					int j;
 					for (j = 0; j < n; ++j) putchar(' ');
@@ -2178,7 +2170,8 @@ static int show_all_metadata(xmlXPathContextPtr ctxt, int formatall, int endl, i
 				}
 			}
 
-			metadata[i].show(node, endl);
+			metadata[i].show(node, opts);
+			if (opts->endl > -1) putchar(opts->endl);
 		}
 	}
 
@@ -2196,11 +2189,11 @@ static int edit_all_metadata(FILE *input, xmlXPathContextPtr ctxt)
 	return 0;
 }
 
-static void list_metadata_key(const char *key, const char *descr, int formatall)
+static void list_metadata_key(const char *key, const char *descr, struct opts *opts)
 {
 	int n = KEY_COLUMN_WIDTH - strlen(key);
 	printf("%s", key);
-	if (formatall) {
+	if (opts->format_all) {
 		int j;
 		for (j = 0; j < n; ++j) putchar(' ');
 	} else {
@@ -2231,19 +2224,19 @@ static int has_key(xmlNodePtr keys, const char *key)
 	return 1;
 }
 
-static void list_metadata_keys(xmlNodePtr keys, int formatall, int only_editable)
+static void list_metadata_keys(struct opts *opts)
 {
 	int i;
 	for (i = 0; metadata[i].key; ++i) {
-		if (has_key(keys, metadata[i].key) && (!only_editable || metadata[i].edit)) {
-			list_metadata_key(metadata[i].key, metadata[i].descr, formatall);
+		if (has_key(opts->keys, metadata[i].key) && (!opts->only_editable || metadata[i].edit)) {
+			list_metadata_key(metadata[i].key, metadata[i].descr, opts);
 		}
 	}
 }
 
-static int show_err(int err, const char *key, const char *val, const char *fname)
+static int show_err(int err, const char *key, const char *val, const char *fname, struct opts *opts)
 {
-	if (verbosity < NORMAL) return err;
+	if (opts->verbosity < NORMAL) return err;
 
 	switch (err) {
 		case EXIT_INVALID_METADATA:
@@ -2270,14 +2263,13 @@ static int show_err(int err, const char *key, const char *val, const char *fname
 	return err;
 }
 
-static int show_path(const char *fname, int endl)
+static int show_path(const char *fname, struct opts *opts)
 {
 	printf("%s", fname);
-	if (endl > -1) putchar(endl);
 	return 0;
 }
 
-static char *get_format(const char *bname)
+static char *get_format(const char *bname, struct opts *opts)
 {
 	char *s;
 	if ((s = strchr(bname, '.'))) {
@@ -2287,34 +2279,32 @@ static char *get_format(const char *bname)
 	}
 }
 
-static int show_format(const char *bname, int endl)
+static int show_format(const char *bname, struct opts *opts)
 {
-	printf("%s", get_format(bname));
-	if (endl > -1) putchar(endl);
+	printf("%s", get_format(bname, opts));
 	return 0;
 }
 
-static char *get_modtime(const char *fname, const char *timefmt)
+static char *get_modtime(const char *fname, struct opts *opts)
 {
 	struct stat st;
 	char *buf;
 	stat(fname, &st);
 	buf = malloc(256);
-	strftime(buf, 256, timefmt, localtime(&st.st_mtime));
+	strftime(buf, 256, opts->timefmt, localtime(&st.st_mtime));
 	return buf;
 }
 
-static int show_modtime(const char *fname, const char *timefmt, int endl)
+static int show_modtime(const char *fname, struct opts *opts)
 {
 	char *s;
-	s = get_modtime(fname, timefmt);
+	s = get_modtime(fname, opts);
 	printf("%s", s);
 	free(s);
-	if (endl > -1) putchar(endl);
 	return 0;
 }
 
-static int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n)
+static int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n, struct opts *opts)
 {
 	int i;
 	char *key;
@@ -2326,23 +2316,23 @@ static int show_metadata_fmtstr_key(xmlXPathContextPtr ctx, const char *k, int n
 		if (strcmp(metadata[i].key, key) == 0) {
 			xmlNodePtr node;
 			if (!(node = first_xpath_node(metadata[i].path, ctx))) {
-				show_err(EXIT_MISSING_METADATA, key, NULL, NULL);
+				show_err(EXIT_MISSING_METADATA, key, NULL, NULL, opts);
 				free(key);
 				return EXIT_MISSING_METADATA;
 			}
 			if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
-			metadata[i].show(node, -1);
+			metadata[i].show(node, opts);
 			free(key);
 			return EXIT_SUCCESS;
 		}
 	}
 
-	show_err(EXIT_INVALID_METADATA, key, NULL, NULL);
+	show_err(EXIT_INVALID_METADATA, key, NULL, NULL, opts);
 	free(key);
 	return EXIT_INVALID_METADATA;
 }
 
-static int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
+static int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n, struct opts *opts)
 {
 	int i;
 	char *key;
@@ -2352,23 +2342,23 @@ static int show_icn_metadata_fmtstr_key(const char *bname, const char *k, int n)
 
 	for (i = 0; icn_metadata[i].key; ++i) {
 		if (strcmp(icn_metadata[i].key, key) == 0) {
-			icn_metadata[i].show(bname, -1);
+			icn_metadata[i].show(bname, opts);
 			free(key);
 			return EXIT_SUCCESS;
 		}
 	}
 
-	show_err(EXIT_INVALID_METADATA, key, NULL, NULL);
+	show_err(EXIT_INVALID_METADATA, key, NULL, NULL, opts);
 	free(key);
 	return EXIT_INVALID_METADATA;
 }
 
-static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const char *fmt, struct opts *opts)
+static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, struct opts *opts)
 {
 	int i;
-	for (i = 0; fmt[i]; ++i) {
-		if (fmt[i] == FMTSTR_DELIM) {
-			if (fmt[i + 1] == FMTSTR_DELIM) {
+	for (i = 0; opts->fmtstr[i]; ++i) {
+		if (opts->fmtstr[i] == FMTSTR_DELIM) {
+			if (opts->fmtstr[i + 1] == FMTSTR_DELIM) {
 				putchar(FMTSTR_DELIM);
 				++i;
 			} else {
@@ -2376,7 +2366,7 @@ static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const
 				int n;
 				char *s, *bname;
 
-				k = fmt + i + 1;
+				k = opts->fmtstr + i + 1;
 				e = strchr(k, FMTSTR_DELIM);
 				if (!e) break;
 				n = e - k;
@@ -2385,30 +2375,30 @@ static int show_metadata_fmtstr(const char *fname, xmlXPathContextPtr ctx, const
 				bname = basename(s);
 
 				if (strncmp(k, "path", n) == 0) {
-					show_path(fname, -1);
+					show_path(fname, opts);
 				} else if (strncmp(k, "format", n) == 0) {
-					show_format(bname, -1);
+					show_format(bname, opts);
 				} else if (strncmp(k, "modified", n) == 0) {
-					show_modtime(fname, opts->timefmt, -1);
+					show_modtime(fname, opts);
 				} else if (is_icn(bname)) {
-					show_icn_metadata_fmtstr_key(bname, k, n);
+					show_icn_metadata_fmtstr_key(bname, k, n, opts);
 				} else {
-					show_metadata_fmtstr_key(ctx, k, n);
+					show_metadata_fmtstr_key(ctx, k, n, opts);
 				}
 
 				free(s);
 
 				i += n + 1;
 			}
-		} else if (fmt[i] == '\\') {
-			switch (fmt[i + 1]) {
+		} else if (opts->fmtstr[i] == '\\') {
+			switch (opts->fmtstr[i + 1]) {
 				case 'n': putchar('\n'); ++i; break;
 				case 't': putchar('\t'); ++i; break;
 				case '0': putchar('\0'); ++i; break;
-				default: putchar(fmt[i]);
+				default: putchar(opts->fmtstr[i]);
 			}
 		} else {
-			putchar(fmt[i]);
+			putchar(opts->fmtstr[i]);
 		}
 	}
 	return 0;
@@ -2421,12 +2411,12 @@ static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fnam
 	if (strcmp(metadata[i].key, "path") == 0) {
 		return xmlCharStrdup(fname);
 	} else if (strcmp(metadata[i].key, "format") == 0) {
-		return xmlCharStrdup(get_format(fname));
+		return xmlCharStrdup(get_format(fname, opts));
 	} else if (strcmp(metadata[i].key, "modified") == 0) {
-		return xmlCharStrdup(get_modtime(fname, opts->timefmt));
+		return xmlCharStrdup(get_modtime(fname, opts));
 	} else if ((node = first_xpath_node(metadata[i].path, ctx))) {
 		if (metadata[i].get) {
-			return BAD_CAST metadata[i].get(node);
+			return BAD_CAST metadata[i].get(node, opts);
 		} else {
 			return xmlNodeGetContent(node);
 		}
@@ -2477,31 +2467,32 @@ static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fn
 	return cmp;
 }
 
-static int show_icn_metadata(const char *bname, const char *key, int endl)
+static int show_icn_metadata(const char *bname, const char *key, struct opts *opts)
 {
 	int i;
 
 	for (i = 0; icn_metadata[i].key; ++i) {
 		if (strcmp(key, icn_metadata[i].key) == 0) {
-			icn_metadata[i].show(bname, endl);
+			icn_metadata[i].show(bname, opts);
+			if (opts->endl > -1) putchar(opts->endl);
 			return EXIT_SUCCESS;
 		}
 	}
 
-	if (endl > -1) putchar(endl);
+	if (opts->endl > -1) putchar(opts->endl);
 
 	return EXIT_INVALID_METADATA;
 }
 
-static int show_all_icn_metadata(const char *fname, int formatall, int endl)
+static int show_all_icn_metadata(const char *fname, struct opts *opts)
 {
 	int i;
 
 	for (i = 0; icn_metadata[i].key; ++i) {
-		if (endl == '\n') {
+		if (opts->endl == '\n') {
 			printf("%s", icn_metadata[i].key);
 
-			if (formatall) {
+			if (opts->format_all) {
 				int n = KEY_COLUMN_WIDTH - strlen(icn_metadata[i].key);
 				int j;
 				for (j = 0; j < n; ++j) putchar(' ');
@@ -2510,16 +2501,13 @@ static int show_all_icn_metadata(const char *fname, int formatall, int endl)
 			}
 		}
 
-		icn_metadata[i].show(fname, endl);
+		icn_metadata[i].show(fname, opts);
 	}
 
 	return 0;
 }
 
-static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
-	xmlNodePtr keys, int formatall, int overwrite, int endl,
-	int only_editable, const char *fmtstr, xmlNodePtr conds,
-	const char *execstr, struct opts *opts)
+static int show_or_edit_metadata(const char *fname, struct opts *opts)
 {
 	int err = 0;
 	xmlDocPtr doc;
@@ -2531,7 +2519,7 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 
 	ctxt = xmlXPathNewContext(doc);
 
-	for (cond = conds->children; cond; cond = cond->next) {
+	for (cond = opts->conds->children; cond; cond = cond->next) {
 		if (!condition_met(ctxt, cond, fname, opts)) {
 			err = EXIT_CONDITION_UNMET;
 		}
@@ -2543,13 +2531,13 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		s = strdup(fname);
 		bname = basename(s);
 
-		if (execstr) {
-			err = execfile(execstr, fname) != 0;
-		} else if (fmtstr) {
-			err = show_metadata_fmtstr(fname, ctxt, fmtstr, opts);
-		} else if (keys->children) {
+		if (opts->execstr) {
+			err = execfile(opts->execstr, fname) != 0;
+		} else if (opts->fmtstr) {
+			err = show_metadata_fmtstr(fname, ctxt, opts);
+		} else if (opts->keys->children) {
 			xmlNodePtr cur;
-			for (cur = keys->children; cur; cur = cur->next) {
+			for (cur = opts->keys->children; cur; cur = cur->next) {
 				char *key = NULL, *val = NULL;
 
 				key = (char *) xmlGetProp(cur, BAD_CAST "name");
@@ -2559,40 +2547,42 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 					edit = 1;
 					err = edit_metadata(ctxt, key, val);
 				} else if (strcmp(key, "path") == 0) {
-					err = show_path(fname, endl);
+					err = show_path(fname, opts);
 				} else if (strcmp(key, "format") == 0) {
-					err = show_format(bname, endl);
+					err = show_format(bname, opts);
 				} else if (strcmp(key, "modified") == 0) {
-					err = show_modtime(fname, opts->timefmt, endl);
+					err = show_modtime(fname, opts);
 				} else if (is_icn(bname)) {
-					err = show_icn_metadata(bname, key, endl);
+					err = show_icn_metadata(bname, key, opts);
 				} else {
-					err = show_metadata(ctxt, key, endl);
+					err = show_metadata(ctxt, key, opts);
 				}
 
-				show_err(err, key, val, fname);
+				if (opts->endl > -1) putchar(opts->endl);
+
+				show_err(err, key, val, fname, opts);
 
 				xmlFree(key);
 				xmlFree(val);
 			}
-		} else if (metadata_fname) {
+		} else if (opts->metadata_fname) {
 			FILE *input;
 
 			edit = 1;
 
-			if (strcmp(metadata_fname, "-") == 0) {
+			if (strcmp(opts->metadata_fname, "-") == 0) {
 				input = stdin;
 			} else {
-				input = fopen(metadata_fname, "r");
+				input = fopen(opts->metadata_fname, "r");
 			}
 
 			err = edit_all_metadata(input, ctxt);
 
 			fclose(input);
 		} else if (is_icn(bname)) {
-			err = show_all_icn_metadata(bname, formatall, endl);
+			err = show_all_icn_metadata(bname, opts);
 		} else {
-			err = show_all_metadata(ctxt, formatall, endl, only_editable);
+			err = show_all_metadata(ctxt, opts);
 		}
 
 		free(s);
@@ -2601,7 +2591,7 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 	xmlXPathFreeContext(ctxt);
 
 	if (edit && !err) {
-		if (overwrite) {
+		if (opts->overwrite) {
 			if (access(fname, W_OK) != -1) {
 				save_xml_doc(doc, fname);
 			} else {
@@ -2611,7 +2601,7 @@ static int show_or_edit_metadata(const char *fname, const char *metadata_fname,
 		} else {
 			save_xml_doc(doc, "-");
 		}
-	} else if (endl != '\n' && err != EXIT_CONDITION_UNMET) {
+	} else if (opts->endl != '\n' && err != EXIT_CONDITION_UNMET) {
 		putchar('\n');
 	}
 
@@ -2652,10 +2642,7 @@ static void add_cond_val(xmlNodePtr conds, const char *v, bool regex)
 	xmlSetProp(cond, BAD_CAST "val", BAD_CAST v);
 }
 
-static int show_or_edit_metadata_list(const char *fname, const char *metadata_fname,
-	xmlNodePtr keys, int formatall, int overwrite, int endl,
-	int only_editable, const char *fmtstr, xmlNodePtr conds,
-	const char *execstr, struct opts *opts)
+static int show_or_edit_metadata_list(const char *fname, struct opts *opts)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -2672,9 +2659,7 @@ static int show_or_edit_metadata_list(const char *fname, const char *metadata_fn
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		err += show_or_edit_metadata(path, metadata_fname, keys,
-			formatall, overwrite, endl, only_editable, fmtstr, conds,
-			execstr, opts);
+		err += show_or_edit_metadata(path, opts);
 	}
 
 	if (fname) {
@@ -2759,19 +2744,12 @@ static void show_version(void)
 
 int main(int argc, char **argv)
 {
-	xmlNodePtr keys, conds, last = NULL;
+	xmlNodePtr last = NULL;
 	int err = 0;
 
 	int i;
-	char *metadata_fname = NULL;
-	int formatall = 1;
-	int overwrite = 0;
-	int endl = '\n';
 	int list_keys = 0;
 	int islist = 0;
-	int only_editable = 0;
-	char *fmtstr = NULL;
-	char *execstr = NULL;
 	struct opts opts;
 
 	const char *sopts = "0d:c:Ee:F:fHlm:n:Ttv:qW:w:h?";
@@ -2800,10 +2778,18 @@ int main(int argc, char **argv)
 	};
 	int loptind = 0;
 
-	keys = xmlNewNode(NULL, BAD_CAST "keys");
-	conds = xmlNewNode(NULL, BAD_CAST "conds");
-
+	/* Initialize program option defaults. */
+	opts.conds = xmlNewNode(NULL, BAD_CAST "conds");
+	opts.endl = '\n';
+	opts.execstr = NULL;
+	opts.fmtstr = NULL;
+	opts.format_all = 1;
+	opts.keys = xmlNewNode(NULL, BAD_CAST "keys");
+	opts.metadata_fname = NULL;
+	opts.only_editable = 0;
+	opts.overwrite = 0;
 	opts.timefmt = strdup(DEFAULT_TIMEFMT);
+	opts.verbosity = NORMAL;
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -2814,68 +2800,60 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
-			case '0': endl = '\0'; break;
-			case 'c': metadata_fname = strdup(optarg); break;
+			case '0': opts.endl = '\0'; break;
+			case 'c': opts.metadata_fname = strdup(optarg); break;
 			case 'd': free(opts.timefmt); opts.timefmt = strdup(optarg); break;
-			case 'E': only_editable = 1; break;
-			case 'e': execstr = strdup(optarg); break;
-			case 'F': fmtstr = strdup(optarg); endl = -1; break;
-			case 'f': overwrite = 1; break;
+			case 'E': opts.only_editable = 1; break;
+			case 'e': opts.execstr = strdup(optarg); break;
+			case 'F': opts.fmtstr = strdup(optarg); opts.endl = -1; break;
+			case 'f': opts.overwrite = 1; break;
 			case 'H': list_keys = 1; break;
 			case 'l': islist = 1; break;
 			case 'm':
-				  if (last == conds) {
-					  add_cond_val(conds, optarg, true);
+				  if (last == opts.conds) {
+					  add_cond_val(opts.conds, optarg, true);
 				  }
 				  break;
-			case 'n': add_key(keys, optarg); last = keys; break;
-			case 'T': formatall = 0; break;
-			case 't': endl = '\t'; break;
+			case 'n': add_key(opts.keys, optarg); last = opts.keys; break;
+			case 'T': opts.format_all = 0; break;
+			case 't': opts.endl = '\t'; break;
 			case 'v':
-				if (last == keys)
-					add_val(keys, optarg);
-				else if (last == conds)
-					add_cond_val(conds, optarg, false);
+				if (last == opts.keys)
+					add_val(opts.keys, optarg);
+				else if (last == opts.conds)
+					add_cond_val(opts.conds, optarg, false);
 				break;
-			case 'q': verbosity = SILENT; break;
-			case 'w': add_cond(conds, optarg, "="); last = conds; break;
-			case 'W': add_cond(conds, optarg, "~"); last = conds; break;
+			case 'q': opts.verbosity = SILENT; break;
+			case 'w': add_cond(opts.conds, optarg, "="); last = opts.conds; break;
+			case 'W': add_cond(opts.conds, optarg, "~"); last = opts.conds; break;
 			case 'h':
 			case '?': show_help(); goto cleanup;
 		}
 	}
 
 	if (list_keys) {
-		list_metadata_keys(keys, formatall, only_editable);
+		list_metadata_keys(&opts);
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				err += show_or_edit_metadata_list(argv[i],
-					metadata_fname, keys, formatall,
-					overwrite, endl, only_editable, fmtstr,
-					conds, execstr, &opts);
+				err += show_or_edit_metadata_list(argv[i], &opts);
 			} else {
-				err += show_or_edit_metadata(argv[i],
-					metadata_fname, keys, formatall,
-					overwrite, endl, only_editable, fmtstr,
-					conds, execstr, &opts);
+				err += show_or_edit_metadata(argv[i], &opts);
 			}
 		}
 	} else if (islist) {
-		err = show_or_edit_metadata_list(NULL, metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr, conds, execstr, &opts);
+		err = show_or_edit_metadata_list(NULL, &opts);
 	} else {
-		err = show_or_edit_metadata("-", metadata_fname, keys, formatall,
-			overwrite, endl, only_editable, fmtstr, conds, execstr, &opts);
+		err = show_or_edit_metadata("-", &opts);
 	}
 
 cleanup:
-	free(metadata_fname);
-	free(fmtstr);
-	free(execstr);
+	free(opts.metadata_fname);
+	free(opts.fmtstr);
+	free(opts.execstr);
 	free(opts.timefmt);
-	xmlFreeNode(keys);
-	xmlFreeNode(conds);
+	xmlFreeNode(opts.keys);
+	xmlFreeNode(opts.conds);
 
 	xmlCleanupParser();
 
