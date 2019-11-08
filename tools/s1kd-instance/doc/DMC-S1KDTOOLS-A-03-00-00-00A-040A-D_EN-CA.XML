@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="043" inWork="02"/>
+        <issueInfo issueNumber="043" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="11" day="01"/>
+        <issueDate year="2019" month="11" day="08"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -9 option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add CIR search option with "*" argument to -R.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -404,12 +407,13 @@
                   </randomList>
                 </para>
                 <para>The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -x option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -D option.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-r, --recursive</listItemTerm>
               <listItemDefinition>
-                <para>Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), when searching for source objects (-@), or when searching for CIR data modules (-R).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -1118,6 +1122,12 @@ applicPropertyValues="1"/&gt;
               <listItemTerm>8</listItemTerm>
               <listItemDefinition>
                 <para>Issue date specified with -I is invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>9</listItemTerm>
+              <listItemDefinition>
+                <para>The number of CIR data modules found when searching exceeded the available memory.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

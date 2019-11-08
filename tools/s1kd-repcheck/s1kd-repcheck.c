@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.5.0"
+#define VERSION "0.5.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -469,30 +469,16 @@ static void free_objects(struct objects *objects)
 	free(objects->paths);
 }
 
-/* Determine if a CSDB object is a CIR. */
-static bool is_cir(const char *path)
-{
-	xmlDocPtr doc;
-	bool is;
-
-	if (!(doc = read_xml_doc(path))) {
-		return false;
-	}
-
-	is = xpath_first_node(doc, NULL, BAD_CAST "//commonRepository|//techRepository|//techrep") != NULL;
-
-	xmlFreeDoc(doc);
-
-	return is;
-}
-
 /* Find CIRs in directories and add them to the list. */
 static void find_cirs(struct objects *cirs, char *search_dir, struct opts *opts)
 {
 	DIR *dir;
 	struct dirent *cur;
 	char fpath[PATH_MAX], cpath[PATH_MAX];
-	struct objects latest;
+
+	if (opts->verbosity >= DEBUG) {
+		fprintf(stderr, I_FIND_CIR, search_dir);
+	}
 
 	if (!(dir = opendir(search_dir))) {
 		return;
@@ -524,22 +510,21 @@ static void find_cirs(struct objects *cirs, char *search_dir, struct opts *opts)
 	}
 
 	closedir(dir);
+}
 
-	/* Use only the latest issue of a CIR. */
+/* Use only the latest issue of a CIR. */
+static void extract_latest_cirs(struct objects *cirs)
+{
+	struct objects latest;
+
 	qsort(cirs->paths, cirs->count, PATH_MAX, compare_basename);
+
 	latest.paths = malloc(cirs->count * PATH_MAX);
 	latest.count = extract_latest_csdb_objects(latest.paths, cirs->paths, cirs->count);
+
 	free(cirs->paths);
 	cirs->paths = latest.paths;
 	cirs->count = latest.count;
-
-	/* Print the final CIR list in DEBUG mode. */
-	if (opts->verbosity >= DEBUG) {
-		int i;
-		for (i = 0; i < cirs->count; ++i) {
-			fprintf(stderr, I_FIND_CIR_ADD, cirs->paths[i]);
-		}
-	}
 }
 
 /* Show a summary of the check. */
@@ -703,10 +688,17 @@ int main(int argc, char **argv)
 	}
 
 	if (find_cir) {
-		if (opts.verbosity >= DEBUG) {
-			fprintf(stderr, I_FIND_CIR, opts.search_dir);
-		}
 		find_cirs(&opts.cirs, opts.search_dir, &opts);
+
+		extract_latest_cirs(&opts.cirs);
+
+		/* Print the final CIR list in DEBUG mode. */
+		if (opts.verbosity >= DEBUG) {
+			int i;
+			for (i = 0; i < opts.cirs.count; ++i) {
+				fprintf(stderr, I_FIND_CIR_ADD, opts.cirs.paths[i]);
+			}
+		}
 	}
 
 	/* Read specified objects into a list in memory. */

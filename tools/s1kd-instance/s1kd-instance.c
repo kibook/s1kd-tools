@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.2.1"
+#define VERSION "8.3.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -32,6 +32,7 @@
 #define EXIT_BAD_XML 6		/* Invalid XML/S1000D */
 #define EXIT_BAD_ARG 7		/* Malformed argument */
 #define EXIT_BAD_DATE 8		/* Malformed issue date */
+#define EXIT_MAX_OBJECTS 9      /* Out of memory */
 
 /* Error messages */
 #define S_MISSING_OBJECT ERR_PREFIX "Could not read source object: %s\n"
@@ -50,6 +51,7 @@
 #define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s\n"
 #define S_MISSING_SOURCE ERR_PREFIX "Could not find source object for instance %s\n"
 #define S_NOT_DIR ERR_PREFIX "%s is not a directory.\n"
+#define E_MAX_OBJECTS ERR_PREFIX "Out of memory\n"
 
 /* Warning messages */
 #define S_FILE_EXISTS WRN_PREFIX "%s already exists. Use -f to overwrite.\n"
@@ -66,6 +68,9 @@
 #define I_CUSTOMIZE INF_PREFIX "Customizing %s...\n"
 #define I_CUSTOMIZE_DIR INF_PREFIX "Customizing %s -> %s...\n"
 #define I_COPY INF_PREFIX "Copying %s -> %s...\n"
+#define I_FIND_CIR INF_PREFIX "Searching for CIRs in \"%s\"...\n"
+#define I_FIND_CIR_FOUND INF_PREFIX "Found CIR %s...\n"
+#define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s\n"
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -131,7 +136,7 @@ static int napplics = 0;
 static bool no_issue = false;
 
 /* Verbosity level */
-static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
+static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 /* Define a value for a product attribute or condition. */
 static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm)
@@ -3598,6 +3603,121 @@ static xmlNodePtr rem_supersets(xmlNodePtr referencedApplicGroup, xmlNodePtr roo
 	return referencedApplicGroup;
 }
 
+/* List of CSDB objects. */
+struct objects {
+	char (*paths)[PATH_MAX];
+	unsigned count;
+	unsigned max;
+};
+
+/* Initialize a list of CSDB objects. */
+static void init_objects(struct objects *objects)
+{
+	objects->paths = malloc(PATH_MAX);
+	objects->max = 1;
+	objects->count = 0;
+}
+
+/* Free a list of CSDB objects. */
+static void free_objects(struct objects *objects)
+{
+	free(objects->paths);
+}
+
+/* Add a CSDB object to a list. */
+static void add_object(struct objects *objects, const char *path)
+{
+	if (objects->count == objects->max) {
+		if (!(objects->paths = realloc(objects->paths, (objects->max *= 2) * PATH_MAX))) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, E_MAX_OBJECTS);
+			}
+			exit(EXIT_MAX_OBJECTS);
+		}
+	}
+
+	strcpy(objects->paths[(objects->count)++], path);
+}
+
+/* Find CIRs in directories and add them to the list. */
+static void find_cirs(struct objects *cirs, const char *spath)
+{
+	DIR *dir;
+	struct dirent *cur;
+	char fpath[PATH_MAX], cpath[PATH_MAX];
+
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_FIND_CIR, spath);
+	}
+
+	if (!(dir = opendir(spath))) {
+		return;
+	}
+
+	/* Clean up the directory string. */
+	if (strcmp(spath, ".") == 0) {
+		strcpy(fpath, "");
+	} else if (spath[strlen(spath) - 1] != '/') {
+		strcpy(fpath, spath);
+		strcat(fpath, "/");
+	} else {
+		strcpy(fpath, spath);
+	}
+
+	/* Search for CIRs. */
+	while ((cur = readdir(dir))) {
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
+
+		if (recursive_search && isdir(cpath, true)) {
+			find_cirs(cirs, cpath);
+		} else if (is_dm(cur->d_name) && is_cir(cpath)) {
+			if (verbosity >= DEBUG) {
+				fprintf(stderr, I_FIND_CIR_FOUND, cpath);
+			}
+			add_object(cirs, cpath);
+		}
+	}
+
+	closedir(dir);
+}
+
+/* Use only the latest issue of a CIR. */
+static void extract_latest_cirs(struct objects *cirs)
+{
+	struct objects latest;
+
+	qsort(cirs->paths, cirs->count, PATH_MAX, compare_basename);
+
+	latest.paths = malloc(cirs->count * PATH_MAX);
+	latest.count = extract_latest_csdb_objects(latest.paths, cirs->paths, cirs->count);
+
+	free(cirs->paths);
+	cirs->paths = latest.paths;
+	cirs->count = latest.count;
+}
+
+static void auto_add_cirs(xmlNodePtr cirs)
+{
+	struct objects files;
+	int i;
+
+	init_objects(&files);
+
+	find_cirs(&files, search_dir);
+	extract_latest_cirs(&files);
+
+	for (i = 0; i < files.count; ++i) {
+		xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST files.paths[i]);
+
+		if (verbosity >= DEBUG) {
+			fprintf(stderr, I_FIND_CIR_ADD, files.paths[i]);
+		}
+	}
+
+	free_objects(&files);
+}
+
 #ifdef LIBS1KD
 void s1kdFilter(xmlDocPtr doc, xmlNodePtr defs, bool reduce)
 {
@@ -3776,6 +3896,7 @@ int main(int argc, char **argv)
 	bool rem_unused = false;
 	bool re_applic = false;
 	bool remtrue = true;
+	bool find_cir = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -3965,10 +4086,14 @@ int main(int argc, char **argv)
 				rslvcntrs = true;
 				break;
 			case 'q':
-				verbosity = QUIET;
+				--verbosity;
 				break;
 			case 'R':
-				xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg);
+				if (strcmp(optarg, "*") == 0) {
+					find_cir = true;
+				} else {
+					xmlNewChild(cirs, NULL, BAD_CAST "cir", BAD_CAST optarg);
+				}
 				break;
 			case 'r':
 				recursive_search = true;
@@ -3995,7 +4120,7 @@ int main(int argc, char **argv)
 				info_name_variant = xmlStrdup(BAD_CAST optarg);
 				break;
 			case 'v':
-				verbosity = VERBOSE;
+				++verbosity;
 				break;
 			case 'W':
 				new_applic = true; combine_applic = false;
@@ -4100,6 +4225,10 @@ int main(int argc, char **argv)
 		save_xml_doc(props_report, "-");
 
 		goto cleanup;
+	}
+
+	if (find_cir) {
+		auto_add_cirs(cirs);
 	}
 
 	if (optind >= argc) {

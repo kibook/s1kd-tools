@@ -287,10 +287,14 @@ The methods of resolving the dependencies for a CIR can be changed by
 specifying a custom XSLT script with the -x option. The built-in XSLT
 used for the above CIR data modules can be dumped with the -D option.
 
+If "\*" is given for &lt;CIR&gt;, the tool will search for CIR data
+modules automatically.
+
 -r, --recursive  
 Search for referenced objects recursively. This applies for the ACT and
 PCT data modules when a product is specified (-p) without specifying the
-PCT explicitly (-P), or when searching for source objects (-@).
+PCT explicitly (-P), when searching for source objects (-@), or when
+searching for CIR data modules (-R).
 
 -S, --no-source-ident  
 Do not include
@@ -1011,6 +1015,10 @@ Value given for an argument was malformed.
 
 8  
 Issue date specified with -I is invalid.
+
+9  
+The number of CIR data modules found when searching exceeded the
+available memory.
 
 EXAMPLES
 ========

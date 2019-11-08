@@ -174,4 +174,7 @@ int extract_latest_csdb_objects(char (*latest)[PATH_MAX], char (*files)[PATH_MAX
 /* Compare the base names of two files. */
 int compare_basename(const void *a, const void *b);
 
+/* Determine if a CSDB object is a CIR. */
+bool is_cir(const char *path);
+
 #endif

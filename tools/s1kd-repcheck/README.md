@@ -53,7 +53,7 @@ Quiet mode. Error messages will not be printed.
 -R, --cir &lt;CIR&gt;  
 A CIR to resolve references in CSDB objects against. Multiple CIRs can
 be specified by using this option multiple times. If "\*" is given for
-&lt;CIR&gt;, the tool will search for CIR data modules.
+&lt;CIR&gt;, the tool will search for CIR data modules automatically.
 
 -r, --recursive  
 Search for CIR data modules recursively.

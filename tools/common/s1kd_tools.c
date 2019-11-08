@@ -969,3 +969,20 @@ int compare_basename(const void *a, const void *b)
 
 	return d;
 }
+
+/* Determine if a CSDB object is a CIR. */
+bool is_cir(const char *path)
+{
+	xmlDocPtr doc;
+	bool is;
+
+	if (!(doc = read_xml_doc(path))) {
+		return false;
+	}
+
+	is = xpath_first_node(doc, NULL, BAD_CAST "//commonRepository|//techRepository|//techrep") != NULL;
+
+	xmlFreeDoc(doc);
+
+	return is;
+}
