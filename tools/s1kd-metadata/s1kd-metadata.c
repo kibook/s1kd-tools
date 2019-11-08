@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.3.0"
+#define VERSION "3.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1753,7 +1753,7 @@ static struct metadata metadata[] = {
 		show_issue_date,
 		edit_issue_date,
 		NULL,
-		"Issue date in ISO 8601 format (YYYY-MM-DD)"},
+		"Issue date of the CSDB object"},
 	{"issueNumber",
 		"//issueInfo/@issueNumber|//issno/@issno",
 		NULL,
