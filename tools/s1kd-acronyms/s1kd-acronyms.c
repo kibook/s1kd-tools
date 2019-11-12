@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.9.1"
+#define VERSION "1.9.2"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -648,12 +648,12 @@ static void deleteAcronymsInList(const char *fname, const char *out, bool overwr
 	fclose(f);
 }
 
-static void showHelp(void)
+static void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " [-dlptvx] [-n <#>] [-o <file>] [-T <types>] [<dmodule>...]");
-	puts("  " PROG_NAME " [-m|-M <list>] [-i|-I|-!] [-flv] [-o <file>] [-X <xpath>] [<dmodule>...]");
+	puts("  " PROG_NAME " [-flv] [-i|-I|-!] [-m|-M <list>] [-o <file>] [-X <xpath>] [<dmodule>...]");
 	puts("  " PROG_NAME " -D [-flv] [-o <file>] [<dmodule>...]");
 	puts("");
 	puts("Options:");
@@ -737,7 +737,7 @@ int main(int argc, char **argv)
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
-					return 0;
+					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
@@ -802,8 +802,8 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			case '?':
-				showHelp();
-				exit(0);
+				show_help();
+				goto cleanup;
 		}
 	}
 
@@ -916,6 +916,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+cleanup:
 	free(types);
 	free(out);
 	free(markup);
