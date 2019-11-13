@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.5.1"
+#define VERSION "0.6.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -114,14 +114,14 @@ static xmlNodePtr find_ref_in_cir(xmlNodePtr ref, const xmlChar *ident, const xm
 }
 
 /* Add a reference to the XML report. */
-static void add_ref_to_report(xmlNodePtr rpt, xmlNodePtr ref, long int lineno, const char *cir, struct opts *opts)
+static void add_ref_to_report(xmlNodePtr rpt, xmlNodePtr ref, const xmlChar *ident, long int lineno, const char *cir, struct opts *opts)
 {
 	xmlNodePtr node;
 	xmlChar line_s[16], *xpath;
 
-	node = xmlAddChild(rpt, xmlCopyNode(ref, 1));
-	xmlUnsetProp(node, BAD_CAST "name");
-	xmlUnsetProp(node, BAD_CAST "test");
+	node = xmlNewChild(rpt, NULL, BAD_CAST "ref", NULL);
+
+	xmlSetProp(node, BAD_CAST "name", ident);
 
 	xmlStrPrintf(line_s, 16, "%ld", lineno);
 	xmlSetProp(node, BAD_CAST "line", BAD_CAST line_s);
@@ -133,6 +133,8 @@ static void add_ref_to_report(xmlNodePtr rpt, xmlNodePtr ref, long int lineno, c
 	if (cir) {
 		xmlSetProp(node, BAD_CAST "cir", BAD_CAST cir);
 	}
+
+	node = xmlAddChild(node, xmlCopyNode(ref, 1));
 }
 
 /* Find a data module filename in the current directory based on the dmRefIdent
@@ -273,6 +275,8 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 
 	ident = xmlGetProp(ref, BAD_CAST "repcheck_name");
 	xpath = xmlGetProp(ref, BAD_CAST "repcheck_test");
+	xmlUnsetProp(ref, BAD_CAST "repcheck_name");
+	xmlUnsetProp(ref, BAD_CAST "repcheck_test");
 
 	/* Check if there is an explicit CIR reference. */
 	ctx = xmlXPathNewContext(ref->doc);
@@ -284,7 +288,7 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 		/* Search in all CIRs. */
 		for (i = 0; i < opts->cirs.count; ++i) {
 			if (find_ref_in_cir(ref, ident, xpath, opts->cirs.paths[i], opts)) {
-				add_ref_to_report(rpt, ref, lineno, opts->cirs.paths[i], opts);
+				add_ref_to_report(rpt, ref, ident, lineno, opts->cirs.paths[i], opts);
 				goto done;
 			}
 		}
@@ -293,7 +297,7 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 		if (opts->search_all_objs) {
 			for (i = 0; i < opts->objects.count; ++i) {
 				if (find_ref_in_cir(ref, ident, xpath, opts->objects.paths[i], opts)) {
-					add_ref_to_report(rpt, ref, lineno, opts->objects.paths[i], opts);
+					add_ref_to_report(rpt, ref, ident, lineno, opts->objects.paths[i], opts);
 					goto done;
 				}
 			}
@@ -305,7 +309,7 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 
 			if (find_dmod_fname(fname, obj->nodesetval->nodeTab[i], opts)) {
 				if (find_ref_in_cir(ref, ident, xpath, fname, opts)) {
-					add_ref_to_report(rpt, ref, lineno, fname, opts);
+					add_ref_to_report(rpt, ref, ident, lineno, fname, opts);
 					goto done;
 				}
 			}
@@ -315,7 +319,7 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 	if (opts->verbosity >= NORMAL) {
 		fprintf(stderr, E_NOT_FOUND, path, lineno, ident);
 	}
-	add_ref_to_report(rpt, ref, lineno, NULL, opts);
+	add_ref_to_report(rpt, ref, ident, lineno, NULL, opts);
 	err = 1;
 
 done:
