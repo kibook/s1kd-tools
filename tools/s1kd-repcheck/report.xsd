@@ -3,7 +3,7 @@
   <xs:element name="ref" type="refElemType"/>
   <xs:complexType name="refElemType">
     <xs:sequence>
-      <xs:any/>
+      <xs:any processContents="skip"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string"/>
     <xs:attribute name="line" type="xs:integer"/>
