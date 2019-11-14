@@ -470,7 +470,7 @@
     </currency>
     <currency name="BMD">
       <prefix>$</prefix>
-      <postfox> BMD</postfox>
+      <postfix> BMD</postfix>
     </currency>
     <currency name="BOB">
       <prefix>$b</prefix>
@@ -750,7 +750,7 @@
     </currency>
     <currency name="RON">
       <prefix>lei</prefix>
-      <prefix> RON</prefix>
+      <postfix> RON</postfix>
     </currency>
     <currency name="RUB">
       <prefix>₽</prefix>
