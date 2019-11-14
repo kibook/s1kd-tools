@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
   <xs:attribute name="id" type="xs:ID"/>
   <xs:element name="subScript" type="xs:string"/>
   <xs:element name="superScript" type="xs:string"/>
@@ -24,6 +24,7 @@
   <xs:element name="acronymDefinition" type="acronymDefinitionElemType"/>
   <xs:complexType mixed="true" name="acronymDefinitionElemType">
     <xs:group maxOccurs="unbounded" minOccurs="0" ref="subOrSuperScriptElemGroup"/>
+    <xs:attribute ref="id"/>
   </xs:complexType>
   <xs:attribute default="at01" name="acronymType" type="acronymTypeAttType"/>
   <xs:simpleType name="acronymTypeAttType">
