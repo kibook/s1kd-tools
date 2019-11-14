@@ -1,0 +1,755 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd"/>
+  <xs:attribute name="year" type="yearAttType"/>
+  <xs:simpleType name="yearAttType">
+    <xs:restriction base="xs:gYear">
+      <xs:pattern value="\d{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="month" type="monthAttType"/>
+  <xs:simpleType name="monthAttType">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:maxInclusive value="12"/>
+      <xs:pattern value="\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="day" type="dayAttType"/>
+  <xs:simpleType name="dayAttType">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:maxInclusive value="31"/>
+      <xs:pattern value="\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="pubMedia" type="pubMediaElemType"/>
+  <xs:complexType name="pubMediaElemType">
+    <xs:attribute ref="pubMediaType" use="required"/>
+    <xs:attribute ref="pubMediaCode" use="required"/>
+    <xs:attribute ref="volumeNumber"/>
+    <xs:attribute ref="mediaLocation"/>
+  </xs:complexType>
+  <xs:attribute name="pubMediaType" type="xs:string"/>
+  <xs:attribute name="pubMediaCode" type="xs:string"/>
+  <xs:attribute name="volumeNumber" type="xs:string"/>
+  <xs:attribute name="mediaLocation" type="xs:string"/>
+  <xs:element name="responsiblePartnerCompany" type="responsiblePartnerCompanyElemType"/>
+  <xs:complexType name="responsiblePartnerCompanyElemType">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="enterpriseName"/>
+    </xs:sequence>
+    <xs:attribute ref="enterpriseCode"/>
+    <xs:attribute ref="id"/>
+  </xs:complexType>
+  <xs:element name="enterpriseName" type="xs:string"/>
+  <xs:attribute name="enterpriseCode" type="xs:string"/>
+  <xs:group name="subOrSuperScriptElemGroup">
+    <xs:choice>
+      <xs:element ref="subScript"/>
+      <xs:element ref="superScript"/>
+    </xs:choice>
+  </xs:group>
+  <xs:attributeGroup name="authorityAttGroup">
+    <xs:attribute ref="authorityName"/>
+    <xs:attribute ref="authorityDocument"/>
+  </xs:attributeGroup>
+  <xs:attribute name="authorityName" type="xs:string"/>
+  <xs:attribute name="authorityDocument" type="xs:string"/>
+  <xs:attributeGroup name="securityAttGroup">
+    <xs:attribute ref="securityClassification"/>
+    <xs:attributeGroup ref="commercialSecurityAttGroup"/>
+    <xs:attribute ref="derivativeClassificationRefId"/>
+  </xs:attributeGroup>
+  <xs:element name="security" type="securityElemType"/>
+  <xs:complexType name="securityElemType">
+    <xs:attribute ref="securityClassification" use="required"/>
+    <xs:attributeGroup ref="commercialSecurityAttGroup"/>
+    <xs:attribute ref="derivativeClassificationRefId"/>
+  </xs:complexType>
+  <xs:attribute name="securityClassification" type="securityClassificationAttType"/>
+  <xs:simpleType name="securityClassificationAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="01"/>
+      <xs:enumeration value="02"/>
+      <xs:enumeration value="03"/>
+      <xs:enumeration value="04"/>
+      <xs:enumeration value="05"/>
+      <xs:enumeration value="06"/>
+      <xs:enumeration value="07"/>
+      <xs:enumeration value="08"/>
+      <xs:enumeration value="09"/>
+      <xs:enumeration value="10"/>
+      <xs:enumeration value="11"/>
+      <xs:enumeration value="12"/>
+      <xs:enumeration value="13"/>
+      <xs:enumeration value="14"/>
+      <xs:enumeration value="15"/>
+      <xs:enumeration value="16"/>
+      <xs:enumeration value="17"/>
+      <xs:enumeration value="18"/>
+      <xs:enumeration value="19"/>
+      <xs:enumeration value="20"/>
+      <xs:enumeration value="21"/>
+      <xs:enumeration value="22"/>
+      <xs:enumeration value="23"/>
+      <xs:enumeration value="24"/>
+      <xs:enumeration value="25"/>
+      <xs:enumeration value="26"/>
+      <xs:enumeration value="27"/>
+      <xs:enumeration value="28"/>
+      <xs:enumeration value="29"/>
+      <xs:enumeration value="30"/>
+      <xs:enumeration value="31"/>
+      <xs:enumeration value="32"/>
+      <xs:enumeration value="33"/>
+      <xs:enumeration value="34"/>
+      <xs:enumeration value="35"/>
+      <xs:enumeration value="36"/>
+      <xs:enumeration value="37"/>
+      <xs:enumeration value="38"/>
+      <xs:enumeration value="39"/>
+      <xs:enumeration value="40"/>
+      <xs:enumeration value="41"/>
+      <xs:enumeration value="42"/>
+      <xs:enumeration value="43"/>
+      <xs:enumeration value="44"/>
+      <xs:enumeration value="45"/>
+      <xs:enumeration value="46"/>
+      <xs:enumeration value="47"/>
+      <xs:enumeration value="48"/>
+      <xs:enumeration value="49"/>
+      <xs:enumeration value="50"/>
+      <xs:enumeration value="51"/>
+      <xs:enumeration value="52"/>
+      <xs:enumeration value="53"/>
+      <xs:enumeration value="54"/>
+      <xs:enumeration value="55"/>
+      <xs:enumeration value="56"/>
+      <xs:enumeration value="57"/>
+      <xs:enumeration value="58"/>
+      <xs:enumeration value="59"/>
+      <xs:enumeration value="60"/>
+      <xs:enumeration value="61"/>
+      <xs:enumeration value="62"/>
+      <xs:enumeration value="63"/>
+      <xs:enumeration value="64"/>
+      <xs:enumeration value="65"/>
+      <xs:enumeration value="66"/>
+      <xs:enumeration value="67"/>
+      <xs:enumeration value="68"/>
+      <xs:enumeration value="69"/>
+      <xs:enumeration value="70"/>
+      <xs:enumeration value="71"/>
+      <xs:enumeration value="72"/>
+      <xs:enumeration value="73"/>
+      <xs:enumeration value="74"/>
+      <xs:enumeration value="75"/>
+      <xs:enumeration value="76"/>
+      <xs:enumeration value="77"/>
+      <xs:enumeration value="78"/>
+      <xs:enumeration value="79"/>
+      <xs:enumeration value="80"/>
+      <xs:enumeration value="81"/>
+      <xs:enumeration value="82"/>
+      <xs:enumeration value="83"/>
+      <xs:enumeration value="84"/>
+      <xs:enumeration value="85"/>
+      <xs:enumeration value="86"/>
+      <xs:enumeration value="87"/>
+      <xs:enumeration value="88"/>
+      <xs:enumeration value="89"/>
+      <xs:enumeration value="90"/>
+      <xs:enumeration value="91"/>
+      <xs:enumeration value="92"/>
+      <xs:enumeration value="93"/>
+      <xs:enumeration value="94"/>
+      <xs:enumeration value="95"/>
+      <xs:enumeration value="96"/>
+      <xs:enumeration value="97"/>
+      <xs:enumeration value="98"/>
+      <xs:enumeration value="99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attributeGroup name="commercialSecurityAttGroup">
+    <xs:attribute ref="commercialClassification"/>
+    <xs:attribute ref="caveat"/>
+  </xs:attributeGroup>
+  <xs:attribute name="commercialClassification" type="commercialClassificationAttType"/>
+  <xs:simpleType name="commercialClassificationAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cc01"/>
+      <xs:enumeration value="cc02"/>
+      <xs:enumeration value="cc03"/>
+      <xs:enumeration value="cc04"/>
+      <xs:enumeration value="cc05"/>
+      <xs:enumeration value="cc06"/>
+      <xs:enumeration value="cc07"/>
+      <xs:enumeration value="cc08"/>
+      <xs:enumeration value="cc09"/>
+      <xs:enumeration value="cc10"/>
+      <xs:enumeration value="cc11"/>
+      <xs:enumeration value="cc12"/>
+      <xs:enumeration value="cc13"/>
+      <xs:enumeration value="cc14"/>
+      <xs:enumeration value="cc15"/>
+      <xs:enumeration value="cc16"/>
+      <xs:enumeration value="cc17"/>
+      <xs:enumeration value="cc18"/>
+      <xs:enumeration value="cc19"/>
+      <xs:enumeration value="cc20"/>
+      <xs:enumeration value="cc21"/>
+      <xs:enumeration value="cc22"/>
+      <xs:enumeration value="cc23"/>
+      <xs:enumeration value="cc24"/>
+      <xs:enumeration value="cc25"/>
+      <xs:enumeration value="cc26"/>
+      <xs:enumeration value="cc27"/>
+      <xs:enumeration value="cc28"/>
+      <xs:enumeration value="cc29"/>
+      <xs:enumeration value="cc30"/>
+      <xs:enumeration value="cc31"/>
+      <xs:enumeration value="cc32"/>
+      <xs:enumeration value="cc33"/>
+      <xs:enumeration value="cc34"/>
+      <xs:enumeration value="cc35"/>
+      <xs:enumeration value="cc36"/>
+      <xs:enumeration value="cc37"/>
+      <xs:enumeration value="cc38"/>
+      <xs:enumeration value="cc39"/>
+      <xs:enumeration value="cc40"/>
+      <xs:enumeration value="cc41"/>
+      <xs:enumeration value="cc42"/>
+      <xs:enumeration value="cc43"/>
+      <xs:enumeration value="cc44"/>
+      <xs:enumeration value="cc45"/>
+      <xs:enumeration value="cc46"/>
+      <xs:enumeration value="cc47"/>
+      <xs:enumeration value="cc48"/>
+      <xs:enumeration value="cc49"/>
+      <xs:enumeration value="cc50"/>
+      <xs:enumeration value="cc51"/>
+      <xs:enumeration value="cc52"/>
+      <xs:enumeration value="cc53"/>
+      <xs:enumeration value="cc54"/>
+      <xs:enumeration value="cc55"/>
+      <xs:enumeration value="cc56"/>
+      <xs:enumeration value="cc57"/>
+      <xs:enumeration value="cc58"/>
+      <xs:enumeration value="cc59"/>
+      <xs:enumeration value="cc60"/>
+      <xs:enumeration value="cc61"/>
+      <xs:enumeration value="cc62"/>
+      <xs:enumeration value="cc63"/>
+      <xs:enumeration value="cc64"/>
+      <xs:enumeration value="cc65"/>
+      <xs:enumeration value="cc66"/>
+      <xs:enumeration value="cc67"/>
+      <xs:enumeration value="cc68"/>
+      <xs:enumeration value="cc69"/>
+      <xs:enumeration value="cc70"/>
+      <xs:enumeration value="cc71"/>
+      <xs:enumeration value="cc72"/>
+      <xs:enumeration value="cc73"/>
+      <xs:enumeration value="cc74"/>
+      <xs:enumeration value="cc75"/>
+      <xs:enumeration value="cc76"/>
+      <xs:enumeration value="cc77"/>
+      <xs:enumeration value="cc78"/>
+      <xs:enumeration value="cc79"/>
+      <xs:enumeration value="cc80"/>
+      <xs:enumeration value="cc81"/>
+      <xs:enumeration value="cc82"/>
+      <xs:enumeration value="cc83"/>
+      <xs:enumeration value="cc84"/>
+      <xs:enumeration value="cc85"/>
+      <xs:enumeration value="cc86"/>
+      <xs:enumeration value="cc87"/>
+      <xs:enumeration value="cc88"/>
+      <xs:enumeration value="cc89"/>
+      <xs:enumeration value="cc90"/>
+      <xs:enumeration value="cc91"/>
+      <xs:enumeration value="cc92"/>
+      <xs:enumeration value="cc93"/>
+      <xs:enumeration value="cc94"/>
+      <xs:enumeration value="cc95"/>
+      <xs:enumeration value="cc96"/>
+      <xs:enumeration value="cc97"/>
+      <xs:enumeration value="cc98"/>
+      <xs:enumeration value="cc99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="caveat" type="caveatAttType"/>
+  <xs:simpleType name="caveatAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cv01"/>
+      <xs:enumeration value="cv02"/>
+      <xs:enumeration value="cv03"/>
+      <xs:enumeration value="cv04"/>
+      <xs:enumeration value="cv05"/>
+      <xs:enumeration value="cv06"/>
+      <xs:enumeration value="cv07"/>
+      <xs:enumeration value="cv08"/>
+      <xs:enumeration value="cv09"/>
+      <xs:enumeration value="cv10"/>
+      <xs:enumeration value="cv11"/>
+      <xs:enumeration value="cv12"/>
+      <xs:enumeration value="cv13"/>
+      <xs:enumeration value="cv14"/>
+      <xs:enumeration value="cv15"/>
+      <xs:enumeration value="cv16"/>
+      <xs:enumeration value="cv17"/>
+      <xs:enumeration value="cv18"/>
+      <xs:enumeration value="cv19"/>
+      <xs:enumeration value="cv20"/>
+      <xs:enumeration value="cv21"/>
+      <xs:enumeration value="cv22"/>
+      <xs:enumeration value="cv23"/>
+      <xs:enumeration value="cv24"/>
+      <xs:enumeration value="cv25"/>
+      <xs:enumeration value="cv26"/>
+      <xs:enumeration value="cv27"/>
+      <xs:enumeration value="cv28"/>
+      <xs:enumeration value="cv29"/>
+      <xs:enumeration value="cv30"/>
+      <xs:enumeration value="cv31"/>
+      <xs:enumeration value="cv32"/>
+      <xs:enumeration value="cv33"/>
+      <xs:enumeration value="cv34"/>
+      <xs:enumeration value="cv35"/>
+      <xs:enumeration value="cv36"/>
+      <xs:enumeration value="cv37"/>
+      <xs:enumeration value="cv38"/>
+      <xs:enumeration value="cv39"/>
+      <xs:enumeration value="cv40"/>
+      <xs:enumeration value="cv41"/>
+      <xs:enumeration value="cv42"/>
+      <xs:enumeration value="cv43"/>
+      <xs:enumeration value="cv44"/>
+      <xs:enumeration value="cv45"/>
+      <xs:enumeration value="cv46"/>
+      <xs:enumeration value="cv47"/>
+      <xs:enumeration value="cv48"/>
+      <xs:enumeration value="cv49"/>
+      <xs:enumeration value="cv50"/>
+      <xs:enumeration value="cv51"/>
+      <xs:enumeration value="cv52"/>
+      <xs:enumeration value="cv53"/>
+      <xs:enumeration value="cv54"/>
+      <xs:enumeration value="cv55"/>
+      <xs:enumeration value="cv56"/>
+      <xs:enumeration value="cv57"/>
+      <xs:enumeration value="cv58"/>
+      <xs:enumeration value="cv59"/>
+      <xs:enumeration value="cv60"/>
+      <xs:enumeration value="cv61"/>
+      <xs:enumeration value="cv62"/>
+      <xs:enumeration value="cv63"/>
+      <xs:enumeration value="cv64"/>
+      <xs:enumeration value="cv65"/>
+      <xs:enumeration value="cv66"/>
+      <xs:enumeration value="cv67"/>
+      <xs:enumeration value="cv68"/>
+      <xs:enumeration value="cv69"/>
+      <xs:enumeration value="cv70"/>
+      <xs:enumeration value="cv71"/>
+      <xs:enumeration value="cv72"/>
+      <xs:enumeration value="cv73"/>
+      <xs:enumeration value="cv74"/>
+      <xs:enumeration value="cv75"/>
+      <xs:enumeration value="cv76"/>
+      <xs:enumeration value="cv77"/>
+      <xs:enumeration value="cv78"/>
+      <xs:enumeration value="cv79"/>
+      <xs:enumeration value="cv80"/>
+      <xs:enumeration value="cv81"/>
+      <xs:enumeration value="cv82"/>
+      <xs:enumeration value="cv83"/>
+      <xs:enumeration value="cv84"/>
+      <xs:enumeration value="cv85"/>
+      <xs:enumeration value="cv86"/>
+      <xs:enumeration value="cv87"/>
+      <xs:enumeration value="cv88"/>
+      <xs:enumeration value="cv89"/>
+      <xs:enumeration value="cv90"/>
+      <xs:enumeration value="cv91"/>
+      <xs:enumeration value="cv92"/>
+      <xs:enumeration value="cv93"/>
+      <xs:enumeration value="cv94"/>
+      <xs:enumeration value="cv95"/>
+      <xs:enumeration value="cv96"/>
+      <xs:enumeration value="cv97"/>
+      <xs:enumeration value="cv98"/>
+      <xs:enumeration value="cv99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="derivativeClassificationRefId" type="xs:IDREF"/>
+  <xs:attribute name="id" type="xs:ID"/>
+  <xs:attributeGroup name="changeAttGroup">
+    <xs:attribute ref="changeType"/>
+    <xs:attribute ref="changeMark"/>
+    <xs:attribute ref="reasonForUpdateRefIds"/>
+  </xs:attributeGroup>
+  <xs:attribute name="changeType" type="changeTypeAttType"/>
+  <xs:simpleType name="changeTypeAttType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="add"/>
+      <xs:enumeration value="delete"/>
+      <xs:enumeration value="modify"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="changeMark" type="yesOrNoAttType"/>
+  <xs:simpleType name="yesOrNoAttType">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="[01]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="reasonForUpdateRefIds" type="xs:IDREFS"/>
+  <xs:element name="subScript" type="xs:string"/>
+  <xs:element name="superScript" type="xs:string"/>
+  <xs:element name="externalPubCode" type="externalPubCodeElemType"/>
+  <xs:complexType mixed="true" name="externalPubCodeElemType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element ref="indexFlag"/>
+      <xs:element ref="subScript"/>
+      <xs:element ref="superScript"/>
+      <xs:element ref="acronym"/>
+      <xs:element ref="acronymTerm"/>
+      <xs:element ref="verbatimText"/>
+    </xs:choice>
+    <xs:attribute ref="pubCodingScheme"/>
+  </xs:complexType>
+  <xs:element name="indexFlag" type="indexFlagElemType"/>
+  <xs:complexType name="indexFlagElemType">
+    <xs:attribute ref="indexLevelOne"/>
+    <xs:attribute ref="indexLevelTwo"/>
+    <xs:attribute ref="indexLevelThree"/>
+    <xs:attribute ref="indexLevelFour"/>
+  </xs:complexType>
+  <xs:attribute name="indexLevelOne" type="xs:string"/>
+  <xs:attribute name="indexLevelTwo" type="xs:string"/>
+  <xs:attribute name="indexLevelThree" type="xs:string"/>
+  <xs:attribute name="indexLevelFour" type="xs:string"/>
+  <xs:element name="acronym" type="acronymElemType"/>
+  <xs:complexType name="acronymElemType">
+    <xs:sequence>
+      <xs:element ref="acronymTerm"/>
+      <xs:element ref="acronymDefinition"/>
+    </xs:sequence>
+    <xs:attribute ref="acronymType"/>
+    <xs:attribute ref="id"/>
+    <xs:attributeGroup ref="changeAttGroup"/>
+    <xs:attributeGroup ref="securityAttGroup"/>
+    <xs:attributeGroup ref="authorityAttGroup"/>
+  </xs:complexType>
+  <xs:element name="acronymTerm" type="acronymTermElemType"/>
+  <xs:complexType mixed="true" name="acronymTermElemType">
+    <xs:group maxOccurs="unbounded" minOccurs="0" ref="subOrSuperScriptElemGroup"/>
+    <xs:attribute ref="internalRefId"/>
+  </xs:complexType>
+  <xs:attribute name="internalRefId" type="xs:IDREF"/>
+  <xs:element name="acronymDefinition" type="acronymDefinitionElemType"/>
+  <xs:complexType mixed="true" name="acronymDefinitionElemType">
+    <xs:group maxOccurs="unbounded" minOccurs="0" ref="subOrSuperScriptElemGroup"/>
+    <xs:attribute ref="id"/>
+    <xs:attributeGroup ref="changeAttGroup"/>
+    <xs:attributeGroup ref="securityAttGroup"/>
+    <xs:attributeGroup ref="authorityAttGroup"/>
+  </xs:complexType>
+  <xs:attribute default="at01" name="acronymType" type="acronymTypeAttType"/>
+  <xs:simpleType name="acronymTypeAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="at01"/>
+      <xs:enumeration value="at02"/>
+      <xs:enumeration value="at03"/>
+      <xs:enumeration value="at04"/>
+      <xs:enumeration value="at05"/>
+      <xs:enumeration value="at06"/>
+      <xs:enumeration value="at07"/>
+      <xs:enumeration value="at08"/>
+      <xs:enumeration value="at09"/>
+      <xs:enumeration value="at10"/>
+      <xs:enumeration value="at11"/>
+      <xs:enumeration value="at12"/>
+      <xs:enumeration value="at13"/>
+      <xs:enumeration value="at14"/>
+      <xs:enumeration value="at15"/>
+      <xs:enumeration value="at16"/>
+      <xs:enumeration value="at17"/>
+      <xs:enumeration value="at18"/>
+      <xs:enumeration value="at19"/>
+      <xs:enumeration value="at20"/>
+      <xs:enumeration value="at21"/>
+      <xs:enumeration value="at22"/>
+      <xs:enumeration value="at23"/>
+      <xs:enumeration value="at24"/>
+      <xs:enumeration value="at25"/>
+      <xs:enumeration value="at26"/>
+      <xs:enumeration value="at27"/>
+      <xs:enumeration value="at28"/>
+      <xs:enumeration value="at29"/>
+      <xs:enumeration value="at30"/>
+      <xs:enumeration value="at31"/>
+      <xs:enumeration value="at32"/>
+      <xs:enumeration value="at33"/>
+      <xs:enumeration value="at34"/>
+      <xs:enumeration value="at35"/>
+      <xs:enumeration value="at36"/>
+      <xs:enumeration value="at37"/>
+      <xs:enumeration value="at38"/>
+      <xs:enumeration value="at39"/>
+      <xs:enumeration value="at40"/>
+      <xs:enumeration value="at41"/>
+      <xs:enumeration value="at42"/>
+      <xs:enumeration value="at43"/>
+      <xs:enumeration value="at44"/>
+      <xs:enumeration value="at45"/>
+      <xs:enumeration value="at46"/>
+      <xs:enumeration value="at47"/>
+      <xs:enumeration value="at48"/>
+      <xs:enumeration value="at49"/>
+      <xs:enumeration value="at50"/>
+      <xs:enumeration value="at51"/>
+      <xs:enumeration value="at52"/>
+      <xs:enumeration value="at53"/>
+      <xs:enumeration value="at54"/>
+      <xs:enumeration value="at55"/>
+      <xs:enumeration value="at56"/>
+      <xs:enumeration value="at57"/>
+      <xs:enumeration value="at58"/>
+      <xs:enumeration value="at59"/>
+      <xs:enumeration value="at60"/>
+      <xs:enumeration value="at61"/>
+      <xs:enumeration value="at62"/>
+      <xs:enumeration value="at63"/>
+      <xs:enumeration value="at64"/>
+      <xs:enumeration value="at65"/>
+      <xs:enumeration value="at66"/>
+      <xs:enumeration value="at67"/>
+      <xs:enumeration value="at68"/>
+      <xs:enumeration value="at69"/>
+      <xs:enumeration value="at70"/>
+      <xs:enumeration value="at71"/>
+      <xs:enumeration value="at72"/>
+      <xs:enumeration value="at73"/>
+      <xs:enumeration value="at74"/>
+      <xs:enumeration value="at75"/>
+      <xs:enumeration value="at76"/>
+      <xs:enumeration value="at77"/>
+      <xs:enumeration value="at78"/>
+      <xs:enumeration value="at79"/>
+      <xs:enumeration value="at80"/>
+      <xs:enumeration value="at81"/>
+      <xs:enumeration value="at82"/>
+      <xs:enumeration value="at83"/>
+      <xs:enumeration value="at84"/>
+      <xs:enumeration value="at85"/>
+      <xs:enumeration value="at86"/>
+      <xs:enumeration value="at87"/>
+      <xs:enumeration value="at88"/>
+      <xs:enumeration value="at89"/>
+      <xs:enumeration value="at90"/>
+      <xs:enumeration value="at91"/>
+      <xs:enumeration value="at92"/>
+      <xs:enumeration value="at93"/>
+      <xs:enumeration value="at94"/>
+      <xs:enumeration value="at95"/>
+      <xs:enumeration value="at96"/>
+      <xs:enumeration value="at97"/>
+      <xs:enumeration value="at98"/>
+      <xs:enumeration value="at99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="verbatimText" type="verbatimTextElemType"/>
+  <xs:complexType mixed="true" name="verbatimTextElemType">
+    <xs:attribute ref="verbatimStyle"/>
+    <xs:attribute ref="id"/>
+    <xs:attributeGroup ref="changeAttGroup"/>
+    <xs:attributeGroup ref="securityAttGroup"/>
+  </xs:complexType>
+  <xs:attribute name="verbatimStyle" type="verbatimStyleAttType"/>
+  <xs:simpleType name="verbatimStyleAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="vs01"/>
+      <xs:enumeration value="vs02"/>
+      <xs:enumeration value="vs03"/>
+      <xs:enumeration value="vs04"/>
+      <xs:enumeration value="vs05"/>
+      <xs:enumeration value="vs06"/>
+      <xs:enumeration value="vs07"/>
+      <xs:enumeration value="vs08"/>
+      <xs:enumeration value="vs09"/>
+      <xs:enumeration value="vs10"/>
+      <xs:enumeration value="vs11"/>
+      <xs:enumeration value="vs12"/>
+      <xs:enumeration value="vs13"/>
+      <xs:enumeration value="vs14"/>
+      <xs:enumeration value="vs15"/>
+      <xs:enumeration value="vs16"/>
+      <xs:enumeration value="vs17"/>
+      <xs:enumeration value="vs18"/>
+      <xs:enumeration value="vs19"/>
+      <xs:enumeration value="vs20"/>
+      <xs:enumeration value="vs21"/>
+      <xs:enumeration value="vs22"/>
+      <xs:enumeration value="vs23"/>
+      <xs:enumeration value="vs24"/>
+      <xs:enumeration value="vs25"/>
+      <xs:enumeration value="vs26"/>
+      <xs:enumeration value="vs27"/>
+      <xs:enumeration value="vs28"/>
+      <xs:enumeration value="vs29"/>
+      <xs:enumeration value="vs30"/>
+      <xs:enumeration value="vs31"/>
+      <xs:enumeration value="vs32"/>
+      <xs:enumeration value="vs33"/>
+      <xs:enumeration value="vs34"/>
+      <xs:enumeration value="vs35"/>
+      <xs:enumeration value="vs36"/>
+      <xs:enumeration value="vs37"/>
+      <xs:enumeration value="vs38"/>
+      <xs:enumeration value="vs39"/>
+      <xs:enumeration value="vs40"/>
+      <xs:enumeration value="vs41"/>
+      <xs:enumeration value="vs42"/>
+      <xs:enumeration value="vs43"/>
+      <xs:enumeration value="vs44"/>
+      <xs:enumeration value="vs45"/>
+      <xs:enumeration value="vs46"/>
+      <xs:enumeration value="vs47"/>
+      <xs:enumeration value="vs48"/>
+      <xs:enumeration value="vs49"/>
+      <xs:enumeration value="vs50"/>
+      <xs:enumeration value="vs51"/>
+      <xs:enumeration value="vs52"/>
+      <xs:enumeration value="vs53"/>
+      <xs:enumeration value="vs54"/>
+      <xs:enumeration value="vs55"/>
+      <xs:enumeration value="vs56"/>
+      <xs:enumeration value="vs57"/>
+      <xs:enumeration value="vs58"/>
+      <xs:enumeration value="vs59"/>
+      <xs:enumeration value="vs60"/>
+      <xs:enumeration value="vs61"/>
+      <xs:enumeration value="vs62"/>
+      <xs:enumeration value="vs63"/>
+      <xs:enumeration value="vs64"/>
+      <xs:enumeration value="vs65"/>
+      <xs:enumeration value="vs66"/>
+      <xs:enumeration value="vs67"/>
+      <xs:enumeration value="vs68"/>
+      <xs:enumeration value="vs69"/>
+      <xs:enumeration value="vs70"/>
+      <xs:enumeration value="vs71"/>
+      <xs:enumeration value="vs72"/>
+      <xs:enumeration value="vs73"/>
+      <xs:enumeration value="vs74"/>
+      <xs:enumeration value="vs75"/>
+      <xs:enumeration value="vs76"/>
+      <xs:enumeration value="vs77"/>
+      <xs:enumeration value="vs78"/>
+      <xs:enumeration value="vs79"/>
+      <xs:enumeration value="vs80"/>
+      <xs:enumeration value="vs81"/>
+      <xs:enumeration value="vs82"/>
+      <xs:enumeration value="vs83"/>
+      <xs:enumeration value="vs84"/>
+      <xs:enumeration value="vs85"/>
+      <xs:enumeration value="vs86"/>
+      <xs:enumeration value="vs87"/>
+      <xs:enumeration value="vs88"/>
+      <xs:enumeration value="vs89"/>
+      <xs:enumeration value="vs90"/>
+      <xs:enumeration value="vs91"/>
+      <xs:enumeration value="vs92"/>
+      <xs:enumeration value="vs93"/>
+      <xs:enumeration value="vs94"/>
+      <xs:enumeration value="vs95"/>
+      <xs:enumeration value="vs96"/>
+      <xs:enumeration value="vs97"/>
+      <xs:enumeration value="vs98"/>
+      <xs:enumeration value="vs99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="pubCodingScheme" type="xs:string"/>
+  <xs:element name="externalPubTitle" type="externalPubTitleElemType"/>
+  <xs:complexType mixed="true" name="externalPubTitleElemType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element ref="indexFlag"/>
+      <xs:element ref="subScript"/>
+      <xs:element ref="superScript"/>
+      <xs:element ref="acronym"/>
+      <xs:element ref="acronymTerm"/>
+      <xs:element ref="verbatimText"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="externalPubIssueInfo" type="externalPubIssueInfoElemType"/>
+  <xs:complexType mixed="true" name="externalPubIssueInfoElemType">
+    <xs:sequence>
+      <xs:element ref="externalPubIssue"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="externalPubIssue" type="externalPubIssueElemType"/>
+  <xs:complexType mixed="true" name="externalPubIssueElemType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element ref="indexFlag"/>
+      <xs:element ref="subScript"/>
+      <xs:element ref="superScript"/>
+      <xs:element ref="acronym"/>
+      <xs:element ref="acronymTerm"/>
+      <xs:element ref="verbatimText"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="externalPubRefAddressItems" type="externalPubRefAddressItemsElemType"/>
+  <xs:complexType name="externalPubRefAddressItemsElemType">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="externalPubIssueDate"/>
+      <xs:element minOccurs="0" ref="security"/>
+      <xs:element minOccurs="0" ref="responsiblePartnerCompany"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" ref="pubMedia"/>
+      <xs:element minOccurs="0" ref="shortExternalPubTitle"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="externalPubIssueDate" type="externalPubIssueDateElemType"/>
+  <xs:complexType mixed="true" name="externalPubIssueDateElemType">
+    <xs:attributeGroup ref="externalPubIssueDateAttGroup"/>
+  </xs:complexType>
+  <xs:attributeGroup name="externalPubIssueDateAttGroup">
+    <xs:attribute ref="year"/>
+    <xs:attribute ref="month"/>
+    <xs:attribute ref="day"/>
+  </xs:attributeGroup>
+  <xs:element name="shortExternalPubTitle" type="shortExternalPubTitleElemType"/>
+  <xs:complexType mixed="true" name="shortExternalPubTitleElemType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element ref="indexFlag"/>
+      <xs:element ref="subScript"/>
+      <xs:element ref="superScript"/>
+      <xs:element ref="acronym"/>
+      <xs:element ref="acronymTerm"/>
+      <xs:element ref="verbatimText"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="externalPubRefIdent" type="externalPubRefIdentElemType"/>
+  <xs:complexType name="externalPubRefIdentElemType">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="externalPubCode"/>
+      <xs:element minOccurs="0" ref="externalPubTitle"/>
+      <xs:element minOccurs="0" ref="externalPubIssueInfo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="externalPubRef" type="externalPubRefElemType"/>
+  <xs:complexType name="externalPubRefElemType">
+    <xs:sequence>
+      <xs:element ref="externalPubRefIdent"/>
+      <xs:element minOccurs="0" ref="externalPubRefAddressItems"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="securityAttGroup"/>
+    <xs:attributeGroup ref="authorityAttGroup"/>
+    <xs:attributeGroup ref="xlink:XLINKATT4"/>
+  </xs:complexType>
+  <xs:element name="externalPubs" type="externalPubsElemType"/>
+  <xs:complexType name="externalPubsElemType">
+    <xs:sequence>
+      <xs:element ref="externalPubRef" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
