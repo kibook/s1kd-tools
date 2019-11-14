@@ -2,7 +2,7 @@
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/share/xml/schema/s1kd-tools
-INSTALL=install -D
+INSTALL=install
 
 SCHEMAS=*.xsd
 
@@ -13,8 +13,10 @@ REPL_SCHEMA_URL=file://$(INSTALL_PREFIX)
 all:
 
 install:
-	for schema in $(SCHEMAS); do $(INSTALL) "$$schema" $(INSTALL_PREFIX)/"$$schema"; done
+	mkdir -p $(INSTALL_PREFIX)
+	$(INSTALL) $(SCHEMAS) $(INSTALL_PREFIX)
 	xmlcatalog --noout --add rewriteURI '$(ORIG_SCHEMA_URL)' '$(REPL_SCHEMA_URL)' $(XML_CATALOG_FILE)
 
 uninstall:
 	rm -rf $(INSTALL_PREFIX)
+	xmlcatalog --noout --del '$(ORIG_SCHEMA_URL)' $(XML_CATALOG_FILE)
