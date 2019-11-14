@@ -60,6 +60,11 @@ extern int DEFAULT_PARSE_OPTS;
 	puts("  --noent     Resolve entities.");\
 	puts("  --xinclude  Do XInclude processing.");
 
+#define LIBXML2_PARSE_INIT \
+	if (optset(DEFAULT_PARSE_OPTS, XML_PARSE_NONET)) {\
+		xmlSetExternalEntityLoader(xmlNoNetExternalEntityLoader);\
+	}
+
 /* Return the full path name from a relative path. */
 char *real_path(const char *path, char *real);
 
