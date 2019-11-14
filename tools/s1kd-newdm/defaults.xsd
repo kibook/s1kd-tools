@@ -1,9 +1,70 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
   <xs:complexType name="defaultElemType">
-    <xs:attribute name="ident" type="xs:string" use="required"/>
+    <xs:attribute name="ident" type="identAttType" use="required"/>
     <xs:attribute name="value" type="xs:string" use="required"/>
   </xs:complexType>
+  <xs:simpleType name="identAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="act"/>
+      <xs:enumeration value="assyCode"/>
+      <xs:enumeration value="authorization"/>
+      <xs:enumeration value="brex"/>
+      <xs:enumeration value="city"/>
+      <xs:enumeration value="commentPriorityCode"/>
+      <xs:enumeration value="commentType"/>
+      <xs:enumeration value="countryIsoCode"/>
+      <xs:enumeration value="country"/>
+      <xs:enumeration value="disassyCodeVariant"/>
+      <xs:enumeration value="disassyCode"/>
+      <xs:enumeration value="dmlType"/>
+      <xs:enumeration value="includePrevSnsTitle"/>
+      <xs:enumeration value="infoCodeVariant"/>
+      <xs:enumeration value="infoCode"/>
+      <xs:enumeration value="infoName"/>
+      <xs:enumeration value="infoNameVariant"/>
+      <xs:enumeration value="inWork"/>
+      <xs:enumeration value="issueNumber"/>
+      <xs:enumeration value="issueType"/>
+      <xs:enumeration value="issue"/>
+      <xs:enumeration value="itemLocationCode"/>
+      <xs:enumeration value="languageIsoCode"/>
+      <xs:enumeration value="learnCode"/>
+      <xs:enumeration value="learnEventCode"/>
+      <xs:enumeration value="maintainedSns"/>
+      <xs:enumeration value="modelIdentCode"/>
+      <xs:enumeration value="omitIssueInfo"/>
+      <xs:enumeration value="originatorCode"/>
+      <xs:enumeration value="originator"/>
+      <xs:enumeration value="pmIssuer"/>
+      <xs:enumeration value="pmNumber"/>
+      <xs:enumeration value="pmVolume"/>
+      <xs:enumeration value="receiver"/>
+      <xs:enumeration value="receiverCity"/>
+      <xs:enumeration value="receiverCountry"/>
+      <xs:enumeration value="receiverIdent"/>
+      <xs:enumeration value="remarks"/>
+      <xs:enumeration value="responsiblePartnerCompanyCode"/>
+      <xs:enumeration value="responsiblePartnerCompany"/>
+      <xs:enumeration value="schema"/>
+      <xs:enumeration value="scormContentPackageIssuer"/>
+      <xs:enumeration value="scormContentPackageNumber"/>
+      <xs:enumeration value="scormContentPackageVolume"/>
+      <xs:enumeration value="securityClassification"/>
+      <xs:enumeration value="sender"/>
+      <xs:enumeration value="senderIdent"/>
+      <xs:enumeration value="seqNumber"/>
+      <xs:enumeration value="skillLevelCode"/>
+      <xs:enumeration value="sns"/>
+      <xs:enumeration value="subSubSystemCode"/>
+      <xs:enumeration value="subSystemCode"/>
+      <xs:enumeration value="systemCode"/>
+      <xs:enumeration value="systemDiffCode"/>
+      <xs:enumeration value="techName"/>
+      <xs:enumeration value="templates"/>
+      <xs:enumeration value="yearOfDataIssue"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:complexType name="defaultsElemType">
     <xs:sequence>
       <xs:element name="default" type="defaultElemType" minOccurs="0" maxOccurs="unbounded"/>
