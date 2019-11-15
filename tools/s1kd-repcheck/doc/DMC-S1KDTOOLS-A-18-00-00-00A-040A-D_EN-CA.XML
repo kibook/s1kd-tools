@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="05"/>
+        <issueInfo issueNumber="000" inWork="06"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="15"/>
@@ -120,7 +120,8 @@
             <definitionListItem>
               <listItemTerm>-R, --cir &lt;CIR&gt;</listItemTerm>
               <listItemDefinition>
-                <para>A CIR to resolve references in CSDB objects against. Multiple CIRs can be specified by using this option multiple times. If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
+                <para>A CIR to resolve references in CSDB objects against. Multiple CIRs can be specified by using this option multiple times.</para>
+                <para>If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
