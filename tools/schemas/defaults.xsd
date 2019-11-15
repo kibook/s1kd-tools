@@ -33,7 +33,6 @@
       <xs:enumeration value="learnEventCode"/>
       <xs:enumeration value="maintainedSns"/>
       <xs:enumeration value="modelIdentCode"/>
-      <xs:enumeration value="omitIssueInfo"/>
       <xs:enumeration value="originatorCode"/>
       <xs:enumeration value="originator"/>
       <xs:enumeration value="pmIssuer"/>

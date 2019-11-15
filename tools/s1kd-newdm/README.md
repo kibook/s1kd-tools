@@ -144,8 +144,7 @@ can be used to set one of the above SNS as the default.
 Set remarks for the new data module.
 
 -N, --omit-issue  
-Omit issue/inwork numbers from filename. The "`omitIssueInfo`"
-`.defaults` file key can also be set to control this option.
+Omit issue/inwork numbers from filename.
 
 -n, --issno &lt;issue&gt;  
 The issue number of the new data module.

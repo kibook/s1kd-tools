@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "2.2.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -347,8 +347,6 @@ static void copy_default_value(const char *key, const char *val)
 		sns_fname = strdup(val);
 	else if (strcmp(key, "issue") == 0 && issue == NO_ISS)
 		issue = get_issue(val);
-	else if (strcmp(key, "omitIssueInfo") == 0 && !no_issue_set)
-		no_issue = strcasecmp(val, "true") == 0;
 	else if (strcmp(key, "remarks") == 0 && !remarks)
 		remarks = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "templates") == 0 && !template_dir)
