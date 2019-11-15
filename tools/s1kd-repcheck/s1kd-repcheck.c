@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "0.6.0"
+#define VERSION "1.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
