@@ -38,7 +38,6 @@ Alphabetic index
 | `learnEventCode`                | A, B, C, D, or E                         |
 | `maintainedSns`                 | string                                   |
 | `modelIdentCode`                | 1 to 14 alphanumeric characters          |
-| `omitIssueInfo`                 | true or false                            |
 | `originatorCode`                | 5-character NCAGE code                   |
 | `originator`                    | string                                   |
 | `pmIssuer`                      | 5-character NCAGE code                   |
