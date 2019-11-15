@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.3.1"
+#define VERSION "3.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -2571,7 +2571,9 @@ static int show_or_edit_metadata(const char *fname, struct opts *opts)
 					err = show_metadata(ctxt, key, opts);
 				}
 
-				if (opts->endl > -1) putchar(opts->endl);
+				if (!edit) {
+					putchar(opts->endl);
+				}
 
 				show_err(err, key, val, fname, opts);
 
