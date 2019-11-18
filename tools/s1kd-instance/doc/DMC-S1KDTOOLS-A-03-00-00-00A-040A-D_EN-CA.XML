@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="044" inWork="00"/>
+        <issueInfo issueNumber="044" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="15"/>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -9 (--prune) option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add CIR search option with "*" argument to -R.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -407,13 +401,13 @@
                   </randomList>
                 </para>
                 <para>The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -x option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -D option.</para>
-                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
+                <para>If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-r, --recursive</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), when searching for source objects (-@), or when searching for CIR data modules (-R).</para>
+                <para>Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), when searching for source objects (-@), or when searching for CIR data modules (-R).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -548,7 +542,7 @@
                 <para>Automatically reapply the applicability of the source object when filtering.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-9, --prune</listItemTerm>
               <listItemDefinition>
                 <para>Remove only invalid parts of applicability annotations.</para>
@@ -628,11 +622,11 @@
           <para>If the -S option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>/<verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements or <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
         </levelledPara>
         <levelledPara>
-          <title changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Removing/simplifying/pruning applicability annotations</title>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a (--reduce), -A (--simplify) and -9 (--prune) options provide different methods of doing this.</para>
+          <title>Removing/simplifying/pruning applicability annotations</title>
+          <para>By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a (--reduce), -A (--simplify) and -9 (--prune) options provide different methods of doing this.</para>
           <para>The -a (--reduce) option will remove applicability annotations (<verbatimText verbatimStyle="vs13">applicRefId</verbatimText>) from elements which are deemed to be unambiguously valid or invalid (their validity does not rely on applicability values left undefined by the user). The unused occurrences of the corresponding <verbatimText verbatimStyle="vs12">&lt;applic&gt;</verbatimText> elements are removed as well.</para>
           <para>The -A (--simplify) option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded <verbatimText verbatimStyle="vs12">&lt;evaluate&gt;</verbatimText> elements when they contain only one remaining <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText>.</para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">The -9 (--prune) option works similarly to the -A option, except that only invalid parts of applicability annotations are removed.</para>
+          <para>The -9 (--prune) option works similarly to the -A option, except that only invalid parts of applicability annotations are removed.</para>
           <para>For example, given the following input:</para>
           <para>
             <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
@@ -783,7 +777,7 @@ the weather is icy.
 &lt;/para&gt;</verbatimText>
           </para>
           <para>The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is <emphasis>not</emphasis> A can be removed as invalid. This leaves only the assertion about the weather.</para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>
             If the -9 option is used, the following would be the result:
             <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
 <applic id="app-0001">
@@ -814,8 +808,8 @@ the weather is icy.
             The first annotation is kept because it is entirely valid. The third annotation is simplified by removing the invalid assertions, but the valid assertions are preserved.
           </para>
           <note>
-            <notePara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The -A and -9 options may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect.</notePara>
-            <notePara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">These options are best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool. The -J option of this tool can be combined with the -k option of the s1kd-aspp tool to only generate display text for annotations which are modified.</notePara>
+            <notePara>The -A and -9 options may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect.</notePara>
+            <notePara>These options are best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool. The -J option of this tool can be combined with the -k option of the s1kd-aspp tool to only generate display text for annotations which are modified.</notePara>
           </note>
         </levelledPara>
         <levelledPara>
@@ -1124,7 +1118,7 @@ applicPropertyValues="1"/&gt;
                 <para>Issue date specified with -I is invalid.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>9</listItemTerm>
               <listItemDefinition>
                 <para>The number of CIR data modules found when searching exceeded the available memory.</para>

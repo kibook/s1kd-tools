@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="018" inWork="00"/>
+        <issueInfo issueNumber="018" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="15"/>
@@ -39,9 +39,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add s1kd-repcheck tool.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -962,7 +959,7 @@
                 <para>X</para>
               </entry>
             </row>
-            <row changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <row>
               <entry>
                 <para>s1kd-repcheck</para>
               </entry>

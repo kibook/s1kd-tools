@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="023" inWork="00"/>
+        <issueInfo issueNumber="023" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="15"/>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -4 (--remove-marks) option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -78,7 +75,7 @@
                 <para>Set second verification type (tabtop, onobject, ttandoo).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-4, --remove-marks</listItemTerm>
               <listItemDefinition>
                 <para>Remove change markup on elements, but not RFUs, in the upissued object. This is automatically applied if the issue type (-s) is not <verbatimText verbatimStyle="vs14">"changed"</verbatimText> or <verbatimText verbatimStyle="vs14">"rinstate-changed"</verbatimText>.</para>
