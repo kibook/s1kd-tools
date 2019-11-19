@@ -1,1 +1,1 @@
-.//scoEntryItem/text()
+descendant-or-self::scoEntryItem/text()

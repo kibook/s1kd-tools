@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.2.1"
+#define VERSION "3.2.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1504,7 +1504,7 @@ static void transform_refs_in_doc(const xmlDocPtr doc, const char *path, const x
 			els = elems_epr_txt;
 			len = elems_epr_txt_len;
 		} else {
-			els = BAD_CAST ".//*/text()";
+			els = BAD_CAST "descendant-or-self::*/text()";
 			len = 11;
 		}
 
