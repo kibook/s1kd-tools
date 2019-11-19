@@ -77,8 +77,8 @@ in the XML document(s) specified. The textual references must include
 the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p option is
 specified. &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for
 comment, data module, external publication, ICN, DML, publication
-module, SCORM content package and CSN references respectively. If "-" is
-given, then all types of references will be transformed.
+module, SCORM content package and CSN references respectively. If "all"
+is given, then all types of references will be transformed.
 
 -t, --include-title  
 Include the title in the reference (target must be a file).
