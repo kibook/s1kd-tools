@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-cdfiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
+    s1kd-ref [-cdfiLlpqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
              [-x <xpath>] [-3 <file>] [-o <dst>] [<code>|<file> ...]
 
 DESCRIPTION
@@ -49,6 +49,10 @@ file)
 -o, --out &lt;dst&gt;  
 Output to &lt;dst&gt; instead of stdout.
 
+-p, --no-prefix  
+When using the -T option, transform textual references that do not
+include the standard prefixes (e.g., "DMC-", "PMC-").
+
 -q, --quiet  
 Quiet mode. Do not print errors.
 
@@ -69,12 +73,12 @@ the -r option.
 
 -T, --transform &lt;opts&gt;  
 Transform textual references into the appropriate XML within text nodes
-in the XML document(s) specified. The textual references may or may not
-include the standard prefixes (e.g., "DMC-", "PMC-"). &lt;opts&gt; is a
-sequence of characters from "CDEGLPSY", for comment, data module,
-external publication, ICN, DML, publication module, SCORM content
-package and CSN references respectively. If "-" is given, then all types
-of references will be transformed.
+in the XML document(s) specified. The textual references must include
+the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p option is
+specified. &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for
+comment, data module, external publication, ICN, DML, publication
+module, SCORM content package and CSN references respectively. If "-" is
+given, then all types of references will be transformed.
 
 -t, --include-title  
 Include the title in the reference (target must be a file).

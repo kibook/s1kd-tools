@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="01"/>
+        <issueInfo issueNumber="022" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="11" day="19"/>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -c (--content), -L (--list), -T (--transform) and -x (--xpath) options.</simplePara>
+        <simplePara>Add -c (--content), -L (--list), -p (--no-prefix), -T (--transform) and -x (--xpath) options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-ref [-cdfiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-ref [-cdfiLlpqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
          [-x <xpath>] [-3 <file>] [-o <dst>] [<code>|<file> ...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -118,6 +118,12 @@
                 <para>Output to &lt;dst&gt; instead of stdout.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-p, --no-prefix</listItemTerm>
+              <listItemDefinition>
+                <para>When using the -T option, transform textual references that do not include the standard prefixes (e.g., "DMC-", "PMC-").</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
@@ -151,7 +157,7 @@
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-T, --transform &lt;opts&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Transform textual references into the appropriate XML within text nodes in the XML document(s) specified. The textual references may or may not include the standard prefixes (e.g., "DMC-", "PMC-"). &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for comment, data module, external publication, ICN, DML, publication module, SCORM content package and CSN references respectively. If "-" is given, then all types of references will be transformed.</para>
+                <para>Transform textual references into the appropriate XML within text nodes in the XML document(s) specified. The textual references must include the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p option is specified. &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for comment, data module, external publication, ICN, DML, publication module, SCORM content package and CSN references respectively. If "all" is given, then all types of references will be transformed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

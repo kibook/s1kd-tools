@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.2.2"
+#define VERSION "3.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -25,15 +25,16 @@
 #define EXIT_BAD_ISSUE 3
 #define EXIT_BAD_XPATH 4
 
-#define OPT_TITLE   (int) 0x001
-#define OPT_ISSUE   (int) 0x002
-#define OPT_LANG    (int) 0x004
-#define OPT_DATE    (int) 0x008
-#define OPT_SRCID   (int) 0x010
-#define OPT_CIRID   (int) 0x020
-#define OPT_INS     (int) 0x040
-#define OPT_URL     (int) 0x080
-#define OPT_CONTENT (int) 0x100
+#define OPT_TITLE     (int) 0x001
+#define OPT_ISSUE     (int) 0x002
+#define OPT_LANG      (int) 0x004
+#define OPT_DATE      (int) 0x008
+#define OPT_SRCID     (int) 0x010
+#define OPT_CIRID     (int) 0x020
+#define OPT_INS       (int) 0x040
+#define OPT_URL       (int) 0x080
+#define OPT_CONTENT   (int) 0x100
+#define OPT_NONSTRICT (int) 0x200
 
 /* Issue of the S1000D specification to create references for. */
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50 };
@@ -1360,6 +1361,30 @@ static enum issue spec_issue(const char *s)
 	exit(EXIT_BAD_ISSUE);
 }
 
+/* Skip a reference if it has a conflicting prefix. */
+static bool skip_confl_ref(xmlNodePtr *node, xmlChar **content, regoff_t so, regoff_t eo, const char *pre)
+{
+	xmlChar *p = (*content) + so - 4;
+
+	if (p > (*content) && (xmlStrncmp(p, BAD_CAST pre, 4) == 0)) {
+		xmlChar *s1, *s2;
+
+		s1 = xmlStrndup((*content), eo);
+		s2 = xmlStrdup((*content) + eo);
+
+		xmlFree(*content);
+		xmlNodeSetContent(*node, s1);
+		xmlFree(s1);
+
+		*node = xmlAddNextSibling(*node, xmlNewText(s2));
+		*content = s2;
+
+		return true;
+	}
+
+	return false;
+}
+
 /* Replace a textual reference with XML. */
 static void transform_ref(xmlNodePtr *node, const char *path, xmlChar **content, regoff_t so, regoff_t eo, const char *prefix, newref_t f, int opts)
 {
@@ -1390,23 +1415,16 @@ static void transform_ref(xmlNodePtr *node, const char *path, xmlChar **content,
 		fprintf(stderr, INF_PREFIX "%s: Found %s ref %.*s\n", path, type, eo - so, (*content) + so);
 	}
 
-	/* Extra test for DM refs to avoid confusion with CSN refs. */
-	if (f == new_dm_ref) {
-		xmlChar *p;
-
-		p = (*content) + so - 4;
-
-		/* If the DM code is prefixed by CSN-, skip it. */
-		if (p > (*content) && xmlStrncmp(p, BAD_CAST "CSN-", 4) == 0) {
-			s1 = xmlStrndup((*content), eo);
-			s2 = xmlStrdup((*content) + eo);
-			xmlFree(*content);
-			xmlNodeSetContent(*node, s1);
-			xmlFree(s1);
-			*node = xmlAddNextSibling(*node, xmlNewText(s2));
-			*content = s2;
-			return;
-		}
+	/* If prefixes are not required, some types of references have
+	 * overlapping formats. This will look backwards to determine if a
+	 * reference has a conflicting prefix.
+	 *
+	 * FIXME: Does not account for extended variants (DME, PME, SME). */
+	if (optset(opts, OPT_NONSTRICT)) {
+		if (f ==  new_dm_ref && skip_confl_ref(node, content, so, eo, "CSN-")) return;
+		if (f == new_csn_ref && skip_confl_ref(node, content, so, eo, "DMC-")) return;
+		if (f ==  new_pm_ref && skip_confl_ref(node, content, so, eo, "SMC-")) return;
+		if (f == new_smc_ref && skip_confl_ref(node, content, so, eo, "PMC-")) return;
 	}
 
 	if (prefix && xmlStrncmp((*content) + so, BAD_CAST prefix, 4) != 0) {
@@ -1606,12 +1624,24 @@ static void transform_extpub_refs_in_doc(const xmlDocPtr doc, const char *path, 
 /* Regular expressions for transformation mode. */
 #define ISSNO_REGEX "(_[0-9]{3}-[0-9]{2})?"
 #define LANG_REGEX  "(_[A-Z]{2}-[A-Z]{2})?"
-#define DMC_REGEX "(DMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]" ISSNO_REGEX LANG_REGEX
+#define DMC_REGEX "(DMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define DMC_REGEX_STRICT "DMC-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define DME_REGEX "(DME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define DME_REGEX_STRICT "DME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
 #define PMC_REGEX "(PMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define PMC_REGEX_STRICT "PMC-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define PME_REGEX "(PME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define PME_REGEX_STRICT "PME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
 #define COM_REGEX "(COM-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
+#define COM_REGEX_STRICT "COM-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
 #define DML_REGEX "(DML-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
-#define CSN_REGEX "CSN-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
+#define DML_REGEX_STRICT "DML-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
+#define CSN_REGEX "(CSN-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
+#define CSN_REGEX_STRICT "CSN-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
 #define SMC_REGEX "(SMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SMC_REGEX_STRICT "SMC-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SME_REGEX "(SME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SME_REGEX_STRICT "SME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
 #define ICN_REGEX "(ICN-[A-Z0-9]{5}-[A-Z0-9]{5,10}-[0-9]{3}-[0-9]{2})|(ICN-[A-Z0-9]{2,14}-[A-Z0-9]{1,4}-[A-Z0-9]{6,9}-[A-Z0-9]{1}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z]{1}-[0-9]{2,3}-[0-9]{1,2})"
 
 /* Transform all textual references in a file. */
@@ -1619,6 +1649,7 @@ static void transform_refs_in_file(const char *path, const char *transform, cons
 {
 	xmlDocPtr doc;
 	int i;
+	bool nonstrict = optset(opts, OPT_NONSTRICT);
 
 	if (!(doc = read_xml_doc(path))) {
 		if (verbosity > QUIET) {
@@ -1634,10 +1665,17 @@ static void transform_refs_in_file(const char *path, const char *transform, cons
 	for (i = 0; transform[i]; ++i) {
 		switch (transform[i]) {
 			case 'C':
-				transform_refs_in_doc(doc, path, xpath, COM_REGEX, "COM-", new_com_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? COM_REGEX : COM_REGEX_STRICT,
+					"COM-", new_com_ref, opts);
 				break;
 			case 'D':
-				transform_refs_in_doc(doc, path, xpath, DMC_REGEX, "DMC-", new_dm_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? DME_REGEX : DME_REGEX_STRICT,
+					"DME-", new_dm_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? DMC_REGEX : DMC_REGEX_STRICT,
+					"DMC-", new_dm_ref, opts);
 				break;
 			case 'E':
 				if (extpubs) {
@@ -1648,16 +1686,30 @@ static void transform_refs_in_file(const char *path, const char *transform, cons
 				transform_refs_in_doc(doc, path, xpath, ICN_REGEX, NULL, new_icn_ref, opts);
 				break;
 			case 'L':
-				transform_refs_in_doc(doc, path, xpath, DML_REGEX, "DML-", new_dml_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? DML_REGEX : DML_REGEX_STRICT,
+					"DML-", new_dml_ref, opts);
 				break;
 			case 'P':
-				transform_refs_in_doc(doc, path, xpath, PMC_REGEX, "PMC-", new_pm_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? PME_REGEX : PME_REGEX_STRICT,
+					"PME-", new_pm_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? PMC_REGEX : PMC_REGEX_STRICT,
+					"PMC-", new_pm_ref, opts);
 				break;
 			case 'S':
-				transform_refs_in_doc(doc, path, xpath, SMC_REGEX, "SMC-", new_smc_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? SME_REGEX : SME_REGEX_STRICT,
+					"SME-", new_smc_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? SMC_REGEX : SMC_REGEX_STRICT,
+					"SMC-", new_smc_ref, opts);
 				break;
 			case 'Y':
-				transform_refs_in_doc(doc, path, xpath, CSN_REGEX, NULL, new_csn_ref, opts);
+				transform_refs_in_doc(doc, path, xpath,
+					nonstrict ? CSN_REGEX : CSN_REGEX_STRICT,
+					"CSN-", new_csn_ref, opts);
 				break;
 			default:
 				if (verbosity > QUIET) {
@@ -1706,7 +1758,7 @@ static void transform_refs_in_list(const char *path, const char *transform, cons
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-cdfiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>] [-o <dst>] [-x <xpath>] [-3 <file>] [<code>|<file> ...]");
+	puts("Usage: " PROG_NAME " [-cdfiLlpqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>] [-o <dst>] [-x <xpath>] [-3 <file>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -$, --issue <issue>        Output XML for the specified issue of S1000D.");
@@ -1718,6 +1770,7 @@ static void show_help(void)
 	puts("  -L, --list                 Treat input as a list of CSDB objects.");
 	puts("  -l, --include-lang         Include language.");
 	puts("  -o, --out <dst>            Output to <dst> instead of stdout.");
+	puts("  -p, --no-prefix            Transform textual references without prefixes.");
 	puts("  -q, --quiet                Quiet mode. Do not print errors.");
 	puts("  -R, --repository-id        Generate a <repositorySourceDmIdent>.");
 	puts("  -r, --add                  Add reference to data module's <refs> table.");
@@ -1757,7 +1810,7 @@ int main(int argc, char **argv)
 	xmlChar *transform_xpath = NULL;
 	bool is_list = false;
 
-	const char *sopts = "3:cfiLlo:qRrSs:T:tvd$:ux:h?";
+	const char *sopts = "3:cfiLlo:pqRrSs:T:tvd$:ux:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1767,6 +1820,7 @@ int main(int argc, char **argv)
 		{"include-issue", no_argument      , 0, 'i'},
 		{"include-lang" , no_argument      , 0, 'l'},
 		{"out"          , required_argument, 0, 'o'},
+		{"no-prefix"    , no_argument      , 0, 'p'},
 		{"quiet"        , no_argument      , 0, 'q'},
 		{"add"          , no_argument      , 0, 'r'},
 		{"repository-id", no_argument      , 0, 'R'},
@@ -1814,6 +1868,9 @@ int main(int argc, char **argv)
 			case 'o':
 				strcpy(dst, optarg);
 				break;
+			case 'p':
+				opts |= OPT_NONSTRICT;
+				break;
 			case 'q':
 				--verbosity;
 				break;
@@ -1832,7 +1889,7 @@ int main(int argc, char **argv)
 				break;
 			case 'T':
 				  free(transform);
-				  if (strcmp(optarg, "-") == 0) {
+				  if (strcmp(optarg, "all") == 0) {
 					  transform = strdup("CDEGLPSY");
 				  } else {
 					  transform = strdup(optarg);
