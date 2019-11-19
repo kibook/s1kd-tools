@@ -1,0 +1,3 @@
+.//dmlEntry/text()|
+.//dmlRefGroup/text()|
+.//dmlStatus/text()

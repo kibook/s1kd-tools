@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="10" day="25"/>
+        <issueDate year="2019" month="11" day="19"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -c (--content), -L (--list), -T (--transform) and -x (--xpath) options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,8 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-ref [-dfilqRrStuvh?] [-$ &lt;issue&gt;] [-s &lt;src&gt;] [-3 &lt;file&gt;]
-         [-o &lt;dst&gt;] [&lt;code&gt;|&lt;file&gt; ...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-ref [-cdfiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
+         [-x <xpath>] [-3 <file>] [-o <dst>] [<code>|<file> ...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -65,6 +68,12 @@
               <listItemTerm>-$, --issue &lt;issue&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Output XML for the specified issue of S1000D.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-c, --content</listItemTerm>
+              <listItemDefinition>
+                <para>When using the -T option, only transform textual references found in the content section of CSDB objects.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -89,6 +98,12 @@
               <listItemTerm>-i, --include-issue</listItemTerm>
               <listItemDefinition>
                 <para>Include the issue information in the reference (target must be a file)</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-L, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of CSDB objects.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -133,6 +148,12 @@
                 <para>Specify a source data module &lt;src&gt; to add references to when using the -r option.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-T, --transform &lt;opts&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Transform textual references into the appropriate XML within text nodes in the XML document(s) specified. The textual references may or may not include the standard prefixes (e.g., "DMC-", "PMC-"). &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for comment, data module, external publication, ICN, DML, publication module, SCORM content package and CSN references respectively. If "-" is given, then all types of references will be transformed.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-t, --include-title</listItemTerm>
               <listItemDefinition>
@@ -149,6 +170,12 @@
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
                 <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-x, --xpath &lt;xpath&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>When using the -T option, this specifies which nodes to transform textual references in. By default, only the elements which can contain each type of reference are considered.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

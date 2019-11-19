@@ -5,14 +5,16 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <libgen.h>
+#include <regex.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxslt/transform.h>
 #include "s1kd_tools.h"
 #include "xslt.h"
+#include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.1.1"
+#define VERSION "3.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -21,21 +23,28 @@
 #define EXIT_MISSING_FILE 1
 #define EXIT_BAD_INPUT 2
 #define EXIT_BAD_ISSUE 3
+#define EXIT_BAD_XPATH 4
 
-#define OPT_TITLE (int) 0x01
-#define OPT_ISSUE (int) 0x02
-#define OPT_LANG  (int) 0x04
-#define OPT_DATE  (int) 0x08
-#define OPT_SRCID (int) 0x10
-#define OPT_CIRID (int) 0x20
-#define OPT_INS   (int) 0x40
-#define OPT_URL   (int) 0x80
+#define OPT_TITLE   (int) 0x001
+#define OPT_ISSUE   (int) 0x002
+#define OPT_LANG    (int) 0x004
+#define OPT_DATE    (int) 0x008
+#define OPT_SRCID   (int) 0x010
+#define OPT_CIRID   (int) 0x020
+#define OPT_INS     (int) 0x040
+#define OPT_URL     (int) 0x080
+#define OPT_CONTENT (int) 0x100
 
+/* Issue of the S1000D specification to create references for. */
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50 };
 
 #define DEFAULT_S1000D_ISSUE ISS_50
 
-static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
+/* Verbosity of the program's output. */
+static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
+
+/* Function for creating a new reference node. */
+typedef xmlNodePtr (*newref_t)(const char *, const char *, int);
 
 static xmlNode *find_child(xmlNode *parent, char *name)
 {
@@ -1351,16 +1360,350 @@ static enum issue spec_issue(const char *s)
 	exit(EXIT_BAD_ISSUE);
 }
 
+/* Replace a textual reference with XML. */
+static void transform_ref(xmlNodePtr *node, const char *path, xmlChar **content, regoff_t so, regoff_t eo, const char *prefix, newref_t f, int opts)
+{
+	xmlChar *r, *s1, *s2;
+	xmlNodePtr ref;
+
+	if (verbosity >= DEBUG) {
+		const char *type;
+
+		if (f == new_dm_ref) {
+			type = "DM";
+		} else {
+			type = "unknown";
+		}
+
+		fprintf(stderr, INF_PREFIX "%s: Found %s ref %.*s\n", path, type, eo - so, (*content) + so);
+	}
+
+	/* Extra test for DM refs to avoid confusion with CSN refs. */
+	if (f == new_dm_ref) {
+		xmlChar *p;
+
+		p = (*content) + so - 4;
+
+		/* If the DM code is prefixed by CSN-, skip it. */
+		if (p > (*content) && xmlStrncmp(p, BAD_CAST "CSN-", 4) == 0) {
+			s1 = xmlStrndup((*content), eo);
+			s2 = xmlStrdup((*content) + eo);
+			xmlFree(*content);
+			xmlNodeSetContent(*node, s1);
+			xmlFree(s1);
+			*node = xmlAddNextSibling(*node, xmlNewText(s2));
+			*content = s2;
+			return;
+		}
+	}
+
+	if (prefix && xmlStrncmp((*content) + so, BAD_CAST prefix, 4) != 0) {
+		r = xmlStrdup(BAD_CAST prefix);
+	} else {
+		r = xmlStrdup(BAD_CAST "");
+	}
+	r = xmlStrncat(r, (*content) + so, eo - so);
+
+	s1 = xmlStrndup((*content), so);
+	s2 = xmlStrdup((*content) + eo);
+
+	xmlFree(*content);
+
+	xmlNodeSetContent(*node, s1);
+	xmlFree(s1);
+
+	ref = xmlAddNextSibling(*node, f((char *) r, NULL, opts));
+
+	xmlFree(r);
+
+	*node = xmlAddNextSibling(ref, xmlNewText(s2));
+
+	*content = s2;
+}
+
+/* Transform all textual references in a particular node. */
+static void transform_refs_in_node(xmlNodePtr node, const char *path, const char *regex, const char *prefix, newref_t f, const int opts)
+{
+	xmlChar *content;
+	regex_t re;
+	regmatch_t pmatch[1];
+
+	content = xmlNodeGetContent(node);
+
+	regcomp(&re, regex, REG_EXTENDED);
+
+	while (regexec(&re, (char *) content, 1, pmatch, 0) == 0) {
+		transform_ref(&node, path, &content, pmatch[0].rm_so, pmatch[0].rm_eo, prefix, f, opts);
+	}
+
+	regfree(&re);
+	xmlFree(content);
+}
+
+/* Transform all textual references in text nodes in an XML document. */
+static void transform_refs_in_doc(const xmlDocPtr doc, const char *path, const xmlChar *xpath, const char *regex, const char *prefix, newref_t f, const int opts)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+
+	/* If the -c option is given, only transform refs in the content section. */
+	if (optset(opts, OPT_CONTENT)) {
+		xmlXPathSetContextNode(first_xpath_node(doc, NULL, BAD_CAST "//content"), ctx);
+	} else {
+		xmlXPathSetContextNode(xmlDocGetRootElement(doc), ctx);
+	}
+
+	/* Use the user-specified XPath. */
+	if (xpath) {
+		if (!(obj = xmlXPathEvalExpression(xpath, ctx))) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Invalid XPath expression: %s\n", (char *) xpath);
+			}
+			exit(EXIT_BAD_XPATH);
+		}
+	/* Use the appropriate built-in XPath based on ref type. */
+	} else {
+		unsigned char *els;
+		unsigned int len;
+		xmlChar *s;
+		int n;
+
+		if (f == new_dm_ref) {
+			els = elems_dmc_txt;
+			len = elems_dmc_txt_len;
+		} else if (f == new_pm_ref) {
+			els = elems_pmc_txt;
+			len = elems_pmc_txt_len;
+		} else if (f == new_csn_ref) {
+			els = elems_csn_txt;
+			len = elems_csn_txt_len;
+		} else if (f == new_dml_ref) {
+			els = elems_dml_txt;
+			len = elems_dml_txt_len;
+		} else if (f == new_icn_ref) {
+			els = elems_icn_txt;
+			len = elems_icn_txt_len;
+		} else if (f == new_smc_ref) {
+			els = elems_smc_txt;
+			len = elems_smc_txt_len;
+		} else if (f == new_ext_pub) {
+			els = elems_epr_txt;
+			len = elems_epr_txt_len;
+		} else {
+			els = BAD_CAST ".//*/text()";
+			len = 11;
+		}
+
+		n = len + 1;
+
+		s = malloc(n * sizeof(xmlChar));
+		xmlStrPrintf(s, n, "%.*s", len, els);
+
+		if (!(obj = xmlXPathEvalExpression(s, ctx))) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Invalid XPath expression: %s\n", (char *) s);
+			}
+			exit(EXIT_BAD_XPATH);
+		}
+
+		xmlFree(s);
+	}
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			transform_refs_in_node(obj->nodesetval->nodeTab[i], path, regex, prefix, f, opts);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+/* Build a regex pattern to match a string. */
+static char *regex_esc(const char *s)
+{
+	int i, j;
+	char *esc;
+
+	/* At most, the resulting pattern will be twice the length of the original string. */
+	esc = malloc(strlen(s) * 2 + 1);
+
+	for (i = 0, j = 0; s[i]; ++i, ++j) {
+		switch (s[i]) {
+			/* These special characters must be escaped. */
+			case '.':
+			case '[':
+			case '{':
+			case '}':
+			case '(':
+			case ')':
+			case '\\':
+			case '*':
+			case '+':
+			case '?':
+			case '|':
+			case '^':
+			case '$':
+				esc[j++] = '\\';
+			/* All other characters match themselves. */
+			default:
+				esc[j] = s[i];
+				break;
+		}
+	}
+
+	/* Ensure the pattern is null-terminated. */
+	esc[j] = '\0';
+
+	return esc;
+}
+
+/* Transform all external pub refs in an XML document. */
+static void transform_extpub_refs_in_doc(const xmlDocPtr doc, const char *path, const xmlChar *xpath, const xmlDocPtr extpubs, int opts)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(extpubs);
+	obj = xmlXPathEvalExpression(BAD_CAST "//externalPubCode", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			char *code, *code_esc;
+
+			code = (char *) xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+			code_esc = regex_esc(code);
+			xmlFree(code);
+
+			transform_refs_in_doc(doc, path, xpath, (char *) code_esc, NULL, new_ext_pub, opts);
+
+			free(code_esc);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+/* Regular expressions for transformation mode. */
+#define ISSNO_REGEX "(_[0-9]{3}-[0-9]{2})?"
+#define LANG_REGEX  "(_[A-Z]{2}-[A-Z]{2})?"
+#define DMC_REGEX "(DMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]" ISSNO_REGEX LANG_REGEX
+#define PMC_REGEX "(PMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define COM_REGEX "(COM-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
+#define DML_REGEX "(DML-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
+#define CSN_REGEX "CSN-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
+#define SMC_REGEX "(SMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define ICN_REGEX "(ICN-[A-Z0-9]{5}-[A-Z0-9]{5,10}-[0-9]{3}-[0-9]{2})|(ICN-[A-Z0-9]{2,14}-[A-Z0-9]{1,4}-[A-Z0-9]{6,9}-[A-Z0-9]{1}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z]{1}-[0-9]{2,3}-[0-9]{1,2})"
+
+/* Transform all textual references in a file. */
+static void transform_refs_in_file(const char *path, const char *transform, const xmlChar *xpath, const xmlDocPtr extpubs, bool overwrite, const int opts)
+{
+	xmlDocPtr doc;
+	int i;
+
+	if (!(doc = read_xml_doc(path))) {
+		if (verbosity > QUIET) {
+			fprintf(stderr, ERR_PREFIX "Could not read object: %s\n", path);
+		}
+		exit(EXIT_MISSING_FILE);
+	}
+
+	if (verbosity >= VERBOSE) {
+		fprintf(stderr, INF_PREFIX "Transforming textual references in %s...\n", path);
+	}
+
+	for (i = 0; transform[i]; ++i) {
+		switch (transform[i]) {
+			case 'C':
+				transform_refs_in_doc(doc, path, xpath, COM_REGEX, "COM-", new_com_ref, opts);
+				break;
+			case 'D':
+				transform_refs_in_doc(doc, path, xpath, DMC_REGEX, "DMC-", new_dm_ref, opts);
+				break;
+			case 'E':
+				if (extpubs) {
+					transform_extpub_refs_in_doc(doc, path, xpath, extpubs, opts);
+				}
+				break;
+			case 'G':
+				transform_refs_in_doc(doc, path, xpath, ICN_REGEX, NULL, new_icn_ref, opts);
+				break;
+			case 'L':
+				transform_refs_in_doc(doc, path, xpath, DML_REGEX, "DML-", new_dml_ref, opts);
+				break;
+			case 'P':
+				transform_refs_in_doc(doc, path, xpath, PMC_REGEX, "PMC-", new_pm_ref, opts);
+				break;
+			case 'S':
+				transform_refs_in_doc(doc, path, xpath, SMC_REGEX, "SMC-", new_smc_ref, opts);
+				break;
+			case 'Y':
+				transform_refs_in_doc(doc, path, xpath, CSN_REGEX, NULL, new_csn_ref, opts);
+				break;
+			default:
+				if (verbosity > QUIET) {
+					fprintf(stderr, WRN_PREFIX "Unknown reference type: %c\n", transform[i]);
+				}
+				break;
+		}
+	}
+
+	if (overwrite) {
+		save_xml_doc(doc, path);
+	} else {
+		save_xml_doc(doc, "-");
+	}
+
+	xmlFreeDoc(doc);
+}
+
+/* Transform all textual references in all files in a list. */
+static void transform_refs_in_list(const char *path, const char *transform, const xmlChar *xpath, const xmlDocPtr extpubs, bool overwrite, const int opts)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			if (verbosity > QUIET) {
+				fprintf(stderr, ERR_PREFIX "Could not read list: %s\n", path);
+			}
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		transform_refs_in_file(line, transform, xpath, extpubs, overwrite, opts);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+}
+
+/* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dfilqRrStuvh?] [-$ <issue>] [-s <src>] [-o <dst>] [-3 <file>] [<code>|<file> ...]");
+	puts("Usage: " PROG_NAME " [-cdfiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>] [-o <dst>] [-x <xpath>] [-3 <file>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -$, --issue <issue>        Output XML for the specified issue of S1000D.");
-	puts("  -d, --include-date         Include issue date (target must be file)");
+	puts("  -c, --content              Only transform textual references in the content section.");
+	puts("  -d, --include-date         Include issue date (target must be file).");
 	puts("  -f, --overwrite            Overwrite source data module instead of writing to stdout.");
 	puts("  -h, -?, --help             Show this help message.");
 	puts("  -i, --include-issue        Include issue info.");
+	puts("  -L, --list                 Treat input as a list of CSDB objects.");
 	puts("  -l, --include-lang         Include language.");
 	puts("  -o, --out <dst>            Output to <dst> instead of stdout.");
 	puts("  -q, --quiet                Quiet mode. Do not print errors.");
@@ -1368,16 +1711,19 @@ static void show_help(void)
 	puts("  -r, --add                  Add reference to data module's <refs> table.");
 	puts("  -S, --source-id            Generate a <sourceDmIdent> or <sourcePmIdent>.");
 	puts("  -s, --source <src>         Source data module to add references to.");
+	puts("  -T, --transform <opts>     Transform textual references to XML in objects.");
 	puts("  -t, --include-title        Include title (target must be file)");
 	puts("  -u, --include-url          Include xlink:href to the full URL/filename.");
 	puts("  -v, --verbose              Verbose output.");
+	puts("  -x, --xpath <xpath>        Transform textual references using <xpath>.");
 	puts("  -3, --externalpubs <file>  Use a custom .externalpubs file.");
 	puts("  --version                  Show version information.");
 	puts("  <code>                     The code of the reference (must include prefix DMC/PMC/etc.).");
-	puts("  <file>                     A file to reference.");
+	puts("  <file>                     A file to reference, or transform references in (-T).");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
+/* Show version information. */
 static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
@@ -1395,12 +1741,16 @@ int main(int argc, char **argv)
 	enum issue iss = DEFAULT_S1000D_ISSUE;
 	char extpubs_fname[PATH_MAX] = "";
 	xmlDocPtr extpubs = NULL;
+	char *transform = NULL;
+	xmlChar *transform_xpath = NULL;
+	bool is_list = false;
 
-	const char *sopts = "3:filo:qRrSs:tvd$:uh?";
+	const char *sopts = "3:cfiLlo:qRrSs:T:tvd$:ux:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
 		{"externalpubs" , required_argument, 0, '3'},
+		{"content"      , no_argument      , 0, 'c'},
 		{"overwrite"    , no_argument      , 0, 'f'},
 		{"include-issue", no_argument      , 0, 'i'},
 		{"include-lang" , no_argument      , 0, 'l'},
@@ -1410,11 +1760,13 @@ int main(int argc, char **argv)
 		{"repository-id", no_argument      , 0, 'R'},
 		{"source-id"    , no_argument      , 0, 'S'},
 		{"source"       , required_argument, 0, 's'},
+		{"transform"    , required_argument, 0, 'T'},
 		{"include-title", no_argument      , 0, 't'},
 		{"verbose"      , no_argument      , 0, 'v'},
 		{"include-date" , no_argument      , 0, 'd'},
 		{"issue"        , required_argument, 0, '$'},
 		{"include-url"  , no_argument      , 0, 'u'},
+		{"xpath"        , required_argument, 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1425,27 +1777,76 @@ int main(int argc, char **argv)
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
-					return EXIT_SUCCESS;
+					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
-			case '3': strncpy(extpubs_fname, optarg, PATH_MAX - 1); break;
-			case 'f': overwrite = true; break;
-			case 'i': opts |= OPT_ISSUE; break;
-			case 'l': opts |= OPT_LANG; break;
-			case 'o': strcpy(dst, optarg); break;
-			case 'q': verbosity = QUIET; break;
-			case 'r': opts |= OPT_INS; break;
-			case 'R': opts |= OPT_CIRID;
-			case 'S': opts |= OPT_SRCID; opts |= OPT_ISSUE; opts |= OPT_LANG; break;
-			case 's': strcpy(src, optarg); break;
-			case 't': opts |= OPT_TITLE; break;
-			case 'v': verbosity = VERBOSE; break;
-			case 'd': opts |= OPT_DATE; break;
-			case '$': iss = spec_issue(optarg); break;
-			case 'u': opts |= OPT_URL; break;
+			case '3':
+				strncpy(extpubs_fname, optarg, PATH_MAX - 1);
+				break;
+			case 'c':
+				opts |= OPT_CONTENT;
+				break;
+			case 'f':
+				overwrite = true;
+				break;
+			case 'i':
+				opts |= OPT_ISSUE;
+				break;
+			case 'L':
+				is_list = true;
+				break;
+			case 'l':
+				opts |= OPT_LANG;
+				break;
+			case 'o':
+				strcpy(dst, optarg);
+				break;
+			case 'q':
+				--verbosity;
+				break;
+			case 'r':
+				opts |= OPT_INS;
+				break;
+			case 'R':
+				opts |= OPT_CIRID;
+			case 'S':
+				opts |= OPT_SRCID;
+				opts |= OPT_ISSUE;
+				opts |= OPT_LANG;
+				break;
+			case 's':
+				strcpy(src, optarg);
+				break;
+			case 'T':
+				  free(transform);
+				  if (strcmp(optarg, "-") == 0) {
+					  transform = strdup("CDEGLPSY");
+				  } else {
+					  transform = strdup(optarg);
+				  }
+				  break;
+			case 't':
+				  opts |= OPT_TITLE;
+				  break;
+			case 'v':
+				  ++verbosity;
+				  break;
+			case 'd':
+				  opts |= OPT_DATE;
+				  break;
+			case '$':
+				  iss = spec_issue(optarg);
+				  break;
+			case 'u':
+				  opts |= OPT_URL;
+				  break;
+			case 'x':
+				  free(transform_xpath);
+				  transform_xpath = xmlCharStrdup(optarg);
+				  break;
 			case '?':
-			case 'h': show_help(); return EXIT_SUCCESS;
+			case 'h': show_help(); goto cleanup;
 		}
 	}
 
@@ -1456,16 +1857,30 @@ int main(int argc, char **argv)
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			char *base;
-
-			if (strncmp(argv[i], "URN:S1000D:", 11) == 0) {
-				base = argv[i] + 11;
+			if (transform) {
+				if (is_list) {
+					transform_refs_in_list(argv[i], transform, transform_xpath, extpubs, overwrite, opts);
+				} else {
+					transform_refs_in_file(argv[i], transform, transform_xpath, extpubs, overwrite, opts);
+				}
 			} else {
-				strcpy(scratch, argv[i]);
-				base = basename(scratch);
-			}
+				char *base;
 
-			print_ref(src, dst, base, argv[i], opts, overwrite, iss, extpubs);
+				if (strncmp(argv[i], "URN:S1000D:", 11) == 0) {
+					base = argv[i] + 11;
+				} else {
+					strcpy(scratch, argv[i]);
+					base = basename(scratch);
+				}
+
+				print_ref(src, dst, base, argv[i], opts, overwrite, iss, extpubs);
+			}
+		}
+	} else if (transform) {
+		if (is_list) {
+			transform_refs_in_list(NULL, transform, transform_xpath, extpubs, overwrite, opts);
+		} else {
+			transform_refs_in_file("-", transform, transform_xpath, extpubs, overwrite, opts);
 		}
 	} else {
 		while (fgets(scratch, PATH_MAX, stdin)) {
@@ -1473,7 +1888,10 @@ int main(int argc, char **argv)
 		}
 	}
 
+cleanup:
 	xmlFreeDoc(extpubs);
+	free(transform);
+	xmlFree(transform_xpath);
 	xsltCleanupGlobals();
 	xmlCleanupParser();
 

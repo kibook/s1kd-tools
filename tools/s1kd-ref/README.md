@@ -6,8 +6,8 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-dfilqRrStuvh?] [-$ <issue>] [-s <src>] [-3 <file>]
-             [-o <dst>] [<code>|<file> ...]
+    s1kd-ref [-cdfiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
+             [-x <xpath>] [-3 <file>] [-o <dst>] [<code>|<file> ...]
 
 DESCRIPTION
 ===========
@@ -23,6 +23,10 @@ OPTIONS
 -$, --issue &lt;issue&gt;  
 Output XML for the specified issue of S1000D.
 
+-c, --content  
+When using the -T option, only transform textual references found in the
+content section of CSDB objects.
+
 -d, --include-date  
 Include the issue date in the reference (target must be a file)
 
@@ -34,6 +38,9 @@ Show the usage message.
 
 -i, --include-issue  
 Include the issue information in the reference (target must be a file)
+
+-L, --list  
+Treat input as a list of CSDB objects.
 
 -l, --include-lang  
 Include the language information in the reference (target must be a
@@ -60,6 +67,15 @@ Generate a `<sourceDmIdent>` (for data modules) or `<sourcePmIdent>`
 Specify a source data module &lt;src&gt; to add references to when using
 the -r option.
 
+-T, --transform &lt;opts&gt;  
+Transform textual references into the appropriate XML within text nodes
+in the XML document(s) specified. The textual references may or may not
+include the standard prefixes (e.g., "DMC-", "PMC-"). &lt;opts&gt; is a
+sequence of characters from "CDEGLPSY", for comment, data module,
+external publication, ICN, DML, publication module, SCORM content
+package and CSN references respectively. If "-" is given, then all types
+of references will be transformed.
+
 -t, --include-title  
 Include the title in the reference (target must be a file).
 
@@ -69,6 +85,11 @@ attribute.
 
 -v, --verbose  
 Verbose output.
+
+-x, --xpath &lt;xpath&gt;  
+When using the -T option, this specifies which nodes to transform
+textual references in. By default, only the elements which can contain
+each type of reference are considered.
 
 -3, --externalpubs &lt;file&gt;  
 Use a custom `.externalpubs` file.

@@ -18,13 +18,16 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-$(OUTPUT): $(SOURCE) xslt.h
+$(OUTPUT): $(SOURCE) xslt.h elems.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 xslt.h: ../common/to*.xsl ref.xsl
 	>xslt.h
-	for f in ../common/to*.xsl; do xxd -i "$$f" >> xslt.h; done
-	xxd -i ref.xsl >> xslt.h
+	for f in $+; do xxd -i "$$f" >> $@; done
+
+elems.h: elems/*.txt
+	>elems.h
+	for f in $+; do xxd -i "$$f" >> $@; done
 
 .PHONY: docs clean maintainer-clean install uninstall
 
