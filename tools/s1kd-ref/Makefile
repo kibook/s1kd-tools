@@ -12,6 +12,10 @@ endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
+ifeq ($(OS),Windows_NT)
+	LDFLAGS+=-lregex2
+endif
+
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -s
