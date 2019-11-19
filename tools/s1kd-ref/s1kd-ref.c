@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.2.0"
+#define VERSION "3.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1371,6 +1371,18 @@ static void transform_ref(xmlNodePtr *node, const char *path, xmlChar **content,
 
 		if (f == new_dm_ref) {
 			type = "DM";
+		} else if (f == new_pm_ref) {
+			type = "PM";
+		} else if (f == new_csn_ref) {
+			type = "CSN";
+		} else if (f == new_icn_ref) {
+			type = "ICN";
+		} else if (f == new_dml_ref) {
+			type = "DML";
+		} else if (f == new_smc_ref) {
+			type = "SMC";
+		} else if (f == new_ext_pub) {
+			type = "external pub";
 		} else {
 			type = "unknown";
 		}
