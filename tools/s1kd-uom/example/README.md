@@ -16,6 +16,7 @@ on 2019-11-20.
 | Height        | 53 mm       |
 | Depth         | 305 mm      |
 | Speed         | 100 km/h    |
+| Temperature   | 23 °C       |
 | Price         | $380.00 CAD |
 
 ## output-EU.md
@@ -27,6 +28,7 @@ on 2019-11-20.
 | Height        | 53 mm       |
 | Depth         | 305 mm      |
 | Speed         | 100 km/h    |
+| Temperature   | 23 °C       |
 | Price         | €259,40 EUR |
 
 ## output-US.md
@@ -38,5 +40,6 @@ on 2019-11-20.
 | Height        | 2 in        |
 | Depth         | 12 in       |
 | Speed         | 62 mi/h     |
+| Temperature   | 73 °F       |
 | Price         | $287.38 USD |
 

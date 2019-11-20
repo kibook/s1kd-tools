@@ -127,6 +127,20 @@
             </row>
             <row>
               <entry>
+                <para>Temperature</para>
+              </entry>
+              <entry>
+                <para>
+                  <quantity quantityType="qty03">
+                    <quantityGroup>
+                      <quantityValue quantityUnitOfMeasure="degC">23</quantityValue>
+                    </quantityGroup>
+                  </quantity>
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
                 <para>Price</para>
               </entry>
               <entry>
