@@ -4,7 +4,7 @@ The following tables are all produced from the same source table using
 semantic quantity markup.
 
 The exchange rates used to convert the currencies were pulled
-automatically from (ExchangeRate-API)[https://www.exchangerate-api.com]
+automatically from [ExchangeRate-API](https://www.exchangerate-api.com)
 on 2019-11-20.
 
 ## output-CA.md
