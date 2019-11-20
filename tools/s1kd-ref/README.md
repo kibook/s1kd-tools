@@ -6,7 +6,7 @@ s1kd-ref - Generate XML to reference CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-ref [-cdfiLlpqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
+    s1kd-ref [-cdfgiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
              [-x <xpath>] [-3 <file>] [-o <dst>] [<code>|<file> ...]
 
 DESCRIPTION
@@ -33,6 +33,11 @@ Include the issue date in the reference (target must be a file)
 -f, --overwrite  
 Overwrite source data module instead of writing to stdout.
 
+-g, --guess-prefix  
+Accept references which do not include a standard prefix (e.g., "DMC-",
+"PMC-") and guess what they are based on their format and, when using
+the -T option, the XML context in which they occur.
+
 -h, -?, --help  
 Show the usage message.
 
@@ -48,10 +53,6 @@ file)
 
 -o, --out &lt;dst&gt;  
 Output to &lt;dst&gt; instead of stdout.
-
--p, --no-prefix  
-Accept references which do not include a standard prefix (e.g., "DMC-",
-"PMC-").
 
 -q, --quiet  
 Quiet mode. Do not print errors.

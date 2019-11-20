@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.4.0"
+#define VERSION "3.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1826,7 +1826,7 @@ static void transform_refs_in_list(const char *path, const char *transform, cons
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-cdfiLlpqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>] [-o <dst>] [-x <xpath>] [-3 <file>] [<code>|<file> ...]");
+	puts("Usage: " PROG_NAME " [-cdfgiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>] [-o <dst>] [-x <xpath>] [-3 <file>] [<code>|<file> ...]");
 	puts("");
 	puts("Options:");
 	puts("  -$, --issue <issue>        Output XML for the specified issue of S1000D.");
@@ -1838,7 +1838,7 @@ static void show_help(void)
 	puts("  -L, --list                 Treat input as a list of CSDB objects.");
 	puts("  -l, --include-lang         Include language.");
 	puts("  -o, --out <dst>            Output to <dst> instead of stdout.");
-	puts("  -p, --no-prefix            Accept references without a prefix.");
+	puts("  -g, --guess-prefix         Accept references without a prefix.");
 	puts("  -q, --quiet                Quiet mode. Do not print errors.");
 	puts("  -R, --repository-id        Generate a <repositorySourceDmIdent>.");
 	puts("  -r, --add                  Add reference to data module's <refs> table.");
@@ -1878,17 +1878,17 @@ int main(int argc, char **argv)
 	xmlChar *transform_xpath = NULL;
 	bool is_list = false;
 
-	const char *sopts = "3:cfiLlo:pqRrSs:T:tvd$:ux:h?";
+	const char *sopts = "3:cfgiLlo:qRrSs:T:tvd$:ux:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
 		{"externalpubs" , required_argument, 0, '3'},
 		{"content"      , no_argument      , 0, 'c'},
 		{"overwrite"    , no_argument      , 0, 'f'},
+		{"guess-prefix" , no_argument      , 0, 'g'},
 		{"include-issue", no_argument      , 0, 'i'},
 		{"include-lang" , no_argument      , 0, 'l'},
 		{"out"          , required_argument, 0, 'o'},
-		{"no-prefix"    , no_argument      , 0, 'p'},
 		{"quiet"        , no_argument      , 0, 'q'},
 		{"add"          , no_argument      , 0, 'r'},
 		{"repository-id", no_argument      , 0, 'R'},
@@ -1924,6 +1924,9 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
+			case 'g':
+				opts |= OPT_NONSTRICT;
+				break;
 			case 'i':
 				opts |= OPT_ISSUE;
 				break;
@@ -1935,9 +1938,6 @@ int main(int argc, char **argv)
 				break;
 			case 'o':
 				strcpy(dst, optarg);
-				break;
-			case 'p':
-				opts |= OPT_NONSTRICT;
 				break;
 			case 'q':
 				--verbosity;

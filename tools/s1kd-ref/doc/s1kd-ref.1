@@ -9,7 +9,7 @@ s1kd\-ref \- Generate XML to reference CSDB objects
 .IP
 .nf
 \f[C]
-s1kd\-ref\ [\-cdfiLlpqRrStuvh?]\ [\-$\ <issue>]\ [\-s\ <src>]\ [\-T\ <opts>]
+s1kd\-ref\ [\-cdfgiLlqRrStuvh?]\ [\-$\ <issue>]\ [\-s\ <src>]\ [\-T\ <opts>]
 \ \ \ \ \ \ \ \ \ [\-x\ <xpath>]\ [\-3\ <file>]\ [\-o\ <dst>]\ [<code>|<file>\ ...]
 \f[]
 .fi
@@ -42,6 +42,13 @@ Overwrite source data module instead of writing to stdout.
 .RS
 .RE
 .TP
+.B \-g, \-\-guess\-prefix
+Accept references which do not include a standard prefix (e.g., "DMC\-",
+"PMC\-") and guess what they are based on their format and, when using
+the \-T option, the XML context in which they occur.
+.RS
+.RE
+.TP
 .B \-h, \-?, \-\-help
 Show the usage message.
 .RS
@@ -65,12 +72,6 @@ file)
 .TP
 .B \-o, \-\-out <dst>
 Output to <dst> instead of stdout.
-.RS
-.RE
-.TP
-.B \-p, \-\-no\-prefix
-Accept references which do not include a standard prefix (e.g., "DMC\-",
-"PMC\-").
 .RS
 .RE
 .TP
