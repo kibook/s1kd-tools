@@ -14,7 +14,8 @@ EOF
 
 for file in $@
 do
-	echo "${file}:"
+	echo "## ${file}"
+	echo
 	cat "$file"
 	echo
 done

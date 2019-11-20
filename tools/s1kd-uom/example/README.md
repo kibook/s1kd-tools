@@ -7,7 +7,8 @@ The exchange rates used to convert the currencies were pulled
 automatically from (ExchangeRate-API)[https://www.exchangerate-api.com]
 on 2019-11-20.
 
-output-CA.md:
+## output-CA.md
+
 | Specification | Value      |
 |---------------|------------|
 | Mass          | 2.8 kg     |
@@ -17,7 +18,8 @@ output-CA.md:
 | Speed         | 100 km/h   |
 | Price         | 380.00 CAD |
 
-output-EU.md:
+## output-EU.md
+
 | Specification | Value      |
 |---------------|------------|
 | Mass          | 2,8 kg     |
@@ -27,7 +29,8 @@ output-EU.md:
 | Speed         | 100 km/h   |
 | Price         | 259,40 EUR |
 
-output-US.md:
+## output-US.md
+
 | Specification | Value      |
 |---------------|------------|
 | Mass          | 6 lbm      |
