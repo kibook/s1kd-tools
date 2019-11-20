@@ -31,8 +31,10 @@ Specify the formula for a conversion, given as an XPath expression.
 
 -F, --format &lt;fmt&gt;  
 Specify the format for quantity values. When used before -u, this
-specifies the format for all conversions. Otherwise, this specifies the
-format for each individual conversion.
+specifies the default format for all conversions. Otherwise, this
+specifies the format for each individual conversion. Formats specified
+for individual conversions override the default format set for all
+conversions.
 
 -f, --overwrite  
 Overwrite input CSDB objects.

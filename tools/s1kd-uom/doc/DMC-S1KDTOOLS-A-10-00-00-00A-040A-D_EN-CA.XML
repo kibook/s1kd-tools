@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="10" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="012" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="11" day="15"/>
+        <issueDate year="2019" month="11" day="20"/>
         <dmTitle>
           <techName>s1kd-uom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of the -F option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -78,7 +81,7 @@
             <definitionListItem>
               <listItemTerm>-F, --format &lt;fmt&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Specify the format for quantity values. When used before -u, this specifies the format for all conversions. Otherwise, this specifies the format for each individual conversion.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Specify the format for quantity values. When used before -u, this specifies the default format for all conversions. Otherwise, this specifies the format for each individual conversion. Formats specified for individual conversions override the default format set for all conversions.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

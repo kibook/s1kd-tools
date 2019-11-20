@@ -81,14 +81,14 @@
     <xsl:param name="uom-format"/>
     <xsl:variable name="format">
       <xsl:choose>
+        <xsl:when test="@format">
+          <xsl:value-of select="@format"/>
+        </xsl:when>
         <xsl:when test="$user-format">
           <xsl:value-of select="$user-format"/>
         </xsl:when>
         <xsl:when test="$uom-format">
           <xsl:value-of select="$uom-format"/>
-        </xsl:when>
-        <xsl:when test="@format">
-          <xsl:value-of select="@format"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$default-format"/>
