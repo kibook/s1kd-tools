@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.3.0"
+#define VERSION "3.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -35,6 +35,43 @@
 #define OPT_URL       (int) 0x080
 #define OPT_CONTENT   (int) 0x100
 #define OPT_NONSTRICT (int) 0x200
+
+/* Regular expressions to match references. */
+
+/* Common components */
+#define ISSNO_REGEX "(_[0-9]{3}-[0-9]{2})?"
+#define LANG_REGEX  "(_[A-Z]{2}-[A-Z]{2})?"
+
+/* Optional prefix */
+#define DME_REGEX "(DME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define DMC_REGEX "(DMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define CSN_REGEX "(CSN-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
+#define PME_REGEX "(PME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define PMC_REGEX "(PMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SME_REGEX "(SME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SMC_REGEX "(SMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define COM_REGEX "(COM-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
+#define DML_REGEX "(DML-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
+
+/* Mandatory prefix */
+#define DME_REGEX_STRICT "DME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define DMC_REGEX_STRICT "DMC-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
+#define CSN_REGEX_STRICT "CSN-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
+#define PME_REGEX_STRICT "PME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define PMC_REGEX_STRICT "PMC-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SME_REGEX_STRICT "SME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define SMC_REGEX_STRICT "SMC-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
+#define COM_REGEX_STRICT "COM-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
+#define DML_REGEX_STRICT "DML-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
+#define ICN_REGEX "(ICN-[A-Z0-9]{5}-[A-Z0-9]{5,10}-[0-9]{3}-[0-9]{2})|(ICN-[A-Z0-9]{2,14}-[A-Z0-9]{1,4}-[A-Z0-9]{6,9}-[A-Z0-9]{1}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z]{1}-[0-9]{2,3}-[0-9]{1,2})"
+
+/* No prefix */
+#define DME_REGEX_NOPRE "^[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX "$"
+#define DMC_REGEX_NOPRE "^[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX "$"
+#define PME_REGEX_NOPRE "^[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX "$"
+#define PMC_REGEX_NOPRE "^[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX "$"
+#define COM_REGEX_NOPRE "^[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX "$"
+#define DML_REGEX_NOPRE "^[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX "$"
 
 /* Issue of the S1000D specification to create references for. */
 enum issue { ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50 };
@@ -1213,28 +1250,81 @@ static xmlNodePtr find_ref_type(const char *fname, int opts)
 	return node;
 }
 
+/* Determine whether a string is matched by a regular expression. */
+static bool matches_regex(const char *s, const char *regex)
+{
+	regex_t re;
+	bool match;
+	regcomp(&re, regex, REG_EXTENDED);
+	match = regexec(&re, s, 0, NULL, 0) == 0;
+	regfree(&re);
+	return match;
+}
+
+/* Attempt to automatically add the prefix to a ref. */
+static char *add_prefix(const char *ref)
+{
+	int n = strlen(ref) + 5;
+	char *s = malloc(n);
+
+	/* Notes:
+	 *   Check against extended variants (DME, PME, SME) before
+	 *   non-extended variants (DMC, PMC, SMC).
+	 *
+	 *   There is no need to check for CSN, SME or SMC, as these are
+	 *   indistinguishable from DMC, PME and PMC without a prefix or an
+	 *   XML context.
+	 */
+	if (matches_regex(ref, DME_REGEX_NOPRE)) {
+		snprintf(s, n, "DME-%s", ref);
+	} else if (matches_regex(ref, DMC_REGEX_NOPRE)) {
+		snprintf(s, n, "DMC-%s", ref);
+	} else if (matches_regex(ref, PME_REGEX_NOPRE)) {
+		snprintf(s, n, "PME-%s", ref);
+	} else if (matches_regex(ref, PMC_REGEX_NOPRE)) {
+		snprintf(s, n, "PMC-%s", ref);
+	} else if (matches_regex(ref, COM_REGEX_NOPRE)) {
+		snprintf(s, n, "COM-%s", ref);
+	} else if (matches_regex(ref, DML_REGEX_NOPRE)) {
+		snprintf(s, n, "DML-%s", ref);
+	} else {
+		snprintf(s, n, "%s", ref);
+	}
+
+	return s;
+}
+
 static void print_ref(const char *src, const char *dst, const char *ref,
 	const char *fname, int opts, bool overwrite, enum issue iss,
 	xmlDocPtr extpubs)
 {
 	xmlNodePtr node;
 	xmlNodePtr (*f)(const char *, const char *, int);
+	char *fullref;
 
-	if (is_dm_ref(ref)) {
+	/* If -p is given, try automatically adding the prefix. */
+	if (optset(opts, OPT_NONSTRICT)) {
+		fullref = add_prefix(ref);
+	/* Otherwise, just copy the ref as-is. */
+	} else {
+		fullref = strdup(ref);
+	}
+
+	if (is_dm_ref(fullref)) {
 		f = new_dm_ref;
-	} else if (is_pm_ref(ref)) {
+	} else if (is_pm_ref(fullref)) {
 		f = new_pm_ref;
-	} else if (is_smc_ref(ref)) {
+	} else if (is_smc_ref(fullref)) {
 		f = new_smc_ref;
-	} else if (is_com_ref(ref)) {
+	} else if (is_com_ref(fullref)) {
 		f = new_com_ref;
-	} else if (is_dml_ref(ref)) {
+	} else if (is_dml_ref(fullref)) {
 		f = new_dml_ref;
-	} else if (is_icn_ref(ref)) {
+	} else if (is_icn_ref(fullref)) {
 		f = new_icn_ref;
-	} else if (is_csn_ref(ref)) {
+	} else if (is_csn_ref(fullref)) {
 		f = new_csn_ref;
-	} else if (extpubs && (node = find_ext_pub(extpubs, ref))) {
+	} else if (extpubs && (node = find_ext_pub(extpubs, fullref))) {
 		f = NULL;
 	} else if ((node = find_ref_type(fname, opts))) {
 		f = NULL;
@@ -1243,7 +1333,7 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 	}
 
 	if (f) {
-		node = f(ref, fname, opts);
+		node = f(fullref, fname, opts);
 	}
 
 	if (iss < DEFAULT_S1000D_ISSUE) {
@@ -1302,7 +1392,7 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 
 	if (optset(opts, OPT_INS)) {
 		if (verbosity >= VERBOSE) {
-			fprintf(stderr, INF_PREFIX "Adding reference %s to %s...\n", ref, src);
+			fprintf(stderr, INF_PREFIX "Adding reference %s to %s...\n", fullref, src);
 		}
 
 		if (overwrite) {
@@ -1315,6 +1405,7 @@ static void print_ref(const char *src, const char *dst, const char *ref,
 	}
 
 	xmlFreeNode(node);
+	free(fullref);
 }
 
 static char *trim(char *str)
@@ -1621,29 +1712,6 @@ static void transform_extpub_refs_in_doc(const xmlDocPtr doc, const char *path, 
 	xmlXPathFreeContext(ctx);
 }
 
-/* Regular expressions for transformation mode. */
-#define ISSNO_REGEX "(_[0-9]{3}-[0-9]{2})?"
-#define LANG_REGEX  "(_[A-Z]{2}-[A-Z]{2})?"
-#define DMC_REGEX "(DMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
-#define DMC_REGEX_STRICT "DMC-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
-#define DME_REGEX "(DME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
-#define DME_REGEX_STRICT "DME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT](-[0-9A-Z]{4})?" ISSNO_REGEX LANG_REGEX
-#define PMC_REGEX "(PMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define PMC_REGEX_STRICT "PMC-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define PME_REGEX "(PME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define PME_REGEX_STRICT "PME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define COM_REGEX "(COM-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
-#define COM_REGEX_STRICT "COM-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9]{4}-[0-9]{5}-[QIR]" LANG_REGEX
-#define DML_REGEX "(DML-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
-#define DML_REGEX_STRICT "DML-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[CPS]-[0-9]{4}-[0-9]{5}" ISSNO_REGEX
-#define CSN_REGEX "(CSN-)?[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
-#define CSN_REGEX_STRICT "CSN-[0-9A-Z]{2,14}-[0-9A-Z]{1,4}-[0-9A-Z]{2,3}-[0-9A-Z]{2}-[0-9A-Z]{2,4}-[0-9A-Z]{3,5}-[0-9A-Z]{4}-[ABCDT]"
-#define SMC_REGEX "(SMC-)?[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define SMC_REGEX_STRICT "SMC-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define SME_REGEX "(SME-)?[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define SME_REGEX_STRICT "SME-[0-9A-Z]+-[0-9A-Z]+-[0-9A-Z]{2,14}-[0-9A-Z]{5}-[0-9A-Z]{5}-[0-9]{2}" ISSNO_REGEX LANG_REGEX
-#define ICN_REGEX "(ICN-[A-Z0-9]{5}-[A-Z0-9]{5,10}-[0-9]{3}-[0-9]{2})|(ICN-[A-Z0-9]{2,14}-[A-Z0-9]{1,4}-[A-Z0-9]{6,9}-[A-Z0-9]{1}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z]{1}-[0-9]{2,3}-[0-9]{1,2})"
-
 /* Transform all textual references in a file. */
 static void transform_refs_in_file(const char *path, const char *transform, const xmlChar *xpath, const xmlDocPtr extpubs, bool overwrite, const int opts)
 {
@@ -1770,7 +1838,7 @@ static void show_help(void)
 	puts("  -L, --list                 Treat input as a list of CSDB objects.");
 	puts("  -l, --include-lang         Include language.");
 	puts("  -o, --out <dst>            Output to <dst> instead of stdout.");
-	puts("  -p, --no-prefix            Transform textual references without prefixes.");
+	puts("  -p, --no-prefix            Accept references without a prefix.");
 	puts("  -q, --quiet                Quiet mode. Do not print errors.");
 	puts("  -R, --repository-id        Generate a <repositorySourceDmIdent>.");
 	puts("  -r, --add                  Add reference to data module's <refs> table.");

@@ -50,8 +50,8 @@ file)
 Output to &lt;dst&gt; instead of stdout.
 
 -p, --no-prefix  
-When using the -T option, transform textual references that do not
-include the standard prefixes (e.g., "DMC-", "PMC-").
+Accept references which do not include a standard prefix (e.g., "DMC-",
+"PMC-").
 
 -q, --quiet  
 Quiet mode. Do not print errors.
