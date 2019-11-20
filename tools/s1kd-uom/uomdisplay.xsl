@@ -328,8 +328,18 @@
         <xsl:attribute name="mode">prefix</xsl:attribute>
       </xsl:element>
     </xsl:element>
-    <xsl:element name="xsl:apply-templates">
-      <xsl:attribute name="select">*|text()[normalize-space(.)!='']</xsl:attribute>
+    <xsl:element name="xsl:choose">
+      <xsl:element name="xsl:when">
+        <xsl:attribute name="test">*</xsl:attribute>
+        <xsl:element name="xsl:apply-templates">
+          <xsl:attribute name="select">*|text()[normalize-space(.)!='']</xsl:attribute>
+        </xsl:element>
+      </xsl:element>
+      <xsl:element name="xsl:otherwise">
+        <xsl:element name="xsl:call-template">
+          <xsl:attribute name="name">format-quantity-value</xsl:attribute>
+        </xsl:element>
+      </xsl:element>
     </xsl:element>
     <xsl:element name="xsl:if">
       <xsl:attribute name="test">@quantityTypeSpecifics</xsl:attribute>
