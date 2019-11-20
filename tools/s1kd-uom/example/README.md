@@ -9,34 +9,34 @@ on 2019-11-20.
 
 ## output-CA.md
 
-| Specification | Value      |
-|---------------|------------|
-| Mass          | 2.8 kg     |
-| Width         | 275 mm     |
-| Height        | 53 mm      |
-| Depth         | 305 mm     |
-| Speed         | 100 km/h   |
-| Price         | 380.00 CAD |
+| Specification | Value       |
+|---------------|-------------|
+| Mass          | 2.8 kg      |
+| Width         | 275 mm      |
+| Height        | 53 mm       |
+| Depth         | 305 mm      |
+| Speed         | 100 km/h    |
+| Price         | $380.00 CAD |
 
 ## output-EU.md
 
-| Specification | Value      |
-|---------------|------------|
-| Mass          | 2,8 kg     |
-| Width         | 275 mm     |
-| Height        | 53 mm      |
-| Depth         | 305 mm     |
-| Speed         | 100 km/h   |
-| Price         | 259,40 EUR |
+| Specification | Value       |
+|---------------|-------------|
+| Mass          | 2,8 kg      |
+| Width         | 275 mm      |
+| Height        | 53 mm       |
+| Depth         | 305 mm      |
+| Speed         | 100 km/h    |
+| Price         | €259,40 EUR |
 
 ## output-US.md
 
-| Specification | Value      |
-|---------------|------------|
-| Mass          | 6 lbm      |
-| Width         | 11 in      |
-| Height        | 2 in       |
-| Depth         | 12 in      |
-| Speed         | 62 mi/h    |
-| Price         | 287.38 USD |
+| Specification | Value       |
+|---------------|-------------|
+| Mass          | 6 lbm       |
+| Width         | 11 in       |
+| Height        | 2 in        |
+| Depth         | 12 in       |
+| Speed         | 62 mi/h     |
+| Price         | $287.38 USD |
 
