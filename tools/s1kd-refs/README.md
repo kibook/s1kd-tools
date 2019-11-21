@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvXxh?] [-d <dir>] [-e <cmd>]
+    s1kd-refs [-aCcDEFfGHIilmNnoPqRrsTUuvwXxh?] [-d <dir>] [-e <cmd>]
               [-J <ns=URL>] [-j <xpath>] [-3 <file>] [<object>...]
 
 DESCRIPTION
@@ -129,6 +129,10 @@ with the -a option.
 
 -v, --verbose  
 Verbose output.
+
+-w, --where-used  
+Instead of listing references contained within specified objects, list
+places within other objects where the specified objects are referenced.
 
 -X, --tag-unmatched  
 Tag unmatched references with the processing instruction

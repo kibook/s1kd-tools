@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.0.2"
+#define VERSION "4.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -89,9 +89,6 @@ static long unsigned maxListedFiles = 1;
 #define SHOW_EPR 0x10 /* External publications */
 #define SHOW_HOT 0x20 /* Hotspots */
 #define SHOW_FRG 0x40 /* Fragments */
-
-/* Which types of object references will be listed. */
-static int showObjects = 0;
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
@@ -203,6 +200,10 @@ static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	xmlFree(s);
 	xmlFree(r);
 	xmlFree(xpath);
+}
+static void printMatchedWhereUsed(xmlNodePtr node, const char *src, const char *ref)
+{
+	printf("%s\n", src);
 }
 
 static void execMatched(xmlNodePtr node, const char *src, const char *ref)
@@ -1135,49 +1136,55 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 	}
 }
 
-static int listReferences(const char *path);
+static int listReferences(const char *path, int show, const char *targetRef, int targetShow);
+static int listWhereUsed(const char *path, int show);
 
 /* Print a reference found in an object. */
-static int printReference(xmlNodePtr *refptr, const char *src)
+static int printReference(xmlNodePtr *refptr, const char *src, int show, const char *targetRef, int targetShow)
 {
 	char code[PATH_MAX];
 	char fname[PATH_MAX];
 	xmlNodePtr ref = *refptr;
 
-	if ((showObjects & SHOW_DMC) == SHOW_DMC &&
+	if ((show & SHOW_DMC) == SHOW_DMC &&
 	    (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0 ||
 	     xmlStrcmp(ref->name, BAD_CAST "refdm") == 0 ||
 	     xmlStrcmp(ref->name, BAD_CAST "addresdm") == 0))
 		getDmCode(code, ref);
-	else if ((showObjects & SHOW_PMC) == SHOW_PMC &&
+	else if ((show & SHOW_PMC) == SHOW_PMC &&
 		 (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 ||
 	          xmlStrcmp(ref->name, BAD_CAST "refpm") == 0))
 		getPmCode(code, ref);
-	else if ((showObjects & SHOW_ICN) == SHOW_ICN &&
+	else if ((show & SHOW_ICN) == SHOW_ICN &&
 	         (xmlStrcmp(ref->name, BAD_CAST "infoEntityRef") == 0))
 		getICN(code, ref);
-	else if ((showObjects & SHOW_COM) == SHOW_COM && (xmlStrcmp(ref->name, BAD_CAST "commentRef") == 0))
+	else if ((show & SHOW_COM) == SHOW_COM && (xmlStrcmp(ref->name, BAD_CAST "commentRef") == 0))
 		getComCode(code, ref);
-	else if ((showObjects & SHOW_ICN) == SHOW_ICN &&
+	else if ((show & SHOW_ICN) == SHOW_ICN &&
 		 (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0 ||
 	          xmlStrcmp(ref->name, BAD_CAST "boardno") == 0))
 		getICNAttr(code, ref);
-	else if ((showObjects & SHOW_EPR) == SHOW_EPR &&
+	else if ((show & SHOW_EPR) == SHOW_EPR &&
 	         (xmlStrcmp(ref->name, BAD_CAST "externalPubRef") == 0 ||
 		  xmlStrcmp(ref->name, BAD_CAST "reftp") == 0))
 		getExternalPubCode(code, ref);
 	else if (xmlStrcmp(ref->name, BAD_CAST "dispatchFileName") == 0 ||
 	         xmlStrcmp(ref->name, BAD_CAST "ddnfilen") == 0)
 		getDispatchFileName(code, ref);
-	else if ((showObjects & SHOW_HOT) == SHOW_HOT &&
+	else if ((show & SHOW_HOT) == SHOW_HOT &&
 		 xmlStrcmp(ref->name, BAD_CAST "graphic") == 0)
 		return getHotspots(ref, src);
-	else if ((showObjects & SHOW_FRG) == SHOW_FRG &&
+	else if ((show & SHOW_FRG) == SHOW_FRG &&
 		 (xmlStrcmp(ref->name, BAD_CAST "referredFragment") == 0 ||
 		  xmlStrcmp(ref->name, BAD_CAST "target") == 0))
 		return getFragment(ref, src);
 	else
 		return 0;
+
+	/* If looking for a particular ref in -w mode, skip any others. */
+	if (targetRef && !strnmatch(targetRef, code, strlen(code))) {
+		return 0;
+	}
 
 	if (find_object_fname(fname, directory, code, recursive)) {
 		if (updateRefs) {
@@ -1188,7 +1195,11 @@ static int printReference(xmlNodePtr *refptr, const char *src)
 			}
 
 			if (listRecursively) {
-				listReferences(fname);
+				if (targetRef) {
+					listWhereUsed(src, targetShow);
+				} else {
+					listReferences(fname, show, NULL, 0);
+				}
 			}
 		}
 		return 0;
@@ -1234,14 +1245,20 @@ static void addFile(const char *path)
 }
 
 /* List all references in the given object. */
-static int listReferences(const char *path)
+static int listReferences(const char *path, int show, const char *targetRef, int targetShow)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	int unmatched = 0;
 
-	if (listRecursively) {
+	/* In recursive mode, keep a record of which files have been listed
+	 * to avoid infinite loops.
+	 *
+	 * If this is invoked in -w mode (targetRef != NULL), don't update the
+	 * record, as that is handled by listWhereUsed.
+	 */
+	if (listRecursively && targetRef == NULL) {
 		if (listedFile(path)) {
 			return 0;
 		}
@@ -1276,7 +1293,7 @@ static int listReferences(const char *path)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			unmatched += printReference(&(obj->nodesetval->nodeTab[i]), path);
+			unmatched += printReference(&(obj->nodesetval->nodeTab[i]), path, show, targetRef, targetShow);
 		}
 	}
 
@@ -1308,7 +1325,7 @@ static int listReferences(const char *path)
 }
 
 /* Parse a list of filenames as input. */
-static int listReferencesInList(const char *path)
+static int listReferencesInList(const char *path, int show)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -1325,7 +1342,7 @@ static int listReferencesInList(const char *path)
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		unmatched += listReferences(line);
+		unmatched += listReferences(line, show, NULL, 0);
 	}
 
 	if (path) {
@@ -1349,10 +1366,131 @@ static void addHotspotNs(char *s)
 	xmlSetProp(node, BAD_CAST "uri", BAD_CAST uri);
 }
 
+static bool isUsedTarget(const char *name, int show)
+{
+	return
+		(optset(show, SHOW_COM) && is_com(name)) ||
+		(optset(show, SHOW_DMC) && is_dm(name))  ||
+		(optset(show, SHOW_PMC) && is_pm(name));
+}
+
+static int findWhereUsed(const char *dpath, const char *ref, int show)
+{
+	DIR *dir;
+	struct dirent *cur;
+	char fpath[PATH_MAX], cpath[PATH_MAX];
+	int unmatched = 0;
+
+	if (!(dir = opendir(dpath))) {
+		return 1;
+	}
+
+	if (strcmp(dpath, ".") == 0) {
+		strcpy(fpath, "");
+	} else if (dpath[strlen(dpath) - 1] != '/') {
+		strcpy(fpath, dpath);
+		strcat(fpath, "/");
+	} else {
+		strcpy(fpath, dpath);
+	}
+
+	while ((cur = readdir(dir))) {
+		strcpy(cpath, fpath);
+		strcat(cpath, cur->d_name);
+
+		if (recursive && isdir(cpath, true)) {
+			unmatched += findWhereUsed(cpath, ref, show);
+		} else if (isUsedTarget(cur->d_name, show)) {
+			unmatched += listReferences(cpath, SHOW_COM | SHOW_DMC | SHOW_PMC, ref, show);
+		}
+	}
+
+	closedir(dir);
+
+	return unmatched;
+}
+
+static int listWhereUsed(const char *path, int show)
+{
+	xmlDocPtr doc, tmp;
+	xmlNodePtr ident, node;
+	char code[PATH_MAX] = "";
+
+	/* In recursive mode, keep a record of which objects have been listed
+	 * to avoid infinite loops. */
+	if (listRecursively) {
+		if (listedFile(path)) {
+			return 0;
+		}
+
+		addFile(path);
+	}
+
+	if (!(doc = read_xml_doc(path))) {
+		return 1;
+	}
+
+	ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent");
+	node  = xmlNewNode(NULL, BAD_CAST "ref");
+	ident = xmlAddChild(node, xmlCopyNode(ident, 1));
+	tmp   = xmlNewDoc(BAD_CAST "1.0");
+	xmlDocSetRootElement(tmp, node);
+
+	if (xmlStrcmp(ident->name, BAD_CAST "commentIdent") == 0) {
+		xmlNodeSetName(ident, BAD_CAST "commentRefIdent");
+		xmlNodeSetName(ident, BAD_CAST "commentRef");
+		getComCode(code, node);
+	} else if (xmlStrcmp(ident->name, BAD_CAST "dmIdent") == 0) {
+		xmlNodeSetName(ident, BAD_CAST "dmRefIdent");
+		xmlNodeSetName(node , BAD_CAST "dmRef");
+		getDmCode(code, node);
+	} else if (xmlStrcmp(ident->name, BAD_CAST "pmIdent") == 0) {
+		xmlNodeSetName(ident, BAD_CAST "pmRefIdent");
+		xmlNodeSetName(node , BAD_CAST "pmRef");
+		getPmCode(code, node);
+	}
+
+	xmlFreeDoc(tmp);
+	xmlFreeDoc(doc);
+
+	if (strcmp(code, "") == 0) {
+		return 1;
+	}
+
+	return findWhereUsed(directory, code, show);
+}
+
+static int listWhereUsedList(const char *path, int show)
+{
+	FILE *f;
+	char line[PATH_MAX];
+	int unmatched = 0;
+
+	if (path) {
+		if (!(f = fopen(path, "r"))) {
+			fprintf(stderr, E_BAD_LIST, path);
+			return 0;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+		unmatched += listWhereUsed(line, show);
+	}
+
+	if (path) {
+		fclose(f);
+	}
+
+	return unmatched;
+}
+
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsTUuvXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1385,6 +1523,7 @@ static void show_help(void)
 	puts("  -U, --update                 Update address items in matched references.");
 	puts("  -u, --unmatched              Show only unmatched references.");
 	puts("  -v, --verbose                Verbose output.");
+	puts("  -w, --where-used             List places where an object is referenced.");
 	puts("  -X, --tag-unmatched          Tag unmatched references.");
 	puts("  -x, --xml                    Output XML report.");
 	puts("  -3, --externalpubs <file>    Use custom .externalpubs file.");
@@ -1409,8 +1548,12 @@ int main(int argc, char **argv)
 	bool inclSrcFname = false;
 	bool inclLineNum = false;
 	char extpubsFname[PATH_MAX] = "";
+	bool findUsed = false;
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:T3:h?";
+	/* Which types of object references will be listed. */
+	int showObjects = 0;
+
+	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:T3:wh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1446,6 +1589,7 @@ int main(int argc, char **argv)
 		{"hotspot-xpath", required_argument, 0, 'j'},
 		{"namespace"    , required_argument, 0, 'J'},
 		{"fragment"     , no_argument      , 0, 'T'},
+		{"where-used"   , no_argument      , 0, 'w'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1565,6 +1709,10 @@ int main(int argc, char **argv)
 			case 'e':
 				execStr = strdup(optarg);
 				break;
+			case 'w':
+				findUsed = true;
+				printMatchedFn = printMatchedWhereUsed;
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -1607,15 +1755,31 @@ int main(int argc, char **argv)
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (isList) {
-				unmatched += listReferencesInList(argv[i]);
+				if (findUsed) {
+					unmatched += listWhereUsedList(argv[i], showObjects);
+				} else {
+					unmatched += listReferencesInList(argv[i], showObjects);
+				}
 			} else {
-				unmatched += listReferences(argv[i]);
+				if (findUsed) {
+					unmatched += listWhereUsed(argv[i], showObjects);
+				} else {
+					unmatched += listReferences(argv[i], showObjects, NULL, 0);
+				}
 			}
 		}
 	} else if (isList) {
-		unmatched += listReferencesInList(NULL);
+		if (findUsed) {
+			unmatched += listWhereUsedList(NULL, showObjects);
+		} else {
+			unmatched += listReferencesInList(NULL, showObjects);
+		}
 	} else {
-		unmatched += listReferences("-");
+		if (findUsed) {
+			unmatched += listWhereUsed("-", showObjects);
+		} else {
+			unmatched += listReferences("-", showObjects, NULL, 0);
+		}
 	}
 
 	if (xmlOutput) {

@@ -262,6 +262,25 @@ bool strmatch(const char *p, const char *s)
 	return true;
 }
 
+/* Match a string with a pattern case-insensitvely, using ? as a wildcard, up to a certain length. */
+bool strnmatch(const char *p, const char *s, int n)
+{
+	const unsigned char *cp = (const unsigned char *) p;
+	const unsigned char *cs = (const unsigned char *) s;
+	int i = 0;
+
+	while (*cp && i < n) {
+		if (tolower(*cp) != tolower(*cs) && *cp != '?') {
+			return false;
+		}
+		++cp;
+		++cs;
+		++i;
+	}
+
+	return true;
+}
+
 /* Find a CSDB object in a directory hierarchy based on its code. */
 bool find_csdb_object(char *dst, const char *path, const char *code, bool (*is)(const char *), bool recursive)
 {
