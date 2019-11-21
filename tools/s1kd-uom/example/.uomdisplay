@@ -5,6 +5,7 @@
   <uoms>
     <uom name="degC"> °C</uom>
     <uom name="degF"> °F</uom>
+    <uom name="lbm"> lb</uom>
   </uoms>
   <currencies>
     <currency name="CAD">

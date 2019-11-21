@@ -35,7 +35,7 @@ on 2019-11-21.
 
 | Specification | Value       |
 |---------------|-------------|
-| Mass          | 6 lbm       |
+| Mass          | 6 lb        |
 | Width         | 11 in       |
 | Height        | 2 in        |
 | Depth         | 12 in       |

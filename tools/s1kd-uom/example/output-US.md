@@ -1,6 +1,6 @@
 | Specification | Value       |
 |---------------|-------------|
-| Mass          | 6 lbm       |
+| Mass          | 6 lb        |
 | Width         | 11 in       |
 | Height        | 2 in        |
 | Depth         | 12 in       |
