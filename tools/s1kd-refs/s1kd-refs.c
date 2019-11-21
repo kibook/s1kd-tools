@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.0.1"
+#define VERSION "4.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -555,7 +555,12 @@ static void getICNAttr(char *dst, xmlNodePtr ref)
 
 	/* Remove issue number when not doing a full match. */
 	if (ignoreIss) {
-		*(strrchr(dst, '-') - 3) = 0;
+		char *e = strrchr(dst, '-');
+		char *s = e - 3;
+
+		if (e && s >= dst) {
+			*s = 0;
+		}
 	}
 
 	xmlFree(icn);
