@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.2.0"
+#define VERSION "4.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -82,20 +82,21 @@ static int numListedFiles = 0;
 static long unsigned maxListedFiles = 1;
 
 /* Possible objects to list references to. */
-#define SHOW_COM 0x01 /* Comments */
-#define SHOW_DMC 0x02 /* Data modules */
-#define SHOW_ICN 0x04 /* ICNs */
-#define SHOW_PMC 0x08 /* Publication modules */
-#define SHOW_EPR 0x10 /* External publications */
-#define SHOW_HOT 0x20 /* Hotspots */
-#define SHOW_FRG 0x40 /* Fragments */
-#define SHOW_DML 0x80 /* DMLs */
+#define SHOW_COM 0x001 /* Comments */
+#define SHOW_DMC 0x002 /* Data modules */
+#define SHOW_ICN 0x004 /* ICNs */
+#define SHOW_PMC 0x008 /* Publication modules */
+#define SHOW_EPR 0x010 /* External publications */
+#define SHOW_HOT 0x020 /* Hotspots */
+#define SHOW_FRG 0x040 /* Fragments */
+#define SHOW_DML 0x080 /* DMLs */
+#define SHOW_SMC 0x100 /* SCORM content packages */
 
 /* All possible objects. */
-#define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML
+#define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML | SHOW_SMC
 
 /* All objects relevant to -w mode. */
-#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML
+#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML | SHOW_SMC
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
@@ -531,6 +532,111 @@ static void getPmCode(char *dst, xmlNodePtr pmRef)
 		strcat(dst, languageIsoCode);
 		strcat(dst, "-");
 		strcat(dst, countryIsoCode);
+
+		xmlFree(languageIsoCode);
+		xmlFree(countryIsoCode);
+	}
+}
+
+/* Get the SMC as a string from a scormContentPackageRef. */
+static void getSmcCode(char *dst, xmlNodePtr smcRef)
+{
+	xmlNodePtr identExtension, smcCode, issueInfo, language;
+
+	char *modelIdentCode;
+	char *smcIssuer;
+	char *smcNumber;
+	char *smcVolume;
+
+	identExtension = firstXPathNode(NULL, smcRef, BAD_CAST "scormContentPackageRefIdent/identExtension");
+	smcCode        = firstXPathNode(NULL, smcRef, BAD_CAST "scormContentPackageRefIdent/scormContentPackageCode");
+
+	if (ignoreIss) {
+		issueInfo = NULL;
+	} else {
+		issueInfo = firstXPathNode(NULL, smcRef, BAD_CAST "scormContentPackageRefIdent/issueInfo");
+	}
+
+	language = firstXPathNode(NULL, smcRef, BAD_CAST "scormContentPackageRefIdent/language");
+
+	strcpy(dst, "");
+
+	if (identExtension) {
+		char *extensionProducer, *extensionCode;
+
+		extensionProducer = (char *) xmlGetProp(identExtension, BAD_CAST "extensionProducer");
+		extensionCode     = (char *) xmlGetProp(identExtension, BAD_CAST "extensionCode");
+
+		strcat(dst, "SME-");
+
+		if (extensionProducer && extensionCode) {
+			strcat(dst, extensionProducer);
+			strcat(dst, "-");
+			strcat(dst, extensionCode);
+			strcat(dst, "-");
+		}
+
+		xmlFree(extensionProducer);
+		xmlFree(extensionCode);
+	} else {
+		strcat(dst, "SMC-");
+	}
+
+	modelIdentCode = (char *) xmlGetProp(smcCode, BAD_CAST "modelIdentCode");
+	smcIssuer      = (char *) xmlGetProp(smcCode, BAD_CAST "scormContentPackageIssuer");
+	smcNumber      = (char *) xmlGetProp(smcCode, BAD_CAST "scormContentPackageNumber");
+	smcVolume      = (char *) xmlGetProp(smcCode, BAD_CAST "scormContentPackageVolume");
+
+	if (modelIdentCode && smcIssuer && smcNumber && smcVolume) {
+		strcat(dst, modelIdentCode);
+		strcat(dst, "-");
+		strcat(dst, smcIssuer);
+		strcat(dst, "-");
+		strcat(dst, smcNumber);
+		strcat(dst, "-");
+		strcat(dst, smcVolume);
+	}
+
+	xmlFree(modelIdentCode);
+	xmlFree(smcIssuer);
+	xmlFree(smcNumber);
+	xmlFree(smcVolume);
+
+	if (!noIssue) {
+		if (issueInfo) {
+			char *issueNumber, *inWork;
+
+			issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
+			inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+
+			if (issueNumber && inWork) {
+				strcat(dst, "_");
+				strcat(dst, issueNumber);
+				strcat(dst, "-");
+				strcat(dst, inWork);
+			}
+
+			xmlFree(issueNumber);
+			xmlFree(inWork);
+		} else if (language) {
+			strcat(dst, "_\?\?\?-\?\?");
+		}
+	}
+
+	if (language) {
+		char *languageIsoCode, *countryIsoCode;
+
+		languageIsoCode = (char *) xmlGetProp(language, BAD_CAST "languageIsoCode");
+		countryIsoCode  = (char *) xmlGetProp(language, BAD_CAST "countryIsoCode");
+
+		if (languageIsoCode && countryIsoCode) {
+			uppercase(languageIsoCode);
+
+			strcat(dst, "_");
+			strcat(dst, languageIsoCode);
+			strcat(dst, "-");
+			strcat(dst, countryIsoCode);
+		}
 
 		xmlFree(languageIsoCode);
 		xmlFree(countryIsoCode);
@@ -1217,6 +1323,8 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 		 (xmlStrcmp(ref->name, BAD_CAST "pmRef") == 0 ||
 	          xmlStrcmp(ref->name, BAD_CAST "refpm") == 0))
 		getPmCode(code, ref);
+	else if ((show & SHOW_SMC) == SHOW_SMC && xmlStrcmp(ref->name, BAD_CAST "scormContentPackageRef") == 0)
+		getSmcCode(code, ref);
 	else if ((show & SHOW_ICN) == SHOW_ICN &&
 	         (xmlStrcmp(ref->name, BAD_CAST "infoEntityRef") == 0))
 		getICN(code, ref);
@@ -1351,7 +1459,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1436,7 +1544,8 @@ static bool isUsedTarget(const char *name, int show)
 		(optset(show, SHOW_COM) && is_com(name)) ||
 		(optset(show, SHOW_DMC) && is_dm(name))  ||
 		(optset(show, SHOW_DML) && is_dml(name)) ||
-		(optset(show, SHOW_PMC) && is_pm(name));
+		(optset(show, SHOW_PMC) && is_pm(name))  ||
+		(optset(show, SHOW_SMC) && is_smc(name));
 }
 
 static int findWhereUsed(const char *dpath, const char *ref, int show)
@@ -1495,7 +1604,7 @@ static int listWhereUsed(const char *path, int show)
 		return 1;
 	}
 
-	ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent");
+	ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent|//scormContentPackageIdent");
 	node  = xmlNewNode(NULL, BAD_CAST "ref");
 	ident = xmlAddChild(node, xmlCopyNode(ident, 1));
 	tmp   = xmlNewDoc(BAD_CAST "1.0");
@@ -1517,6 +1626,10 @@ static int listWhereUsed(const char *path, int show)
 		xmlNodeSetName(ident, BAD_CAST "pmRefIdent");
 		xmlNodeSetName(node , BAD_CAST "pmRef");
 		getPmCode(code, node);
+	} else if (xmlStrcmp(ident->name, BAD_CAST "scormContentPackageIdent") == 0) {
+		xmlNodeSetName(ident, BAD_CAST "scormContentPackageRefIdent");
+		xmlNodeSetName(node , BAD_CAST "scormContentPackageRef");
+		getSmcCode(code, node);
 	}
 
 	xmlFreeDoc(tmp);
@@ -1559,7 +1672,7 @@ static int listWhereUsedList(const char *path, int show)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrSsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1588,6 +1701,7 @@ static void show_help(void)
 	puts("  -q, --quiet                  Quiet mode.");
 	puts("  -R, --recursively            List references in matched objects recursively.");
 	puts("  -r, --recursive              Search for matches in directories recursively.");
+	puts("  -S, --smc                    List SCORM content package references.");
 	puts("  -s, --include-src            Include the source object as a reference.");
 	puts("  -T, --fragment               List referred fragments in other DMs.");
 	puts("  -U, --update                 Update address items in matched references.");
@@ -1623,7 +1737,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxsove:mHj:J:T3:wh?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:T3:wh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1652,6 +1766,7 @@ int main(int argc, char **argv)
 		{"exec"         , required_argument, 0, 'e'},
 		{"tag-unmatched", no_argument      , 0, 'X'},
 		{"xml"          , no_argument      , 0, 'x'},
+		{"smc"          , no_argument      , 0, 'S'},
 		{"include-src"  , no_argument      , 0, 's'},
 		{"output-valid" , no_argument      , 0, 'o'},
 		{"verbose"      , no_argument      , 0, 'v'},
@@ -1758,6 +1873,9 @@ int main(int argc, char **argv)
 			case 'x':
 				xmlOutput = true;
 				break;
+			case 'S':
+				showObjects |= SHOW_SMC;
+				break;
 			case 's':
 				listSrc = true;
 				break;
@@ -1794,7 +1912,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* If none of -CDEGHLPT are given, show all types of objects. */
+	/* If none of -CDEGHLPST are given, show all types of objects. */
 	if (!showObjects) {
 		showObjects = SHOW_ALL;
 	}
