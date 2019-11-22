@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrsTUuvwXxh?] [-d <dir>] [-e <cmd>]
+    s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?] [-d <dir>] [-e <cmd>]
               [-J <ns=URL>] [-j <xpath>] [-3 <file>] [<object>...]
 
 DESCRIPTION
