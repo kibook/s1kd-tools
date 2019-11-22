@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.1.0"
+#define VERSION "4.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -89,6 +89,13 @@ static long unsigned maxListedFiles = 1;
 #define SHOW_EPR 0x10 /* External publications */
 #define SHOW_HOT 0x20 /* Hotspots */
 #define SHOW_FRG 0x40 /* Fragments */
+#define SHOW_DML 0x80 /* DMLs */
+
+/* All possible objects. */
+#define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML
+
+/* All objects relevant to -w mode. */
+#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
@@ -831,6 +838,61 @@ static void getComCode(char *dst, xmlNodePtr ref)
 	}
 }
 
+/* Get the DML code as a string from a dmlRef. */
+static void getDmlCode(char *dst, xmlNodePtr ref)
+{
+	xmlNodePtr dmlCode, issueInfo;
+
+	char *modelIdentCode;
+	char *senderIdent;
+	char *dmlType;
+	char *yearOfDataIssue;
+	char *seqNumber;
+
+	dmlCode   = firstXPathNode(NULL, ref, BAD_CAST "dmlRefIdent/dmlCode");
+	issueInfo = firstXPathNode(NULL, ref, BAD_CAST "dmlRefIdent/issueInfo");
+
+	modelIdentCode  = (char *) xmlGetProp(dmlCode, BAD_CAST "modelIdentCode");
+	senderIdent     = (char *) xmlGetProp(dmlCode, BAD_CAST "senderIdent");
+	dmlType         = (char *) xmlGetProp(dmlCode, BAD_CAST "dmlType");
+	yearOfDataIssue = (char *) xmlGetProp(dmlCode, BAD_CAST "yearOfDataIssue");
+	seqNumber       = (char *) xmlGetProp(dmlCode, BAD_CAST "seqNumber");
+
+	uppercase(dmlType);
+
+	strcpy(dst, "DML-");
+	strcat(dst, modelIdentCode);
+	strcat(dst, "-");
+	strcat(dst, senderIdent);
+	strcat(dst, "-");
+	strcat(dst, dmlType);
+	strcat(dst, "-");
+	strcat(dst, yearOfDataIssue);
+	strcat(dst, "-");
+	strcat(dst, seqNumber);
+
+	xmlFree(modelIdentCode);
+	xmlFree(senderIdent);
+	xmlFree(dmlType);
+	xmlFree(yearOfDataIssue);
+	xmlFree(seqNumber);
+
+	if (issueInfo) {
+		char *issueNumber, *inWork;
+
+		issueNumber = (char *) xmlGetProp(issueInfo, BAD_CAST "issueNumber");
+		inWork      = (char *) xmlGetProp(issueInfo, BAD_CAST "inWork");
+
+		strcat(dst, "_");
+		strcat(dst, issueNumber);
+		strcat(dst, "-");
+		strcat(dst, inWork);
+
+		xmlFree(issueNumber);
+		xmlFree(inWork);
+	}
+}
+
 /* Get the external pub code as a string from an externalPubRef. */
 static void getExternalPubCode(char *dst, xmlNodePtr ref)
 {
@@ -1160,6 +1222,8 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 		getICN(code, ref);
 	else if ((show & SHOW_COM) == SHOW_COM && (xmlStrcmp(ref->name, BAD_CAST "commentRef") == 0))
 		getComCode(code, ref);
+	else if ((show & SHOW_DML) == SHOW_DML && (xmlStrcmp(ref->name, BAD_CAST "dmlRef") == 0))
+		getDmlCode(code, ref);
 	else if ((show & SHOW_ICN) == SHOW_ICN &&
 		 (xmlStrcmp(ref->name, BAD_CAST "infoEntityIdent") == 0 ||
 	          xmlStrcmp(ref->name, BAD_CAST "boardno") == 0))
@@ -1287,7 +1351,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1371,6 +1435,7 @@ static bool isUsedTarget(const char *name, int show)
 	return
 		(optset(show, SHOW_COM) && is_com(name)) ||
 		(optset(show, SHOW_DMC) && is_dm(name))  ||
+		(optset(show, SHOW_DML) && is_dml(name)) ||
 		(optset(show, SHOW_PMC) && is_pm(name));
 }
 
@@ -1401,7 +1466,7 @@ static int findWhereUsed(const char *dpath, const char *ref, int show)
 		if (recursive && isdir(cpath, true)) {
 			unmatched += findWhereUsed(cpath, ref, show);
 		} else if (isUsedTarget(cur->d_name, show)) {
-			unmatched += listReferences(cpath, SHOW_COM | SHOW_DMC | SHOW_PMC, ref, show);
+			unmatched += listReferences(cpath, SHOW_WHERE_USED, ref, show);
 		}
 	}
 
@@ -1430,7 +1495,7 @@ static int listWhereUsed(const char *path, int show)
 		return 1;
 	}
 
-	ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent");
+	ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent");
 	node  = xmlNewNode(NULL, BAD_CAST "ref");
 	ident = xmlAddChild(node, xmlCopyNode(ident, 1));
 	tmp   = xmlNewDoc(BAD_CAST "1.0");
@@ -1444,6 +1509,10 @@ static int listWhereUsed(const char *path, int show)
 		xmlNodeSetName(ident, BAD_CAST "dmRefIdent");
 		xmlNodeSetName(node , BAD_CAST "dmRef");
 		getDmCode(code, node);
+	} else if (xmlStrcmp(ident->name, BAD_CAST "dmlIdent") == 0) {
+		xmlNodeSetName(ident, BAD_CAST "dmlRefIdent");
+		xmlNodeSetName(node , BAD_CAST "dmlRef");
+		getDmlCode(code, node);
 	} else if (xmlStrcmp(ident->name, BAD_CAST "pmIdent") == 0) {
 		xmlNodeSetName(ident, BAD_CAST "pmRefIdent");
 		xmlNodeSetName(node , BAD_CAST "pmRef");
@@ -1490,7 +1559,7 @@ static int listWhereUsedList(const char *path, int show)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIilmNnoPqrsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1509,6 +1578,7 @@ static void show_help(void)
 	puts("  -i, --ignore-issue           Ignore issue info when matching.");
 	puts("  -J, --namespace <ns=URL>     Register a namespace for the hotspot XPath.");
 	puts("  -j, --hotspot-xpath <xpath>  XPath to use for matching hotspots (-H).");
+	puts("  -L, --dml                    List DML references.");
 	puts("  -l, --list                   Treat input as list of CSDB objects.");
 	puts("  -m, --strict-match           Be more strict when matching filenames of objects.");
 	puts("  -N, --omit-issue             Assume filenames omit issue info.");
@@ -1553,7 +1623,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFflUuCDGPRrd:IinEXxsove:mHj:J:T3:wh?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxsove:mHj:J:T3:wh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1564,6 +1634,7 @@ int main(int argc, char **argv)
 		{"all"          , no_argument      , 0, 'a'},
 		{"overwrite"    , no_argument      , 0, 'F'},
 		{"filename"     , no_argument      , 0, 'f'},
+		{"dml"          , no_argument      , 0, 'L'},
 		{"list"         , no_argument      , 0, 'l'},
 		{"update"       , no_argument      , 0, 'U'},
 		{"unmatched"    , no_argument      , 0, 'u'},
@@ -1631,6 +1702,9 @@ int main(int argc, char **argv)
 				break;
 			case 'H':
 				showObjects |= SHOW_HOT;
+				break;
+			case 'L':
+				showObjects |= SHOW_DML;
 				break;
 			case 'l':
 				isList = true;
@@ -1720,9 +1794,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* If none of -CDEGHPT are given, show all types of objects. */
+	/* If none of -CDEGHLPT are given, show all types of objects. */
 	if (!showObjects) {
-		showObjects = SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG;
+		showObjects = SHOW_ALL;
 	}
 
 	/* Load .externalpubs config file. */
