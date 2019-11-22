@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.4.0"
+#define VERSION "4.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -201,9 +201,9 @@ static void processFormatStr(FILE *f, xmlNodePtr node, const char *src, const ch
 			}
 		} else if (printFormat[i] == '\\') {
 			switch (printFormat[i + 1]) {
-				case 'n': fputc('\n', f); break;
-				case 't': fputc('\t', f); break;
-				case '0': fputc('\0', f); break;
+				case 'n': fputc('\n', f); i++; break;
+				case 't': fputc('\t', f); i++; break;
+				case '0': fputc('\0', f); i++; break;
 				default:  fputc(printFormat[i], f);
 			}
 		} else {
