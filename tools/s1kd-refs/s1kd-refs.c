@@ -122,6 +122,11 @@ static bool looseMatch = true;
 static xmlChar *hotspotXPath = NULL;
 static xmlNodePtr hotspotNs = NULL;
 
+/* Delimiter for the format string. */
+#define FMTSTR_DELIM '%'
+/* Custom format for printed references. */
+static char *printFormat = NULL;
+
 /* Return the first node matching an XPath expression. */
 static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
@@ -159,6 +164,54 @@ static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *
 static xmlChar *firstXPathValue(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
 	return xmlNodeGetContent(firstXPathNode(doc, root, path));
+}
+
+/* Process and print info based on a format string. */
+static void processFormatStr(FILE *f, xmlNodePtr node, const char *src, const char *ref)
+{
+	int i;
+
+	for (i = 0; printFormat[i]; ++i) {
+		if (printFormat[i] == FMTSTR_DELIM) {
+			if (printFormat[i + 1] == FMTSTR_DELIM) {
+				fputc(FMTSTR_DELIM, f);
+				++i;
+			} else {
+				const char *k, *e;
+				int n;
+
+				k = printFormat + i + 1;
+				e = strchr(k, FMTSTR_DELIM);
+				if (!e) break;
+				n = e - k;
+
+				if (strncmp(k, "src", n) == 0) {
+					fprintf(f, "%s", src);
+				} else if (strncmp(k, "ref", n) == 0) {
+					fprintf(f, "%s", ref);
+				} else if (strncmp(k, "line", n) == 0) {
+					fprintf(f, "%ld", xmlGetLineNo(node));
+				} else if (strncmp(k, "xpath", n) == 0) {
+					xmlChar *xpath = xpath_of(node);
+					fprintf(f, "%s", (char *) xpath);
+					xmlFree(xpath);
+				}
+
+				i += n + 1;
+			}
+		} else if (printFormat[i] == '\\') {
+			switch (printFormat[i + 1]) {
+				case 'n': fputc('\n', f); break;
+				case 't': fputc('\t', f); break;
+				case '0': fputc('\0', f); break;
+				default:  fputc(printFormat[i], f);
+			}
+		} else {
+			fputc(printFormat[i], f);
+		}
+	}
+
+	fputc('\n', f);
 }
 
 /* Print a reference which is matched in the filesystem. */
@@ -213,6 +266,10 @@ static void printMatchedWhereUsed(xmlNodePtr node, const char *src, const char *
 {
 	printf("%s\n", src);
 }
+static void printMatchedCustom(xmlNodePtr node, const char *src, const char *ref)
+{
+	processFormatStr(stdout, node, src, ref);
+}
 
 static void execMatched(xmlNodePtr node, const char *src, const char *ref)
 {
@@ -262,6 +319,11 @@ static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	xmlFree(s);
 	xmlFree(r);
 	xmlFree(xpath);
+}
+static void printUnmatchedCustom(xmlNodePtr node, const char *src, const char *ref)
+{
+	fputs(ERR_PREFIX "Unmatched reference: ", stderr);
+	processFormatStr(stderr, node, src, ref);
 }
 
 static void (*printMatchedFn)(xmlNodePtr, const char *, const char *) = printMatched;
@@ -1672,7 +1734,7 @@ static int listWhereUsedList(const char *path, int show)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrSsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrSsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1704,6 +1766,7 @@ static void show_help(void)
 	puts("  -S, --smc                    List SCORM content package references.");
 	puts("  -s, --include-src            Include the source object as a reference.");
 	puts("  -T, --fragment               List referred fragments in other DMs.");
+	puts("  -t, --format <fmt>           The format to use when printing references.");
 	puts("  -U, --update                 Update address items in matched references.");
 	puts("  -u, --unmatched              Show only unmatched references.");
 	puts("  -v, --verbose                Verbose output.");
@@ -1737,7 +1800,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:T3:wh?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1775,6 +1838,7 @@ int main(int argc, char **argv)
 		{"hotspot-xpath", required_argument, 0, 'j'},
 		{"namespace"    , required_argument, 0, 'J'},
 		{"fragment"     , no_argument      , 0, 'T'},
+		{"format"       , required_argument, 0, 't'},
 		{"where-used"   , no_argument      , 0, 'w'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -1898,6 +1962,9 @@ int main(int argc, char **argv)
 			case 'T':
 				showObjects |= SHOW_FRG;
 				break;
+			case 't':
+				printFormat = strdup(optarg);
+				break;
 			case 'e':
 				execStr = strdup(optarg);
 				break;
@@ -1931,6 +1998,9 @@ int main(int argc, char **argv)
 	/* Set the functions for printing matched/unmatched refs. */
 	if (execStr) {
 		printMatchedFn = execMatched;
+	} else if (printFormat) {
+		printMatchedFn   = printMatchedCustom;
+		printUnmatchedFn = printUnmatchedCustom;
 	} else if (xmlOutput) {
 		printMatchedFn = printMatchedXml;
 		printUnmatchedFn = printUnmatchedXml;
@@ -1983,6 +2053,7 @@ int main(int argc, char **argv)
 	xmlFreeNode(hotspotNs);
 	free(listedFiles);
 	free(execStr);
+	free(printFormat);
 	xmlFreeDoc(externalPubs);
 	xmlCleanupParser();
 

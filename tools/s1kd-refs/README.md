@@ -7,7 +7,8 @@ SYNOPSIS
 ========
 
     s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?] [-d <dir>] [-e <cmd>]
-              [-J <ns=URL>] [-j <xpath>] [-3 <file>] [<object>...]
+              [-J <ns=URL>] [-j <xpath>] [-t <fmt>] [-3 <file>]
+              [<object>...]
 
 DESCRIPTION
 ===========
@@ -120,6 +121,22 @@ Search for matches to references in directories recursively.
 Include the source object as a reference. This is helpful when the
 output of this tool is used to apply some operation to a source object
 and all its dependencies together.
+
+-t, --format &lt;fmt&gt;  
+Specify a custom format for printed references. &lt;fmt&gt; is a format
+string, where the following variables can be given:
+
+-   %line% - The line number where the reference occurs in the source.
+
+-   %ref% - The reference.
+
+-   %src% - The source of the reference.
+
+-   %xpath% - The XPath denoting where the reference occurs in the
+    source.
+
+For example, `-t '%src% (%line%): %ref%'` is equivalent to the -n
+option.
 
 -U, --update  
 Update the title of matched references from the corresponding object.

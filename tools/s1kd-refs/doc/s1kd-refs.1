@@ -10,7 +10,8 @@ s1kd\-refs \- Manage references between CSDB objects
 .nf
 \f[C]
 s1kd\-refs\ [\-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?]\ [\-d\ <dir>]\ [\-e\ <cmd>]
-\ \ \ \ \ \ \ \ \ \ [\-J\ <ns=URL>]\ [\-j\ <xpath>]\ [\-3\ <file>]\ [<object>...]
+\ \ \ \ \ \ \ \ \ \ [\-J\ <ns=URL>]\ [\-j\ <xpath>]\ [\-t\ <fmt>]\ [\-3\ <file>]
+\ \ \ \ \ \ \ \ \ \ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -164,6 +165,23 @@ Include the source object as a reference.
 This is helpful when the output of this tool is used to apply some
 operation to a source object and all its dependencies together.
 .RS
+.RE
+.TP
+.B \-t, \-\-format <fmt>
+Specify a custom format for printed references.
+<fmt> is a format string, where the following variables can be given:
+.RS
+.IP \[bu] 2
+%line% \- The line number where the reference occurs in the source.
+.IP \[bu] 2
+%ref% \- The reference.
+.IP \[bu] 2
+%src% \- The source of the reference.
+.IP \[bu] 2
+%xpath% \- The XPath denoting where the reference occurs in the source.
+.PP
+For example, \f[C]\-t\ \[aq]%src%\ (%line%):\ %ref%\[aq]\f[] is
+equivalent to the \-n option.
 .RE
 .TP
 .B \-U, \-\-update
