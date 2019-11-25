@@ -8,6 +8,7 @@ To install the schemas, use the following command:
 ```# make install```
 
 Variables:
+
 `PREFIX`	
 Installation prefix. Default is `/usr/local`.
 
