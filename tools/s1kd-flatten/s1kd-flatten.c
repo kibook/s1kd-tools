@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.5"
+#define VERSION "3.0.6"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -247,7 +247,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 
 					flatten_pm_entry(content, xiNs);
 
-					for (c = content->children; c; c = c->next) {
+					for (c = content->last; c; c = c->prev) {
 						if (xmlStrcmp(c->name, BAD_CAST "pmEntry") != 0) {
 							continue;
 						}
