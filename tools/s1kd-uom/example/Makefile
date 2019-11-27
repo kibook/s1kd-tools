@@ -11,7 +11,7 @@ CAD2USD=\$$value * `sh exchange-rate.sh CAD USD`
 all: README.md
 
 # Build a README out of the concatenated output tables
-README.md: output-CA.md output-EU.md output-US.md
+README.md: output-CA.md output-EU.md output-US.md output-dual.md
 	sh concat.sh $+ > $@
 
 # Deploy for a Canadian customer by:
@@ -30,7 +30,11 @@ output-EU.md: $(SOURCE)
 # - Converting Canadian dollars to US dollars at the current exchange rate, with the format 0.00
 # - Pre-formatting quantities with the imperial conventions
 output-US.md: $(SOURCE)
-	$(S1KD_UOM) -F '0' -s US -u CAD -t USD -e "$(CAD2USD)" -F '0.00' -p imperial $< | $(TO_MARKDOWN) > $@
+	$(S1KD_UOM) -s US -F '0' -u CAD -t USD -e "$(CAD2USD)" -F '0.00' -p imperial $< | $(TO_MARKDOWN) > $@
+
+# Deploy a dual Canadian/US version with the -d option
+output-dual.md: $(SOURCE)
+	$(S1KD_UOM) -s US -F '0' -u CAD -t USD -e "$(CAD2USD)" -F '0.00' -p imperial -d $< | $(TO_MARKDOWN) > $@
 
 clean:
-	rm -f output-CA.md output-EU.md output-US.md README.md
+	rm -f output-CA.md output-EU.md output-US.md output-dual.md README.md

@@ -6,4 +6,4 @@
 | Depth         | 12 in       |
 | Speed         | 62 mi/h     |
 | Temperature   | 73 °F       |
-| Price         | $286.09 USD |
+| Price         | $285.71 USD |
