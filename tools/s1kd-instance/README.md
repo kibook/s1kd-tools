@@ -160,7 +160,8 @@ be used.
 Give the data module instance a different infoName.
 
 -J, --clean-display-text  
-Remove display text from annotations which are simplified in -A mode.
+Remove display text from annotations which are simplified in -A or -9
+mode.
 
 -j, --clean-ents  
 After filtering, remove external entities (such as ICNs) which are no
