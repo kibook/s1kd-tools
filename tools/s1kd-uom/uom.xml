@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <uom>
+  <convert from="1/degC" to="1/degC"/>
+  <convert from="1/degF" to="1/degF"/>
+  <convert from="1/degR" to="1/degR"/>
+  <convert from="1/K" to="1/K"/>
   <convert from="cm" to="cm"/>
   <convert from="cm2" to="cm2"/>
   <convert from="cm3" to="cm3"/>
@@ -7,9 +11,11 @@
   <convert from="ddegC" to="ddegC"/>
   <convert from="ddegF" to="ddegF"/>
   <convert from="ddegK" to="ddegK"/>
+  <convert from="ddegR" to="ddegR"/>
   <convert from="dega" to="dega"/>
   <convert from="degC" to="degC"/>
   <convert from="degF" to="degF"/>
+  <convert from="degR" to="degR"/>
   <convert from="fathom" to="fathom"/>
   <convert from="flozUS" to="flozUS"/>
   <convert from="ft" to="ft"/>
@@ -25,6 +31,7 @@
   <convert from="in2" to="in2"/>
   <convert from="in3" to="in3"/>
   <convert from="in4" to="in4"/>
+  <convert from="K" to="K"/>
   <convert from="kg" to="kg"/>
   <convert from="km" to="km"/>
   <convert from="km/h" to="km/h"/>
@@ -56,6 +63,18 @@
   <convert from="yd" to="yd"/>
   <convert from="yd2" to="yd2"/>
   <convert from="yd3" to="yd3"/>
+  <convert from="1/degC" to="1/degF" formula="$value * (9 div 5) + 32"/>
+  <convert from="1/degC" to="1/degR" formula="$value * (9 div 5) + 491.67"/>
+  <convert from="1/degC" to="1/K" formula="$value + 273.15"/>
+  <convert from="1/degF" to="1/degC" formula="($value - 32) * (5 div 9)"/>
+  <convert from="1/degF" to="1/degR" formula="$value + 459.67"/>
+  <convert from="1/degF" to="1/K" formula="($value - 32) * (5 div 9) + 273.15"/>
+  <convert from="1/degR" to="1/degC" formula="($value - 491.67) * (5 div 9)"/>
+  <convert from="1/degR" to="1/degF" formula="$value - 459.67"/>
+  <convert from="1/degR" to="1/K" formula="$value * (5 div 9)"/>
+  <convert from="1/K" to="1/degC" formula="$value - 273.15"/>
+  <convert from="1/K" to="1/degF" formula="($value - 273.15) * (9 div 5) + 32"/>
+  <convert from="1/K" to="1/degR" formula="$value * 1.8"/>
   <convert from="cm" to="fathom" formula="$value div 182.88"/>
   <convert from="cm" to="ft" formula="$value div 30.48"/>
   <convert from="cm" to="in" formula="$value div 2.54"/>
@@ -82,13 +101,26 @@
   <convert from="cm4" to="in4" formula="$value * 0.24025147994538"/>
   <convert from="ddegC" to="ddegF" formula="$value * (9 div 5) + 32"/>
   <convert from="ddegC" to="ddegK" formula="$value + 273.15"/>
+  <convert from="ddegC" to="ddegR" formula="$value * (9 div 5) + 491.67"/>
   <convert from="ddegF" to="ddegC" formula="($value - 32) * (5 div 9)"/>
   <convert from="ddegF" to="ddegK" formula="($value - 32) * (5 div 9) + 273.15"/>
+  <convert from="ddegF" to="ddegR" formula="$value + 459.67"/>
   <convert from="ddegK" to="ddegC" formula="$value - 273.15"/>
   <convert from="ddegK" to="ddegF" formula="($value - 273.15) * (9 div 5) + 32"/>
+  <convert from="ddegK" to="ddegR" formula="$value * 1.8"/>
+  <convert from="ddegR" to="ddegC" formula="($value - 491.67) * (5 div 9)"/>
+  <convert from="ddegR" to="ddegF" formula="$value - 459.67"/>
+  <convert from="ddegR" to="ddegK" formula="$value * (5 div 9)"/>
   <convert from="dega" to="rad" formula="$value * ($pi div 180)"/>
   <convert from="degC" to="degF" formula="$value * (9 div 5) + 32"/>
+  <convert from="degC" to="degR" formula="$value * (9 div 5) + 491.67"/>
+  <convert from="degC" to="K" formula="$value + 273.15"/>
   <convert from="degF" to="degC" formula="($value - 32) * (5 div 9)"/>
+  <convert from="degF" to="degR" formula="$value + 459.67"/>
+  <convert from="degF" to="K" formula="($value - 32) * (5 div 9) + 273.15"/>
+  <convert from="degR" to="degC" formula="($value - 491.67) * (5 div 9)"/>
+  <convert from="degR" to="degF" formula="$value - 459.67"/>
+  <convert from="degR" to="K" formula="$value * (5 div 9)"/>
   <convert from="fathom" to="cm" formula="$value * 182.88"/>
   <convert from="fathom" to="ft" formula="$value * 6"/>
   <convert from="fathom" to="in" formula="$value * 72"/>
@@ -164,6 +196,9 @@
   <convert from="in3" to="mm3" formula="$value * 16387.064"/>
   <convert from="in3" to="yd3" formula="$value div 46656"/>
   <convert from="in4" to="cm4" formula="$value div 0.24025147994538"/>
+  <convert from="K" to="degC" formula="$value - 273.15"/>
+  <convert from="K" to="degF" formula="($value - 273.15) * (9 div 5) + 32"/>
+  <convert from="K" to="degR" formula="$value * 1.8"/>
   <convert from="kg" to="g" formula="$value * 1000"/>
   <convert from="kg" to="lbm" formula="$value * 2.205"/>
   <convert from="kg" to="mg" formula="$value * 1000000"/>
