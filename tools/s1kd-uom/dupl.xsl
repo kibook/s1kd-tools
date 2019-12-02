@@ -3,6 +3,9 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   version="1.0">
 
+  <xsl:param name="prefix"> (</xsl:param>
+  <xsl:param name="postfix">)</xsl:param>
+
   <xsl:template match="@*|node()">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
@@ -14,9 +17,9 @@
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
     <s1kd-uom_DUPLICATE>
-      <xsl:text> (</xsl:text>
+      <xsl:value-of select="$prefix"/>
       <xsl:copy-of select="."/>
-      <xsl:text>)</xsl:text>
+      <xsl:value-of select="$postfix"/>
     </s1kd-uom_DUPLICATE>
   </xsl:template>
 

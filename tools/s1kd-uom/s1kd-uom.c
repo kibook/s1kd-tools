@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.15.4"
+#define VERSION "1.16.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -29,26 +29,27 @@ static bool verbose = false;
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dflv,.h?] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-s <name>|-S <path> ...] [-U <path>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-dflv,.h?] [-D <fmt>] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-s <name>|-S <path> ...] [-U <path>] [<object>...]");
 	puts("");
-	puts("  -d, --duplicate          Include conversions as duplicate quantities in parenthesis.");
-	puts("  -e, --formula <expr>     Specify formula for a conversion.");
-	puts("  -F, --format <fmt>       Number format for converted values.");
-	puts("  -f, --overwrite          Overwrite input objects.");
-	puts("  -h, -?, --help           Show help/usage message.");
-	puts("  -l, --list               Treat input as list of CSDB objects.");
-	puts("  -P, --uomdisplay <path>  Use custom UOM display file.");
-	puts("  -p, --preformat <fmt>    Preformat quantity data.");
-	puts("  -S, --set <path>         Apply a custom set of conversions.");
-	puts("  -s, --preset <name>      Apply a predefined set of conversions.");
-	puts("  -t, --to <uom>           UOM to convert to.");
-	puts("  -U, --uom <path>         Use custom .uom file.");
-	puts("  -u, --from <uom>         UOM to convert from.");
-	puts("  -v, --verbose            Verbose output.");
-	puts("  -,, --dump-uom           Dump default .uom file.");
-	puts("  -., --dump-uomdisplay    Dump default UOM preformatting file.");
-	puts("  --version                Show version information.");
-	puts("  <object>                 CSDB object to convert quantities in.");
+	puts("  -D, --duplicate-format <fmt>  Custom format for duplicate quantities (-d).");
+	puts("  -d, --duplicate               Include conversions as duplicate quantities in parenthesis.");
+	puts("  -e, --formula <expr>          Specify formula for a conversion.");
+	puts("  -F, --format <fmt>            Number format for converted values.");
+	puts("  -f, --overwrite               Overwrite input objects.");
+	puts("  -h, -?, --help                Show help/usage message.");
+	puts("  -l, --list                    Treat input as list of CSDB objects.");
+	puts("  -P, --uomdisplay <path>       Use custom UOM display file.");
+	puts("  -p, --preformat <fmt>         Preformat quantity data.");
+	puts("  -S, --set <path>              Apply a custom set of conversions.");
+	puts("  -s, --preset <name>           Apply a predefined set of conversions.");
+	puts("  -t, --to <uom>                UOM to convert to.");
+	puts("  -U, --uom <path>              Use custom .uom file.");
+	puts("  -u, --from <uom>              UOM to convert from.");
+	puts("  -v, --verbose                 Verbose output.");
+	puts("  -,, --dump-uom                Dump default .uom file.");
+	puts("  -., --dump-uomdisplay         Dump default UOM preformatting file.");
+	puts("  --version                     Show version information.");
+	puts("  <object>                      CSDB object to convert quantities in.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -200,8 +201,52 @@ static void transform_doc(xmlDocPtr doc, unsigned char *xsl, unsigned int len, c
 	xmlFreeDoc(styledoc);
 }
 
+/* Read the custom duplicate format to obtain the prefix and postfix. */
+static void read_dupl_fmt(const char *duplfmt, char *prefix, char *postfix, int n)
+{
+	int i, j, s = n - 3;
+
+	prefix[0] = '"';
+
+	for (i = 0, j = 1; duplfmt[i] && j < s; ++i, ++j) {
+		if (duplfmt[i] == '\\' && duplfmt[i + 1]) {
+			switch (duplfmt[i + 1]) {
+				case 'n': prefix[j] = '\n'; break;
+				case 't': prefix[j] = '\t'; break;
+				default:  prefix[j] = duplfmt[i + 1];
+			}
+			++i;
+		} else if (duplfmt[i] == '%') {
+			break;
+		} else {
+			prefix[j] = duplfmt[i];
+		}
+	}
+
+	prefix[j++] = '"';
+	prefix[j] = '\0';
+
+	postfix[0] = '"';
+
+	for (i = i + 1, j = 1; duplfmt[i] && j < s; ++i, ++j) {
+		if (duplfmt[i] == '\\' && duplfmt[i + 1]) {
+			switch (duplfmt[i + 1]) {
+				case 'n': postfix[j] = '\n'; break;
+				case 't': postfix[j] = '\t'; break;
+				default:  postfix[j] = duplfmt[i + 1];
+			}
+			++i;
+		} else {
+			postfix[j] = duplfmt[i];
+		}
+	}
+
+	postfix[j++] = '"';
+	postfix[j] = '\0';
+}
+
 /* Convert UOM for a single data module. */
-static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, xmlDocPtr dupl, bool overwrite)
+static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, xmlDocPtr dupl, const char *duplfmt, bool overwrite)
 {
 	xmlDocPtr doc;
 	char *params[5];
@@ -223,7 +268,24 @@ static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xm
 	}
 
 	if (dupl) {
-		transform_doc(doc, dupl_xsl, dupl_xsl_len, NULL);
+		char *duplparams[5];
+
+		if (duplfmt) {
+			char prefix[256], postfix[256];
+
+			read_dupl_fmt(duplfmt, prefix, postfix, 256);
+
+			duplparams[0] = "prefix";
+			duplparams[1] = prefix;
+			duplparams[2] = "postfix";
+			duplparams[3] = postfix;
+			duplparams[4] = NULL;
+		} else {
+			duplparams[0] = NULL;
+		}
+
+		transform_doc(doc, dupl_xsl, dupl_xsl_len, (const char **) duplparams);
+
 		params[i++] = "duplicate";
 		params[i++] = "true()";
 	}
@@ -271,7 +333,7 @@ static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xm
 }
 
 /* Convert UOM for data modules given in a list. */
-static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, xmlDocPtr dupl, bool overwrite)
+static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *format, xmlDocPtr uomdisp, const char *dispfmt, xmlDocPtr dupl, const char *duplfmt, bool overwrite)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -287,7 +349,7 @@ static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *forma
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		convert_uoms(line, uom, format, uomdisp, dispfmt, dupl, overwrite);
+		convert_uoms(line, uom, format, uomdisp, dispfmt, dupl, duplfmt, overwrite);
 	}
 
 	if (path) {
@@ -342,25 +404,26 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "de:F:flP:p:S:s:t:U:u:v,.h?";
+	const char *sopts = "D:de:F:flP:p:S:s:t:U:u:v,.h?";
 	struct option lopts[] = {
-		{"version"        , no_argument      , 0, 0},
-		{"help"           , no_argument      , 0, 'h'},
-		{"duplicate"      , no_argument      , 0, 'd'},
-		{"formula"        , required_argument, 0, 'e'},
-		{"format"         , required_argument, 0, 'F'},
-		{"overwrite"      , no_argument      , 0, 'f'},
-		{"list"           , no_argument      , 0, 'l'},
-		{"uomdisplay"     , required_argument, 0, 'P'},
-		{"preformat"      , required_argument, 0, 'p'},
-		{"to"             , required_argument, 0, 't'},
-		{"uom"            , required_argument, 0, 'U'},
-		{"from"           , required_argument, 0, 'u'},
-		{"set"            , required_argument, 0, 'S'},
-		{"preset"         , required_argument, 0, 's'},
-		{"verbose"        , no_argument      , 0, 'v'},
-		{"dump-uom"       , no_argument      , 0, ','},
-		{"dump-uomdisplay", no_argument      , 0 ,'.'},
+		{"version"         , no_argument      , 0, 0},
+		{"help"            , no_argument      , 0, 'h'},
+		{"duplicate-format", required_argument, 0, 'D'},
+		{"duplicate"       , no_argument      , 0, 'd'},
+		{"formula"         , required_argument, 0, 'e'},
+		{"format"          , required_argument, 0, 'F'},
+		{"overwrite"       , no_argument      , 0, 'f'},
+		{"list"            , no_argument      , 0, 'l'},
+		{"uomdisplay"      , required_argument, 0, 'P'},
+		{"preformat"       , required_argument, 0, 'p'},
+		{"to"              , required_argument, 0, 't'},
+		{"uom"             , required_argument, 0, 'U'},
+		{"from"            , required_argument, 0, 'u'},
+		{"set"             , required_argument, 0, 'S'},
+		{"preset"          , required_argument, 0, 's'},
+		{"verbose"         , no_argument      , 0, 'v'},
+		{"dump-uom"        , no_argument      , 0, ','},
+		{"dump-uomdisplay" , no_argument      , 0 ,'.'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -382,6 +445,7 @@ int main(int argc, char **argv)
 	bool dump_uomdisp = false;
 
 	xmlDocPtr dupl = NULL;
+	char *duplfmt = NULL;
 
 	conversions = xmlNewNode(NULL, BAD_CAST "conversions");
 
@@ -394,6 +458,10 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
+			case 'D':
+				if (!duplfmt) {
+					duplfmt = strdup(optarg);
+				}
 			case 'd':
 				if (!dupl) {
 					dupl = read_xml_mem((const char *) dupl_xsl, dupl_xsl_len);
@@ -488,15 +556,15 @@ int main(int argc, char **argv)
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (list) {
-				convert_uoms_list(argv[i], uom, format, uomdisp, dispfmt, dupl, overwrite);
+				convert_uoms_list(argv[i], uom, format, uomdisp, dispfmt, dupl, duplfmt, overwrite);
 			} else {
-				convert_uoms(argv[i], uom, format, uomdisp, dispfmt, dupl, overwrite);
+				convert_uoms(argv[i], uom, format, uomdisp, dispfmt, dupl, duplfmt, overwrite);
 			}
 		}
 	} else if (list) {
-		convert_uoms_list(NULL, uom, format, uomdisp, dispfmt, dupl, overwrite);
+		convert_uoms_list(NULL, uom, format, uomdisp, dispfmt, dupl, duplfmt, overwrite);
 	} else {
-		convert_uoms(NULL, uom, format, uomdisp, dispfmt, dupl, false);
+		convert_uoms(NULL, uom, format, uomdisp, dispfmt, dupl, duplfmt, false);
 	}
 	
 	free(format);
@@ -507,6 +575,7 @@ int main(int argc, char **argv)
 	xmlFreeDoc(uomdisp);
 
 	xmlFreeDoc(dupl);
+	free(duplfmt);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

@@ -6,7 +6,7 @@ s1kd-uom - Convert units of measure in quantity data
 SYNOPSIS
 ========
 
-    s1kd-uom [-dflv,.h?] [-F <fmt>]
+    s1kd-uom [-dflv,.h?] [-D <fmt>] [-F <fmt>]
              [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
              [-s <name>|-S <path> ...] [-U <path>] [-p <fmt> [-P <path>]]
              [<object>...]
@@ -20,6 +20,11 @@ in data modules.
 
 OPTIONS
 =======
+
+-D, --duplicate-format &lt;fmt&gt;  
+Specify a custom format for duplicating quantities (-d). The '%'
+character acts as a placeholder for the duplicate quantity value. The
+default format for -d is equivalent to `-D ' (%)'`.
 
 -d, --duplicate  
 When converting, instead of overwriting the original quantity, include
