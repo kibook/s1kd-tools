@@ -898,7 +898,7 @@ bool is_upf(const char *name)
 /* Interpolate a command string with a file name and execute it. */
 int execfile(const char *execstr, const char *path)
 {
-	int i, j, n, e;
+	int i, j, n, e, c = 0;
 	char *fmtstr, *cmd;
 
 	n = strlen(execstr);
@@ -910,8 +910,11 @@ int execfile(const char *execstr, const char *path)
 			case '{':
 				if (execstr[i+1] && execstr[i+1] == '}') {
 					fmtstr[j++] = '%';
+					fmtstr[j++] = '1';
+					fmtstr[j++] = '$';
 					fmtstr[j++] = 's';
-					i++;
+					++c;
+					++i;
 				}
 				break;
 			case '%':
@@ -926,7 +929,7 @@ int execfile(const char *execstr, const char *path)
 
 	fmtstr[j] = 0;
 
-	n = strlen(fmtstr) + strlen(path);
+	n = strlen(fmtstr) + strlen(path) * c;
 	cmd = malloc(n);
 	snprintf(cmd, n, fmtstr, path);
 	free(fmtstr);

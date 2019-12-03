@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.13.4"
+#define VERSION "1.13.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
