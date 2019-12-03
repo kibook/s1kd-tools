@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.3.0"
+#define VERSION "8.3.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -66,8 +66,8 @@
 /* Info messages */
 #define I_UPDATE_INST INF_PREFIX "Updating instance %s from source %s...\n"
 #define I_CUSTOMIZE INF_PREFIX "Customizing %s...\n"
-#define I_CUSTOMIZE_DIR INF_PREFIX "Customizing %s -> %s...\n"
-#define I_COPY INF_PREFIX "Copying %s -> %s...\n"
+#define I_CUSTOMIZE_DIR INF_PREFIX "Customizing %s -> %s ...\n"
+#define I_COPY INF_PREFIX "Copying %s -> %s ...\n"
 #define I_FIND_CIR INF_PREFIX "Searching for CIRs in \"%s\"...\n"
 #define I_FIND_CIR_FOUND INF_PREFIX "Found CIR %s...\n"
 #define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s\n"
