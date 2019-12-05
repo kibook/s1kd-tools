@@ -389,6 +389,10 @@ instance.
 -6, --clean-annotations  
 Remove unused applicability annotations.
 
+-7, --dry-run  
+Do not actually create or update any instances, only print the file
+names of instances that would be created or updated.
+
 -8, --reapply  
 Automatically reapply the applicability of the source object when
 filtering.

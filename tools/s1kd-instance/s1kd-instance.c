@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.3.1"
+#define VERSION "8.4.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3813,6 +3813,7 @@ static void show_help(void)
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
+	puts("  -7, --dry-run                     Do not write anything, only print names of instances.");
 	puts("  -8, --reapply                     Reapply the source object's applicability.");
 	puts("  -9, --prune                       Simplify by removing only false assertions.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
@@ -3897,6 +3898,7 @@ int main(int argc, char **argv)
 	bool re_applic = false;
 	bool remtrue = true;
 	bool find_cir = false;
+	bool write_files = true;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -3904,7 +3906,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:45689~H:";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:456789~H:";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -3965,6 +3967,7 @@ int main(int argc, char **argv)
 		{"list-properties"   , required_argument, 0, 'H'},
 		{"infoname-variant"  , required_argument, 0, 'V'},
 		{"clean-annotations" , no_argument      , 0, '6'},
+		{"dry-run"           , no_argument      , 0, '7'},
 		{"reapply"           , no_argument      , 0, '8'},
 		{"prune"             , no_argument      , 0, '9'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -4063,7 +4066,8 @@ int main(int argc, char **argv)
 				strncpy(issinfo, optarg, 15);
 				break;
 			case 'O':
-				autoname = true; strncpy(dir, optarg, PATH_MAX - 1);
+				autoname = true;
+				strncpy(dir, optarg, PATH_MAX - 1);
 				use_stdout = false;
 				break;
 			case 'o':
@@ -4174,6 +4178,11 @@ int main(int argc, char **argv)
 			case '6':
 				rem_unused = true;
 				break;
+			case '7':
+				write_files = false;
+				print_fnames = true;
+				force_overwrite = true;
+				break;
 			case '8':
 				re_applic = true;
 				break;
@@ -4243,8 +4252,10 @@ int main(int argc, char **argv)
 	 * exist.
 	 *
 	 * Fail if an existing non-directory file is specified.
+	 *
+	 * Ignore if the -7 option is given and no files will be written.
 	 */
-	if (autoname) {
+	if (autoname && write_files) {
 		if (access(dir, F_OK) == -1) {
 			int err;
 
@@ -4671,10 +4682,12 @@ int main(int argc, char **argv)
 						fprintf(stderr, S_FILE_EXISTS, out);
 					}
 				} else {
-					save_xml_doc(doc, out);
+					if (write_files) {
+						save_xml_doc(doc, out);
 
-					if (lock) {
-						mkreadonly(out);
+						if (lock) {
+							mkreadonly(out);
+						}
 					}
 
 					if (print_fnames) {
@@ -4708,10 +4721,12 @@ int main(int argc, char **argv)
 					fprintf(stderr, S_FILE_EXISTS, out);
 				}
 			} else {
-				copy(src, out);
+				if (write_files) {
+					copy(src, out);
 
-				if (lock) {
-					mkreadonly(out);
+					if (lock) {
+						mkreadonly(out);
+					}
 				}
 
 				if (print_fnames) {

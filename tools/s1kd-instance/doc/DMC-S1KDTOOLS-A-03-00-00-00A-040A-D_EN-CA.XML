@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="044" inWork="02"/>
+        <issueInfo issueNumber="044" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="11" day="29"/>
+        <issueDate year="2019" month="12" day="05"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
         <simplePara>Correct applicable modes of -J option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -7 (--dry-run) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -537,6 +540,12 @@
               <listItemTerm>-6, --clean-annotations</listItemTerm>
               <listItemDefinition>
                 <para>Remove unused applicability annotations.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-7, --dry-run</listItemTerm>
+              <listItemDefinition>
+                <para>Do not actually create or update any instances, only print the file names of instances that would be created or updated.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
