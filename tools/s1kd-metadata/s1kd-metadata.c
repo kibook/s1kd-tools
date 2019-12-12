@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.3.3"
+#define VERSION "3.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1564,6 +1564,52 @@ static int create_second_verification(xmlXPathContextPtr ctx, const char *val)
 	return 0;
 }
 
+static xmlChar *get_remarks(xmlNodePtr node, struct opts *opts)
+{
+	return xmlNodeGetContent(first_xpath_node_local(node, BAD_CAST "simplePara|p"));
+}
+
+static void show_remarks(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *s = get_remarks(node, opts);
+	printf("%s", (char *) s);
+	xmlFree(s);
+}
+
+static int edit_remarks(xmlNodePtr node, const char *val)
+{
+	xmlNodePtr p = first_xpath_node_local(node, BAD_CAST "simplePara|p");
+	return edit_simple_node(p, val);
+}
+
+static int create_remarks(xmlXPathContextPtr ctx, const char *val)
+{
+	xmlNodePtr node, remarks;
+	bool iss30;
+
+	node = first_xpath_node(
+		"("
+		"//dmStatus/*|//status/*|"
+		"//pmStatus/*|//pmstatus/*|"
+		"//commentStatus/*|"
+		"//ddnStatus/*|"
+		"//dmlStatus/*|"
+		"//scormContentPackageStatus/*"
+		")[last()]", ctx);
+
+	if (!node) {
+		return EXIT_INVALID_CREATE;
+	}
+
+	iss30 = xmlStrcmp(node->parent->name, BAD_CAST "status") == 0 || xmlStrcmp(node->parent->name, BAD_CAST "pmstatus") == 0;
+
+	remarks = xmlNewNode(NULL, BAD_CAST "remarks");
+	xmlAddNextSibling(node, remarks);
+	xmlNewTextChild(remarks, NULL, BAD_CAST (iss30 ? "p" : "simplePara"), BAD_CAST val);
+
+	return 0;
+}
+
 static struct metadata metadata[] = {
 	{"act",
 		"//applicCrossRefTableRef/dmRef/dmRefIdent/dmCode",
@@ -1880,6 +1926,13 @@ static struct metadata metadata[] = {
 		edit_receiver_ident,
 		NULL,
 		"Receiving authority"},
+	{"remarks",
+		"//dmStatus/remarks|//status/remarks|//pmStatus/remarks|//pmstatus/remarks|//commentStatus/remarks|//dmlStatus/remarks|//ddnStatus/remarks|//scormContentPackageStatus/remarks|//imfStatus/remarks",
+		get_remarks,
+		show_remarks,
+		edit_remarks,
+		create_remarks,
+		"General remarks"},
 	{"responsiblePartnerCompany",
 		"//responsiblePartnerCompany/enterpriseName|//rpc/@rpcname",
 		NULL,
