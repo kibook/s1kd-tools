@@ -10,10 +10,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="B" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="04"/>
+        <issueInfo issueNumber="000" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="08" day="20"/>
+        <issueDate year="2019" month="12" day="13"/>
         <dmTitle>
           <techName>S1000D tutorial</techName>
         </dmTitle>
@@ -214,11 +214,11 @@
             <title>Standard numbering system</title>
             <para>The standard numbering system identifies the detailed breakdown of the product. The idea derives from ATA100, where common components are given a specific chapter, section, subsection, and subject number across all publications. S1000D generalizes these as the system, subsystem, subsubsystem, and assembly codes. A number of common SNS are provided by the S1000D specification for any project to use, or a project can create its own SNS.</para>
             <para>For example, the bicycle might be broken down as follows:</para>
-            <table>
+            <table frame="topbot" rowsep="0" colsep="0">
               <title>Example SNS</title>
               <tgroup cols="3">
                 <thead>
-                  <row>
+                  <row rowsep="1">
                     <entry>
                       <para>System</para>
                     </entry>
