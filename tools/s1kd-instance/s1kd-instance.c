@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.1"
+#define VERSION "8.4.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -4446,10 +4446,6 @@ int main(int argc, char **argv)
 				}
 			}
 
-			if (re_applic) {
-				load_applic_from_inst(doc);
-			}
-
 			/* Load the ACT to find the CCT and/or PCT. */
 			if (!useract && ((add_deps && !usercct) || (strcmp(product, "") != 0 && !userpct))) {
 				char fname[PATH_MAX];
@@ -4489,6 +4485,10 @@ int main(int argc, char **argv)
 			if (act && !useract) {
 				xmlFreeDoc(act);
 				act = NULL;
+			}
+
+			if (re_applic) {
+				load_applic_from_inst(doc);
 			}
 
 			if (!wholedm || create_instance(doc, applicability, skill_codes, sec_classes)) {
