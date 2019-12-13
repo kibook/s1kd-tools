@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.0"
+#define VERSION "8.4.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -139,7 +139,7 @@ static bool no_issue = false;
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 /* Define a value for a product attribute or condition. */
-static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm)
+static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm, bool allowmulti)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
@@ -168,8 +168,8 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 		xmlSetProp(assert, BAD_CAST "applicPropertyType",  type);
 		xmlSetProp(assert, BAD_CAST "applicPropertyValues", value);
 		++napplics;
-	/* Or, if an assert already exists... */
-	} else {
+	/* Or, if an assert already exists and multi-asserts are allowed... */
+	} else if (allowmulti) {
 		/* Check for duplicate value in a single-assert. */
 		if (xmlHasProp(assert, BAD_CAST "applicPropertyValues")) {
 			xmlChar *first_value;
@@ -202,8 +202,12 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 				xmlNewChild(assert, NULL, BAD_CAST "value", value);
 			}
 		}
+	/* Otherwise, ignore the new assertion. */
+	} else {
+		return;
 	}
 
+	/* Tag asserts that may only be true for individual DMs. */
 	if (perdm) {
 		xmlSetProp(assert, BAD_CAST "perDm", BAD_CAST "true");
 	}
@@ -2137,7 +2141,7 @@ static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char
 			value = xmlGetProp(obj->nodesetval->nodeTab[i],
 				BAD_CAST "applicPropertyValue");
 
-			define_applic(ident, type, value, true);
+			define_applic(ident, type, value, true, true);
 
 			xmlFree(ident);
 			xmlFree(type);
@@ -2242,7 +2246,7 @@ static void read_applic(char *s)
 	type  = strtok(NULL, "=");
 	value = strtok(NULL, "");
 
-	define_applic(BAD_CAST ident, BAD_CAST type, BAD_CAST value, false);
+	define_applic(BAD_CAST ident, BAD_CAST type, BAD_CAST value, false, true);
 }
 
 /* Set the remarks for the object */
@@ -2696,7 +2700,8 @@ static void load_applic_from_inst(xmlDocPtr doc)
 			type  = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType");
 			value = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyValues");
 
-			define_applic(ident, type, value, true);
+			/* allowmulti = false so that user-defined assertions override those in the instance. */
+			define_applic(ident, type, value, true, false);
 
 			xmlFree(ident);
 			xmlFree(type);
