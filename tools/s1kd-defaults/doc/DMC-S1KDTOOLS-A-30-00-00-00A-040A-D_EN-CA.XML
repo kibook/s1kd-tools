@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="30" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="01"/>
+        <issueInfo issueNumber="016" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2019" month="12" day="16"/>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -o (--dir) option.</simplePara>
+        <simplePara>Add -o (--dir), -n (--name) and -v (--value) options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,8 +52,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>] [-o <dir>]
-              [<file>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>]
+              [-n <name> -v <value> ...] [-o <dir>] [<file>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -119,6 +119,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-n, --name &lt;name&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The name of a specific default key to set a value for. The value must be specified after this option with -v. Multiple pairs of -n and -v can be specified to set multiple default values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>-o, --dir &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Initialize or manage configuration files in &lt;dir&gt; instead of the current directory. If &lt;dir&gt; does not exist, it will be created.</para>
@@ -134,6 +140,12 @@
               <listItemTerm>-t, --text</listItemTerm>
               <listItemDefinition>
                 <para>Output using the simple text format. Otherwise, the XML format is used by default.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-v, --value &lt;value&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The new value to set for the default key specified with -n. This option must be specified after -n.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -227,6 +239,12 @@ $ s1kd-defaults -ti</verbatimText>
           <title>Sort entries and output in text format</title>
           <para>
             <verbatimText verbatimStyle="vs24">$ s1kd-defaults -dts custom-defaults.txt</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Set a default value in the current <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-defaults -df -n issue -v 5.0</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

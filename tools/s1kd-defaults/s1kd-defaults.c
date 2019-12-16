@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 #include <libxslt/transform.h>
 
 #ifdef _WIN32
@@ -16,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "2.4.0"
+#define VERSION "2.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -35,7 +37,7 @@ enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
 /* Show the help/usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [-o <dir>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [-n <name> -v <value> ...] [-o <dir>] [<file>...]");
 	puts("");
 	puts("Options:");
 	puts("  -b, --brex <BREX>    Create from a BREX DM.");
@@ -47,9 +49,11 @@ static void show_help(void)
 	puts("  -i, --init           Initialize a new CSDB.");
 	puts("  -J, --dump-brexmap   Dump default .brexmap file.");
 	puts("  -j, --brexmap <map>  Use a custom .brexmap file.");
+	puts("  -n, --name <name>    Default to set a value for with -v.");
 	puts("  -o, --dir <dir>      Use <dir> instead of current directory.");
 	puts("  -s, --sort           Sort entries.");
 	puts("  -t, --text           Output in the simple text format.");
+	puts("  -v, --value <value>  Value for default specified with -n.");
 	puts("  --version  Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -259,6 +263,41 @@ static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const char *x
 	return first;
 }
 
+/* Obtain some defaults values from the user as arguments. */
+static void set_user_defaults(xmlDocPtr doc, xmlNodePtr user_defs)
+{
+	xmlNodePtr root, cur;
+
+	root = xmlDocGetRootElement(doc);
+
+	for (cur = user_defs->children; cur; cur = cur->next) {
+		xmlXPathContextPtr ctx;
+		xmlXPathObjectPtr obj;
+		xmlChar *ident, *value;
+
+		ident = xmlGetProp(cur, BAD_CAST "ident");
+		value = xmlGetProp(cur, BAD_CAST "value");
+
+		ctx = xmlXPathNewContext(doc);
+		xmlXPathSetContextNode(root, ctx);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "ident", xmlXPathNewString(ident));
+
+		obj = xmlXPathEvalExpression(BAD_CAST "default[@ident=$ident]", ctx);
+
+		if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			xmlAddChild(root, xmlCopyNode(cur, 1));
+		} else {
+			xmlSetProp(obj->nodesetval->nodeTab[0], BAD_CAST "value", value);
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+
+		xmlFree(ident);
+		xmlFree(value);
+	}
+}
+
 /* Obtain some defaults values from the environment. */
 static void set_defaults(xmlDocPtr doc)
 {
@@ -333,7 +372,7 @@ static xmlDocPtr new_dmtypes_from_brex(xmlDocPtr brex, xmlDocPtr brexmap)
 }
 
 /* Dump the built-in defaults in the XML format. */
-static void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
+static void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap, xmlNodePtr user_defs)
 {
 	xmlDocPtr doc;
 
@@ -342,6 +381,7 @@ static void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex,
 	} else {
 		doc = read_xml_mem((const char *) defaults_xml, defaults_xml_len);
 		set_defaults(doc);
+		set_user_defaults(doc, user_defs);
 	}
 
 	if (overwrite) {
@@ -354,7 +394,7 @@ static void dump_defaults_xml(const char *fname, bool overwrite, xmlDocPtr brex,
 }
 
 /* Dump the built-in defaults in the simple text format. */
-static void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap)
+static void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex, xmlDocPtr brexmap, xmlNodePtr user_defs)
 {
 	xmlDocPtr doc, res;
 	FILE *f;
@@ -364,6 +404,7 @@ static void dump_defaults_text(const char *fname, bool overwrite, xmlDocPtr brex
 	} else {
 		doc = read_xml_mem((const char *) defaults_xml, defaults_xml_len);
 		set_defaults(doc);
+		set_user_defaults(doc, user_defs);
 	}
 
 	res = transform_doc(doc, xsl_xml_defaults_to_text_xsl, xsl_xml_defaults_to_text_xsl_len);
@@ -412,12 +453,16 @@ static xmlDocPtr simple_text_to_xml(const char *path, enum file f, bool sort, xm
 }
 
 /* Convert an XML defaults/dmtypes file to the simple text version. */
-static void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static void xml_to_text(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap, xmlNodePtr user_defs)
 {
 	xmlDocPtr doc, res = NULL;
 
 	if (!(doc = read_xml_doc(path))) {
 		doc = simple_text_to_xml(path, f, sort, brex, brexmap);
+	}
+
+	if (f == DEFAULTS) {
+		set_user_defaults(doc, user_defs);
 	}
 
 	switch (f) {
@@ -452,11 +497,15 @@ static void xml_to_text(const char *path, enum file f, bool overwrite, bool sort
 }
 
 /* Convert a simple text defaults/dmtypes file to the XML version. */
-static void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static void text_to_xml(const char *path, enum file f, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap, xmlNodePtr user_defs)
 {
 	xmlDocPtr doc;
 
 	doc = simple_text_to_xml(path, f, sort, brex, brexmap);
+
+	if (f == DEFAULTS) {
+		set_user_defaults(doc, user_defs);
+	}
 
 	if (sort) {
 		xmlDocPtr res;
@@ -474,7 +523,7 @@ static void text_to_xml(const char *path, enum file f, bool overwrite, bool sort
 	xmlFreeDoc(doc);
 }
 
-static void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap)
+static void convert_or_dump(enum format fmt, enum file f, const char *fname, bool overwrite, bool sort, xmlDocPtr brex, xmlDocPtr brexmap, xmlNodePtr user_defs)
 {
 	if (f != NONE && (!brex || f == FMTYPES) && access(fname, F_OK) == -1) {
 		fprintf(stderr, S_NO_FILE_ERR, fname);
@@ -483,15 +532,15 @@ static void convert_or_dump(enum format fmt, enum file f, const char *fname, boo
 
 	if (fmt == TEXT) {
 		if (f == NONE) {
-			dump_defaults_text(fname, overwrite, brex, brexmap);
+			dump_defaults_text(fname, overwrite, brex, brexmap, user_defs);
 		} else {
-			xml_to_text(fname, f, overwrite, sort, brex, brexmap);
+			xml_to_text(fname, f, overwrite, sort, brex, brexmap, user_defs);
 		}
 	} else if (fmt == XML) {
 		if (f == NONE) {
-			dump_defaults_xml(fname, overwrite, brex, brexmap);
+			dump_defaults_xml(fname, overwrite, brex, brexmap, user_defs);
 		} else {
-			text_to_xml(fname, f, overwrite, sort, brex, brexmap);
+			text_to_xml(fname, f, overwrite, sort, brex, brexmap, user_defs);
 		}
 	}
 }
@@ -524,8 +573,9 @@ int main(int argc, char **argv)
 	xmlDocPtr brex = NULL;
 	xmlDocPtr brexmap = NULL;
 	char *dir = NULL;
+	xmlNodePtr user_defs, cur = NULL;
 
-	const char *sopts = "b:DdFfiJj:o:sth?";
+	const char *sopts = "b:DdFfiJj:n:o:stv:h?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -535,15 +585,19 @@ int main(int argc, char **argv)
 		{"fmtypes"     , no_argument      , 0, 'F'},
 		{"overwrite"   , no_argument      , 0, 'f'},
 		{"init"        , no_argument      , 0, 'i'},
+		{"name"        , required_argument, 0, 'n'},
 		{"dir"         , required_argument, 0, 'o'},
 		{"dump-brexmap", no_argument      , 0, 'J'},
 		{"brexmap"     , required_argument, 0, 'j'},
 		{"sort"        , no_argument      , 0, 's'},
 		{"text"        , no_argument      , 0, 't'},
+		{"value"       , required_argument, 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
+
+	user_defs = xmlNewNode(NULL, BAD_CAST "defs");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -581,6 +635,10 @@ int main(int argc, char **argv)
 			case 'j':
 				if (!brexmap) brexmap = read_xml_doc(optarg);
 				break;
+			case 'n':
+				cur = xmlNewChild(user_defs, NULL, BAD_CAST "default", NULL);
+				xmlSetProp(cur, BAD_CAST "ident", BAD_CAST optarg);
+				break;
 			case 'o':
 				free(dir);
 				dir = strdup(optarg);
@@ -590,6 +648,11 @@ int main(int argc, char **argv)
 				break;
 			case 't':
 				fmt = TEXT;
+				break;
+			case 'v':
+				if (cur) {
+					xmlSetProp(cur, BAD_CAST "value", BAD_CAST optarg);
+				}
 				break;
 			case 'h':
 			case '?':
@@ -631,7 +694,7 @@ int main(int argc, char **argv)
 	if (initialize) {
 		char sys[256];
 		const char *opt;
-		void (*fn)(const char *, bool, xmlDocPtr, xmlDocPtr);
+		void (*fn)(const char *, bool, xmlDocPtr, xmlDocPtr, xmlNodePtr);
 
 		if (fmt == TEXT) {
 			opt = "-.";
@@ -643,7 +706,7 @@ int main(int argc, char **argv)
 
 
 		if (overwrite || access(DEFAULT_DEFAULTS_FNAME, F_OK) == -1) {
-			fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap);
+			fn(DEFAULT_DEFAULTS_FNAME, true, brex, brexmap, user_defs);
 
 			#ifdef _WIN32
 			SetFileAttributes(DEFAULT_DEFAULTS_FNAME, FILE_ATTRIBUTE_HIDDEN);
@@ -695,16 +758,17 @@ int main(int argc, char **argv)
 		}
 	} else if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
-			convert_or_dump(fmt, f, argv[i], overwrite, sort, brex, brexmap);
+			convert_or_dump(fmt, f, argv[i], overwrite, sort, brex, brexmap, user_defs);
 		}
 	} else {
-		convert_or_dump(fmt, f, fname, overwrite, sort, brex, brexmap);
+		convert_or_dump(fmt, f, fname, overwrite, sort, brex, brexmap, user_defs);
 	}
 
 	free(fname);
 	free(dir);
 	xmlFreeDoc(brex);
 	xmlFreeDoc(brexmap);
+	xmlFreeNode(user_defs);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();

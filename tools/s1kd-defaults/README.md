@@ -7,8 +7,8 @@ tool
 SYNOPSIS
 ========
 
-    s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>] [-o <dir>]
-                  [<file>...]
+    s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>]
+                  [-n <name> -v <value> ...] [-o <dir>] [<file>...]
 
 DESCRIPTION
 ===========
@@ -53,6 +53,11 @@ Dump the default `.brexmap` file to stdout.
 Use a custom `.brexmap` file to map a BREX DM to a `.defaults` or
 `.dmtypes` file.
 
+-n, --name &lt;name&gt;  
+The name of a specific default key to set a value for. The value must be
+specified after this option with -v. Multiple pairs of -n and -v can be
+specified to set multiple default values.
+
 -o, --dir &lt;dir&gt;  
 Initialize or manage configuration files in &lt;dir&gt; instead of the
 current directory. If &lt;dir&gt; does not exist, it will be created.
@@ -63,6 +68,10 @@ Sort the entries alphabetically for either file/output format.
 -t, --text  
 Output using the simple text format. Otherwise, the XML format is used
 by default.
+
+-v, --value &lt;value&gt;  
+The new value to set for the default key specified with -n. This option
+must be specified after -n.
 
 --version  
 Show version information.
@@ -140,3 +149,8 @@ Sort entries and output in text format
 --------------------------------------
 
     $ s1kd-defaults -dts custom-defaults.txt
+
+Set a default value in the current `.defaults` file
+---------------------------------------------------
+
+    $ s1kd-defaults -df -n issue -v 5.0

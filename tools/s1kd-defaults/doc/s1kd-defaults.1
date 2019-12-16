@@ -10,8 +10,8 @@ s1kd\-defaults \- \f[C]\&.defaults\f[], \f[C]\&.dmtypes\f[] and
 .IP
 .nf
 \f[C]
-s1kd\-defaults\ [\-DdFfisth?]\ [\-b\ <BREX>]\ [\-j\ <map>]\ [\-o\ <dir>]
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ [<file>...]
+s1kd\-defaults\ [\-DdFfisth?]\ [\-b\ <BREX>]\ [\-j\ <map>]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-n\ <name>\ \-v\ <value>\ ...]\ [\-o\ <dir>]\ [<file>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -75,6 +75,14 @@ Use a custom \f[C]\&.brexmap\f[] file to map a BREX DM to a
 .RS
 .RE
 .TP
+.B \-n, \-\-name <name>
+The name of a specific default key to set a value for.
+The value must be specified after this option with \-v.
+Multiple pairs of \-n and \-v can be specified to set multiple default
+values.
+.RS
+.RE
+.TP
 .B \-o, \-\-dir <dir>
 Initialize or manage configuration files in <dir> instead of the current
 directory.
@@ -90,6 +98,12 @@ Sort the entries alphabetically for either file/output format.
 .B \-t, \-\-text
 Output using the simple text format.
 Otherwise, the XML format is used by default.
+.RS
+.RE
+.TP
+.B \-v, \-\-value <value>
+The new value to set for the default key specified with \-n.
+This option must be specified after \-n.
 .RS
 .RE
 .TP
@@ -193,6 +207,13 @@ $\ s1kd\-defaults\ \-df
 .nf
 \f[C]
 $\ s1kd\-defaults\ \-dts\ custom\-defaults.txt
+\f[]
+.fi
+.SS Set a default value in the current \f[C]\&.defaults\f[] file
+.IP
+.nf
+\f[C]
+$\ s1kd\-defaults\ \-df\ \-n\ issue\ \-v\ 5.0
 \f[]
 .fi
 .SH AUTHORS
