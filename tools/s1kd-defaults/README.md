@@ -7,7 +7,8 @@ tool
 SYNOPSIS
 ========
 
-    s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>] [<file>...]
+    s1kd-defaults [-DdFfisth?] [-b <BREX>] [-j <map>] [-o <dir>]
+                  [<file>...]
 
 DESCRIPTION
 ===========
@@ -51,6 +52,10 @@ Dump the default `.brexmap` file to stdout.
 -j, --brexmap &lt;map&gt;  
 Use a custom `.brexmap` file to map a BREX DM to a `.defaults` or
 `.dmtypes` file.
+
+-o, --dir &lt;dir&gt;  
+Initialize or manage configuration files in &lt;dir&gt; instead of the
+current directory. If &lt;dir&gt; does not exist, it will be created.
 
 -s, --sort  
 Sort the entries alphabetically for either file/output format.

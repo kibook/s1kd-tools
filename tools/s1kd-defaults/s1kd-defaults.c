@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
+#include <errno.h>
 #include <libxml/tree.h>
 #include <libxslt/transform.h>
 
@@ -15,13 +16,18 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "2.3.0"
+#define VERSION "2.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
-#define EXIT_NO_FILE 2
+
 #define S_DMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_DMTYPES_FNAME " file.\n"
 #define S_FMTYPES_ERR ERR_PREFIX "Could not create " DEFAULT_FMTYPES_FNAME " file.\n"
 #define S_NO_FILE_ERR ERR_PREFIX "Could not open file: %s\n"
+#define S_MKDIR_FAILED ERR_PREFIX "Could not create directory %s: %s\n"
+#define S_CHDIR_FAILED ERR_PREFIX "Could not change to directory %s: %s\n"
+
+#define EXIT_NO_FILE 2
+#define EXIT_OS_ERROR 3
 
 enum format {TEXT, XML};
 enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
@@ -29,7 +35,7 @@ enum file {NONE, DEFAULTS, DMTYPES, FMTYPES};
 /* Show the help/usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-Ddfisth?] [-b <BREX>] [-j <map>] [-o <dir>] [<file>...]");
 	puts("");
 	puts("Options:");
 	puts("  -b, --brex <BREX>    Create from a BREX DM.");
@@ -41,6 +47,7 @@ static void show_help(void)
 	puts("  -i, --init           Initialize a new CSDB.");
 	puts("  -J, --dump-brexmap   Dump default .brexmap file.");
 	puts("  -j, --brexmap <map>  Use a custom .brexmap file.");
+	puts("  -o, --dir <dir>      Use <dir> instead of current directory.");
 	puts("  -s, --sort           Sort entries.");
 	puts("  -t, --text           Output in the simple text format.");
 	puts("  --version  Show version information.");
@@ -516,8 +523,9 @@ int main(int argc, char **argv)
 	bool sort = false;
 	xmlDocPtr brex = NULL;
 	xmlDocPtr brexmap = NULL;
+	char *dir = NULL;
 
-	const char *sopts = "b:DdFfiJj:sth?";
+	const char *sopts = "b:DdFfiJj:o:sth?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -527,6 +535,7 @@ int main(int argc, char **argv)
 		{"fmtypes"     , no_argument      , 0, 'F'},
 		{"overwrite"   , no_argument      , 0, 'f'},
 		{"init"        , no_argument      , 0, 'i'},
+		{"dir"         , required_argument, 0, 'o'},
 		{"dump-brexmap", no_argument      , 0, 'J'},
 		{"brexmap"     , required_argument, 0, 'j'},
 		{"sort"        , no_argument      , 0, 's'},
@@ -572,6 +581,10 @@ int main(int argc, char **argv)
 			case 'j':
 				if (!brexmap) brexmap = read_xml_doc(optarg);
 				break;
+			case 'o':
+				free(dir);
+				dir = strdup(optarg);
+				break;
 			case 's':
 				sort = true;
 				break;
@@ -591,6 +604,28 @@ int main(int argc, char **argv)
 
 	if (!brexmap) {
 		brexmap = read_default_brexmap();
+	}
+
+	if (dir) {
+		if (access(dir, F_OK) == -1) {
+			int err;
+
+			#ifdef _WIN32
+			err = mkdir(dir);
+			#else
+			err = mkdir(dir, S_IRWXU);
+			#endif
+
+			if (err) {
+				fprintf(stderr, S_MKDIR_FAILED, dir, strerror(errno));
+				exit(EXIT_OS_ERROR);
+			}
+		}
+
+		if (chdir(dir) != 0) {
+			fprintf(stderr, S_CHDIR_FAILED, dir, strerror(errno));
+			exit(EXIT_OS_ERROR);
+		}
 	}
 
 	if (initialize) {
@@ -667,6 +702,7 @@ int main(int argc, char **argv)
 	}
 
 	free(fname);
+	free(dir);
 	xmlFreeDoc(brex);
 	xmlFreeDoc(brexmap);
 
