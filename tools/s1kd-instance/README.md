@@ -235,8 +235,9 @@ The ID or primary key of a product in the specified PCT data module
 the PCT data module referenced by the source data module itself. A
 primary key is given in the same form as the -s option and should match
 a unique assign of a product instance, e.g.,
-"`serialno:prodattr=12345`". Multiple keys can be used by specifying
-this option multiple times.
+"`serialno:prodattr=12345`". If the key matches multiple products within
+the PCT, then the objects will be filtered on the combination of all
+matching products.
 
 -Q, --resolve-containers  
 Resolve references to container data modules, selecting the appropriate
