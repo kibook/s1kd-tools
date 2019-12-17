@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.2"
+#define VERSION "8.4.3"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2090,16 +2090,16 @@ static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	char xpath[512];
+	xmlChar *xpath;
 
 	ctx = xmlXPathNewContext(pct);
 
-	/* If the product is in the form of IDENT:TYPE:VALUE, it identifies the
+	/* If the product is in the form of IDENT:TYPE=VALUE, it identifies the
 	 * primary key of a product instance.
 	 *
 	 * Otherwise, it is simply the XML ID of a product instance.
 	 */
-	if (strchr(product, ':')) {
+	if (match_pattern(BAD_CAST product, BAD_CAST "[^:]+:(prodattr|condition)=[^|~]+")) {
 		char *prod, *ident, *type, *value;
 
 		prod  = strdup(product);
@@ -2108,18 +2108,15 @@ static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char
 		type  = strtok(NULL, "=");
 		value = strtok(NULL, "");
 
-		if (!(ident && type && value)) {
-			if (verbosity > QUIET) {
-				fprintf(stderr, S_BAD_ASSIGN, product);
-			}
-			exit(EXIT_BAD_APPLIC);
-		}
-
-		snprintf(xpath, 512, "//product[assign[@applicPropertyIdent='%s' and @applicPropertyType='%s' and @applicPropertyValue='%s']]/assign", ident, type, value);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "ident", xmlXPathNewCString(ident));
+		xmlXPathRegisterVariable(ctx, BAD_CAST "type" , xmlXPathNewCString(type));
+		xmlXPathRegisterVariable(ctx, BAD_CAST "value", xmlXPathNewCString(value));
+		xpath = BAD_CAST "//product[assign[@applicPropertyIdent=$ident and @applicPropertyType=$type and @applicPropertyValue=$value]]/assign";
 
 		free(prod);
 	} else {
-		snprintf(xpath, 512, "//product[@id='%s']/assign", product);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewCString(product));
+		xpath = BAD_CAST "//product[@id=$id]/assign";
 	}
 
 	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
