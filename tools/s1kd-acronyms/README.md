@@ -11,7 +11,7 @@ SYNOPSIS
                   [<dmodule>...]
     s1kd-acronyms [-flv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
                   [<dmodule>...]
-    s1kd-acronyms -D [-flv] [-o <file>] [<dmodule>...]
+    s1kd-acronyms [-D|-P] [-flv] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
 ===========
@@ -72,6 +72,11 @@ Minimum number of spaces after the term in pretty-printed text output.
 
 -o, --out &lt;file&gt;  
 Output to &lt;file&gt; instead of stdout.
+
+-P, --preformat  
+Remove acronym markup by preformatting it. The element `<acronym>` is
+flattened to the definition, followed by the term in brackets \[()\].
+The element `<acronymTerm>` is flattened to the term.
 
 -p, --pretty  
 Pretty print text/XML acronym list output.

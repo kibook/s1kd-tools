@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.9.3"
+#define VERSION "1.10.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -35,6 +35,8 @@ static xmlChar *acro_markup_xpath = NULL;
 #define I_FIND INF_PREFIX "Searching for acronyms in %s...\n"
 #define I_MARKUP INF_PREFIX "Marking up acronyms in %s...\n"
 #define I_DELETE INF_PREFIX "Deleting acronym markup in %s...\n"
+#define I_PREFORMAT INF_PREFIX "Preformatting acronyms in %s...\n"
+
 #define EXIT_NO_LIST 1
 
 static bool prettyPrint = false;
@@ -648,13 +650,62 @@ static void deleteAcronymsInList(const char *fname, const char *out, bool overwr
 	fclose(f);
 }
 
+static void preformatAcronyms(xmlDocPtr doc)
+{
+	transformDoc(doc, stylesheets_prefmt_xsl, stylesheets_prefmt_xsl_len);
+}
+
+static void preformatAcronymsInFile(const char *fname, const char *out)
+{
+	xmlDocPtr doc;
+
+	if (verbose) {
+		fprintf(stderr, I_PREFORMAT, fname);
+	}
+
+	doc = read_xml_doc(fname);
+
+	preformatAcronyms(doc);
+
+	save_xml_doc(doc, out);
+
+	xmlFreeDoc(doc);
+}
+
+static void preformatAcronymsInList(const char *fname, const char *out, bool overwrite)
+{
+	FILE *f;
+	char line[PATH_MAX];
+
+	if (fname) {
+		if (!(f = fopen(fname, "r"))) {
+			fprintf(stderr, E_BAD_LIST, fname);
+			return;
+		}
+	} else {
+		f = stdin;
+	}
+
+	while (fgets(line, PATH_MAX, f)) {
+		strtok(line, "\t\r\n");
+
+		if (overwrite) {
+			preformatAcronymsInFile(line, line);
+		} else {
+			preformatAcronymsInFile(line, out);
+		}
+	}
+
+	fclose(f);
+}
+
 static void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " [-dlptvx] [-n <#>] [-o <file>] [-T <types>] [<dmodule>...]");
 	puts("  " PROG_NAME " [-flv] [-i|-I|-!] [-m|-M <list>] [-o <file>] [-X <xpath>] [<dmodule>...]");
-	puts("  " PROG_NAME " -D [-flv] [-o <file>] [<dmodule>...]");
+	puts("  " PROG_NAME " [-D|-P] [-flv] [-o <file>] [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -D, --delete               Remove acronym markup.");
@@ -668,6 +719,7 @@ static void show_help(void)
 	puts("  -m, --markup               Markup acronyms from .acronyms file.");
 	puts("  -n, --width <#>            Minimum spaces after term in pretty printed output.");
 	puts("  -o, --out <file>           Output to <file> instead of stdout.");
+	puts("  -P, --preformat            Remove acronym markup by preformatting it.");
 	puts("  -p, --pretty               Pretty print text/XML output.");
 	puts("  -T, --types <types>        Only search for acronyms of these types.");
 	puts("  -t, --table                Format XML output as table.");
@@ -701,11 +753,13 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool list = false;
 	bool delete = false;
+	bool preformat = false;
 
-	const char *sopts = "pn:xDdtT:o:M:miIfl!X:vh?";
+	const char *sopts = "Ppn:xDdtT:o:M:miIfl!X:vh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
+		{"preformat"    , no_argument      , 0, 'P'},
 		{"pretty"       , no_argument      , 0, 'p'},
 		{"width"        , required_argument, 0, 'n'},
 		{"xml"          , no_argument      , 0, 'x'},
@@ -740,6 +794,9 @@ int main(int argc, char **argv)
 					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				break;
+			case 'P':
+				preformat = true;
 				break;
 			case 'p':
 				prettyPrint = true;
@@ -811,7 +868,25 @@ int main(int argc, char **argv)
 		acro_markup_xpath = xmlStrdup(ACRO_MARKUP_XPATH);
 	}
 
-	if (delete) {
+	if (preformat) {
+		if (optind >= argc) {
+			if (list) {
+				preformatAcronymsInList(NULL, out, overwrite);
+			} else {
+				preformatAcronymsInFile("-", out);
+			}
+		}
+
+		for (i = optind; i < argc; ++i) {
+			if (list) {
+				preformatAcronymsInList(argv[i], out, overwrite);
+			} else if (overwrite) {
+				preformatAcronymsInFile(argv[i], argv[i]);
+			} else {
+				preformatAcronymsInFile(argv[i], out);
+			}
+		}
+	} else if (delete) {
 		if (optind >= argc) {
 			if (list) {
 				deleteAcronymsInList(NULL, out, overwrite);
