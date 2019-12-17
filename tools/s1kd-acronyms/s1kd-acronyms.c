@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.9.2"
+#define VERSION "1.9.3"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -24,8 +24,8 @@ static xmlChar *acro_markup_xpath = NULL;
 
 /* Characters that must occur before/after a set of characters in order for the
  * set to be considered a valid acronym. */
-#define PRE_ACRONYM_DELIM BAD_CAST " (/\n"
-#define POST_ACRONYM_DELIM BAD_CAST " .,)/\n"
+#define PRE_ACRONYM_DELIM BAD_CAST " (/\"'\n"
+#define POST_ACRONYM_DELIM BAD_CAST " .,)/?!:\"'\n"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
