@@ -995,6 +995,62 @@ used to update these instances automatically:
 
     $ s1kd-instance -@ -f DME-*.XML
 
+Reapplying source applicability (-8)
+------------------------------------
+
+Normally, filtering is based only on the assertions specified by the
+user with the -s or -p options. However, in some cases it may be
+desirable to take the applicability of the source object itself in to
+account, particularly when inline applicability annotations contain
+redundant assertions. For example:
+
+    ...
+    <dmStatus ...>
+    ...
+    <applic>
+    <displayText>
+    <simplePara>Version: A</simplePara>
+    </displayText>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    ...
+    </dmStatus>
+    ...
+    <referencedApplicGroup>
+    <applic id="app-0001">
+    <displayText>
+    <simplePara>Version: A and Weather: Icy</simplePara>
+    </displayText>
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="weather"
+    applicPropertyType="condition"
+    applicPropertyValues="Icy"/>
+    </evaluate>
+    </applic>
+    ...
+    <para applicRefId="app-0001">
+    Applies to version A when the weather is icy.
+    </para>
+
+If this data module is filtered with `-a -s weather:condition=Icy`, the
+annotation shown will not be removed, because the tool cannot fully
+resolve it, as it is only has a value for the weather condition.
+
+The -8 (--reapply) option will reapply the applicability of each
+individual object when filtering it. In the example above, the whole
+data module is applicable to version A, and therefore, when the -8
+option is specified, this is added to the user-defined assertions
+automatically for the given data module. Now the annotation is fully
+resolved, and can be removed in accordance with the -a option.
+
 EXIT STATUS
 ===========
 
