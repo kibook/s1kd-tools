@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.4.0"
+#define VERSION "3.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -2540,7 +2540,6 @@ static int show_icn_metadata(const char *bname, const char *key, struct opts *op
 	for (i = 0; icn_metadata[i].key; ++i) {
 		if (strcmp(key, icn_metadata[i].key) == 0) {
 			icn_metadata[i].show(bname, opts);
-			if (opts->endl > -1) putchar(opts->endl);
 			return EXIT_SUCCESS;
 		}
 	}
@@ -2568,6 +2567,7 @@ static int show_all_icn_metadata(const char *fname, struct opts *opts)
 		}
 
 		icn_metadata[i].show(fname, opts);
+		if (opts->endl > -1) putchar(opts->endl);
 	}
 
 	return 0;
