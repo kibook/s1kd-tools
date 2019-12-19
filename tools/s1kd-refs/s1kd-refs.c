@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.4.2"
+#define VERSION "4.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -96,7 +96,7 @@ static long unsigned maxListedFiles = 1;
 #define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML | SHOW_SMC
 
 /* All objects relevant to -w mode. */
-#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML | SHOW_SMC
+#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML | SHOW_SMC | SHOW_ICN
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
@@ -1600,6 +1600,8 @@ static void addHotspotNs(char *s)
 	xmlSetProp(node, BAD_CAST "uri", BAD_CAST uri);
 }
 
+/* Determine if an object is a type that may contain references to other
+ * objects. */
 static bool isUsedTarget(const char *name, int show)
 {
 	return
@@ -1610,6 +1612,7 @@ static bool isUsedTarget(const char *name, int show)
 		(optset(show, SHOW_SMC) && is_smc(name));
 }
 
+/* Search objects in a given directory for references to a target object. */
 static int findWhereUsed(const char *dpath, const char *ref, int show)
 {
 	DIR *dir;
@@ -1646,11 +1649,11 @@ static int findWhereUsed(const char *dpath, const char *ref, int show)
 	return unmatched;
 }
 
+/* List objects that reference a target object. */
 static int listWhereUsed(const char *path, int show)
 {
-	xmlDocPtr doc, tmp;
-	xmlNodePtr ident, node;
 	char code[PATH_MAX] = "";
+	xmlDocPtr doc;
 
 	/* In recursive mode, keep a record of which objects have been listed
 	 * to avoid infinite loops. */
@@ -1662,41 +1665,52 @@ static int listWhereUsed(const char *path, int show)
 		addFile(path);
 	}
 
-	if (!(doc = read_xml_doc(path))) {
-		return 1;
+	/* If the target object is an ICN, get the ICN from the file name. */
+	if (is_icn(path)) {
+		strcpy(code, path);
+		strtok(code, ".");
+	/* If the target object is an XML file, read the object and get the
+	 * appropriate code from the IDSTATUS section. */
+	} else if ((doc = read_xml_doc(path))) {
+		xmlDocPtr tmp;
+		xmlNodePtr ident, node;
+
+		ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent|//scormContentPackageIdent");
+		node  = xmlNewNode(NULL, BAD_CAST "ref");
+		ident = xmlAddChild(node, xmlCopyNode(ident, 1));
+		tmp   = xmlNewDoc(BAD_CAST "1.0");
+		xmlDocSetRootElement(tmp, node);
+
+		if (xmlStrcmp(ident->name, BAD_CAST "commentIdent") == 0) {
+			xmlNodeSetName(ident, BAD_CAST "commentRefIdent");
+			xmlNodeSetName(ident, BAD_CAST "commentRef");
+			getComCode(code, node);
+		} else if (xmlStrcmp(ident->name, BAD_CAST "dmIdent") == 0) {
+			xmlNodeSetName(ident, BAD_CAST "dmRefIdent");
+			xmlNodeSetName(node , BAD_CAST "dmRef");
+			getDmCode(code, node);
+		} else if (xmlStrcmp(ident->name, BAD_CAST "dmlIdent") == 0) {
+			xmlNodeSetName(ident, BAD_CAST "dmlRefIdent");
+			xmlNodeSetName(node , BAD_CAST "dmlRef");
+			getDmlCode(code, node);
+		} else if (xmlStrcmp(ident->name, BAD_CAST "pmIdent") == 0) {
+			xmlNodeSetName(ident, BAD_CAST "pmRefIdent");
+			xmlNodeSetName(node , BAD_CAST "pmRef");
+			getPmCode(code, node);
+		} else if (xmlStrcmp(ident->name, BAD_CAST "scormContentPackageIdent") == 0) {
+			xmlNodeSetName(ident, BAD_CAST "scormContentPackageRefIdent");
+			xmlNodeSetName(node , BAD_CAST "scormContentPackageRef");
+			getSmcCode(code, node);
+		}
+
+		xmlFreeDoc(tmp);
+		xmlFreeDoc(doc);
+	/* Otherwise, interpret the path as a literal code. */
+	} else {
+		strcpy(code, path);
 	}
 
-	ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent|//scormContentPackageIdent");
-	node  = xmlNewNode(NULL, BAD_CAST "ref");
-	ident = xmlAddChild(node, xmlCopyNode(ident, 1));
-	tmp   = xmlNewDoc(BAD_CAST "1.0");
-	xmlDocSetRootElement(tmp, node);
-
-	if (xmlStrcmp(ident->name, BAD_CAST "commentIdent") == 0) {
-		xmlNodeSetName(ident, BAD_CAST "commentRefIdent");
-		xmlNodeSetName(ident, BAD_CAST "commentRef");
-		getComCode(code, node);
-	} else if (xmlStrcmp(ident->name, BAD_CAST "dmIdent") == 0) {
-		xmlNodeSetName(ident, BAD_CAST "dmRefIdent");
-		xmlNodeSetName(node , BAD_CAST "dmRef");
-		getDmCode(code, node);
-	} else if (xmlStrcmp(ident->name, BAD_CAST "dmlIdent") == 0) {
-		xmlNodeSetName(ident, BAD_CAST "dmlRefIdent");
-		xmlNodeSetName(node , BAD_CAST "dmlRef");
-		getDmlCode(code, node);
-	} else if (xmlStrcmp(ident->name, BAD_CAST "pmIdent") == 0) {
-		xmlNodeSetName(ident, BAD_CAST "pmRefIdent");
-		xmlNodeSetName(node , BAD_CAST "pmRef");
-		getPmCode(code, node);
-	} else if (xmlStrcmp(ident->name, BAD_CAST "scormContentPackageIdent") == 0) {
-		xmlNodeSetName(ident, BAD_CAST "scormContentPackageRefIdent");
-		xmlNodeSetName(node , BAD_CAST "scormContentPackageRef");
-		getSmcCode(code, node);
-	}
-
-	xmlFreeDoc(tmp);
-	xmlFreeDoc(doc);
-
+	/* If no code could be determined, give up. */
 	if (strcmp(code, "") == 0) {
 		return 1;
 	}
@@ -1704,6 +1718,7 @@ static int listWhereUsed(const char *path, int show)
 	return findWhereUsed(directory, code, show);
 }
 
+/* List objects that reference any of a list of target objects. */
 static int listWhereUsedList(const char *path, int show)
 {
 	FILE *f;
@@ -1971,6 +1986,7 @@ int main(int argc, char **argv)
 			case 'w':
 				findUsed = true;
 				printMatchedFn = printMatchedWhereUsed;
+				printUnmatchedFn = printUnmatchedSrc;
 				break;
 			case 'h':
 			case '?':

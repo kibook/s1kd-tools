@@ -152,6 +152,10 @@ Verbose output.
 Instead of listing references contained within specified objects, list
 places within other objects where the specified objects are referenced.
 
+In this case, &lt;object&gt; may also be a code (with the appropriate
+prefix) instead of an actual file. For example:
+`s1kd-refs -w DMC-TEST-A-00-00-00-00A-040A-D`
+
 -X, --tag-unmatched  
 Tag unmatched references with the processing instruction
 `<?unmatched?>`.

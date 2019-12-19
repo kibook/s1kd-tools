@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="12" day="13"/>
+        <issueDate year="2019" month="12" day="19"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -w (--where-used), -L (--dml), -S (--smc) and -t (--format) options.</simplePara>
+        <simplePara>Expand -w (--where-used) functionality.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?] [-d <dir>] [-e <cmd>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?] [-d <dir>] [-e <cmd>]
           [-J <ns=URL>] [-j <xpath>] [-t <fmt>] [-3 <file>]
           [<object>...]]]></verbatimText>
         </para>
@@ -85,7 +85,7 @@
                 <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-C, -D, -E, -G, -H, -L, -P, -S, -T</listItemTerm>
               <listItemDefinition>
                 <para>List references to comments, data modules, external publications, ICNs, hotspots, data management lists, publication modules, SCORM content packages and referred fragments respectively. If none are specified, -CDEGHLPST is assumed.</para>
@@ -207,7 +207,7 @@
                 <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-t, --format &lt;fmt&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a custom format for printed references. &lt;fmt&gt; is a format string, where the following variables can be given:</para>
@@ -248,10 +248,11 @@
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-w, --where-used</listItemTerm>
               <listItemDefinition>
                 <para>Instead of listing references contained within specified objects, list places within other objects where the specified objects are referenced.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">In this case, &lt;object&gt; may also be a code (with the appropriate prefix) instead of an actual file. For example: <verbatimText>s1kd-refs -w DMC-TEST-A-00-00-00-00A-040A-D</verbatimText></para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
