@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -29,15 +29,15 @@
 #define I_DELETE INF_PREFIX "Deleting index flags from %s...\n"
 #define EXIT_NO_LIST 1
 
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 /* Help/usage message */
 static void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-I <index>] [-filv] [<module>...]");
-	puts("  " PROG_NAME " -D [-filv] [<module>...]");
+	puts("  " PROG_NAME " [-I <index>] [-filqv] [<module>...]");
+	puts("  " PROG_NAME " -D [-filqv] [<module>...]");
 	puts("");
 	puts("Options:");
 	puts("  -D, --delete              Delete current index flags.");
@@ -46,6 +46,7 @@ static void show_help(void)
 	puts("  -I, --indexflags <index>  Specify a custom .indexflags file");
 	puts("  -i, --ignore-case         Ignore case when flagging terms.");
 	puts("  -l, --list                Input is a list of file names.");
+	puts("  -q, --quiet               Quiet mode.");
 	puts("  -v, --verbose             Verbose output.");
 	puts("  --version                 Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -195,7 +196,7 @@ static void delete_index_flags(const char *path, bool overwrite)
 {
 	xmlDocPtr doc;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_DELETE, path);
 	}
 
@@ -218,12 +219,14 @@ static void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, boo
 	xmlXPathObjectPtr index_obj;
 	xmlNodeSetPtr flags;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_MARKUP, path);
 	}
 
 	if (!(doc = read_xml_doc(path))) {
-		fprintf(stderr, E_NO_FILE, path);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_NO_FILE, path);
+		}
 		return;
 	}
 
@@ -259,7 +262,9 @@ static xmlDocPtr read_index_flags(const char *fname)
 	xmlDocPtr index_doc;
 
 	if (!(index_doc = read_xml_doc(fname))) {
-		fprintf(stderr, E_NO_LIST, fname);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_NO_LIST, fname);
+		}
 		exit(EXIT_NO_LIST);
 	}
 
@@ -278,7 +283,9 @@ static void handle_list(const char *path, bool delflags, xmlDocPtr index_doc, bo
 	}
 
 	if (!f) {
-		fprintf(stderr, E_BAD_LIST, path);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_BAD_LIST, path);
+		}
 		return;
 	}
 
@@ -305,7 +312,7 @@ int main(int argc, char **argv)
 
 	xmlDocPtr index_doc = NULL;
 
-	const char *sopts = "DfI:livh?";
+	const char *sopts = "DfI:liqvh?";
 	struct option lopts[] = {
 		{"version"    , no_argument      , 0, 0},
 		{"help"       , no_argument      , 0, 'h'},
@@ -314,6 +321,7 @@ int main(int argc, char **argv)
 		{"indexflags" , required_argument, 0, 'I'},
 		{"ignore-case", no_argument      , 0, 'i'},
 		{"list"       , no_argument      , 0, 'l'},
+		{"quiet"      , no_argument      , 0, 'q'},
 		{"verbose"    , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -346,8 +354,11 @@ int main(int argc, char **argv)
 			case 'l':
 				list = true;
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'h':
 			case '?':

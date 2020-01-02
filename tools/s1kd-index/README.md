@@ -7,8 +7,8 @@ SYNOPSIS
 ========
 
     s1kd-index -h?
-    s1kd-index [-I <index>] [-filv] [<module>...]
-    s1kd-index -D [-filv] [<module>...]
+    s1kd-index [-I <index>] [-filqv] [<module>...]
+    s1kd-index -D [-filqv] [<module>...]
 
 DESCRIPTION
 ===========
@@ -38,6 +38,9 @@ Ignore case when flagging terms.
 -l, --list  
 Treat input (stdin or arguments) as lists of filenames of data modules
 to add index flags to, rather than data modules themselves.
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -v, --verbose  
 Verbose output.
