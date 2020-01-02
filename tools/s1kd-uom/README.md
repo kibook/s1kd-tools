@@ -6,7 +6,7 @@ s1kd-uom - Convert units of measure in quantity data
 SYNOPSIS
 ========
 
-    s1kd-uom [-dflv,.h?] [-D <fmt>] [-F <fmt>]
+    s1kd-uom [-dflqv,.h?] [-D <fmt>] [-F <fmt>]
              [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
              [-s <name>|-S <path> ...] [-U <path>] [-p <fmt> [-P <path>]]
              [<object>...]
@@ -63,6 +63,9 @@ formats are:
 -   euro - comma for decimal separator, full-stop for grouping
 
 -   imperial - full-stop for decimal separator, comma for grouping
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -S, --set &lt;path&gt;  
 Apply a set of conversions defined in an XML file.

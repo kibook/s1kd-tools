@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.16.0"
+#define VERSION "1.17.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -24,12 +24,12 @@
 #define EXIT_NO_CONV 1
 #define EXIT_NO_UOM 2
 
-static bool verbose = false;
+enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dflv,.h?] [-D <fmt>] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-s <name>|-S <path> ...] [-U <path>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-dflqv,.h?] [-D <fmt>] [-F <fmt>] [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...] [-p <fmt> [-P <path>]] [-s <name>|-S <path> ...] [-U <path>] [<object>...]");
 	puts("");
 	puts("  -D, --duplicate-format <fmt>  Custom format for duplicate quantities (-d).");
 	puts("  -d, --duplicate               Include conversions as duplicate quantities in parenthesis.");
@@ -40,6 +40,7 @@ static void show_help(void)
 	puts("  -l, --list                    Treat input as list of CSDB objects.");
 	puts("  -P, --uomdisplay <path>       Use custom UOM display file.");
 	puts("  -p, --preformat <fmt>         Preformat quantity data.");
+	puts("  -q, --quiet                   Quiet mode.");
 	puts("  -S, --set <path>              Apply a custom set of conversions.");
 	puts("  -s, --preset <name>           Apply a predefined set of conversions.");
 	puts("  -t, --to <uom>                UOM to convert to.");
@@ -148,7 +149,7 @@ static void select_uoms(xmlNodePtr uom, xmlNodePtr conversions)
 
 		if (xmlHasProp(cur, BAD_CAST "formula")) {
 			xmlAddChild(uom, xmlCopyNode(cur, 1));
-		} else {
+		} else if (verbosity >= NORMAL) {
 			xmlChar *from, *to;
 
 			from = xmlGetProp(cur, BAD_CAST "from");
@@ -253,7 +254,7 @@ static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xm
 	int i = 0;
 	char *s;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_CONVERT, path ? path : "-");
 	}
 
@@ -340,7 +341,9 @@ static void convert_uoms_list(const char *path, xmlDocPtr uom, const char *forma
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, W_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, W_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -379,7 +382,9 @@ static void load_presets(xmlNodePtr convs, const char *preset, bool file)
 			xml = presets_US_xml;
 			len = presets_US_xml_len;
 		} else {
-			fprintf(stderr, W_NO_PRESET, preset);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, W_NO_PRESET, preset);
+			}
 			return;
 		}
 
@@ -387,7 +392,9 @@ static void load_presets(xmlNodePtr convs, const char *preset, bool file)
 	}
 
 	if (!doc) {
-		fprintf(stderr, W_BAD_PRESET, preset);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, W_BAD_PRESET, preset);
+		}
 		return;
 	}
 
@@ -404,7 +411,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "D:de:F:flP:p:S:s:t:U:u:v,.h?";
+	const char *sopts = "D:de:F:flP:p:qS:s:t:U:u:v,.h?";
 	struct option lopts[] = {
 		{"version"         , no_argument      , 0, 0},
 		{"help"            , no_argument      , 0, 'h'},
@@ -416,6 +423,7 @@ int main(int argc, char **argv)
 		{"list"            , no_argument      , 0, 'l'},
 		{"uomdisplay"      , required_argument, 0, 'P'},
 		{"preformat"       , required_argument, 0, 'p'},
+		{"quiet"           , no_argument      , 0, 'q'},
 		{"to"              , required_argument, 0, 't'},
 		{"uom"             , required_argument, 0, 'U'},
 		{"from"            , required_argument, 0, 'u'},
@@ -469,7 +477,9 @@ int main(int argc, char **argv)
 				break;
 			case 'e':
 				if (!cur) {
-					fprintf(stderr, E_NO_UOM, "-e");
+					if (verbosity >= NORMAL) {
+						fprintf(stderr, E_NO_UOM, "-e");
+					}
 					exit(EXIT_NO_UOM);
 				}
 				xmlSetProp(cur, BAD_CAST "formula", BAD_CAST optarg);
@@ -493,9 +503,14 @@ int main(int argc, char **argv)
 			case 'p':
 				dispfmt = strdup(optarg);
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 't':
 				if (!cur) {
-					fprintf(stderr, E_NO_UOM, "-t");
+					if (verbosity >= NORMAL) {
+						fprintf(stderr, E_NO_UOM, "-t");
+					}
 					exit(EXIT_NO_UOM);
 				}
 				xmlSetProp(cur, BAD_CAST "to", BAD_CAST optarg);
@@ -514,7 +529,7 @@ int main(int argc, char **argv)
 				load_presets(conversions, optarg, false);
 				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case ',':
 				dump_uom = true;
