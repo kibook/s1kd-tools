@@ -20,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.1.3"
+#define VERSION "3.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -55,7 +55,7 @@ static char *search_dir;
 static bool overwriteDispText = true;
 
 /* Verbose output. */
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 /* Assume objects were created with -N. */
 static bool no_issue = false;
@@ -511,7 +511,9 @@ static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent)
 		return true;
 	}
 
-	fprintf(stderr, W_MISSING_REF, code);
+	if (verbosity >= NORMAL) {
+		fprintf(stderr, W_MISSING_REF, code);
+	}
 	return false;
 }
 
@@ -554,7 +556,7 @@ static void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr cct
 	}
 }
 
-static void processFile(const char *in, const char *out, bool xincl, bool process,
+static void processFile(const char *in, const char *out, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
 	const char *format)
 {
@@ -563,7 +565,7 @@ static void processFile(const char *in, const char *out, bool xincl, bool proces
 	xmlXPathObjectPtr obj;
 	xmlNodePtr all_acts, all_ccts;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_PROCESS, in);
 	}
 
@@ -607,7 +609,7 @@ static void processFile(const char *in, const char *out, bool xincl, bool proces
 	xmlFreeDoc(doc);
 }
 
-static void process_list(const char *path, bool overwrite, bool xincl, bool process,
+static void process_list(const char *path, bool overwrite, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
 	const char *format)
 {
@@ -616,7 +618,9 @@ static void process_list(const char *path, bool overwrite, bool xincl, bool proc
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -625,7 +629,7 @@ static void process_list(const char *path, bool overwrite, bool xincl, bool proc
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		processFile(line, overwrite ? line : "-", xincl, process, genDispText, acts, ccts, findcts, format);
+		processFile(line, overwrite ? line : "-", process, genDispText, acts, ccts, findcts, format);
 	}
 
 	if (path) {
@@ -638,8 +642,8 @@ static void show_help(void)
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
 	puts("  " PROG_NAME " -D");
-	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>] [-cfklrvx] [<object>...]");
-	puts("  " PROG_NAME " -p [-a <ID>] [-flvx] [<object>...]");
+	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>] [-cfklNqrv] [<object>...]");
+	puts("  " PROG_NAME " -p [-a <ID>] [-flqv] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -A, --act <ACT>       Use <ACT> when generating display text.");
@@ -654,7 +658,9 @@ static void show_help(void)
 	puts("  -g, --generate        Generate display text for applicability annotations.");
 	puts("  -k, --keep            Do not overwrite existing display text.");
 	puts("  -l, --list            Treat input as list of modules.");
+	puts("  -N, --omit-issue      Assume issue/inwork number are omitted.");
 	puts("  -p, --presentation    Convert semantic applicability to presentation applicability.");
+	puts("  -q, --quiet           Quiet mode.");
 	puts("  -r, --recursive       Search for ACT/CCT recursively.");
 	puts("  -v, --verbose         Verbose output.");
 	puts("  -h, -?, --help        Show help/usage message.");
@@ -674,7 +680,6 @@ int main(int argc, char **argv)
 {
 	int i;
 	bool overwrite = false;
-	bool xincl = false;
 	bool genDispText = false;
 	bool process = false;
 	bool findcts = false;
@@ -683,7 +688,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:F:fG:gklNprvxh?";
+	const char *sopts = "A:a:C:cDd:F:fG:gklNpqrvxh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -701,6 +706,7 @@ int main(int argc, char **argv)
 		{"list"        , no_argument      , 0, 'l'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
 		{"presentation", no_argument      , 0, 'p'},
+		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursive"   , no_argument      , 0, 'r'},
 		{"verbose"     , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -776,14 +782,14 @@ int main(int argc, char **argv)
 			case 'p':
 				process = true;
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 'r':
 				recursive_search = true;
 				break;
 			case 'v':
-				verbose = true;
-				break;
-			case 'x':
-				xincl = true;
+				++verbosity;
 				break;
 			case 'h':
 			case '?':
@@ -794,18 +800,18 @@ int main(int argc, char **argv)
 
 	if (optind >= argc) {
 		if (islist) {
-			process_list(NULL, overwrite, xincl, process, genDispText, acts, ccts, findcts, format);
+			process_list(NULL, overwrite, process, genDispText, acts, ccts, findcts, format);
 		} else {
-			processFile("-", "-", xincl, process, genDispText, acts, ccts, findcts, format);
+			processFile("-", "-", process, genDispText, acts, ccts, findcts, format);
 		}
 	} else {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				process_list(argv[i], overwrite, xincl, process,
+				process_list(argv[i], overwrite, process,
 					genDispText, acts, ccts, findcts, format);
 			} else {
 				processFile(argv[i], overwrite ? argv[i] : "-",
-					xincl, process, genDispText, acts,
+					process, genDispText, acts,
 					ccts, findcts, format);
 			}
 		}

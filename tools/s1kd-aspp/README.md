@@ -9,8 +9,8 @@ SYNOPSIS
     s1kd-aspp -h?
     s1kd-aspp -D
     s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
-                 [-cfklNrv] [<object>...]
-    s1kd-aspp -p [-a <ID>] [-flv] [<object>...]
+                 [-cfklNqrv] [<object>...]
+    s1kd-aspp -p [-a <ID>] [-flqv] [<object>...]
 
 DESCRIPTION
 ===========
