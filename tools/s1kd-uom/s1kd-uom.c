@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.17.0"
+#define VERSION "1.17.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -24,7 +24,7 @@
 #define EXIT_NO_CONV 1
 #define EXIT_NO_UOM 2
 
-enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 /* Show usage message. */
 static void show_help(void)
