@@ -7,11 +7,11 @@ SYNOPSIS
 ========
 
     s1kd-acronyms -h?
-    s1kd-acronyms [-dlptvx] [-n <#>] [-o <file>] [-T <types>]
+    s1kd-acronyms [-dlpqtvx] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
-    s1kd-acronyms [-flv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
+    s1kd-acronyms [-flqv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
                   [<dmodule>...]
-    s1kd-acronyms [-D|-P] [-flv] [-o <file>] [<dmodule>...]
+    s1kd-acronyms [-D|-P] [-flqv] [-o <file>] [<dmodule>...]
 
 DESCRIPTION
 ===========
@@ -80,6 +80,9 @@ The element `<acronymTerm>` is flattened to the term.
 
 -p, --pretty  
 Pretty print text/XML acronym list output.
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -T, --types &lt;types&gt;  
 Only search for acronyms with an attribute `acronymType` whose value is
