@@ -6,7 +6,7 @@ s1kd-syncrefs - Synchronize references in a data module
 SYNOPSIS
 ========
 
-    s1kd-syncrefs [-dflvh?] [-o <out>] [<data module>...]
+    s1kd-syncrefs [-dflqvh?] [-o <out>] [<data module>...]
 
 DESCRIPTION
 ===========
@@ -35,6 +35,9 @@ references in, rather than data modules themselves.
 
 -o, --out &lt;out&gt;  
 The resulting XML is written to &lt;out&gt; instead of stdout.
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -v, --verbose  
 Verbose output.

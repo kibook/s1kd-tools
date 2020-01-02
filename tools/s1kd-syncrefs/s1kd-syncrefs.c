@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.6.2"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -35,7 +35,7 @@ struct ref {
 };
 
 static bool only_delete = false;
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 static struct ref *refs;
 static int nrefs;
@@ -217,7 +217,9 @@ static void copy_code(char *dst, xmlNodePtr ref)
 static void resize(void)
 {
 	if (!(refs = realloc(refs, (MAX_REFS *= 2) * sizeof(struct ref)))) {
-		fprintf(stderr, E_MAX_REFS, nrefs);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_MAX_REFS, nrefs);
+		}
 		exit(EXIT_MAX_REFS);
 	}
 }
@@ -280,7 +282,9 @@ static void sync_refs(xmlNodePtr dmodule)
 	searchable = xmlLastElementChild(content);
 
 	if (!searchable) {
-		fprintf(stderr, ERR_PREFIX "Invalid data module.\n");
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, ERR_PREFIX "Invalid data module.\n");
+		}
 		exit(EXIT_INVALID_DM);
 	}
 
@@ -344,7 +348,7 @@ static void sync_refs_file(const char *path, const char *out, bool overwrite)
 	xmlDocPtr dm;
 	xmlNodePtr dmodule;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		if (only_delete) {
 			fprintf(stderr, I_DELREFS, path);
 		} else {
@@ -376,7 +380,9 @@ static void sync_refs_list(const char *path, const char *out, bool overwrite)
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -395,7 +401,7 @@ static void sync_refs_list(const char *path, const char *out, bool overwrite)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-dflvh?] [-o <out>] [<dms>]");
+	puts("Usage: " PROG_NAME " [-dflqvh?] [-o <out>] [<dms>]");
 	puts("");
 	puts("Options:");
 	puts("  -d, --delete     Delete the references table.");
@@ -403,6 +409,7 @@ static void show_help(void)
 	puts("  -h, -?, --help   Show help/usage message.");
 	puts("  -l, --list       Treat input as list of CSDB objects.");
 	puts("  -o, --out <out>  Output to <out> instead of stdout.");
+	puts("  -q, --quiet      Quiet mode.");
 	puts("  -v, --verbose    Verbose output.");
 	puts("  --version        Show version information.");
 	puts("  <dms>            Any number of data modules. Otherwise, read from stdin.");
@@ -424,7 +431,7 @@ int main(int argc, char *argv[])
 	bool overwrite = false;
 	bool islist = false;
 
-	const char *sopts = "dflo:vh?";
+	const char *sopts = "dflo:qvh?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
@@ -432,6 +439,7 @@ int main(int argc, char *argv[])
 		{"overwrite", no_argument      , 0, 'f'},
 		{"list"     , no_argument      , 0, 'l'},
 		{"out"      , required_argument, 0, 'o'},
+		{"quiet"    , no_argument      , 0, 'q'},
 		{"verbose"  , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -461,8 +469,11 @@ int main(int argc, char *argv[])
 			case 'o':
 				strcpy(out, optarg);
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'h':
 			case '?':

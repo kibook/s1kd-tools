@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="01" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2020" month="01" day="02"/>
         <dmTitle>
           <techName>s1kd-syncrefs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -q (--quiet) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs23">s1kd-syncrefs [-dflvh?] [-o &lt;out&gt;] [&lt;data module&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs23" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-syncrefs [-dflqvh?] [-o &lt;out&gt;] [&lt;data module&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -88,6 +91,12 @@
               <listItemTerm>-o, --out &lt;out&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The resulting XML is written to &lt;out&gt; instead of stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Errors are not printed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
