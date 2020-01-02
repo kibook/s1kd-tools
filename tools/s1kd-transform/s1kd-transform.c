@@ -12,10 +12,10 @@
 #include "identity.h"
 
 static bool includeIdentity = false;
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.5.1"
+#define VERSION "1.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -83,7 +83,7 @@ static void transformFile(const char *path, xmlNodePtr stylesheets, const char *
 {
 	xmlDocPtr doc;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_TRANSFORM, path);
 	}
 
@@ -108,7 +108,9 @@ static void transform_list(const char *path, xmlNodePtr stylesheets, const char 
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -221,7 +223,7 @@ static void freeStylesheets(xmlNodePtr stylesheets)
 /* Show help/usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-filvh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
+	puts("Usage: " PROG_NAME " [-filqvh?] [-s <stylesheet> [-p <name>=<value> ...] ...] [-o <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -f, --overwrite                Overwrite input CSDB objects.");
@@ -230,6 +232,7 @@ static void show_help(void)
 	puts("  -l, --list                     Treat input as list of objects.");
 	puts("  -o, --out <file>               Output result of transformation to <path>.");
 	puts("  -p, --param <name>=<value>     Pass parameters to stylesheets.");
+	puts("  -q, --quiet                    Quiet mode.");
 	puts("  -s, --stylesheet <stylesheet>  Apply XSLT stylesheet to CSDB objects.");
 	puts("  -v, --verbose                  Verbose output.");
 	puts("  --version                      Show version information.");
@@ -255,16 +258,17 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool islist = false;
 
-	const char *sopts = "s:ilo:p:fvh?";
+	const char *sopts = "s:ilo:p:qfvh?";
 	struct option lopts[] = {
-		{"version", no_argument, 0, 0},
-		{"help"   , no_argument, 0, 'h'},
-		{"identity", no_argument, 0, 'i'},
-		{"list", no_argument, 0, 'l'},
-		{"out", required_argument, 0, 'o'},
-		{"param", required_argument, 0, 'p'},
+		{"version"   , no_argument      , 0, 0},
+		{"help"      , no_argument      , 0, 'h'},
+		{"identity"  , no_argument      , 0, 'i'},
+		{"list"      , no_argument      , 0, 'l'},
+		{"out"       , required_argument, 0, 'o'},
+		{"param"     , required_argument, 0, 'p'},
+		{"quiet"     , no_argument      , 0, 'q'},
 		{"stylesheet", required_argument, 0, 's'},
-		{"verbose", no_argument, 0, 'v'},
+		{"verbose"   , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -300,11 +304,14 @@ int main(int argc, char **argv)
 			case 'p':
 				addParam(lastStyle, optarg);
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 'f':
 				overwrite = true;
 				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'h':
 			case '?':

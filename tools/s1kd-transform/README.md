@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-transform [-s <stylesheet> [-p <name>=<value> ...] ...]
-                   [-o <file>] [-filvh?] [<object> ...]
+                   [-o <file>] [-filqvh?] [<object> ...]
 
 DESCRIPTION
 ===========
@@ -38,6 +38,9 @@ when the input is a single CSDB object.
 
 -p, --param &lt;name&gt;=&lt;value&gt;  
 Pass a parameter to the last specified stylesheet.
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -s, --stylesheet &lt;stylesheet&gt;  
 An XSLT stylesheet file to apply to each CSDB object. Multiple
