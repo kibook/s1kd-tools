@@ -13,7 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -22,7 +22,7 @@
 
 #define I_NEUTRALIZE INF_PREFIX "Adding neutral metadata to %s...\n"
 
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 static void neutralizeFile(const char *fname, const char *outfile, bool overwrite, bool namesp)
 {
@@ -30,7 +30,7 @@ static void neutralizeFile(const char *fname, const char *outfile, bool overwrit
 	xsltStylesheetPtr style;
 	xmlNodePtr oldroot;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_NEUTRALIZE, fname);
 	}
 
@@ -86,7 +86,9 @@ static void neutralizeList(const char *path, const char *outfile, bool overwrite
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -109,7 +111,7 @@ static void deneutralizeFile(const char *fname, const char *outfile, bool overwr
 	xsltStylesheetPtr style;
 	xmlNodePtr oldroot;
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_NEUTRALIZE, fname);
 	}
 
@@ -146,7 +148,9 @@ static void deneutralizeList(const char *path, const char *outfile, bool overwri
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -165,7 +169,7 @@ static void deneutralizeList(const char *path, const char *outfile, bool overwri
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-o <file>] [-Dflnvh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-o <file>] [-Dflnqvh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -D, --delete      Remove neutral metadata.");
@@ -174,6 +178,7 @@ static void show_help(void)
 	puts("  -l, --list        Treat input as list of CSDB objects.");
 	puts("  -n, --namespace   Include IETP namespaces on elements.");
 	puts("  -o, --out <file>  Output to <file> instead of stdout.");
+	puts("  -q, --quiet       Quiet mode.");
 	puts("  -v, --verbose     Verbose output.");
 	puts("  --version         Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -194,7 +199,7 @@ int main(int argc, char **argv)
 	bool namesp = false;
 	bool delete = false;
 
-	const char *sopts = "Dflno:vh?";
+	const char *sopts = "Dflno:qvh?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
@@ -203,6 +208,7 @@ int main(int argc, char **argv)
 		{"list"     , no_argument      , 0, 'l'},
 		{"namespace", no_argument      , 0, 'n'},
 		{"out"      , required_argument, 0, 'o'},
+		{"quiet"    , no_argument      , 0, 'q'},
 		{"verbose"  , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -234,8 +240,11 @@ int main(int argc, char **argv)
 				free(outfile);
 				outfile = strdup(optarg);
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'h':
 			case '?':
