@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.3.1"
+#define VERSION "2.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -23,7 +23,7 @@
 #define REFS_PATH_CONTENT BAD_CAST "//content//dmRef|//content//refdm[*]|//content//pmRef|//content/refpm"
 #define REFS_PATH BAD_CAST "//dmRef|//pmRef|//refdm[*]|//refpm"
 
-static bool verbose = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 static xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc, xmlNodePtr node)
 {
@@ -304,7 +304,7 @@ static bool sameDm(xmlNodePtr ref, xmlNodePtr address)
 	getDmCode(refcode, ref_dmIdent, withIssue, withLang);
 	getDmCode(addcode, add_dmIdent, withIssue, withLang);
 
-	if (verbose && strcmp(refcode, addcode) == 0) {
+	if (verbosity >= VERBOSE && strcmp(refcode, addcode) == 0) {
 		fprintf(stderr, "    Updating reference to data module %s...\n", addcode);
 	}
 
@@ -341,7 +341,7 @@ static bool samePm(xmlNodePtr ref, xmlNodePtr address)
 	getPmCode(refcode, ref_pmIdent, withIssue, withLang);
 	getPmCode(addcode, add_pmIdent, withIssue, withLang);
 
-	if (verbose && strcmp(refcode, addcode) == 0) {
+	if (verbosity >= VERBOSE && strcmp(refcode, addcode) == 0) {
 		fprintf(stderr, "    Updating reference to pub module %s...\n", addcode);
 	}
 
@@ -370,7 +370,7 @@ static void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, x
 			refIssueInfo = firstXPathNode("issueInfo|issno", NULL, dmRefIdent);
 			refLanguage = findChild(dmRefIdent, "language");
 
-			if (verbose) {
+			if (verbosity >= VERBOSE) {
 				char code[256];
 				getDmCode(code, dmIdent, refIssueInfo, refLanguage);
 				fprintf(stderr, "      Recoding to %s...\n", code);
@@ -408,7 +408,7 @@ static void updateRef(xmlNodePtr ref, xmlNodePtr addresses, const char *fname, x
 			refIssueInfo = firstXPathNode("issueInfo|issno", NULL, pmRefIdent);
 			refLanguage = findChild(pmRefIdent, "language");
 
-			if (verbose) {
+			if (verbosity >= VERBOSE) {
 				char code[256];
 				getPmCode(code, pmIdent, refIssueInfo, refLanguage);
 				fprintf(stderr, "      Recoding to %s...\n", code);
@@ -444,7 +444,7 @@ static void updateRefs(xmlNodeSetPtr refs, xmlNodePtr addresses, const char *fna
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-s <source>] [-t <target>] [-clvh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-s <source>] [-t <target>] [-clqvh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -c, --content          Only move references in content section of targets.");
@@ -452,6 +452,7 @@ static void show_help(void)
 	puts("  -f, --overwrite        Overwrite input objects.");
 	puts("  -h, -?, --help         Show help/usage message.");
 	puts("  -l, --list             Input is a list of data module filenames.");
+	puts("  -q, --quiet            Quiet mode.");
 	puts("  -s, --source <source>  Source object.");
 	puts("  -t, --target <target>  Change refs to <source> into refs to <target>.");
 	puts("  -v, --verbose          Verbose output.");
@@ -492,7 +493,7 @@ static void addAddress(const char *fname, xmlNodePtr addresses)
 	if (!doc)
 		return;
 
-	if (verbose)
+	if (verbosity >= VERBOSE)
 		fprintf(stderr, "Registering %s...\n", fname);
 
 	address = firstXPathNode(ADDR_PATH, doc, NULL);
@@ -522,7 +523,7 @@ static void updateRefsFile(const char *fname, xmlNodePtr addresses, bool content
 		recodeIdent = NULL;
 	}
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, "Checking refs in %s...\n", fname);
 	}
 
@@ -557,7 +558,9 @@ static void addDirectory(const char *path, xmlNodePtr addresses)
 	dir = opendir(path);
 
 	if (!dir) {
-		fprintf(stderr, ERR_PREFIX "Directory %s does not exist.\n", path);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, ERR_PREFIX "Directory %s does not exist.\n", path);
+		}
 		exit(EXIT_NO_FILE);
 	}
 
@@ -565,7 +568,9 @@ static void addDirectory(const char *path, xmlNodePtr addresses)
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
 			if (snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name) < 0) {
-				fprintf(stderr, E_ENCODING_ERROR);
+				if (verbosity >= NORMAL) {
+					fprintf(stderr, E_ENCODING_ERROR);
+				}
 				exit(EXIT_ENCODING_ERROR);
 			}
 			addAddress(fname, addresses);
@@ -586,7 +591,9 @@ static void updateRefsDirectory(const char *path, xmlNodePtr addresses, bool con
 		if (isS1000D(cur->d_name)) {
 			char fname[PATH_MAX];
 			if (snprintf(fname, PATH_MAX, "%s/%s", path, cur->d_name) < 0) {
-				fprintf(stderr, E_ENCODING_ERROR);
+				if (verbosity >= NORMAL) {
+					fprintf(stderr, E_ENCODING_ERROR);
+				}
 				exit(EXIT_ENCODING_ERROR);
 			}
 			updateRefsFile(fname, addresses, contentOnly, recode, overwrite);
@@ -603,7 +610,9 @@ static xmlNodePtr addAddressList(const char *fname, xmlNodePtr addresses, xmlNod
 
 	if (fname) {
 		if (!(f = fopen(fname, "r"))) {
-			fprintf(stderr, E_BAD_LIST, fname);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, fname);
+			}
 			return paths;
 		}
 	} else {
@@ -647,13 +656,14 @@ int main(int argc, char **argv)
 	char *recode = NULL;
 	bool overwrite = false;
 
-	const char *sopts = "s:cfvd:lt:qh?";
+	const char *sopts = "s:cfqvd:lt:qh?";
 	struct option lopts[] = {
 		{"version"  , no_argument      , 0, 0},
 		{"help"     , no_argument      , 0, 'h'},
 		{"source"   , required_argument, 0, 's'},
 		{"content"  , no_argument      , 0, 'c'},
 		{"overwrite", no_argument      , 0, 'f'},
+		{"quiet"    , no_argument      , 0, 'q'},
 		{"verbose"  , no_argument      , 0, 'v'},
 		{"dir"      , required_argument, 0, 'd'},
 		{"list"     , no_argument      , 0, 'l'},
@@ -681,8 +691,11 @@ int main(int argc, char **argv)
 			case 'f':
 				overwrite = true;
 				break;
+			case 'q':
+				--verbosity;
+				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'd':
 				if (!directory) directory = strdup(optarg);
@@ -701,7 +714,9 @@ int main(int argc, char **argv)
 	}
 
 	if (recode && !source) {
-		fprintf(stderr, ERR_PREFIX "Source object must be specified with -s to be moved with -m.\n");
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, ERR_PREFIX "Source object must be specified with -s to be moved with -m.\n");
+		}
 		exit(EXIT_NO_FILE);
 	}
 

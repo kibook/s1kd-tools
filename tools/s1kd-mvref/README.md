@@ -6,7 +6,7 @@ s1kd-mvref - Change one reference in to another in S1000D CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-mvref [-d <dir>] [-s <source>] [-t <target>] [-cflvh?]
+    s1kd-mvref [-d <dir>] [-s <source>] [-t <target>] [-cflqvh?]
                [<object>...]
 
 DESCRIPTION
@@ -34,6 +34,9 @@ Show help/usage message
 -l, --list  
 Treat input as a list of data module filenames, rather than a data
 module itself.
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -s, --source &lt;source&gt;  
 The source object.
