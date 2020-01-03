@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="01" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="01"/>
+        <issueInfo issueNumber="015" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="01" day="02"/>
+        <issueDate year="2020" month="01" day="03"/>
         <dmTitle>
           <techName>s1kd-syncrefs(1) | s1kd-tools</techName>
         </dmTitle>
