@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="20" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="01" day="03"/>
+        <issueDate year="2020" month="01" day="06"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -P (--preformat) and -q (--quiet) options.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +49,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-acronyms -h?
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-acronyms -h?
 s1kd-acronyms [-dlpqtvx] [-n <#>] [-o <file>] [-T <types>]
               [<dmodule>...]
 s1kd-acronyms [-flqv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
@@ -148,7 +145,7 @@ s1kd-acronyms [-D|-P] [-flqv] [-o <file>] [<dmodule>...]]]></verbatimText>
                 <para>Output to &lt;file&gt; instead of stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-P, --preformat</listItemTerm>
               <listItemDefinition>
                 <para>Remove acronym markup by preformatting it. The element <verbatimText verbatimStyle="vs12">&lt;acronym&gt;</verbatimText> is flattened to the definition, followed by the term in brackets [()]. The element <verbatimText verbatimStyle="vs12">&lt;acronymTerm&gt;</verbatimText> is flattened to the term.</para>
@@ -160,7 +157,7 @@ s1kd-acronyms [-D|-P] [-flqv] [-o <file>] [<dmodule>...]]]></verbatimText>
                 <para>Pretty print text/XML acronym list output.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Errors are not printed.</para>

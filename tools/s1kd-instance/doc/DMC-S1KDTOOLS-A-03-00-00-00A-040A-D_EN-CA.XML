@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="046" inWork="00"/>
+        <issueInfo issueNumber="046" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="01" day="03"/>
+        <issueDate year="2020" month="01" day="06"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Correct definition of -p (--product) option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add example of -8 (--reapply) option.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -342,7 +336,7 @@
             <definitionListItem>
               <listItemTerm>-p, --product &lt;product&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". If the key matches multiple products within the PCT, then the objects will be filtered on the combination of all matching products.</para>
+                <para>The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". If the key matches multiple products within the PCT, then the objects will be filtered on the combination of all matching products.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -1077,7 +1071,7 @@ applicPropertyValues="1"/&gt;
             <verbatimText verbatimStyle="vs24">$ s1kd-instance -@ -f DME-*.XML</verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+        <levelledPara>
           <title>Reapplying source applicability (-8)</title>
           <para>Normally, filtering is based only on the assertions specified by the user with the -s or -p options. However, in some cases it may be desirable to take the applicability of the source object itself in to account, particularly when inline applicability annotations contain redundant assertions. For example:</para>
           <para>
