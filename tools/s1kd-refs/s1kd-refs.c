@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.5.0"
+#define VERSION "4.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1415,9 +1415,16 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 	else
 		return 0;
 
-	/* If looking for a particular ref in -w mode, skip any others. */
-	if (targetRef && !strnmatch(targetRef, code, strlen(code))) {
-		return 0;
+	if (targetRef) {
+		/* If looking for a particular ref in -w mode, skip any others. */
+		if (!strnmatch(targetRef, code, strlen(code))) {
+			return 0;
+		}
+
+		/* Replace the code with the target ref so as to match that
+		 * specific object rather than the latest object with the same
+		 * code. */
+		strcpy(code, targetRef);
 	}
 
 	if (find_object_fname(fname, directory, code, recursive)) {
