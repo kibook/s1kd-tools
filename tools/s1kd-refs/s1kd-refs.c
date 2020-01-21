@@ -13,11 +13,12 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.5.1"
+#define VERSION "4.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
 #define FAIL_PREFIX PROG_NAME ": FAILURE: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_OUT_OF_MEMORY ERR_PREFIX "Too many files in recursive listing.\n"
@@ -25,6 +26,8 @@
 
 #define S_UNMATCHED SUCC_PREFIX "No unmatched references in %s\n"
 #define F_UNMATCHED FAIL_PREFIX "Unmatched references in %s\n"
+
+#define I_WHEREUSED INF_PREFIX "Searching for references to %s...\n"
 
 #define EXIT_UNMATCHED_REF 1
 #define EXIT_OUT_OF_MEMORY 2
@@ -1558,7 +1561,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	xmlXPathFreeContext(ctx);
 	xmlFreeDoc(doc);
 
-	if (verbose) {
+	if (verbose && !targetRef) {
 		fprintf(stderr, unmatched ? F_UNMATCHED : S_UNMATCHED, path);
 	}
 
@@ -1670,6 +1673,10 @@ static int listWhereUsed(const char *path, int show)
 		}
 
 		addFile(path);
+	}
+
+	if (verbose) {
+		fprintf(stderr, I_WHEREUSED, path);
 	}
 
 	/* If the target object is an ICN, get the ICN from the file name. */
