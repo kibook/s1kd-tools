@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.3"
+#define VERSION "8.4.4"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3262,11 +3262,12 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 				xmlFree(l);
 			}
 		}
+
+		xmlXPathFreeObject(obj);
 	} else {
 		fprintf(stderr, S_NO_CT_PROP, (char *) type, (char *) id);
 	}
 
-	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 }
 
