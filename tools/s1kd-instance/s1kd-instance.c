@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.4"
+#define VERSION "8.4.5"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1898,6 +1898,20 @@ static void remove_change_markup(xmlDocPtr doc)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Set the issue type of the instance. */
+static void set_issue_type(xmlDocPtr doc, const char *type)
+{
+	xmlNodePtr status;
+
+	status = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus|//pmStatus|//commentStatus|//dmlStatus|//scormContentPackageStatus|//issno");
+
+	if (xmlStrcmp(status->name, BAD_CAST "issno") == 0) {
+		xmlSetProp(status, BAD_CAST "type", BAD_CAST type);
+	} else {
+		xmlSetProp(status, BAD_CAST "issueType", BAD_CAST type);
+	}
+}
+
 /* Set the issue and inwork numbers of the instance. */
 static void set_issue(xmlDocPtr dm, char *issinfo)
 {
@@ -1935,9 +1949,10 @@ static void set_issue(xmlDocPtr dm, char *issinfo)
 		exit(EXIT_MISSING_ARGS);
 	}
 
-	/* If the issue is set below 001-01, there cannot be change marks. */
+	/* If the issue is set below 001-01, there cannot be change marks, and issue type is "new" */
 	if (strcmp(issue, "000") == 0 || (strcmp(issue, "001") == 0 && strcmp(inwork, "00") == 0)) {
 		remove_change_markup(dm);
+		set_issue_type(dm, "new");
 	}
 
 	if (xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") == 0) {
@@ -1959,20 +1974,6 @@ static void set_issue_date(xmlDocPtr doc, const char *year, const char *month, c
 	xmlSetProp(issueDate, BAD_CAST "year", BAD_CAST year);
 	xmlSetProp(issueDate, BAD_CAST "month", BAD_CAST month);
 	xmlSetProp(issueDate, BAD_CAST "day", BAD_CAST day);
-}
-
-/* Set the issue type of the instance. */
-static void set_issue_type(xmlDocPtr doc, const char *type)
-{
-	xmlNodePtr status;
-
-	status = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus|//pmStatus|//commentStatus|//dmlStatus|//scormContentPackageStatus|//issno");
-
-	if (xmlStrcmp(status->name, BAD_CAST "issno") == 0) {
-		xmlSetProp(status, BAD_CAST "type", BAD_CAST type);
-	} else {
-		xmlSetProp(status, BAD_CAST "issueType", BAD_CAST type);
-	}
 }
 
 /* Set the securty classification of the instance. */
