@@ -39,6 +39,10 @@
   <convert from="km3" to="km3"/>
   <convert from="knot" to="knot"/>
   <convert from="L" to="L"/>
+  <convert from="lbf.ft" to="lbf.ft"/>
+  <convert from="lbf.in" to="lbf.in"/>
+  <convert from="lbf/ft" to="lbf/ft"/>
+  <convert from="lbf/in" to="lbf/in"/>
   <convert from="lbm" to="lbm"/>
   <convert from="m" to="m"/>
   <convert from="m2" to="m2"/>
@@ -55,6 +59,8 @@
   <convert from="mm" to="mm"/>
   <convert from="mm2" to="mm2"/>
   <convert from="mm3" to="mm3"/>
+  <convert from="N.m" to="N.m"/>
+  <convert from="N/m" to="N/m"/>
   <convert from="nautmi" to="nautmi"/>
   <convert from="rad" to="rad"/>
   <convert from="s" to="s"/>
@@ -235,6 +241,14 @@
   <convert from="L" to="galUK" formula="$value div 4.546"/>
   <convert from="L" to="galUS" formula="$value div 3.785"/>
   <convert from="L" to="mL" formula="$value * 1000"/>
+  <convert from="lbf.ft" to="lbf.in" formula="$value * 12"/>
+  <convert from="lbf.ft" to="N.m" formula="$value * 1.356"/>
+  <convert from="lbf.in" to="lbf.ft" formula="$value div 12"/>
+  <convert from="lbf.in" to="N.m" formula="$value div 8.851"/>
+  <convert from="lbf/ft" to="lbf/in" formula="$value * 12"/>
+  <convert from="lbf/ft" to="N/m" formula="$value * 14.594"/>
+  <convert from="lbf/in" to="lbf/ft" formula="$value div 12"/>
+  <convert from="lbf/in" to="N/m" formula="$value * 175.127"/>
   <convert from="lbm" to="g" formula="$value * 453.592"/>
   <convert from="lbm" to="kg" formula="$value div 2.205"/>
   <convert from="lbm" to="mg" formula="$value * 453592.37"/>
@@ -325,6 +339,10 @@
   <convert from="mm3" to="m3" formula="$value div 1e+9"/>
   <convert from="mm3" to="mi3" formula="$value div 4.168e+18"/>
   <convert from="mm3" to="yd3" formula="$value div 7.646e+8"/>
+  <convert from="N.m" to="lbf.ft" formula="$value div 1.356"/>
+  <convert from="N.m" to="lbf.in" formula="$value * 8.851"/>
+  <convert from="N/m" to="lbf/ft" formula="$value div 14.594"/>
+  <convert from="N/m" to="lbf/in" formula="$value div 175.127"/>
   <convert from="nautmi" to="cm" formula="$value * 185200"/>
   <convert from="nautmi" to="fathom" formula="$value * 1012.686"/>
   <convert from="nautmi" to="ft" formula="$value * 6076.115"/>
