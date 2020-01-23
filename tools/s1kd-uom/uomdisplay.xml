@@ -260,6 +260,8 @@
     <uom name="kW/m3.K"> kW/m<superScript>3</superScript>.K</uom>
     <uom name="L/m3"> L/m<superScript>3</superScript></uom>
     <uom name="L/s2"> L/s<superScript>2</superScript></uom>
+    <uom name="lbf.ft"> ft-lb</uom>
+    <uom name="lbf.in"> in-lb</uom>
     <uom name="lbf.ft/in2"> lbf.ft/in<superScript>2</superScript></uom>
     <uom name="lbf.in2"> lbf.in<superScript>2</superScript></uom>
     <uom name="lbf.s/ft2"> lbf.s/ft<superScript>2</superScript></uom>

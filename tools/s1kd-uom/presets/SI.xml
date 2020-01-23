@@ -13,6 +13,10 @@
   <convert from="mi/h" to="km/h"/>
   <convert from="mi2" to="km2"/>
   <convert from="mi3" to="km3"/>
+  <convert from="lbf.ft" to="N.m"/>
+  <convert from="lbf.in" to="N.m"/>
+  <convert from="lbf/ft" to="N/m"/>
+  <convert from="lbf/in" to="N/m"/>
   <convert from="tonUK" to="kg"/>
   <convert from="tonUS" to="kg"/>
   <convert from="yd" to="m"/>

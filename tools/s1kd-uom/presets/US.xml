@@ -17,4 +17,6 @@
   <convert from="mm" to="in"/>
   <convert from="mm2" to="in2"/>
   <convert from="mm3" to="in3"/>
+  <convert from="N.m" to="lbf.ft"/>
+  <convert from="N/m" to="lbf/ft"/>
 </uom>
