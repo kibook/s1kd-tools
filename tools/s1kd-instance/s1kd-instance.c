@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.5"
+#define VERSION "8.4.6"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -138,8 +138,17 @@ static bool no_issue = false;
 /* Verbosity level */
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
+/* Determine whether an applicability definition may be modified.
+ * User-definitions may only be modified by other user-definitions.
+ * User-definitions may modify non-user-definitions.
+ */
+static bool allow_def_modify(bool userdefined, const xmlChar *attr)
+{
+	return userdefined || xmlStrcmp(attr, BAD_CAST "false") == 0;
+}
+
 /* Define a value for a product attribute or condition. */
-static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm, bool allowmulti)
+static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm, bool userdefined)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
@@ -167,18 +176,24 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", ident);
 		xmlSetProp(assert, BAD_CAST "applicPropertyType",  type);
 		xmlSetProp(assert, BAD_CAST "applicPropertyValues", value);
+		xmlSetProp(assert, BAD_CAST "userDefined", BAD_CAST (userdefined ? "true" : "false"));
 		++napplics;
-	/* Or, if an assert already exists and multi-asserts are allowed... */
-	} else if (allowmulti) {
+	/* Or, if an assert already exists... */
+	} else {
+		xmlChar *user_defined_attr;
+
+		user_defined_attr = xmlGetProp(assert, BAD_CAST "userDefined");
+
 		/* Check for duplicate value in a single-assert. */
 		if (xmlHasProp(assert, BAD_CAST "applicPropertyValues")) {
 			xmlChar *first_value;
 
 			first_value = xmlGetProp(assert, BAD_CAST "applicPropertyValues");
 
-			/* If not a duplicate, convert to a multi-assert and
-			 * add the original and new values. */
-			if (xmlStrcmp(first_value, BAD_CAST value) != 0) {
+			/* If the value is not a duplicate, and the assertion
+			 * may be modified, convert to a multi-assert and add
+			 * the original and new values. */
+			if (xmlStrcmp(first_value, BAD_CAST value) != 0 && allow_def_modify(userdefined, user_defined_attr)) {
 				xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
 				xmlNewChild(assert, NULL, BAD_CAST "value", value);
 				xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
@@ -196,15 +211,15 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 				xmlFree(cur_value);
 			}
 
-			/* If not a duplicate, add the new value to the
+			/* If the value is not a duplicate, and the assertion
+			 * may be modified, add the new value to the
 			 * multi-assert. */
-			if (!dup) {
+			if (!dup && allow_def_modify(userdefined, user_defined_attr)) {
 				xmlNewChild(assert, NULL, BAD_CAST "value", value);
 			}
 		}
-	/* Otherwise, ignore the new assertion. */
-	} else {
-		return;
+
+		xmlFree(user_defined_attr);
 	}
 
 	/* Tag asserts that may only be true for individual DMs. */
@@ -2698,7 +2713,7 @@ static void load_applic_from_inst(xmlDocPtr doc)
 			type  = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType");
 			value = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyValues");
 
-			/* allowmulti = false so that user-defined assertions override those in the instance. */
+			/* userdefined = false so that user-defined assertions override those in the instance. */
 			define_applic(ident, type, value, true, false);
 
 			xmlFree(ident);
