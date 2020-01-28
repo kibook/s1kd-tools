@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "3.4.1"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -2797,8 +2797,8 @@ static void show_help(void)
 	puts("  -T, --raw                Do not format columns in output.");
 	puts("  -t, --tab                Use tab-delimited fields.");
 	puts("  -v, --value <value>      The value to set or match.");
-	puts("  -W, --not-when <name>    Only list/edit when metadata <name> does not equal a value.");
-	puts("  -w, --when <name>        Only list/edit when metadata <name> equals a value.");
+	puts("  -W, --where-not <name>   Only list/edit objects where metadata <name> does not equal a value.");
+	puts("  -w, --where <name>       Only list/edit objects where metadata <name> equals a value.");
 	puts("  --version                Show version information.");
 	puts("  <object>                 CSDB object(s) to view/edit metadata on.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -2839,8 +2839,8 @@ int main(int argc, char **argv)
 		{"tab"        , no_argument      , 0, 't'},
 		{"value"      , required_argument, 0, 'v'},
 		{"quiet"      , no_argument      , 0, 'q'},
-		{"when"       , required_argument, 0, 'w'},
-		{"not-when"   , required_argument, 0, 'W'},
+		{"where"      , required_argument, 0, 'w'},
+		{"where-not"  , required_argument, 0, 'W'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};

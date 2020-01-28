@@ -94,13 +94,13 @@ that piece of metadata to.
 Each -n, -w, or -W can be followed by -v to edit or define conditions on
 multiple pieces of metadata.
 
--W, --not-when &lt;name&gt;  
+-W, --where-not &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is
 not equal to the value specified in the following -v option. If no -v
 option follows, this will show objects which do not have metadata
 &lt;name&gt; of any value.
 
--w, --when &lt;name&gt;  
+-w, --where &lt;name&gt;  
 Show or edit metadata only on objects where the value of &lt;name&gt; is
 equal to the value specified in the following -v option. If no -v option
 follows, this will show objects which have metadata &lt;name&gt; with
