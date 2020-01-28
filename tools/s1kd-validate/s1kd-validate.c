@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.3.1"
+#define VERSION "2.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -439,7 +439,7 @@ int main(int argc, char *argv[])
 		{"output-valid", no_argument      , 0, 'o'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"verbose"     , no_argument      , 0, 'v'},
-		{"exclude"     , required_argument, 0, 'X'},
+		{"exclude"     , required_argument, 0, 'x'},
 		{"ignore-empty", no_argument      , 0, 'e'},
 		{"schema"      , required_argument, 0, 's'},
 		LIBXML2_PARSE_LONGOPT_DEFS

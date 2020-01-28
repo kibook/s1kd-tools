@@ -77,10 +77,10 @@
             </mrow>
           </math>
         </para>
-        <para>Since MathML is not supported as of S1000D Issue 4.2, this would normally fail to validate. However, the -X option allows specified XML namespaces to be ignored when validating.</para>
+        <para>Since MathML is not supported as of S1000D Issue 5.0, this would normally fail to validate. However, the -x option allows specified XML namespaces to be ignored when validating.</para>
         <para>To ignore MathML, for example:</para>
         <para>
-          <verbatimText>$ s1kd-validate -X http://www.w3.org/1998/Math/MathML &lt;data modules&gt;</verbatimText>
+          <verbatimText>$ s1kd-validate -x http://www.w3.org/1998/Math/MathML &lt;data modules&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>
