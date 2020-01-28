@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.6"
+#define VERSION "8.4.7"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1928,7 +1928,7 @@ static void set_issue_type(xmlDocPtr doc, const char *type)
 }
 
 /* Set the issue and inwork numbers of the instance. */
-static void set_issue(xmlDocPtr dm, char *issinfo)
+static void set_issue(xmlDocPtr dm, char *issinfo, bool incr_iss)
 {
 	char issue[32], inwork[32];
 	xmlNodePtr issueInfo;
@@ -1937,7 +1937,7 @@ static void set_issue(xmlDocPtr dm, char *issinfo)
 		return;
 	}
 
-	if (strcmp(issinfo, "+") == 0) {
+	if (incr_iss) {
 		xmlChar *issue_s, *inwork_s;
 		int inwork_i;
 
@@ -2780,6 +2780,7 @@ static void load_metadata_from_inst(xmlDocPtr doc,
 	char *code,
 	char *lang,
 	char *issinfo,
+	bool incr_iss,
 	char **techname,
 	char **infoname,
 	xmlChar **infonamevar,
@@ -2907,7 +2908,7 @@ static void load_metadata_from_inst(xmlDocPtr doc,
 			w = strdup("00");
 		}
 
-		if (strcmp(issinfo, "+") == 0) {
+		if (incr_iss) {
 			int inwork_i;
 			inwork_i = atoi(w);
 			free(w);
@@ -3877,6 +3878,7 @@ int main(int argc, char **argv)
 	bool force_overwrite = false;
 	bool use_stdin = false;
 	char issinfo[16] = "";
+	bool incr_iss = false;
 	char secu[4] = "";
 	bool wholedm = false;
 	char *useract = NULL;
@@ -4082,7 +4084,11 @@ int main(int argc, char **argv)
 				no_issue = true;
 				break;
 			case 'n':
-				strncpy(issinfo, optarg, 15);
+				if (strcmp(optarg, "+") == 0) {
+					incr_iss = true;
+				} else {
+					strncpy(issinfo, optarg, 15);
+				}
 				break;
 			case 'O':
 				autoname = true;
@@ -4434,6 +4440,7 @@ int main(int argc, char **argv)
 				code,
 				language,
 				issinfo,
+				incr_iss,
 				&tech,
 				&info,
 				&info_name_variant,
@@ -4635,7 +4642,7 @@ int main(int argc, char **argv)
 				}
 
 				if (strcmp(issinfo, "") != 0) {
-					set_issue(doc, issinfo);
+					set_issue(doc, issinfo, incr_iss);
 				}
 
 				if (strcmp(issdate, "") != 0) {
