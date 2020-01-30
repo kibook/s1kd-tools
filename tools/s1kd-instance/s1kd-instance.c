@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.7"
+#define VERSION "8.4.8"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -130,6 +130,8 @@ struct ident {
 
 /* User-defined applicability */
 static xmlNodePtr applicability;
+
+/* Number of user-defined applicability definitions. */
 static int napplics = 0;
 
 /* Assume objects were created with -N. */
@@ -177,7 +179,10 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 		xmlSetProp(assert, BAD_CAST "applicPropertyType",  type);
 		xmlSetProp(assert, BAD_CAST "applicPropertyValues", value);
 		xmlSetProp(assert, BAD_CAST "userDefined", BAD_CAST (userdefined ? "true" : "false"));
-		++napplics;
+
+		if (userdefined) {
+			++napplics;
+		}
 	/* Or, if an assert already exists... */
 	} else {
 		xmlChar *user_defined_attr;
@@ -1466,21 +1471,29 @@ static void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 	}
 
 	for (cur = applicability->children; cur; cur = cur->next) {
-		xmlChar *cur_ident, *cur_type, *cur_value;
+		xmlChar *user_def;
 
-		cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
-		cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
-		cur_value = xmlGetProp(cur, BAD_CAST "applicPropertyValues");
+		user_def = xmlGetProp(cur, BAD_CAST "userDefined");
 
-		if (cur_value) {
-			xmlAddChild(new_evaluate, create_assert(cur_ident, cur_type, cur_value, iss));
-		} else {
-			xmlAddChild(new_evaluate, create_or(cur_ident, cur_type, cur, iss));
+		if (xmlStrcmp(user_def, BAD_CAST "true") == 0) {
+			xmlChar *cur_ident, *cur_type, *cur_value;
+
+			cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+			cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
+			cur_value = xmlGetProp(cur, BAD_CAST "applicPropertyValues");
+
+			if (cur_value) {
+				xmlAddChild(new_evaluate, create_assert(cur_ident, cur_type, cur_value, iss));
+			} else {
+				xmlAddChild(new_evaluate, create_or(cur_ident, cur_type, cur, iss));
+			}
+
+			xmlFree(cur_ident);
+			xmlFree(cur_type);
+			xmlFree(cur_value);
 		}
 
-		xmlFree(cur_ident);
-		xmlFree(cur_type);
-		xmlFree(cur_value);
+		xmlFree(user_def);
 	}
 
 	xmlUnlinkNode(applic);
