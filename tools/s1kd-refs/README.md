@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?] [-d <dir>] [-e <cmd>]
+    s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>]
               [-J <ns=URL>] [-j <xpath>] [-t <fmt>] [-3 <file>]
               [<object>...]
 
@@ -32,14 +32,15 @@ OPTIONS
 -a, --all  
 List all references, both matched and unmatched.
 
--C, -D, -E, -G, -H, -L, -P, -S, -T  
+-C, -D, -E, -G, -H, -L, -P, -S, -T, -Y, -Z  
 List references to comments, data modules, external publications, ICNs,
 hotspots, data management lists, publication modules, SCORM content
-packages and referred fragments respectively. If none are specified,
--CDEGHLPST is assumed.
+packages, referred fragments, repository source DMs and source objects
+respectively. If none are specified, -CDEGHLPSTYZ is assumed.
 
 The following long options can also be used for each: --com, --dm,
---epr, --icn, --hotspot, --dml, --pm, --smc, --fragment.
+--epr, --icn, --hotspot, --dml, --pm, --smc, --fragment, --repository,
+--source.
 
 -c, --content  
 List references in the `content` section of a CSDB object only.

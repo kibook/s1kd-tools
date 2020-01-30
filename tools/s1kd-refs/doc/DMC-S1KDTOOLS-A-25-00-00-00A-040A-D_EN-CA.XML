@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="01"/>
+        <issueInfo issueNumber="026" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="01" day="06"/>
+        <issueDate year="2020" month="01" day="30"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -Y (--repository) and -Z (--source) options.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -49,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxh?] [-d <dir>] [-e <cmd>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>]
           [-J <ns=URL>] [-j <xpath>] [-t <fmt>] [-3 <file>]
           [<object>...]]]></verbatimText>
         </para>
@@ -82,11 +85,11 @@
                 <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-C, -D, -E, -G, -H, -L, -P, -S, -T</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-C, -D, -E, -G, -H, -L, -P, -S, -T, -Y, -Z</listItemTerm>
               <listItemDefinition>
-                <para>List references to comments, data modules, external publications, ICNs, hotspots, data management lists, publication modules, SCORM content packages and referred fragments respectively. If none are specified, -CDEGHLPST is assumed.</para>
-                <para>The following long options can also be used for each: --com, --dm, --epr, --icn, --hotspot, --dml, --pm, --smc, --fragment.</para>
+                <para>List references to comments, data modules, external publications, ICNs, hotspots, data management lists, publication modules, SCORM content packages, referred fragments, repository source DMs and source objects respectively. If none are specified, -CDEGHLPSTYZ is assumed.</para>
+                <para>The following long options can also be used for each: --com, --dm, --epr, --icn, --hotspot, --dml, --pm, --smc, --fragment, --repository, --source.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.6.0"
+#define VERSION "4.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -94,12 +94,14 @@ static long unsigned maxListedFiles = 1;
 #define SHOW_FRG 0x040 /* Fragments */
 #define SHOW_DML 0x080 /* DMLs */
 #define SHOW_SMC 0x100 /* SCORM content packages */
+#define SHOW_SRC 0x200 /* Source ident */
+#define SHOW_REP 0x400 /* Repository source ident */
 
 /* All possible objects. */
-#define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML | SHOW_SMC
+#define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML | SHOW_SMC | SHOW_SRC | SHOW_REP
 
 /* All objects relevant to -w mode. */
-#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML | SHOW_SMC | SHOW_ICN
+#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML | SHOW_SMC | SHOW_ICN | SHOW_SRC | SHOW_REP
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
@@ -601,6 +603,34 @@ static void getPmCode(char *dst, xmlNodePtr pmRef)
 		xmlFree(languageIsoCode);
 		xmlFree(countryIsoCode);
 	}
+}
+
+/* Get the code of the source DM or PM. */
+static void getSourceIdent(char *dst, xmlNodePtr sourceIdent)
+{
+	xmlDocPtr refdoc;
+	xmlNodePtr ref, ident;
+
+	refdoc = xmlNewDoc(BAD_CAST "1.0");
+	ident = xmlCopyNode(sourceIdent, 1);
+
+	if (xmlStrcmp(sourceIdent->name, BAD_CAST "sourcePmIdent") == 0) {
+		ref = xmlNewNode(NULL, BAD_CAST "pmRef");
+		xmlDocSetRootElement(refdoc, ref);
+		xmlNodeSetName(ident, BAD_CAST "pmRefIdent");
+		ident = xmlAddChild(ref, ident);
+
+		getPmCode(dst, ref);
+	} else {
+		ref = xmlNewNode(NULL, BAD_CAST "dmRef");
+		xmlDocSetRootElement(refdoc, ref);
+		xmlNodeSetName(ident, BAD_CAST "dmRefIdent");
+		ident = xmlAddChild(ref, ident);
+
+		getDmCode(dst, ref);
+	}
+
+	xmlFreeDoc(refdoc);
 }
 
 /* Get the SMC as a string from a scormContentPackageRef. */
@@ -1408,6 +1438,13 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 	else if (xmlStrcmp(ref->name, BAD_CAST "dispatchFileName") == 0 ||
 	         xmlStrcmp(ref->name, BAD_CAST "ddnfilen") == 0)
 		getDispatchFileName(code, ref);
+	else if ((show & SHOW_SRC) == SHOW_SRC &&
+		(xmlStrcmp(ref->name, BAD_CAST "sourceDmIdent") == 0 ||
+		 xmlStrcmp(ref->name, BAD_CAST "sourcePmIdent") == 0))
+		getSourceIdent(code, ref);
+	else if ((show & SHOW_REP) == SHOW_REP &&
+		xmlStrcmp(ref->name, BAD_CAST "repositorySourceDmIdent") == 0)
+		getSourceIdent(code, ref);
 	else if ((show & SHOW_HOT) == SHOW_HOT &&
 		 xmlStrcmp(ref->name, BAD_CAST "graphic") == 0)
 		return getHotspots(ref, src);
@@ -1531,7 +1568,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef|.//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1715,6 +1752,10 @@ static int listWhereUsed(const char *path, int show)
 			xmlNodeSetName(ident, BAD_CAST "scormContentPackageRefIdent");
 			xmlNodeSetName(node , BAD_CAST "scormContentPackageRef");
 			getSmcCode(code, node);
+		} else if (xmlStrcmp(ident->name, BAD_CAST "sourceDmIdent") == 0 ||
+			   xmlStrcmp(ident->name, BAD_CAST "sourcePmIdent") == 0 ||
+			   xmlStrcmp(ident->name, BAD_CAST "repositorySourceDmIdent") == 0) {
+			getSourceIdent(code, ident);
 		}
 
 		xmlFreeDoc(tmp);
@@ -1763,7 +1804,7 @@ static int listWhereUsedList(const char *path, int show)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrSsTUuvwXxh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -1802,6 +1843,8 @@ static void show_help(void)
 	puts("  -w, --where-used             List places where an object is referenced.");
 	puts("  -X, --tag-unmatched          Tag unmatched references.");
 	puts("  -x, --xml                    Output XML report.");
+	puts("  -Y, --repository             List repository source DMs.");
+	puts("  -Z, --source                 List source DM or PM.");
 	puts("  -3, --externalpubs <file>    Use custom .externalpubs file.");
 	puts("  --version                    Show version information.");
 	puts("  <object>                     CSDB object to list references in.");
@@ -1829,7 +1872,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wh?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1869,6 +1912,8 @@ int main(int argc, char **argv)
 		{"fragment"     , no_argument      , 0, 'T'},
 		{"format"       , required_argument, 0, 't'},
 		{"where-used"   , no_argument      , 0, 'w'},
+		{"repository"   , no_argument      , 0, 'Y'},
+		{"source"       , no_argument      , 0, 'Z'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2001,6 +2046,12 @@ int main(int argc, char **argv)
 				findUsed = true;
 				printMatchedFn = printMatchedWhereUsed;
 				printUnmatchedFn = printUnmatchedSrc;
+				break;
+			case 'Y':
+				showObjects |= SHOW_REP;
+				break;
+			case 'Z':
+				showObjects |= SHOW_SRC;
 				break;
 			case 'h':
 			case '?':
