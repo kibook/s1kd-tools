@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.8"
+#define VERSION "8.4.9"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -997,9 +997,42 @@ static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup
 	}
 }
 
+/* Copy applic defs without non-user-definitions. */
+static xmlNodePtr remove_non_user_defs(xmlNodePtr defs)
+{
+	xmlNodePtr cur, userdefs;
+
+	userdefs = xmlCopyNode(defs, 1);
+	cur = userdefs->children;
+
+	while (cur) {
+		xmlNodePtr next;
+		xmlChar *userdefined;
+
+		next = cur->next;
+
+		userdefined = xmlGetProp(cur, BAD_CAST "userDefined");
+
+		if (xmlStrcmp(userdefined, BAD_CAST "false") == 0) {
+			xmlUnlinkNode(cur);
+			xmlFreeNode(cur);
+		}
+
+		xmlFree(userdefined);
+
+		cur = next;
+	}
+
+	return userdefs;
+}
+
+/* Simplify the applicability of the whole object. */
 static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc, bool remtrue)
 {
-	xmlNodePtr applic, orig;
+	xmlNodePtr applic, orig, userdefs;
+
+	/* Remove non-user-definitions. */
+	userdefs = remove_non_user_defs(defs);
 
 	orig = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus/applic|//pmStatus/applic");
 
@@ -1009,7 +1042,7 @@ static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc, bool remtru
 
 	applic = xmlCopyNode(orig, 1);
 
-	if (simpl_applic(defs, applic, remtrue)) {
+	if (simpl_applic(userdefs, applic, remtrue)) {
 		xmlNodePtr disptext;
 		applic = xmlNewNode(NULL, BAD_CAST "applic");
 		disptext = xmlNewChild(applic, NULL, BAD_CAST "displayText", NULL);
@@ -1021,6 +1054,7 @@ static xmlNodePtr simpl_whole_applic(xmlNodePtr defs, xmlDocPtr doc, bool remtru
 	xmlAddNextSibling(orig, applic);
 	xmlUnlinkNode(orig);
 	xmlFreeNode(orig);
+	xmlFreeNode(userdefs);
 
 	return applic;
 }
