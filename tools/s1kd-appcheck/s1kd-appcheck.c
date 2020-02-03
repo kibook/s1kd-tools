@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.3.2"
+#define VERSION "5.4.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -27,6 +27,7 @@
 #define I_CHECK_ALL_PROP INF_PREFIX "  %s %s = %s\n"
 #define I_NESTEDCHECK INF_PREFIX "Checking nested applicability in %s...\n"
 #define I_PROPCHECK INF_PREFIX "Checking product attribute and condition definitions in %s...\n"
+#define I_NUM_PRODS INF_PREFIX "Checking %s for %d configurations...\n"
 
 /* Error messages. */
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
@@ -1179,6 +1180,10 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
+
+		if (verbosity >= DEBUG) {
+			fprintf(stderr, I_NUM_PRODS, path, obj->nodesetval->nodeNr);
+		}
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			xmlNodePtr asserts;
