@@ -15,7 +15,8 @@
  * @param doc The CSDB object
  * @param defs Applicability definitions to filter on
  * @param reduce Whether or not to hide redundant applicability
+ * @return A new XML document for the filtered instance
  */
-void s1kdFilter(xmlDocPtr doc, xmlNodePtr defs, bool reduce);
+xmlDocPtr s1kdFilter(xmlDocPtr doc, xmlNodePtr defs, bool reduce);
 
 #endif

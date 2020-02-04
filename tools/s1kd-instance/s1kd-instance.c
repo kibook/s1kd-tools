@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.9"
+#define VERSION "8.4.10"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3556,18 +3556,18 @@ static xmlNodePtr get_applic_def(xmlNodePtr defs, const xmlChar *id, const xmlCh
 }
 
 /* Determine whether an annotation is a superset of the user-defined applicability. */
-static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
+static bool annotation_is_superset(xmlNodePtr defs, xmlNodePtr applic, bool simpl)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	xmlNodePtr defs, app;
+	xmlNodePtr defscopy, app;
 	bool result;
 
-	defs = xmlCopyNode(applicability, 1);
-	app  = xmlCopyNode(applic, 1);
+	defscopy = xmlCopyNode(defs, 1);
+	app = xmlCopyNode(applic, 1);
 
 	if (simpl) {
-		simpl_applic(defs, app, true);
+		simpl_applic(defscopy, app, true);
 		simpl_applic_evals(app);
 	}
 
@@ -3586,7 +3586,7 @@ static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 			id   = first_xpath_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyIdent|@actidref");
 			type = first_xpath_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType|@actreftype");
 
-			if ((a = get_applic_def(defs, id, type)) && eval_assert(defs, obj->nodesetval->nodeTab[i], true)) {
+			if ((a = get_applic_def(defscopy, id, type)) && eval_assert(defscopy, obj->nodesetval->nodeTab[i], true)) {
 				xmlChar *vals, *op;
 
 				vals = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
@@ -3597,7 +3597,7 @@ static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 				/* Do not remove assertions from AND evaluations,
 				 * unless they are unambiguously true.
 				 */
-				if (xmlStrcmp(op, BAD_CAST "and") != 0 || eval_assert(defs, obj->nodesetval->nodeTab[i], false)) {
+				if (xmlStrcmp(op, BAD_CAST "and") != 0 || eval_assert(defscopy, obj->nodesetval->nodeTab[i], false)) {
 					xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 					xmlFreeNode(obj->nodesetval->nodeTab[i]);
 					obj->nodesetval->nodeTab[i] = NULL;
@@ -3619,22 +3619,22 @@ static bool annotation_is_superset(xmlNodePtr applic, bool simpl)
 	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		result = eval_applic_stmt(defs, applic, true);
+		result = eval_applic_stmt(defscopy, applic, true);
 	} else {
-		result = eval_applic_stmt(defs, app, false);
+		result = eval_applic_stmt(defscopy, app, false);
 	}
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 
 	xmlFreeNode(app);
-	xmlFreeNode(defs);
+	xmlFreeNode(defscopy);
 
 	return result;
 }
 
 /* Remove annotations which are supersets of the user-defined applicability. */
-static xmlNodePtr rem_supersets(xmlNodePtr referencedApplicGroup, xmlNodePtr root, bool simpl)
+static xmlNodePtr rem_supersets(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, xmlNodePtr root, bool simpl)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -3648,7 +3648,7 @@ static xmlNodePtr rem_supersets(xmlNodePtr referencedApplicGroup, xmlNodePtr roo
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			if (annotation_is_superset(obj->nodesetval->nodeTab[i], simpl)) {
+			if (annotation_is_superset(defs, obj->nodesetval->nodeTab[i], simpl)) {
 				xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
 				xmlFreeNode(obj->nodesetval->nodeTab[i]);
 				obj->nodesetval->nodeTab[i] = NULL;
@@ -3786,25 +3786,28 @@ static void auto_add_cirs(xmlNodePtr cirs)
 }
 
 #ifdef LIBS1KD
-void s1kdFilter(xmlDocPtr doc, xmlNodePtr defs, bool reduce)
+xmlDocPtr s1kdFilter(const xmlDocPtr doc, const xmlNodePtr defs, bool reduce)
 {
+	xmlDocPtr out;
 	xmlNodePtr root, referencedApplicGroup;
 
+	out = xmlCopyDoc(doc, 1);
+
 	if (xmlChildElementCount(defs) == 0) {
-		return;
+		return out;
 	}
 
-	root = xmlDocGetRootElement(doc);
-	referencedApplicGroup = first_xpath_node(doc, NULL, BAD_CAST "//referencedApplicGroup");
+	root = xmlDocGetRootElement(out);
+	referencedApplicGroup = first_xpath_node(out, NULL, BAD_CAST "//referencedApplicGroup");
 
 	if (xmlChildElementCount(referencedApplicGroup) == 0) {
-		return;
+		return out;
 	}
 
 	strip_applic(defs, referencedApplicGroup, root);
 
 	if (reduce) {
-		clean_applic_stmts(defs, referencedApplicGroup);
+		clean_applic_stmts(defs, referencedApplicGroup, true);
 
 		if (xmlChildElementCount(referencedApplicGroup) == 0) {
 			xmlUnlinkNode(referencedApplicGroup);
@@ -3815,9 +3818,11 @@ void s1kdFilter(xmlDocPtr doc, xmlNodePtr defs, bool reduce)
 		clean_applic(referencedApplicGroup, root);
 
 		if (xmlChildElementCount(referencedApplicGroup) != 0) {
-			referencedApplicGroup = rem_supersets(referencedApplicGroup, root, true);
+			referencedApplicGroup = rem_supersets(defs, referencedApplicGroup, root, true);
 		}
 	}
+
+	return out;
 }
 #else
 /* Print a usage message */
@@ -4634,7 +4639,7 @@ int main(int argc, char **argv)
 							}
 
 							if (remtrue && xmlChildElementCount(referencedApplicGroup) != 0) {
-								referencedApplicGroup = rem_supersets(referencedApplicGroup, root, !simpl);
+								referencedApplicGroup = rem_supersets(applicability, referencedApplicGroup, root, !simpl);
 							}
 						}
 					}

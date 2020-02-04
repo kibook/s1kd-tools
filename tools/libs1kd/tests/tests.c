@@ -45,6 +45,7 @@ void test_metadata(void)
 void test_instance(void)
 {
 	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
+	xmlDocPtr out;
 	xmlNodePtr defs = xmlNewNode(NULL, BAD_CAST "applic");
 	xmlNodePtr a;
 
@@ -53,12 +54,13 @@ void test_instance(void)
 	xmlSetProp(a, BAD_CAST "applicPropertyType", BAD_CAST "prodattr");
 	xmlSetProp(a, BAD_CAST "applicPropertyValues", BAD_CAST "A");
 
-	s1kdFilter(doc, defs, true);
+	out = s1kdFilter(doc, defs, true);
 
-	xmlSaveFile("-", doc);
+	xmlSaveFile("-", out);
 
 	xmlFreeNode(defs);
 	xmlFreeDoc(doc);
+	xmlFreeDoc(out);
 }
 
 int main()

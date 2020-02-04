@@ -2742,6 +2742,20 @@ xmlChar *s1kdGetMetadata(xmlDocPtr doc, const xmlChar *name)
 {
 	int i;
 	xmlChar *value = NULL;
+	struct opts opts;
+
+	/* Initialize option defaults. */
+	opts.conds = NULL;
+	opts.endl = '\n';
+	opts.execstr = NULL;
+	opts.fmtstr = NULL;
+	opts.format_all = 1;
+	opts.keys = NULL;
+	opts.metadata_fname = NULL;
+	opts.only_editable = 0;
+	opts.overwrite = 0;
+	opts.timefmt = strdup(DEFAULT_TIMEFMT);
+	opts.verbosity = NORMAL;
 
 	for (i = 0; metadata[i].key && !value; ++i) {
 		if (strcmp(metadata[i].key, name) == 0) {
@@ -2752,7 +2766,7 @@ xmlChar *s1kdGetMetadata(xmlDocPtr doc, const xmlChar *name)
 
 			if ((node = first_xpath_node(metadata[i].path, ctx))) {
 				if (metadata[i].get) {
-					value = metadata[i].get(node);
+					value = metadata[i].get(node, &opts);
 				} else {
 					value = xmlNodeGetContent(node);
 				}
@@ -2763,6 +2777,8 @@ xmlChar *s1kdGetMetadata(xmlDocPtr doc, const xmlChar *name)
 			break;
 		}
 	}
+
+	free(opts.timefmt);
 
 	return value;
 }
