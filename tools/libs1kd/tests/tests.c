@@ -70,4 +70,6 @@ int main()
 	test_instance();
 
 	xmlCleanupParser();
+
+	return 0;
 }
