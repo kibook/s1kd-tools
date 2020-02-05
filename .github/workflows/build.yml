@@ -12,7 +12,7 @@ jobs:
     - name: Update repositories
       run: sudo apt-get update -qq
     - name: Install dependencies
-      run: sudo apt-get install -y -qq libxml2-dev libxslt1-dev vim-common
+      run: sudo apt-get install -y -qq libxml2-dev libxslt1-dev vim-common valgrind
     - name: make
       run: make
     - name: Test libs1kd
