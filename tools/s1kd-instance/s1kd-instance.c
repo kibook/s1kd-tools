@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.10"
+#define VERSION "8.4.11"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3786,6 +3786,25 @@ static void auto_add_cirs(xmlNodePtr cirs)
 }
 
 #ifdef LIBS1KD
+xmlNodePtr s1kdNewApplicDefs(void)
+{
+	return xmlNewNode(NULL, BAD_CAST "applic");
+}
+
+void s1kdFreeApplicDefs(xmlNodePtr defs)
+{
+	xmlFreeNode(defs);
+}
+
+void s1kdAssign(xmlNodePtr defs, const xmlChar *ident, const xmlChar *type, const xmlChar *value)
+{
+	xmlNodePtr a;
+	a = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
+	xmlSetProp(a, BAD_CAST "applicPropertyIdent", ident);
+	xmlSetProp(a, BAD_CAST "applicPropertyType", type);
+	xmlSetProp(a, BAD_CAST "applicPropertyValues", value);
+}
+
 xmlDocPtr s1kdFilter(const xmlDocPtr doc, const xmlNodePtr defs, bool reduce)
 {
 	xmlDocPtr out;

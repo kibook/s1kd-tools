@@ -46,19 +46,15 @@ void test_instance(void)
 {
 	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
 	xmlDocPtr out;
-	xmlNodePtr defs = xmlNewNode(NULL, BAD_CAST "applic");
-	xmlNodePtr a;
+	s1kdApplicDefs defs = s1kdNewApplicDefs();
 
-	a = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
-	xmlSetProp(a, BAD_CAST "applicPropertyIdent", BAD_CAST "version");
-	xmlSetProp(a, BAD_CAST "applicPropertyType", BAD_CAST "prodattr");
-	xmlSetProp(a, BAD_CAST "applicPropertyValues", BAD_CAST "A");
+	s1kdAssign(defs, BAD_CAST "version", BAD_CAST "prodattr", BAD_CAST "A");
 
 	out = s1kdFilter(doc, defs, true);
 
 	xmlSaveFile("-", out);
 
-	xmlFreeNode(defs);
+	s1kdFreeApplicDefs(defs);
 	xmlFreeDoc(doc);
 	xmlFreeDoc(out);
 }
