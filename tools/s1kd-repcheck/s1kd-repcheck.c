@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -68,6 +68,7 @@ struct opts {
 	bool no_issue;
 	bool search_all_objs;
 	bool output_valid;
+	bool list_refs;
 	struct objects objects;
 	struct objects cirs;
 	xmlNodePtr report;
@@ -118,6 +119,11 @@ static void add_ref_to_report(xmlNodePtr rpt, xmlNodePtr ref, const xmlChar *ide
 {
 	xmlNodePtr node;
 	xmlChar line_s[16], *xpath;
+
+	/* Check if XML report is enabled. */
+	if (!rpt) {
+		return;
+	}
 
 	node = xmlNewChild(rpt, NULL, BAD_CAST "ref", NULL);
 
@@ -331,6 +337,30 @@ done:
 	return err;
 }
 
+/* List a CIR reference without validating it. */
+static void list_cir_ref(const xmlNodePtr ref, const char *path, xmlNodePtr rpt, struct opts *opts)
+{
+	xmlChar *ident;
+	long int lineno;
+
+	lineno = xmlGetLineNo(ref);
+
+	ident = xmlGetProp(ref, BAD_CAST "repcheck_name");
+	xmlUnsetProp(ref, BAD_CAST "repcheck_name");
+	xmlUnsetProp(ref, BAD_CAST "repcheck_test");
+
+	xmlUnsetProp(ref, BAD_CAST "repcheck_name");
+	xmlUnsetProp(ref, BAD_CAST "repcheck_test");
+
+	if (rpt) {
+		add_ref_to_report(rpt, ref, ident, lineno, NULL, opts);
+	} else {
+		printf("%s:%ld:%s\n", path, lineno, (char *) ident);
+	}
+
+	xmlFree(ident);
+}
+
 /* Check all CIR references in a document. */
 static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 {
@@ -342,8 +372,12 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 	xmlXPathObjectPtr obj;
 
 	/* Add object to report. */
-	rpt = xmlNewChild(opts->report, NULL, BAD_CAST "object", NULL);
-	xmlSetProp(rpt, BAD_CAST "path", BAD_CAST path);
+	if (opts->report) {
+		rpt = xmlNewChild(opts->report, NULL, BAD_CAST "object", NULL);
+		xmlSetProp(rpt, BAD_CAST "path", BAD_CAST path);
+	} else {
+		rpt = NULL;
+	}
 
 	styledoc = read_xml_mem((const char *) xsl_cirrefs_xsl, xsl_cirrefs_xsl_len);
 	style = xsltParseStylesheetDoc(styledoc);
@@ -357,7 +391,9 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			if (check_cir_ref(obj->nodesetval->nodeTab[i], path, rpt, opts) != 0) {
+			if (opts->list_refs) {
+				list_cir_ref(obj->nodesetval->nodeTab[i], path, rpt, opts);
+			} else if (check_cir_ref(obj->nodesetval->nodeTab[i], path, rpt, opts) != 0) {
 				err = 1;
 			}
 		}
@@ -369,10 +405,12 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 	xmlFreeDoc(res);
 	xsltFreeStylesheet(style);
 
-	if (err) {
-		xmlSetProp(rpt, BAD_CAST "valid", BAD_CAST "no");
-	} else {
-		xmlSetProp(rpt, BAD_CAST "valid", BAD_CAST "yes");
+	if (!opts->list_refs) {
+		if (err) {
+			xmlSetProp(rpt, BAD_CAST "valid", BAD_CAST "no");
+		} else {
+			xmlSetProp(rpt, BAD_CAST "valid", BAD_CAST "yes");
+		}
 	}
 
 	return err;
@@ -559,6 +597,7 @@ static void show_help(void)
 	puts("  -d, --dir <dir>     Search for CIRs in <dir>.");
 	puts("  -f, --filenames     List invalid files.");
 	puts("  -h, -?, --help      Show help/usage message.");
+	puts("  -L, --list-refs     List CIR refs instead of validating them.");
 	puts("  -l, --list          Treat input as list of CSDB objects.");
 	puts("  -N, --omit-issue    Assume issue/inwork numbers are omitted.");
 	puts("  -o, --output-valid  Output valid CSDB objects to stdout.");
@@ -585,13 +624,14 @@ int main(int argc, char **argv)
 {
 	int i, err = 0;
 
-	const char *sopts = "ad:flNopqR:rTvxh?";
+	const char *sopts = "ad:fLlNopqR:rTvxh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
 		{"all"         , no_argument      , 0, 'a'},
 		{"dir"         , required_argument, 0, 'd'},
 		{"filenames"   , no_argument      , 0, 'f'},
+		{"list-refs"   , no_argument      , 0, 'L'},
 		{"list"        , no_argument      , 0, 'l'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
 		{"output-valid", no_argument      , 0, 'o'},
@@ -610,10 +650,10 @@ int main(int argc, char **argv)
 	bool is_list = false;
 	bool show_progress = false;
 	bool find_cir = false;
-	bool xml_report = false;
 	bool show_stats = false;
+	bool xml_report = false;
 
-	xmlDocPtr report_doc;
+	xmlDocPtr report_doc = NULL;
 
 	/* Initialize program options. */
 	opts.verbosity = NORMAL;
@@ -622,13 +662,10 @@ int main(int argc, char **argv)
 	opts.no_issue = false;
 	opts.search_all_objs = false;
 	opts.output_valid = false;
+	opts.list_refs = false;
 
 	init_objects(&opts.objects);
 	init_objects(&opts.cirs);
-
-	report_doc = xmlNewDoc(BAD_CAST "1.0");
-	opts.report = xmlNewNode(NULL, BAD_CAST "repCheck");
-	xmlDocSetRootElement(report_doc, opts.report);
 
 	opts.search_dir = strdup(".");
 
@@ -649,6 +686,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				opts.show_filenames = true;
+				break;
+			case 'L':
+				opts.list_refs = true;
 				break;
 			case 'l':
 				is_list = true;
@@ -689,6 +729,14 @@ int main(int argc, char **argv)
 				show_help();
 				goto cleanup;
 		}
+	}
+
+	if (xml_report) {
+		report_doc = xmlNewDoc(BAD_CAST "1.0");
+		opts.report = xmlNewNode(NULL, BAD_CAST "repCheck");
+		xmlDocSetRootElement(report_doc, opts.report);
+	} else {
+		opts.report = NULL;
 	}
 
 	if (find_cir) {

@@ -34,6 +34,9 @@ Print the filenames of invalid objects.
 -h, -?, --help  
 Show help/usage message.
 
+-L, --list-refs  
+List CIR references found in objects instead of validating them.
+
 -l, --list  
 Treat input as a list of CSDB objects to check.
 
