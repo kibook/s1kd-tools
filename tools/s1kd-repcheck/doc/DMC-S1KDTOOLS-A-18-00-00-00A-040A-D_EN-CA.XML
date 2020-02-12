@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="002" inWork="01"/>
+        <issueInfo issueNumber="002" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="02" day="11"/>
+        <issueDate year="2020" month="02" day="12"/>
         <dmTitle>
           <techName>s1kd-repcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -L (--list-refs) option.</simplePara>
+        <simplePara>Add -L (--list-refs) and -A (--all-refs) options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -63,6 +63,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-A, --all-refs</listItemTerm>
+              <listItemDefinition>
+                <para>Validate indirect tool/supply/part CIR references using the element <verbatimText verbatimStyle="vs12">&lt;identNumber&gt;</verbatimText>. Normally, only the direct reference elements <verbatimText verbatimStyle="vs12">&lt;toolRef&gt;</verbatimText>, <verbatimText verbatimStyle="vs12">&lt;supplyRef&gt;</verbatimText> and <verbatimText verbatimStyle="vs12">&lt;partRef&gt;</verbatimText> are validated.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-a, --all</listItemTerm>
               <listItemDefinition>

@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -69,6 +69,7 @@ struct opts {
 	bool search_all_objs;
 	bool output_valid;
 	bool list_refs;
+	bool all_refs;
 	struct objects objects;
 	struct objects cirs;
 	xmlNodePtr report;
@@ -370,6 +371,7 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 	xmlNodePtr rpt;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+	const char *params[3];
 
 	/* Add object to report. */
 	if (opts->report) {
@@ -382,7 +384,11 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 	styledoc = read_xml_mem((const char *) xsl_cirrefs_xsl, xsl_cirrefs_xsl_len);
 	style = xsltParseStylesheetDoc(styledoc);
 
-	res = xsltApplyStylesheet(style, doc, NULL);
+	params[0] = "all-refs";
+	params[1] = opts->all_refs ? "true()" : "false()";
+	params[2] = NULL;
+
+	res = xsltApplyStylesheet(style, doc, params);
 
 	ctx = xmlXPathNewContext(res);
 	obj = xmlXPathEvalExpression(BAD_CAST "//*[@repcheck_test]", ctx);
@@ -593,6 +599,7 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
+	puts("  -A, --all-refs      Validate indirect CIR references.");
 	puts("  -a, --all           Resolve against CIRs specified as objects to check.");
 	puts("  -d, --dir <dir>     Search for CIRs in <dir>.");
 	puts("  -f, --filenames     List invalid files.");
@@ -624,10 +631,11 @@ int main(int argc, char **argv)
 {
 	int i, err = 0;
 
-	const char *sopts = "ad:fLlNopqR:rTvxh?";
+	const char *sopts = "Aad:fLlNopqR:rTvxh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
+		{"all-refs"    , no_argument      , 0, 'A'},
 		{"all"         , no_argument      , 0, 'a'},
 		{"dir"         , required_argument, 0, 'd'},
 		{"filenames"   , no_argument      , 0, 'f'},
@@ -663,6 +671,7 @@ int main(int argc, char **argv)
 	opts.search_all_objs = false;
 	opts.output_valid = false;
 	opts.list_refs = false;
+	opts.all_refs = false;
 
 	init_objects(&opts.objects);
 	init_objects(&opts.cirs);
@@ -676,6 +685,9 @@ int main(int argc, char **argv)
 					show_version();
 					goto cleanup;
 				}
+				break;
+			case 'A':
+				opts.all_refs = true;
 				break;
 			case 'a':
 				opts.search_all_objs = true;

@@ -19,6 +19,11 @@ will cause the tool to report an error.
 OPTIONS
 =======
 
+-A, --all-refs  
+Validate indirect tool/supply/part CIR references using the element
+`<identNumber>`. Normally, only the direct reference elements
+`<toolRef>`, `<supplyRef>` and `<partRef>` are validated.
+
 -a, --all  
 In addition to CIR data modules specified with -R or explicitly linked
 in CIR references, allow CIR references to be resolved against any CIR
