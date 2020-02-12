@@ -276,7 +276,7 @@
 
   <!-- If all-refs is enabled, check indirect CIR references using <identNumber>. -->
 
-  <xsl:template match="identNumber|identno">
+  <xsl:template match="identNumber[partAndSerialNumber]|identno[pnr]">
     <xsl:copy>
       <xsl:choose>
         <xsl:when test="$all-refs">
@@ -325,7 +325,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="spareDescr/identNumber|spare/identno">
+  <xsl:template match="spareDescr/identNumber[partAndSerialNumber]|spare/identno[pnr]">
     <xsl:copy>
       <xsl:choose>
         <xsl:when test="$all-refs">
@@ -358,7 +358,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="supplyDescr/identNumber|supply/identno">
+  <xsl:template match="supplyDescr/identNumber[partAndSerialNumber]|supply/identno[pnr]">
     <xsl:copy>
       <xsl:choose>
         <xsl:when test="$all-refs">
@@ -384,7 +384,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="supportEquipDescr/identNumber|supequi/identno">
+  <xsl:template match="supportEquipDescr/identNumber[partAndSerialNumber]|supequi/identno[pnr]">
     <xsl:copy>
       <xsl:choose>
         <xsl:when test="$all-refs">
