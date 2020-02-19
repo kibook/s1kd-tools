@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="047" inWork="00"/>
+        <issueInfo issueNumber="047" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="01" day="31"/>
+        <issueDate year="2020" month="02" day="19"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -0 (--print-non-applic) option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of the -7 (--dry-run) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -58,13 +64,19 @@
         <para>
           <randomList>
             <listItem>
-              <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01"><acronymTerm>PCT</acronymTerm><acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition></acronym>.</para>
+              <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01">
+                  <acronymTerm>PCT</acronymTerm>
+                  <acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition>
+                </acronym>.</para>
             </listItem>
             <listItem>
               <para>Filtering on skill levels and security classifications to remove sensitive data.</para>
             </listItem>
             <listItem>
-              <para>Using a <acronym acronymType="at01"><acronymTerm>CIR</acronymTerm><acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition></acronym> to produce a standalone instance from a CIR-dependent master.</para>
+              <para>Using a <acronym acronymType="at01">
+                  <acronymTerm>CIR</acronymTerm>
+                  <acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition>
+                </acronym> to produce a standalone instance from a CIR-dependent master.</para>
             </listItem>
           </randomList>
         </para>
@@ -539,7 +551,7 @@
             <definitionListItem>
               <listItemTerm>-7, --dry-run</listItemTerm>
               <listItemDefinition>
-                <para>Do not actually create or update any instances, only print the file names of instances that would be created or updated.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">Do not actually create or update any instances. This can be combined with options like -5 (--print) or -0 (--print-non-applic) to print information about what objects would/would not be created or updated, but nothing will actually be written out.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -552,6 +564,12 @@
               <listItemTerm>-9, --prune</listItemTerm>
               <listItemDefinition>
                 <para>Remove only invalid parts of applicability annotations.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-0, --print-non-applic</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file names of objects which are not applicable, and therefore no instance for them will be created. Since this would only have an effect in the -w (--whole-objects) mode, that option is implied.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -391,8 +391,10 @@ instance.
 Remove unused applicability annotations.
 
 -7, --dry-run  
-Do not actually create or update any instances, only print the file
-names of instances that would be created or updated.
+Do not actually create or update any instances. This can be combined
+with options like -5 (--print) or -0 (--print-non-applic) to print
+information about what objects would/would not be created or updated,
+but nothing will actually be written out.
 
 -8, --reapply  
 Automatically reapply the applicability of the source object when
@@ -400,6 +402,11 @@ filtering.
 
 -9, --prune  
 Remove only invalid parts of applicability annotations.
+
+-0, --print-non-applic  
+Print the file names of objects which are not applicable, and therefore
+no instance for them will be created. Since this would only have an
+effect in the -w (--whole-objects) mode, that option is implied.
 
 -@, --update-instances  
 Rather than source objects, the objects specified are existing instances

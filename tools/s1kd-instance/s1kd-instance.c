@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "8.4.11"
+#define VERSION "9.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -71,6 +71,7 @@
 #define I_FIND_CIR INF_PREFIX "Searching for CIRs in \"%s\"...\n"
 #define I_FIND_CIR_FOUND INF_PREFIX "Found CIR %s...\n"
 #define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s\n"
+#define I_NON_APPLIC INF_PREFIX "Ignoring non-applicable object: %s\n"
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -3904,9 +3905,10 @@ static void show_help(void)
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
-	puts("  -7, --dry-run                     Do not write anything, only print names of instances.");
+	puts("  -7, --dry-run                     Do not write anything out.");
 	puts("  -8, --reapply                     Reapply the source object's applicability.");
 	puts("  -9, --prune                       Simplify by removing only false assertions.");
+	puts("  -0, --print-non-applic            Print the file names of objects which are not applicable.");
 	puts("  -@, --update-instances            Update existing instance objects from their source.");
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
@@ -3991,6 +3993,7 @@ int main(int argc, char **argv)
 	bool remtrue = true;
 	bool find_cir = false;
 	bool write_files = true;
+	bool print_non_applic = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -3998,7 +4001,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:456789~H:";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4567890~H:";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -4062,6 +4065,7 @@ int main(int argc, char **argv)
 		{"dry-run"           , no_argument      , 0, '7'},
 		{"reapply"           , no_argument      , 0, '8'},
 		{"prune"             , no_argument      , 0, '9'},
+		{"print-non-applic"  , no_argument      , 0, '0'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -4276,7 +4280,6 @@ int main(int argc, char **argv)
 				break;
 			case '7':
 				write_files = false;
-				print_fnames = true;
 				force_overwrite = true;
 				break;
 			case '8':
@@ -4285,6 +4288,10 @@ int main(int argc, char **argv)
 			case '9':
 				simpl = true;
 				remtrue = false;
+				break;
+			case '0':
+				print_non_applic = true;
+				wholedm = true;
 				break;
 			case 'H':
 				if (!props_report) {
@@ -4790,6 +4797,14 @@ int main(int argc, char **argv)
 					if (print_fnames) {
 						puts(out);
 					}
+				}
+			} else {
+				if (verbosity >= VERBOSE) {
+					fprintf(stderr, I_NON_APPLIC, src);
+				}
+
+				if (print_non_applic) {
+					puts(src);
 				}
 			}
 
