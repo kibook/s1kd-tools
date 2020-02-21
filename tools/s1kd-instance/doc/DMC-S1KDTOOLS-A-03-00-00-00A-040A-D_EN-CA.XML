@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="047" inWork="01"/>
+        <issueInfo issueNumber="047" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="02" day="19"/>
+        <issueDate year="2020" month="02" day="21"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Change behaviour of the -7 (--dry-run) option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of the -n (--issue) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -305,6 +308,18 @@
               <listItemDefinition>
                 <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
                 <para>When updating an instance (-@), if + is given for &lt;iss&gt;, the updated instance will have the same issue number with an inwork number incremented by one.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+                  Setting the issue of the instance will also set a default issue type:
+                  <randomList>
+                    <listItem>
+                      <para>If the issue is 000-01 thru 001-00, the default issue type will be "new".</para>
+                    </listItem>
+                    <listItem>
+                      <para>If the issue is 001-01 and up, the default issue type will be "changed".</para>
+                    </listItem>
+                  </randomList>
+                  A different issue type than the default can be set with the -z (--issue-type) option.
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

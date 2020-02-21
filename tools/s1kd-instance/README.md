@@ -197,6 +197,17 @@ When updating an instance (-@), if + is given for &lt;iss&gt;, the
 updated instance will have the same issue number with an inwork number
 incremented by one.
 
+Setting the issue of the instance will also set a default issue type:
+
+-   If the issue is 000-01 thru 001-00, the default issue type will be
+    "new".
+
+-   If the issue is 001-01 and up, the default issue type will be
+    "changed".
+
+A different issue type than the default can be set with the -z
+(--issue-type) option.
+
 -O, --outdir &lt;dir&gt;  
 Output instance(s) in &lt;dir&gt;, automatically naming them based on:
 
