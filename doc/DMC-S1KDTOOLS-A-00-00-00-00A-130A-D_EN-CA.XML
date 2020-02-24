@@ -14,7 +14,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="024" inWork="01"/>
+        <issueInfo issueNumber="024" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="02" day="24"/>
@@ -48,7 +48,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Correct s1kd-ls -d to -D.</simplePara>
+        <simplePara>Correct s1kd-ls example.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -511,7 +511,7 @@ tmp=$(mktemp -d)
 
 # Copy all CSDB objects to the temp directory. The CSDB objects
 # are filtered for a given serial number.
-s1kd-ls -D "$csdb" |
+s1kd-ls "$csdb" |
   xargs s1kd-instance -O "$tmp" -s serialno:prodattr="$serialno"
 
 # Synchronize references in the filtered DMs. This is necessary

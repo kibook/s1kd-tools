@@ -578,7 +578,7 @@ product serial number:
 
     # Copy all CSDB objects to the temp directory. The CSDB objects
     # are filtered for a given serial number.
-    s1kd-ls -D "$csdb" |
+    s1kd-ls "$csdb" |
       xargs s1kd-instance -O "$tmp" -s serialno:prodattr="$serialno"
 
     # Synchronize references in the filtered DMs. This is necessary
