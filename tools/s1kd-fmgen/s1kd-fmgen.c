@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.3.0"
+#define VERSION "3.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -65,6 +65,20 @@ static xmlNodePtr first_xpath_node(xmlDocPtr doc, xmlNodePtr node, const xmlChar
 static xmlChar *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar *expr)
 {
 	return xmlNodeGetContent(first_xpath_node(doc, node, expr));
+}
+
+/* Determine whether a set of parameters already contains a name. */
+static bool has_param(const char **params, const char *name)
+{
+	int i;
+
+	for (i = 0; params[i]; i += 2) {
+		if (strcmp(params[i], name) == 0) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /* Apply an XProc XSLT step to a document. */
@@ -119,13 +133,21 @@ static xmlDocPtr apply_xproc_xslt(const xmlDocPtr doc, const char *xslpath, cons
 		}
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlChar *name, *select;
+			char *name;
 
-			name   = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "name");
-			select = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "select");
+			name = (char *) xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "name");
 
-			combined_params[j++] = (char *) name;
-			combined_params[j++] = (char *) select;
+			/* User-defined parameters override XProc parameters. */
+			if (has_param(params, name)) {
+				xmlFree(name);
+			} else {
+				char *select;
+
+				select = (char *) xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "select");
+
+				combined_params[j++] = name;
+				combined_params[j++] = select;
+			}
 		}
 
 		combined_params[j] = NULL;
