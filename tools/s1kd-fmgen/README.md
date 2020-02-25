@@ -198,6 +198,38 @@ module, optional elements which cannot be derived from the publication
 module (such as the product illustration or bar code) will be copied
 from the source data module when updating it.
 
+Multi-pass transforms
+---------------------
+
+Rather than a literal XSLT file, the path specified for the `xsl`
+attribute in the `.fmtypes` file or the -x (--xsl) option may be an
+XProc file which contains a pipeline with multiple stylesheets. This
+allows for multi-pass transformations. Only a small subset of XProc is
+supported at this time.
+
+Example:
+
+    <p:pipeline
+    xmlns:p="http://www.w3.org/ns/xproc"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    version="1.0">
+    <p:xslt name="Pass 1">
+    <p:input port="stylesheet">
+    <p:document href="pass1.xsl"/>
+    </p:input>
+    <p:with-param name="update-instr" select="true()"/>
+    </p:xslt>
+    <p:xslt name="Pass 2">
+    <p:input port="stylesheet">
+    <p:inline>
+    <xsl:transform version="1.0">
+    ...
+    </xsl:transform>
+    </p:inline>
+    </p:input>
+    </p:xslt>
+    </p:pipeline>
+
 EXIT STATUS
 ===========
 
@@ -216,6 +248,9 @@ An unknown front matter type was specified.
 4  
 The resulting front matter content could not be merged in to a data
 module.
+
+5  
+The stylesheet specified for a type of front matter was invalid.
 
 EXAMPLE
 =======

@@ -9,13 +9,14 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
+#include <libxml/uri.h>
 #include <libxslt/transform.h>
 
 #include "s1kd_tools.h"
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.2.4"
+#define VERSION "3.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -24,6 +25,7 @@
 #define EXIT_NO_TYPE 2
 #define EXIT_BAD_TYPE 3
 #define EXIT_MERGE 4
+#define EXIT_BAD_STYLESHEET 5
 
 #define S_NO_PM_ERR ERR_PREFIX "No publication module.\n"
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
@@ -32,8 +34,12 @@
 #define E_BAD_DATE ERR_PREFIX "Bad date: %s\n"
 #define E_MERGE_NAME ERR_PREFIX "Failed to update %s: no <%s> element to merge on.\n"
 #define E_MERGE_ELEM ERR_PREFIX "Failed to update %s: no front matter contents generated.\n"
+#define E_BAD_STYLESHEET ERR_PREFIX "Failed to update %s: %s is not a valid stylesheet.\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 #define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
+#define I_TRANSFORM INF_PREFIX "Applying transformation %s...\n"
+#define I_XPROC_TRANSFORM INF_PREFIX "Applying XProc transforation %s/%s...\n"
+#define I_XPROC_TRANSFORM_NONAME INF_PREFIX "Applying XProc transformation %s/%ld...\n"
 
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
@@ -61,18 +67,152 @@ static xmlChar *first_xpath_string(xmlDocPtr doc, xmlNodePtr node, const xmlChar
 	return xmlNodeGetContent(first_xpath_node(doc, node, expr));
 }
 
+/* Apply an XProc XSLT step to a document. */
+static xmlDocPtr apply_xproc_xslt(const xmlDocPtr doc, const char *xslpath, const xmlNodePtr xslt, const char **params)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlDocPtr res;
+	const char **combined_params;
+	int i, nparams = 0;
+
+	if (verbosity >= DEBUG) {
+		xmlChar *name = xmlGetProp(xslt, BAD_CAST "name");
+
+		if (name) {
+			fprintf(stderr, I_XPROC_TRANSFORM, xslpath, name);
+		} else {
+			fprintf(stderr, I_XPROC_TRANSFORM_NONAME, xslpath, xmlGetLineNo(xslt));
+		}
+
+		xmlFree(name);
+	}
+
+	ctx = xmlXPathNewContext(xslt->doc);
+	xmlXPathRegisterNs(ctx, BAD_CAST "p", BAD_CAST "http://www.w3.org/ns/xproc");
+	xmlXPathSetContextNode(xslt, ctx);
+
+	/* Get number of current params. */
+	for (i = 0; params[i]; i += 2, ++nparams);
+
+	/* Combine the current params with additional params from the XSLT step. */
+	obj = xmlXPathEvalExpression(BAD_CAST "p:with-param", ctx);
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		/* If there are no additional params, simply copy the current
+		 * params. */
+		combined_params = malloc((nparams * 2 + 1) * sizeof(char *));
+
+		for (i = 0; params[i]; ++i) {
+			combined_params[i] = strdup(params[i]);
+		}
+
+		combined_params[i] = NULL;
+	} else {
+		/* If there are additional params, copy the current params and
+		 * then append the additional ones. */
+		int j;
+
+		combined_params = malloc(((nparams + obj->nodesetval->nodeNr) * 2 + 1) * sizeof(char *));
+
+		for (j = 0; params[j]; ++j) {
+			combined_params[j] = strdup(params[j]);
+		}
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *name, *select;
+
+			name   = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "name");
+			select = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "select");
+
+			combined_params[j++] = (char *) name;
+			combined_params[j++] = (char *) select;
+		}
+
+		combined_params[j] = NULL;
+	}
+	xmlXPathFreeObject(obj);
+
+	/* Read the XProc stylesheet input. */
+	obj = xmlXPathEvalExpression(BAD_CAST "p:input[@port='stylesheet']/p:*", ctx);
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		res = xmlCopyDoc(doc, 1);
+	} else {
+		xmlNodePtr src = obj->nodesetval->nodeTab[0];
+		xmlDocPtr s;
+
+		if (xmlStrcmp(src->name, BAD_CAST "document") == 0) {
+			xmlChar *href, *URI;
+			href = xmlGetProp(obj->nodesetval->nodeTab[0], BAD_CAST "href");
+			URI = xmlBuildURI(href, BAD_CAST xslpath);
+			s = read_xml_doc((char *) URI);
+			xmlFree(href);
+			xmlFree(URI);
+		} else if (xmlStrcmp(src->name, BAD_CAST "inline") == 0) {
+			s = xmlNewDoc(BAD_CAST "1.0");
+			xmlDocSetRootElement(s, xmlCopyNode(xmlFirstElementChild(src), 1));
+		} else {
+			s = NULL;
+		}
+
+		if (s) {
+			xsltStylesheetPtr style;
+			style = xsltParseStylesheetDoc(s);
+			res   = xsltApplyStylesheet(style, doc, combined_params);
+			xsltFreeStylesheet(style);
+		} else {
+			res = xmlCopyDoc(doc, 1);
+		}
+	}
+	xmlXPathFreeObject(obj);
+
+	xmlXPathFreeContext(ctx);
+
+	for (i = 0; combined_params[i]; i += 2) {
+		xmlFree((char *) combined_params[i]);
+		xmlFree((char *) combined_params[i + 1]);
+	}
+	free(combined_params);
+
+	return res;
+}
+
 static xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **params)
 {
-	xmlDocPtr styledoc, res;
+	xmlDocPtr styledoc, res = NULL;
 	xsltStylesheetPtr style;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_TRANSFORM, xslpath);
+	}
 
 	styledoc = read_xml_doc(xslpath);
 
-	style = xsltParseStylesheetDoc(styledoc);
+	ctx = xmlXPathNewContext(styledoc);
+	xmlXPathRegisterNs(ctx, BAD_CAST "p", BAD_CAST "http://www.w3.org/ns/xproc");
+	obj = xmlXPathEvalExpression(BAD_CAST "/p:pipeline/p:xslt", ctx);
 
-	res = xsltApplyStylesheet(style, doc, params);
+	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		style = xsltParseStylesheetDoc(styledoc);
+		res = xsltApplyStylesheet(style, doc, params);
+		xsltFreeStylesheet(style);
+		styledoc = NULL;
+	} else {
+		int i;
+		xmlDocPtr d = xmlCopyDoc(doc, 1);
 
-	xsltFreeStylesheet(style);
+		for (i =0; i < obj->nodesetval->nodeNr; ++i) {
+			res = apply_xproc_xslt(d, xslpath, obj->nodesetval->nodeTab[i], params);
+			xmlFreeDoc(d);
+			d = res;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	xmlFreeDoc(styledoc);
 
 	return res;
 }
@@ -206,6 +346,10 @@ static void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 	xmlNodePtr fmtp, node;
 
 	fmtp = first_xpath_node(res, NULL, BAD_CAST "//frontMatterTitlePage");
+
+	if (!fmtp) {
+		return;
+	}
 
 	if ((node = first_xpath_node(doc, NULL, BAD_CAST "//productIntroName"))) {
 		xmlAddPrevSibling(first_xpath_node(res, fmtp,
@@ -365,7 +509,12 @@ static void generate_fm_content_for_dm(
 			fprintf(stderr, I_GENERATE, dmpath, type);
 		}
 
-		res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params);
+		if (!(res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params))) {
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_STYLESHEET, dmpath, xslpath ? xslpath : fmxsl);
+			}
+			exit(EXIT_BAD_STYLESHEET);
+		}
 
 		if (strcmp(type, "TP") == 0) {
 			copy_tp_elems(res, doc);
@@ -478,12 +627,8 @@ static void dump_builtin_xsl(const char *type)
 
 static void fix_fmxsl_paths(xmlDocPtr doc, const char *path)
 {
-	char *s, *dir;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-
-	s = strdup(path);
-	dir = dirname(s);
 
 	ctx = xmlXPathNewContext(doc);
 	obj = xmlXPathEvalExpression(BAD_CAST "//@xsl", ctx);
@@ -492,30 +637,16 @@ static void fix_fmxsl_paths(xmlDocPtr doc, const char *path)
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlChar *old_xsl;
-
-			old_xsl = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
-
-			if (old_xsl[0] != '/') {
-				xmlChar *new_xsl;
-				int n;
-
-				n = xmlStrlen(old_xsl) + strlen(dir) + 2;
-				new_xsl = malloc(n * sizeof(xmlChar));
-				xmlStrPrintf(new_xsl, n, "%s/%s", dir, old_xsl);
-
-				xmlNodeSetContent(obj->nodesetval->nodeTab[i], new_xsl);
-
-				free(new_xsl);
-			}
-
-			xmlFree(old_xsl);
+			xmlChar *xsl = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+			xmlChar *URI = xmlBuildURI(xsl, BAD_CAST path);
+			xmlNodeSetContent(obj->nodesetval->nodeTab[i], URI);
+			xmlFree(xsl);
+			xmlFree(URI);
 		}
 	}
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
-	free(s);
 }
 
 static xmlDocPtr read_fmtypes(const char *path)

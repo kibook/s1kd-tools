@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="00"/>
+        <issueInfo issueNumber="020" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="11" day="15"/>
+        <issueDate year="2020" month="02" day="25"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,12 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add support for multi-pass transforms with a subset of XProc.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add error code for an invalid stylesheet.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -279,6 +285,33 @@
           <title>Optional title page elements</title>
           <para>When re-generating the front matter content for a title page data module, optional elements which cannot be derived from the publication module (such as the product illustration or bar code) will be copied from the source data module when updating it.</para>
         </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Multi-pass transforms</title>
+          <para>Rather than a literal XSLT file, the path specified for the <verbatimText verbatimStyle="vs13">xsl</verbatimText> attribute in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file or the -x (--xsl) option may be an XProc file which contains a pipeline with multiple stylesheets. This allows for multi-pass transformations. Only a small subset of XProc is supported at this time.</para>
+          <para>
+            Example:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<p:pipeline
+xmlns:p="http://www.w3.org/ns/xproc"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+version="1.0">
+<p:xslt name="Pass 1">
+<p:input port="stylesheet">
+<p:document href="pass1.xsl"/>
+</p:input>
+<p:with-param name="update-instr" select="true()"/>
+</p:xslt>
+<p:xslt name="Pass 2">
+<p:input port="stylesheet">
+<p:inline>
+<xsl:transform version="1.0">
+...
+</xsl:transform>
+</p:inline>
+</p:input>
+</p:xslt>
+</p:pipeline>]]></verbatimText>
+          </para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXIT STATUS</title>
@@ -312,6 +345,12 @@
               <listItemTerm>4</listItemTerm>
               <listItemDefinition>
                 <para>The resulting front matter content could not be merged in to a data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>5</listItemTerm>
+              <listItemDefinition>
+                <para>The stylesheet specified for a type of front matter was invalid.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
