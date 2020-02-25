@@ -204,8 +204,11 @@ Multi-pass transforms
 Rather than a literal XSLT file, the path specified for the `xsl`
 attribute in the `.fmtypes` file or the -x (--xsl) option may be an
 XProc file which contains a pipeline with multiple stylesheets. This
-allows for multi-pass transformations. Only a small subset of XProc is
-supported at this time.
+allows for multi-pass transformations.
+
+> **Note**
+>
+> Only a small subset of XProc is supported at this time.
 
 Example:
 

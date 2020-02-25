@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="01"/>
+        <issueInfo issueNumber="020" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="02" day="25"/>
@@ -287,7 +287,10 @@
         </levelledPara>
         <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
           <title>Multi-pass transforms</title>
-          <para>Rather than a literal XSLT file, the path specified for the <verbatimText verbatimStyle="vs13">xsl</verbatimText> attribute in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file or the -x (--xsl) option may be an XProc file which contains a pipeline with multiple stylesheets. This allows for multi-pass transformations. Only a small subset of XProc is supported at this time.</para>
+          <para>Rather than a literal XSLT file, the path specified for the <verbatimText verbatimStyle="vs13">xsl</verbatimText> attribute in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file or the -x (--xsl) option may be an XProc file which contains a pipeline with multiple stylesheets. This allows for multi-pass transformations.</para>
+          <note>
+            <notePara>Only a small subset of XProc is supported at this time.</notePara>
+          </note>
           <para>
             Example:
             <verbatimText verbatimStyle="vs11"><![CDATA[<p:pipeline
