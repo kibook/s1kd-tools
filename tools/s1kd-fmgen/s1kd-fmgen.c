@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.3.1"
+#define VERSION "3.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -39,7 +39,7 @@
 #define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
 #define I_TRANSFORM INF_PREFIX "Applying transformation %s...\n"
 #define I_XPROC_TRANSFORM INF_PREFIX "Applying XProc transforation %s/%s...\n"
-#define I_XPROC_TRANSFORM_NONAME INF_PREFIX "Applying XProc transformation %s/%ld...\n"
+#define I_XPROC_TRANSFORM_NONAME INF_PREFIX "Applying XProc transformation %s/line %ld...\n"
 
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
