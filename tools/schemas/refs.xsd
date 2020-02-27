@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  version="1.0">
+  <xs:element name="results" type="resultsElemType"/>
+  <xs:complexType name="resultsElemType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="found"/>
+        <xs:element ref="missing"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="found" type="foundElemType"/>
+  <xs:complexType name="foundElemType">
+    <xs:sequence>
+      <xs:element ref="ref"/>
+      <xs:element ref="source"/>
+      <xs:element name="filename" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ref" type="refElemType"/>
+  <xs:complexType name="refElemType">
+    <xs:sequence>
+      <xs:any processContents="skip"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="source" type="sourceElemType"/>
+  <xs:complexType name="sourceElemType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute ref="line"/>
+        <xs:attribute ref="xpath"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:attribute name="line" type="xs:positiveInteger"/>
+  <xs:attribute name="xpath" type="xs:string"/>
+  <xs:element name="missing" type="missingElemType"/>
+  <xs:complexType name="missingElemType">
+    <xs:sequence>
+      <xs:element ref="ref"/>
+      <xs:element ref="source"/>
+      <xs:element name="code" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
