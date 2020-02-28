@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="07" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="047" inWork="00"/>
+        <issueInfo issueNumber="047" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="12" day="13"/>
+        <issueDate year="2020" month="02" day="28"/>
         <dmTitle>
           <techName>s1kd-newdm(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Document that an SNS may also be read using the "brex" .defaults key.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -336,7 +339,7 @@
             <definitionListItem>
               <listItemTerm>-S, --sns &lt;BREX&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>".</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Determine the tech name from the SNS rules of a specified BREX data module. This can also be specified in the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file with the key "<verbatimText verbatimStyle="vs14">sns</verbatimText>", or the key "<verbatimText verbatimStyle="vs14">brex</verbatimText>" if "<verbatimText verbatimStyle="vs14">sns</verbatimText>" is not specified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

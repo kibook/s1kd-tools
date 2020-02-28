@@ -187,7 +187,7 @@ The responsible partner company enterprise name of the new data module.
 -S, --sns &lt;BREX&gt;  
 Determine the tech name from the SNS rules of a specified BREX data
 module. This can also be specified in the `.defaults` file with the key
-"`sns`".
+"`sns`", or the key "`brex`" if "`sns`" is not specified.
 
 -s, --schema &lt;schema&gt;  
 The schema URL.
