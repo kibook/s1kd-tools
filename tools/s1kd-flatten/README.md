@@ -6,7 +6,7 @@ s1kd-flatten - Flatten a publication module for publishing
 SYNOPSIS
 ========
 
-    s1kd-flatten [-d <dir>] [-I <path>] [-cDfimNpqRruvx] <PM> [<DM>...]
+    s1kd-flatten [-d <dir>] [-I <path>] [-cDfimNPpqRruvx] <PM> [<DM>...]
 
 DESCRIPTION
 ===========
@@ -54,6 +54,9 @@ Modify the references in the publication module without flattening them.
 Assume that the files representing the referenced data modules do not
 include the issue info in their filenames, i.e. they were created using
 the -N option of the s1kd-new\* tools.
+
+-P, --only-pm-refs  
+Only flatten PM references, leaving DM references alone.
 
 -p, --simple  
 Instead of the hierarchical PM-based format, use a simpler "flat"

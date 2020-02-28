@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.0.6"
+#define VERSION "3.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -53,11 +53,13 @@ static int recursive = 0;
 static int recursive_search = 0;
 static int remove_unresolved = 0;
 
+static int only_pm_refs = 0;
+
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfimNpqRruvxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfimNPpqRruvxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
 	puts("  -c, --containers      Flatten referenced container data modules.");
@@ -69,6 +71,7 @@ static void show_help(void)
 	puts("  -i, --ignore-issue    Always match the latest issue of an object found.");
 	puts("  -m, --modify          Modiy references without flattening them.");
 	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
+	puts("  -P, --only-pm-refs    Only flatten PM refs.");
 	puts("  -p, --simple          Output a simple, flat XML file.");
 	puts("  -q, --quiet           Quiet mode.");
 	puts("  -R, --recursively     Recursively flatten referenced PMs.");
@@ -331,7 +334,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 	xmlNodePtr cur;
 
 	/* Skip DM refs if they do not need to be processed. */
-	if (!(flatten_ref || remove_unresolved || flatten_container)) {
+	if (only_pm_refs || !(flatten_ref || remove_unresolved || flatten_container)) {
 		return;
 	}
 
@@ -591,7 +594,7 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "cDd:fxmNpqRruvI:ih?";
+	const char *sopts = "cDd:fxmNPpqRruvI:ih?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -602,6 +605,7 @@ int main(int argc, char **argv)
 		{"use-xinclude", no_argument      , 0, 'x'},
 		{"modify"      , no_argument      , 0, 'm'},
 		{"omit-issue"  , no_argument      , 0, 'N'},
+		{"only-pm-refs", no_argument      , 0, 'P'},
 		{"simple"      , no_argument      , 0, 'p'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursively" , no_argument      , 0, 'R'},
@@ -639,6 +643,7 @@ int main(int argc, char **argv)
 			case 'x': xinclude = 1; break;
 			case 'm': flatten_ref = 0; break;
 			case 'N': no_issue = 1; break;
+			case 'P': only_pm_refs = 1; break;
 			case 'p': use_pub_fmt = 1; break;
 			case 'q': --verbosity; break;
 			case 'R': recursive = 1; break;
