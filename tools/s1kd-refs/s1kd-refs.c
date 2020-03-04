@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.7.0"
+#define VERSION "4.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -85,23 +85,47 @@ static int numListedFiles = 0;
 static long unsigned maxListedFiles = 1;
 
 /* Possible objects to list references to. */
-#define SHOW_COM 0x001 /* Comments */
-#define SHOW_DMC 0x002 /* Data modules */
-#define SHOW_ICN 0x004 /* ICNs */
-#define SHOW_PMC 0x008 /* Publication modules */
-#define SHOW_EPR 0x010 /* External publications */
-#define SHOW_HOT 0x020 /* Hotspots */
-#define SHOW_FRG 0x040 /* Fragments */
-#define SHOW_DML 0x080 /* DMLs */
-#define SHOW_SMC 0x100 /* SCORM content packages */
-#define SHOW_SRC 0x200 /* Source ident */
-#define SHOW_REP 0x400 /* Repository source ident */
+#define SHOW_COM 0x0001 /* Comments */
+#define SHOW_DMC 0x0002 /* Data modules */
+#define SHOW_ICN 0x0004 /* ICNs */
+#define SHOW_PMC 0x0008 /* Publication modules */
+#define SHOW_EPR 0x0010 /* External publications */
+#define SHOW_HOT 0x0020 /* Hotspots */
+#define SHOW_FRG 0x0040 /* Fragments */
+#define SHOW_DML 0x0080 /* DMLs */
+#define SHOW_SMC 0x0100 /* SCORM content packages */
+#define SHOW_SRC 0x0200 /* Source ident */
+#define SHOW_REP 0x0400 /* Repository source ident */
+#define SHOW_IPD 0x0800 /* IPD data modules */
+#define SHOW_CSN 0x1000 /* CSN items */
 
 /* All possible objects. */
-#define SHOW_ALL SHOW_COM | SHOW_DMC | SHOW_ICN | SHOW_PMC | SHOW_EPR | SHOW_HOT | SHOW_FRG | SHOW_DML | SHOW_SMC | SHOW_SRC | SHOW_REP
+#define SHOW_ALL \
+	SHOW_COM | \
+	SHOW_DMC | \
+	SHOW_ICN | \
+	SHOW_PMC | \
+	SHOW_EPR | \
+	SHOW_HOT | \
+	SHOW_FRG | \
+	SHOW_DML | \
+	SHOW_SMC | \
+	SHOW_SRC | \
+	SHOW_REP | \
+	SHOW_IPD | \
+	SHOW_CSN
 
 /* All objects relevant to -w mode. */
-#define SHOW_WHERE_USED SHOW_COM | SHOW_DMC | SHOW_PMC | SHOW_DML | SHOW_SMC | SHOW_ICN | SHOW_SRC | SHOW_REP
+#define SHOW_WHERE_USED \
+	SHOW_COM | \
+	SHOW_DMC | \
+	SHOW_PMC | \
+	SHOW_DML | \
+	SHOW_SMC | \
+	SHOW_ICN | \
+	SHOW_SRC | \
+	SHOW_REP | \
+	SHOW_IPD
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
@@ -1123,6 +1147,181 @@ static void getDispatchFileName(char *dst, xmlNodePtr ref)
 	xmlFree(fname);
 }
 
+/* Get the code of an IPD data module from a CSN ref. */
+static void getIpdCode(char *dst, xmlNodePtr ref)
+{
+	xmlChar *modelIdentCode, *systemDiffCode, *systemCode, *subSystemCode, *subSubSystemCode, *assyCode, *figureNumber, *figureNumberVariant, *itemLocationCode, *item, *itemVariant;
+
+	modelIdentCode      = xmlGetProp(ref, BAD_CAST "modelIdentCode");
+	systemDiffCode      = xmlGetProp(ref, BAD_CAST "systemDiffCode");
+	systemCode          = xmlGetProp(ref, BAD_CAST "systemCode");
+	subSystemCode       = xmlGetProp(ref, BAD_CAST "subSystemCode");
+	subSubSystemCode    = xmlGetProp(ref, BAD_CAST "subSubSystemCode");
+	assyCode            = xmlGetProp(ref, BAD_CAST "assyCode");
+	figureNumber        = xmlGetProp(ref, BAD_CAST "figureNumber");
+	figureNumberVariant = xmlGetProp(ref, BAD_CAST "figureNumberVariant");
+	itemLocationCode    = xmlGetProp(ref, BAD_CAST "itemLocationCode");
+	item = xmlGetProp(ref, BAD_CAST "item");
+	itemVariant = xmlGetProp(ref, BAD_CAST "itemVariant");
+
+	/* If CSN is chapterized, attempt to match it to a DMC. */
+	if (modelIdentCode && systemDiffCode && systemCode && subSystemCode && subSubSystemCode && assyCode && figureNumber && itemLocationCode) {
+		xmlDocPtr tmp;
+		xmlNodePtr dmRef, dmRefIdent, dmCode;
+
+		tmp = xmlNewDoc(BAD_CAST "1.0");
+
+		dmRef = xmlNewNode(NULL, BAD_CAST "dmRef");
+		dmRefIdent = xmlNewChild(dmRef, NULL, BAD_CAST "dmRefIdent", NULL);
+		dmCode = xmlNewChild(dmRefIdent, NULL, BAD_CAST "dmCode", NULL);
+
+		xmlDocSetRootElement(tmp, dmRef);
+
+		if (!figureNumberVariant) {
+			figureNumberVariant = xmlCharStrdup("0");
+		}
+
+		xmlSetProp(dmCode, BAD_CAST "modelIdentCode", modelIdentCode);
+		xmlSetProp(dmCode, BAD_CAST "systemDiffCode", systemDiffCode);
+		xmlSetProp(dmCode, BAD_CAST "systemCode", systemCode);
+		xmlSetProp(dmCode, BAD_CAST "subSystemCode", subSystemCode);
+		xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", subSubSystemCode);
+		xmlSetProp(dmCode, BAD_CAST "assyCode", assyCode);
+		xmlSetProp(dmCode, BAD_CAST "disassyCode", figureNumber);
+		xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", figureNumberVariant);
+		xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST "941");
+		xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST "A");
+		xmlSetProp(dmCode, BAD_CAST "itemLocationCode", itemLocationCode);
+
+		getDmCode(dst, dmRef);
+
+		xmlFreeDoc(tmp);
+	/* Otherwise, just return a generic CSN name. */
+	} else {
+		strcpy(dst, "Fig ");
+		strcat(dst, (char *) figureNumber);
+		if (figureNumberVariant) {
+			strcat(dst, (char *) figureNumberVariant);
+		}
+		strcat(dst, " Item ");
+		strcat(dst, (char *) item);
+		if (itemVariant) {
+			strcat(dst, (char *) itemVariant);
+		}
+	}
+
+	xmlFree(modelIdentCode);
+	xmlFree(systemDiffCode);
+	xmlFree(systemCode);
+	xmlFree(subSystemCode);
+	xmlFree(subSubSystemCode);
+	xmlFree(assyCode);
+	xmlFree(figureNumber);
+	xmlFree(figureNumberVariant);
+	xmlFree(itemLocationCode);
+	xmlFree(item);
+	xmlFree(itemVariant);
+}
+
+/* Match a CSN item in an IPD. */
+static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const char *fname, const char *src)
+{
+	xmlChar *item, *itemVariant, *id;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+	xmlNodePtr node;
+	char *s;
+	int err = doc == NULL;
+
+	item = xmlGetProp(ref, BAD_CAST "item");
+	itemVariant = xmlGetProp(ref, BAD_CAST "itemVariant");
+
+	id = xmlCharStrdup("Item ");
+	id = xmlStrcat(id, item);
+	id = xmlStrcat(id, itemVariant);
+
+	if (doc) {
+		ctx = xmlXPathNewContext(doc);
+		xmlXPathRegisterVariable(ctx, BAD_CAST "item", xmlXPathNewString(item));
+		xmlXPathRegisterVariable(ctx, BAD_CAST "itemVariant", xmlXPathNewString(itemVariant));
+		obj = xmlXPathEvalExpression(BAD_CAST "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]", ctx);
+
+		if (!obj || xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			node = NULL;
+		} else {
+			node = obj->nodesetval->nodeTab[0];
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+
+		if (node) {
+			if (showMatched && !tagUnmatched) {
+				s = malloc(strlen(fname) + strlen((char *) id) + 2);
+
+				strcpy(s, fname);
+				strcat(s, " ");
+				strcat(s, (char *) id);
+
+				printMatchedFn(ref, src, s);
+
+				free(s);
+			}
+		} else {
+			++err;
+		}
+	}
+
+	if (err) {
+		s = malloc(strlen(code) + strlen((char *) id) + 2);
+		strcpy(s, code);
+		strcat(s, " ");
+		strcat(s, (char *) id);
+
+		if (tagUnmatched) {
+			tagUnmatchedRef(ref);
+		} else if (showUnmatched) {
+			printMatchedFn(ref, src, s);
+		} else if (!quiet) {
+			printUnmatchedFn(ref, src, s);
+		}
+
+		free(s);
+	}
+
+	xmlFree(item);
+	xmlFree(itemVariant);
+	xmlFree(id);
+
+	return err;
+
+}
+
+/* Match the CSN items in another DM. */
+static int getCsnItem(xmlNodePtr ref, const char *src)
+{
+	xmlNodePtr csnref;
+	char code[PATH_MAX], fname[PATH_MAX];
+	xmlDocPtr doc;
+	int err;
+
+	csnref = ref->parent;
+
+	getIpdCode(code, csnref);
+
+	if (find_object_fname(fname, directory, code, recursive)) {
+		doc = read_xml_doc(fname);
+	} else {
+		doc = NULL;
+	}
+
+	err = matchCsnItem(doc, csnref, code, doc ? fname : code, src);
+
+	xmlFreeDoc(doc);
+
+	return err;
+}
+
 /* Update address items using the matched referenced object. */
 static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, const char *fname)
 {
@@ -1452,6 +1651,12 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 		 (xmlStrcmp(ref->name, BAD_CAST "referredFragment") == 0 ||
 		  xmlStrcmp(ref->name, BAD_CAST "target") == 0))
 		return getFragment(ref, src);
+	else if ((show & SHOW_IPD) == SHOW_IPD &&
+		 (xmlStrcmp(ref->name, BAD_CAST "catalogSeqNumberRef") == 0))
+			getIpdCode(code, ref);
+	else if ((show & SHOW_CSN) == SHOW_CSN &&
+		 (xmlStrcmp(ref->name, BAD_CAST "item") == 0))
+			return getCsnItem(ref, src);
 	else
 		return 0;
 
@@ -1568,7 +1773,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef|.//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef|.//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent|.//catalogSeqNumberRef|.//catalogSeqNumberRef/@item", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1804,11 +2009,12 @@ static int listWhereUsedList(const char *path, int show)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aCcDEFfGHIiLlmNnoPqrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
-	puts("  -C, --com                    List commnent references.");
+	puts("  -B, --ipd                    List IPD references.");
+	puts("  -C, --com                    List comment references.");
 	puts("  -c, --content                Only show references in content section.");
 	puts("  -D, --dm                     List data module references.");
 	puts("  -d, --dir                    Directory to search for matches in.");
@@ -1823,6 +2029,7 @@ static void show_help(void)
 	puts("  -i, --ignore-issue           Ignore issue info when matching.");
 	puts("  -J, --namespace <ns=URL>     Register a namespace for the hotspot XPath.");
 	puts("  -j, --hotspot-xpath <xpath>  XPath to use for matching hotspots (-H).");
+	puts("  -K, --csn                    List CSN references.");
 	puts("  -L, --dml                    List DML references.");
 	puts("  -l, --list                   Treat input as list of CSDB objects.");
 	puts("  -m, --strict-match           Be more strict when matching filenames of objects.");
@@ -1872,7 +2079,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZh?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKh?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -1914,6 +2121,8 @@ int main(int argc, char **argv)
 		{"where-used"   , no_argument      , 0, 'w'},
 		{"repository"   , no_argument      , 0, 'Y'},
 		{"source"       , no_argument      , 0, 'Z'},
+		{"ipd"          , no_argument      , 0, 'B'},
+		{"csn"          , no_argument      , 0, 'K'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2052,6 +2261,12 @@ int main(int argc, char **argv)
 				break;
 			case 'Z':
 				showObjects |= SHOW_SRC;
+				break;
+			case 'B':
+				showObjects |= SHOW_IPD;
+				break;
+			case 'K':
+				showObjects |= SHOW_CSN;
 				break;
 			case 'h':
 			case '?':

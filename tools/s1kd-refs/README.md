@@ -6,9 +6,9 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aCcDEFfGHIiLlmNnoPqRrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>]
-              [-J <ns=URL>] [-j <xpath>] [-t <fmt>] [-3 <file>]
-              [<object>...]
+    s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZh?] [-d <dir>]
+              [-e <cmd>] [-J <ns=URL>] [-j <xpath>] [-t <fmt>]
+              [-3 <file>] [<object>...]
 
 DESCRIPTION
 ===========
@@ -32,15 +32,15 @@ OPTIONS
 -a, --all  
 List all references, both matched and unmatched.
 
--C, -D, -E, -G, -H, -L, -P, -S, -T, -Y, -Z  
-List references to comments, data modules, external publications, ICNs,
-hotspots, data management lists, publication modules, SCORM content
-packages, referred fragments, repository source DMs and source objects
-respectively. If none are specified, -CDEGHLPSTYZ is assumed.
+-B, -C, -D, -E, -G, -H, -K, -L, -P, -S, -T, -Y, -Z  
+List references to IPDs, comments, data modules, external publications,
+ICNs, hotspots, CSNs, data management lists, publication modules, SCORM
+content packages, referred fragments, repository source DMs and source
+objects respectively. If none are specified, -BCDEGHKLPSTYZ is assumed.
 
-The following long options can also be used for each: --com, --dm,
---epr, --icn, --hotspot, --dml, --pm, --smc, --fragment, --repository,
---source.
+The following long options can also be used for each: --ipd, --com,
+--dm, --epr, --icn, --hotspot, --csn, --dml, --pm, --smc, --fragment,
+--repository, --source.
 
 -c, --content  
 List references in the `content` section of a CSDB object only.
