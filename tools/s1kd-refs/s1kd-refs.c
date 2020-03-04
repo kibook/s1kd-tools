@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.8.0"
+#define VERSION "4.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1150,7 +1150,7 @@ static void getDispatchFileName(char *dst, xmlNodePtr ref)
 /* Get the code of an IPD data module from a CSN ref. */
 static void getIpdCode(char *dst, xmlNodePtr ref)
 {
-	xmlChar *modelIdentCode, *systemDiffCode, *systemCode, *subSystemCode, *subSubSystemCode, *assyCode, *figureNumber, *figureNumberVariant, *itemLocationCode, *item, *itemVariant;
+	xmlChar *modelIdentCode, *systemDiffCode, *systemCode, *subSystemCode, *subSubSystemCode, *assyCode, *figureNumber, *figureNumberVariant, *itemLocationCode;
 
 	modelIdentCode      = xmlGetProp(ref, BAD_CAST "modelIdentCode");
 	systemDiffCode      = xmlGetProp(ref, BAD_CAST "systemDiffCode");
@@ -1161,8 +1161,6 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	figureNumber        = xmlGetProp(ref, BAD_CAST "figureNumber");
 	figureNumberVariant = xmlGetProp(ref, BAD_CAST "figureNumberVariant");
 	itemLocationCode    = xmlGetProp(ref, BAD_CAST "itemLocationCode");
-	item = xmlGetProp(ref, BAD_CAST "item");
-	itemVariant = xmlGetProp(ref, BAD_CAST "itemVariant");
 
 	/* If CSN is chapterized, attempt to match it to a DMC. */
 	if (modelIdentCode && systemDiffCode && systemCode && subSystemCode && subSubSystemCode && assyCode && figureNumber && itemLocationCode) {
@@ -1196,17 +1194,12 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 		getDmCode(dst, dmRef);
 
 		xmlFreeDoc(tmp);
-	/* Otherwise, just return a generic CSN name. */
+	/* Otherwise, just return a generic IPD figure name. */
 	} else {
 		strcpy(dst, "Fig ");
 		strcat(dst, (char *) figureNumber);
 		if (figureNumberVariant) {
 			strcat(dst, (char *) figureNumberVariant);
-		}
-		strcat(dst, " Item ");
-		strcat(dst, (char *) item);
-		if (itemVariant) {
-			strcat(dst, (char *) itemVariant);
 		}
 	}
 
@@ -1219,8 +1212,6 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	xmlFree(figureNumber);
 	xmlFree(figureNumberVariant);
 	xmlFree(itemLocationCode);
-	xmlFree(item);
-	xmlFree(itemVariant);
 }
 
 /* Match a CSN item in an IPD. */
