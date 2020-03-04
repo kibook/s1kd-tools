@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.8.1"
+#define VERSION "4.9.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -23,6 +23,7 @@
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_OUT_OF_MEMORY ERR_PREFIX "Too many files in recursive listing.\n"
 #define E_BAD_STDIN ERR_PREFIX "stdin does not contain valid XML.\n"
+#define E_BAD_CSN_CODE ERR_PREFIX "Invalid non-chapterized IPD SNS: %s\n"
 
 #define S_UNMATCHED SUCC_PREFIX "No unmatched references in %s\n"
 #define F_UNMATCHED FAIL_PREFIX "Unmatched references in %s\n"
@@ -32,6 +33,7 @@
 #define EXIT_UNMATCHED_REF 1
 #define EXIT_OUT_OF_MEMORY 2
 #define EXIT_BAD_STDIN 3
+#define EXIT_BAD_CSN_CODE 4
 
 /* List only references found in the content section. */
 static bool contentOnly = false;
@@ -75,7 +77,15 @@ static bool overwriteUpdated = false;
 /* Remove unmatched references from the input objects. */
 static bool tagUnmatched = false;
 
+/* Command string to execute with the -e option. */
 static char *execStr = NULL;
+
+/* Non-chapterized IPD SNS. */
+static bool nonChapIpdSns = false;
+static char nonChapIpdSystemCode[4] = "";
+static char nonChapIpdSubSystemCode[2] = "";
+static char nonChapIpdSubSubSystemCode[2] = "";
+static char nonChapIpdAssyCode[5] = "";
 
 /* When listing references recursively, keep track of files which have already
  * been listed to avoid loops.
@@ -1162,6 +1172,32 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	figureNumberVariant = xmlGetProp(ref, BAD_CAST "figureNumberVariant");
 	itemLocationCode    = xmlGetProp(ref, BAD_CAST "itemLocationCode");
 
+	/* If a non-chapterized IPD SNS is given, apply it. */
+	if (nonChapIpdSns) {
+		xmlNodePtr dmCode = firstXPathNode(NULL, ref, BAD_CAST "ancestor::dmodule//dmIdent/dmCode");
+
+		if (dmCode) {
+			/* These attributes are always interpreted as relative to the current DM. */
+			if (!modelIdentCode)   modelIdentCode   = xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
+			if (!systemDiffCode)   systemDiffCode   = xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
+			if (!itemLocationCode) itemLocationCode = xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
+
+			/* "-" indicates the SNS is also relative to the current DM. */
+			if (strcmp(nonChapIpdSystemCode, "-") == 0) {
+				if (!systemCode)       systemCode       = xmlGetProp(dmCode, BAD_CAST "systemCode");
+				if (!subSystemCode)    subSystemCode    = xmlGetProp(dmCode, BAD_CAST "subSystemCode");
+				if (!subSubSystemCode) subSubSystemCode = xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
+				if (!assyCode)         assyCode         = xmlGetProp(dmCode, BAD_CAST "assyCode");
+			/* Otherwise, construct the SNS from the given code. */
+			} else {
+				if (!systemCode) systemCode = xmlCharStrdup(nonChapIpdSystemCode);
+				if (!subSystemCode) subSystemCode = xmlCharStrdup(nonChapIpdSubSystemCode);
+				if (!subSubSystemCode) subSubSystemCode = xmlCharStrdup(nonChapIpdSubSubSystemCode);
+				if (!assyCode) assyCode = xmlCharStrdup(nonChapIpdAssyCode);
+			}
+		}
+	}
+
 	/* If CSN is chapterized, attempt to match it to a DMC. */
 	if (modelIdentCode && systemDiffCode && systemCode && subSystemCode && subSubSystemCode && assyCode && figureNumber && itemLocationCode) {
 		xmlDocPtr tmp;
@@ -1997,6 +2033,27 @@ static int listWhereUsedList(const char *path, int show)
 	return unmatched;
 }
 
+/* Read a non-chapterized IPD SNS code. */
+static void readnonChapIpdSns(const char *s)
+{
+	if (strcmp(s, "-") == 0) {
+		strcpy(nonChapIpdSystemCode, s);
+	} else {
+		int n;
+
+		n = sscanf(s, "%3[0-9A-Z]-%1[0-9A-Z]%1[0-9A-Z]-%4[0-9A-Z]",
+			nonChapIpdSystemCode,
+			nonChapIpdSubSystemCode,
+			nonChapIpdSubSubSystemCode,
+			nonChapIpdAssyCode);
+
+		if (n != 4) {
+			fprintf(stderr, E_BAD_CSN_CODE, s);
+			exit(EXIT_BAD_CSN_CODE);
+		}
+	}
+}
+
 /* Display the usage message. */
 static void show_help(void)
 {
@@ -2005,6 +2062,7 @@ static void show_help(void)
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
 	puts("  -B, --ipd                    List IPD references.");
+	puts("  -b, --ipd-sns <SNS>          The SNS for non-chapterized IPDs.");
 	puts("  -C, --com                    List comment references.");
 	puts("  -c, --content                Only show references in content section.");
 	puts("  -D, --dm                     List data module references.");
@@ -2070,7 +2128,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKh?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKb:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -2114,6 +2172,7 @@ int main(int argc, char **argv)
 		{"source"       , no_argument      , 0, 'Z'},
 		{"ipd"          , no_argument      , 0, 'B'},
 		{"csn"          , no_argument      , 0, 'K'},
+		{"ipd-sns"      , no_argument      , 0, 'b'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2258,6 +2317,10 @@ int main(int argc, char **argv)
 				break;
 			case 'K':
 				showObjects |= SHOW_CSN;
+				break;
+			case 'b':
+				readnonChapIpdSns(optarg);
+				nonChapIpdSns = true;
 				break;
 			case 'h':
 			case '?':

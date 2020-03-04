@@ -42,6 +42,14 @@ The following long options can also be used for each: --ipd, --com,
 --dm, --epr, --icn, --hotspot, --csn, --dml, --pm, --smc, --fragment,
 --repository, --source.
 
+-b, --ipd-sns &lt;SNS&gt;  
+Specify the SNS for non-chapterized IPD data modules, in the form of
+SYSTEM-SUBSYSTEM-ASSY (for example, "ZD-00-35"). This code is used to
+resolve non-chapterized CSN references.
+
+If "-" is given for &lt;SNS&gt;, then the SNS will be derived from
+current data module.
+
 -c, --content  
 List references in the `content` section of a CSDB object only.
 
@@ -248,6 +256,9 @@ available memory.
 
 3  
 stdin did not contain valid XML and not in list mode (-l).
+
+4  
+The non-chapterized SNS specified (-b) is not valid.
 
 EXAMPLE
 =======
