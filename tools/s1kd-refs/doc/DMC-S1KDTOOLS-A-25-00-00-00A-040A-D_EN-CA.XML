@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -B (--ipd), -b (--ipd-sns) and -K (--csn) options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Include filename of matched objects separately from reference code.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -220,11 +223,14 @@
                 <para>Specify a custom format for printed references. &lt;fmt&gt; is a format string, where the following variables can be given:</para>
                 <para>
                   <randomList>
+                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                      <para>%file% - The filename of the referenced object (nothing is printed if no file is matched).</para>
+                    </listItem>
                     <listItem>
                       <para>%line% - The line number where the reference occurs in the source.</para>
                     </listItem>
-                    <listItem>
-                      <para>%ref% - The reference.</para>
+                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">
+                      <para>%ref% - The reference. May be a code (if no file is matched), a file name (for objects where a file is matched) or a file name + fragment name.</para>
                     </listItem>
                     <listItem>
                       <para>%src% - The source of the reference.</para>

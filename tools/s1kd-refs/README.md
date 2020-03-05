@@ -135,9 +135,14 @@ and all its dependencies together.
 Specify a custom format for printed references. &lt;fmt&gt; is a format
 string, where the following variables can be given:
 
+-   %file% - The filename of the referenced object (nothing is printed
+    if no file is matched).
+
 -   %line% - The line number where the reference occurs in the source.
 
--   %ref% - The reference.
+-   %ref% - The reference. May be a code (if no file is matched), a file
+    name (for objects where a file is matched) or a file name + fragment
+    name.
 
 -   %src% - The source of the reference.
 

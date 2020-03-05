@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.9.1"
+#define VERSION "4.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -206,7 +206,7 @@ static xmlChar *firstXPathValue(xmlDocPtr doc, xmlNodePtr root, const xmlChar *p
 }
 
 /* Process and print info based on a format string. */
-static void processFormatStr(FILE *f, xmlNodePtr node, const char *src, const char *ref)
+static void processFormatStr(FILE *f, xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	int i;
 
@@ -228,6 +228,8 @@ static void processFormatStr(FILE *f, xmlNodePtr node, const char *src, const ch
 					fprintf(f, "%s", src);
 				} else if (strncmp(k, "ref", n) == 0) {
 					fprintf(f, "%s", ref);
+				} else if (strncmp(k, "file", n) == 0 && fname) {
+					fprintf(f, "%s", fname);
 				} else if (strncmp(k, "line", n) == 0) {
 					fprintf(f, "%ld", xmlGetLineNo(node));
 				} else if (strncmp(k, "xpath", n) == 0) {
@@ -254,21 +256,21 @@ static void processFormatStr(FILE *f, xmlNodePtr node, const char *src, const ch
 }
 
 /* Print a reference which is matched in the filesystem. */
-static void printMatched(xmlNodePtr node, const char *src, const char *ref)
+static void printMatched(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	puts(ref);
 }
-static void printMatchedSrc(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedSrc(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	printf("%s: %s\n", src, ref);
 }
-static void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedSrcLine(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	printf("%s (%ld): %s\n", src, xmlGetLineNo(node), ref);
 }
-static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
-	xmlChar *s, *r, *xpath;
+	xmlChar *s, *r, *f, *xpath;
 	xmlDocPtr doc;
 
 	if (!node) {
@@ -277,6 +279,7 @@ static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 
 	s = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST src);
 	r = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST ref);
+	f = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST fname);
 	xpath = xpath_of(node);
 
 	printf("<found>");
@@ -293,7 +296,10 @@ static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	printf("</ref>");
 
 	printf("<source line=\"%ld\" xpath=\"%s\">%s</source>", xmlGetLineNo(node), xpath, s);
-	printf("<filename>%s</filename>", r);
+	printf("<code>%s</code>", r);
+	if (f) {
+		printf("<filename>%s</filename>", f);
+	}
 
 	printf("</found>");
 
@@ -301,40 +307,41 @@ static void printMatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	xmlFree(r);
 	xmlFree(xpath);
 }
-static void printMatchedWhereUsed(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedWhereUsed(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	printf("%s\n", src);
 }
-static void printMatchedCustom(xmlNodePtr node, const char *src, const char *ref)
+static void printMatchedCustom(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
-	processFormatStr(stdout, node, src, ref);
+	processFormatStr(stdout, node, src, ref, fname);
 }
 
-static void execMatched(xmlNodePtr node, const char *src, const char *ref)
+static void execMatched(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
-	execfile(execStr, ref);
+	execfile(execStr, fname);
 }
 
 /* Print an error for references which are unmatched. */
-static void printUnmatched(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatched(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	fprintf(stderr, ERR_PREFIX "Unmatched reference: %s\n", ref);
 }
-static void printUnmatchedSrc(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedSrc(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	fprintf(stderr, ERR_PREFIX "%s: Unmatched reference: %s\n", src, ref);
 }
-static void printUnmatchedSrcLine(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedSrcLine(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	fprintf(stderr, ERR_PREFIX "%s (%ld): Unmatched reference: %s\n", src, xmlGetLineNo(node), ref);
 }
-static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
-	xmlChar *s, *r, *xpath;
+	xmlChar *s, *r, *f, *xpath;
 	xmlDocPtr doc;
 
 	s = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST src);
 	r = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST ref);
+	f = xmlEncodeEntitiesReentrant(node->doc, BAD_CAST fname);
 	xpath = xpath_of(node);
 
 	printf("<missing>");
@@ -352,6 +359,9 @@ static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 
 	printf("<source line=\"%ld\" xpath=\"%s\">%s</source>", xmlGetLineNo(node), xpath, s);
 	printf("<code>%s</code>", r);
+	if (f) {
+		printf("<filename>%s</filename>", f);
+	}
 
 	printf("</missing>");
 
@@ -359,14 +369,14 @@ static void printUnmatchedXml(xmlNodePtr node, const char *src, const char *ref)
 	xmlFree(r);
 	xmlFree(xpath);
 }
-static void printUnmatchedCustom(xmlNodePtr node, const char *src, const char *ref)
+static void printUnmatchedCustom(xmlNodePtr node, const char *src, const char *ref, const char *fname)
 {
 	fputs(ERR_PREFIX "Unmatched reference: ", stderr);
-	processFormatStr(stderr, node, src, ref);
+	processFormatStr(stderr, node, src, ref, fname);
 }
 
-static void (*printMatchedFn)(xmlNodePtr, const char *, const char *) = printMatched;
-static void (*printUnmatchedFn)(xmlNodePtr, const char *, const char*) = printUnmatched;
+static void (*printMatchedFn)(xmlNodePtr, const char *, const char *, const char *) = printMatched;
+static void (*printUnmatchedFn)(xmlNodePtr, const char *, const char*, const char *) = printUnmatched;
 
 static bool exact_match(char *dst, const char *code)
 {
@@ -857,7 +867,7 @@ static int matchHotspot(xmlNodePtr ref, xmlDocPtr doc, const char *code, const c
 				strcpy(s, fname);
 				strcat(s, "#");
 				strcat(s, (char *) apsid);
-				printMatchedFn(ref, src, s);
+				printMatchedFn(ref, src, s, fname);
 				free(s);
 			}
 		} else {
@@ -874,9 +884,9 @@ static int matchHotspot(xmlNodePtr ref, xmlDocPtr doc, const char *code, const c
 		if (tagUnmatched) {
 			tagUnmatchedRef(ref);
 		} else if (showUnmatched) {
-			printMatchedFn(ref, src, s);
+			printMatchedFn(ref, src, s, fname);
 		} else if (!quiet) {
-			printUnmatchedFn(ref, src, s);
+			printUnmatchedFn(ref, src, s, fname);
 		}
 
 		free(s);
@@ -962,7 +972,7 @@ static int matchFragment(xmlDocPtr doc, xmlNodePtr ref, const char *code, const 
 				strcpy(s, fname);
 				strcat(s, "#");
 				strcat(s, (char *) id);
-				printMatchedFn(ref, src, s);
+				printMatchedFn(ref, src, s, fname);
 				free(s);
 			}
 		} else {
@@ -971,17 +981,17 @@ static int matchFragment(xmlDocPtr doc, xmlNodePtr ref, const char *code, const 
 	}
 
 	if (err) {
-		s = malloc(strlen(code) + strlen((char *) id) + 2);
-		strcpy(s, code);
+		s = malloc(strlen(doc ? fname : code) + strlen((char *) id) + 2);
+		strcpy(s, doc ? fname : code);
 		strcat(s, "#");
 		strcat(s, (char *) id);
 
 		if (tagUnmatched) {
 			tagUnmatchedRef(ref);
 		} else if (showUnmatched) {
-			printMatchedFn(ref, src, s);
+			printMatchedFn(ref, src, s, doc ? fname : NULL);
 		} else if (!quiet) {
-			printUnmatchedFn(ref, src, s);
+			printUnmatchedFn(ref, src, s, doc ? fname : NULL);
 		}
 
 		free(s);
@@ -1253,7 +1263,7 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 /* Match a CSN item in an IPD. */
 static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const char *fname, const char *src)
 {
-	xmlChar *item, *itemVariant, *id;
+	xmlChar *item, *itemVariant, *itemSeqNumberValue, *id;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
@@ -1262,16 +1272,27 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const c
 
 	item = xmlGetProp(ref, BAD_CAST "item");
 	itemVariant = xmlGetProp(ref, BAD_CAST "itemVariant");
+	itemSeqNumberValue = xmlGetProp(ref, BAD_CAST "itemSeqNumberValue");
 
 	id = xmlCharStrdup("Item ");
 	id = xmlStrcat(id, item);
 	id = xmlStrcat(id, itemVariant);
+	if (itemSeqNumberValue) {
+		id = xmlStrcat(id, BAD_CAST " ISN ");
+		id = xmlStrcat(id, itemSeqNumberValue);
+	}
 
 	if (doc) {
 		ctx = xmlXPathNewContext(doc);
 		xmlXPathRegisterVariable(ctx, BAD_CAST "item", xmlXPathNewString(item));
 		xmlXPathRegisterVariable(ctx, BAD_CAST "itemVariant", xmlXPathNewString(itemVariant));
-		obj = xmlXPathEvalExpression(BAD_CAST "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]", ctx);
+
+		if (itemSeqNumberValue) {
+			xmlXPathRegisterVariable(ctx, BAD_CAST "isn", xmlXPathNewString(itemSeqNumberValue));
+			obj = xmlXPathEvalExpression(BAD_CAST "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]/itemSeqNumber[@itemSeqNumberValue=$isn]", ctx);
+		} else {
+			obj = xmlXPathEvalExpression(BAD_CAST "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]", ctx);
+		}
 
 		if (!obj || xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 			node = NULL;
@@ -1290,7 +1311,7 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const c
 				strcat(s, " ");
 				strcat(s, (char *) id);
 
-				printMatchedFn(ref, src, s);
+				printMatchedFn(ref, src, s, fname);
 
 				free(s);
 			}
@@ -1300,17 +1321,17 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const c
 	}
 
 	if (err) {
-		s = malloc(strlen(code) + strlen((char *) id) + 2);
-		strcpy(s, code);
+		s = malloc(strlen(doc ? fname : code) + strlen((char *) id) + 2);
+		strcpy(s, doc ? fname : code);
 		strcat(s, " ");
 		strcat(s, (char *) id);
 
 		if (tagUnmatched) {
 			tagUnmatchedRef(ref);
 		} else if (showUnmatched) {
-			printMatchedFn(ref, src, s);
+			printMatchedFn(ref, src, s, doc ? fname : NULL);
 		} else if (!quiet) {
-			printUnmatchedFn(ref, src, s);
+			printUnmatchedFn(ref, src, s, doc ? fname : NULL);
 		}
 
 		free(s);
@@ -1318,6 +1339,7 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const c
 
 	xmlFree(item);
 	xmlFree(itemVariant);
+	xmlFree(itemSeqNumberValue);
 	xmlFree(id);
 
 	return err;
@@ -1704,7 +1726,7 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 			updateRef(refptr, src, code, fname);
 		} else if (!tagUnmatched) {
 			if (showMatched) {
-				printMatchedFn(ref, src, fname);
+				printMatchedFn(ref, src, fname, fname);
 			}
 
 			if (listRecursively) {
@@ -1719,9 +1741,9 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 	} else if (tagUnmatched) {
 		tagUnmatchedRef(ref);
 	} else if (showUnmatched) {
-		printMatchedFn(ref, src, code);
+		printMatchedFn(ref, src, code, NULL);
 	} else if (!quiet) {
-		printUnmatchedFn(ref, src, code);
+		printUnmatchedFn(ref, src, code, NULL);
 	}
 
 	/* Update metadata for unmatched external pubs. */
@@ -1780,7 +1802,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	}
 
 	if (listSrc) {
-		printMatchedFn(NULL, path, path);
+		printMatchedFn(NULL, path, path, path);
 	}
 
 	if (!(doc = read_xml_doc(path))) {

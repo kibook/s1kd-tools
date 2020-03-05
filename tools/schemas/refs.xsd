@@ -11,12 +11,14 @@
       </xs:choice>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="found" type="foundElemType"/>
-  <xs:complexType name="foundElemType">
+  <xs:element name="found" type="foundOrMissingElemType"/>
+  <xs:element name="missing" type="foundOrMissingElemType"/>
+  <xs:complexType name="foundOrMissingElemType">
     <xs:sequence>
       <xs:element ref="ref"/>
       <xs:element ref="source"/>
-      <xs:element name="filename" type="xs:string"/>
+      <xs:element ref="code"/>
+      <xs:element ref="filename" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ref" type="refElemType"/>
@@ -34,14 +36,8 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
+  <xs:element name="code" type="xs:string"/>
+  <xs:element name="filename" type="xs:string"/>
   <xs:attribute name="line" type="xs:positiveInteger"/>
   <xs:attribute name="xpath" type="xs:string"/>
-  <xs:element name="missing" type="missingElemType"/>
-  <xs:complexType name="missingElemType">
-    <xs:sequence>
-      <xs:element ref="ref"/>
-      <xs:element ref="source"/>
-      <xs:element name="code" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
 </xs:schema>
