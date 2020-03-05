@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.9.0"
+#define VERSION "4.9.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -2057,7 +2057,7 @@ static void readnonChapIpdSns(const char *s)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZh?] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZh?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");

@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="02"/>
+        <issueInfo issueNumber="028" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="03" day="04"/>
@@ -52,9 +52,9 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZh?] [-d <dir>]
-          [-e <cmd>] [-J <ns=URL>] [-j <xpath>] [-t <fmt>]
-          [-3 <file>] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZh?] [-b <SNS>]
+          [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
+          [-t <fmt>] [-3 <file>] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
