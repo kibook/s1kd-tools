@@ -8,7 +8,7 @@ SYNOPSIS
 
     s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZh?] [-b <SNS>]
               [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
-              [-t <fmt>] [-3 <file>] [<object>...]
+              [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]
 
 DESCRIPTION
 ===========
