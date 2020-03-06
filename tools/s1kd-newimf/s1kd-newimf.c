@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "2.0.4"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

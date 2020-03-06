@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newddn"
-#define VERSION "2.0.2"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 

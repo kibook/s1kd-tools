@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.3.2"
+#define VERSION "1.4.0"
 
 static void show_help(void)
 {

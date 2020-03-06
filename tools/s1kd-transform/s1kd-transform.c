@@ -15,7 +15,7 @@ static bool includeIdentity = false;
 static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "

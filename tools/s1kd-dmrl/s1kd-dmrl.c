@@ -12,7 +12,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 
 static void showHelp(void)
 {
