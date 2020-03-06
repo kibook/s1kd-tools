@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.10.0"
+#define VERSION "4.11.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -86,6 +86,9 @@ static char nonChapIpdSystemCode[4] = "";
 static char nonChapIpdSubSystemCode[2] = "";
 static char nonChapIpdSubSubSystemCode[2] = "";
 static char nonChapIpdAssyCode[5] = "";
+
+/* Figure number variant format string. */
+static xmlChar *figNumVarFormat;
 
 /* When listing references recursively, keep track of files which have already
  * been listed to avoid loops.
@@ -1167,6 +1170,28 @@ static void getDispatchFileName(char *dst, xmlNodePtr ref)
 	xmlFree(fname);
 }
 
+/* Get the disassembly code variant pattern using the figure number variant and
+ * the specified format string. */
+static xmlChar *formatFigNumVar(const xmlChar *figureNumberVariant)
+{
+	int i;
+	xmlChar *disassyCodeVariant;
+
+	disassyCodeVariant = xmlStrdup(figNumVarFormat);
+
+	for (i = 0; disassyCodeVariant[i]; ++i) {
+		switch (disassyCodeVariant[i]) {
+			case '%':
+				disassyCodeVariant[i] = figureNumberVariant[0];
+				break;
+			default:
+				break;
+		}
+	}
+
+	return disassyCodeVariant;
+}
+
 /* Get the code of an IPD data module from a CSN ref. */
 static void getIpdCode(char *dst, xmlNodePtr ref)
 {
@@ -1212,6 +1237,7 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	if (modelIdentCode && systemDiffCode && systemCode && subSystemCode && subSubSystemCode && assyCode && figureNumber && itemLocationCode) {
 		xmlDocPtr tmp;
 		xmlNodePtr dmRef, dmRefIdent, dmCode;
+		xmlChar *disassyCodeVariant;
 
 		tmp = xmlNewDoc(BAD_CAST "1.0");
 
@@ -1225,6 +1251,13 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 			figureNumberVariant = xmlCharStrdup("0");
 		}
 
+		/* The figure number variant alone cannot fully determine the
+		 * disassembly code variant of the IPD data module (for example,
+		 * in projects where the disassembly code variant is more than 1
+		 * character). Therefore, the figNumVarFormat pattern is used to
+		 * construct the full disassemby code variant. */
+		disassyCodeVariant = formatFigNumVar(figureNumberVariant);
+
 		xmlSetProp(dmCode, BAD_CAST "modelIdentCode", modelIdentCode);
 		xmlSetProp(dmCode, BAD_CAST "systemDiffCode", systemDiffCode);
 		xmlSetProp(dmCode, BAD_CAST "systemCode", systemCode);
@@ -1232,13 +1265,14 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 		xmlSetProp(dmCode, BAD_CAST "subSubSystemCode", subSubSystemCode);
 		xmlSetProp(dmCode, BAD_CAST "assyCode", assyCode);
 		xmlSetProp(dmCode, BAD_CAST "disassyCode", figureNumber);
-		xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", figureNumberVariant);
+		xmlSetProp(dmCode, BAD_CAST "disassyCodeVariant", disassyCodeVariant);
 		xmlSetProp(dmCode, BAD_CAST "infoCode", BAD_CAST "941");
 		xmlSetProp(dmCode, BAD_CAST "infoCodeVariant", BAD_CAST "A");
 		xmlSetProp(dmCode, BAD_CAST "itemLocationCode", itemLocationCode);
 
 		getDmCode(dst, dmRef);
 
+		xmlFree(disassyCodeVariant);
 		xmlFreeDoc(tmp);
 	/* Otherwise, just return a generic IPD figure name. */
 	} else {
@@ -2079,7 +2113,7 @@ static void readnonChapIpdSns(const char *s)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZh?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-t <fmt>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZh?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -2101,6 +2135,7 @@ static void show_help(void)
 	puts("  -J, --namespace <ns=URL>     Register a namespace for the hotspot XPath.");
 	puts("  -j, --hotspot-xpath <xpath>  XPath to use for matching hotspots (-H).");
 	puts("  -K, --csn                    List CSN references.");
+	puts("  -k, --ipd-dcv <pattern>      Pattern for IPD disassembly code variant.");
 	puts("  -L, --dml                    List DML references.");
 	puts("  -l, --list                   Treat input as list of CSDB objects.");
 	puts("  -m, --strict-match           Be more strict when matching filenames of objects.");
@@ -2150,7 +2185,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKb:h?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKb:k:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -2194,7 +2229,8 @@ int main(int argc, char **argv)
 		{"source"       , no_argument      , 0, 'Z'},
 		{"ipd"          , no_argument      , 0, 'B'},
 		{"csn"          , no_argument      , 0, 'K'},
-		{"ipd-sns"      , no_argument      , 0, 'b'},
+		{"ipd-sns"      , required_argument, 0, 'b'},
+		{"ipd-dcv"      , required_argument, 0, 'k'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2203,6 +2239,8 @@ int main(int argc, char **argv)
 	directory = strdup(".");
 	hotspotXPath = xmlStrdup(DEFAULT_HOTSPOT_XPATH);
 	hotspotNs = xmlNewNode(NULL, BAD_CAST "hotspotNs");
+
+	figNumVarFormat = xmlCharStrdup("%");
 
 	while ((i = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (i) {
@@ -2344,6 +2382,10 @@ int main(int argc, char **argv)
 				readnonChapIpdSns(optarg);
 				nonChapIpdSns = true;
 				break;
+			case 'k':
+				xmlFree(figNumVarFormat);
+				figNumVarFormat = xmlCharStrdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2426,6 +2468,7 @@ int main(int argc, char **argv)
 	free(listedFiles);
 	free(execStr);
 	free(printFormat);
+	xmlFree(figNumVarFormat);
 	xmlFreeDoc(externalPubs);
 	xmlCleanupParser();
 

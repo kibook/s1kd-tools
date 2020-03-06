@@ -91,6 +91,22 @@ specifying this option multiple times.
 Specify a custom XPath expression to use when matching hotspots (-H) in
 XML-based ICN formats.
 
+-k, --ipd-dcv &lt;pattern&gt;  
+Specify a pattern used to determine the disassembly code variant for IPD
+data modules when resolving CSN references.
+
+Within the pattern, the following characters have special meaning:
+
+-   % - The figure number variant code.
+
+-   ? - A wildcard that matches any single character.
+
+The default pattern is "%", which means the disassembly code variant is
+exactly the same as the figure number variant. Projects that use a 2- or
+3-character disassembly code variant must specify a pattern of the
+appropriate length in order for their IPD DMs to be matched (for
+example, "%?" or "%??").
+
 -l, --list  
 Treat input (stdin or arguments) as lists of filenames of CSDB objects
 to list references in, rather than CSDB objects themselves.
@@ -265,10 +281,46 @@ stdin did not contain valid XML and not in list mode (-l).
 4  
 The non-chapterized SNS specified (-b) is not valid.
 
-EXAMPLE
-=======
+EXAMPLES
+========
+
+General
+-------
 
     $ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-    DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
-    DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
-    ICN-12345-00001-001-01.JPG
+      DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
+      DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
+      ICN-12345-00001-001-01.JPG
+
+CSN references
+--------------
+
+These examples are based on the following CSN reference:
+
+    <catalogSeqNumberRef figureNumber="01" item="004"/>
+
+in the following data module:
+
+    DM=DMC-EX-A-00-00-00-00AA-100A-D_001-00_EN-CA.XML
+
+Because the CSN reference is not chapterized, it cannot be matched to an
+IPD DM without more information:
+
+    $ s1kd-refs -K $DM
+    Unmatched reference: Fig 01 Item 004
+
+The SNS for non-chapterized IPDs can be specified with -b. In this case,
+the project uses the SNS "ZD-00-35" for their IPDs:
+
+    $ s1kd-refs -K -b ZD-00-35 $DM
+    Unmatched reference: DMC-EX-A-ZD-00-35-010-941A-D Item 004
+
+This project uses a 2-character disassembly code variant, so the figure
+number variant is not sufficient to resolve the DMC of the referenced
+IPD data module. The -k option can be used in this case to specify the
+pattern for the disassembly code variant of IPDs. Since the second
+character of the disassembly code variant of all IPD DMs in this project
+is A, the pattern "%A" can be used:
+
+    $ s1kd-refs -K -b ZD-00-35 -k %A $DM
+    DMC-EX-A-ZD-00-35-010A-941A-D_001-00_EN-CA.XML Item 004
