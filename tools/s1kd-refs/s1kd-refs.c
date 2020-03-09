@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.12.0"
+#define VERSION "4.13.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1192,43 +1192,170 @@ static xmlChar *formatFigNumVar(const xmlChar *figureNumberVariant)
 	return disassyCodeVariant;
 }
 
+/* Parse an old (< 4.1) style CSN reference. */
+#define CSN_VALUE_PATTERN_16 "%3[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%4[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_15 "%2[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%4[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_14 "%3[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%2[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_13 "%2[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%2[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_NO_SNS "%2[A-Z0-9]%1[A-Z0-9 ]"
+
+char *CSN_VALUE_PATTERNS[] = {
+	CSN_VALUE_PATTERN_13,
+	CSN_VALUE_PATTERN_14,
+	CSN_VALUE_PATTERN_15,
+	CSN_VALUE_PATTERN_16,
+	NULL
+};
+
+static int str_is_blank(const char *s) {
+	int i;
+	for (i = 0; s[i]; ++i) {
+		if (!isspace(s[i])) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+static void parseCsnValue(const xmlChar *csnValue,
+	xmlChar **systemCode,
+	xmlChar **subSystemCode,
+	xmlChar **subSubSystemCode,
+	xmlChar **assyCode,
+	xmlChar **figureNumber,
+	xmlChar **figureNumberVariant)
+{
+	char system[4];
+	char subsys[2];
+	char subsub[2];
+	char assemb[5];
+	char fignum[3];
+	char figvar[2];
+	int i;
+	bool match = false;
+
+	for (i = 0; CSN_VALUE_PATTERNS[i]; ++i) {
+		if (sscanf((char *) csnValue, CSN_VALUE_PATTERNS[i++], system, subsys, subsub, assemb, fignum, figvar) == 6) {
+			match = true;
+			break;
+		}
+	}
+
+	if (match) {
+		*systemCode          = str_is_blank(system) ? NULL : xmlCharStrdup(system);
+		*subSystemCode       = str_is_blank(subsys) ? NULL : xmlCharStrdup(subsys);
+		*subSubSystemCode    = str_is_blank(subsub) ? NULL : xmlCharStrdup(subsub);
+		*assyCode            = str_is_blank(assemb) ? NULL : xmlCharStrdup(assemb);
+		*figureNumber        = xmlCharStrdup(fignum);
+		*figureNumberVariant = str_is_blank(figvar) ? NULL : xmlCharStrdup(figvar);
+	} else if (sscanf((char *) csnValue, CSN_VALUE_PATTERN_NO_SNS, fignum, figvar) == 2) {
+		*systemCode          = NULL;
+		*subSystemCode       = NULL;
+		*subSubSystemCode    = NULL;
+		*assyCode            = NULL;
+		*figureNumber        = xmlCharStrdup(fignum);
+		*figureNumberVariant = str_is_blank(figvar) ? NULL : xmlCharStrdup(figvar);
+	} else {
+		*systemCode          = NULL;
+		*subSystemCode       = NULL;
+		*subSubSystemCode    = NULL;
+		*assyCode            = NULL;
+		*figureNumber        = NULL;
+		*figureNumberVariant = NULL;
+	}
+}
+
 /* Get the code of an IPD data module from a CSN ref. */
 static void getIpdCode(char *dst, xmlNodePtr ref)
 {
-	xmlChar *modelIdentCode, *systemDiffCode, *systemCode, *subSystemCode, *subSubSystemCode, *assyCode, *figureNumber, *figureNumberVariant, *itemLocationCode;
+	xmlChar *csnValue;
+	xmlChar *modelIdentCode;
+	xmlChar *systemDiffCode;
+	xmlChar *systemCode;
+	xmlChar *subSystemCode;
+	xmlChar *subSubSystemCode;
+	xmlChar *assyCode;
+	xmlChar *figureNumber;
+	xmlChar *figureNumberVariant;
+	xmlChar *itemLocationCode;
 
-	modelIdentCode      = xmlGetProp(ref, BAD_CAST "modelIdentCode");
-	systemDiffCode      = xmlGetProp(ref, BAD_CAST "systemDiffCode");
-	systemCode          = xmlGetProp(ref, BAD_CAST "systemCode");
-	subSystemCode       = xmlGetProp(ref, BAD_CAST "subSystemCode");
-	subSubSystemCode    = xmlGetProp(ref, BAD_CAST "subSubSystemCode");
-	assyCode            = xmlGetProp(ref, BAD_CAST "assyCode");
-	figureNumber        = xmlGetProp(ref, BAD_CAST "figureNumber");
-	figureNumberVariant = xmlGetProp(ref, BAD_CAST "figureNumberVariant");
-	itemLocationCode    = xmlGetProp(ref, BAD_CAST "itemLocationCode");
+	csnValue = firstXPathValue(NULL, ref, BAD_CAST "@catalogSeqNumberValue|@refcsn");
 
-	/* If a non-chapterized IPD SNS is given, apply it. */
-	if (nonChapIpdSns) {
-		xmlNodePtr dmCode = firstXPathNode(NULL, ref, BAD_CAST "ancestor::dmodule//dmIdent/dmCode");
+	if (csnValue) {
+		modelIdentCode = NULL;
+		systemDiffCode = NULL;
+		itemLocationCode = NULL;
+
+		parseCsnValue(csnValue,
+			&systemCode,
+			&subSystemCode,
+			&subSubSystemCode,
+			&assyCode,
+			&figureNumber,
+			&figureNumberVariant);
+	} else {
+		modelIdentCode      = xmlGetProp(ref, BAD_CAST "modelIdentCode");
+		systemDiffCode      = xmlGetProp(ref, BAD_CAST "systemDiffCode");
+		systemCode          = xmlGetProp(ref, BAD_CAST "systemCode");
+		subSystemCode       = xmlGetProp(ref, BAD_CAST "subSystemCode");
+		subSubSystemCode    = xmlGetProp(ref, BAD_CAST "subSubSystemCode");
+		assyCode            = xmlGetProp(ref, BAD_CAST "assyCode");
+		figureNumber        = xmlGetProp(ref, BAD_CAST "figureNumber");
+		figureNumberVariant = xmlGetProp(ref, BAD_CAST "figureNumberVariant");
+		itemLocationCode    = xmlGetProp(ref, BAD_CAST "itemLocationCode");
+	}
+
+	/* Apply attributes to non-chapterized or old-style CSN refs. */
+	if (nonChapIpdSns || csnValue) {
+		xmlNodePtr dmCode = firstXPathNode(NULL, ref, BAD_CAST "ancestor::dmodule/identAndStatusSection/dmAddress/dmIdent/dmCode|ancestor::dmodule/idstatus/dmaddres/dmc/avee");
 
 		if (dmCode) {
 			/* These attributes are always interpreted as relative to the current DM. */
-			if (!modelIdentCode)   modelIdentCode   = xmlGetProp(dmCode, BAD_CAST "modelIdentCode");
-			if (!systemDiffCode)   systemDiffCode   = xmlGetProp(dmCode, BAD_CAST "systemDiffCode");
-			if (!itemLocationCode) itemLocationCode = xmlGetProp(dmCode, BAD_CAST "itemLocationCode");
+			if (!modelIdentCode) {
+				modelIdentCode = firstXPathValue(NULL, dmCode, BAD_CAST "@modelIdentCode|modelic");
+			}
+			if (!systemDiffCode) {
+				systemDiffCode = firstXPathValue(NULL, dmCode, BAD_CAST "@systemDiffCode|sdc");
+			}
+			if (!itemLocationCode) {
+				itemLocationCode = firstXPathValue(NULL, dmCode, BAD_CAST "@itemLocationCode|itemloc");
+			}
 
-			/* "-" indicates the SNS is also relative to the current DM. */
-			if (strcmp(nonChapIpdSystemCode, "-") == 0) {
-				if (!systemCode)       systemCode       = xmlGetProp(dmCode, BAD_CAST "systemCode");
-				if (!subSystemCode)    subSystemCode    = xmlGetProp(dmCode, BAD_CAST "subSystemCode");
-				if (!subSubSystemCode) subSubSystemCode = xmlGetProp(dmCode, BAD_CAST "subSubSystemCode");
-				if (!assyCode)         assyCode         = xmlGetProp(dmCode, BAD_CAST "assyCode");
-			/* Otherwise, construct the SNS from the given code. */
-			} else {
-				if (!systemCode) systemCode = xmlCharStrdup(nonChapIpdSystemCode);
-				if (!subSystemCode) subSystemCode = xmlCharStrdup(nonChapIpdSubSystemCode);
-				if (!subSubSystemCode) subSubSystemCode = xmlCharStrdup(nonChapIpdSubSubSystemCode);
-				if (!assyCode) assyCode = xmlCharStrdup(nonChapIpdAssyCode);
+			/* If a non-chapterized IPD SNS is given, apply it. */
+			if (nonChapIpdSns) {
+				/* "-" indicates the SNS is also relative to the current DM. */
+				if (strcmp(nonChapIpdSystemCode, "-") == 0) {
+					if (!systemCode) {
+						systemCode = firstXPathValue(NULL, dmCode,
+							BAD_CAST "@systemCode|chapnum");
+					}
+					if (!subSystemCode) {
+						subSystemCode = firstXPathValue(NULL, dmCode,
+							BAD_CAST "@subSystemCode|section");
+					}
+					if (!subSubSystemCode) {
+						subSubSystemCode = firstXPathValue(NULL, dmCode,
+							BAD_CAST "@subSubSystemCode|subsect");
+					}
+					if (!assyCode) {
+						assyCode = firstXPathValue(NULL, dmCode,
+							BAD_CAST "@assyCode|subject");
+					}
+				/* Otherwise, construct the SNS from the given code. */
+				} else {
+					if (!systemCode) {
+						systemCode = xmlCharStrdup(nonChapIpdSystemCode);
+					}
+					if (!subSystemCode) {
+						subSystemCode = xmlCharStrdup(nonChapIpdSubSystemCode);
+					}
+					if (!subSubSystemCode) {
+						subSubSystemCode = xmlCharStrdup(nonChapIpdSubSubSystemCode);
+					}
+					if (!assyCode) {
+						assyCode = xmlCharStrdup(nonChapIpdAssyCode);
+					}
+				}
 			}
 		}
 	}
@@ -1277,12 +1404,17 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	/* Otherwise, just return a generic IPD figure name. */
 	} else {
 		strcpy(dst, "Fig ");
-		strcat(dst, (char *) figureNumber);
+		if (figureNumber) {
+			strcat(dst, (char *) figureNumber);
+		} else {
+			strcat(dst, "??");
+		}
 		if (figureNumberVariant) {
 			strcat(dst, (char *) figureNumberVariant);
 		}
 	}
 
+	xmlFree(csnValue);
 	xmlFree(modelIdentCode);
 	xmlFree(systemDiffCode);
 	xmlFree(systemCode);
@@ -1735,7 +1867,8 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 		  xmlStrcmp(ref->name, BAD_CAST "target") == 0))
 		return getFragment(ref, src);
 	else if ((show & SHOW_IPD) == SHOW_IPD &&
-		 (xmlStrcmp(ref->name, BAD_CAST "catalogSeqNumberRef") == 0))
+		 (xmlStrcmp(ref->name, BAD_CAST "catalogSeqNumberRef") == 0 ||
+		  xmlStrcmp(ref->name, BAD_CAST "csnref") == 0))
 			getIpdCode(code, ref);
 	else if ((show & SHOW_CSN) == SHOW_CSN &&
 		 (xmlStrcmp(ref->name, BAD_CAST "item") == 0))
@@ -1856,7 +1989,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef|.//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent|.//catalogSeqNumberRef|.//catalogSeqNumberRef/@item", ctx);
+	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef|.//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent|.//catalogSeqNumberRef|.//csnref|.//catalogSeqNumberRef/@item", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
