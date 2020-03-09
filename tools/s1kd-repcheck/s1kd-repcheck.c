@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -743,7 +743,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (xml_report) {
+	if (xml_report || show_stats) {
 		report_doc = xmlNewDoc(BAD_CAST "1.0");
 		opts.report = xmlNewNode(NULL, BAD_CAST "repCheck");
 		xmlDocSetRootElement(report_doc, opts.report);
