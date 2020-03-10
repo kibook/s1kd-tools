@@ -75,9 +75,99 @@
     </dmEntry>
   </xsl:template>
 
-  <xsl:template match="catalogSeqNumber/@figureNumber"/>
+  <xsl:template match="catalogSeqNumber">
+    <xsl:copy>
+      <xsl:apply-templates select="@id"/>
+      <xsl:apply-templates select="@changeMark"/>
+      <xsl:apply-templates select="@changeType"/>
+      <xsl:apply-templates select="@reasonForUpdateRefIds"/>
+      <xsl:attribute name="catalogSeqNumberValue">
+        <xsl:choose>
+          <xsl:when test="@systemCode and @subSystemCode and @subSubSystemCode and @assyCode">
+            <xsl:value-of select="@systemCode"/>
+            <xsl:value-of select="@subSystemCode"/>
+            <xsl:value-of select="@subSubSystemCode"/>
+            <xsl:value-of select="@assyCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'      '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@figureNumber"/>
+        <xsl:choose>
+          <xsl:when test="@figureNumberVariant">
+            <xsl:value-of select="@figureNumberVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@item"/>
+        <xsl:choose>
+          <xsl:when test="@itemVariant">
+            <xsl:value-of select="@itemVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:apply-templates select="@indenture"/>
+      <xsl:apply-templates select="@securityClassification"/>
+      <xsl:apply-templates select="@commercialClassification"/>
+      <xsl:apply-templates select="@caveat"/>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
 
-  <xsl:template match="catalogSeqNumber/@item"/>
+  <xsl:template match="catalogSeqNumberRef">
+    <xsl:copy>
+      <xsl:apply-templates select="@id"/>
+      <xsl:apply-templates select="@changeMark"/>
+      <xsl:apply-templates select="@changeType"/>
+      <xsl:apply-templates select="@reasonForUpdateRefIds"/>
+      <xsl:apply-templates select="@initialProvisioningProjectValue"/>
+      <xsl:apply-templates select="@responsiblePartnerCompanyCode"/>
+      <xsl:apply-templates select="@authorityName"/>
+      <xsl:apply-templates select="@authorityDocument"/>
+      <xsl:apply-templates select="@securityClassification"/>
+      <xsl:apply-templates select="@commercialClassification"/>
+      <xsl:apply-templates select="@caveat"/>
+      <xsl:attribute name="catalogSeqNumberValue">
+        <xsl:choose>
+          <xsl:when test="@systemCode and @subSystemCode and @subSubSystemCode and @assyCode">
+            <xsl:value-of select="@systemCode"/>
+            <xsl:value-of select="@subSystemCode"/>
+            <xsl:value-of select="@subSubSystemCode"/>
+            <xsl:value-of select="@assyCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'      '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@figureNumber"/>
+        <xsl:choose>
+          <xsl:when test="@figureNumberVariant">
+            <xsl:value-of select="@figureNumberVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@item"/>
+        <xsl:choose>
+          <xsl:when test="@itemVariant">
+            <xsl:value-of select="@itemVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:apply-templates select="@itemSeqNumberValue"/>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
 
   <xsl:template match="itemSeqNumber">
     <itemSequenceNumber>

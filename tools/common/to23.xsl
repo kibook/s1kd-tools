@@ -443,12 +443,82 @@
 
   <xsl:template match="catalogSeqNumber">
     <csn>
-      <xsl:apply-templates select="@*|node()"/>
+      <xsl:attribute name="csn">
+        <xsl:choose>
+          <xsl:when test="@systemCode and @subSystemCode and @subSubSystemCode and @assyCode">
+            <xsl:value-of select="@systemCode"/>
+            <xsl:value-of select="@subSystemCode"/>
+            <xsl:value-of select="@subSubSystemCode"/>
+            <xsl:value-of select="@assyCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'      '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@figureNumber"/>
+        <xsl:choose>
+          <xsl:when test="@figureNumberVariant">
+            <xsl:value-of select="@figureNumberVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@item"/>
+        <xsl:choose>
+          <xsl:when test="@itemVariant">
+            <xsl:value-of select="@itemVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:apply-templates select="@indenture"/>
+      <xsl:apply-templates select="node()"/>
     </csn>
   </xsl:template>
 
-  <xsl:template match="@figureNumber">
-    <xsl:attribute name="csn">
+  <xsl:template match="catalogSeqNumberRef">
+    <csnref>
+      <xsl:attribute name="refcsn">
+        <xsl:choose>
+          <xsl:when test="@systemCode and @subSystemCode and @subSubSystemCode and @assyCode">
+            <xsl:value-of select="@systemCode"/>
+            <xsl:value-of select="@subSystemCode"/>
+            <xsl:value-of select="@subSubSystemCode"/>
+            <xsl:value-of select="@assyCode"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'      '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@figureNumber"/>
+        <xsl:choose>
+          <xsl:when test="@figureNumberVariant">
+            <xsl:value-of select="@figureNumberVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="@item"/>
+        <xsl:choose>
+          <xsl:when test="@itemVariant">
+            <xsl:value-of select="@itemVariant"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:apply-templates select="@itemSeqNumberValue"/>
+      <xsl:apply-templates select="node()"/>
+    </csnref>
+  </xsl:template>
+
+  <xsl:template match="catalogSeqNumberRef/@itemSeqNumberValue">
+    <xsl:attribute name="refisn">
       <xsl:apply-templates/>
     </xsl:attribute>
   </xsl:template>

@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.6.0"
+#define VERSION "3.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1061,9 +1061,13 @@ static xmlNodePtr new_csn_ref(const char *ref, const char *fname, int opts)
 	xmlSetProp(csn_ref, BAD_CAST "subSubSystemCode", BAD_CAST sub_sub_system_code);
 	xmlSetProp(csn_ref, BAD_CAST "assyCode", BAD_CAST assy_code);
 	xmlSetProp(csn_ref, BAD_CAST "figureNumber", BAD_CAST figure_number);
-	xmlSetProp(csn_ref, BAD_CAST "figureNumberVariant", BAD_CAST figure_number_variant);
+	if (strcmp(figure_number_variant, "*") != 0) {
+		xmlSetProp(csn_ref, BAD_CAST "figureNumberVariant", BAD_CAST figure_number_variant);
+	}
 	xmlSetProp(csn_ref, BAD_CAST "item", BAD_CAST item);
-	xmlSetProp(csn_ref, BAD_CAST "itemVariant", BAD_CAST item_variant);
+	if (strcmp(item_variant, "*") != 0) {
+		xmlSetProp(csn_ref, BAD_CAST "itemVariant", BAD_CAST item_variant);
+	}
 	xmlSetProp(csn_ref, BAD_CAST "itemLocationCode", BAD_CAST item_location_code);
 
 	if (optset(opts, OPT_URL)) {
