@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.13.0"
+#define VERSION "4.14.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1192,20 +1192,22 @@ static xmlChar *formatFigNumVar(const xmlChar *figureNumberVariant)
 	return disassyCodeVariant;
 }
 
-/* Parse an old (< 4.1) style CSN reference. */
-#define CSN_VALUE_PATTERN_16 "%3[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%4[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
-#define CSN_VALUE_PATTERN_15 "%2[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%4[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
-#define CSN_VALUE_PATTERN_14 "%3[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%2[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
-#define CSN_VALUE_PATTERN_13 "%2[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%2[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]"
-#define CSN_VALUE_PATTERN_NO_SNS "%2[A-Z0-9]%1[A-Z0-9 ]"
-
-char *CSN_VALUE_PATTERNS[] = {
-	CSN_VALUE_PATTERN_13,
-	CSN_VALUE_PATTERN_14,
-	CSN_VALUE_PATTERN_15,
-	CSN_VALUE_PATTERN_16,
-	NULL
-};
+/* Parse an old (< 4.1) style CSN reference.
+ *
+ * refcsn (2.0-3.0)/catalogSeqNumberValue (4.0) is a 13-16 digit code:
+ *
+ * 13:  YY|Y|Y|  YY|YY|Y|NNN|Y (2-character system, 2-character assembly)
+ * 14: YYY|Y|Y|  YY|YY|Y|NNN|Y (3-character system, 2-character assembly)
+ * 15:  YY|Y|Y|YYYY|YY|Y|NNN|Y (2-character system, 4-character assembly)
+ * 16: YYY|Y|Y|YYYY|YY|Y|NNN|Y (3-character system, 4-character assembly)
+ *
+ * Y = [A-Z0-9 ] (alphanumeric + space)
+ * N = [0-9]     (numeric)
+ */
+#define CSN_VALUE_PATTERN_16 "%3[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%4[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]%3[0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_15 "%2[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%4[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]%3[0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_14 "%3[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%2[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]%3[0-9]%1[A-Z0-9 ]"
+#define CSN_VALUE_PATTERN_13 "%2[A-Z0-9 ]%1[A-Z0-9 ]%1[A-Z0-9 ]%2[A-Z0-9 ]%2[A-Z0-9]%1[A-Z0-9 ]%3[0-9]%1[A-Z0-9 ]"
 
 static int str_is_blank(const char *s) {
 	int i;
@@ -1223,7 +1225,9 @@ static void parseCsnValue(const xmlChar *csnValue,
 	xmlChar **subSubSystemCode,
 	xmlChar **assyCode,
 	xmlChar **figureNumber,
-	xmlChar **figureNumberVariant)
+	xmlChar **figureNumberVariant,
+	xmlChar **item,
+	xmlChar **itemVariant)
 {
 	char system[4];
 	char subsys[2];
@@ -1231,30 +1235,35 @@ static void parseCsnValue(const xmlChar *csnValue,
 	char assemb[5];
 	char fignum[3];
 	char figvar[2];
-	int i;
-	bool match = false;
+	char itemno[4];
+	char itemva[2];
+	const char *pattern;
 
-	for (i = 0; CSN_VALUE_PATTERNS[i]; ++i) {
-		if (sscanf((char *) csnValue, CSN_VALUE_PATTERNS[i++], system, subsys, subsub, assemb, fignum, figvar) == 6) {
-			match = true;
-			break;
-		}
+	switch (xmlStrlen(csnValue)) {
+		case 16: pattern = CSN_VALUE_PATTERN_16; break;
+		case 15: pattern = CSN_VALUE_PATTERN_15; break;
+		case 14: pattern = CSN_VALUE_PATTERN_14; break;
+		case 13: pattern = CSN_VALUE_PATTERN_13; break;
+		default: pattern = NULL; break;
 	}
 
-	if (match) {
+	if (pattern && sscanf((char *) csnValue, pattern,
+			system,
+			subsys,
+			subsub,
+			assemb,
+			fignum,
+			figvar,
+			itemno,
+			itemva) == 8) {
 		*systemCode          = str_is_blank(system) ? NULL : xmlCharStrdup(system);
 		*subSystemCode       = str_is_blank(subsys) ? NULL : xmlCharStrdup(subsys);
 		*subSubSystemCode    = str_is_blank(subsub) ? NULL : xmlCharStrdup(subsub);
 		*assyCode            = str_is_blank(assemb) ? NULL : xmlCharStrdup(assemb);
 		*figureNumber        = xmlCharStrdup(fignum);
 		*figureNumberVariant = str_is_blank(figvar) ? NULL : xmlCharStrdup(figvar);
-	} else if (sscanf((char *) csnValue, CSN_VALUE_PATTERN_NO_SNS, fignum, figvar) == 2) {
-		*systemCode          = NULL;
-		*subSystemCode       = NULL;
-		*subSubSystemCode    = NULL;
-		*assyCode            = NULL;
-		*figureNumber        = xmlCharStrdup(fignum);
-		*figureNumberVariant = str_is_blank(figvar) ? NULL : xmlCharStrdup(figvar);
+		*item                = xmlCharStrdup(itemno);
+		*itemVariant         = str_is_blank(itemva) ? NULL : xmlCharStrdup(itemva);
 	} else {
 		*systemCode          = NULL;
 		*subSystemCode       = NULL;
@@ -1262,13 +1271,14 @@ static void parseCsnValue(const xmlChar *csnValue,
 		*assyCode            = NULL;
 		*figureNumber        = NULL;
 		*figureNumberVariant = NULL;
+		*item                = NULL;
+		*itemVariant         = NULL;
 	}
 }
 
-/* Get the code of an IPD data module from a CSN ref. */
-static void getIpdCode(char *dst, xmlNodePtr ref)
+/* Get the code of a CSN ref, including IPD data module code, CSN and item number. */
+static void getCsnCode(char *dst, xmlNodePtr ref, xmlChar **csnValue, xmlChar **item, xmlChar **itemVariant)
 {
-	xmlChar *csnValue;
 	xmlChar *modelIdentCode;
 	xmlChar *systemDiffCode;
 	xmlChar *systemCode;
@@ -1279,20 +1289,22 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	xmlChar *figureNumberVariant;
 	xmlChar *itemLocationCode;
 
-	csnValue = firstXPathValue(NULL, ref, BAD_CAST "@catalogSeqNumberValue|@refcsn");
+	*csnValue = firstXPathValue(NULL, ref, BAD_CAST "@catalogSeqNumberValue|@refcsn");
 
-	if (csnValue) {
+	if (*csnValue) {
 		modelIdentCode = NULL;
 		systemDiffCode = NULL;
 		itemLocationCode = NULL;
 
-		parseCsnValue(csnValue,
+		parseCsnValue(*csnValue,
 			&systemCode,
 			&subSystemCode,
 			&subSubSystemCode,
 			&assyCode,
 			&figureNumber,
-			&figureNumberVariant);
+			&figureNumberVariant,
+			item,
+			itemVariant);
 	} else {
 		modelIdentCode      = xmlGetProp(ref, BAD_CAST "modelIdentCode");
 		systemDiffCode      = xmlGetProp(ref, BAD_CAST "systemDiffCode");
@@ -1303,10 +1315,13 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 		figureNumber        = xmlGetProp(ref, BAD_CAST "figureNumber");
 		figureNumberVariant = xmlGetProp(ref, BAD_CAST "figureNumberVariant");
 		itemLocationCode    = xmlGetProp(ref, BAD_CAST "itemLocationCode");
+
+		*item               = xmlGetProp(ref, BAD_CAST "item");
+		*itemVariant        = xmlGetProp(ref, BAD_CAST "itemVariant");
 	}
 
-	/* Apply attributes to non-chapterized or old-style CSN refs. */
-	if (nonChapIpdSns || csnValue) {
+	/* Apply attributes to non-chapterized or old style CSN refs. */
+	if (nonChapIpdSns || *csnValue) {
 		xmlNodePtr dmCode = firstXPathNode(NULL, ref, BAD_CAST "ancestor::dmodule/identAndStatusSection/dmAddress/dmIdent/dmCode|ancestor::dmodule/idstatus/dmaddres/dmc/avee");
 
 		if (dmCode) {
@@ -1317,6 +1332,13 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 			if (!systemDiffCode) {
 				systemDiffCode = firstXPathValue(NULL, dmCode, BAD_CAST "@systemDiffCode|sdc");
 			}
+			/* TODO: Should itemLocationCode:
+			 *
+			 * - be inherited? (current behaviour)
+			 * - default to "D"?
+			 * - use a wildcard?
+			 *
+			 * Bike data < 4.1 suggests default to "D" or wildcard. */
 			if (!itemLocationCode) {
 				itemLocationCode = firstXPathValue(NULL, dmCode, BAD_CAST "@itemLocationCode|itemloc");
 			}
@@ -1414,7 +1436,6 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 		}
 	}
 
-	xmlFree(csnValue);
 	xmlFree(modelIdentCode);
 	xmlFree(systemDiffCode);
 	xmlFree(systemCode);
@@ -1426,19 +1447,33 @@ static void getIpdCode(char *dst, xmlNodePtr ref)
 	xmlFree(itemLocationCode);
 }
 
-/* Match a CSN item in an IPD. */
-static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const char *fname, const char *src)
+/* Get the code of an IPD data module only, discarding item number. */
+static void getIpdCode(char *dst, xmlNodePtr ref)
 {
-	xmlChar *item, *itemVariant, *itemSeqNumberValue, *id;
+	xmlChar *csn;
+	xmlChar *item;
+	xmlChar *itemVariant;
+
+	getCsnCode(dst, ref, &csn, &item, &itemVariant);
+
+	xmlFree(csn);
+	xmlFree(item);
+	xmlFree(itemVariant);
+}
+
+/* Match a CSN item in an IPD. */
+static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, xmlChar *csn,
+	xmlChar *item, xmlChar *itemVariant, const char *code,
+	const char *fname, const char *src)
+{
+	xmlChar *itemSeqNumberValue, *id;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
 	char *s;
 	int err = doc == NULL;
 
-	item = xmlGetProp(ref, BAD_CAST "item");
-	itemVariant = xmlGetProp(ref, BAD_CAST "itemVariant");
-	itemSeqNumberValue = xmlGetProp(ref, BAD_CAST "itemSeqNumberValue");
+	itemSeqNumberValue = firstXPathValue(NULL, ref, BAD_CAST "@itemSeqNumberValue|@refisn");
 
 	id = xmlCharStrdup("Item ");
 	id = xmlStrcat(id, item);
@@ -1452,12 +1487,21 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const c
 		ctx = xmlXPathNewContext(doc);
 		xmlXPathRegisterVariable(ctx, BAD_CAST "item", xmlXPathNewString(item));
 		xmlXPathRegisterVariable(ctx, BAD_CAST "itemVariant", xmlXPathNewString(itemVariant));
+		xmlXPathRegisterVariable(ctx, BAD_CAST "csn", xmlXPathNewString(csn));
 
 		if (itemSeqNumberValue) {
 			xmlXPathRegisterVariable(ctx, BAD_CAST "isn", xmlXPathNewString(itemSeqNumberValue));
-			obj = xmlXPathEvalExpression(BAD_CAST "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]/itemSeqNumber[@itemSeqNumberValue=$isn]", ctx);
+			obj = xmlXPathEvalExpression(BAD_CAST
+				/* 4.1+ */ "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]/itemSeqNumber[@itemSeqNumberValue=$isn]|"
+				/* 4.0  */ "//catalogSeqNumber[@catalogSeqNumberValue=$csn]/itemSequenceNumber[@itemSeqNumberValue=$isn]|"
+				/* 3.0- */ "//csn[@csn=$csn]/isn[@isn=$isn]",
+				ctx);
 		} else {
-			obj = xmlXPathEvalExpression(BAD_CAST "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]", ctx);
+			obj = xmlXPathEvalExpression(BAD_CAST
+				/* 4.1+ */ "//catalogSeqNumber[@item=$item and (not(@itemVariant) or not($itemVariant) or @itemVariant=$itemVariant)]|"
+				/* 4.0  */ "//catalogSeqNumber[@catalogSeqNumberValue=$csn]|"
+				/* 3.0- */ "//csn[@csn=$csn]",
+				ctx);
 		}
 
 		if (!obj || xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
@@ -1503,8 +1547,6 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, const char *code, const c
 		free(s);
 	}
 
-	xmlFree(item);
-	xmlFree(itemVariant);
 	xmlFree(itemSeqNumberValue);
 	xmlFree(id);
 
@@ -1519,10 +1561,13 @@ static int getCsnItem(xmlNodePtr ref, const char *src)
 	char code[PATH_MAX], fname[PATH_MAX];
 	xmlDocPtr doc;
 	int err;
+	xmlChar *csn;
+	xmlChar *item;
+	xmlChar *itemVariant;
 
 	csnref = ref->parent;
 
-	getIpdCode(code, csnref);
+	getCsnCode(code, csnref, &csn, &item, &itemVariant);
 
 	if (find_object_fname(fname, directory, code, recursive)) {
 		doc = read_xml_doc(fname);
@@ -1530,7 +1575,11 @@ static int getCsnItem(xmlNodePtr ref, const char *src)
 		doc = NULL;
 	}
 
-	err = matchCsnItem(doc, csnref, code, doc ? fname : code, src);
+	err = matchCsnItem(doc, csnref, csn, item, itemVariant, code, doc ? fname : code, src);
+
+	xmlFree(csn);
+	xmlFree(item);
+	xmlFree(itemVariant);
 
 	xmlFreeDoc(doc);
 
@@ -1869,10 +1918,12 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 	else if ((show & SHOW_IPD) == SHOW_IPD &&
 		 (xmlStrcmp(ref->name, BAD_CAST "catalogSeqNumberRef") == 0 ||
 		  xmlStrcmp(ref->name, BAD_CAST "csnref") == 0))
-			getIpdCode(code, ref);
+		getIpdCode(code, ref);
 	else if ((show & SHOW_CSN) == SHOW_CSN &&
-		 (xmlStrcmp(ref->name, BAD_CAST "item") == 0))
-			return getCsnItem(ref, src);
+		 (xmlStrcmp(ref->name, BAD_CAST "item") == 0 ||
+		  xmlStrcmp(ref->name, BAD_CAST "catalogSeqNumberValue") == 0 ||
+		  xmlStrcmp(ref->name, BAD_CAST "refcsn") == 0))
+		return getCsnItem(ref, src);
 	else
 		return 0;
 
@@ -1946,6 +1997,22 @@ static void addFile(const char *path)
 	strcpy(listedFiles[numListedFiles++], path);
 }
 
+/* XPath to select all possible types of references. */
+#define REFS_XPATH BAD_CAST \
+	".//dmRef|.//refdm|.//addresdm|" \
+	".//pmRef|.//refpm|" \
+	".//infoEntityRef|//@infoEntityIdent|//@boardno|" \
+	".//commentRef|" \
+	".//dmlRef|" \
+	".//externalPubRef|.//reftp|" \
+	".//dispatchFileName|.//ddnfilen|" \
+	".//graphic[hotspot]|" \
+	".//dmRef/@referredFragment|.//refdm/@target|" \
+	".//scormContentPackageRef|" \
+	".//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent|" \
+	".//catalogSeqNumberRef|.//csnref|" \
+	".//catalogSeqNumberRef/@item|.//catalogSeqNumberRef/@catalogSeqNumberValue|.//@refcsn"
+
 /* List all references in the given object. */
 static int listReferences(const char *path, int show, const char *targetRef, int targetShow)
 {
@@ -1989,7 +2056,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	else
 		ctx->node = xmlDocGetRootElement(doc);
 
-	obj = xmlXPathEvalExpression(BAD_CAST ".//dmRef|.//refdm|.//addresdm|.//pmRef|.//refpm|.//infoEntityRef|//@infoEntityIdent|//@boardno|.//commentRef|.//dmlRef|.//externalPubRef|.//reftp|.//dispatchFileName|.//ddnfilen|.//graphic[hotspot]|.//dmRef/@referredFragment|.//refdm/@target|.//scormContentPackageRef|.//sourceDmIdent|.//sourcePmIdent|.//repositorySourceDmIdent|.//catalogSeqNumberRef|.//csnref|.//catalogSeqNumberRef/@item", ctx);
+	obj = xmlXPathEvalExpression(REFS_XPATH, ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
