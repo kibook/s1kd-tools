@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.1.0"
+#define VERSION "4.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1564,19 +1564,19 @@ static int create_second_verification(xmlXPathContextPtr ctx, const char *val)
 	return 0;
 }
 
-static xmlChar *get_remarks(xmlNodePtr node, struct opts *opts)
+static xmlChar *get_remarks_or_rfu(xmlNodePtr node, struct opts *opts)
 {
 	return xmlNodeGetContent(first_xpath_node_local(node, BAD_CAST "simplePara|p"));
 }
 
-static void show_remarks(xmlNodePtr node, struct opts *opts)
+static void show_remarks_or_rfu(xmlNodePtr node, struct opts *opts)
 {
-	xmlChar *s = get_remarks(node, opts);
+	xmlChar *s = get_remarks_or_rfu(node, opts);
 	printf("%s", (char *) s);
 	xmlFree(s);
 }
 
-static int edit_remarks(xmlNodePtr node, const char *val)
+static int edit_remarks_or_rfu(xmlNodePtr node, const char *val)
 {
 	xmlNodePtr p = first_xpath_node_local(node, BAD_CAST "simplePara|p");
 	return edit_simple_node(p, val);
@@ -1606,6 +1606,34 @@ static int create_remarks(xmlXPathContextPtr ctx, const char *val)
 	remarks = xmlNewNode(NULL, BAD_CAST "remarks");
 	xmlAddNextSibling(node, remarks);
 	xmlNewTextChild(remarks, NULL, BAD_CAST (iss30 ? "p" : "simplePara"), BAD_CAST val);
+
+	return 0;
+}
+
+static int create_rfu(xmlXPathContextPtr ctx, const char *val)
+{
+	xmlNodePtr node, rfu;
+	bool iss30;
+
+	node = first_xpath_node(
+		"("
+		"//dmStatus/*|//status/*|"
+		"//pmStatus/*|//pmstatus/*|"
+		"//commentStatus/*|"
+		"//ddnStatus/*|"
+		"//dmlStatus/*|"
+		"//scormContentPackageStatus/*"
+		")[not(self::productSafety or self::remarks)][last()]", ctx);
+
+	if (!node) {
+		return EXIT_INVALID_CREATE;
+	}
+
+	iss30 = xmlStrcmp(node->parent->name, BAD_CAST "status") == 0 || xmlStrcmp(node->parent->name, BAD_CAST "pmstatus") == 0;
+
+	rfu = xmlNewNode(NULL, BAD_CAST (iss30 ? "rfu" : "reasonForUpdate"));
+	xmlAddNextSibling(node, rfu);
+	xmlNewTextChild(rfu, NULL, BAD_CAST (iss30 ? "p" : "simplePara"), BAD_CAST val);
 
 	return 0;
 }
@@ -1919,6 +1947,13 @@ static struct metadata metadata[] = {
 		NULL,
 		NULL,
 		"Quality assurance status"},
+	{"reasonForUpdate",
+		"//reasonForUpdate|//rfu",
+		get_remarks_or_rfu,
+		show_remarks_or_rfu,
+		edit_remarks_or_rfu,
+		create_rfu,
+		"Reason for update"},
 	{"receiverIdent",
 		"//@receiverIdent|//recvid",
 		NULL,
@@ -1928,9 +1963,9 @@ static struct metadata metadata[] = {
 		"Receiving authority"},
 	{"remarks",
 		"//dmStatus/remarks|//status/remarks|//pmStatus/remarks|//pmstatus/remarks|//commentStatus/remarks|//dmlStatus/remarks|//ddnStatus/remarks|//scormContentPackageStatus/remarks|//imfStatus/remarks",
-		get_remarks,
-		show_remarks,
-		edit_remarks,
+		get_remarks_or_rfu,
+		show_remarks_or_rfu,
+		edit_remarks_or_rfu,
 		create_remarks,
 		"General remarks"},
 	{"responsiblePartnerCompany",
