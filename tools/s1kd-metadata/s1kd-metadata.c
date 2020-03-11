@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.2.0"
+#define VERSION "4.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -932,6 +932,28 @@ static int edit_in_work(xmlNodePtr node, const char *val)
 	return edit_simple_attr(node, "inWork", val);
 }
 
+static xmlChar *get_issue_info(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *i, *w;
+	i = first_xpath_string(node, BAD_CAST "@issueNumber|@issno");
+	w = first_xpath_string(node, BAD_CAST "@inWork|@inwork");
+
+	i = xmlStrcat(i, BAD_CAST "-");
+	i = xmlStrcat(i, w ? w : BAD_CAST "00");
+
+	xmlFree(w);
+
+	return i;
+}
+
+static void show_issue_info(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *s;
+	s = get_issue_info(node, opts);
+	printf("%s", (char *) s);
+	xmlFree(s);
+}
+
 static int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
@@ -1828,6 +1850,13 @@ static struct metadata metadata[] = {
 		edit_issue_date,
 		NULL,
 		"Issue date of the CSDB object"},
+	{"issueInfo",
+		"//issueInfo|//issno",
+		get_issue_info,
+		show_issue_info,
+		NULL,
+		NULL,
+		"Issue info (NNN-NN)"},
 	{"issueNumber",
 		"//issueInfo/@issueNumber|//issno/@issno",
 		NULL,
