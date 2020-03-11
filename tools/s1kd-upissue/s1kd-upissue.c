@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.16.0"
+#define VERSION "1.16.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -40,6 +40,8 @@ static void show_help(void)
 	puts("  -d, --dry-run                Do not write anything, only print new filename.");
 	puts("  -e, --erase                  Remove old issue.");
 	puts("  -f, --overwrite              Overwrite existing upissued object.");
+	puts("  -H, --highlight              Highlight the last RFU.");
+	puts("  -h, -?, --help               Show usage message.");
 	puts("  -I, --(keep|change)-date     Do not change issue date. In -m mode, change issue date.");
 	puts("  -i, --official               Increase issue number instead of inwork.");
 	puts("  -l, --list                   Treat input as list of objects.");
@@ -51,7 +53,6 @@ static void show_help(void)
 	puts("  -s, --status <status>        Set change status type.");
 	puts("  -t, --type <urt>             Set the updateReasonType of the last RFU.");
 	puts("  -u, --clean-rfus             Remove unassociated RFUs.");
-	puts("  -H, --highlight              Highlight the last RFU.");
 	puts("  -v, --verbose                Print filename of upissued objects.");
 	puts("  -w, --lock                   Make old and official issues read-only.");
 	puts("  -z, --date <date>            The issue date to use for the upissued objects.");
