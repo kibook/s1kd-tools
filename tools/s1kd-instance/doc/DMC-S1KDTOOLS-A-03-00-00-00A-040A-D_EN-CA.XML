@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="048" inWork="01"/>
+        <issueInfo issueNumber="048" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="06"/>
+        <issueDate year="2020" month="03" day="12"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -3 (--delete) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -537,6 +540,12 @@
               <listItemTerm>-2, --cct</listItemTerm>
               <listItemDefinition>
                 <para>Specify the CCT to read dependency tests from (-~).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-3, --delete</listItemTerm>
+              <listItemDefinition>
+                <para>Remove elements with change type of "delete" in the resulting instance. If -w (--whole-objects) is specified, then no instance will be created for objects with an issue type of "deleted".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

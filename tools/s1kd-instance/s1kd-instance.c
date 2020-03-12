@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.2.0"
+#define VERSION "9.3.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2404,12 +2404,50 @@ static void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *c
 	xmlXPathFreeContext(ctx);
 }
 
+/* Remove elements marked as "delete". */
+static void rem_delete(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//*[@change='delete']|//*[@changeType='delete']", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+/* Determine if an object is "deleted". */
+static bool is_deleted(xmlDocPtr doc)
+{
+	xmlChar *isstype;
+	bool is;
+
+	isstype = first_xpath_value(doc, NULL, BAD_CAST "//dmStatus/@issueType|//dmaddres/issno/@type|//pmStatus/@issueType|//pmaddres/issno/@type|//commentStatus/@issueType|//dmlStatus/@issueType|//scormContentPackageStatus/@issueType");
+	is = xmlStrcmp(isstype, BAD_CAST "deleted") == 0;
+	xmlFree(isstype);
+
+	return is;
+}
+
 /* Determine whether or not to create an instance based on the object's:
  * - Applicability
  * - Skill level
  * - Security classification
+ * - Issue type
  */
-static bool create_instance(xmlDocPtr doc, xmlNodePtr defs, const char *skills, const char *securities)
+static bool create_instance(xmlDocPtr doc, xmlNodePtr defs, const char *skills, const char *securities, bool delete)
 {
 	if (!check_wholedm_applic(doc, defs)) {
 		return false;
@@ -2420,6 +2458,10 @@ static bool create_instance(xmlDocPtr doc, xmlNodePtr defs, const char *skills, 
 	}
 
 	if (skills && !valid_object(doc, "//dmStatus/skillLevel/@skillLevelCode", skills)) {
+		return false;
+	}
+
+	if (delete && is_deleted(doc)) {
 		return false;
 	}
 
@@ -3905,6 +3947,7 @@ static void show_help(void)
 	puts("  -z, --issue-type <type>           Set the issue type of the instance.");
 	puts("  -1, --act <file>                  Specify custom ACT.");
 	puts("  -2, --cct <file>                  Specify custom CCT.");
+	puts("  -3, --delete                      Remove deleted objects/elements.");
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
@@ -3997,6 +4040,7 @@ int main(int argc, char **argv)
 	bool find_cir = false;
 	bool write_files = true;
 	bool print_non_applic = false;
+	bool delete = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -4004,7 +4048,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4567890~H:";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:43567890~H:";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -4059,6 +4103,7 @@ int main(int argc, char **argv)
 		{"no-infoname"       , no_argument      , 0, '!'},
 		{"act"               , required_argument, 0, '1'},
 		{"cct"               , required_argument, 0, '2'},
+		{"delete"            , no_argument      , 0, '3'},
 		{"dependencies"      , no_argument      , 0, '~'},
 		{"resolve-containers", no_argument      , 0, 'Q'},
 		{"flatten-alts-refs" , no_argument      , 0, '4'},
@@ -4182,6 +4227,9 @@ int main(int argc, char **argv)
 				break;
 			case '2':
 				usercct = strdup(optarg);
+				break;
+			case '3':
+				delete = true;
 				break;
 			case 'P':
 				userpct = strdup(optarg);
@@ -4593,7 +4641,7 @@ int main(int argc, char **argv)
 				load_applic_from_inst(doc);
 			}
 
-			if (!wholedm || create_instance(doc, applicability, skill_codes, sec_classes)) {
+			if (!wholedm || create_instance(doc, applicability, skill_codes, sec_classes, delete)) {
 				bool ispm;
 				xmlNodePtr root;
 
@@ -4687,6 +4735,10 @@ int main(int argc, char **argv)
 				 * given list. */
 				if (skill_codes) {
 					filter_elements_by_att(doc, "skillLevelCode", skill_codes);
+				}
+				/* Remove elements marked as "delete". */
+				if (delete) {
+					rem_delete(doc);
 				}
 
 				if (strcmp(extension, "") != 0) {
