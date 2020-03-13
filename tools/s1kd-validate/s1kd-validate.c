@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.5.0"
+#define VERSION "2.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -130,10 +130,9 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-s <path>] [-x <URI>] [-Defloqv] [<object>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-s <path>] [-x <URI>] [-efloqv^h?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -D, --remove-deleted  Validate with elements marked as \"delete\" removed.");
 	puts("  -d, --schemas <dir>   Search for schemas in <dir> instead of using the URL.");
 	puts("  -e, --ignore-empty    Ignore empty/non-XML documents.");
 	puts("  -f, --filenames       List invalid files.");
@@ -144,6 +143,7 @@ static void show_help(void)
 	puts("  -s, --schema <path>   Validate against the given schema.");
 	puts("  -v, --verbose         Verbose output.");
 	puts("  -x, --exclude <URI>   Exclude namespace from validation by URI.");
+	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
 	puts("  --version             Show version information.");
 	puts("  <object>              Any number of CSDB objects to validate.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -438,11 +438,10 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqDd:X:xfloes:h?";
+	const char *sopts = "vqd:X:xfloes:^h?";
 	struct option lopts[] = {
 		{"version"       , no_argument      , 0, 0},
 		{"help"          , no_argument      , 0, 'h'},
-		{"remove-deleted", no_argument      , 0, 'D'},
 		{"schemas"       , required_argument, 0, 'd'},
 		{"filenames"     , no_argument      , 0, 'f'},
 		{"list"          , no_argument      , 0, 'l'},
@@ -452,6 +451,7 @@ int main(int argc, char *argv[])
 		{"exclude"       , required_argument, 0, 'x'},
 		{"ignore-empty"  , no_argument      , 0, 'e'},
 		{"schema"        , required_argument, 0, 's'},
+		{"remove-deleted", no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -472,7 +472,6 @@ int main(int argc, char *argv[])
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
-			case 'D': rem_del = 1; break;
 			case 'd': strcpy(schema_dir, optarg); break;
 			case 'x': add_ignore_ns(ignore_ns, optarg); break;
 			case 'f': list_invalid = 1; break;
@@ -480,6 +479,7 @@ int main(int argc, char *argv[])
 			case 'o': output_tree = 1; break;
 			case 'e': ignore_empty = 1; break;
 			case 's': schema = strdup(optarg); break;
+			case '^': rem_del = 1; break;
 			case 'h': 
 			case '?': show_help(); return EXIT_SUCCESS;
 		}

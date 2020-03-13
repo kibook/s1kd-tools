@@ -9,7 +9,7 @@ s1kd\-validate \- Validate S1000D CSDB objects against their schemas
 .IP
 .nf
 \f[C]
-s1kd\-validate\ [\-d\ <dir>]\ [\-s\ <path>]\ [\-x\ <URI>]\ [\-Defloqvh?]
+s1kd\-validate\ [\-d\ <dir>]\ [\-s\ <path>]\ [\-x\ <URI>]\ [\-efloqv^h?]
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ [<object>...]
 \f[]
 .fi
@@ -19,11 +19,6 @@ The \f[I]s1kd\-validate\f[] tool validates S1000D CSDB objects, checking
 whether they are valid XML files and if they are valid against their own
 S1000D schemas.
 .SH OPTIONS
-.TP
-.B \-D, \-\-remove\-deleted
-Validate with elements that have a change type of "delete" removed.
-.RS
-.RE
 .TP
 .B \-d, \-\-schemas <dir>
 Search for schemas in <dir>.
@@ -83,6 +78,11 @@ Success/failure will be explicitly reported on top of any errors.
 .B \-x, \-\-exclude <URI>
 Exclude an XML namespace from the validation.
 Elements in the namespace specified by <URI> are ignored.
+.RS
+.RE
+.TP
+.B \-^, \-\-remove\-deleted
+Validate with elements that have a change type of "delete" removed.
 .RS
 .RE
 .TP
