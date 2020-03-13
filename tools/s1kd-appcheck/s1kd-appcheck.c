@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.6.0"
+#define VERSION "5.6.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -112,7 +112,6 @@ static void show_help(void)
 	puts("  -b, --brexcheck       Validate against BREX.");
 	puts("  -C, --cct <file>      User-specified CCT.");
 	puts("  -c, --custom          Perform a customized check.");
-	puts("  -D, --remove-deleted  Validate with elements marked as \"delete\" removed.");
 	puts("  -d, --dir <dir>       Search for ACT/CCT/PCT in <dir>.");
 	puts("  -e, --exec <cmd>      Commands used to validate objects.");
 	puts("  -f, --filenames       List invalid files.");
@@ -133,6 +132,7 @@ static void show_help(void)
 	puts("  -v, --verbose         Verbose output.");
 	puts("  -x, --xml             Output XML report.");
 	puts("  -~, --dependencies    Check CCT dependencies.");
+	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
 	puts("  --version             Show version information.");
 	puts("  <object>...           CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -1771,7 +1771,6 @@ int main(int argc, char **argv)
 		{"brexcheck"     , no_argument      , 0, 'b'},
 		{"cct"           , required_argument, 0, 'C'},
 		{"custom"        , no_argument      , 0, 'c'},
-		{"remove-deleted", no_argument      , 0, 'D'},
 		{"dir"           , required_argument, 0, 'd'},
 		{"exec"          , required_argument, 0, 'e'},
 		{"filenames"     , no_argument      , 0, 'f'},
@@ -1791,6 +1790,7 @@ int main(int argc, char **argv)
 		{"verbose"       , no_argument      , 0, 'v'},
 		{"xml"           , no_argument      , 0, 'x'},
 		{"dependencies"  , no_argument      , 0, '~'},
+		{"remove-deleted", no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1855,9 +1855,6 @@ int main(int argc, char **argv)
 			case 'c':
 				opts.mode = CUSTOM;
 				break;
-			case 'D':
-				opts.rem_delete = true;
-				break;
 			case 'd':
 				free(search_dir);
 				search_dir = strdup(optarg);
@@ -1918,6 +1915,9 @@ int main(int argc, char **argv)
 				break;
 			case '~':
 				opts.add_deps = true;
+				break;
+			case '^':
+				opts.rem_delete = true;
 				break;
 			case 'h':
 			case '?':

@@ -69,12 +69,6 @@ If neither of these options are specified, no checks will be performed.
 .RS
 .RE
 .TP
-.B \-D, \-\-remove\-deleted
-Validate objects with elements that have a change type of "delete"
-removed.
-.RS
-.RE
-.TP
 .B \-d, \-\-dir <dir>
 The directory to start searching for ACT/CCT/PCT data modules in.
 By default, the current directory is used.
@@ -193,6 +187,12 @@ Print an XML report of the check.
 .B \-~, \-\-dependencies
 Check with CCT dependency tests added to assertions which use the
 dependant values.
+.RS
+.RE
+.TP
+.B \-^, \-\-remove\-deleted
+Validate objects with elements that have a change type of "delete"
+removed.
 .RS
 .RE
 .TP

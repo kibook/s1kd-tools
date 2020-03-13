@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="005" inWork="02"/>
+        <issueInfo issueNumber="005" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="03" day="13"/>
@@ -42,7 +42,7 @@
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -D (--remove-deleted) option.</simplePara>
+        <simplePara>Add -^ (--remove-deleted) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -96,12 +96,6 @@
               <listItemTerm>-c, --custom</listItemTerm>
               <listItemDefinition>
                 <para>Perform a customized check. The default standalone applicability check is disabled. This can then be combined with the -s option, to only check that all product attributes and conditions are defined in the ACT and CCT respectively, and/or the -n option, to only check nested applicability annotations. If neither of these options are specified, no checks will be performed.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
-              <listItemTerm>-D, --remove-deleted</listItemTerm>
-              <listItemDefinition>
-                <para>Validate objects with elements that have a change type of "delete" removed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -222,6 +216,12 @@
               <listItemTerm>-~, --dependencies</listItemTerm>
               <listItemDefinition>
                 <para>Check with CCT dependency tests added to assertions which use the dependant values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects with elements that have a change type of "delete" removed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
