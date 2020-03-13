@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="035" inWork="01"/>
+        <issueInfo issueNumber="035" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="06"/>
+        <issueDate year="2020" month="03" day="13"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D (--remove-deleted) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24">s1kd-brexcheck [-b &lt;brex&gt;] [-d &lt;dir&gt;] [-I &lt;path&gt;] [-w &lt;severities&gt;]
-               [-BcefLlnopqrS[tu]sTvxh?] [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">s1kd-brexcheck [-b &lt;brex&gt;] [-d &lt;dir&gt;] [-I &lt;path&gt;] [-w &lt;severities&gt;]
+               [-BcDefLlnopqrS[tu]sTvxh?] [&lt;object&gt;...]</verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -80,6 +83,12 @@
               <listItemTerm>-c, --values</listItemTerm>
               <listItemDefinition>
                 <para>When a context rule defines values for an object (objectValue), check if the value of each object is within the allowed set of values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-D, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Check the CSDB objects with elements that have a change type of "delete" removed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

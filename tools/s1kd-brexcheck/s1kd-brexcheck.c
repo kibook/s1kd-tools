@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.4.0"
+#define VERSION "3.5.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -110,6 +110,9 @@ static bool output_tree = false;
 
 /* Ignore empty/non-XML files. */
 static bool ignore_empty = false;
+
+/* Remove elements marked as "delete" before check. */
+static bool rem_delete = false;
 
 /* Return the first node in a set matching an XPath expression. */
 static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -1019,6 +1022,19 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	char *schema;
 	char xpath[512];
 
+	xmlDocPtr validtree = NULL;
+
+	/* Make a copy of the original XML tree before performing extra
+	 * processing on it. */
+	if (output_tree) {
+		validtree = xmlCopyDoc(dmod_doc, 1);
+	}
+
+	/* Remove "delete" elements. */
+	if (rem_delete) {
+		rem_delete_elems(dmod_doc);
+	}
+
 	schema = (char *) xmlGetProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation");
 	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema, schema);
 	xmlFree(schema);
@@ -1073,8 +1089,11 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		print_fnames(documentNode);
 	}
 
-	if (output_tree && !total) {
-		save_xml_doc(dmod_doc, "-");
+	if (output_tree) {
+		if (total == 0) {
+			save_xml_doc(validtree, "-");
+		}
+		xmlFreeDoc(validtree);
 	}
 
 	return total;
@@ -1274,6 +1293,7 @@ static void show_help(void)
 	puts("  -B, --default-brex                   Use the default BREX.");
 	puts("  -b, --brex <brex>                    Use <brex> as the BREX data module.");
 	puts("  -c, --values                         Check object values.");
+	puts("  -D, --remove-deleted                 Check with elements marked as \"delete\" removed.");
 	puts("  -d, --dir <dir>                      Directory to start search for BREX in.");
 	puts("  -e, --ignore-empty                   Ignore empty/non-XML files.");
 	puts("  -f, --filenames                      Print the filenames of invalid objects.");
@@ -1332,12 +1352,13 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:eI:xvqslw:StupfncLTrd:oh?";
+	const char *sopts = "Bb:eI:xvqslw:StupfncLTrDd:oh?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
 		{"default-brex"   , no_argument      , 0, 'B'},
 		{"brex"           , required_argument, 0, 'b'},
+		{"remove-deleted" , no_argument      , 0, 'D'},
 		{"dir"            , required_argument, 0, 'd'},
 		{"ignore-empty"   , no_argument      , 0, 'e'},
 		{"include"        , required_argument, 0, 'I'},
@@ -1379,6 +1400,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'b':
 				add_path(&brex_fnames, &num_brex_fnames, &BREX_MAX, optarg);
+				break;
+			case 'D':
+				rem_delete = true;
 				break;
 			case 'd':
 				free(search_dir);
