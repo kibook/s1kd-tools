@@ -386,11 +386,6 @@ Specify the ACT to use to find the CCT and/or PCT.
 -2, --cct  
 Specify the CCT to read dependency tests from (-\~).
 
--3, --remove-deleted  
-Remove elements with change type of "delete" in the resulting instance.
-If -w (--whole-objects) is specified, then no instance will be created
-for objects with an issue type of "deleted".
-
 -4, --flatten-alts-refs  
 Same as the -F option, but in addition to flattening alts elements, the
 `internalRefTargetType` of cross-references to them will be changed to
@@ -437,6 +432,11 @@ Do not include an infoName in the instance.
 -\~, --dependencies  
 Add dependency tests from the CCT to assertions that use the dependant
 values.
+
+-^, --remove-deleted  
+Remove elements with change type of "delete" in the resulting instance.
+If -w (--whole-objects) is specified, then no instance will be created
+for objects with an issue type of "deleted".
 
 --version  
 Show version information.

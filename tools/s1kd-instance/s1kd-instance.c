@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.3.2"
+#define VERSION "9.3.3"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3923,7 +3923,6 @@ static void show_help(void)
 	puts("  -z, --issue-type <type>           Set the issue type of the instance.");
 	puts("  -1, --act <file>                  Specify custom ACT.");
 	puts("  -2, --cct <file>                  Specify custom CCT.");
-	puts("  -3, --remove-deleted              Remove deleted objects/elements.");
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
@@ -3935,6 +3934,7 @@ static void show_help(void)
 	puts("  -%, --read-only                   Make instances read-only.");
 	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
 	puts("  -~, --dependencies                Add CCT dependencies to annotations.");
+	puts("  -^, --remove-deleted              Remove deleted objects/elements.");
 	puts("  --version                         Show version information.");
 	puts("  <object>...                       Source CSDB object(s)");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -4079,7 +4079,6 @@ int main(int argc, char **argv)
 		{"no-infoname"       , no_argument      , 0, '!'},
 		{"act"               , required_argument, 0, '1'},
 		{"cct"               , required_argument, 0, '2'},
-		{"remove-deleted"    , no_argument      , 0, '3'},
 		{"dependencies"      , no_argument      , 0, '~'},
 		{"resolve-containers", no_argument      , 0, 'Q'},
 		{"flatten-alts-refs" , no_argument      , 0, '4'},
@@ -4090,6 +4089,7 @@ int main(int argc, char **argv)
 		{"reapply"           , no_argument      , 0, '8'},
 		{"prune"             , no_argument      , 0, '9'},
 		{"print-non-applic"  , no_argument      , 0, '0'},
+		{"remove-deleted"    , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -4203,9 +4203,6 @@ int main(int argc, char **argv)
 				break;
 			case '2':
 				usercct = strdup(optarg);
-				break;
-			case '3':
-				delete = true;
 				break;
 			case 'P':
 				userpct = strdup(optarg);
@@ -4328,6 +4325,9 @@ int main(int argc, char **argv)
 						all_props = true;
 					}
 				}
+				break;
+			case '^':
+				delete = true;
 				break;
 			case 'h':
 			case '?':

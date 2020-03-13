@@ -502,13 +502,6 @@ Specify the CCT to read dependency tests from (\-~).
 .RS
 .RE
 .TP
-.B \-3, \-\-remove\-deleted
-Remove elements with change type of "delete" in the resulting instance.
-If \-w (\-\-whole\-objects) is specified, then no instance will be
-created for objects with an issue type of "deleted".
-.RS
-.RE
-.TP
 .B \-4, \-\-flatten\-alts\-refs
 Same as the \-F option, but in addition to flattening alts elements, the
 \f[C]internalRefTargetType\f[] of cross\-references to them will be
@@ -578,6 +571,13 @@ Do not include an infoName in the instance.
 .B \-~, \-\-dependencies
 Add dependency tests from the CCT to assertions that use the dependant
 values.
+.RS
+.RE
+.TP
+.B \-^, \-\-remove\-deleted
+Remove elements with change type of "delete" in the resulting instance.
+If \-w (\-\-whole\-objects) is specified, then no instance will be
+created for objects with an issue type of "deleted".
 .RS
 .RE
 .TP

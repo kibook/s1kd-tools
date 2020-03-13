@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="048" inWork="03"/>
+        <issueInfo issueNumber="048" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="03" day="13"/>
@@ -42,7 +42,7 @@
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -3 (--remove-deleted) option.</simplePara>
+        <simplePara>Add -^ (--remove-deleted) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -542,12 +542,6 @@
                 <para>Specify the CCT to read dependency tests from (-~).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
-              <listItemTerm>-3, --remove-deleted</listItemTerm>
-              <listItemDefinition>
-                <para>Remove elements with change type of "delete" in the resulting instance. If -w (--whole-objects) is specified, then no instance will be created for objects with an issue type of "deleted".</para>
-              </listItemDefinition>
-            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-4, --flatten-alts-refs</listItemTerm>
               <listItemDefinition>
@@ -612,6 +606,12 @@
               <listItemTerm>-~, --dependencies</listItemTerm>
               <listItemDefinition>
                 <para>Add dependency tests from the CCT to assertions that use the dependant values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Remove elements with change type of "delete" in the resulting instance. If -w (--whole-objects) is specified, then no instance will be created for objects with an issue type of "deleted".</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
