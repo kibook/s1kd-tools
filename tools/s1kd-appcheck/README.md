@@ -55,6 +55,10 @@ CCT respectively, and/or the -n option, to only check nested
 applicability annotations. If neither of these options are specified, no
 checks will be performed.
 
+-D, --remove-deleted  
+Validate objects with elements that have a change type of "delete"
+removed.
+
 -d, --dir &lt;dir&gt;  
 The directory to start searching for ACT/CCT/PCT data modules in. By
 default, the current directory is used.
