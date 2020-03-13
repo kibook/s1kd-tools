@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D (--remove-deleted) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-efloqvh?]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-Defloqvh?]
               [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -64,6 +67,12 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-D, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Validate with elements that have a change type of "delete" removed.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-d, --schemas &lt;dir&gt;</listItemTerm>
               <listItemDefinition>

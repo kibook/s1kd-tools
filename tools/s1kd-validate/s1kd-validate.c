@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.4.0"
+#define VERSION "2.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -130,21 +130,22 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-s <path>] [-x <URI>] [-efloqv] [<object>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-s <path>] [-x <URI>] [-Defloqv] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d, --schemas <dir>  Search for schemas in <dir> instead of using the URL.");
-	puts("  -e, --ignore-empty   Ignore empty/non-XML documents.");
-	puts("  -f, --filenames      List invalid files.");
-	puts("  -h, -?, --help       Show help/usage message.");
-	puts("  -l, --list           Treat input as list of filenames.");
-	puts("  -o, --output-valid   Output valid CSDB objects to stdout.");
-	puts("  -q, --quiet          Silent (no output).");
-	puts("  -s, --schema <path>  Validate against the given schema.");
-	puts("  -v, --verbose        Verbose output.");
-	puts("  -x, --exclude <URI>  Exclude namespace from validation by URI.");
-	puts("  --version            Show version information.");
-	puts("  <object>             Any number of CSDB objects to validate.");
+	puts("  -D, --remove-deleted  Validate with elements marked as \"delete\" removed.");
+	puts("  -d, --schemas <dir>   Search for schemas in <dir> instead of using the URL.");
+	puts("  -e, --ignore-empty    Ignore empty/non-XML documents.");
+	puts("  -f, --filenames       List invalid files.");
+	puts("  -h, -?, --help        Show help/usage message.");
+	puts("  -l, --list            Treat input as list of filenames.");
+	puts("  -o, --output-valid    Output valid CSDB objects to stdout.");
+	puts("  -q, --quiet           Silent (no output).");
+	puts("  -s, --schema <path>   Validate against the given schema.");
+	puts("  -v, --verbose         Verbose output.");
+	puts("  -x, --exclude <URI>   Exclude namespace from validation by URI.");
+	puts("  --version             Show version information.");
+	puts("  <object>              Any number of CSDB objects to validate.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -272,7 +273,7 @@ static void resize_schema_parsers(void)
 	}
 }
 
-static int validate_file(const char *fname, const char *schema_dir, const char *schema, xmlNodePtr ignore_ns, int list, int ignore_empty)
+static int validate_file(const char *fname, const char *schema_dir, const char *schema, xmlNodePtr ignore_ns, int list, int ignore_empty, int rem_del)
 {
 	xmlDocPtr doc;
 	xmlDocPtr validtree = NULL;
@@ -297,6 +298,11 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 		for (cur = ignore_ns->children; cur; cur = cur->next) {
 			strip_ns(doc, cur);
 		}
+	}
+
+	/* Remove elements marked as "delete". */
+	if (rem_del) {
+		rem_delete_elems(doc);
 	}
 
 	/* This shouldn't be needed because the xs:ID, xs:IDREF and xs:IDREFS
@@ -366,8 +372,10 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 	}
 
 	/* Write the original XML tree to stdout if determined to be valid. */
-	if (output_tree && !err) {
-		save_xml_doc(validtree, "-");
+	if (output_tree) {
+		if (err == 0) {
+			save_xml_doc(validtree, "-");
+		}
 		xmlFreeDoc(validtree);
 	}
 
@@ -388,7 +396,7 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 	return err;
 }
 
-static int validate_file_list(const char *fname, char *schema_dir, const char *schema, xmlNodePtr ignore_ns, int list_invalid, int ignore_empty)
+static int validate_file_list(const char *fname, char *schema_dir, const char *schema, xmlNodePtr ignore_ns, int list_invalid, int ignore_empty, int rem_del)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -407,7 +415,7 @@ static int validate_file_list(const char *fname, char *schema_dir, const char *s
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		err += validate_file(path, schema_dir, schema, ignore_ns, list_invalid, ignore_empty);
+		err += validate_file(path, schema_dir, schema, ignore_ns, list_invalid, ignore_empty, rem_del);
 	}
 
 	if (fname) {
@@ -425,23 +433,25 @@ int main(int argc, char *argv[])
 	int list_invalid = 0;
 	int is_list = 0;
 	int ignore_empty = 0;
+	int rem_del = 0;
 	char *schema = NULL;
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqd:X:xfloes:h?";
+	const char *sopts = "vqDd:X:xfloes:h?";
 	struct option lopts[] = {
-		{"version"     , no_argument      , 0, 0},
-		{"help"        , no_argument      , 0, 'h'},
-		{"schemas"     , required_argument, 0, 'd'},
-		{"filenames"   , no_argument      , 0, 'f'},
-		{"list"        , no_argument      , 0, 'l'},
-		{"output-valid", no_argument      , 0, 'o'},
-		{"quiet"       , no_argument      , 0, 'q'},
-		{"verbose"     , no_argument      , 0, 'v'},
-		{"exclude"     , required_argument, 0, 'x'},
-		{"ignore-empty", no_argument      , 0, 'e'},
-		{"schema"      , required_argument, 0, 's'},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"remove-deleted", no_argument      , 0, 'D'},
+		{"schemas"       , required_argument, 0, 'd'},
+		{"filenames"     , no_argument      , 0, 'f'},
+		{"list"          , no_argument      , 0, 'l'},
+		{"output-valid"  , no_argument      , 0, 'o'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"exclude"       , required_argument, 0, 'x'},
+		{"ignore-empty"  , no_argument      , 0, 'e'},
+		{"schema"        , required_argument, 0, 's'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -462,6 +472,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
+			case 'D': rem_del = 1; break;
 			case 'd': strcpy(schema_dir, optarg); break;
 			case 'x': add_ignore_ns(ignore_ns, optarg); break;
 			case 'f': list_invalid = 1; break;
@@ -487,15 +498,15 @@ int main(int argc, char *argv[])
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (is_list) {
-				err += validate_file_list(argv[i], schema_dir, schema, ignore_ns, list_invalid, ignore_empty);
+				err += validate_file_list(argv[i], schema_dir, schema, ignore_ns, list_invalid, ignore_empty, rem_del);
 			} else {
-				err += validate_file(argv[i], schema_dir, schema, ignore_ns, list_invalid, ignore_empty);
+				err += validate_file(argv[i], schema_dir, schema, ignore_ns, list_invalid, ignore_empty, rem_del);
 			}
 		}
 	} else if (is_list) {
-		err = validate_file_list(NULL, schema_dir, schema, ignore_ns, list_invalid, ignore_empty);
+		err = validate_file_list(NULL, schema_dir, schema, ignore_ns, list_invalid, ignore_empty, rem_del);
 	} else {
-		err = validate_file("-", schema_dir, schema, ignore_ns, list_invalid, ignore_empty);
+		err = validate_file("-", schema_dir, schema, ignore_ns, list_invalid, ignore_empty, rem_del);
 	}
 
 	for (i = 0; i < schema_parser_count; ++i) {

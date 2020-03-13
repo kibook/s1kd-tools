@@ -6,7 +6,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-efloqvh?]
+    s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-Defloqvh?]
                   [<object>...]
 
 DESCRIPTION
@@ -18,6 +18,9 @@ schemas.
 
 OPTIONS
 =======
+
+-D, --remove-deleted  
+Validate with elements that have a change type of "delete" removed.
 
 -d, --schemas &lt;dir&gt;  
 Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is
