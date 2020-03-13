@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-BcDefLlnopqrS[tu]sTvxh?] [<object>...]
+                   [-BcefLlnopqrS[tu]sTvx^h?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -34,10 +34,6 @@ modules are specified, the BREX data module referenced in
 -c, --values  
 When a context rule defines values for an object (objectValue), check if
 the value of each object is within the allowed set of values.
-
--D, --remove-deleted  
-Check the CSDB objects with elements that have a change type of "delete"
-removed.
 
 -d, --dir &lt;dir&gt;  
 Directory to start searching for BREX data modules in. By default, the
@@ -111,6 +107,10 @@ Specify a list of severity levels for business rules.
 
 -x, --xml  
 Output an XML report.
+
+-^, --remove-deleted  
+Check the CSDB objects with elements that have a change type of "delete"
+removed.
 
 --version  
 Show version information.

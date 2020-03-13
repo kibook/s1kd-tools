@@ -11,7 +11,7 @@ modules
 .nf
 \f[C]
 s1kd\-brexcheck\ [\-b\ <brex>]\ [\-d\ <dir>]\ [\-I\ <path>]\ [\-w\ <severities>]
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-BcDefLlnopqrS[tu]sTvxh?]\ [<object>...]
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\-BcefLlnopqrS[tu]sTvx^h?]\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -42,12 +42,6 @@ in <brexDmRef> in the CSDB object is attempted to be used instead.
 .B \-c, \-\-values
 When a context rule defines values for an object (objectValue), check if
 the value of each object is within the allowed set of values.
-.RS
-.RE
-.TP
-.B \-D, \-\-remove\-deleted
-Check the CSDB objects with elements that have a change type of "delete"
-removed.
 .RS
 .RE
 .TP
@@ -161,6 +155,12 @@ Specify a list of severity levels for business rules.
 .TP
 .B \-x, \-\-xml
 Output an XML report.
+.RS
+.RE
+.TP
+.B \-^, \-\-remove\-deleted
+Check the CSDB objects with elements that have a change type of "delete"
+removed.
 .RS
 .RE
 .TP
