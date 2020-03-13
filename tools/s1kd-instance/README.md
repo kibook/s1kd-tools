@@ -386,7 +386,7 @@ Specify the ACT to use to find the CCT and/or PCT.
 -2, --cct  
 Specify the CCT to read dependency tests from (-\~).
 
--3, --delete  
+-3, --remove-deleted  
 Remove elements with change type of "delete" in the resulting instance.
 If -w (--whole-objects) is specified, then no instance will be created
 for objects with an issue type of "deleted".
