@@ -169,6 +169,9 @@ static xmlNodePtr hotspotNs = NULL;
 /* Custom format for printed references. */
 static char *printFormat = NULL;
 
+/* Remove elements marked as "delete". */
+static bool remDelete = false;
+
 /* Return the first node matching an XPath expression. */
 static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
 {
@@ -930,6 +933,10 @@ static int getHotspots(xmlNodePtr ref, const char *src)
 			doc = NULL;
 		}
 
+		if (remDelete) {
+			rem_delete_elems(doc);
+		}
+
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			err += matchHotspot(obj->nodesetval->nodeTab[i], doc, code, doc ? fname : code, src);
 		}
@@ -1021,6 +1028,10 @@ static int getFragment(xmlNodePtr ref, const char *src)
 		doc = read_xml_doc(fname);
 	} else {
 		doc = NULL;
+	}
+
+	if (remDelete) {
+		rem_delete_elems(doc);
 	}
 
 	err = matchFragment(doc, ref, code, doc ? fname : code, src);
@@ -1570,6 +1581,10 @@ static int getCsnItem(xmlNodePtr ref, const char *src)
 		doc = NULL;
 	}
 
+	if (remDelete) {
+		rem_delete_elems(doc);
+	}
+
 	err = matchCsnItem(doc, csnref, csn, item, itemVariant, code, doc ? fname : code, src);
 
 	xmlFree(csn);
@@ -2015,6 +2030,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	int unmatched = 0;
+	xmlDocPtr validTree = NULL;
 
 	/* In recursive mode, keep a record of which files have been listed
 	 * to avoid infinite loops.
@@ -2043,6 +2059,17 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 		return 0;
 	}
 
+	/* Make a copy of the XML tree before performing extra
+	 * processing on it. */
+	if (outputTree) {
+		validTree = xmlCopyDoc(doc, 1);
+	}
+
+	/* Remove elements marked as "delete". */
+	if (remDelete) {
+		rem_delete_elems(doc);
+	}
+
 	ctx = xmlXPathNewContext(doc);
 
 	if (contentOnly)
@@ -2062,8 +2089,11 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	}
 
 	/* Write valid CSDB object to stdout. */
-	if (outputTree && !unmatched) {
-		save_xml_doc(doc, "-");
+	if (outputTree) {
+		if (unmatched == 0) {
+			save_xml_doc(validTree, "-");
+		}
+		xmlFreeDoc(validTree);
 	}
 
 	/* If the given object was modified by updating matched refs or
@@ -2209,6 +2239,10 @@ static int listWhereUsed(const char *path, int show)
 		xmlDocPtr tmp;
 		xmlNodePtr ident, node;
 
+		if (remDelete) {
+			rem_delete_elems(doc);
+		}
+
 		ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent|//scormContentPackageIdent");
 		node  = xmlNewNode(NULL, BAD_CAST "ref");
 		ident = xmlAddChild(node, xmlCopyNode(ident, 1));
@@ -2308,7 +2342,7 @@ static void readnonChapIpdSns(const char *s)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZh?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZ^h?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -2354,6 +2388,7 @@ static void show_help(void)
 	puts("  -Y, --repository             List repository source DMs.");
 	puts("  -Z, --source                 List source DM or PM.");
 	puts("  -3, --externalpubs <file>    Use custom .externalpubs file.");
+	puts("  -^, --remove-deleted         List refs with elements marked as \"delete\" removed.");
 	puts("  --version                    Show version information.");
 	puts("  <object>                     CSDB object to list references in.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -2380,52 +2415,53 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKb:k:h?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKb:k:^h?";
 	struct option lopts[] = {
-		{"version"      , no_argument      , 0, 0},
-		{"help"         , no_argument      , 0, 'h'},
-		{"quiet"        , no_argument      , 0, 'q'},
-		{"content"      , no_argument      , 0, 'c'},
-		{"externalpubs" , required_argument, 0, '3'},
-		{"omit-issue"   , no_argument      , 0, 'N'},
-		{"all"          , no_argument      , 0, 'a'},
-		{"overwrite"    , no_argument      , 0, 'F'},
-		{"filename"     , no_argument      , 0, 'f'},
-		{"dml"          , no_argument      , 0, 'L'},
-		{"list"         , no_argument      , 0, 'l'},
-		{"update"       , no_argument      , 0, 'U'},
-		{"unmatched"    , no_argument      , 0, 'u'},
-		{"com"          , no_argument      , 0, 'C'},
-		{"dm"           , no_argument      , 0, 'D'},
-		{"icn"          , no_argument      , 0, 'G'},
-		{"pm"           , no_argument      , 0, 'P'},
-		{"recursively"  , no_argument      , 0, 'R'},
-		{"recursive"    , no_argument      , 0, 'r'},
-		{"dir"          , required_argument, 0, 'd'},
-		{"update-issue" , no_argument      , 0, 'I'},
-		{"ignore-issue" , no_argument      , 0, 'i'},
-		{"lineno"       , no_argument      , 0, 'n'},
-		{"epr"          , no_argument      , 0, 'E'},
-		{"exec"         , required_argument, 0, 'e'},
-		{"tag-unmatched", no_argument      , 0, 'X'},
-		{"xml"          , no_argument      , 0, 'x'},
-		{"smc"          , no_argument      , 0, 'S'},
-		{"include-src"  , no_argument      , 0, 's'},
-		{"output-valid" , no_argument      , 0, 'o'},
-		{"verbose"      , no_argument      , 0, 'v'},
-		{"strict-match" , no_argument      , 0, 'm'},
-		{"hotspot"      , no_argument      , 0, 'H'},
-		{"hotspot-xpath", required_argument, 0, 'j'},
-		{"namespace"    , required_argument, 0, 'J'},
-		{"fragment"     , no_argument      , 0, 'T'},
-		{"format"       , required_argument, 0, 't'},
-		{"where-used"   , no_argument      , 0, 'w'},
-		{"repository"   , no_argument      , 0, 'Y'},
-		{"source"       , no_argument      , 0, 'Z'},
-		{"ipd"          , no_argument      , 0, 'B'},
-		{"csn"          , no_argument      , 0, 'K'},
-		{"ipd-sns"      , required_argument, 0, 'b'},
-		{"ipd-dcv"      , required_argument, 0, 'k'},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"content"       , no_argument      , 0, 'c'},
+		{"externalpubs"  , required_argument, 0, '3'},
+		{"omit-issue"    , no_argument      , 0, 'N'},
+		{"all"           , no_argument      , 0, 'a'},
+		{"overwrite"     , no_argument      , 0, 'F'},
+		{"filename"      , no_argument      , 0, 'f'},
+		{"dml"           , no_argument      , 0, 'L'},
+		{"list"          , no_argument      , 0, 'l'},
+		{"update"        , no_argument      , 0, 'U'},
+		{"unmatched"     , no_argument      , 0, 'u'},
+		{"com"           , no_argument      , 0, 'C'},
+		{"dm"            , no_argument      , 0, 'D'},
+		{"icn"           , no_argument      , 0, 'G'},
+		{"pm"            , no_argument      , 0, 'P'},
+		{"recursively"   , no_argument      , 0, 'R'},
+		{"recursive"     , no_argument      , 0, 'r'},
+		{"dir"           , required_argument, 0, 'd'},
+		{"update-issue"  , no_argument      , 0, 'I'},
+		{"ignore-issue"  , no_argument      , 0, 'i'},
+		{"lineno"        , no_argument      , 0, 'n'},
+		{"epr"           , no_argument      , 0, 'E'},
+		{"exec"          , required_argument, 0, 'e'},
+		{"tag-unmatched" , no_argument      , 0, 'X'},
+		{"xml"           , no_argument      , 0, 'x'},
+		{"smc"           , no_argument      , 0, 'S'},
+		{"include-src"   , no_argument      , 0, 's'},
+		{"output-valid"  , no_argument      , 0, 'o'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"strict-match"  , no_argument      , 0, 'm'},
+		{"hotspot"       , no_argument      , 0, 'H'},
+		{"hotspot-xpath" , required_argument, 0, 'j'},
+		{"namespace"     , required_argument, 0, 'J'},
+		{"fragment"      , no_argument      , 0, 'T'},
+		{"format"        , required_argument, 0, 't'},
+		{"where-used"    , no_argument      , 0, 'w'},
+		{"repository"    , no_argument      , 0, 'Y'},
+		{"source"        , no_argument      , 0, 'Z'},
+		{"ipd"           , no_argument      , 0, 'B'},
+		{"csn"           , no_argument      , 0, 'K'},
+		{"ipd-sns"       , required_argument, 0, 'b'},
+		{"ipd-dcv"       , required_argument, 0, 'k'},
+		{"remove-deleted", no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2580,6 +2616,9 @@ int main(int argc, char **argv)
 			case 'k':
 				xmlFree(figNumVarFormat);
 				figNumVarFormat = xmlCharStrdup(optarg);
+				break;
+			case '^':
+				remDelete = true;
 				break;
 			case 'h':
 			case '?':

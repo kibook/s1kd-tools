@@ -6,7 +6,7 @@ s1kd-refs - Manage references between CSDB objects
 SYNOPSIS
 ========
 
-    s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZh?] [-b <SNS>]
+    s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
               [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
               [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]
 
@@ -195,6 +195,10 @@ Output a detailed XML report instead of plain text messages.
 
 -3, --externalpubs &lt;file&gt;  
 Use a custom `.externalpubs` file.
+
+-^, --remove-deleted  
+List references with elements that have a change type of "delete"
+removed.
 
 --version  
 Show version information.

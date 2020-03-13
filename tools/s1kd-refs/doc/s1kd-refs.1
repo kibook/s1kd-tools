@@ -9,7 +9,7 @@ s1kd\-refs \- Manage references between CSDB objects
 .IP
 .nf
 \f[C]
-s1kd\-refs\ [\-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZh?]\ [\-b\ <SNS>]
+s1kd\-refs\ [\-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?]\ [\-b\ <SNS>]
 \ \ \ \ \ \ \ \ \ \ [\-d\ <dir>]\ [\-e\ <cmd>]\ [\-J\ <ns=URL>]\ [\-j\ <xpath>]
 \ \ \ \ \ \ \ \ \ \ [\-k\ <pattern>]\ [\-t\ <fmt>]\ [\-3\ <file>]\ [<object>...]
 \f[]
@@ -260,6 +260,12 @@ Output a detailed XML report instead of plain text messages.
 .TP
 .B \-3, \-\-externalpubs <file>
 Use a custom \f[C]\&.externalpubs\f[] file.
+.RS
+.RE
+.TP
+.B \-^, \-\-remove\-deleted
+List references with elements that have a change type of "delete"
+removed.
 .RS
 .RE
 .TP
