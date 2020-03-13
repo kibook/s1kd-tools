@@ -1287,7 +1287,7 @@ int s1kdCheckBREX(xmlDocPtr doc, xmlDocPtr brex)
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcefLlnopqrS[tu]sTvxh?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcDefLlnopqrS[tu]sTvxh?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -B, --default-brex                   Use the default BREX.");
