@@ -197,4 +197,7 @@ int compare_basename(const void *a, const void *b);
 /* Determine if a CSDB object is a CIR. */
 bool is_cir(const char *path);
 
+/* Remove elements marked as "delete". */
+void rem_delete_elems(xmlDocPtr doc);
+
 #endif

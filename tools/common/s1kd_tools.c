@@ -1008,3 +1008,27 @@ bool is_cir(const char *path)
 
 	return is;
 }
+
+/* Remove elements marked as "delete". */
+void rem_delete_elems(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+
+	obj = xmlXPathEvalExpression(BAD_CAST "//*[@change='delete']|//*[@changeType='delete']", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}

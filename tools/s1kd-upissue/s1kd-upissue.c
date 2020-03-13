@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.16.1"
+#define VERSION "1.16.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -236,34 +236,6 @@ static void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
 	}
 
 	xmlXPathFreeObject(obj);
-}
-
-/* Remove elements marked as "delete". */
-static void rem_delete(xmlDocPtr doc, bool iss30)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-
-	ctx = xmlXPathNewContext(doc);
-
-	if (iss30) {
-		obj = xmlXPathEvalExpression(BAD_CAST "//*[@change='delete']", ctx);
-	} else {
-		obj = xmlXPathEvalExpression(BAD_CAST "//*[@changeType='delete']", ctx);
-	}
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
 }
 
 /* Delete old RFUs */
@@ -526,7 +498,7 @@ static void upissue(const char *path)
 		}
 
 		if (remdel) {
-			rem_delete(dmdoc, iss30);
+			rem_delete_elems(dmdoc);
 		}
 
 		add_rfus(dmdoc, rfus, iss30);
@@ -681,7 +653,7 @@ static void upissue(const char *path)
 				}
 		/* Or, remove "delete"d elements any time. */
 		} else if (remdel) {
-			rem_delete(dmdoc, iss30);
+			rem_delete_elems(dmdoc);
 		}
 
 		if (set_date) {

@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.3.0"
+#define VERSION "9.3.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2404,30 +2404,6 @@ static void filter_elements_by_att(xmlDocPtr doc, const char *att, const char *c
 	xmlXPathFreeContext(ctx);
 }
 
-/* Remove elements marked as "delete". */
-static void rem_delete(xmlDocPtr doc)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-
-	ctx = xmlXPathNewContext(doc);
-
-	obj = xmlXPathEvalExpression(BAD_CAST "//*[@change='delete']|//*[@changeType='delete']", ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-}
-
 /* Determine if an object is "deleted". */
 static bool is_deleted(xmlDocPtr doc)
 {
@@ -4738,7 +4714,7 @@ int main(int argc, char **argv)
 				}
 				/* Remove elements marked as "delete". */
 				if (delete) {
-					rem_delete(doc);
+					rem_delete_elems(doc);
 				}
 
 				if (strcmp(extension, "") != 0) {
