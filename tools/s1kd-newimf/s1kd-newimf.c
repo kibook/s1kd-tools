@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newimf"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -79,7 +79,7 @@ static xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return read_xml_doc(src);
+		return read_xml_doc(src, false);
 	} else {
 		return read_xml_mem((const char *) icnmetadata_xml, icnmetadata_xml_len);
 	}
@@ -471,7 +471,7 @@ int main(int argc, char **argv)
 		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	if ((defaults_xml = read_xml_doc(defaults_fname))) {
+	if ((defaults_xml = read_xml_doc(defaults_fname, false))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {

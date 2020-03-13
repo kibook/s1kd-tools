@@ -14,7 +14,7 @@
 #define EP "2" /* externalPubRef */
 
 #define PROG_NAME "s1kd-syncrefs"
-#define VERSION "1.8.0"
+#define VERSION "1.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -356,7 +356,7 @@ static void sync_refs_file(const char *path, const char *out, bool overwrite)
 		}
 	}
 
-	if (!(dm = read_xml_doc(path))) {
+	if (!(dm = read_xml_doc(path, false))) {
 		return;
 	}
 

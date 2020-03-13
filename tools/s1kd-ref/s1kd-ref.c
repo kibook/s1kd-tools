@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.7.0"
+#define VERSION "3.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -275,7 +275,7 @@ static xmlNodePtr new_smc_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr language = NULL;
 		char *s;
 
-		if ((doc = read_xml_doc(fname))) {
+		if ((doc = read_xml_doc(fname, false))) {
 			ref_smc_address = first_xpath_node(doc, NULL, BAD_CAST "//scormContentPackageAddress");
 			ref_smc_ident = find_child(ref_smc_address, "scormContentPackageIdent");
 			ref_smc_address_items = find_child(ref_smc_address, "scormContentPackageAddressItems");
@@ -448,7 +448,7 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr language = NULL;
 		char *s;
 
-		if ((doc = read_xml_doc(fname))) {
+		if ((doc = read_xml_doc(fname, false))) {
 			ref_pm_address = first_xpath_node(doc, NULL, BAD_CAST "//pmAddress|//pmaddres");
 
 			if (xmlStrcmp(ref_pm_address->name, BAD_CAST "pmaddres") == 0) {
@@ -697,7 +697,7 @@ static xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr language = NULL;
 		char *s;
 
-		if ((doc = read_xml_doc(fname))) {
+		if ((doc = read_xml_doc(fname, false))) {
 			ref_dm_address = first_xpath_node(doc, NULL, BAD_CAST "//dmAddress|//dmaddres");
 
 			if (xmlStrcmp(ref_dm_address->name, BAD_CAST "dmaddres") == 0) {
@@ -891,7 +891,7 @@ static xmlNodePtr new_com_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_comment_ident;
 		char *s;
 
-		if ((doc = read_xml_doc(fname))) {
+		if ((doc = read_xml_doc(fname, false))) {
 			ref_comment_address = first_xpath_node(doc, NULL, BAD_CAST "//commentAddress");
 			ref_comment_ident = find_child(ref_comment_address, "commentIdent");
 		}
@@ -970,7 +970,7 @@ static xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 		xmlNodePtr ref_dml_ident;
 		char *s;
 
-		if ((doc = read_xml_doc(fname))) {
+		if ((doc = read_xml_doc(fname, false))) {
 			ref_dml_address = first_xpath_node(doc, NULL, BAD_CAST "//dmlAddress");
 			ref_dml_ident = find_child(ref_dml_address, "dmlIdent");
 		}
@@ -1117,7 +1117,7 @@ static void add_ref(const char *src, const char *dst, xmlNodePtr ref, int opts)
 	xmlDocPtr doc;
 	xmlNodePtr refs;
 
-	if (!(doc = read_xml_doc(src))) {
+	if (!(doc = read_xml_doc(src, false))) {
 		if (verbosity > QUIET) {
 			fprintf(stderr, ERR_PREFIX "Could not read source data module: %s\n", src);
 		}
@@ -1212,7 +1212,7 @@ static xmlNodePtr find_ref_type(const char *fname, int opts)
 	xsltStylesheetPtr style;
 	xmlNodePtr node = NULL;
 
-	if (!(doc = read_xml_doc(fname))) {
+	if (!(doc = read_xml_doc(fname, false))) {
 		return NULL;
 	}
 
@@ -1723,7 +1723,7 @@ static void transform_refs_in_file(const char *path, const char *transform, cons
 	int i;
 	bool nonstrict = optset(opts, OPT_NONSTRICT);
 
-	if (!(doc = read_xml_doc(path))) {
+	if (!(doc = read_xml_doc(path, false))) {
 		if (verbosity > QUIET) {
 			fprintf(stderr, ERR_PREFIX "Could not read object: %s\n", path);
 		}
@@ -1993,7 +1993,7 @@ int main(int argc, char **argv)
 
 	/* Load .externalpubs config file. */
 	if (strcmp(extpubs_fname, "") != 0 || find_config(extpubs_fname, DEFAULT_EXTPUBS_FNAME)) {
-		extpubs = read_xml_doc(extpubs_fname);
+		extpubs = read_xml_doc(extpubs_fname, false);
 	}
 
 	if (optind < argc) {

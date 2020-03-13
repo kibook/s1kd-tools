@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.16.2"
+#define VERSION "1.16.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -476,7 +476,7 @@ static void upissue(const char *path)
 		exit(EXIT_NO_FILE);
 	}
 
-	dmdoc = read_xml_doc(dmfile);
+	dmdoc = read_xml_doc(dmfile, false);
 
 	if (dmdoc) {
 		issueInfo = firstXPathNode("//issueInfo|//issno", dmdoc);

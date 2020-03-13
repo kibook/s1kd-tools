@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.6.1"
+#define VERSION "5.6.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1126,13 +1126,13 @@ static int custom_check(xmlDocPtr doc, const char *path, struct appcheckopts *op
 		char cctfname[PATH_MAX];
 
 		if (find_act_fname(actfname, opts->useract, doc)) {
-			if ((act = read_xml_doc(actfname))) {
+			if ((act = read_xml_doc(actfname, false))) {
 				add_object_node(report, "act", actfname);
 			}
 		}
 
 		if (find_cct_fname(cctfname, opts->usercct, act)) {
-			if ((cct = read_xml_doc(cctfname))) {
+			if ((cct = read_xml_doc(cctfname, false))) {
 				add_object_node(report, "cct", cctfname);
 
 				if (opts->add_deps) {
@@ -1172,7 +1172,7 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 			return 0;
 		}
 
-		pct = read_xml_doc(pctfname);
+		pct = read_xml_doc(pctfname, false);
 
 		add_object_node(report, "pct", pctfname);
 	}
@@ -1319,13 +1319,13 @@ static int check_object_props(xmlDocPtr doc, const char *path, struct appcheckop
 		xmlDocPtr cct = NULL;
 
 		if (find_act_fname(actfname, opts->useract, doc)) {
-			if ((act = read_xml_doc(actfname))) {
+			if ((act = read_xml_doc(actfname, false))) {
 				add_object_node(report, "act", actfname);
 			}
 		}
 
 		if (find_cct_fname(cctfname, opts->usercct, act)) {
-			if ((cct = read_xml_doc(cctfname))) {
+			if ((cct = read_xml_doc(cctfname, false))) {
 				add_object_node(report, "cct", cctfname);
 
 				if (opts->add_deps) {
@@ -1420,7 +1420,7 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 	xmlDocSetRootElement(psdoc, propsets);
 
 	if (find_cct_fname(cctfname, opts->usercct, act)) {
-		if ((cct = read_xml_doc(cctfname))) {
+		if ((cct = read_xml_doc(cctfname, false))) {
 			add_object_node(report, "cct", cctfname);
 
 			if (opts->add_deps) {
@@ -1529,7 +1529,7 @@ static int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, s
 		/* The ACT may or may not have already been read. */
 		if (act) {
 			if (find_cct_fname(cctfname, opts->usercct, act)) {
-				if ((cct = read_xml_doc(cctfname))) {
+				if ((cct = read_xml_doc(cctfname, false))) {
 					add_object_node(report, "cct", cctfname);
 
 					if (opts->add_deps) {
@@ -1547,13 +1547,13 @@ static int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, s
 			char actfname[PATH_MAX];
 
 			if (find_act_fname(actfname, opts->useract, doc)) {
-				if ((act = read_xml_doc(actfname))) {
+				if ((act = read_xml_doc(actfname, false))) {
 					add_object_node(report, "act", cctfname);
 				}
 			}
 
 			if (find_cct_fname(cctfname, opts->usercct, act)) {
-				if ((cct = read_xml_doc(cctfname))) {
+				if ((cct = read_xml_doc(cctfname, false))) {
 					add_object_node(report, "cct", cctfname);
 
 					if (opts->add_deps) {
@@ -1596,7 +1596,7 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 	xmlNodePtr report_node = NULL;
 	xmlDocPtr validtree = NULL;
 
-	if (!(doc = read_xml_doc(path))) {
+	if (!(doc = read_xml_doc(path, false))) {
 		if (verbosity > QUIET) {
 			fprintf(stderr, E_BAD_OBJECT, path);
 		}
@@ -1657,7 +1657,7 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 
 		add_object_node(report_node, "act", actfname);
 
-		act = read_xml_doc(actfname);
+		act = read_xml_doc(actfname, false);
 
 		if (opts->mode == ALL) {
 			err += check_all_props(doc, path, act, opts, report_node);

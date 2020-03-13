@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-icncatalog"
-#define VERSION "3.2.0"
+#define VERSION "3.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -248,7 +248,7 @@ static void resolve_icns_in_file(const char *fname, xmlDocPtr icns, bool overwri
 		fprintf(stderr, I_RESOLVE, fname);
 	}
 
-	if (!(doc = read_xml_doc(fname))) {
+	if (!(doc = read_xml_doc(fname, false))) {
 		return;
 	}
 
@@ -531,7 +531,7 @@ int main(int argc, char **argv)
 	if (createnew || access(icns_fname, F_OK) == -1) {
 		icns = read_xml_mem((const char *) icncatalog_xml, icncatalog_xml_len);
 	} else {
-		icns = read_xml_doc(icns_fname);
+		icns = read_xml_doc(icns_fname, false);
 	}
 
 	if (add->children || del->children) {

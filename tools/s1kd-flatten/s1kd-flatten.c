@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.2.0"
+#define VERSION "3.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -242,7 +242,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 					fprintf(stderr, I_INCLUDE, fs_pm_fname);
 				}
 
-				subpm = read_xml_doc(fs_pm_fname);
+				subpm = read_xml_doc(fs_pm_fname, false);
 				content = first_xpath_node(subpm, NULL, "//content");
 
 				if (content) {
@@ -274,7 +274,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 						xi = xmlAddPrevSibling(pm_ref, xi);
 					}
 				} else {
-					doc = read_xml_doc(fs_pm_fname);
+					doc = read_xml_doc(fs_pm_fname, false);
 					pm = xmlDocGetRootElement(doc);
 					xmlAddPrevSibling(pm_ref, xmlCopyNode(pm, 1));
 					xmlFreeDoc(doc);
@@ -441,7 +441,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 				xmlDocPtr doc;
 				xmlNodePtr refs;
 
-				doc = read_xml_doc(fs_dm_fname);
+				doc = read_xml_doc(fs_dm_fname, false);
 				refs = first_xpath_node(doc, NULL, "//container/refs");
 
 				if (refs) {
@@ -480,7 +480,7 @@ static void flatten_dm_ref(xmlNodePtr dm_ref, xmlNsPtr xiNs)
 					}
 				} else {
 					xmlChar *app;
-					doc = read_xml_doc(fs_dm_fname);
+					doc = read_xml_doc(fs_dm_fname, false);
 					dmodule = xmlDocGetRootElement(doc);
 					if ((app = xmlGetProp(dm_ref, BAD_CAST "applicRefId"))) {
 						xmlSetProp(dmodule, BAD_CAST "applicRefId", app);
@@ -666,7 +666,7 @@ int main(int argc, char **argv)
 		pm_fname = "-";
 	}
 
-	if (!(pm_doc = read_xml_doc(pm_fname))) {
+	if (!(pm_doc = read_xml_doc(pm_fname, false))) {
 		fprintf(stderr, E_BAD_PM, pm_fname);
 		exit(EXIT_BAD_PM);
 	}
@@ -686,7 +686,7 @@ int main(int argc, char **argv)
 			xmlSetProp(xi, BAD_CAST "href", BAD_CAST pm_fname);
 		} else {
 			xmlDocPtr doc;
-			doc = read_xml_doc(pm_fname);
+			doc = read_xml_doc(pm_fname, false);
 			xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
 			xmlFreeDoc(doc);
 		}
@@ -723,7 +723,7 @@ int main(int argc, char **argv)
 				xmlSetProp(xi, BAD_CAST "href", BAD_CAST argv[i]);
 			} else {
 				xmlDocPtr doc;
-				doc = read_xml_doc(argv[i]);
+				doc = read_xml_doc(argv[i], false);
 				xmlAddChild(pub, xmlCopyNode(xmlDocGetRootElement(doc), 1));
 				xmlFreeDoc(doc);
 			}

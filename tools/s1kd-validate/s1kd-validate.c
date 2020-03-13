@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.5.1"
+#define VERSION "2.5.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -282,7 +282,7 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 	struct s1kd_schema_parser *parser;
 	int err = 0;
 
-	if (!(doc = read_xml_doc(fname))) {
+	if (!(doc = read_xml_doc(fname, false))) {
 		return !ignore_empty;
 	}
 

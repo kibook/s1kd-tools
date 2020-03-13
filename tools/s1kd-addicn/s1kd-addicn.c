@@ -10,7 +10,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-addicn"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 static void show_help(void)
 {
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((doc = read_xml_doc(src))) {
+	if ((doc = read_xml_doc(src, false))) {
 		for (i = optind; i < argc; ++i) {
 			add_icn(doc, argv[i], fullpath);
 		}

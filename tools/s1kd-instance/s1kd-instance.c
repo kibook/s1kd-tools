@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.3.4"
+#define VERSION "9.3.5"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1838,7 +1838,7 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 
 	xmlDocPtr styledoc = NULL;
 
-	cir = read_xml_doc(cirdocfname);
+	cir = read_xml_doc(cirdocfname, false);
 
 	if (!cir) {
 		if (verbosity > QUIET) {
@@ -1882,7 +1882,7 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 	cirtype = (char *) cirnode->name;
 
 	if (cir_xsl) {
-		styledoc = read_xml_doc(cir_xsl);
+		styledoc = read_xml_doc(cir_xsl, false);
 	} else if (def_cir_xsl) {
 		styledoc = xmlCopyDoc(def_cir_xsl, 1);
 	} else {
@@ -2747,7 +2747,7 @@ static int find_source(char *src, xmlDocPtr *doc)
 	xmlNodePtr sdi;
 	bool found = false;
 
-	if (!(*doc = read_xml_doc(src))) {
+	if (!(*doc = read_xml_doc(src, false))) {
 		return -1;
 	}
 
@@ -3114,7 +3114,7 @@ static xmlNodePtr add_container_applics(xmlDocPtr doc, xmlNodePtr content, xmlNo
 				xmlDocPtr doc;
 				xmlChar id[32];
 
-				if (!(doc = read_xml_doc(path))) {
+				if (!(doc = read_xml_doc(path, false))) {
 					continue;
 				}
 
@@ -3223,7 +3223,7 @@ static void resolve_containers(xmlDocPtr doc, xmlNodePtr defs)
 			if (find_dmod_fname(path, obj->nodesetval->nodeTab[i], false)) {
 				xmlDocPtr doc;
 
-				if (!(doc = read_xml_doc(path))) {
+				if (!(doc = read_xml_doc(path, false))) {
 					continue;
 				}
 
@@ -3429,7 +3429,7 @@ static void add_props(xmlNodePtr report, const char *path, bool all, const char 
 	xmlXPathObjectPtr obj;
 	xmlNodePtr object;
 
-	if (!(doc = read_xml_doc(path))) {
+	if (!(doc = read_xml_doc(path, false))) {
 		return;
 	}
 
@@ -3437,13 +3437,13 @@ static void add_props(xmlNodePtr report, const char *path, bool all, const char 
 		char fname[PATH_MAX];
 
 		if (useract) {
-			if (!(act = read_xml_doc(useract))) {
+			if (!(act = read_xml_doc(useract, false))) {
 				if (verbosity > QUIET) {
 					fprintf(stderr, S_MISSING_ACT, useract);
 				}
 			}
 		} else if (find_act_fname(fname, doc)) {
-			if (!(act = read_xml_doc(fname))) {
+			if (!(act = read_xml_doc(fname, false))) {
 				if (verbosity > QUIET) {
 					fprintf(stderr, S_MISSING_ACT, fname);
 				}
@@ -3452,13 +3452,13 @@ static void add_props(xmlNodePtr report, const char *path, bool all, const char 
 
 		if (act) {
 			if (usercct) {
-				if (!(cct = read_xml_doc(usercct))) {
+				if (!(cct = read_xml_doc(usercct, false))) {
 					if (verbosity > QUIET) {
 						fprintf(stderr, S_MISSING_CCT, usercct);
 					}
 				}
 			} else if (find_cct_fname(fname, act)) {
-				if (!(cct = read_xml_doc(fname))) {
+				if (!(cct = read_xml_doc(fname, false))) {
 					if (verbosity > QUIET) {
 						fprintf(stderr, S_MISSING_CCT, fname);
 					}
@@ -4263,7 +4263,7 @@ int main(int argc, char **argv)
 				if (cirs->last) {
 					xmlSetProp(cirs->last, BAD_CAST "xsl", BAD_CAST optarg);
 				} else if (!def_cir_xsl) {
-					def_cir_xsl = read_xml_doc(optarg);
+					def_cir_xsl = read_xml_doc(optarg, false);
 				}
 				break;
 			case 'y':
@@ -4410,7 +4410,7 @@ int main(int argc, char **argv)
 	}
 
 	if (useract) {
-		if (!(act = read_xml_doc(useract))) {
+		if (!(act = read_xml_doc(useract, false))) {
 			if (verbosity > QUIET) {
 				fprintf(stderr, S_MISSING_ACT, useract);
 			}
@@ -4418,7 +4418,7 @@ int main(int argc, char **argv)
 		}
 	}
 	if (usercct) {
-		if (!(cct = read_xml_doc(usercct))) {
+		if (!(cct = read_xml_doc(usercct, false))) {
 			if (verbosity > QUIET) {
 				fprintf(stderr, S_MISSING_CCT, usercct);
 			}
@@ -4426,7 +4426,7 @@ int main(int argc, char **argv)
 		}
 	}
 	if (userpct) {
-		if (!(pct = read_xml_doc(userpct))) {
+		if (!(pct = read_xml_doc(userpct, false))) {
 			if (verbosity > QUIET) {
 				fprintf(stderr, S_MISSING_PCT, userpct);
 			}
@@ -4563,7 +4563,7 @@ int main(int argc, char **argv)
 			xmlFreeDoc(inst);
 		}
 
-		if ((doc = read_xml_doc(src))) {
+		if ((doc = read_xml_doc(src, false))) {
 			if (verbosity >= VERBOSE && !update_inst) {
 				if (autoname) {
 					fprintf(stderr, I_CUSTOMIZE_DIR, src, dir);
@@ -4576,7 +4576,7 @@ int main(int argc, char **argv)
 			if (!useract && ((add_deps && !usercct) || (strcmp(product, "") != 0 && !userpct))) {
 				char fname[PATH_MAX];
 				if (find_act_fname(fname, doc)) {
-					act = read_xml_doc(fname);
+					act = read_xml_doc(fname, false);
 				}
 			}
 
@@ -4587,7 +4587,7 @@ int main(int argc, char **argv)
 				} else if (act) {
 					char fname[PATH_MAX];
 					if (find_cct_fname(fname, act)) {
-						if ((cct = read_xml_doc(fname))) {
+						if ((cct = read_xml_doc(fname, false))) {
 							add_cct_depends(doc, cct, NULL);
 							xmlFreeDoc(cct);
 						}
@@ -4601,7 +4601,7 @@ int main(int argc, char **argv)
 			if (!userpct && act && strcmp(product, "") != 0) {
 				char fname[PATH_MAX];
 				if (find_pct_fname(fname, act)) {
-					if ((pct = read_xml_doc(fname))) {
+					if ((pct = read_xml_doc(fname, false))) {
 						load_applic_from_pct(pct, fname, product);
 						xmlFreeDoc(pct);
 					}

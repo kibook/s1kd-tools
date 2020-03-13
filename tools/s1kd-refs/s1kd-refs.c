@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.14.1"
+#define VERSION "4.14.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -928,13 +928,9 @@ static int getHotspots(xmlNodePtr ref, const char *src)
 		getICNAttr(code, icn);
 
 		if (find_object_fname(fname, directory, code, recursive)) {
-			doc = read_xml_doc(fname);
+			doc = read_xml_doc(fname, remDelete);
 		} else {
 			doc = NULL;
-		}
-
-		if (remDelete) {
-			rem_delete_elems(doc);
 		}
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
@@ -1025,13 +1021,9 @@ static int getFragment(xmlNodePtr ref, const char *src)
 	getDmCode(code, dmref);
 
 	if (find_object_fname(fname, directory, code, recursive)) {
-		doc = read_xml_doc(fname);
+		doc = read_xml_doc(fname, remDelete);
 	} else {
 		doc = NULL;
-	}
-
-	if (remDelete) {
-		rem_delete_elems(doc);
 	}
 
 	err = matchFragment(doc, ref, code, doc ? fname : code, src);
@@ -1576,13 +1568,9 @@ static int getCsnItem(xmlNodePtr ref, const char *src)
 	getCsnCode(code, csnref, &csn, &item, &itemVariant);
 
 	if (find_object_fname(fname, directory, code, recursive)) {
-		doc = read_xml_doc(fname);
+		doc = read_xml_doc(fname, remDelete);
 	} else {
 		doc = NULL;
-	}
-
-	if (remDelete) {
-		rem_delete_elems(doc);
 	}
 
 	err = matchCsnItem(doc, csnref, csn, item, itemVariant, code, doc ? fname : code, src);
@@ -1606,7 +1594,7 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 		xmlNodePtr dmRefAddressItems, dmTitle;
 		xmlChar *techName, *infoName, *infoNameVariant;
 
-		if (!(doc = read_xml_doc(fname))) {
+		if (!(doc = read_xml_doc(fname, false))) {
 			return;
 		}
 
@@ -1695,7 +1683,7 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 		xmlNodePtr pmRefAddressItems;
 		xmlChar *pmTitle;
 
-		if (!(doc = read_xml_doc(fname))) {
+		if (!(doc = read_xml_doc(fname, false))) {
 			return;
 		}
 
@@ -1773,7 +1761,7 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 		xmlNodePtr oldtitle, newtitle;
 		xmlChar *techname, *infoname;
 
-		if (!(doc = read_xml_doc(fname))) {
+		if (!(doc = read_xml_doc(fname, false))) {
 			return;
 		}
 
@@ -2050,7 +2038,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 		printMatchedFn(NULL, path, path, path);
 	}
 
-	if (!(doc = read_xml_doc(path))) {
+	if (!(doc = read_xml_doc(path, false))) {
 		if (strcmp(path, "-") == 0) {
 			fprintf(stderr, E_BAD_STDIN);
 			exit(EXIT_BAD_STDIN);
@@ -2235,13 +2223,9 @@ static int listWhereUsed(const char *path, int show)
 		strtok(code, ".");
 	/* If the target object is an XML file, read the object and get the
 	 * appropriate code from the IDSTATUS section. */
-	} else if ((doc = read_xml_doc(path))) {
+	} else if ((doc = read_xml_doc(path, remDelete))) {
 		xmlDocPtr tmp;
 		xmlNodePtr ident, node;
-
-		if (remDelete) {
-			rem_delete_elems(doc);
-		}
 
 		ident = firstXPathNode(doc, NULL, BAD_CAST "//dmIdent|//pmIdent|//commentIdent|//dmlIdent|//scormContentPackageIdent");
 		node  = xmlNewNode(NULL, BAD_CAST "ref");
@@ -2634,7 +2618,7 @@ int main(int argc, char **argv)
 
 	/* Load .externalpubs config file. */
 	if (strcmp(extpubsFname, "") != 0 || find_config(extpubsFname, DEFAULT_EXTPUBS_FNAME)) {
-		externalPubs = read_xml_doc(extpubsFname);
+		externalPubs = read_xml_doc(extpubsFname, false);
 	}
 
 	/* Print opening of XML report. */

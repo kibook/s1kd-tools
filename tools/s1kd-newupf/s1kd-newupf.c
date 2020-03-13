@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "2.1.0"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -575,7 +575,7 @@ static xmlDocPtr xmlSkeleton(const char *templateDir)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return read_xml_doc(src);
+		return read_xml_doc(src, false);
 	} else {
 		return read_xml_mem((const char *) update_xml, update_xml_len);
 	}
@@ -710,14 +710,14 @@ int main(int argc, char **argv)
 	source = argv[optind];
 	target = argv[optind + 1];
 
-	sourceDoc = read_xml_doc(source);
-	targetDoc = read_xml_doc(target);
+	sourceDoc = read_xml_doc(source, false);
+	targetDoc = read_xml_doc(target, false);
 
 	if (!custom_defaults) {
 		find_config(defaultsFname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	if ((defaultsXml = read_xml_doc(defaultsFname))) {
+	if ((defaultsXml = read_xml_doc(defaultsFname, false))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaultsXml)->children; cur; cur = cur->next) {

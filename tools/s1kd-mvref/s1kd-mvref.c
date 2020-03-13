@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-mvref"
-#define VERSION "2.5.0"
+#define VERSION "2.5.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -488,7 +488,7 @@ static void addAddress(const char *fname, xmlNodePtr addresses)
 	xmlDocPtr doc;
 	xmlNodePtr address;
 
-	doc = read_xml_doc(fname);
+	doc = read_xml_doc(fname, false);
 
 	if (!doc)
 		return;
@@ -512,12 +512,12 @@ static void updateRefsFile(const char *fname, xmlNodePtr addresses, bool content
 	xmlXPathObjectPtr obj;
 	xmlNodePtr recodeIdent;
 
-	if (!(doc = read_xml_doc(fname))) {
+	if (!(doc = read_xml_doc(fname, false))) {
 		return;
 	}
 
 	if (recode) {
-		recodeDoc = read_xml_doc(recode);
+		recodeDoc = read_xml_doc(recode, false);
 		recodeIdent = firstXPathNode(ADDR_PATH, recodeDoc, NULL);
 	} else {
 		recodeIdent = NULL;

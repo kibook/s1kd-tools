@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newpm"
-#define VERSION "2.1.1"
+#define VERSION "2.1.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -100,7 +100,7 @@ static xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return read_xml_doc(src);
+		return read_xml_doc(src, false);
 	} else {
 		return read_xml_mem((const char *) pm_xml, pm_xml_len);
 	}
@@ -268,7 +268,7 @@ static void add_dm_ref(xmlNodePtr pmEntry, char *path, bool include_issue_info, 
 		return;
 	}
 
-	dmodule = read_xml_doc(path);
+	dmodule = read_xml_doc(path, false);
 	ctx = xmlXPathNewContext(dmodule);
 
 	ident_extension = first_xpath_node("//dmIdent/identExtension", ctx);
@@ -729,7 +729,7 @@ int main(int argc, char **argv)
 		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	defaults_xml = read_xml_doc(defaults_fname);
+	defaults_xml = read_xml_doc(defaults_fname, false);
 
 	if (defaults_xml) {
 		xmlNodePtr cur;

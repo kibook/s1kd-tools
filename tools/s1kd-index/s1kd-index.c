@@ -12,7 +12,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-index"
-#define VERSION "1.9.0"
+#define VERSION "1.9.1"
 
 /* Path to text nodes where indexFlags may occur */
 #define ELEMENTS_XPATH BAD_CAST "//para/text()"
@@ -200,7 +200,7 @@ static void delete_index_flags(const char *path, bool overwrite)
 		fprintf(stderr, I_DELETE, path);
 	}
 
-	doc = read_xml_doc(path);
+	doc = read_xml_doc(path, false);
 
 	transform_doc(doc, delete_xsl, delete_xsl_len);
 
@@ -223,7 +223,7 @@ static void gen_index(const char *path, xmlDocPtr index_doc, bool overwrite, boo
 		fprintf(stderr, I_MARKUP, path);
 	}
 
-	if (!(doc = read_xml_doc(path))) {
+	if (!(doc = read_xml_doc(path, false))) {
 		if (verbosity >= NORMAL) {
 			fprintf(stderr, E_NO_FILE, path);
 		}
@@ -261,7 +261,7 @@ static xmlDocPtr read_index_flags(const char *fname)
 {
 	xmlDocPtr index_doc;
 
-	if (!(index_doc = read_xml_doc(fname))) {
+	if (!(index_doc = read_xml_doc(fname, false))) {
 		if (verbosity >= NORMAL) {
 			fprintf(stderr, E_NO_LIST, fname);
 		}
