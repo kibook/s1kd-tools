@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.3.3"
+#define VERSION "9.3.4"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -4024,7 +4024,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	bool all_props = false;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:43567890~H:";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4567890~H:^";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
