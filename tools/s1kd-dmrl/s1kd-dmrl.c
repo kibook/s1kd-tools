@@ -12,7 +12,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.11.1"
+#define VERSION "1.11.0"
 
 static void showHelp(void)
 {
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 		char *defname = NULL;
 		char *dmtname = NULL;
 
-		if (!(in = read_xml_doc(argv[i], false))) {
+		if (!(in = read_xml_doc(argv[i]))) {
 			continue;
 		}
 

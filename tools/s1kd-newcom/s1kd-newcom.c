@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "2.1.2"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -92,7 +92,7 @@ static xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return read_xml_doc(src, false);
+		return read_xml_doc(src);
 	} else {
 		return read_xml_mem((const char *) comment_xml, comment_xml_len);
 	}
@@ -643,7 +643,7 @@ int main(int argc, char **argv)
 		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	if ((defaults_xml = read_xml_doc(defaults_fname, false))) {
+	if ((defaults_xml = read_xml_doc(defaults_fname))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {

@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.5.2"
+#define VERSION "3.5.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -759,7 +759,7 @@ static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 		return xmlCopyDoc(dmod_doc, 1);
 	/* If the BREX name is an existing filename, read from that. */
 	} else if (access(name, F_OK) != -1) {
-		return read_xml_doc(name, false);
+		return read_xml_doc(name);
 	/* If the BREX name is one of the standard Default BREX codes, read
 	 * it from memory.
 	 */
@@ -1459,7 +1459,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (brsl_fname) {
-		brsl = read_xml_doc(brsl_fname, false);
+		brsl = read_xml_doc(brsl_fname);
 	}
 
 	outdoc = xmlNewDoc(BAD_CAST "1.0");
@@ -1507,7 +1507,7 @@ int main(int argc, char *argv[])
 		 * module which referenced it. */
 		bool ref_brex = false;
 
-		dmod_doc = read_xml_doc(dmod_fnames[i], false);
+		dmod_doc = read_xml_doc(dmod_fnames[i]);
 
 		if (!dmod_doc) {
 			if (ignore_empty) {

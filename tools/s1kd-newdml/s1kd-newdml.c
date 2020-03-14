@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "2.1.2"
+#define VERSION "2.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -95,7 +95,7 @@ static xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return read_xml_doc(src, false);
+		return read_xml_doc(src);
 	} else {
 		return read_xml_mem((const char *) dml_xml, dml_xml_len);
 	}
@@ -501,7 +501,7 @@ static void add_sns(xmlNodePtr content, const char *path, const char *incode)
 	int n, i = 0;
 	char *is = NULL, *vs = NULL, *ls = NULL, *rc = NULL, *rn = NULL;
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		fprintf(stderr, E_BAD_SNS, path);
 		exit(EXIT_BAD_SNS);
 	}
@@ -735,7 +735,7 @@ static void set_remarks(xmlDocPtr doc, xmlChar *text)
 
 static void add_ref(xmlNodePtr dmlContent, char *path)
 {
-	xmlDocPtr doc = read_xml_doc(path, false);
+	xmlDocPtr doc = read_xml_doc(path);
 
 	if (doc) {
 		if (isdm(doc)) {
@@ -892,7 +892,7 @@ int main(int argc, char **argv)
 		xmlNewChild(sns_incodes, NULL, BAD_CAST "incode", BAD_CAST "000");
 	}
 
-	if ((defaults_xml = read_xml_doc(defaults_fname, false))) {
+	if ((defaults_xml = read_xml_doc(defaults_fname))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {

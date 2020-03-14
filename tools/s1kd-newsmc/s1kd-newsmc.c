@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newsmc"
-#define VERSION "2.1.1"
+#define VERSION "2.1.0"
 
 #define ERR_PREFIX PROG_NAME " ERROR: "
 
@@ -96,7 +96,7 @@ static xmlDocPtr xml_skeleton(void)
 			exit(EXIT_BAD_TEMPLATE);
 		}
 
-		return read_xml_doc(src, false);
+		return read_xml_doc(src);
 	} else {
 		return read_xml_mem((const char *) scormcontentpackage_xml, scormcontentpackage_xml_len);
 	}
@@ -228,7 +228,7 @@ static void add_dm_ref(xmlNodePtr scoEntry, char *path, bool include_issue_info,
 		return;
 	}
 
-	dmodule = read_xml_doc(path, false);
+	dmodule = read_xml_doc(path);
 	ctx = xmlXPathNewContext(dmodule);
 
 	ident_extension = first_xpath_node("//dmIdent/identExtension", ctx);
@@ -706,7 +706,7 @@ int main(int argc, char **argv)
 		find_config(defaults_fname, DEFAULT_DEFAULTS_FNAME);
 	}
 
-	defaults_xml = read_xml_doc(defaults_fname, false);
+	defaults_xml = read_xml_doc(defaults_fname);
 
 	if (defaults_xml) {
 		xmlNodePtr cur;

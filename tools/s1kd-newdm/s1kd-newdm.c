@@ -21,7 +21,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "3.1.2"
+#define VERSION "3.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -579,9 +579,9 @@ static xmlDocPtr set_tech_from_sns(const char *dir)
 	if (maint_sns) {
 		brex = maint_sns_doc();
 	} else if (sns_fname && find_brex_file(fname, dir, sns_fname)) {
-		brex = read_xml_doc(fname, false);
+		brex = read_xml_doc(fname);
 	} else if (strcmp(brex_dmcode, "") != 0 && find_brex_file(fname, dir, brex_dmcode)) {
-		brex = read_xml_doc(fname, false);
+		brex = read_xml_doc(fname);
 	}
 
 	if (!brex) {
@@ -670,7 +670,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			exit(EXIT_UNKNOWN_DMTYPE);
 		}
 
-		return read_xml_doc(src, false);
+		return read_xml_doc(src);
 	} else if (strcmp(dmtype, "descript") == 0) {
 		switch (iss) {
 			case ISS_20:
@@ -1244,7 +1244,7 @@ static xmlDocPtr read_default_brexmap(void)
 	char fname[PATH_MAX];
 
 	if (find_config(fname, DEFAULT_BREXMAP_FNAME)) {
-		return read_xml_doc(fname, false);
+		return read_xml_doc(fname);
 	} else {
 		return read_xml_mem((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len);
 	}
@@ -1549,7 +1549,7 @@ int main(int argc, char **argv)
 			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
 			case '!': no_info_name = true; break;
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
-			case 'j': if (!brexmap) brexmap = read_xml_doc(optarg, false); break;
+			case 'j': if (!brexmap) brexmap = read_xml_doc(optarg); break;
 			case '~': dump_templates(optarg); return 0;
 			case 'z': issue_type = xmlStrdup(BAD_CAST optarg); break;
 			case 'h':
@@ -1587,7 +1587,7 @@ int main(int argc, char **argv)
 		xmlFree(path);
 	}
 
-	if ((defaults_xml = read_xml_doc(defaults_fname, false))) {
+	if ((defaults_xml = read_xml_doc(defaults_fname))) {
 		xmlNodePtr cur;
 
 		for (cur = xmlDocGetRootElement(defaults_xml)->children; cur; cur = cur->next) {
@@ -1661,7 +1661,7 @@ int main(int argc, char **argv)
 	}
 
 	if (strcmp(dmtype, "") == 0 || (strcmp(infoName_content, "") == 0 && !no_info_name)) {
-		if ((defaults_xml = read_xml_doc(dmtypes_fname, false))) {
+		if ((defaults_xml = read_xml_doc(dmtypes_fname))) {
 			process_dmtypes_xml(defaults_xml, brex_rules);
 			xmlFreeDoc(defaults_xml);
 		} else if ((defaults = fopen(dmtypes_fname, "r"))) {

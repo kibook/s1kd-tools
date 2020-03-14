@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.14.1"
+#define VERSION "1.14.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -300,7 +300,7 @@ static int is_official_issue(const char *fname, const char *path)
 		xmlChar *inwork;
 		int official;
 
-		doc = read_xml_doc(path, false);
+		doc = read_xml_doc(path);
 
 		if (!doc) {
 			return 1;

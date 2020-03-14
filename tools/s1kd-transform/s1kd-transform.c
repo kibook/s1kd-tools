@@ -15,7 +15,7 @@ static bool includeIdentity = false;
 static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 
 #define PROG_NAME "s1kd-transform"
-#define VERSION "1.7.1"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -87,7 +87,7 @@ static void transformFile(const char *path, xmlNodePtr stylesheets, const char *
 		fprintf(stderr, I_TRANSFORM, path);
 	}
 
-	doc = read_xml_doc(path, false);
+	doc = read_xml_doc(path);
 
 	doc = transformDoc(doc, stylesheets);
 
@@ -154,7 +154,7 @@ static void loadStylesheets(xmlNodePtr stylesheets)
 		const char **params = NULL;
 
 		path = xmlGetProp(cur, BAD_CAST "path");
-		doc = read_xml_doc((char *) path, false);
+		doc = read_xml_doc((char *) path);
 		xmlFree(path);
 
 		if (includeIdentity) {

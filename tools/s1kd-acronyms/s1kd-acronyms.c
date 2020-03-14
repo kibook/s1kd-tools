@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.12.1"
+#define VERSION "1.12.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -70,7 +70,7 @@ static void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 		fprintf(stderr, I_FIND, path);
 	}
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		if (verbosity >= NORMAL) {
 			fprintf(stderr, E_NO_FILE, path);
 		}
@@ -522,7 +522,7 @@ static void markupAcronymsInFile(const char *path, xmlNodePtr acronyms, const ch
 		fprintf(stderr, I_MARKUP, path);
 	}
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		if (verbosity >= NORMAL) {
 			fprintf(stderr, E_NO_FILE, path);
 		}
@@ -622,7 +622,7 @@ static void deleteAcronymsInFile(const char *fname, const char *out)
 		fprintf(stderr, I_DELETE, fname);
 	}
 
-	doc = read_xml_doc(fname, false);
+	doc = read_xml_doc(fname);
 	
 	deleteAcronyms(doc);
 
@@ -673,7 +673,7 @@ static void preformatAcronymsInFile(const char *fname, const char *out)
 		fprintf(stderr, I_PREFORMAT, fname);
 	}
 
-	doc = read_xml_doc(fname, false);
+	doc = read_xml_doc(fname);
 
 	preformatAcronyms(doc);
 
@@ -924,7 +924,7 @@ int main(int argc, char **argv)
 	} else if (markup) {
 		xmlDocPtr termStylesheetDoc, idStylesheetDoc;
 
-		if (!(doc = read_xml_doc(markup, false))) {
+		if (!(doc = read_xml_doc(markup))) {
 			if (verbosity >= NORMAL) {
 				fprintf(stderr, E_NO_LIST, markup);
 			}

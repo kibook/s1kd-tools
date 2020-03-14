@@ -13,7 +13,7 @@
 #include "stylesheets.h"
 
 #define PROG_NAME "s1kd-neutralize"
-#define VERSION "1.10.1"
+#define VERSION "1.10.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -34,7 +34,7 @@ static void neutralizeFile(const char *fname, const char *outfile, bool overwrit
 		fprintf(stderr, I_NEUTRALIZE, fname);
 	}
 
-	orig = read_xml_doc(fname, false);
+	orig = read_xml_doc(fname);
 
 	doc = xmlCopyDoc(orig, 1);
 
@@ -115,7 +115,7 @@ static void deneutralizeFile(const char *fname, const char *outfile, bool overwr
 		fprintf(stderr, I_NEUTRALIZE, fname);
 	}
 
-	orig = read_xml_doc(fname, false);
+	orig = read_xml_doc(fname);
 
 	doc = xmlCopyDoc(orig, 1);
 

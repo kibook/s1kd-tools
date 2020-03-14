@@ -9,7 +9,7 @@
 #include "uom.h"
 
 #define PROG_NAME "s1kd-uom"
-#define VERSION "1.19.1"
+#define VERSION "1.19.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -259,9 +259,9 @@ static void convert_uoms(const char *path, xmlDocPtr uom, const char *format, xm
 	}
 
 	if (path) {
-		doc = read_xml_doc(path, false);
+		doc = read_xml_doc(path);
 	} else {
-		doc = read_xml_doc("-", false);
+		doc = read_xml_doc("-");
 	}
 
 	if (!doc) {
@@ -367,7 +367,7 @@ static void load_presets(xmlNodePtr convs, const char *preset, bool file)
 	xmlNodePtr cur;
 
 	if (file) {
-		doc = read_xml_doc(preset, false);
+		doc = read_xml_doc(preset);
 	} else {
 		unsigned char *xml;
 		unsigned int len;
@@ -546,7 +546,7 @@ int main(int argc, char **argv)
 
 	/* Load .uom configuration file (or built-in copy). */
 	if (!dump_uom && (strcmp(uom_fname, "") != 0 || find_config(uom_fname, DEFAULT_UOM_FNAME))) {
-		uom = read_xml_doc(uom_fname, false);
+		uom = read_xml_doc(uom_fname);
 	}
 	if (!uom) {
 		uom = read_xml_mem((const char *) uom_xml, uom_xml_len);
@@ -554,7 +554,7 @@ int main(int argc, char **argv)
 
 	/* Load .uomdisplay configuration file (or built-in copy). */
 	if (!dump_uomdisp && (strcmp(uomdisp_fname, "") != 0 || find_config(uomdisp_fname, DEFAULT_UOMDISP_FNAME))) {
-		uomdisp = read_xml_doc(uomdisp_fname, false);
+		uomdisp = read_xml_doc(uomdisp_fname);
 	}
 	if (!uomdisp) {
 		uomdisp = read_xml_mem((const char *) uomdisplay_xml, uomdisplay_xml_len);

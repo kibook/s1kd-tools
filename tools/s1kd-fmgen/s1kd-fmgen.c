@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.4.1"
+#define VERSION "3.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -166,7 +166,7 @@ static xmlDocPtr apply_xproc_xslt(const xmlDocPtr doc, const char *xslpath, cons
 			xmlChar *href, *URI;
 			href = xmlGetProp(obj->nodesetval->nodeTab[0], BAD_CAST "href");
 			URI = xmlBuildURI(href, BAD_CAST xslpath);
-			s = read_xml_doc((char *) URI, false);
+			s = read_xml_doc((char *) URI);
 			xmlFree(href);
 			xmlFree(URI);
 		} else if (xmlStrcmp(src->name, BAD_CAST "inline") == 0) {
@@ -209,7 +209,7 @@ static xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **
 		fprintf(stderr, I_TRANSFORM, xslpath);
 	}
 
-	styledoc = read_xml_doc(xslpath, false);
+	styledoc = read_xml_doc(xslpath);
 
 	ctx = xmlXPathNewContext(styledoc);
 	xmlXPathRegisterNs(ctx, BAD_CAST "p", BAD_CAST "http://www.w3.org/ns/xproc");
@@ -492,7 +492,7 @@ static void generate_fm_content_for_dm(
 	xmlDocPtr doc, res = NULL;
 	char *type, *fmxsl;
 
-	if (!(doc = read_xml_doc(dmpath, false))) {
+	if (!(doc = read_xml_doc(dmpath))) {
 		return;
 	}
 
@@ -675,7 +675,7 @@ static xmlDocPtr read_fmtypes(const char *path)
 {
 	xmlDocPtr doc;
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		FILE *f;
 		char line[256];
 		xmlNodePtr root;
@@ -896,7 +896,7 @@ int main(int argc, char **argv)
 		pmpath = strdup("-");
 	}
 
-	pm = read_xml_doc(pmpath, false);
+	pm = read_xml_doc(pmpath);
 
 	if (optind < argc) {
 		void (*gen_fn)(xmlDocPtr, const char *, xmlDocPtr, const char *,

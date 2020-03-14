@@ -135,7 +135,7 @@ void uppercase(char *s);
 bool optset(int opts, int opt);
 
 /* Read an XML document from a file. */
-xmlDocPtr read_xml_doc(const char *path, const bool remdel);
+xmlDocPtr read_xml_doc(const char *path);
 
 /* Read an XML document from memory. */
 xmlDocPtr read_xml_mem(const char *buffer, int size);

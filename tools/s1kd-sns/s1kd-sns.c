@@ -14,7 +14,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-sns"
-#define VERSION "1.7.1"
+#define VERSION "1.7.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -336,7 +336,7 @@ static void print_or_setup_sns(const char *brex_fname, bool printsns, const char
 	xmlXPathContextPtr ctxt;
 	xmlXPathObjectPtr results;
 
-	if (!(brex = read_xml_doc(brex_fname, false))) {
+	if (!(brex = read_xml_doc(brex_fname))) {
 		fprintf(stderr, ERR_PREFIX "Could not read BREX data module: %s\n", brex_fname);
 		exit(EXIT_NO_BREX);
 	}

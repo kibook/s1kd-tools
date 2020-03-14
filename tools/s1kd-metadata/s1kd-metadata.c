@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.3.1"
+#define VERSION "4.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -2645,7 +2645,7 @@ static int show_or_edit_metadata(const char *fname, struct opts *opts)
 	int edit = 0;
 	xmlNodePtr cond;
 
-	doc = read_xml_doc(fname, false);
+	doc = read_xml_doc(fname);
 
 	ctxt = xmlXPathNewContext(doc);
 

@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "2.6.1"
+#define VERSION "2.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -121,7 +121,7 @@ static xmlDocPtr text_defaults_to_xml(const char *path)
 		return NULL;
 	}
 
-	if ((doc = read_xml_doc(path, false))) {
+	if ((doc = read_xml_doc(path))) {
 		return doc;
 	}
 
@@ -160,7 +160,7 @@ static xmlDocPtr text_dmtypes_to_xml(const char *path)
 	xmlDocPtr doc;
 	xmlNodePtr dmtypes;
 
-	if ((doc = read_xml_doc(path, false))) {
+	if ((doc = read_xml_doc(path))) {
 		return doc;
 	}
 
@@ -206,7 +206,7 @@ static xmlDocPtr text_fmtypes_to_xml(const char *path)
 	xmlDocPtr doc;
 	xmlNodePtr fmtypes;
 
-	if ((doc = read_xml_doc(path, false))) {
+	if ((doc = read_xml_doc(path))) {
 		return doc;
 	}
 
@@ -457,7 +457,7 @@ static void xml_to_text(const char *path, enum file f, bool overwrite, bool sort
 {
 	xmlDocPtr doc, res = NULL;
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		doc = simple_text_to_xml(path, f, sort, brex, brexmap);
 	}
 
@@ -550,7 +550,7 @@ static xmlDocPtr read_default_brexmap(void)
 	char fname[PATH_MAX];
 
 	if (find_config(fname, DEFAULT_BREXMAP_FNAME)) {
-		return read_xml_doc(fname, false);
+		return read_xml_doc(fname);
 	} else {
 		return read_xml_mem((const char *) ___common_brexmap_xml, ___common_brexmap_xml_len);
 	}
@@ -609,7 +609,7 @@ int main(int argc, char **argv)
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'b':
-				if (!brex) brex = read_xml_doc(optarg, false);
+				if (!brex) brex = read_xml_doc(optarg);
 				break;
 			case 'D':
 				f = DMTYPES;
@@ -633,7 +633,7 @@ int main(int argc, char **argv)
 				dump_brexmap();
 				return 0;
 			case 'j':
-				if (!brexmap) brexmap = read_xml_doc(optarg, false);
+				if (!brexmap) brexmap = read_xml_doc(optarg);
 				break;
 			case 'n':
 				cur = xmlNewChild(user_defs, NULL, BAD_CAST "default", NULL);

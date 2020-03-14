@@ -20,7 +20,7 @@
 #include "identity.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.3.1"
+#define VERSION "3.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -330,7 +330,7 @@ static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts,
 		xmlDocPtr act;
 		xmlChar *path;
 		path = xmlNodeGetContent(cur);
-		act = read_xml_doc((char *) path, false);
+		act = read_xml_doc((char *) path);
 		xmlAddChild(muxacts, xmlCopyNode(xmlDocGetRootElement(act), 1));
 		xmlFreeDoc(act);
 		xmlFree(path);
@@ -339,14 +339,14 @@ static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts,
 		xmlDocPtr cct;
 		xmlChar *path;
 		path = xmlNodeGetContent(cur);
-		cct = read_xml_doc((char *) path, false);
+		cct = read_xml_doc((char *) path);
 		xmlAddChild(muxccts, xmlCopyNode(xmlDocGetRootElement(cct), 1));
 		xmlFreeDoc(cct);
 		xmlFree(path);
 	}
 
 	if (customGenDispTextXsl) {
-		styledoc = read_xml_doc(customGenDispTextXsl, false);
+		styledoc = read_xml_doc(customGenDispTextXsl);
 	} else {
 		styledoc = read_xml_mem((const char *) generateDisplayText_xsl,
 			generateDisplayText_xsl_len);
@@ -543,7 +543,7 @@ static void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr cct
 	char act_fname[PATH_MAX];
 	xmlDocPtr act = NULL;
 
-	if (find_act_fname(act_fname, doc) && (act = read_xml_doc(act_fname, false))) {
+	if (find_act_fname(act_fname, doc) && (act = read_xml_doc(act_fname))) {
 		char cct_fname[PATH_MAX];
 
 		xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST act_fname);
@@ -569,7 +569,7 @@ static void processFile(const char *in, const char *out, bool process,
 		fprintf(stderr, I_PROCESS, in);
 	}
 
-	doc = read_xml_doc(in, false);
+	doc = read_xml_doc(in);
 
 	if (findcts) {
 		/* Copy the user-defined ACTs/CCTs. */

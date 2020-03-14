@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.3.2"
+#define VERSION "1.3.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -87,7 +87,7 @@ static xmlNodePtr find_ref_in_cir(xmlNodePtr ref, const xmlChar *ident, const xm
 		fprintf(stderr, I_SEARCH_PART, ident, cirpath);
 	}
 
-	if (!(doc = read_xml_doc(cirpath, false))) {
+	if (!(doc = read_xml_doc(cirpath))) {
 		return NULL;
 	}
 
@@ -432,7 +432,7 @@ static int check_cir_refs_in_file(const char *path, struct opts *opts)
 		fprintf(stderr, I_CHECK, path);
 	}
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		return 1;
 	}
 

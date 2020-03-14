@@ -513,7 +513,7 @@ bool optset(int opts, int opt)
 }
 
 /* Read an XML document from a file. */
-xmlDocPtr read_xml_doc(const char *path, const bool remdel)
+xmlDocPtr read_xml_doc(const char *path)
 {
 	xmlDocPtr doc;
 
@@ -521,10 +521,6 @@ xmlDocPtr read_xml_doc(const char *path, const bool remdel)
 
 	if (optset(DEFAULT_PARSE_OPTS, XML_PARSE_XINCLUDE)) {
 		xmlXIncludeProcessFlags(doc, DEFAULT_PARSE_OPTS);
-	}
-
-	if (remdel) {
-		rem_delete_elems(doc);
 	}
 
 	return doc;
@@ -1002,7 +998,7 @@ bool is_cir(const char *path)
 	xmlDocPtr doc;
 	bool is;
 
-	if (!(doc = read_xml_doc(path, false))) {
+	if (!(doc = read_xml_doc(path))) {
 		return false;
 	}
 
