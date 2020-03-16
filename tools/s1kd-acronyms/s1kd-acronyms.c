@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.12.0"
+#define VERSION "1.13.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -47,6 +47,7 @@ static bool alwaysAsk = false;
 static bool deferChoice = false;
 static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
 static xmlNodePtr defaultChoices;
+static bool remDelete = false;
 
 static xsltStylesheetPtr termStylesheet, idStylesheet;
 
@@ -75,6 +76,10 @@ static void findAcronymsInFile(xmlNodePtr acronyms, const char *path)
 			fprintf(stderr, E_NO_FILE, path);
 		}
 		return;
+	}
+
+	if (remDelete) {
+		rem_delete_elems(doc);
 	}
 
 	styleDoc = read_xml_mem((const char *) stylesheets_acronyms_xsl, stylesheets_acronyms_xsl_len);
@@ -715,7 +720,7 @@ static void show_help(void)
 {
 	puts("Usage:");
 	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " [-dlpqtvx] [-n <#>] [-o <file>] [-T <types>] [<dmodule>...]");
+	puts("  " PROG_NAME " [-dlpqtvx^] [-n <#>] [-o <file>] [-T <types>] [<dmodule>...]");
 	puts("  " PROG_NAME " [-flqv] [-i|-I|-!] [-m|-M <list>] [-o <file>] [-X <xpath>] [<dmodule>...]");
 	puts("  " PROG_NAME " [-D|-P] [-flqv] [-o <file>] [<dmodule>...]");
 	puts("");
@@ -739,6 +744,7 @@ static void show_help(void)
 	puts("  -v, --verbose              Verbose output.");
 	puts("  -X, --select <xpath>       Use custom XPath to markup elements.");
 	puts("  -x, --xml                  Output XML instead of text.");
+	puts("  -^, --remove-deleted       List acronyms with elements marked as \"delete\" removed.");
 	puts("  --version                  Show version information.");
 	puts("  <dmodule>                  Data module(s) to process.");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -768,29 +774,30 @@ int main(int argc, char **argv)
 	bool delete = false;
 	bool preformat = false;
 
-	const char *sopts = "Ppqn:xDdtT:o:M:miIfl!X:vh?";
+	const char *sopts = "Ppqn:xDdtT:o:M:miIfl!X:v^h?";
 	struct option lopts[] = {
-		{"version"      , no_argument      , 0, 0},
-		{"help"         , no_argument      , 0, 'h'},
-		{"preformat"    , no_argument      , 0, 'P'},
-		{"pretty"       , no_argument      , 0, 'p'},
-		{"quiet"        , no_argument      , 0, 'q'},
-		{"width"        , required_argument, 0, 'n'},
-		{"xml"          , no_argument      , 0, 'x'},
-		{"delete"       , no_argument      , 0, 'D'},
-		{"deflist"      , no_argument      , 0, 'd'},
-		{"table"        , no_argument      , 0, 't'},
-		{"types"        , required_argument, 0, 'T'},
-		{"out"          , required_argument, 0, 'o'},
-		{"markup"       , no_argument      , 0, 'm'},
-		{"acronym-list" , required_argument, 0, 'M'},
-		{"interactive"  , no_argument      , 0, 'i'},
-		{"always-ask"   , no_argument      , 0, 'I'},
-		{"overwrite"    , no_argument      , 0, 'f'},
-		{"list"         , no_argument      , 0, 'l'},
-		{"defer-choice" , no_argument      , 0, '!'},
-		{"select"       , required_argument, 0, 'X'},
-		{"verbose"      , no_argument      , 0, 'v'},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"preformat"     , no_argument      , 0, 'P'},
+		{"pretty"        , no_argument      , 0, 'p'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"width"         , required_argument, 0, 'n'},
+		{"xml"           , no_argument      , 0, 'x'},
+		{"delete"        , no_argument      , 0, 'D'},
+		{"deflist"       , no_argument      , 0, 'd'},
+		{"table"         , no_argument      , 0, 't'},
+		{"types"         , required_argument, 0, 'T'},
+		{"out"           , required_argument, 0, 'o'},
+		{"markup"        , no_argument      , 0, 'm'},
+		{"acronym-list"  , required_argument, 0, 'M'},
+		{"interactive"   , no_argument      , 0, 'i'},
+		{"always-ask"    , no_argument      , 0, 'I'},
+		{"overwrite"     , no_argument      , 0, 'f'},
+		{"list"          , no_argument      , 0, 'l'},
+		{"defer-choice"  , no_argument      , 0, '!'},
+		{"select"        , required_argument, 0, 'X'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"remove-deleted", no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -873,6 +880,9 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				++verbosity;
+				break;
+			case '^':
+				remDelete = true;
 				break;
 			case 'h':
 			case '?':

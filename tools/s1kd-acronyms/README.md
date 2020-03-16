@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-acronyms -h?
-    s1kd-acronyms [-dlpqtvx] [-n <#>] [-o <file>] [-T <types>]
+    s1kd-acronyms [-dlpqtvx^] [-n <#>] [-o <file>] [-T <types>]
                   [<dmodule>...]
     s1kd-acronyms [-flqv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
                   [<dmodule>...]
@@ -108,6 +108,9 @@ Use XML output instead of plain text.
 Mark where acronyms are found using a `<chooseAcronym>` element, whose
 child elements are all possible acronyms matching the term. Another
 program can then use this as input to actually prompt the user.
+
+-^, --remove-deleted  
+List acronyms with elements that have a change type of "delete" removed.
 
 --version  
 Show version information.
