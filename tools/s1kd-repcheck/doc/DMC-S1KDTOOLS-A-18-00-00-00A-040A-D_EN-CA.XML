@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="003" inWork="01"/>
+        <issueInfo issueNumber="003" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="06"/>
+        <issueDate year="2020" month="03" day="16"/>
         <dmTitle>
           <techName>s1kd-repcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -^ (--remove-deleted) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -158,6 +161,12 @@
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para>Print an XML report of the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Validate with elements that have a change type of "delete" removed. CIR data modules with an issue type of "deleted" will also be ignored in the automatic search when this option is specified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

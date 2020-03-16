@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.3.4"
+#define VERSION "9.3.5"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3760,7 +3760,7 @@ static void find_cirs(struct objects *cirs, const char *spath)
 
 		if (recursive_search && isdir(cpath, true)) {
 			find_cirs(cirs, cpath);
-		} else if (is_dm(cur->d_name) && is_cir(cpath)) {
+		} else if (is_dm(cur->d_name) && is_cir(cpath, false)) {
 			if (verbosity >= DEBUG) {
 				fprintf(stderr, I_FIND_CIR_FOUND, cpath);
 			}

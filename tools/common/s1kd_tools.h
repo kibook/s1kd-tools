@@ -195,7 +195,7 @@ int extract_latest_csdb_objects(char (*latest)[PATH_MAX], char (*files)[PATH_MAX
 int compare_basename(const void *a, const void *b);
 
 /* Determine if a CSDB object is a CIR. */
-bool is_cir(const char *path);
+bool is_cir(const char *path, const bool ignore_del);
 
 /* Remove elements marked as "delete". */
 void rem_delete_elems(xmlDocPtr doc);

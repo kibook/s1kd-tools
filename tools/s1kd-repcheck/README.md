@@ -78,6 +78,11 @@ Verbose output. Specify multiple times to increase the verbosity.
 -x, --xml  
 Print an XML report of the check.
 
+-^, --remove-deleted  
+Validate with elements that have a change type of "delete" removed. CIR
+data modules with an issue type of "deleted" will also be ignored in the
+automatic search when this option is specified.
+
 --version  
 Show version information.
 

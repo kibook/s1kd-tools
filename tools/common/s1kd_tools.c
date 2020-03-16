@@ -993,16 +993,32 @@ int compare_basename(const void *a, const void *b)
 }
 
 /* Determine if a CSDB object is a CIR. */
-bool is_cir(const char *path)
+bool is_cir(const char *path, const bool ignore_del)
 {
 	xmlDocPtr doc;
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
 	bool is;
 
 	if (!(doc = read_xml_doc(path))) {
 		return false;
 	}
 
-	is = xpath_first_node(doc, NULL, BAD_CAST "//commonRepository|//techRepository|//techrep") != NULL;
+	ctx = xmlXPathNewContext(doc);
+
+	/* Check that this is a CIR/TIR DM. */
+	obj = xmlXPathEvalExpression(BAD_CAST "//commonRepository|//techRepository|//techrep", ctx);
+	is = !xmlXPathNodeSetIsEmpty(obj->nodesetval);
+	xmlXPathFreeObject(obj);
+
+	/* Check that the DM is not "deleted" if ignore_del = true. */
+	if (is && ignore_del) {
+		obj = xmlXPathEvalExpression(BAD_CAST "//dmodule[identAndStatusSection/dmStatus/@issueType='deleted' or status/issno/@type='deleted']", ctx);
+		is = xmlXPathNodeSetIsEmpty(obj->nodesetval);
+		xmlXPathFreeObject(obj);
+	}
+
+	xmlXPathFreeContext(ctx);
 
 	xmlFreeDoc(doc);
 

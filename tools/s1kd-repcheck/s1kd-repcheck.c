@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.3.1"
+#define VERSION "1.4.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -70,6 +70,7 @@ struct opts {
 	bool output_valid;
 	bool list_refs;
 	bool all_refs;
+	bool rem_delete;
 	struct objects objects;
 	struct objects cirs;
 	xmlNodePtr report;
@@ -89,6 +90,10 @@ static xmlNodePtr find_ref_in_cir(xmlNodePtr ref, const xmlChar *ident, const xm
 
 	if (!(doc = read_xml_doc(cirpath))) {
 		return NULL;
+	}
+
+	if (opts->rem_delete) {
+		rem_delete_elems(doc);
 	}
 
 	ctx = xmlXPathNewContext(doc);
@@ -427,6 +432,7 @@ static int check_cir_refs_in_file(const char *path, struct opts *opts)
 {
 	xmlDocPtr doc;
 	int err = 0;
+	xmlDocPtr validtree = NULL;
 
 	if (opts->verbosity >= DEBUG) {
 		fprintf(stderr, I_CHECK, path);
@@ -434,6 +440,16 @@ static int check_cir_refs_in_file(const char *path, struct opts *opts)
 
 	if (!(doc = read_xml_doc(path))) {
 		return 1;
+	}
+
+	/* Make a copy of the XML tree before performing additional
+	 * processing on it. */
+	if (opts->output_valid) {
+		validtree = xmlCopyDoc(doc, 1);
+	}
+
+	if (opts->rem_delete) {
+		rem_delete_elems(doc);
 	}
 
 	err = check_cir_refs(doc, path, opts);
@@ -446,14 +462,15 @@ static int check_cir_refs_in_file(const char *path, struct opts *opts)
 		}
 	}
 
-	if (err) {
-		if (opts->show_filenames) {
+	if (err && opts->show_filenames) {
 			puts(path);
+	}
+
+	if (opts->output_valid) {
+		if (err == 0) {
+			save_xml_doc(validtree, "-");
 		}
-	} else {
-		if (opts->output_valid) {
-			save_xml_doc(doc, "-");
-		}
+		xmlFreeDoc(validtree);
 	}
 
 	xmlFreeDoc(doc);
@@ -549,7 +566,7 @@ static void find_cirs(struct objects *cirs, char *search_dir, struct opts *opts)
 
 		if (opts->recursive && isdir(cpath, true)) {
 			find_cirs(cirs, cpath, opts);
-		} else if (is_dm(cur->d_name) && is_cir(cpath)) {
+		} else if (is_dm(cur->d_name) && is_cir(cpath, opts->rem_delete)) {
 			if (opts->verbosity >= DEBUG) {
 				fprintf(stderr, I_FIND_CIR_FOUND, cpath);
 			}
@@ -599,24 +616,25 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A, --all-refs      Validate indirect CIR references.");
-	puts("  -a, --all           Resolve against CIRs specified as objects to check.");
-	puts("  -d, --dir <dir>     Search for CIRs in <dir>.");
-	puts("  -f, --filenames     List invalid files.");
-	puts("  -h, -?, --help      Show help/usage message.");
-	puts("  -L, --list-refs     List CIR refs instead of validating them.");
-	puts("  -l, --list          Treat input as list of CSDB objects.");
-	puts("  -N, --omit-issue    Assume issue/inwork numbers are omitted.");
-	puts("  -o, --output-valid  Output valid CSDB objects to stdout.");
-	puts("  -p, --progress      Display a progress bar.");
-	puts("  -q, --quiet         Quiet mode.");
-	puts("  -R, --cir <CIR>     Check references against the given CIR.");
-	puts("  -r, --recursive     Search for CIRs recursively.");
-	puts("  -T, --summary       Print a summary of the check.");
-	puts("  -v, --verbose       Verbose output.");
-	puts("  -x, --xml           Output XML report.");
-	puts("  --version           Show version information.");
-	puts("  <object>            CSDB object(s) to check.");
+	puts("  -A, --all-refs        Validate indirect CIR references.");
+	puts("  -a, --all             Resolve against CIRs specified as objects to check.");
+	puts("  -d, --dir <dir>       Search for CIRs in <dir>.");
+	puts("  -f, --filenames       List invalid files.");
+	puts("  -h, -?, --help        Show help/usage message.");
+	puts("  -L, --list-refs       List CIR refs instead of validating them.");
+	puts("  -l, --list            Treat input as list of CSDB objects.");
+	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
+	puts("  -o, --output-valid    Output valid CSDB objects to stdout.");
+	puts("  -p, --progress        Display a progress bar.");
+	puts("  -q, --quiet           Quiet mode.");
+	puts("  -R, --cir <CIR>       Check references against the given CIR.");
+	puts("  -r, --recursive       Search for CIRs recursively.");
+	puts("  -T, --summary         Print a summary of the check.");
+	puts("  -v, --verbose         Verbose output.");
+	puts("  -x, --xml             Output XML report.");
+	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
+	puts("  --version             Show version information.");
+	puts("  <object>              CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -631,25 +649,26 @@ int main(int argc, char **argv)
 {
 	int i, err = 0;
 
-	const char *sopts = "Aad:fLlNopqR:rTvxh?";
+	const char *sopts = "Aad:fLlNopqR:rTvx^h?";
 	struct option lopts[] = {
-		{"version"     , no_argument      , 0, 0},
-		{"help"        , no_argument      , 0, 'h'},
-		{"all-refs"    , no_argument      , 0, 'A'},
-		{"all"         , no_argument      , 0, 'a'},
-		{"dir"         , required_argument, 0, 'd'},
-		{"filenames"   , no_argument      , 0, 'f'},
-		{"list-refs"   , no_argument      , 0, 'L'},
-		{"list"        , no_argument      , 0, 'l'},
-		{"omit-issue"  , no_argument      , 0, 'N'},
-		{"output-valid", no_argument      , 0, 'o'},
-		{"progress"    , no_argument      , 0, 'p'},
-		{"quiet"       , no_argument      , 0, 'q'},
-		{"cir"         , required_argument, 0, 'R'},
-		{"recursive"   , no_argument      , 0, 'r'},
-		{"summary"     , no_argument      , 0, 'T'},
-		{"verbose"     , no_argument      , 0, 'v'},
-		{"xml"         , no_argument      , 0, 'x'},
+		{"version"       , no_argument      , 0, 0},
+		{"help"          , no_argument      , 0, 'h'},
+		{"all-refs"      , no_argument      , 0, 'A'},
+		{"all"           , no_argument      , 0, 'a'},
+		{"dir"           , required_argument, 0, 'd'},
+		{"filenames"     , no_argument      , 0, 'f'},
+		{"list-refs"     , no_argument      , 0, 'L'},
+		{"list"          , no_argument      , 0, 'l'},
+		{"omit-issue"    , no_argument      , 0, 'N'},
+		{"output-valid"  , no_argument      , 0, 'o'},
+		{"progress"      , no_argument      , 0, 'p'},
+		{"quiet"         , no_argument      , 0, 'q'},
+		{"cir"           , required_argument, 0, 'R'},
+		{"recursive"     , no_argument      , 0, 'r'},
+		{"summary"       , no_argument      , 0, 'T'},
+		{"verbose"       , no_argument      , 0, 'v'},
+		{"xml"           , no_argument      , 0, 'x'},
+		{"remove-deleted", no_argument      , 0, '^'},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -672,6 +691,7 @@ int main(int argc, char **argv)
 	opts.output_valid = false;
 	opts.list_refs = false;
 	opts.all_refs = false;
+	opts.rem_delete = false;
 
 	init_objects(&opts.objects);
 	init_objects(&opts.cirs);
@@ -735,6 +755,9 @@ int main(int argc, char **argv)
 				break;
 			case 'x':
 				xml_report = true;
+				break;
+			case '^':
+				opts.rem_delete = true;
 				break;
 			case 'h':
 			case '?':
