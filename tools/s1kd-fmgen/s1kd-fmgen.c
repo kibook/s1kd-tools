@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.5.2"
+#define VERSION "3.5.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -321,6 +321,7 @@ static bool default_ignore_del(const char *type)
 	return
 		strcmp(type, "LOA")   == 0 ||
 		strcmp(type, "LOASD") == 0 ||
+		strcmp(type, "LOEDM") == 0 ||
 		strcmp(type, "LOI")   == 0 ||
 		strcmp(type, "LOS")   == 0 ||
 		strcmp(type, "LOT")   == 0 ||
