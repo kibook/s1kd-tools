@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-4DdefHIilmNqRruvw] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-4defHIilmNqRruvw^] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
                  [<file>...]
 
@@ -38,13 +38,6 @@ or `"rinstate-changed"`.
 -c, --reason &lt;reason&gt;  
 Add a reason for update to the upissued objects. Multiple RFUs can be
 added by specifying this option multiple times.
-
--D, --remove-deleted  
-Remove elements with change type of "delete". These elements are
-automatically removed along with all change marks and RFUs when an
-object is upissued from official to the next inwork issue. This option
-will remove them when upissuing between inwork issues, or when making
-the object official.
 
 -d, --dry-run  
 Do not actually create or modify any files, only print the name of the
@@ -139,6 +132,13 @@ will also be made read-only when they are created.
 -z, --date &lt;date&gt;  
 Specify the issue to use for the upissued object(s). Otherwise, the
 current date will be used.
+
+-^, --remove-deleted  
+Remove elements with change type of "delete". These elements are
+automatically removed along with all change marks and RFUs when an
+object is upissued from official to the next inwork issue. This option
+will remove them when upissuing between inwork issues, or when making
+the object official.
 
 --version  
 Show version information.

@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "1.16.4"
+#define VERSION "2.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,14 +29,13 @@
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-4DdefHIilmNqRruvw] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-4defHIilmNqRruvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -1, --first-ver <type>       Set first verification type.");
 	puts("  -2, --second-ver <type>      Set second verification type.");
 	puts("  -4, --remove-marks           Remove change marks (but not RFUs).");
 	puts("  -c, --reason <reason>        Add an RFU to the upissued object.");
-	puts("  -D, --remove-deleted         Remove \"delete\"d elements.");
 	puts("  -d, --dry-run                Do not write anything, only print new filename.");
 	puts("  -e, --erase                  Remove old issue.");
 	puts("  -f, --overwrite              Overwrite existing upissued object.");
@@ -56,6 +55,7 @@ static void show_help(void)
 	puts("  -v, --verbose                Print filename of upissued objects.");
 	puts("  -w, --lock                   Make old and official issues read-only.");
 	puts("  -z, --date <date>            The issue date to use for the upissued objects.");
+	puts("  -^, --remove-deleted         Remove \"delete\"d elements.");
 	puts("  --version                    Show version information");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -761,7 +761,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:4Ddelc:t:Hwmuz:h?";
+	const char *sopts = "ivs:NfrRIq1:2:4delc:t:Hwmuz:^h?";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -769,7 +769,6 @@ int main(int argc, char **argv)
 		{"second-ver"        , required_argument, 0, '2'},
 		{"remove-marks"      , no_argument      , 0, '4'},
 		{"reason"            , required_argument, 0, 'c'},
-		{"remove-deleted"    , no_argument      , 0, 'D'},
 		{"dry-run"           , no_argument      , 0, 'd'},
 		{"erase"             , no_argument      , 0, 'e'},
 		{"overwrite"         , no_argument      , 0, 'f'},
@@ -791,6 +790,7 @@ int main(int argc, char **argv)
 		{"verbose"           , no_argument      , 0, 'v'},
 		{"lock"              , no_argument      , 0, 'w'},
 		{"date"              , required_argument, 0, 'z'},
+		{"remove-deleted"    , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -818,9 +818,6 @@ int main(int argc, char **argv)
 				break;
 			case 'c':
 				xmlNewChild(rfus, NULL, BAD_CAST "reasonForUpdate", BAD_CAST optarg);
-				break;
-			case 'D':
-				remdel = true;
 				break;
 			case 'd':
 				dry_run = true;
@@ -881,6 +878,9 @@ int main(int argc, char **argv)
 				break;
 			case 'z':
 				issdate = strdup(optarg);
+				break;
+			case '^':
+				remdel = true;
 				break;
 			case 'h':
 			case '?':
