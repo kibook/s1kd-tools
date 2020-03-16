@@ -1041,10 +1041,6 @@ static void rem_delete_nodes(xmlNodePtr node)
 		change = xmlGetProp(node, BAD_CAST "changeType");
 	}
 
-	if (!change) {
-		return;
-	}
-
 	if (xmlStrcmp(change, BAD_CAST "delete") == 0) {
 		xmlUnlinkNode(node);
 		xmlFreeNode(node);
