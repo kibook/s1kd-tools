@@ -47,6 +47,9 @@
       <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add ignoreDel attribute to .fmtypes file.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -262,6 +265,32 @@
           <title><verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file</title>
           <para>This file specifies a list of info codes to associate with a particular type of front matter.</para>
           <para>Optionally, a path to an XSLT script can be given for each info code, which will be used to generate the front matter instead of the built-in XSLT. The path to an XSLT script will be interpreted relative to the location of the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file (typically, the top directory of the CSDB). The -D option can be used to dump the built-in XSLT for a type of front matter as a starting point for a custom script.</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0004">
+            Optionally, in the XML format, the attribute <verbatimText verbatimStyle="vs13">ignoreDel</verbatimText> may be specified to control whether deleted data modules and elements are ignored when generating front matter contents. These are data modules with an issue type of "<verbatimText verbatimStyle="vs14">deleted</verbatimText>" and elements with a change type of "<verbatimText verbatimStyle="vs14">delete</verbatimText>". A value of "<verbatimText verbatimStyle="vs14">yes</verbatimText>" means deleted content will not be included, while "<verbatimText verbatimStyle="vs14">no</verbatimText>" means it will. If this attribute is not specified, then a default value will be used based on the type of front matter. The following types will ignore deleted content by default:
+            <randomList>
+              <listItem>
+                <para>LOA</para>
+              </listItem>
+              <listItem>
+                <para>LOASD</para>
+              </listItem>
+              <listItem>
+                <para>LOI</para>
+              </listItem>
+              <listItem>
+                <para>LOS</para>
+              </listItem>
+              <listItem>
+                <para>LOTBL</para>
+              </listItem>
+              <listItem>
+                <para>TOC</para>
+              </listItem>
+              <listItem>
+                <para>TP</para>
+              </listItem>
+            </randomList>
+          </para>
           <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
           <para>Example of simple text format:</para>
           <para>

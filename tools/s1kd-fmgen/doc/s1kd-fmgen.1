@@ -201,6 +201,31 @@ CSDB).
 The \-D option can be used to dump the built\-in XSLT for a type of
 front matter as a starting point for a custom script.
 .PP
+Optionally, in the XML format, the attribute \f[C]ignoreDel\f[] may be
+specified to control whether deleted data modules and elements are
+ignored when generating front matter contents.
+These are data modules with an issue type of "\f[C]deleted\f[]" and
+elements with a change type of "\f[C]delete\f[]".
+A value of "\f[C]yes\f[]" means deleted content will not be included,
+while "\f[C]no\f[]" means it will.
+If this attribute is not specified, then a default value will be used
+based on the type of front matter.
+The following types will ignore deleted content by default:
+.IP \[bu] 2
+LOA
+.IP \[bu] 2
+LOASD
+.IP \[bu] 2
+LOI
+.IP \[bu] 2
+LOS
+.IP \[bu] 2
+LOTBL
+.IP \[bu] 2
+TOC
+.IP \[bu] 2
+TP
+.PP
 By default, the program will search for a file named \f[C]\&.fmtypes\f[]
 in the current directory and parent directories, but any file can be
 specified using the \-F option.

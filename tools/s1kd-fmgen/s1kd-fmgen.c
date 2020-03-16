@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.4.0"
+#define VERSION "3.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -314,9 +314,46 @@ static void set_def_param(const char **params, int i, const char *val)
 	params[i] = s;
 }
 
-static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *fmxsl, const char *xslpath, const char **params)
+/* Default types of frontmatter where "deleted" objects and elements should be
+ * ignored. */
+static bool default_ignore_del(const char *type)
 {
-	xmlDocPtr res = NULL;
+	return
+		strcmp(type, "LOA")   == 0 ||
+		strcmp(type, "LOASD") == 0 ||
+		strcmp(type, "LOI")   == 0 ||
+		strcmp(type, "LOS")   == 0 ||
+		strcmp(type, "LOT")   == 0 ||
+		strcmp(type, "LOTBL") == 0 ||
+		strcmp(type, "TOC")   == 0 ||
+		strcmp(type, "TP")    == 0;
+}
+
+/* Remove "deleted" DMs from the flattend PM format. */
+static void rem_deleted_dmodules(xmlDocPtr doc)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEvalExpression(BAD_CAST "//dmodule[identAndStatusSection/dmStatus/@issueType='deleted' or status/issno/@isstype='deleted']", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+			xmlFreeNode(obj->nodesetval->nodeTab[i]);
+			obj->nodesetval->nodeTab[i] = NULL;
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
+static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, const char *fmxsl, const char *xslpath, const char **params, const bool ignore_del)
+{
+	xmlDocPtr src, res = NULL;
 	int i = 0;
 
 	/* Supply values to default parameters. */
@@ -326,13 +363,26 @@ static xmlDocPtr generate_fm_content_for_type(xmlDocPtr doc, const char *type, c
 		}
 	}
 
+	/* Certain types of FM should ignore "deleted" objects/elements. */
+	if (ignore_del) {
+		src = xmlCopyDoc(doc, 1);
+		rem_deleted_dmodules(src);
+		rem_delete_elems(src);
+	} else {
+		src = doc;
+	}
+
 	/* Generate contents. */
 	if (xslpath) {
-		res = transform_doc(doc, xslpath, params);
+		res = transform_doc(src, xslpath, params);
 	} else if (fmxsl) {
-		res = transform_doc(doc, fmxsl, params);
+		res = transform_doc(src, fmxsl, params);
 	} else {
-		res = generate_fm(doc, type, params);
+		res = generate_fm(src, type, params);
+	}
+
+	if (ignore_del) {
+		xmlFreeDoc(src);
 	}
 
 	return res;
@@ -491,6 +541,7 @@ static void generate_fm_content_for_dm(
 {
 	xmlDocPtr doc, res = NULL;
 	char *type, *fmxsl;
+	bool ignore_del;
 
 	if (!(doc = read_xml_doc(dmpath))) {
 		return;
@@ -499,6 +550,7 @@ static void generate_fm_content_for_dm(
 	if (fmtype) {
 		type  = strdup(fmtype);
 		fmxsl = NULL;
+		ignore_del = default_ignore_del(type);
 	} else {
 		xmlChar *incode, *incodev;
 		xmlNodePtr fm;
@@ -509,8 +561,18 @@ static void generate_fm_content_for_dm(
 		fm = find_fm(fmtypes, incode, incodev);
 
 		if (fm) {
+			xmlChar *igndel;
+
 			type  = (char *) xmlGetProp(fm, BAD_CAST "type");
 			fmxsl = (char *) xmlGetProp(fm, BAD_CAST "xsl");
+
+			if ((igndel = xmlGetProp(fm, BAD_CAST "ignoreDel"))) {
+				ignore_del = xmlStrcmp(igndel, BAD_CAST "yes") == 0;
+			} else {
+				ignore_del = default_ignore_del(type);
+			}
+
+			xmlFree(igndel);
 		} else {
 			if (verbosity >= DEBUG) {
 				fprintf(stderr, I_NO_INFOCODE, dmpath, incode, incodev);
@@ -518,6 +580,7 @@ static void generate_fm_content_for_dm(
 
 			type = NULL;
 			fmxsl = NULL;
+			ignore_del = false;
 		}
 
 		xmlFree(incode);
@@ -531,7 +594,7 @@ static void generate_fm_content_for_dm(
 			fprintf(stderr, I_GENERATE, dmpath, type);
 		}
 
-		if (!(res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params))) {
+		if (!(res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params, ignore_del))) {
 			if (verbosity >= NORMAL) {
 				fprintf(stderr, E_BAD_STYLESHEET, dmpath, xslpath ? xslpath : fmxsl);
 			}
@@ -913,7 +976,7 @@ int main(int argc, char **argv)
 		}
 	} else if (fmtype) {
 		xmlDocPtr res;
-		res = generate_fm_content_for_type(pm, fmtype, NULL, xslpath, params);
+		res = generate_fm_content_for_type(pm, fmtype, NULL, xslpath, params, default_ignore_del(fmtype));
 		save_xml_doc(res, "-");
 		xmlFreeDoc(res);
 	} else if (islist) {

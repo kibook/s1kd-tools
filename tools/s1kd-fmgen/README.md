@@ -147,6 +147,29 @@ location of the `.fmtypes` file (typically, the top directory of the
 CSDB). The -D option can be used to dump the built-in XSLT for a type of
 front matter as a starting point for a custom script.
 
+Optionally, in the XML format, the attribute `ignoreDel` may be
+specified to control whether deleted data modules and elements are
+ignored when generating front matter contents. These are data modules
+with an issue type of "`deleted`" and elements with a change type of
+"`delete`". A value of "`yes`" means deleted content will not be
+included, while "`no`" means it will. If this attribute is not
+specified, then a default value will be used based on the type of front
+matter. The following types will ignore deleted content by default:
+
+-   LOA
+
+-   LOASD
+
+-   LOI
+
+-   LOS
+
+-   LOTBL
+
+-   TOC
+
+-   TP
+
 By default, the program will search for a file named `.fmtypes` in the
 current directory and parent directories, but any file can be specified
 using the -F option.
