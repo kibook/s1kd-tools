@@ -1025,26 +1025,42 @@ bool is_cir(const char *path, const bool ignore_del)
 	return is;
 }
 
+/* Recursively remove nodes marked as "delete". */
+static void rem_delete_nodes(xmlNodePtr node)
+{
+	xmlChar *change;
+	xmlNodePtr cur;
+
+	if (!node) {
+		return;
+	}
+
+	change = xmlGetProp(node, BAD_CAST "change");
+
+	if (!change) {
+		change = xmlGetProp(node, BAD_CAST "changeType");
+	}
+
+	if (!change) {
+		return;
+	}
+
+	if (xmlStrcmp(change, BAD_CAST "delete") == 0) {
+		xmlUnlinkNode(node);
+		xmlFreeNode(node);
+		return;
+	}
+
+	cur = node->children;
+	while (cur) {
+		xmlNodePtr next = cur->next;
+		rem_delete_nodes(cur);
+		cur = next;
+	}
+}
+
 /* Remove elements marked as "delete". */
 void rem_delete_elems(xmlDocPtr doc)
 {
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-
-	ctx = xmlXPathNewContext(doc);
-
-	obj = xmlXPathEvalExpression(BAD_CAST "//*[@change='delete']|//*[@changeType='delete']", ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
+	rem_delete_nodes(xmlDocGetRootElement(doc));
 }
