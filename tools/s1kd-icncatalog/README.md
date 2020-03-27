@@ -196,9 +196,8 @@ will reconstruct the required external entity declarations in the DTD.
 > **Note**
 >
 > The s1kd-tools will copy the DTD and external entity declarations
-> automatically when performing transformations (such as with the
-> s1kd-transform tool), so this is only necessary when using more
-> generic XML tools.
+> automatically when performing transformations, so this is only
+> necessary when using more generic XML tools.
 
 ICN pattern rules
 -----------------

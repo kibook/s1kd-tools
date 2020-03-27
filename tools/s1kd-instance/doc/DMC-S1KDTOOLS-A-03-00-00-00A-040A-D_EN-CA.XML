@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -^ (--remove-deleted) option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="0" updateReasonType="urt02">
+        <simplePara>The s1kd-transform tool has been removed.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -1250,7 +1253,7 @@ Applies to version A when the weather is icy.
         </para>
         <para>Writing out a data module from stdin to a directory with automatic naming:</para>
         <para>
-          <verbatimText verbatimStyle="vs24">$ s1kd-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0003">$ xml-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>

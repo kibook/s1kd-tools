@@ -1139,4 +1139,4 @@ extended identification:
 Writing out a data module from stdin to a directory with automatic
 naming:
 
-    $ s1kd-transform -s <xsl> <DM> | s1kd-instance -SO <dir>
+    $ xml-transform -s <xsl> <DM> | s1kd-instance -SO <dir>

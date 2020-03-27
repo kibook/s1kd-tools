@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="12" day="13"/>
+        <issueDate year="2020" month="03" day="27"/>
         <dmTitle>
           <techName>s1kd-tools(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,6 +38,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Remove s1kd-transform tool.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -69,7 +72,7 @@
                 <para><emphasis>Generation:</emphasis> The generation of new CSDB objects is supported by the <emphasis>s1kd-dmrl</emphasis> tool and the <emphasis>s1kd-new*</emphasis> set of tools. These provide two methods of creating objects, either using a data management requirements list (DMRL) or a more on-the-fly approach using the s1kd-new* tools directly.</para>
                 <para>The <emphasis>s1kd-defaults</emphasis> tool is used to manage the files which contain default metadata for new CSDB objects.</para>
               </listItem>
-              <listItem>
+              <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
                 <para><emphasis>Authoring:</emphasis> These tools support the authoring process.</para>
                 <para>The <emphasis>s1kd-addicn</emphasis> tool creates the notation and entity elements to reference an ICN in a data module.</para>
                 <para>The <emphasis>s1kd-ls</emphasis> tool lists data modules within a directory.</para>
@@ -77,7 +80,6 @@
                 <para>The <emphasis>s1kd-mvref</emphasis> tool changes references to one object into references to another.</para>
                 <para>The <emphasis>s1kd-ref</emphasis> tool can be used to quickly insert references to other CSDB objects.</para>
                 <para>The <emphasis>s1kd-sns</emphasis> tool can be used to organize the CSDB using a given SNS structure.</para>
-                <para>The <emphasis>s1kd-transform</emphasis> tool applies XSLT transformations to CSDB objects.</para>
                 <para>The <emphasis>s1kd-upissue</emphasis> tool moves CSDB objects through the standard S1000D workflow, between "inwork" (draft) and "official" states.</para>
               </listItem>
               <listItem>
@@ -110,7 +112,7 @@
         <para>S1000D website: <externalPubRef><externalPubRefIdent><externalPubTitle>http://www.s1000d.org</externalPubTitle></externalPubRefIdent></externalPubRef></para>
         <para>Manpages for each tool:</para>
         <para>
-          <randomList>
+          <randomList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <listItem>
               <para>s1kd-acronyms(1)</para>
             </listItem>
@@ -197,9 +199,6 @@
             </listItem>
             <listItem>
               <para>s1kd-syncrefs(1)</para>
-            </listItem>
-            <listItem>
-              <para>s1kd-transform(1)</para>
             </listItem>
             <listItem>
               <para>s1kd-uom(1)</para>
