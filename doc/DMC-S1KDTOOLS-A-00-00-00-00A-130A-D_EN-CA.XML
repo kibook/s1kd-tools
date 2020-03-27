@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
-<!NOTATION PNG SYSTEM "PNG" >
 <!NOTATION GIF SYSTEM "GIF" >
+<!NOTATION PNG SYSTEM "PNG" >
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG" NDATA PNG>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF" NDATA GIF>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF" NDATA GIF>
@@ -14,10 +14,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="02" day="28"/>
+        <issueDate year="2020" month="03" day="27"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
@@ -47,9 +47,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="0" updateReasonType="urt01">
-        <simplePara>Correct s1kd-ls example.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -499,7 +496,7 @@ This information only applies to version B.
         <levelledPara>
           <title>Creating a script for publishing</title>
           <para>The publishing process will often involve many different steps, and many different tools, so it's a good idea to create a script to automate it. Below is an example of a script which publishes a CSDB for a given product serial number:
-            <verbatimText verbatimStyle="vs24" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[#!/bin/sh
+            <verbatimText verbatimStyle="vs24"><![CDATA[#!/bin/sh
 
 # Usage: sh build.sh <zip> <csdb> <serialno>
 zip="$1"

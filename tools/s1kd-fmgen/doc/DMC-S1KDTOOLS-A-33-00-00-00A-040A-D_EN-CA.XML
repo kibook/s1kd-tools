@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="00"/>
+        <issueInfo issueNumber="021" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="02" day="28"/>
+        <issueDate year="2020" month="03" day="27"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,16 +38,10 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add support for multi-pass transforms with a subset of XProc.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add error code for an invalid stylesheet.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
       </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
+      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
         <simplePara>Add ignoreDel attribute to .fmtypes file.</simplePara>
       </reasonForUpdate>
     </dmStatus>
@@ -223,7 +217,7 @@
                 <para>Load the external DTD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>--huge</listItemTerm>
               <listItemDefinition>
                 <para>Remove any internal arbitrary parser limits.</para>
@@ -241,13 +235,13 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>--parser-errors</listItemTerm>
               <listItemDefinition>
                 <para>Emit errors from parser.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
               <listItemTerm>--parser-warnings</listItemTerm>
               <listItemDefinition>
                 <para>Emit warnings from parser.</para>
@@ -265,7 +259,7 @@
           <title><verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file</title>
           <para>This file specifies a list of info codes to associate with a particular type of front matter.</para>
           <para>Optionally, a path to an XSLT script can be given for each info code, which will be used to generate the front matter instead of the built-in XSLT. The path to an XSLT script will be interpreted relative to the location of the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file (typically, the top directory of the CSDB). The -D option can be used to dump the built-in XSLT for a type of front matter as a starting point for a custom script.</para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0004">
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
             Optionally, in the XML format, the attribute <verbatimText verbatimStyle="vs13">ignoreDel</verbatimText> may be specified to control whether deleted data modules and elements are ignored when generating front matter contents. These are data modules with an issue type of "<verbatimText verbatimStyle="vs14">deleted</verbatimText>" and elements with a change type of "<verbatimText verbatimStyle="vs14">delete</verbatimText>". A value of "<verbatimText verbatimStyle="vs14">yes</verbatimText>" means deleted content will not be included, while "<verbatimText verbatimStyle="vs14">no</verbatimText>" means it will. If this attribute is not specified, then a default value will be used based on the type of front matter. The following types will ignore deleted content by default:
             <randomList>
               <listItem>
@@ -335,7 +329,7 @@
           <title>Optional title page elements</title>
           <para>When re-generating the front matter content for a title page data module, optional elements which cannot be derived from the publication module (such as the product illustration or bar code) will be copied from the source data module when updating it.</para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Multi-pass transforms</title>
           <para>Rather than a literal XSLT file, the path specified for the <verbatimText verbatimStyle="vs13">xsl</verbatimText> attribute in the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file or the -x (--xsl) option may be an XProc file which contains a pipeline with multiple stylesheets. This allows for multi-pass transformations.</para>
           <note>
@@ -400,7 +394,7 @@ version="1.0">
                 <para>The resulting front matter content could not be merged in to a data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>5</listItemTerm>
               <listItemDefinition>
                 <para>The stylesheet specified for a type of front matter was invalid.</para>
