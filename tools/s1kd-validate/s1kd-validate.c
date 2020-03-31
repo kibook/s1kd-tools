@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.5.3"
+#define VERSION "2.5.4"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -15,12 +15,10 @@
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define E_MAX_SCHEMA_PARSERS ERR_PREFIX "Maximum number of schemas reached: %d\n"
+#define E_BAD_IDREF ERR_PREFIX "No matching ID for '%s' (%s line %u).\n"
 
 #define EXIT_MAX_SCHEMAS 2
 #define EXIT_MISSING_SCHEMA 3
-#define EXIT_BAD_IDREF 4
-
-#define S_BAD_IDREF ERR_PREFIX "No matching ID for '%s' (%s line %u).\n"
 
 #define INVALID_ID_XPATH BAD_CAST \
 	"//@applicMapRefId[not(//@id=.)]|" \
@@ -209,7 +207,7 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 				xmlChar *id = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
 				fprintf(stderr,
-					S_BAD_IDREF,
+					E_BAD_IDREF,
 					(char *) id,
 					fname,
 					obj->nodesetval->nodeTab[i]->parent->line);
@@ -217,7 +215,7 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 			}
 		}
 
-		err = EXIT_BAD_IDREF;
+		++err;
 	}
 
 	xmlXPathFreeObject(obj);
@@ -243,12 +241,13 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 				if (xmlXPathNodeSetIsEmpty(res->nodesetval)) {
 					if (verbosity > SILENT) {
 						fprintf(stderr,
-							S_BAD_IDREF,
+							E_BAD_IDREF,
 							id,
 							fname,
 							obj->nodesetval->nodeTab[i]->parent->line);
 					}
-					err = EXIT_BAD_IDREF;
+
+					++err;
 				}
 
 				xmlXPathFreeObject(res);
@@ -438,7 +437,7 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqd:X:xfloes:^h?";
+	const char *sopts = "vqd:x:floes:^h?";
 	struct option lopts[] = {
 		{"version"       , no_argument      , 0, 0},
 		{"help"          , no_argument      , 0, 'h'},
