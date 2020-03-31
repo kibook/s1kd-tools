@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.5.4"
+#define VERSION "2.5.5"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -15,7 +15,7 @@
 
 #define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define E_MAX_SCHEMA_PARSERS ERR_PREFIX "Maximum number of schemas reached: %d\n"
-#define E_BAD_IDREF ERR_PREFIX "No matching ID for '%s' (%s line %u).\n"
+#define E_BAD_IDREF ERR_PREFIX "%s (%ld): No matching ID for '%s'.\n"
 
 #define EXIT_MAX_SCHEMAS 2
 #define EXIT_MISSING_SCHEMA 3
@@ -37,6 +37,8 @@
 
 #define INVALID_IDS_XPATH BAD_CAST \
 	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs|//@controlAuthorityRefs"
+
+#define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 static enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
 
@@ -208,9 +210,9 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 				xmlChar *id = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
 				fprintf(stderr,
 					E_BAD_IDREF,
-					(char *) id,
 					fname,
-					obj->nodesetval->nodeTab[i]->parent->line);
+					xmlGetLineNo(obj->nodesetval->nodeTab[i]->parent),
+					(char *) id);
 				xmlFree(id);
 			}
 		}
@@ -242,9 +244,9 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 					if (verbosity > SILENT) {
 						fprintf(stderr,
 							E_BAD_IDREF,
-							id,
 							fname,
-							obj->nodesetval->nodeTab[i]->parent->line);
+							xmlGetLineNo(obj->nodesetval->nodeTab[i]->parent),
+							(char *) id);
 					}
 
 					++err;
@@ -315,7 +317,7 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 	if (schema) {
 		url = strdup(schema);
 	} else {
-		url = (char *) xmlGetProp(dmodule, (xmlChar *) "noNamespaceSchemaLocation");
+		url = (char *) xmlGetNsProp(dmodule, BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
 	}
 
 	if (!url) {
