@@ -33,6 +33,9 @@ data modules that were specified as objects to check.
 The directory to start searching for CIR data modules in. By default,
 the current directory is used.
 
+-F, --valid-filenames  
+Print the filenames of valid objects.
+
 -f, --filenames  
 Print the filenames of invalid objects.
 

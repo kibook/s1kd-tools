@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.4.2"
+#define VERSION "1.5.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -59,10 +59,12 @@ struct objects {
 	unsigned max;
 };
 
+enum show_filenames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
+
 /* Program options. */
 struct opts {
 	enum verbosity verbosity;
-	bool show_filenames;
+	enum show_filenames show_filenames;
 	char *search_dir;
 	bool recursive;
 	bool no_issue;
@@ -462,7 +464,7 @@ static int check_cir_refs_in_file(const char *path, struct opts *opts)
 		}
 	}
 
-	if (err && opts->show_filenames) {
+	if ((err && opts->show_filenames == SHOW_INVALID) || (!err && opts->show_filenames == SHOW_VALID)) {
 			puts(path);
 	}
 
@@ -616,25 +618,26 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A, --all-refs        Validate indirect CIR references.");
-	puts("  -a, --all             Resolve against CIRs specified as objects to check.");
-	puts("  -d, --dir <dir>       Search for CIRs in <dir>.");
-	puts("  -f, --filenames       List invalid files.");
-	puts("  -h, -?, --help        Show help/usage message.");
-	puts("  -L, --list-refs       List CIR refs instead of validating them.");
-	puts("  -l, --list            Treat input as list of CSDB objects.");
-	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
-	puts("  -o, --output-valid    Output valid CSDB objects to stdout.");
-	puts("  -p, --progress        Display a progress bar.");
-	puts("  -q, --quiet           Quiet mode.");
-	puts("  -R, --cir <CIR>       Check references against the given CIR.");
-	puts("  -r, --recursive       Search for CIRs recursively.");
-	puts("  -T, --summary         Print a summary of the check.");
-	puts("  -v, --verbose         Verbose output.");
-	puts("  -x, --xml             Output XML report.");
-	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
-	puts("  --version             Show version information.");
-	puts("  <object>              CSDB object(s) to check.");
+	puts("  -A, --all-refs         Validate indirect CIR references.");
+	puts("  -a, --all              Resolve against CIRs specified as objects to check.");
+	puts("  -d, --dir <dir>        Search for CIRs in <dir>.");
+	puts("  -F, --valid-filenames  List valid files.");
+	puts("  -f, --filenames        List invalid files.");
+	puts("  -h, -?, --help         Show help/usage message.");
+	puts("  -L, --list-refs        List CIR refs instead of validating them.");
+	puts("  -l, --list             Treat input as list of CSDB objects.");
+	puts("  -N, --omit-issue       Assume issue/inwork numbers are omitted.");
+	puts("  -o, --output-valid     Output valid CSDB objects to stdout.");
+	puts("  -p, --progress         Display a progress bar.");
+	puts("  -q, --quiet            Quiet mode.");
+	puts("  -R, --cir <CIR>        Check references against the given CIR.");
+	puts("  -r, --recursive        Search for CIRs recursively.");
+	puts("  -T, --summary          Print a summary of the check.");
+	puts("  -v, --verbose          Verbose output.");
+	puts("  -x, --xml              Output XML report.");
+	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
+	puts("  --version              Show version information.");
+	puts("  <object>               CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -649,26 +652,27 @@ int main(int argc, char **argv)
 {
 	int i, err = 0;
 
-	const char *sopts = "Aad:fLlNopqR:rTvx^h?";
+	const char *sopts = "Aad:FfLlNopqR:rTvx^h?";
 	struct option lopts[] = {
-		{"version"       , no_argument      , 0, 0},
-		{"help"          , no_argument      , 0, 'h'},
-		{"all-refs"      , no_argument      , 0, 'A'},
-		{"all"           , no_argument      , 0, 'a'},
-		{"dir"           , required_argument, 0, 'd'},
-		{"filenames"     , no_argument      , 0, 'f'},
-		{"list-refs"     , no_argument      , 0, 'L'},
-		{"list"          , no_argument      , 0, 'l'},
-		{"omit-issue"    , no_argument      , 0, 'N'},
-		{"output-valid"  , no_argument      , 0, 'o'},
-		{"progress"      , no_argument      , 0, 'p'},
-		{"quiet"         , no_argument      , 0, 'q'},
-		{"cir"           , required_argument, 0, 'R'},
-		{"recursive"     , no_argument      , 0, 'r'},
-		{"summary"       , no_argument      , 0, 'T'},
-		{"verbose"       , no_argument      , 0, 'v'},
-		{"xml"           , no_argument      , 0, 'x'},
-		{"remove-deleted", no_argument      , 0, '^'},
+		{"version"        , no_argument      , 0, 0},
+		{"help"           , no_argument      , 0, 'h'},
+		{"all-refs"       , no_argument      , 0, 'A'},
+		{"all"            , no_argument      , 0, 'a'},
+		{"dir"            , required_argument, 0, 'd'},
+		{"valid-filenames", no_argument      , 0, 'F'},
+		{"filenames"      , no_argument      , 0, 'f'},
+		{"list-refs"      , no_argument      , 0, 'L'},
+		{"list"           , no_argument      , 0, 'l'},
+		{"omit-issue"     , no_argument      , 0, 'N'},
+		{"output-valid"   , no_argument      , 0, 'o'},
+		{"progress"       , no_argument      , 0, 'p'},
+		{"quiet"          , no_argument      , 0, 'q'},
+		{"cir"            , required_argument, 0, 'R'},
+		{"recursive"      , no_argument      , 0, 'r'},
+		{"summary"        , no_argument      , 0, 'T'},
+		{"verbose"        , no_argument      , 0, 'v'},
+		{"xml"            , no_argument      , 0, 'x'},
+		{"remove-deleted" , no_argument      , 0, '^'},
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -684,7 +688,7 @@ int main(int argc, char **argv)
 
 	/* Initialize program options. */
 	opts.verbosity = NORMAL;
-	opts.show_filenames = false;
+	opts.show_filenames = SHOW_NONE;
 	opts.recursive = false;
 	opts.no_issue = false;
 	opts.search_all_objs = false;
@@ -716,8 +720,11 @@ int main(int argc, char **argv)
 				free(opts.search_dir);
 				opts.search_dir = strdup(optarg);
 				break;
+			case 'F':
+				opts.show_filenames = SHOW_VALID;
+				break;
 			case 'f':
-				opts.show_filenames = true;
+				opts.show_filenames = SHOW_INVALID;
 				break;
 			case 'L':
 				opts.list_refs = true;
