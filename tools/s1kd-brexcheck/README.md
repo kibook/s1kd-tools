@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-BcefLlnopqrS[tu]sTvx^h?] [<object>...]
+                   [-F|-f] [-BceLlnopqrS[tu]sTvx^h?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -42,7 +42,10 @@ current directory is used.
 -e, --ignore-empty  
 Ignore check for empty or non-XML documents.
 
--f, --overwrite  
+-F, --valid-filenames  
+Print the filenames of CSDB objects with no BREX/SNS errors.
+
+-f, --filenames  
 Print the filenames of CSDB objects with BREX/SNS errors.
 
 -h, -?, --help  

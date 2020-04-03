@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.5.3"
+#define VERSION "3.6.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -97,7 +97,7 @@ static bool check_notation = false;
 static bool check_values = false;
 
 /* Print the filenames of invalid objects. */
-static bool show_fnames = false;
+static enum show_fnames { SHOW_NONE, SHOW_INVALID, SHOW_VALID } show_fnames = SHOW_NONE;
 
 /* Search for BREX data modules recursively. */
 static bool recursive_search = false;
@@ -993,17 +993,34 @@ static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
 /* Print the filenames of CSDB objects with BREX errors. */
 static void print_fnames(xmlNodePtr node)
 {
-	xmlNodePtr cur;
-
 	if (xmlStrcmp(node->name, BAD_CAST "document") == 0 && firstXPathNode(NULL, node, "brex/error")) {
 		xmlChar *fname;
 		fname = xmlGetProp(node, BAD_CAST "path");
 		puts((char *) fname);
 		xmlFree(fname);
-	}
+	} else {
+		xmlNodePtr cur;
 
-	for (cur = node->children; cur; cur = cur->next) {
-		print_fnames(cur);
+		for (cur = node->children; cur; cur = cur->next) {
+			print_fnames(cur);
+		}
+	}
+}
+
+/* Print the filenames of CSDB objects with no BREX errors. */
+static void print_valid_fnames(xmlNodePtr node)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "document") == 0 && !firstXPathNode(NULL, node, "brex/error")) {
+		xmlChar *fname;
+		fname = xmlGetProp(node, BAD_CAST "path");
+		puts((char *) fname);
+		xmlFree(fname);
+	} else {
+		xmlNodePtr cur;
+
+		for (cur = node->children; cur; cur = cur->next) {
+			print_fnames(cur);
+		}
 	}
 }
 
@@ -1085,8 +1102,10 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlFreeDoc(brex_doc);
 	}
 
-	if (show_fnames) {
-		print_fnames(documentNode);
+	switch (show_fnames) {
+		case SHOW_NONE: break;
+		case SHOW_INVALID: print_fnames(documentNode); break;
+		case SHOW_VALID: print_valid_fnames(documentNode); break;
 	}
 
 	if (output_tree) {
@@ -1287,7 +1306,7 @@ int s1kdCheckBREX(xmlDocPtr doc, xmlDocPtr brex)
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-BcefLlnopqrS[tu]sTvx^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-F|-f] [-BceLlnopqrS[tu]sTvx^h?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -B, --default-brex                   Use the default BREX.");
@@ -1295,6 +1314,7 @@ static void show_help(void)
 	puts("  -c, --values                         Check object values.");
 	puts("  -d, --dir <dir>                      Directory to start search for BREX in.");
 	puts("  -e, --ignore-empty                   Ignore empty/non-XML files.");
+	puts("  -F, --valid-filenames                Print the filenames of valid objects.");
 	puts("  -f, --filenames                      Print the filenames of invalid objects.");
 	puts("  -h, -?, --help                       Show this help message.");
 	puts("  -I, --include <path>                 Add <path> to search path for BREX data module.");
@@ -1352,7 +1372,7 @@ int main(int argc, char *argv[])
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
 
-	const char *sopts = "Bb:eI:xvqslw:StupfncLTrd:o^h?";
+	const char *sopts = "Bb:eI:xvqslw:StupFfncLTrd:o^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -1371,6 +1391,7 @@ int main(int argc, char *argv[])
 		{"strict"         , no_argument      , 0, 't'},
 		{"unstrict"       , no_argument      , 0, 'u'},
 		{"progress"       , no_argument      , 0, 'p'},
+		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
 		{"notations"      , no_argument      , 0, 'n'},
 		{"values"         , no_argument      , 0, 'c'},
@@ -1418,7 +1439,8 @@ int main(int argc, char *argv[])
 			case 't': strict_sns = true; break;
 			case 'u': unstrict_sns = true; break;
 			case 'p': progress = true; break;
-			case 'f': show_fnames = true; break;
+			case 'F': show_fnames = SHOW_VALID; break;
+			case 'f': show_fnames = SHOW_INVALID; break;
 			case 'n': check_notation = true; break;
 			case 'c': check_values = true; break;
 			case 'L': is_list = true; break;
