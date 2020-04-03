@@ -6,7 +6,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-efloqv^h?]
+    s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
                   [<object>...]
 
 DESCRIPTION
@@ -28,6 +28,9 @@ This can also be accomplished through the use of XML catalogs.
 
 -e, --ignore-empty  
 Ignore validation for empty or non-XML documents.
+
+-F, --valid-filenames  
+List valid files.
 
 -f, --filenames  
 List invalid files.
