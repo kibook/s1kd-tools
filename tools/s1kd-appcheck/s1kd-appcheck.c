@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.6.3"
+#define VERSION "5.7.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -83,6 +83,9 @@ static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 /* What type of check to perform. */
 enum appcheckmode { CUSTOM, PCT, ALL, STANDALONE };
 
+/* Which filenames to print. */
+enum show_filenames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
+
 /* Applicability check options. */
 struct appcheckopts {
 	char *useract;
@@ -92,7 +95,7 @@ struct appcheckopts {
 	char *args;
 	xmlNodePtr validators;
 	bool output_tree;
-	bool filenames;
+	enum show_filenames filenames;
 	bool brexcheck;
 	bool add_deps;
 	bool check_props;
@@ -107,34 +110,35 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A, --act <file>      User-specified ACT.");
-	puts("  -a, --all             Validate against all property values.");
-	puts("  -b, --brexcheck       Validate against BREX.");
-	puts("  -C, --cct <file>      User-specified CCT.");
-	puts("  -c, --custom          Perform a customized check.");
-	puts("  -d, --dir <dir>       Search for ACT/CCT/PCT in <dir>.");
-	puts("  -e, --exec <cmd>      Commands used to validate objects.");
-	puts("  -f, --filenames       List invalid files.");
-	puts("  -h, -?, --help        Show help/usage message.");
-	puts("  -K, --filter <cmd>    Command used to create objects.");
-	puts("  -k, --args <args>     Arguments used to create objects.");
-	puts("  -l, --list            Treat input as list of CSDB objects.");
-	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
-	puts("  -n, --nested          Check nested applicability annotations.");
-	puts("  -o, --output-valid    Output valid CSDB objects to stdout.");
-	puts("  -P, --pct <file>      User-specified PCT.");
-	puts("  -p, --progress        Display a progress bar.");
-	puts("  -q, --quiet           Quiet mode.");
-	puts("  -r, --recursive       Search for ACT/CCT/PCT recursively.");
-	puts("  -s, --strict          Check that all properties are defined.");
-	puts("  -T, --summary         Print a summary of the check.");
-	puts("  -t, --products        Validate against product instances.");
-	puts("  -v, --verbose         Verbose output.");
-	puts("  -x, --xml             Output XML report.");
-	puts("  -~, --dependencies    Check CCT dependencies.");
-	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
-	puts("  --version             Show version information.");
-	puts("  <object>...           CSDB object(s) to check.");
+	puts("  -A, --act <file>       User-specified ACT.");
+	puts("  -a, --all              Validate against all property values.");
+	puts("  -b, --brexcheck        Validate against BREX.");
+	puts("  -C, --cct <file>       User-specified CCT.");
+	puts("  -c, --custom           Perform a customized check.");
+	puts("  -d, --dir <dir>        Search for ACT/CCT/PCT in <dir>.");
+	puts("  -e, --exec <cmd>       Commands used to validate objects.");
+	puts("  -F, --valid-filenames  List valid files.");
+	puts("  -f, --filenames        List invalid files.");
+	puts("  -h, -?, --help         Show help/usage message.");
+	puts("  -K, --filter <cmd>     Command used to create objects.");
+	puts("  -k, --args <args>      Arguments used to create objects.");
+	puts("  -l, --list             Treat input as list of CSDB objects.");
+	puts("  -N, --omit-issue       Assume issue/inwork numbers are omitted.");
+	puts("  -n, --nested           Check nested applicability annotations.");
+	puts("  -o, --output-valid     Output valid CSDB objects to stdout.");
+	puts("  -P, --pct <file>       User-specified PCT.");
+	puts("  -p, --progress         Display a progress bar.");
+	puts("  -q, --quiet            Quiet mode.");
+	puts("  -r, --recursive        Search for ACT/CCT/PCT recursively.");
+	puts("  -s, --strict           Check that all properties are defined.");
+	puts("  -T, --summary          Print a summary of the check.");
+	puts("  -t, --products         Validate against product instances.");
+	puts("  -v, --verbose          Verbose output.");
+	puts("  -x, --xml              Output XML report.");
+	puts("  -~, --dependencies     Check CCT dependencies.");
+	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
+	puts("  --version              Show version information.");
+	puts("  <object>...            CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1675,11 +1679,15 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 	if (err) {
 		xmlSetProp(report_node, BAD_CAST "valid", BAD_CAST "no");
 
-		if (opts->filenames) {
+		if (opts->filenames == SHOW_INVALID) {
 			puts(path);
 		}
 	} else {
 		xmlSetProp(report_node, BAD_CAST "valid", BAD_CAST "yes");
+
+		if (opts->filenames == SHOW_VALID) {
+			puts(path);
+		}
 	}
 
 	if (opts->output_tree) {
@@ -1762,35 +1770,36 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:fNnK:k:loP:pqrsTtvx~h?";
+	const char *sopts = "A:abC:cDd:e:FfNnK:k:loP:pqrsTtvx~h?";
 	struct option lopts[] = {
-		{"version"       , no_argument      , 0, 0},
-		{"help"          , no_argument      , 0, 'h'},
-		{"act"           , required_argument, 0, 'A'},
-		{"all"           , no_argument      , 0, 'a'},
-		{"brexcheck"     , no_argument      , 0, 'b'},
-		{"cct"           , required_argument, 0, 'C'},
-		{"custom"        , no_argument      , 0, 'c'},
-		{"dir"           , required_argument, 0, 'd'},
-		{"exec"          , required_argument, 0, 'e'},
-		{"filenames"     , no_argument      , 0, 'f'},
-		{"filter"        , required_argument, 0, 'K'},
-		{"args"          , required_argument, 0, 'k'},
-		{"list"          , no_argument      , 0, 'l'},
-		{"omit-issue"    , no_argument      , 0, 'N'},
-		{"nested"        , no_argument      , 0, 'n'},
-		{"output-valid"  , no_argument      , 0, 'o'},
-		{"pct"           , required_argument, 0, 'P'},
-		{"progress"      , required_argument, 0, 'p'},
-		{"quiet"         , no_argument      , 0, 'q'},
-		{"recursive"     , no_argument      , 0, 'r'},
-		{"strict"        , no_argument      , 0, 's'},
-		{"summary"       , no_argument      , 0, 'T'},
-		{"products"      , no_argument      , 0, 't'},
-		{"verbose"       , no_argument      , 0, 'v'},
-		{"xml"           , no_argument      , 0, 'x'},
-		{"dependencies"  , no_argument      , 0, '~'},
-		{"remove-deleted", no_argument      , 0, '^'},
+		{"version"        , no_argument      , 0, 0},
+		{"help"           , no_argument      , 0, 'h'},
+		{"act"            , required_argument, 0, 'A'},
+		{"all"            , no_argument      , 0, 'a'},
+		{"brexcheck"      , no_argument      , 0, 'b'},
+		{"cct"            , required_argument, 0, 'C'},
+		{"custom"         , no_argument      , 0, 'c'},
+		{"dir"            , required_argument, 0, 'd'},
+		{"exec"           , required_argument, 0, 'e'},
+		{"valid-filenames", no_argument      , 0, 'F'},
+		{"filenames"      , no_argument      , 0, 'f'},
+		{"filter"         , required_argument, 0, 'K'},
+		{"args"           , required_argument, 0, 'k'},
+		{"list"           , no_argument      , 0, 'l'},
+		{"omit-issue"     , no_argument      , 0, 'N'},
+		{"nested"         , no_argument      , 0, 'n'},
+		{"output-valid"   , no_argument      , 0, 'o'},
+		{"pct"            , required_argument, 0, 'P'},
+		{"progress"       , required_argument, 0, 'p'},
+		{"quiet"          , no_argument      , 0, 'q'},
+		{"recursive"      , no_argument      , 0, 'r'},
+		{"strict"         , no_argument      , 0, 's'},
+		{"summary"        , no_argument      , 0, 'T'},
+		{"products"       , no_argument      , 0, 't'},
+		{"verbose"        , no_argument      , 0, 'v'},
+		{"xml"            , no_argument      , 0, 'x'},
+		{"dependencies"   , no_argument      , 0, '~'},
+		{"remove-deleted" , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1809,7 +1818,7 @@ int main(int argc, char **argv)
 		/* filter */       NULL,
 		/* validators */   NULL,
 		/* output_tree */  false,
-		/* filenames */    false,
+		/* filenames */    SHOW_NONE,
 		/* brexcheck */    false,
 		/* add_deps */     false,
 		/* check_props */  false,
@@ -1865,8 +1874,11 @@ int main(int argc, char **argv)
 				}
 				xmlNewChild(opts.validators, NULL, BAD_CAST "cmd", BAD_CAST optarg);
 				break;
+			case 'F':
+				opts.filenames = SHOW_VALID;
+				break;
 			case 'f':
-				opts.filenames = true;
+				opts.filenames = SHOW_INVALID;
 				break;
 			case 'K':
 				opts.filter = strdup(optarg);

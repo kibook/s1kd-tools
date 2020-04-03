@@ -67,6 +67,9 @@ to determine if the object is valid (with a non-zero exit status
 indicating it is invalid). This overrides the default commands
 (s1kd-validate, and s1kd-brexcheck if -b is specified).
 
+-F, --valid-filenames  
+Print the filenames of valid objects.
+
 -f, --filenames  
 Print the filenames of invalid objects.
 

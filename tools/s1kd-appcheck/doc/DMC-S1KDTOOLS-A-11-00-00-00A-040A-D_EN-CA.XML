@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="00"/>
+        <issueInfo issueNumber="006" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="27"/>
+        <issueDate year="2020" month="04" day="03"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -^ (--remove-deleted) option.</simplePara>
+        <simplePara>Add -F (--valid-filenames) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -108,6 +105,12 @@
               <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The commands used to validate objects. Multiple commands can be used by specifying this option multiple times. The objects will be passed to each command on stdin, and the exit status of the command will be used to determine if the object is valid (with a non-zero exit status indicating it is invalid). This overrides the default commands (s1kd-validate, and s1kd-brexcheck if -b is specified).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-F, --valid-filenames</listItemTerm>
+              <listItemDefinition>
+                <para>Print the filenames of valid objects.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -218,7 +221,7 @@
                 <para>Check with CCT dependency tests added to assertions which use the dependant values.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-^, --remove-deleted</listItemTerm>
               <listItemDefinition>
                 <para>Validate objects with elements that have a change type of "delete" removed.</para>
@@ -247,7 +250,7 @@
                 <para>Load the external DTD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--huge</listItemTerm>
               <listItemDefinition>
                 <para>Remove any internal arbitrary parser limits.</para>
@@ -265,13 +268,13 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-errors</listItemTerm>
               <listItemDefinition>
                 <para>Emit errors from parser.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-warnings</listItemTerm>
               <listItemDefinition>
                 <para>Emit warnings from parser.</para>
