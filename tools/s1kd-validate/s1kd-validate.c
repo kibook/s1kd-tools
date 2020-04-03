@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.6.0"
+#define VERSION "2.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -42,6 +42,8 @@
 
 static enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
 
+enum show_fnames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
+
 /* Cache schemas to prevent parsing them twice (mainly needed when accessing
  * the schema over a network)
  */
@@ -51,8 +53,6 @@ struct s1kd_schema_parser {
 	xmlSchemaPtr schema;
 	xmlSchemaValidCtxtPtr valid_ctxt;
 };
-
-enum show_fnames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
 
 /* Initial max schema parsers. */
 static unsigned SCHEMA_PARSERS_MAX = 1;
@@ -276,7 +276,7 @@ static void resize_schema_parsers(void)
 	}
 }
 
-static int validate_file(const char *fname, const char *schema_dir, const char *schema, xmlNodePtr ignore_ns, int show_fnames, int ignore_empty, int rem_del)
+static int validate_file(const char *fname, const char *schema_dir, const char *schema, xmlNodePtr ignore_ns, enum show_fnames show_fnames, int ignore_empty, int rem_del)
 {
 	xmlDocPtr doc;
 	xmlDocPtr validtree = NULL;
@@ -399,7 +399,7 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 	return err;
 }
 
-static int validate_file_list(const char *fname, char *schema_dir, const char *schema, xmlNodePtr ignore_ns, int show_fnames, int ignore_empty, int rem_del)
+static int validate_file_list(const char *fname, char *schema_dir, const char *schema, xmlNodePtr ignore_ns, enum show_fnames show_fnames, int ignore_empty, int rem_del)
 {
 	FILE *f;
 	char path[PATH_MAX];
