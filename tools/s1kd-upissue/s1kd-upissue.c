@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -238,6 +238,43 @@ static void del_rfu_attrs(xmlXPathContextPtr ctx, bool iss30)
 	xmlXPathFreeObject(obj);
 }
 
+/* Remove changeInline elements. */
+static void del_change_inline(xmlNodePtr node, bool iss30)
+{
+	bool remove;
+	xmlNodePtr cur;
+
+	/* Remove <change> (3.0-) or <changeInline> (4.0+) elements only if the
+	 * change attributes have been removed (so that in -R mode,
+	 * unassociated inline change elements will be kept). */
+	if (iss30) {
+		remove = xmlStrcmp(node->name, BAD_CAST "change") == 0 && !(xmlHasProp(node, BAD_CAST "mark") || xmlHasProp(node, BAD_CAST "change") || xmlHasProp(node, BAD_CAST "rfc"));
+	} else{
+		remove = xmlStrcmp(node->name, BAD_CAST "changeInline") == 0 && !(xmlHasProp(node, BAD_CAST "changeMark") || xmlHasProp(node, BAD_CAST "changeType") || xmlHasProp(node, BAD_CAST "reasonForUpdateRefIds"));
+	}
+
+	/* Apply to descendants first to remove nested changeInlines. */
+	cur = node->children;
+	while (cur) {
+		xmlNodePtr next = cur->next;
+		del_change_inline(cur, iss30);
+		cur = next;
+	}
+
+	/* Merge children into parent. */
+	if (remove) {
+		cur = node->last;
+		while (cur) {
+			xmlNodePtr prev = cur->prev;
+			xmlAddNextSibling(node, cur);
+			cur = prev;
+		}
+
+		xmlUnlinkNode(node);
+		xmlFreeNode(node);
+	}
+}
+
 /* Delete old RFUs */
 static void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 {
@@ -270,14 +307,19 @@ static void del_rfus(xmlDocPtr doc, bool only_assoc, bool iss30)
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
+
+	del_change_inline(xmlDocGetRootElement(doc), iss30);
 }
 
 static void del_marks(xmlDocPtr doc, bool iss30)
 {
 	xmlXPathContextPtr ctx;
+
 	ctx = xmlXPathNewContext(doc);
 	del_rfu_attrs(ctx, iss30);
 	xmlXPathFreeContext(ctx);
+
+	del_change_inline(xmlDocGetRootElement(doc), iss30);
 }
 
 static void set_unverified(xmlDocPtr doc, bool iss30)
