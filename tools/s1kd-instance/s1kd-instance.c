@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.3.7"
+#define VERSION "9.4.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2016,9 +2016,22 @@ static void set_issue(xmlDocPtr dm, char *issinfo, bool incr_iss)
 	if (strcmp(issue, "000") == 0 || (strcmp(issue, "001") == 0 && strcmp(inwork, "00") == 0)) {
 		remove_change_markup(dm);
 		set_issue_type(dm, "new");
-	/* Otherwise, default to "changed". */
+	/* Otherwise, try to default to the issue type of the master. */
 	} else {
-		set_issue_type(dm, "changed");
+		xmlChar *type;
+
+		type = first_xpath_value(dm, NULL, BAD_CAST "//@issueType");
+
+		/* If the master is "new" but the target issue cannot be,
+		 * default to "status" as their should be no change marks. */
+		if (xmlStrcmp(type, BAD_CAST "new") == 0) {
+			set_issue_type(dm, "status");
+		/* Otherwise, use the master's issue type. */
+		} else {
+			set_issue_type(dm, (char *) type);
+		}
+
+		xmlFree(type);
 	}
 
 	if (xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") == 0) {

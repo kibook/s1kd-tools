@@ -202,8 +202,11 @@ Setting the issue of the instance will also set a default issue type:
 -   If the issue is 000-01 thru 001-00, the default issue type will be
     "new".
 
--   If the issue is 001-01 and up, the default issue type will be
-    "changed".
+-   If the issue is 001-01 and up and the master is not "new", the
+    default issue type will be that of the master.
+
+-   If the issue is 001-01 and up but the master is "new", the default
+    issue type will be "status".
 
 A different issue type than the default can be set with the -z
 (--issue-type) option.

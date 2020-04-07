@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="049" inWork="00"/>
+        <issueInfo issueNumber="049" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="27"/>
+        <issueDate year="2020" month="04" day="07"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,13 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -^ (--remove-deleted) option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="0" updateReasonType="urt02">
-        <simplePara>The s1kd-transform tool has been removed.</simplePara>
+        <simplePara>Change issue type behaviour with -n (--issue).</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -314,8 +308,11 @@
                     <listItem>
                       <para>If the issue is 000-01 thru 001-00, the default issue type will be "new".</para>
                     </listItem>
-                    <listItem>
-                      <para>If the issue is 001-01 and up, the default issue type will be "changed".</para>
+                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                      <para>If the issue is 001-01 and up and the master is not "new", the default issue type will be that of the master.</para>
+                    </listItem>
+                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>If the issue is 001-01 and up but the master is "new", the default issue type will be "status".</para>
                     </listItem>
                   </randomList>
                   A different issue type than the default can be set with the -z (--issue-type) option.
@@ -611,7 +608,7 @@
                 <para>Add dependency tests from the CCT to assertions that use the dependant values.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-^, --remove-deleted</listItemTerm>
               <listItemDefinition>
                 <para>Remove elements with change type of "delete" in the resulting instance. If -w (--whole-objects) is specified, then no instance will be created for objects with an issue type of "deleted".</para>
@@ -640,7 +637,7 @@
                 <para>Load the external DTD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--huge</listItemTerm>
               <listItemDefinition>
                 <para>Remove any internal arbitrary parser limits.</para>
@@ -658,13 +655,13 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-errors</listItemTerm>
               <listItemDefinition>
                 <para>Emit errors from parser.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-warnings</listItemTerm>
               <listItemDefinition>
                 <para>Emit warnings from parser.</para>
@@ -1253,7 +1250,7 @@ Applies to version A when the weather is icy.
         </para>
         <para>Writing out a data module from stdin to a directory with automatic naming:</para>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="0" changeType="modify" reasonForUpdateRefIds="rfu-0003">$ xml-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
+          <verbatimText verbatimStyle="vs24">$ xml-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
         </para>
       </levelledPara>
     </description>
