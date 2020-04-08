@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.4.0"
+#define VERSION "9.4.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -78,6 +78,10 @@
  */
 #define DEFAULT_ORIG_CODE "S1KDI"
 #define DEFAULT_ORIG_NAME "s1kd-instance tool"
+
+/* Text of the default RFU added when a "new" master produces non-new
+ * instances. */
+#define DEFAULT_RFU BAD_CAST "New master"
 
 /* Search for ACT/PCT recursively. */
 static bool recursive_search = false;
@@ -1975,6 +1979,39 @@ static void set_issue_type(xmlDocPtr doc, const char *type)
 	}
 }
 
+/* Add a default RFU when a "new" master produces non-new instances. */
+static void add_default_rfu(xmlDocPtr dm)
+{
+	xmlNodePtr node, rfu;
+	bool iss30;
+
+	/* Issue 4.2+ allows "new" DMs to have RFUs, so use this instead if
+	 * present. */
+	if (first_xpath_node(dm, NULL, BAD_CAST "//rfu|//reasonForUpdate")) {
+		return;
+	}
+
+	node = first_xpath_node(dm, NULL, BAD_CAST
+		"("
+		"//dmStatus/*|//status/*|"
+		"//pmStatus/*|//pmstatus/*|"
+		"//commentStatus/*|"
+		"//ddnStatus/*|"
+		"//dmlStatus/*|"
+		"//scormContentPackageStatus/*"
+		")[not(self::productSafety or self::remarks)][last()]");
+
+	if (!node) {
+		return;
+	}
+
+	iss30 = xmlStrcmp(node->parent->name, BAD_CAST "status") == 0 || xmlStrcmp(node->parent->name, BAD_CAST "pmstatus") == 0;
+
+	rfu = xmlNewNode(node->ns, BAD_CAST (iss30 ? "rfu" : "reasonForUpdate"));
+	xmlAddNextSibling(node, rfu);
+	xmlNewTextChild(rfu, rfu->ns, BAD_CAST (iss30 ? "p" : "simplePara"), DEFAULT_RFU);
+}
+
 /* Set the issue and inwork numbers of the instance. */
 static void set_issue(xmlDocPtr dm, char *issinfo, bool incr_iss)
 {
@@ -2020,12 +2057,13 @@ static void set_issue(xmlDocPtr dm, char *issinfo, bool incr_iss)
 	} else {
 		xmlChar *type;
 
-		type = first_xpath_value(dm, NULL, BAD_CAST "//@issueType");
+		type = first_xpath_value(dm, NULL, BAD_CAST "//@issueType|//issno/@type");
 
 		/* If the master is "new" but the target issue cannot be,
 		 * default to "status" as their should be no change marks. */
 		if (xmlStrcmp(type, BAD_CAST "new") == 0) {
 			set_issue_type(dm, "status");
+			add_default_rfu(dm);
 		/* Otherwise, use the master's issue type. */
 		} else {
 			set_issue_type(dm, (char *) type);
@@ -4190,6 +4228,7 @@ int main(int argc, char **argv)
 				strncpy(language, optarg, 255);
 				break;
 			case 'm':
+				free(remarks);
 				remarks = strdup(optarg);
 				break;
 			case 'N':
