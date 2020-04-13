@@ -176,7 +176,7 @@ Show only unmatched reference errors, or unmatched codes if combined
 with the -a option.
 
 -v, --verbose  
-Verbose output.
+Verbose output. Specify multiple times to increase the verbosity.
 
 -w, --where-used  
 Instead of listing references contained within specified objects, list

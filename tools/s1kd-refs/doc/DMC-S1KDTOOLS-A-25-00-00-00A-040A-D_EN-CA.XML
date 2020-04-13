@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="27"/>
+        <issueDate year="2020" month="04" day="13"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,13 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -B (--ipd), -b (--ipd-sns), -K (--csn), -k (--ipd-dcv) and -^ (--remove-deleted) options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Include filename of matched objects separately from reference code.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
+        <simplePara>Add debug level of verbose output.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -58,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
           [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
           [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]]]></verbatimText>
         </para>
@@ -91,14 +85,14 @@
                 <para>List all references, both matched and unmatched.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-B, -C, -D, -E, -G, -H, -K, -L, -P, -S, -T, -Y, -Z</listItemTerm>
               <listItemDefinition>
                 <para>List references to IPDs, comments, data modules, external publications, ICNs, hotspots, CSNs, data management lists, publication modules, SCORM content packages, referred fragments, repository source DMs and source objects respectively. If none are specified, -BCDEGHKLPSTYZ is assumed.</para>
                 <para>The following long options can also be used for each: --ipd, --com, --dm, --epr, --icn, --hotspot, --csn, --dml, --pm, --smc, --fragment, --repository, --source.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-b, --ipd-sns &lt;SNS&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the SNS for non-chapterized IPD data modules, in the form of SYSTEM-SUBSYSTEM-ASSY (for example, "ZD-00-35"). This code is used to resolve non-chapterized CSN references.</para>
@@ -165,7 +159,7 @@
                 <para>Specify a custom XPath expression to use when matching hotspots (-H) in XML-based ICN formats.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-k, --ipd-dcv &lt;pattern&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a pattern used to determine the disassembly code variant for IPD data modules when resolving CSN references.</para>
@@ -244,13 +238,13 @@
                 <para>Specify a custom format for printed references. &lt;fmt&gt; is a format string, where the following variables can be given:</para>
                 <para>
                   <randomList>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>%file% - The filename of the referenced object (nothing is printed if no file is matched).</para>
                     </listItem>
                     <listItem>
                       <para>%line% - The line number where the reference occurs in the source.</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">
+                    <listItem>
                       <para>%ref% - The reference. May be a code (if no file is matched), a file name (for objects where a file is matched) or a file name + fragment name.</para>
                     </listItem>
                     <listItem>
@@ -279,7 +273,7 @@
             <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
-                <para>Verbose output.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Verbose output. Specify multiple times to increase the verbosity.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -307,7 +301,7 @@
                 <para>Use a custom <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-^, --remove-deleted</listItemTerm>
               <listItemDefinition>
                 <para>List references with elements that have a change type of "delete" removed.</para>
@@ -336,7 +330,7 @@
                 <para>Load the external DTD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>--huge</listItemTerm>
               <listItemDefinition>
                 <para>Remove any internal arbitrary parser limits.</para>
@@ -354,13 +348,13 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>--parser-errors</listItemTerm>
               <listItemDefinition>
                 <para>Emit errors from parser.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>--parser-warnings</listItemTerm>
               <listItemDefinition>
                 <para>Emit warnings from parser.</para>
@@ -446,7 +440,7 @@
                 <para>stdin did not contain valid XML and not in list mode (-l).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>4</listItemTerm>
               <listItemDefinition>
                 <para>The non-chapterized SNS specified (-b) is not valid.</para>
@@ -466,7 +460,7 @@
   ICN-12345-00001-001-01.JPG]]></verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>CSN references</title>
           <para>
             These examples are based on the following CSN reference:

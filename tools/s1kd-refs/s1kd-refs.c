@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.14.3"
+#define VERSION "4.15.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -29,6 +29,7 @@
 #define F_UNMATCHED FAIL_PREFIX "Unmatched references in %s\n"
 
 #define I_WHEREUSED INF_PREFIX "Searching for references to %s...\n"
+#define I_UPDATE_REF INF_PREFIX "%s: Updating reference %s to match %s...\n"
 
 #define EXIT_UNMATCHED_REF 1
 #define EXIT_OUT_OF_MEMORY 2
@@ -38,8 +39,7 @@
 /* List only references found in the content section. */
 static bool contentOnly = false;
 
-/* Do not display errors. */
-static bool quiet = false;
+static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 /* Assume objects were created with the -N option. */
 static bool noIssue = false;
@@ -142,9 +142,6 @@ static long unsigned maxListedFiles = 1;
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
-
-/* Verbose output. */
-static bool verbose = false;
 
 /* External pub list. */
 static xmlDocPtr externalPubs = NULL;
@@ -891,7 +888,7 @@ static int matchHotspot(xmlNodePtr ref, xmlDocPtr doc, const char *code, const c
 			tagUnmatchedRef(ref);
 		} else if (showUnmatched) {
 			printMatchedFn(ref, src, s, fname);
-		} else if (!quiet) {
+		} else if (verbosity >= NORMAL) {
 			printUnmatchedFn(ref, src, s, fname);
 		}
 
@@ -1000,7 +997,7 @@ static int matchFragment(xmlDocPtr doc, xmlNodePtr ref, const char *code, const 
 			tagUnmatchedRef(ref);
 		} else if (showUnmatched) {
 			printMatchedFn(ref, src, s, doc ? fname : NULL);
-		} else if (!quiet) {
+		} else if (verbosity >= NORMAL) {
 			printUnmatchedFn(ref, src, s, doc ? fname : NULL);
 		}
 
@@ -1546,7 +1543,7 @@ static int matchCsnItem(xmlDocPtr doc, xmlNodePtr ref, xmlChar *csn,
 			tagUnmatchedRef(ref);
 		} else if (showUnmatched) {
 			printMatchedFn(ref, src, s, doc ? fname : NULL);
-		} else if (!quiet) {
+		} else if (verbosity >= NORMAL) {
 			printUnmatchedFn(ref, src, s, doc ? fname : NULL);
 		}
 
@@ -1600,6 +1597,10 @@ static int getCsnItem(xmlNodePtr ref, const char *src)
 static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, const char *fname)
 {
 	xmlNodePtr ref = *refptr;
+
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_UPDATE_REF, src, code, fname);
+	}
 
 	if (xmlStrcmp(ref->name, BAD_CAST "dmRef") == 0) {
 		xmlDocPtr doc;
@@ -1970,7 +1971,7 @@ static int printReference(xmlNodePtr *refptr, const char *src, int show, const c
 		tagUnmatchedRef(ref);
 	} else if (showUnmatched) {
 		printMatchedFn(ref, src, code, NULL);
-	} else if (!quiet) {
+	} else if (verbosity >= NORMAL) {
 		printUnmatchedFn(ref, src, code, NULL);
 	}
 
@@ -2111,7 +2112,7 @@ static int listReferences(const char *path, int show, const char *targetRef, int
 	xmlXPathFreeContext(ctx);
 	xmlFreeDoc(doc);
 
-	if (verbose && !targetRef) {
+	if (verbosity >= VERBOSE && !targetRef) {
 		fprintf(stderr, unmatched ? F_UNMATCHED : S_UNMATCHED, path);
 	}
 
@@ -2225,7 +2226,7 @@ static int listWhereUsed(const char *path, int show)
 		addFile(path);
 	}
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
 		fprintf(stderr, I_WHEREUSED, path);
 	}
 
@@ -2483,7 +2484,7 @@ int main(int argc, char **argv)
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
 			case 'q':
-				quiet = true;
+				--verbosity;
 				break;
 			case 'c':
 				contentOnly = true;
@@ -2571,7 +2572,7 @@ int main(int argc, char **argv)
 				outputTree = true;
 				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'm':
 				looseMatch = false;
