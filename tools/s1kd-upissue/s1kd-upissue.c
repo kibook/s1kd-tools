@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "2.0.1"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,9 +29,10 @@
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-4defHIilmNqRruvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-04defHIilmNqRruvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
+	puts("  -0, --unverified             Set the quality assurance to unverified.");
 	puts("  -1, --first-ver <type>       Set first verification type.");
 	puts("  -2, --second-ver <type>      Set second verification type.");
 	puts("  -4, --remove-marks           Remove change marks (but not RFUs).");
@@ -46,7 +47,7 @@ static void show_help(void)
 	puts("  -l, --list                   Treat input as list of objects.");
 	puts("  -m, --modify                 Modify metadata without upissuing.");
 	puts("  -N, --omit-issue             Omit issue/inwork numbers from filename.");
-	puts("  -q, --(keep|reset)-qa        Keep quality assurance from old issue. In -m mode, set to unverified.");
+	puts("  -q, --keep-qa                Keep quality assurance from old issue.");
 	puts("  -R, --keep-unassoc-marks     Only delete change marks associated with an RFU.");
 	puts("  -r, --(keep|remove)-changes  Keep RFUs and change marks from old issue. In -m mode, remove them.");
 	puts("  -s, --status <status>        Set change status type.");
@@ -344,7 +345,7 @@ static void set_unverified(xmlDocPtr doc, bool iss30)
 
 static void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 {
-	xmlNodePtr qa, unverif;
+	xmlNodePtr qa, unverif, ver1, ver2;
 
 	if (!(firstver || secondver))
 		return;
@@ -361,24 +362,39 @@ static void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 		xmlFreeNode(unverif);
 	}
 
+	ver1 = firstXPathNode(iss30 ? "//firstver" : "//firstVerification", doc);
+	ver2 = firstXPathNode(iss30 ? "//secver" : "//secondVerification", doc);
+
 	if (firstver) {
-		xmlNodePtr ver1;
-		ver1 = firstXPathNode(iss30 ? "//firstver" : "//firstVerification", doc);
+		if (!secondver) {
+			xmlNodePtr ver2;
+			ver2 = firstXPathNode(iss30 ? "//secver" : "//secondVerification", doc);
+			if (ver2) {
+				xmlUnlinkNode(ver2);
+				xmlFreeNode(ver2);
+			}
+		}
+
 		if (ver1) {
 			xmlUnlinkNode(ver1);
 			xmlFreeNode(ver1);
 		}
+
 		ver1 = xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "firstver" : "firstVerification"), NULL);
 		xmlSetProp(ver1, BAD_CAST (iss30 ? "type" : "verificationType"), BAD_CAST firstver);
 	}
 
 	if (secondver) {
-		xmlNodePtr ver2;
-		ver2 = firstXPathNode(iss30 ? "//secver" : "//secondVerification", doc);
+		if (!ver1) {
+			ver1 = xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "firstver" : "firstVerification"), NULL);
+			xmlSetProp(ver1, BAD_CAST (iss30 ? "type" : "verificationType"), BAD_CAST secondver);
+		}
+
 		if (ver2) {
 			xmlUnlinkNode(ver2);
 			xmlFreeNode(ver2);
 		}
+
 		ver2 = xmlNewChild(qa, NULL, BAD_CAST (iss30 ? "secver" : "secondVerification"), NULL);
 		xmlSetProp(ver2, BAD_CAST (iss30 ? "type" : "verificationType"), BAD_CAST secondver);
 	}
@@ -483,7 +499,7 @@ static bool no_issue = false;
 static bool keep_rfus = false;
 static bool set_date = true;
 static bool only_assoc_rfus = false;
-static bool set_unverif = true;
+static bool reset_qa = true;
 static bool dry_run = false;
 static char *firstver = NULL;
 static char *secondver = NULL;
@@ -495,6 +511,7 @@ static bool only_mod = false;
 static bool clean_rfus = false;
 static char *issdate = NULL;
 static bool remove_marks = false;
+static bool set_unverif = false;
 
 static void upissue(const char *path)
 {
@@ -543,6 +560,10 @@ static void upissue(const char *path)
 			rem_delete_elems(dmdoc);
 		}
 
+		if (set_unverif) {
+			set_unverified(dmdoc, iss30);
+		}
+
 		add_rfus(dmdoc, rfus, iss30);
 		set_qa(dmdoc, firstver, secondver, iss30);
 		if (status) {
@@ -552,7 +573,6 @@ static void upissue(const char *path)
 		/* The following options have the opposite effect in -m mode:
 		 * -I sets the date
 		 * -r removes RFUs
-		 * -q sets the QA status to unverified
 		 */
 		if (!set_date) {
 			set_iss_date(dmdoc, issdate);
@@ -561,9 +581,6 @@ static void upissue(const char *path)
 			del_rfus(dmdoc, only_assoc_rfus, iss30);
 		} else if (remove_marks) {
 			del_marks(dmdoc, iss30);
-		}
-		if (!set_unverif) {
-			set_unverified(dmdoc, iss30);
 		}
 
 		if (overwrite) {
@@ -690,12 +707,18 @@ static void upissue(const char *path)
 				}
 
 				/* Set unverified */
-				if (set_unverif) {
+				if (reset_qa) {
 					set_unverified(dmdoc, iss30);
 				}
-		/* Or, remove "delete"d elements any time. */
-		} else if (remdel) {
-			rem_delete_elems(dmdoc);
+		/* Or, perform certain actions any time. */
+		} else {
+			if (remdel) {
+				rem_delete_elems(dmdoc);
+			}
+
+			if (set_unverif) {
+				set_unverified(dmdoc, iss30);
+			}
 		}
 
 		if (set_date) {
@@ -803,10 +826,11 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq1:2:4delc:t:Hwmuz:^h?";
+	const char *sopts = "ivs:NfrRIq01:2:4delc:t:Hwmuz:^h?";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
+		{"unverified"        , no_argument      , 0, '0'},
 		{"first-ver"         , required_argument, 0, '1'},
 		{"second-ver"        , required_argument, 0, '2'},
 		{"remove-marks"      , no_argument      , 0, '4'},
@@ -821,7 +845,6 @@ int main(int argc, char **argv)
 		{"modify"            , no_argument      , 0, 'm'},
 		{"omit-issue"        , no_argument      , 0, 'N'},
 		{"keep-qa"           , no_argument      , 0, 'q'},
-		{"reset-qa"          , no_argument      , 0, 'q'},
 		{"keep-unassoc-marks", no_argument      , 0, 'R'},
 		{"keep-changes"      , no_argument      , 0, 'r'},
 		{"remove-changes"    , no_argument      , 0, 'r'},
@@ -848,6 +871,9 @@ int main(int argc, char **argv)
 					return 0;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				break;
+			case '0':
+				set_unverif = true;
 				break;
 			case '1':
 				firstver = strdup(optarg);
@@ -889,7 +915,7 @@ int main(int argc, char **argv)
 				overwrite = true;
 				break;
 			case 'q':
-				set_unverif = false;
+				reset_qa = false;
 				break;
 			case 'R':
 				only_assoc_rfus = true;

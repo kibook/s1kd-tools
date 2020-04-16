@@ -6,7 +6,7 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-4defHIilmNqRruvw^] [-1 <type>] [-2 <type>]
+    s1kd-upissue [-04defHIilmNqRruvw^] [-1 <type>] [-2 <type>]
                  [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
                  [<file>...]
 
@@ -24,11 +24,19 @@ are simply copied.
 OPTIONS
 =======
 
+-0, --unverified  
+Set the quality assurance to unverified.
+
 -1, --first-ver &lt;type&gt;  
-Set first verification type (tabtop, onobject, ttandoo).
+Set first verification type (tabtop, onobject, ttandoo). If the object
+is second verified and this option is specified without -2
+(--second-ver), the second verification will be unset.
 
 -2, --second-ver &lt;type&gt;  
-Set second verification type (tabtop, onobject, ttandoo).
+Set second verification type (tabtop, onobject, ttandoo). If the object
+is unverified and this option is specified without -1 (--first-ver), the
+first verification will be set as the same type as the second
+verification.
 
 -4, --remove-marks  
 Remove change markup on elements, but not RFUs, in the upissued object.
@@ -76,24 +84,19 @@ rather than CSDB objects themselves.
 
 -m, --modify  
 Modify issue-related metadata on objects without incrementing the issue
-or inwork numbers. The -I, -q, and -r options have the opposite effect
-in this mode. The modified objects are written to stdout by default, and
+or inwork numbers. The -I and -r options have the opposite effect in
+this mode. The modified objects are written to stdout by default, and
 the -f option can be used to change them in-place.
 
 -N, --omit-issue  
 Omit issue/inwork numbers from filename.
 
--q, --(keep\|reset)-qa  
+-q, --keep-qa  
 Keep quality assurance information from old issue. Normally, when
 upissuing an official CSDB object to the first in-work issue, the
 quality assurance is set back to "unverified". Specify this option to
 indicate the upissue will not affect the contents of the CSDB object,
 and so does not require it to be re-verified.
-
-In -m mode, this option has the opposite effect, causing the QA status
-to be reset. The two alternative long option names, --keep-qa and
---reset-qa, allow for the intended meaning of this option to be
-expressed clearly in each mode.
 
 -R, --keep-unassoc-marks  
 Delete only change markup on elements associated with an RFU (by use of

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="27"/>
+        <issueDate year="2020" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,10 +39,10 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
+        <simplePara>Add -0 (--unverified) option.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Rename -D to -^.</simplePara>
+        <simplePara>Change behaviour of -q, -1 and -2 options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-upissue [-4defHIilmNqRruvw^] [-1 <type>] [-2 <type>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-upissue [-04defHIilmNqRruvw^] [-1 <type>] [-2 <type>]
              [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
              [<file>...]]]></verbatimText>
         </para>
@@ -69,16 +69,22 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-0, --unverified</listItemTerm>
+              <listItemDefinition>
+                <para>Set the quality assurance to unverified.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-1, --first-ver &lt;type&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set first verification type (tabtop, onobject, ttandoo).</para>
+                <para>Set first verification type (tabtop, onobject, ttandoo). If the object is second verified and this option is specified without -2 (--second-ver), the second verification will be unset.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
               <listItemTerm>-2, --second-ver &lt;type&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Set second verification type (tabtop, onobject, ttandoo).</para>
+                <para>Set second verification type (tabtop, onobject, ttandoo). If the object is unverified and this option is specified without -1 (--first-ver), the first verification will be set as the same type as the second verification.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -145,7 +151,7 @@
             <definitionListItem>
               <listItemTerm>-m, --modify</listItemTerm>
               <listItemDefinition>
-                <para>Modify issue-related metadata on objects without incrementing the issue or inwork numbers. The -I, -q, and -r options have the opposite effect in this mode. The modified objects are written to stdout by default, and the -f option can be used to change them in-place.</para>
+                <para>Modify issue-related metadata on objects without incrementing the issue or inwork numbers. The -I and -r options have the opposite effect in this mode. The modified objects are written to stdout by default, and the -f option can be used to change them in-place.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -155,10 +161,9 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-q, --(keep|reset)-qa</listItemTerm>
+              <listItemTerm>-q, --keep-qa</listItemTerm>
               <listItemDefinition>
                 <para>Keep quality assurance information from old issue. Normally, when upissuing an official CSDB object to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the CSDB object, and so does not require it to be re-verified.</para>
-                <para>In -m mode, this option has the opposite effect, causing the QA status to be reset. The two alternative long option names, --keep-qa and --reset-qa, allow for the intended meaning of this option to be expressed clearly in each mode.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -211,7 +216,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">-^, --remove-deleted</listItemTerm>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
               <listItemDefinition>
                 <para>Remove elements with change type of "delete". These elements are automatically removed along with all change marks and RFUs when an object is upissued from official to the next inwork issue. This option will remove them when upissuing between inwork issues, or when making the object official.</para>
               </listItemDefinition>
@@ -239,7 +244,7 @@
                 <para>Load the external DTD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--huge</listItemTerm>
               <listItemDefinition>
                 <para>Remove any internal arbitrary parser limits.</para>
@@ -257,13 +262,13 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-errors</listItemTerm>
               <listItemDefinition>
                 <para>Emit errors from parser.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-warnings</listItemTerm>
               <listItemDefinition>
                 <para>Emit warnings from parser.</para>
