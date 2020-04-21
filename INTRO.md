@@ -74,9 +74,6 @@ The s1kd-tools can support multiple parts of the basic S1000D process:
     The **s1kd-sns** tool can be used to organize the CSDB using a given
     SNS structure.
 
-    The **s1kd-transform** tool applies XSLT transformations to CSDB
-    objects.
-
     The **s1kd-upissue** tool moves CSDB objects through the standard
     S1000D workflow, between "inwork" (draft) and "official" states.
 
@@ -198,8 +195,6 @@ Manpages for each tool:
 -   s1kd-sns(1)
 
 -   s1kd-syncrefs(1)
-
--   s1kd-transform(1)
 
 -   s1kd-uom(1)
 
