@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.3.0"
+#define VERSION "4.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -141,7 +141,9 @@ static void show_issue_date(xmlNodePtr issue_date, struct opts *opts)
 {
 	xmlChar *date;
 	date = get_issue_date(issue_date, opts);
-	printf("%s", (char *) date);
+	if (date) {
+		printf("%s", (char *) date);
+	}
 	xmlFree(date);
 }
 
@@ -162,8 +164,10 @@ static int edit_issue_date(xmlNodePtr issue_date, const char *val)
 
 static void show_simple_node(xmlNodePtr node, struct opts *opts)
 {
-	char *content = (char *) xmlNodeGetContent(node);
-	printf("%s", content);
+	xmlChar *content = xmlNodeGetContent(node);
+	if (content) {
+		printf("%s", (char *) content);
+	}
 	xmlFree(content);
 }
 
@@ -209,8 +213,10 @@ static int create_info_name_variant(xmlXPathContextPtr ctxt, const char *val)
 
 static void show_simple_attr(xmlNodePtr node, const char *attr, struct opts *opts)
 {
-	char *text = (char *) xmlGetProp(node, BAD_CAST attr);
-	printf("%s", text);
+	xmlChar *text = xmlGetProp(node, BAD_CAST attr);
+	if (text) {
+		printf("%s", (char *) text);
+	}
 	xmlFree(text);
 }
 
@@ -329,7 +335,7 @@ static xmlChar *get_issue(xmlNodePtr node, struct opts *opts)
 
 	url = xmlGetNsProp(node, BAD_CAST "noNamespaceSchemaLocation", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
 
-	if (regexec(&re, (char *) url, 3, pmatch, 0) == 0) {
+	if (url && regexec(&re, (char *) url, 3, pmatch, 0) == 0) {
 		int len1, len2, n;
 
 		len1 = pmatch[1].rm_eo - pmatch[1].rm_so;
@@ -342,12 +348,13 @@ static xmlChar *get_issue(xmlNodePtr node, struct opts *opts)
 		xmlStrPrintf(iss, n, "%.*s.%.*s",
 			len1, url + pmatch[1].rm_so,
 			len2, url + pmatch[2].rm_so);
+
+		xmlFree(url);
 	} else {
 		iss = NULL;
 	}
 
 	regfree(&re);
-	xmlFree(url);
 
 	return iss;
 }
@@ -441,13 +448,17 @@ static xmlChar *get_schema(xmlNodePtr node, struct opts *opts)
 
 	url = (char *) xmlGetProp(node, BAD_CAST "noNamespaceSchemaLocation");
 
-	s = strrchr(url, '/');
-	s = s ? s + 1 : url;
-	e = strrchr(s, '.');
-	if (e) *e = '\0';
-	r = xmlCharStrdup(s);
+	if (url) {
+		s = strrchr(url, '/');
+		s = s ? s + 1 : url;
+		e = strrchr(s, '.');
+		if (e) *e = '\0';
+		r = xmlCharStrdup(s);
 
-	xmlFree(url);
+		xmlFree(url);
+	} else {
+		r = NULL;
+	}
 
 	return r;
 }
@@ -456,7 +467,9 @@ static void show_schema(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *s;
 	s = get_schema(node, opts);
-	printf("%s", (char *) s);
+	if (s) {
+		printf("%s", (char *) s);
+	}
 	free(s);
 }
 
@@ -563,7 +576,9 @@ static void show_dmcode(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *code;
 	code = get_dmcode(node, opts);
-	printf("%s", (char *) code);
+	if (code) {
+		printf("%s", (char *) code);
+	}
 	free(code);
 }
 
@@ -649,12 +664,14 @@ static void show_ddncode(xmlNodePtr node, struct opts *opts)
 	diyear  = (char *) first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
 	seqnum  = (char *) first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
 
-	printf("%s-%s-%s-%s-%s",
-		modelic,
-		sendid,
-		recvid,
-		diyear,
-		seqnum);
+	if (modelic && sendid && recvid && diyear && seqnum) {
+		printf("%s-%s-%s-%s-%s",
+			modelic,
+			sendid,
+			recvid,
+			diyear,
+			seqnum);
+	}
 
 	xmlFree(modelic);
 	xmlFree(sendid);
@@ -673,12 +690,14 @@ static void show_dmlcode(xmlNodePtr node, struct opts *opts)
 	diyear  = (char *) first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
 	seqnum  = (char *) first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
 
-	printf("%s-%s-%s-%s-%s",
-		modelic,
-		sendid,
-		dmltype,
-		diyear,
-		seqnum);
+	if (modelic && sendid && dmltype && diyear && seqnum) {
+		printf("%s-%s-%s-%s-%s",
+			modelic,
+			sendid,
+			dmltype,
+			diyear,
+			seqnum);
+	}
 
 	xmlFree(modelic);
 	xmlFree(sendid);
@@ -696,11 +715,13 @@ static void show_pmcode(xmlNodePtr node, struct opts *opts)
 	pmnumber = (char *) first_xpath_string(node, BAD_CAST "@pmNumber|pmnumber");
 	pmvolume = (char *) first_xpath_string(node, BAD_CAST "@pmVolume|pmvolume");
 
-	printf("%s-%s-%s-%s",
-		modelic,
-		pmissuer,
-		pmnumber,
-		pmvolume);
+	if (modelic && pmissuer && pmnumber && pmvolume) {
+		printf("%s-%s-%s-%s",
+			modelic,
+			pmissuer,
+			pmnumber,
+			pmvolume);
+	}
 
 	xmlFree(modelic);
 	xmlFree(pmissuer);
@@ -819,12 +840,14 @@ static void show_comment_code(xmlNodePtr node, struct opts *opts)
 		comment_type       = (char *) first_xpath_string(node, BAD_CAST "ctype/@type");
 	}
 
-	printf("%s-%s-%s-%s-%s",
-		model_ident_code,
-		sender_ident,
-		year_of_data_issue,
-		seq_number,
-		comment_type);
+	if (model_ident_code && sender_ident && year_of_data_issue && seq_number && comment_type) {
+		printf("%s-%s-%s-%s-%s",
+			model_ident_code,
+			sender_ident,
+			year_of_data_issue,
+			seq_number,
+			comment_type);
+	}
 
 	xmlFree(model_ident_code);
 	xmlFree(sender_ident);
@@ -950,7 +973,9 @@ static void show_issue_info(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *s;
 	s = get_issue_info(node, opts);
-	printf("%s", (char *) s);
+	if (s) {
+		printf("%s", (char *) s);
+	}
 	xmlFree(s);
 }
 
@@ -1470,9 +1495,10 @@ static xmlChar *get_qa(xmlNodePtr node, struct opts *opts)
 static void show_qa(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *qa;
-
 	qa = get_qa(node, opts);
-	printf("%s", (char *) qa);
+	if (qa) {
+		printf("%s", (char *) qa);
+	}
 	xmlFree(qa);
 }
 
@@ -1594,7 +1620,9 @@ static xmlChar *get_remarks_or_rfu(xmlNodePtr node, struct opts *opts)
 static void show_remarks_or_rfu(xmlNodePtr node, struct opts *opts)
 {
 	xmlChar *s = get_remarks_or_rfu(node, opts);
-	printf("%s", (char *) s);
+	if (s) {
+		printf("%s", (char *) s);
+	}
 	xmlFree(s);
 }
 
