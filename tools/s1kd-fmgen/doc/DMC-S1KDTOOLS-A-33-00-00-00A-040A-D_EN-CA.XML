@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="00"/>
+        <issueInfo issueNumber="022" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="03" day="27"/>
+        <issueDate year="2020" month="05" day="01"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,12 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add --huge, --parser-errors and --parser-warnings parser options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Add ignoreDel attribute to .fmtypes file.</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -217,7 +211,7 @@
                 <para>Load the external DTD.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--huge</listItemTerm>
               <listItemDefinition>
                 <para>Remove any internal arbitrary parser limits.</para>
@@ -235,13 +229,13 @@
                 <para>Resolve entities.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-errors</listItemTerm>
               <listItemDefinition>
                 <para>Emit errors from parser.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>--parser-warnings</listItemTerm>
               <listItemDefinition>
                 <para>Emit warnings from parser.</para>
@@ -259,7 +253,7 @@
           <title><verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file</title>
           <para>This file specifies a list of info codes to associate with a particular type of front matter.</para>
           <para>Optionally, a path to an XSLT script can be given for each info code, which will be used to generate the front matter instead of the built-in XSLT. The path to an XSLT script will be interpreted relative to the location of the <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> file (typically, the top directory of the CSDB). The -D option can be used to dump the built-in XSLT for a type of front matter as a starting point for a custom script.</para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+          <para>
             Optionally, in the XML format, the attribute <verbatimText verbatimStyle="vs13">ignoreDel</verbatimText> may be specified to control whether deleted data modules and elements are ignored when generating front matter contents. These are data modules with an issue type of "<verbatimText verbatimStyle="vs14">deleted</verbatimText>" and elements with a change type of "<verbatimText verbatimStyle="vs14">delete</verbatimText>". A value of "<verbatimText verbatimStyle="vs14">yes</verbatimText>" means deleted content will not be included, while "<verbatimText verbatimStyle="vs14">no</verbatimText>" means it will. If this attribute is not specified, then a default value will be used based on the type of front matter. The following types will ignore deleted content by default:
             <randomList>
               <listItem>
