@@ -18,17 +18,20 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-$(OUTPUT): $(SOURCE) elements_list.h generateDisplayText.h identity.h
+$(OUTPUT): $(SOURCE) elements_list.h generateDisplayText.h identity.h addTags.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 elements_list.h: elements.list
-	xxd -i elements.list > elements_list.h
+	xxd -i $< > $@
 
 generateDisplayText.h: generateDisplayText.xsl
-	xxd -i generateDisplayText.xsl > generateDisplayText.h
+	xxd -i $< > $@
+
+addTags.h: addTags.xsl
+	xxd -i $< > $@
 
 identity.h: ../common/identity.xsl
-	xxd -i ../common/identity.xsl > identity.h
+	xxd -i $< > $@
 
 .PHONY: docs clean maintainer-clean install uninstall
 

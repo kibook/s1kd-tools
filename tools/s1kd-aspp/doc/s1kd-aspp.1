@@ -14,6 +14,7 @@ s1kd\-aspp\ \-D
 s1kd\-aspp\ \-g\ [\-A\ <ACT>]\ [\-C\ <CCT>]\ [\-d\ <dir>]\ [\-F\ <fmt>]\ [\-G\ <XSL>]
 \ \ \ \ \ \ \ \ \ \ \ \ \ [\-cfklNqrv]\ [<object>...]
 s1kd\-aspp\ \-p\ [\-a\ <ID>]\ [\-flqv]\ [<object>...]
+s1kd\-aspp\ \-t\ <mode>\ [<object>...]
 \f[]
 .fi
 .SH DESCRIPTION
@@ -136,6 +137,24 @@ correct.
 .B \-r, \-\-recursive
 Search for ACT/CCT data modules recursively.
 .RS
+.RE
+.TP
+.B \-t, \-\-tags <mode>
+Add tags before elements containing the display text of the
+applicability annotation they reference, simulating the typical
+presentation of applicability annotations within the XML.
+.RS
+.PP
+If <mode> is "pi", the tags are inserted as processing instructions,
+named "s1kd\-aspp".
+This allows existing tags to be removed automatically before adding new
+ones.
+.PP
+If <mode> is "comment", the tags are inserted as XML comments.
+Existing comments will not be removed automatically.
+.PP
+If <mode> is "remove", tags will be removed without adding new ones.
+This only applies to the processing instruction tags.
 .RE
 .TP
 .B \-v, \-\-verbose

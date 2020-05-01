@@ -18,9 +18,10 @@
 #include "elements_list.h"
 #include "generateDisplayText.h"
 #include "identity.h"
+#include "addTags.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.3.0"
+#define VERSION "3.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -556,9 +557,39 @@ static void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr cct
 	}
 }
 
+/* Add tags containing the display text of the referenecd applic annotation. */
+static void addTags(xmlDocPtr doc, const char *tags)
+{
+	xmlDocPtr styledoc, res;
+	xsltStylesheetPtr style;
+	const char *params[3];
+	xmlNodePtr old;
+
+	styledoc = read_xml_mem((const char *) addTags_xsl, addTags_xsl_len);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	params[0] = "mode";
+	if (strcmp(tags, "comment") == 0) {
+		params[1] = "'comment'";
+	} else if (strcmp(tags, "pi") == 0) {
+		params[1] = "'pi'";
+	} else {
+		params[1] = "'remove'";
+	}
+	params[2] = NULL;
+
+	res = xsltApplyStylesheet(style, doc, params);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
 static void processFile(const char *in, const char *out, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
-	const char *format)
+	const char *format, const char *tags)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -597,6 +628,10 @@ static void processFile(const char *in, const char *out, bool process,
 		generateDisplayText(doc, all_acts, all_ccts, format);
 	}
 
+	if (tags) {
+		addTags(doc, tags);
+	}
+
 	save_xml_doc(doc, out);
 
 	/* The next data module could reference a different ACT/CCT, so
@@ -611,7 +646,7 @@ static void processFile(const char *in, const char *out, bool process,
 
 static void process_list(const char *path, bool overwrite, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
-	const char *format)
+	const char *format, const char *tags)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -629,7 +664,7 @@ static void process_list(const char *path, bool overwrite, bool process,
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		processFile(line, overwrite ? line : "-", process, genDispText, acts, ccts, findcts, format);
+		processFile(line, overwrite ? line : "-", process, genDispText, acts, ccts, findcts, format, tags);
 	}
 
 	if (path) {
@@ -685,10 +720,11 @@ int main(int argc, char **argv)
 	bool findcts = false;
 	bool islist = false;
 	char *format = NULL;
+	char *tags = NULL;
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:F:fG:gklNpqrvxh?";
+	const char *sopts = "A:a:C:cDd:F:fG:gklNpqrt:vxh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
@@ -708,6 +744,7 @@ int main(int argc, char **argv)
 		{"presentation", no_argument      , 0, 'p'},
 		{"quiet"       , no_argument      , 0, 'q'},
 		{"recursive"   , no_argument      , 0, 'r'},
+		{"tags"        , required_argument, 0, 't'},
 		{"verbose"     , no_argument      , 0, 'v'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -758,6 +795,7 @@ int main(int argc, char **argv)
 				break;
 			case 'F':
 				genDispText = true;
+				free(format);
 				format = strdup(optarg);
 				break;
 			case 'f':
@@ -765,6 +803,7 @@ int main(int argc, char **argv)
 				break;
 			case 'G':
 				genDispText = true;
+				free(customGenDispTextXsl);
 				customGenDispTextXsl = strdup(optarg);
 				break;
 			case 'g':
@@ -788,6 +827,10 @@ int main(int argc, char **argv)
 			case 'r':
 				recursive_search = true;
 				break;
+			case 't':
+				free(tags);
+				tags = strdup(optarg);
+				break;
 			case 'v':
 				++verbosity;
 				break;
@@ -800,19 +843,19 @@ int main(int argc, char **argv)
 
 	if (optind >= argc) {
 		if (islist) {
-			process_list(NULL, overwrite, process, genDispText, acts, ccts, findcts, format);
+			process_list(NULL, overwrite, process, genDispText, acts, ccts, findcts, format, tags);
 		} else {
-			processFile("-", "-", process, genDispText, acts, ccts, findcts, format);
+			processFile("-", "-", process, genDispText, acts, ccts, findcts, format, tags);
 		}
 	} else {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
 				process_list(argv[i], overwrite, process,
-					genDispText, acts, ccts, findcts, format);
+					genDispText, acts, ccts, findcts, format, tags);
 			} else {
 				processFile(argv[i], overwrite ? argv[i] : "-",
 					process, genDispText, acts,
-					ccts, findcts, format);
+					ccts, findcts, format, tags);
 			}
 		}
 	}
@@ -826,6 +869,7 @@ int main(int argc, char **argv)
 	free(customGenDispTextXsl);
 	free(search_dir);
 	free(format);
+	free(tags);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();
