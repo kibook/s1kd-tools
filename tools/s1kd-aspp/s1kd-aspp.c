@@ -21,7 +21,7 @@
 #include "addTags.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.4.0"
+#define VERSION "3.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -560,7 +560,7 @@ static void find_cross_ref_tables(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr cct
 /* Add tags containing the display text of the referenecd applic annotation. */
 static void addTags(xmlDocPtr doc, const char *tags)
 {
-	xmlDocPtr styledoc, res;
+	xmlDocPtr styledoc, src, res;
 	xsltStylesheetPtr style;
 	const char *params[3];
 	xmlNodePtr old;
@@ -578,7 +578,9 @@ static void addTags(xmlDocPtr doc, const char *tags)
 	}
 	params[2] = NULL;
 
-	res = xsltApplyStylesheet(style, doc, params);
+	src = xmlCopyDoc(doc, 1);
+	res = xsltApplyStylesheet(style, src, params);
+	xmlFreeDoc(src);
 
 	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
 	xmlFreeNode(old);
