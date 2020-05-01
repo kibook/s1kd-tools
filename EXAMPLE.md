@@ -432,14 +432,14 @@ Deleting data modules
 The basic cycle continues until a data module is deleted. "Deleting" a
 data module is a special case of upissuing:
 
-    $ s1kd-upissue -is deleted ...
+    $ s1kd-upissue -i -z deleted ...
 
 The data module is upissued to the next official issue, and it's issue
 type is set to "`deleted`".
 
 Deleted data modules may be reinstated later in a similar way:
 
-    $ s1kd-upissue -s rinstate-status ...
+    $ s1kd-upissue -z rinstate-status ...
 
 The data module is upissued to the next inwork issue, and the issue type
 is set to one of the "`rinstate-x"` types.
