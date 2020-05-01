@@ -6,17 +6,17 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="004" inWork="00"/>
+        <issueInfo issueNumber="005" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="09" day="06"/>
+        <issueDate year="2020" month="05" day="01"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -39,6 +39,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate updateReasonType="urt01">
+        <simplePara>Fix issue type.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -62,7 +65,11 @@
         <para>Debian (.deb) and Red Hat (.rpm) packages are provided to easily install, upgrade or uninstall the s1kd-tools on Linux systems using a package manager. The examples below focus on the standard <verbatimText>dpkg</verbatimText> (for Debian-based distributions) and <verbatimText>rpm</verbatimText> (for Red Hat-based distributions).</para>
         <levelledPara>
           <title>Installing</title>
-          <para>You can download the latest release of the s1kd-tools from <externalPubRef xlink:href="http://khzae.net/1/s1000d/s1kd-tools/releases/latest"><externalPubRefIdent><externalPubCode>http://khzae.net/1/s1000d/s1kd-tools/releases/latest</externalPubCode></externalPubRefIdent></externalPubRef>. Then use one of the following commands to install it:</para>
+          <para>You can download the latest release of the s1kd-tools from <externalPubRef xlink:href="http://khzae.net/1/s1000d/s1kd-tools/releases/latest">
+              <externalPubRefIdent>
+                <externalPubCode>http://khzae.net/1/s1000d/s1kd-tools/releases/latest</externalPubCode>
+              </externalPubRefIdent>
+            </externalPubRef>. Then use one of the following commands to install it:</para>
           <para>
             <emphasis>Debian:</emphasis>
             <verbatimText verbatimStyle="vs24"># dpkg -i s1kd-tools_[version]_[arch].deb</verbatimText>
