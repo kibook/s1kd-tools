@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "3.0.0"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,7 +29,7 @@
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-04defHIilmNqRruvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-s <status>] [-t <urt>] [-z <date>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-I <date>] [-t <urt>] [-z <type>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -0, --unverified             Set the quality assurance to unverified.");
@@ -42,7 +42,7 @@ static void show_help(void)
 	puts("  -f, --overwrite              Overwrite existing upissued object.");
 	puts("  -H, --highlight              Highlight the last RFU.");
 	puts("  -h, -?, --help               Show usage message.");
-	puts("  -I, --(keep|change)-date     Do not change issue date. In -m mode, change issue date.");
+	puts("  -I, --date <date>            The issue date to use for the upissued objects.");
 	puts("  -i, --official               Increase issue number instead of inwork.");
 	puts("  -l, --list                   Treat input as list of objects.");
 	puts("  -m, --modify                 Modify metadata without upissuing.");
@@ -50,12 +50,12 @@ static void show_help(void)
 	puts("  -q, --keep-qa                Keep quality assurance from old issue.");
 	puts("  -R, --keep-unassoc-marks     Only delete change marks associated with an RFU.");
 	puts("  -r, --(keep|remove)-changes  Keep RFUs and change marks from old issue. In -m mode, remove them.");
-	puts("  -s, --status <status>        Set change status type.");
+	puts("  -s, --(keep|change)-date     Do not change issue date. In -m mode, change issue date.");
 	puts("  -t, --type <urt>             Set the updateReasonType of the last RFU.");
 	puts("  -u, --clean-rfus             Remove unassociated RFUs.");
 	puts("  -v, --verbose                Print filename of upissued objects.");
 	puts("  -w, --lock                   Make old and official issues read-only.");
-	puts("  -z, --date <date>            The issue date to use for the upissued objects.");
+	puts("  -z, --issue-type <type>      Set the issue type of the new issue.");
 	puts("  -^, --remove-deleted         Remove \"delete\"d elements.");
 	puts("  --version                    Show version information");
 	LIBXML2_PARSE_LONGOPT_HELP
@@ -517,13 +517,15 @@ static void upissue(const char *path)
 {
 	char *issueNumber = NULL;
 	char *inWork = NULL;
-	int issueNumber_int;
-	int inWork_int;
+	int issueNumber_int = 0;
+	int inWork_int = 0;
 	char dmfile[PATH_MAX], cpfile[PATH_MAX];
 	xmlDocPtr dmdoc;
 	xmlNodePtr issueInfo;
 	xmlChar *issno_name, *inwork_name;
 	bool iss30 = false;
+	int up_issueNumber_int = 0;
+	int up_inWork_int = 0;
 	char upissued_issueNumber[32];
 	char upissued_inWork[32];
 	char *p, *i = NULL;
@@ -566,12 +568,13 @@ static void upissue(const char *path)
 
 		add_rfus(dmdoc, rfus, iss30);
 		set_qa(dmdoc, firstver, secondver, iss30);
+
 		if (status) {
 			set_status(dmdoc, status, iss30, issueInfo);
 		}
 
 		/* The following options have the opposite effect in -m mode:
-		 * -I sets the date
+		 * -s sets the date
 		 * -r removes RFUs
 		 */
 		if (!set_date) {
@@ -679,16 +682,18 @@ static void upissue(const char *path)
 	}
 
 	if (newissue) {
-		snprintf(upissued_issueNumber, 32, "%.3d", issueNumber_int + 1);
+		up_issueNumber_int = issueNumber_int + 1;
 		if (inWork) {
-			snprintf(upissued_inWork, 32, "%.2d", 0);
+			up_inWork_int = 0;
 		}
 	} else {
-		snprintf(upissued_issueNumber, 32, "%.3d", issueNumber_int);
+		up_issueNumber_int = issueNumber_int;
 		if (inWork) {
-			snprintf(upissued_inWork, 32, "%.2d", inWork_int + 1);
+			up_inWork_int = inWork_int + 1;
 		}
 	}
+	snprintf(upissued_issueNumber, 32, "%.3d", up_issueNumber_int);
+	snprintf(upissued_inWork, 32, "%.2d", up_inWork_int);
 
 	if (issueInfo) {
 		xmlSetProp(issueInfo, issno_name, BAD_CAST upissued_issueNumber);
@@ -728,14 +733,15 @@ static void upissue(const char *path)
 		set_qa(dmdoc, firstver, secondver, iss30);
 		add_rfus(dmdoc, rfus, iss30);
 
-		/* Default status is "new" before issue 1, and "changed" after */
-		if (issueNumber_int < 1 && !status) {
-			status = strdup("new");
-		} else if (!status) {
-			status = strdup("changed");
+		/* If an issue type is specified, use that. */
+		if (status) {
+			set_status(dmdoc, status, iss30, issueInfo);
+		/* Otherwise:
+		 * - if the object is official, default to "status"
+		 * - if the object is not official, keep the previous issue type. */
+		} else if (inWork_int == 0) {
+			set_status(dmdoc, "status", iss30, issueInfo);
 		}
-
-		set_status(dmdoc, status, iss30, issueInfo);
 
 		if (remove_marks) {
 			del_marks(dmdoc, iss30);
@@ -826,7 +832,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivs:NfrRIq01:2:4delc:t:Hwmuz:^h?";
+	const char *sopts = "ivsNfrRI:q01:2:4delc:t:Hwmuz:^h?";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -838,8 +844,8 @@ int main(int argc, char **argv)
 		{"dry-run"           , no_argument      , 0, 'd'},
 		{"erase"             , no_argument      , 0, 'e'},
 		{"overwrite"         , no_argument      , 0, 'f'},
-		{"keep-date"         , no_argument      , 0, 'I'},
-		{"change-date"       , no_argument      , 0, 'I'},
+		{"keep-date"         , no_argument      , 0, 's'},
+		{"change-date"       , no_argument      , 0, 's'},
 		{"official"          , no_argument      , 0, 'i'},
 		{"list"              , no_argument      , 0, 'l'},
 		{"modify"            , no_argument      , 0, 'm'},
@@ -848,13 +854,13 @@ int main(int argc, char **argv)
 		{"keep-unassoc-marks", no_argument      , 0, 'R'},
 		{"keep-changes"      , no_argument      , 0, 'r'},
 		{"remove-changes"    , no_argument      , 0, 'r'},
-		{"status"            , required_argument, 0, 's'},
+		{"date"              , required_argument, 0, 'I'},
 		{"type"              , required_argument, 0, 't'},
 		{"clean-rfus"        , no_argument      , 0, 'u'},
 		{"highlight"         , no_argument      , 0, 'H'},
 		{"verbose"           , no_argument      , 0, 'v'},
 		{"lock"              , no_argument      , 0, 'w'},
-		{"date"              , required_argument, 0, 'z'},
+		{"issue-type"        , required_argument, 0, 'z'},
 		{"remove-deleted"    , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -898,7 +904,7 @@ int main(int argc, char **argv)
 				overwrite = true;
 				break;
 			case 'I':
-				set_date = false;
+				issdate = strdup(optarg);
 				break;
 			case 'i':
 				newissue = true;
@@ -924,10 +930,7 @@ int main(int argc, char **argv)
 				keep_rfus = true;
 				break;
 			case 's':
-				status = strdup(optarg);
-				if (!(strcmp(status, "changed") == 0 || strcmp(status, "rinstate-changed") == 0)) {
-					remove_marks = true;
-				}
+				set_date = false;
 				break;
 			case 't':
 				xmlSetProp(rfus->last, BAD_CAST "updateReasonType", BAD_CAST optarg);
@@ -945,7 +948,10 @@ int main(int argc, char **argv)
 				lock = true;
 				break;
 			case 'z':
-				issdate = strdup(optarg);
+				status = strdup(optarg);
+				if (!(strcmp(status, "changed") == 0 || strcmp(status, "rinstate-changed") == 0)) {
+					remove_marks = true;
+				}
 				break;
 			case '^':
 				remdel = true;

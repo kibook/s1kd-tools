@@ -6,8 +6,8 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-04defHIilmNqRruvw^] [-1 <type>] [-2 <type>]
-                 [-c <reason>] [-s <status>] [-t <urt>] [-z <date>]
+    s1kd-upissue [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>]
+                 [-c <reason>] [-I <date>] [-t <urt>] [-z <type>]
                  [<file>...]
 
 DESCRIPTION
@@ -63,16 +63,9 @@ Mark the last specified reason for update (-c) as a highlight.
 -h, -?, --help  
 Show help/usage message.
 
--I, --(keep\|change)-date  
-Do not change issue date. Normally, when upissuing to the next inwork or
-official issue, the issue date is changed to the current date, or the
-date specified with the -z option. This option will keep the date of the
-previous inwork or official issue.
-
-In -m mode, this option has the opposite effect, causing the date to be
-changed. The two alternative long option names, --keep-date and
---change-date, allow for the intended meaning of this option to be
-expressed clearly in each mode.
+-I, --date &lt;date&gt;  
+Specify the issue date to use for the upissued object(s). Otherwise, the
+current date will be used.
 
 -i, --official  
 Increase the issue number of the CSDB object. By default, the in-work
@@ -115,8 +108,16 @@ RFUs and change marks to be removed. The two alternative long option
 names, --keep-changes and --remove-changes, allow for the intended
 meaning of this option to be expressed clearly in each mode.
 
--s, --status &lt;status&gt;  
-Set the status of the new issue. Default is 'changed'.
+-s, --(keep\|change)-date  
+Do not change issue date. Normally, when upissuing to the next inwork or
+official issue, the issue date is changed to the current date, or the
+date specified with the -z option. This option will keep the date of the
+previous inwork or official issue.
+
+In -m mode, this option has the opposite effect, causing the date to be
+changed. The two alternative long option names, --keep-date and
+--change-date, allow for the intended meaning of this option to be
+expressed clearly in each mode.
 
 -t, --type &lt;urt&gt;  
 Set the updateReasonType of the last specified reason for update (-c).
@@ -132,9 +133,17 @@ Print the file name of the upissued CSDB object.
 Make the old issue file read-only after upissuing. Official issues (-i)
 will also be made read-only when they are created.
 
--z, --date &lt;date&gt;  
-Specify the issue to use for the upissued object(s). Otherwise, the
-current date will be used.
+-z, --issue-type &lt;type&gt;  
+Set the issue type of the new issue.
+
+If this option is not specified, then the issue type of the new issue
+will be set as follows:
+
+-   if the previous issue is not an official issue (in-work 00), the
+    issue type of the new issue will be the same as the previous issue.
+
+-   if the previous issue is an official issue, the issue type of the
+    new issue will default to "status".
 
 -^, --remove-deleted  
 Remove elements with change type of "delete". These elements are
