@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.15.0"
+#define VERSION "4.16.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -138,7 +138,8 @@ static long unsigned maxListedFiles = 1;
 	SHOW_ICN | \
 	SHOW_SRC | \
 	SHOW_REP | \
-	SHOW_IPD
+	SHOW_IPD | \
+        SHOW_EPR
 
 /* Write valid CSDB objects to stdout. */
 static bool outputTree = false;
