@@ -15,6 +15,14 @@
 #define s1kdApplicDefs xmlNodePtr
 
 /**
+ * Filtering mode.
+ */
+typedef enum {
+	S1KD_FILTER_DEFAULT, /**< No extra processing */
+	S1KD_FILTER_REDUCE   /**< Remove wholly resolved annotations */
+} s1kdFilterMode;
+
+/**
  * Create a new set of applicability definitions.
  *
  * @return A pointer to a new set of applicability definitions.
@@ -43,9 +51,21 @@ void s1kdAssign(s1kdApplicDefs defs, const xmlChar *ident, const xmlChar *type, 
  *
  * @param doc The CSDB object
  * @param defs Applicability definitions to filter on
- * @param reduce Whether or not to hide redundant applicability
+ * @param mode Filtering mode
  * @return A new XML document for the filtered instance
  */
-xmlDocPtr s1kdFilter(xmlDocPtr doc, s1kdApplicDefs defs, bool reduce);
+xmlDocPtr s1kdDocFilter(xmlDocPtr doc, s1kdApplicDefs defs, s1kdFilterMode mode);
+
+/**
+ * Create a filtered instance based on user-defined applicability.
+ *
+ * @param object_xml Input buffer containing the XML of the CSDB object to filter
+ * @param object_size Size of the object XML buffer
+ * @param defs Applicability definitions to filter on
+ * @param mode Filtering mode
+ * @param result_xml Output buffer containing the XML of the resulting instance
+ * @param result_size Size of the result XML buffer
+ */
+void s1kdFilter(const char *object_xml, int object_size, s1kdApplicDefs defs, s1kdFilterMode mode, char **result_xml, int *result_size);
 
 #endif

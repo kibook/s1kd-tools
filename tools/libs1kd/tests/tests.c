@@ -24,12 +24,18 @@ void test_brexcheck(void)
 
 	xmlFreeDoc(brex);
 	xmlFreeDoc(doc);
+}
 
-	err = s1kdCheckDefaultBREX("<root/>", 7, &report, &size);
+void test_brexcheck_2(void)
+{
+	char *report;
+	int size;
+
+	s1kdCheckDefaultBREX("<root/>", 7, &report, &size);
 	puts(report);
 	free(report);
 
-	err = s1kdCheckBREX("<root/>", 7, "<root/>", 7, &report, &size);
+	s1kdCheckBREX("<root/>", 7, "<root/>", 7, &report, &size);
 	puts(report);
 	free(report);
 }
@@ -57,10 +63,12 @@ void test_instance(void)
 	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
 	xmlDocPtr out;
 	s1kdApplicDefs defs = s1kdNewApplicDefs();
+	char *result;
+	int size;
 
 	s1kdAssign(defs, BAD_CAST "version", BAD_CAST "prodattr", BAD_CAST "A");
 
-	out = s1kdFilter(doc, defs, true);
+	out = s1kdDocFilter(doc, defs, S1KD_FILTER_REDUCE);
 
 	xmlSaveFile("-", out);
 
@@ -69,11 +77,29 @@ void test_instance(void)
 	xmlFreeDoc(out);
 }
 
+void test_instance_2(void)
+{
+	s1kdApplicDefs defs = s1kdNewApplicDefs();
+	char *result;
+	int size;
+
+	s1kdAssign(defs, BAD_CAST "version", BAD_CAST "prodattr", BAD_CAST "A");
+
+	s1kdFilter("<root/>", 7, defs, S1KD_FILTER_DEFAULT, &result, &size);
+
+	puts(result);
+
+	free(result);
+	s1kdFreeApplicDefs(defs);
+}
+
 int main()
 {
 	test_brexcheck();
+	test_brexcheck_2();
 	test_metadata();
 	test_instance();
+	test_instance_2();
 
 	xmlCleanupParser();
 

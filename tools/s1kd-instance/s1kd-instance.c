@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.4.1"
+#define VERSION "9.4.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3859,6 +3859,9 @@ static void auto_add_cirs(xmlNodePtr cirs)
 }
 
 #ifdef LIBS1KD
+#define s1kdApplicDefs xmlNodePtr
+typedef enum { S1KD_FILTER_DEFAULT, S1KD_FILTER_REDUCE } s1kdFilterMode;
+
 xmlNodePtr s1kdNewApplicDefs(void)
 {
 	return xmlNewNode(NULL, BAD_CAST "applic");
@@ -3878,14 +3881,14 @@ void s1kdAssign(xmlNodePtr defs, const xmlChar *ident, const xmlChar *type, cons
 	xmlSetProp(a, BAD_CAST "applicPropertyValues", value);
 }
 
-xmlDocPtr s1kdFilter(const xmlDocPtr doc, const xmlNodePtr defs, bool reduce)
+xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicDefs defs, s1kdFilterMode mode)
 {
 	xmlDocPtr out;
 	xmlNodePtr root, referencedApplicGroup;
 
 	out = xmlCopyDoc(doc, 1);
 
-	if (xmlChildElementCount(defs) == 0) {
+	if (defs == NULL || xmlChildElementCount(defs) == 0) {
 		return out;
 	}
 
@@ -3898,7 +3901,7 @@ xmlDocPtr s1kdFilter(const xmlDocPtr doc, const xmlNodePtr defs, bool reduce)
 
 	strip_applic(defs, referencedApplicGroup, root);
 
-	if (reduce) {
+	if (mode == S1KD_FILTER_REDUCE) {
 		clean_applic_stmts(defs, referencedApplicGroup, true);
 
 		if (xmlChildElementCount(referencedApplicGroup) == 0) {
@@ -3915,6 +3918,27 @@ xmlDocPtr s1kdFilter(const xmlDocPtr doc, const xmlNodePtr defs, bool reduce)
 	}
 
 	return out;
+}
+
+int s1kdFilter(const char *object_xml, int object_size, s1kdApplicDefs defs, s1kdFilterMode mode, char **result_xml, int *result_size)
+{
+	xmlDocPtr doc, res;
+
+	if ((doc = read_xml_mem(object_xml, object_size)) == NULL) {
+		return 1;
+	}
+	if ((res = s1kdDocFilter(doc, defs, mode)) == NULL) {
+		return 1;
+	}
+	xmlFreeDoc(doc);
+
+	if (result_xml && result_size) {
+		xmlDocDumpMemory(res, (xmlChar **) result_xml, result_size);
+	}
+
+	xmlFreeDoc(res);
+
+	return 0;
 }
 #else
 /* Print a usage message */
