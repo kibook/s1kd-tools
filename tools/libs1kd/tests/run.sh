@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 make -C .. all
 make all
 

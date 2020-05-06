@@ -9,19 +9,29 @@ void test_brexcheck(void)
 	int err;
 	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
 	xmlDocPtr brex;
+	char *report;
+	int size;
 
-	err = s1kdCheckDefaultBREX(doc);
+	err = s1kdDocCheckDefaultBREX(doc, NULL);
 
 	printf("Default BREX: %s\n", err ? "FAIL" : "PASS");
 
 	brex = xmlReadFile("brex.xml", NULL, 0);
 
-	err = s1kdCheckBREX(doc, brex);
+	err = s1kdDocCheckBREX(doc, brex, NULL);
 
 	printf("Custom BREX: %s\n", err ? "FAIL" : "PASS");
 
 	xmlFreeDoc(brex);
 	xmlFreeDoc(doc);
+
+	err = s1kdCheckDefaultBREX("<root/>", 7, &report, &size);
+	puts(report);
+	free(report);
+
+	err = s1kdCheckBREX("<root/>", 7, "<root/>", 7, &report, &size);
+	puts(report);
+	free(report);
 }
 
 void test_metadata(void)

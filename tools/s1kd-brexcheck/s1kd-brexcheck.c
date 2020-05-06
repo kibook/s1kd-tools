@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.0"
+#define VERSION "3.6.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1244,18 +1244,19 @@ static void print_stats(xmlDocPtr doc)
 }
 
 #ifdef LIBS1KD
-int s1kdCheckDefaultBREX(xmlDocPtr doc)
+int s1kdDocCheckDefaultBREX(xmlDocPtr doc, xmlDocPtr *report)
 {
 	int err;
-	xmlDocPtr brex, report;
+	xmlDocPtr brex;
+	xmlDocPtr rep;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
 	const char *brex_dmc;
 
-	report = xmlNewDoc(BAD_CAST "1.0");
+	rep = xmlNewDoc(BAD_CAST "1.0");
 	node = xmlNewNode(NULL, BAD_CAST "brexCheck");
-	xmlDocSetRootElement(report, node);
+	xmlDocSetRootElement(rep, node);
 
 	node = xmlNewChild(node, NULL, BAD_CAST "document", NULL);
 	xmlSetProp(node, BAD_CAST "path", doc->URL);
@@ -1270,23 +1271,45 @@ int s1kdCheckDefaultBREX(xmlDocPtr doc)
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
-	xmlFreeDoc(report);
 	xmlFreeDoc(brex);
+
+	if (report) {
+		*report = rep;
+	} else {
+		xmlFreeDoc(rep);
+	}
 
 	return err;
 }
 
-int s1kdCheckBREX(xmlDocPtr doc, xmlDocPtr brex)
+int s1kdCheckDefaultBREX(const char *object_xml, int object_size, char **report_xml, int *report_size)
+{
+	xmlDocPtr doc, rep;
+	int err;
+
+	doc = read_xml_mem(object_xml, object_size);
+	err = s1kdDocCheckDefaultBREX(doc, &rep);
+	xmlFreeDoc(doc);
+
+	if (report_xml && report_size) {
+		xmlDocDumpMemory(rep, (xmlChar **) report_xml, report_size);
+		xmlFreeDoc(rep);
+	}
+
+	return err;
+}
+
+int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, xmlDocPtr *report)
 {
 	int err;
-	xmlDocPtr report;
+	xmlDocPtr rep;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
 
-	report = xmlNewDoc(BAD_CAST "1.0");
+	rep = xmlNewDoc(BAD_CAST "1.0");
 	node = xmlNewNode(NULL, BAD_CAST "brexCheck");
-	xmlDocSetRootElement(report, node);
+	xmlDocSetRootElement(rep, node);
 
 	node = xmlNewChild(node, NULL, BAD_CAST "document", NULL);
 	xmlSetProp(node, BAD_CAST "path", doc->URL);
@@ -1298,7 +1321,31 @@ int s1kdCheckBREX(xmlDocPtr doc, xmlDocPtr brex)
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
-	xmlFreeDoc(report);
+
+	if (report) {
+		*report = rep;
+	} else {
+		xmlFreeDoc(rep);
+	}
+
+	return err;
+}
+
+int s1kdCheckBREX(const char *object_xml, int object_size, const char *brex_xml, int brex_size, char **report_xml, int *report_size)
+{
+	xmlDocPtr doc, brex, rep;
+	int err;
+
+	doc = read_xml_mem(object_xml, object_size);
+	brex = read_xml_mem(brex_xml, brex_size);
+	err = s1kdDocCheckBREX(doc, brex, &rep);
+	xmlFreeDoc(doc);
+	xmlFreeDoc(brex);
+
+	if (report_xml && report_size) {
+		xmlDocDumpMemory(rep, (xmlChar **) report_xml, report_size);
+		xmlFreeDoc(rep);
+	}
 
 	return err;
 }
