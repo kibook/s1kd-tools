@@ -12,7 +12,7 @@
 /**
  * A set of applicability definitions used to filter objects.
  */
-#define s1kdApplicDefs xmlNodePtr
+#define s1kdApplicability xmlNodePtr
 
 /**
  * Filtering mode.
@@ -27,45 +27,45 @@ typedef enum {
  *
  * @return A pointer to a new set of applicability definitions.
  */
-s1kdApplicDefs s1kdNewApplicDefs(void);
+s1kdApplicability s1kdNewApplicability(void);
 
 /**
  * Free a set of applicability definitions.
  *
- * @param defs The set of applicability definitions to free
+ * @param app The set of applicability definitions to free
  */
-void s1kdFreeApplicDefs(s1kdApplicDefs defs);
+void s1kdFreeApplicability(s1kdApplicability app);
 
 /**
  * Add an applicability definition to a set of definitions.
  *
- * @param defs A set of applicability definitions
+ * @param app A set of applicability definitions
  * @param ident The ID of the applicability property
  * @param type The type of the applicability property (prodattr or condition)
  * @param value The value assigned to the applicability property
  */
-void s1kdAssign(s1kdApplicDefs defs, const xmlChar *ident, const xmlChar *type, const xmlChar *value);
+void s1kdAssign(s1kdApplicability app, const xmlChar *ident, const xmlChar *type, const xmlChar *value);
 
 /**
  * Create a filtered instance based on user-defined applicability.
  *
  * @param doc The CSDB object
- * @param defs Applicability definitions to filter on
+ * @param app Applicability definitions to filter on
  * @param mode Filtering mode
  * @return A new XML document for the filtered instance
  */
-xmlDocPtr s1kdDocFilter(xmlDocPtr doc, s1kdApplicDefs defs, s1kdFilterMode mode);
+xmlDocPtr s1kdDocFilter(xmlDocPtr doc, s1kdApplicability app, s1kdFilterMode mode);
 
 /**
  * Create a filtered instance based on user-defined applicability.
  *
  * @param object_xml Input buffer containing the XML of the CSDB object to filter
  * @param object_size Size of the object XML buffer
- * @param defs Applicability definitions to filter on
+ * @param app Applicability definitions to filter on
  * @param mode Filtering mode
  * @param result_xml Output buffer containing the XML of the resulting instance
  * @param result_size Size of the result XML buffer
  */
-void s1kdFilter(const char *object_xml, int object_size, s1kdApplicDefs defs, s1kdFilterMode mode, char **result_xml, int *result_size);
+void s1kdFilter(const char *object_xml, int object_size, s1kdApplicability app, s1kdFilterMode mode, char **result_xml, int *result_size);
 
 #endif

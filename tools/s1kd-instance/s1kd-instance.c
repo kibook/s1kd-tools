@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.4.2"
+#define VERSION "9.4.3"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3859,36 +3859,36 @@ static void auto_add_cirs(xmlNodePtr cirs)
 }
 
 #ifdef LIBS1KD
-#define s1kdApplicDefs xmlNodePtr
+#define s1kdApplicability xmlNodePtr
 typedef enum { S1KD_FILTER_DEFAULT, S1KD_FILTER_REDUCE } s1kdFilterMode;
 
-xmlNodePtr s1kdNewApplicDefs(void)
+s1kdApplicability s1kdNewApplicability(void)
 {
 	return xmlNewNode(NULL, BAD_CAST "applic");
 }
 
-void s1kdFreeApplicDefs(xmlNodePtr defs)
+void s1kdFreeApplicability(s1kdApplicability app)
 {
-	xmlFreeNode(defs);
+	xmlFreeNode(app);
 }
 
-void s1kdAssign(xmlNodePtr defs, const xmlChar *ident, const xmlChar *type, const xmlChar *value)
+void s1kdAssign(s1kdApplicability app, const xmlChar *ident, const xmlChar *type, const xmlChar *value)
 {
 	xmlNodePtr a;
-	a = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
+	a = xmlNewChild(app, NULL, BAD_CAST "assert", NULL);
 	xmlSetProp(a, BAD_CAST "applicPropertyIdent", ident);
 	xmlSetProp(a, BAD_CAST "applicPropertyType", type);
 	xmlSetProp(a, BAD_CAST "applicPropertyValues", value);
 }
 
-xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicDefs defs, s1kdFilterMode mode)
+xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicability app, s1kdFilterMode mode)
 {
 	xmlDocPtr out;
 	xmlNodePtr root, referencedApplicGroup;
 
 	out = xmlCopyDoc(doc, 1);
 
-	if (defs == NULL || xmlChildElementCount(defs) == 0) {
+	if (app == NULL || xmlChildElementCount(app) == 0) {
 		return out;
 	}
 
@@ -3899,10 +3899,10 @@ xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicDefs defs, s1kdFilterMode
 		return out;
 	}
 
-	strip_applic(defs, referencedApplicGroup, root);
+	strip_applic(app, referencedApplicGroup, root);
 
 	if (mode == S1KD_FILTER_REDUCE) {
-		clean_applic_stmts(defs, referencedApplicGroup, true);
+		clean_applic_stmts(app, referencedApplicGroup, true);
 
 		if (xmlChildElementCount(referencedApplicGroup) == 0) {
 			xmlUnlinkNode(referencedApplicGroup);
@@ -3913,21 +3913,21 @@ xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicDefs defs, s1kdFilterMode
 		clean_applic(referencedApplicGroup, root);
 
 		if (xmlChildElementCount(referencedApplicGroup) != 0) {
-			referencedApplicGroup = rem_supersets(defs, referencedApplicGroup, root, true);
+			referencedApplicGroup = rem_supersets(app, referencedApplicGroup, root, true);
 		}
 	}
 
 	return out;
 }
 
-int s1kdFilter(const char *object_xml, int object_size, s1kdApplicDefs defs, s1kdFilterMode mode, char **result_xml, int *result_size)
+int s1kdFilter(const char *object_xml, int object_size, s1kdApplicability app, s1kdFilterMode mode, char **result_xml, int *result_size)
 {
 	xmlDocPtr doc, res;
 
 	if ((doc = read_xml_mem(object_xml, object_size)) == NULL) {
 		return 1;
 	}
-	if ((res = s1kdDocFilter(doc, defs, mode)) == NULL) {
+	if ((res = s1kdDocFilter(doc, app, mode)) == NULL) {
 		return 1;
 	}
 	xmlFreeDoc(doc);
