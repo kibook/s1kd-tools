@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.3.1"
+#define VERSION "4.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -2830,7 +2830,7 @@ static int show_or_edit_metadata_list(const char *fname, struct opts *opts)
 }
 
 #ifdef LIBS1KD
-xmlChar *s1kdGetMetadata(xmlDocPtr doc, const xmlChar *name)
+xmlChar *s1kdDocGetMetadata(xmlDocPtr doc, const xmlChar *name)
 {
 	int i;
 	xmlChar *value = NULL;
@@ -2875,13 +2875,42 @@ xmlChar *s1kdGetMetadata(xmlDocPtr doc, const xmlChar *name)
 	return value;
 }
 
-int s1kdSetMetadata(xmlDocPtr doc, const xmlChar *name, const xmlChar *value)
+char *s1kdGetMetadata(const char *object_xml, int object_size, const char *name)
+{
+	xmlDocPtr doc;
+	char *val;
+
+	doc = read_xml_mem(object_xml, object_size);
+	val = (char *) s1kdDocGetMetadata(doc, BAD_CAST name);
+	xmlFreeDoc(doc);
+
+	return val;
+}
+
+int s1kdDocSetMetadata(xmlDocPtr doc, const xmlChar *name, const xmlChar *value)
 {
 	xmlXPathContextPtr ctx;
 	int err;
 	ctx = xmlXPathNewContext(doc);
 	err = edit_metadata(ctx, (char *) name, (char *) value);
 	xmlXPathFreeContext(ctx);
+	return err;
+}
+
+int s1kdSetMetadata(const char *object_xml, int object_size, const char *name, const char *value, char **result_xml, int *result_size)
+{
+	xmlDocPtr doc;
+	int err;
+
+	doc = read_xml_mem(object_xml, object_size);
+	err = s1kdDocSetMetadata(doc, BAD_CAST name, BAD_CAST value);
+
+	if (result_xml && result_size) {
+		xmlDocDumpMemory(doc, (xmlChar **) result_xml, result_size);
+	}
+
+	xmlFreeDoc(doc);
+
 	return err;
 }
 #else
