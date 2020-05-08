@@ -220,10 +220,18 @@ namespace S1kdTools {
 		/* Metadata exposed as properties: */
 
 		/// <summary>
+		/// Code of the CSDB object
+		/// </summary>
+		public string Code {
+			get { return GetMetadata("code"); }
+		}
+
+		/// <summary>
 		/// Data module code
 		/// </summary>
 		public string DmCode {
 			get { return GetMetadata("dmCode"); }
+			set { SetMetadata("dmCode", value); }
 		}
 
 		/// <summary>

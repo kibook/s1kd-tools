@@ -9,7 +9,7 @@ public class Test
 	{
 		CsdbObject dm = new CsdbObject("test.xml");
 
-		Console.WriteLine("DMC: " + dm.DmCode);
+		Console.WriteLine("Code: " + dm.Code);
 
 		Console.WriteLine("Issue date: " + dm.IssueDate);
 		dm.IssueDate = "1970-01-01";
