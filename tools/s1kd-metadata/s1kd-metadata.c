@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.3.2"
+#define VERSION "4.3.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -443,12 +443,14 @@ static int edit_schema_url(xmlNodePtr node, const char *val)
 
 static xmlChar *get_schema(xmlNodePtr node, struct opts *opts)
 {
-	char *url, *s, *e;
+	char *url, *s;
 	xmlChar *r;
 
 	url = (char *) xmlGetProp(node, BAD_CAST "noNamespaceSchemaLocation");
 
 	if (url) {
+		char *e;
+
 		s = strrchr(url, '/');
 		s = s ? s + 1 : url;
 		e = strrchr(s, '.');
@@ -539,21 +541,36 @@ static xmlChar *get_dmcode(xmlNodePtr node, struct opts *opts)
 		learn_event_code = NULL;
 	}
 
-	code = malloc(256);
+	if (model_ident_code     &&
+	    system_diff_code     &&
+	    system_code          &&
+	    sub_system_code      &&
+	    sub_sub_system_code  &&
+	    assy_code            &&
+	    disassy_code         &&
+	    disassy_code_variant &&
+	    info_code            &&
+	    info_code_variant    &&
+	    item_location_code)
+	{
+		code = malloc(256);
 
-	xmlStrPrintf(code, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
-		model_ident_code,
-		system_diff_code,
-		system_code,
-		sub_system_code,
-		sub_sub_system_code,
-		assy_code,
-		disassy_code,
-		disassy_code_variant,
-		info_code,
-		info_code_variant,
-		item_location_code,
-		learn);
+		xmlStrPrintf(code, 256, "%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s",
+			model_ident_code,
+			system_diff_code,
+			system_code,
+			sub_system_code,
+			sub_sub_system_code,
+			assy_code,
+			disassy_code,
+			disassy_code_variant,
+			info_code,
+			info_code_variant,
+			item_location_code,
+			learn);
+	} else {
+		code = NULL;
+	}
 
 	xmlFree(model_ident_code);
 	xmlFree(system_diff_code);
@@ -579,7 +596,7 @@ static void show_dmcode(xmlNodePtr node, struct opts *opts)
 	if (code) {
 		printf("%s", (char *) code);
 	}
-	free(code);
+	xmlFree(code);
 }
 
 static int edit_dmcode(xmlNodePtr node, const char *val)
@@ -654,23 +671,27 @@ static int edit_dmcode(xmlNodePtr node, const char *val)
 	return 0;
 }
 
-static void show_ddncode(xmlNodePtr node, struct opts *opts)
+static xmlChar *get_ddncode(xmlNodePtr node, struct opts *opts)
 {
-	char *modelic, *sendid, *recvid, *diyear, *seqnum;
+	xmlChar *modelic, *sendid, *recvid, *diyear, *seqnum, *code;
 
-	modelic = (char *) first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
-	sendid  = (char *) first_xpath_string(node, BAD_CAST "@senderIdent|sendid");
-	recvid  = (char *) first_xpath_string(node, BAD_CAST "@receiverIdent|recvid");
-	diyear  = (char *) first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
-	seqnum  = (char *) first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
+	modelic = first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
+	sendid  = first_xpath_string(node, BAD_CAST "@senderIdent|sendid");
+	recvid  = first_xpath_string(node, BAD_CAST "@receiverIdent|recvid");
+	diyear  = first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
+	seqnum  = first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
 
 	if (modelic && sendid && recvid && diyear && seqnum) {
-		printf("%s-%s-%s-%s-%s",
+		code = malloc(256);
+
+		xmlStrPrintf(code, 256, "%s-%s-%s-%s-%s",
 			modelic,
 			sendid,
 			recvid,
 			diyear,
 			seqnum);
+	} else {
+		code = NULL;
 	}
 
 	xmlFree(modelic);
@@ -678,25 +699,38 @@ static void show_ddncode(xmlNodePtr node, struct opts *opts)
 	xmlFree(recvid);
 	xmlFree(diyear);
 	xmlFree(seqnum);
+
+	return code;
 }
 
-static void show_dmlcode(xmlNodePtr node, struct opts *opts)
+static void show_ddncode(xmlNodePtr node, struct opts *opts)
 {
-	char *modelic, *sendid, *dmltype, *diyear, *seqnum;
+	xmlChar *code = get_ddncode(node, opts);
+	if (code) printf("%s", (char *) code);
+	xmlFree(code);
+}
 
-	modelic = (char *) first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
-	sendid  = (char *) first_xpath_string(node, BAD_CAST "@senderIdent|sendid");
-	dmltype = (char *) first_xpath_string(node, BAD_CAST "@dmlType|dmltype/@type");
-	diyear  = (char *) first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
-	seqnum  = (char *) first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
+static xmlChar *get_dmlcode(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *modelic, *sendid, *dmltype, *diyear, *seqnum, *code;
+
+	modelic = first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
+	sendid  = first_xpath_string(node, BAD_CAST "@senderIdent|sendid");
+	dmltype = first_xpath_string(node, BAD_CAST "@dmlType|dmltype/@type");
+	diyear  = first_xpath_string(node, BAD_CAST "@yearOfDataIssue|diyear");
+	seqnum  = first_xpath_string(node, BAD_CAST "@seqNumber|seqnum");
 
 	if (modelic && sendid && dmltype && diyear && seqnum) {
-		printf("%s-%s-%s-%s-%s",
+		code = malloc(256);
+
+		xmlStrPrintf(code, 256, "%s-%s-%s-%s-%s",
 			modelic,
 			sendid,
 			dmltype,
 			diyear,
 			seqnum);
+	} else {
+		code = NULL;
 	}
 
 	xmlFree(modelic);
@@ -704,29 +738,51 @@ static void show_dmlcode(xmlNodePtr node, struct opts *opts)
 	xmlFree(dmltype);
 	xmlFree(diyear);
 	xmlFree(seqnum);
+
+	return code;
 }
 
-static void show_pmcode(xmlNodePtr node, struct opts *opts)
+static void show_dmlcode(xmlNodePtr node, struct opts *opts)
 {
-	char *modelic, *pmissuer, *pmnumber, *pmvolume;
+	xmlChar *code = get_dmlcode(node, opts);
+	if (code) printf("%s", (char *) code);
+	xmlFree(code);
+}
 
-	modelic  = (char *) first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
-	pmissuer = (char *) first_xpath_string(node, BAD_CAST "@pmIssuer|pmissuer");
-	pmnumber = (char *) first_xpath_string(node, BAD_CAST "@pmNumber|pmnumber");
-	pmvolume = (char *) first_xpath_string(node, BAD_CAST "@pmVolume|pmvolume");
+static xmlChar *get_pmcode(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *modelic, *pmissuer, *pmnumber, *pmvolume, *code;
+
+	modelic  = first_xpath_string(node, BAD_CAST "@modelIdentCode|modelic");
+	pmissuer = first_xpath_string(node, BAD_CAST "@pmIssuer|pmissuer");
+	pmnumber = first_xpath_string(node, BAD_CAST "@pmNumber|pmnumber");
+	pmvolume = first_xpath_string(node, BAD_CAST "@pmVolume|pmvolume");
 
 	if (modelic && pmissuer && pmnumber && pmvolume) {
-		printf("%s-%s-%s-%s",
+		code = malloc(256);
+
+		xmlStrPrintf(code, 256, "%s-%s-%s-%s",
 			modelic,
 			pmissuer,
 			pmnumber,
 			pmvolume);
+	} else {
+		code = NULL;
 	}
 
 	xmlFree(modelic);
 	xmlFree(pmissuer);
 	xmlFree(pmnumber);
 	xmlFree(pmvolume);
+
+	return code;
+}
+
+static void show_pmcode(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *code = get_pmcode(node, opts);
+	if (code) printf("%s", (char *) code);
+	xmlFree(code);
 }
 
 static int edit_pmcode(xmlNodePtr node, const char *val)
@@ -818,35 +874,40 @@ static int edit_pm_volume(xmlNodePtr node, const char *val)
 	}
 }
 
-static void show_comment_code(xmlNodePtr node, struct opts *opts)
+static xmlChar *get_comment_code(xmlNodePtr node, struct opts *opts)
 {
-	char *model_ident_code;
-	char *sender_ident;
-	char *year_of_data_issue;
-	char *seq_number;
-	char *comment_type;
+	xmlChar *model_ident_code;
+	xmlChar *sender_ident;
+	xmlChar *year_of_data_issue;
+	xmlChar *seq_number;
+	xmlChar *comment_type;
+	xmlChar *code;
 
 	if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0) {
-		model_ident_code   = (char *) xmlGetProp(node, BAD_CAST "modelIdentCode");
-		sender_ident       = (char *) xmlGetProp(node, BAD_CAST "senderIdent");
-		year_of_data_issue = (char *) xmlGetProp(node, BAD_CAST "yearOfDataIssue");
-		seq_number         = (char *) xmlGetProp(node, BAD_CAST "seqNumber");
-		comment_type       = (char *) xmlGetProp(node, BAD_CAST "commentType");
+		model_ident_code   = xmlGetProp(node, BAD_CAST "modelIdentCode");
+		sender_ident       = xmlGetProp(node, BAD_CAST "senderIdent");
+		year_of_data_issue = xmlGetProp(node, BAD_CAST "yearOfDataIssue");
+		seq_number         = xmlGetProp(node, BAD_CAST "seqNumber");
+		comment_type       = xmlGetProp(node, BAD_CAST "commentType");
 	} else {
-		model_ident_code   = (char *) first_xpath_string(node, BAD_CAST "modelic");
-		sender_ident       = (char *) first_xpath_string(node, BAD_CAST "sendid");
-		year_of_data_issue = (char *) first_xpath_string(node, BAD_CAST "diyear");
-		seq_number         = (char *) first_xpath_string(node, BAD_CAST "seqnum");
-		comment_type       = (char *) first_xpath_string(node, BAD_CAST "ctype/@type");
+		model_ident_code   = first_xpath_string(node, BAD_CAST "modelic");
+		sender_ident       = first_xpath_string(node, BAD_CAST "sendid");
+		year_of_data_issue = first_xpath_string(node, BAD_CAST "diyear");
+		seq_number         = first_xpath_string(node, BAD_CAST "seqnum");
+		comment_type       = first_xpath_string(node, BAD_CAST "ctype/@type");
 	}
 
 	if (model_ident_code && sender_ident && year_of_data_issue && seq_number && comment_type) {
-		printf("%s-%s-%s-%s-%s",
+		code = malloc(256);
+
+		xmlStrPrintf(code, 256, "%s-%s-%s-%s-%s",
 			model_ident_code,
 			sender_ident,
 			year_of_data_issue,
 			seq_number,
 			comment_type);
+	} else {
+		code = NULL;
 	}
 
 	xmlFree(model_ident_code);
@@ -854,21 +915,39 @@ static void show_comment_code(xmlNodePtr node, struct opts *opts)
 	xmlFree(year_of_data_issue);
 	xmlFree(seq_number);
 	xmlFree(comment_type);
+
+	return code;
+}
+
+static void show_comment_code(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *code = get_comment_code(node, opts);
+	if (code) printf("%s", (char *) code);
+	xmlFree(code);
+}
+
+static xmlChar *get_code(xmlNodePtr node, struct opts *opts)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
+		return get_dmcode(node, opts);
+	} else if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "pmc") == 0) {
+		return get_pmcode(node, opts);
+	} else if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ccode") == 0) {
+		return get_comment_code(node, opts);
+	} else if (xmlStrcmp(node->name, BAD_CAST "ddnCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ddnc") == 0) {
+		return get_ddncode(node, opts);
+	} else if (xmlStrcmp(node->name, BAD_CAST "dmlCode") == 0 || xmlStrcmp(node->name, BAD_CAST "dmlc") == 0) {
+		return get_dmlcode(node, opts);
+	}
+
+	return NULL;
 }
 
 static void show_code(xmlNodePtr node, struct opts *opts)
 {
-	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
-		show_dmcode(node, opts);
-	} else if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "pmc") == 0) {
-		show_pmcode(node, opts);
-	} else if (xmlStrcmp(node->name, BAD_CAST "commentCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ccode") == 0) {
-		show_comment_code(node, opts);
-	} else if (xmlStrcmp(node->name, BAD_CAST "ddnCode") == 0 || xmlStrcmp(node->name, BAD_CAST "ddnc") == 0) {
-		show_ddncode(node, opts);
-	} else if (xmlStrcmp(node->name, BAD_CAST "dmlCode") == 0 || xmlStrcmp(node->name, BAD_CAST "dmlc") == 0) {
-		show_dmlcode(node, opts);
-	}
+	xmlChar *code = get_code(node, opts);
+	if (code) printf("%s", (char *) code);
+	xmlFree(code);
 }
 
 static void show_issue_type(xmlNodePtr node, struct opts *opts)
@@ -1726,14 +1805,14 @@ static struct metadata metadata[] = {
 		"BREX data module code"},
 	{"code",
 		"//dmCode|//avee|//pmCode|//pmc|//commentCode|//ccode|//ddnCode|//ddnc|//dmlCode|//dmlc",
-		NULL,
+		get_code,
 		show_code,
 		NULL,
 		NULL,
 		"CSDB object code"},
 	{"commentCode",
 		"//commentCode|//ccode",
-		NULL,
+		get_comment_code,
 		show_comment_code,
 		NULL,
 		NULL,
@@ -1775,7 +1854,7 @@ static struct metadata metadata[] = {
 		"Country ISO code (CA, US, GB...)"},
 	{"ddnCode",
 		"//ddnCode|//ddnc",
-		NULL,
+		get_ddncode,
 		show_ddncode,
 		NULL,
 		NULL,
@@ -1803,7 +1882,7 @@ static struct metadata metadata[] = {
 		"Data module code"},
 	{"dmlCode",
 		"//dmlCode|//dmlc",
-		NULL,
+		get_dmlcode,
 		show_dmlcode,
 		NULL,
 		NULL,
@@ -1964,7 +2043,7 @@ static struct metadata metadata[] = {
 		"Filesystem path of object"},
 	{"pmCode",
 		"//pmCode|//pmc",
-		NULL,
+		get_pmcode,
 		show_pmcode,
 		NULL,
 		NULL,
