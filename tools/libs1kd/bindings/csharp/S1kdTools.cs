@@ -68,8 +68,10 @@ namespace S1kdTools {
 	/// </summary>
 	public enum FilterMode
 	{
-		Default = 0, /// <value>The default filtering mode.</value>
-		Reduce = 1 /// <value>Remove wholly resolved annotations.</value>
+		Default,  /// <value>The default filtering mode.</value>
+		Reduce,   /// <value>Remove wholly resolved annotations.</value>
+		Simplify, /// <value>Remove resolved parts of annotations.</value>
+		Prune,    /// <value>Only remove false parts of annotations.</value>
 	}
 
 	/// <summary>

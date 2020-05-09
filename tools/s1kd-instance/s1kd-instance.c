@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.4.3"
+#define VERSION "9.4.4"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3860,7 +3860,12 @@ static void auto_add_cirs(xmlNodePtr cirs)
 
 #ifdef LIBS1KD
 #define s1kdApplicability xmlNodePtr
-typedef enum { S1KD_FILTER_DEFAULT, S1KD_FILTER_REDUCE } s1kdFilterMode;
+typedef enum {
+	S1KD_FILTER_DEFAULT,
+	S1KD_FILTER_REDUCE,
+	S1KD_FILTER_SIMPLIFY,
+	S1KD_FILTER_PRUNE
+} s1kdFilterMode;
 
 s1kdApplicability s1kdNewApplicability(void)
 {
@@ -3901,8 +3906,8 @@ xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicability app, s1kdFilterMo
 
 	strip_applic(app, referencedApplicGroup, root);
 
-	if (mode == S1KD_FILTER_REDUCE) {
-		clean_applic_stmts(app, referencedApplicGroup, true);
+	if (mode >= S1KD_FILTER_REDUCE) {
+		clean_applic_stmts(app, referencedApplicGroup, mode < S1KD_FILTER_PRUNE);
 
 		if (xmlChildElementCount(referencedApplicGroup) == 0) {
 			xmlUnlinkNode(referencedApplicGroup);
@@ -3912,8 +3917,12 @@ xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicability app, s1kdFilterMo
 
 		clean_applic(referencedApplicGroup, root);
 
-		if (xmlChildElementCount(referencedApplicGroup) != 0) {
-			referencedApplicGroup = rem_supersets(app, referencedApplicGroup, root, true);
+		if (mode >= S1KD_FILTER_SIMPLIFY && xmlChildElementCount(referencedApplicGroup) != 0) {
+			simpl_applic_clean(app, referencedApplicGroup, mode == S1KD_FILTER_PRUNE);
+		}
+
+		if (mode != S1KD_FILTER_PRUNE && xmlChildElementCount(referencedApplicGroup) != 0) {
+			referencedApplicGroup = rem_supersets(app, referencedApplicGroup, root, mode < S1KD_FILTER_SIMPLIFY);
 		}
 	}
 

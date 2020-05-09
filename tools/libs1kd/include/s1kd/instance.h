@@ -18,8 +18,10 @@
  * Filtering mode.
  */
 typedef enum {
-	S1KD_FILTER_DEFAULT, /**< No extra processing */
-	S1KD_FILTER_REDUCE   /**< Remove wholly resolved annotations */
+	S1KD_FILTER_DEFAULT,  /**< No extra processing */
+	S1KD_FILTER_REDUCE,   /**< Remove wholly resolved annotations */
+	S1KD_FILTER_SIMPLIFY, /**< Remove resolved parts of annotations */
+	S1KD_FILTER_PRUNE     /**< Only remove false parts of annotations */
 } s1kdFilterMode;
 
 /**

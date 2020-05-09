@@ -91,13 +91,24 @@ void test_instance(void)
 
 	s1kdAssign(app, BAD_CAST "version", BAD_CAST "prodattr", BAD_CAST "A");
 
-	out = s1kdDocFilter(doc, app, S1KD_FILTER_REDUCE);
-
+	out = s1kdDocFilter(doc, app, S1KD_FILTER_DEFAULT);
 	xmlSaveFile("-", out);
+	xmlFreeDoc(out);
+
+	out = s1kdDocFilter(doc, app, S1KD_FILTER_REDUCE);
+	xmlSaveFile("-", out);
+	xmlFreeDoc(out);
+
+	out = s1kdDocFilter(doc, app, S1KD_FILTER_SIMPLIFY);
+	xmlSaveFile("-", out);
+	xmlFreeDoc(out);
+
+	out = s1kdDocFilter(doc, app, S1KD_FILTER_PRUNE);
+	xmlSaveFile("-", out);
+	xmlFreeDoc(out);
 
 	s1kdFreeApplicability(app);
 	xmlFreeDoc(doc);
-	xmlFreeDoc(out);
 }
 
 void test_instance_2(void)

@@ -14,5 +14,7 @@ public class Test
 
 		Console.WriteLine(dm.Filter(app, FilterMode.Default).XmlDocument.OuterXml);
 		Console.WriteLine(dm.Filter(app, FilterMode.Reduce).XmlDocument.OuterXml);
+		Console.WriteLine(dm.Filter(app, FilterMode.Simplify).XmlDocument.OuterXml);
+		Console.WriteLine(dm.Filter(app, FilterMode.Prune).XmlDocument.OuterXml);
 	}
 }
