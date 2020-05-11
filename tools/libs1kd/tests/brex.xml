@@ -49,6 +49,12 @@
             <objectUse>Emphasis is not allowed.</objectUse>
           </structureObjectRule>
         </structureObjectRuleGroup>
+        <notationRuleList>
+          <notationRule>
+            <notationName allowedNotationFlag="0">JPG</notationName>
+            <objectUse>JPG images are not allowed.</objectUse>
+          </notationRule>
+        </notationRuleList>
       </contextRules>
     </brex>
   </content>

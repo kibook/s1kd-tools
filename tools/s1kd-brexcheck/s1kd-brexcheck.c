@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.5"
+#define VERSION "3.6.6"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -118,7 +118,7 @@ struct opts {
 	/* Whether to check notation rules, that is, what NOTATIONs are allowed in
 	 * the DTD.
 	 */
-	bool check_notation;
+	bool check_notations;
 };
 
 /* Return the first node in a set matching an XPath expression. */
@@ -815,6 +815,7 @@ static bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNo
 	return ret || firstXPathNode(snsRulesDoc, ctx, path);
 }
 
+/* Check SNS rules against a CSDB object. */
 static bool check_brex_sns_rules(xmlDocPtr snsRulesDoc, xmlNodePtr snsRulesGroup, xmlDocPtr dmod_doc, xmlNodePtr documentNode, struct opts *opts)
 {
 	xmlNodePtr dmcode, snsCheck, snsError;
@@ -903,8 +904,8 @@ static bool check_brex_sns_rules(xmlDocPtr snsRulesDoc, xmlNodePtr snsRulesGroup
 }
 
 /* Check the SNS rules of BREX DMs against a CSDB object. */
-static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
-	const char *dmod_fname, xmlNodePtr documentNode, struct opts *opts)
+static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
+	xmlDocPtr dmod_doc,xmlNodePtr documentNode, struct opts *opts)
 {
 	int i;
 	xmlDocPtr snsRulesDoc;
@@ -935,7 +936,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 
 /* Check the notation used by an entity against the notation rules. */
 static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
-	xmlNodePtr notationCheck, const char *docname)
+	xmlNodePtr notationCheck)
 {	
 	char xpath[256];
 	xmlNodePtr rule;
@@ -961,19 +962,39 @@ static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 	return 1;
 }
 
-/* Check the notation rules of BREX DMs against a CSDB object. */
-static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
-	const char *dmod_fname, xmlNodePtr documentNode)
+/* Check notation rules against a CSDB object. */
+static int check_brex_notation_rules(xmlDocPtr notationRuleDoc, xmlNodePtr notationRuleGroup, xmlDocPtr dmod_doc, xmlNodePtr documentNode)
 {
-	xmlDocPtr notationRuleDoc;
-	xmlNodePtr notationRuleGroup;
-	int i;
 	xmlDtdPtr dtd;
-	xmlNodePtr cur, notationCheck;
+	xmlNodePtr notationCheck, cur;
 	int invalid = 0;
 
 	if (!(dtd = dmod_doc->intSubset))
 		return 0;
+
+	notationCheck = xmlNewChild(documentNode, NULL, BAD_CAST "notations", NULL);
+
+	for (cur = dtd->children; cur; cur = cur->next) {
+		if (cur->type == XML_ENTITY_DECL && ((xmlEntityPtr) cur)->etype == 3) {
+			invalid += check_entity((xmlEntityPtr) cur, notationRuleDoc,
+				notationCheck);
+		}
+	}
+
+	if (!notationCheck->children) {
+		xmlNewChild(notationCheck, NULL, BAD_CAST "noErrors", NULL);
+	}
+
+	return invalid;
+}
+
+/* Check the notation rules of BREX DMs against a CSDB object. */
+static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
+	xmlDocPtr dmod_doc, xmlNodePtr documentNode)
+{
+	xmlDocPtr notationRuleDoc;
+	xmlNodePtr notationRuleGroup;
+	int i, invalid;
 
 	notationRuleDoc = xmlNewDoc(BAD_CAST "1.0");
 	xmlDocSetRootElement(notationRuleDoc, xmlNewNode(NULL, BAD_CAST "notationRuleGroup"));
@@ -989,18 +1010,7 @@ static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
 		xmlFreeDoc(brex);
 	}
 
-	notationCheck = xmlNewChild(documentNode, NULL, BAD_CAST "notations", NULL);
-
-	for (cur = dtd->children; cur; cur = cur->next) {
-		if (cur->type == XML_ENTITY_DECL && ((xmlEntityPtr) cur)->etype == 3) {
-			invalid += check_entity((xmlEntityPtr) cur, notationRuleDoc,
-				notationCheck, dmod_fname);
-		}
-	}
-
-	if (!notationCheck->children) {
-		xmlNewChild(notationCheck, NULL, BAD_CAST "noErrors", NULL);
-	}
+	invalid = check_brex_notation_rules(notationRuleDoc, notationRuleGroup, dmod_doc, documentNode);
 
 	xmlFreeDoc(notationRuleDoc);
 
@@ -1079,13 +1089,13 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 	if (opts->check_sns &&
 	    !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc,
-			                 docname, documentNode, opts)))
+			                 documentNode, opts)))
 	{
 		++total;
 	}
 
-	if (opts->check_notation) {
-		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, docname, documentNode);
+	if (opts->check_notations) {
+		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, documentNode);
 		total += invalid_notations;
 	}
 
@@ -1292,7 +1302,7 @@ static void add_config_to_report(xmlNodePtr brexCheck, struct opts *opts)
 		xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "no");
 	}
 
-	if (opts->check_notation) {
+	if (opts->check_notations) {
 		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "yes");
 	} else {
 		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "no");
@@ -1304,17 +1314,18 @@ typedef enum {
 	S1KD_BREXCHECK_VALUES = 1,
 	S1KD_BREXCHECK_SNS = 2,
 	S1KD_BREXCHECK_STRICT_SNS = 4,
-	S1KD_BREXCHECK_UNSTRICT_SNS = 8
+	S1KD_BREXCHECK_UNSTRICT_SNS = 8,
+	S1KD_BREXCHECK_NOTATIONS = 16
 } s1kdBREXCheckOption;
 
 static void init_opts(struct opts *opts, int options)
 {
-	opts->layered        = false;
-	opts->check_values   = optset(options, S1KD_BREXCHECK_VALUES);
-	opts->check_sns      = optset(options, S1KD_BREXCHECK_SNS);
-	opts->strict_sns     = optset(options, S1KD_BREXCHECK_STRICT_SNS);
-	opts->unstrict_sns   = optset(options, S1KD_BREXCHECK_UNSTRICT_SNS);
-	opts->check_notation = false;
+	opts->layered         = false;
+	opts->check_values    = optset(options, S1KD_BREXCHECK_VALUES);
+	opts->check_sns       = optset(options, S1KD_BREXCHECK_SNS);
+	opts->strict_sns      = optset(options, S1KD_BREXCHECK_STRICT_SNS);
+	opts->unstrict_sns    = optset(options, S1KD_BREXCHECK_UNSTRICT_SNS);
+	opts->check_notations = optset(options, S1KD_BREXCHECK_NOTATIONS);
 }
 
 int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
@@ -1408,6 +1419,18 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 		err += check_brex_sns_rules(snsRulesDoc, snsRulesGroup, doc, node, &opts);
 
 		xmlFreeDoc(snsRulesDoc);
+	}
+
+	if (opts.check_notations) {
+		xmlDocPtr notationRulesDoc = xmlNewDoc(BAD_CAST "1.0");
+		xmlNodePtr notationRulesGroup = xmlNewNode(NULL, BAD_CAST "notationRules");
+
+		xmlDocSetRootElement(notationRulesDoc, notationRulesGroup);
+		xmlAddChild(notationRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//notationRuleList"), 1));
+
+		err += check_brex_notation_rules(notationRulesDoc, notationRulesGroup, doc, node);
+
+		xmlFreeDoc(notationRulesDoc);
 	}
 
 	err += check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts);
@@ -1516,7 +1539,7 @@ int main(int argc, char *argv[])
 		/* check_sns */ false,
 		/* strict_sns */ false,
 		/* unstrict_sns */ false,
-		/* check_notation */ false
+		/* check_notations */ false
 	};
 
 	const char *sopts = "Bb:eI:xvqslw:StupFfncLTrd:o^h?";
@@ -1588,7 +1611,7 @@ int main(int argc, char *argv[])
 			case 'p': progress = true; break;
 			case 'F': show_fnames = SHOW_VALID; break;
 			case 'f': show_fnames = SHOW_INVALID; break;
-			case 'n': opts.check_notation = true; break;
+			case 'n': opts.check_notations = true; break;
 			case 'c': opts.check_values = true; break;
 			case 'L': is_list = true; break;
 			case 'T': show_stats = true; break;

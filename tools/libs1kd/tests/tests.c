@@ -14,7 +14,7 @@ void test_brexcheck(void)
 	int size;
 	int opts;
 
-	opts = S1KD_BREXCHECK_VALUES | S1KD_BREXCHECK_SNS | S1KD_BREXCHECK_STRICT_SNS;
+	opts = S1KD_BREXCHECK_VALUES | S1KD_BREXCHECK_SNS | S1KD_BREXCHECK_STRICT_SNS | S1KD_BREXCHECK_NOTATIONS;
 
 	err = s1kdDocCheckDefaultBREX(doc, opts, NULL);
 

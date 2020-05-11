@@ -86,7 +86,8 @@ namespace S1kdTools {
 			Values = 1,
 			Sns = 2,
 			StrictSns = 4,
-			UnstrictSns = 8
+			UnstrictSns = 8,
+			Notations = 16
 		}
 
 		private bool Get(Option opt)
@@ -128,11 +129,19 @@ namespace S1kdTools {
 		}
 
 		/// <summary>
-		/// Uset the unstrict SNS check method.
+		/// Use the unstrict SNS check method.
 		/// </summary>
 		public bool UnstrictSns {
 			get { return Get(Option.UnstrictSns); }
 			set { Set(Option.UnstrictSns, value); }
+		}
+
+		/// <summary>
+		/// Check DTD NOTATIONs.
+		/// </summary>
+		public bool CheckNotations {
+			get { return Get(Option.Notations); }
+			set { Set(Option.Notations, value); }
 		}
 	}
 
