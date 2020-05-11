@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.2"
+#define VERSION "3.6.3"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1301,6 +1301,7 @@ typedef enum {
 
 static void init_opts(struct opts *opts, int options)
 {
+	opts->layered        = false;
 	opts->check_values   = optset(options, S1KD_BREXCHECK_VALUES);
 	opts->check_sns      = optset(options, S1KD_BREXCHECK_SNS);
 	opts->strict_sns     = optset(options, S1KD_BREXCHECK_SNS_STRICT);
