@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.6"
+#define VERSION "3.6.7"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -62,7 +62,7 @@ static unsigned DMOD_MAX = 1;
 static unsigned BREX_PATH_MAX = 1;
 
 /* Verbosity of the tool's output. */
-static enum verbosity {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
+enum verbosity {SILENT, NORMAL, VERBOSE};
 
 /* Whether to use short, single-line error messages. */
 static bool shortmsg = false;
@@ -90,6 +90,8 @@ static bool ignore_empty = false;
 static bool rem_delete = false;
 
 struct opts {
+	enum verbosity verbosity;
+
 	/* Whether to check layered BREX DMs. */
 	bool layered;
 
@@ -318,7 +320,8 @@ static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int l
  *  1  Object references a BREX DM, but it couldn't be found.
  */
 static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[PATH_MAX],
-	int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames)
+	int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames,
+	struct opts *opts)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
@@ -432,7 +435,7 @@ static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[P
 		found = search_brex_fname_from_default_brex(fname, dmcode, len);
 	}
 
-	if (verbosity > SILENT && !found) {
+	if (opts->verbosity > SILENT && !found) {
 		fprintf(stderr, E_BREX_NOT_FOUND, dmcode);
 	}
 
@@ -676,7 +679,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			object = xmlXPathEvalExpression(path, context);
 
 			if (!object) {
-				if (verbosity > SILENT) {
+				if (opts->verbosity > SILENT) {
 					fprintf(stderr, E_INVOBJPATH, brexfname, xmlGetLineNo(objectPath), path);
 				}
 
@@ -733,7 +736,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 
 				xmlFree(severity);
 
-				if (verbosity > SILENT) {
+				if (opts->verbosity > SILENT) {
 					print_node(brexError);
 				}
 			}
@@ -891,7 +894,7 @@ static bool check_brex_sns_rules(xmlDocPtr snsRulesDoc, xmlNodePtr snsRulesGroup
 	if (correct) {
 		xmlFreeNode(snsError);
 		xmlNewChild(snsCheck, NULL, BAD_CAST "noErrors", NULL);
-	} else if (verbosity > SILENT) {
+	} else if (opts->verbosity > SILENT) {
 		print_node(snsError);
 	}
 
@@ -936,7 +939,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
 
 /* Check the notation used by an entity against the notation rules. */
 static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
-	xmlNodePtr notationCheck)
+	xmlNodePtr notationCheck, struct opts *opts)
 {	
 	char xpath[256];
 	xmlNodePtr rule;
@@ -955,7 +958,7 @@ static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 	xmlNewChild(notationError, NULL, BAD_CAST "invalidNotation", entity->content);
 	xmlAddChild(notationError, xmlCopyNode(firstXPathNode(notationRuleDoc, rule, "objectUse"), 1));
 
-	if (verbosity > SILENT) {
+	if (opts->verbosity > SILENT) {
 		print_node(notationError);
 	}
 
@@ -963,7 +966,7 @@ static int check_entity(xmlEntityPtr entity, xmlDocPtr notationRuleDoc,
 }
 
 /* Check notation rules against a CSDB object. */
-static int check_brex_notation_rules(xmlDocPtr notationRuleDoc, xmlNodePtr notationRuleGroup, xmlDocPtr dmod_doc, xmlNodePtr documentNode)
+static int check_brex_notation_rules(xmlDocPtr notationRuleDoc, xmlNodePtr notationRuleGroup, xmlDocPtr dmod_doc, xmlNodePtr documentNode, struct opts *opts)
 {
 	xmlDtdPtr dtd;
 	xmlNodePtr notationCheck, cur;
@@ -977,7 +980,7 @@ static int check_brex_notation_rules(xmlDocPtr notationRuleDoc, xmlNodePtr notat
 	for (cur = dtd->children; cur; cur = cur->next) {
 		if (cur->type == XML_ENTITY_DECL && ((xmlEntityPtr) cur)->etype == 3) {
 			invalid += check_entity((xmlEntityPtr) cur, notationRuleDoc,
-				notationCheck);
+				notationCheck, opts);
 		}
 	}
 
@@ -990,7 +993,7 @@ static int check_brex_notation_rules(xmlDocPtr notationRuleDoc, xmlNodePtr notat
 
 /* Check the notation rules of BREX DMs against a CSDB object. */
 static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
-	xmlDocPtr dmod_doc, xmlNodePtr documentNode)
+	xmlDocPtr dmod_doc, xmlNodePtr documentNode, struct opts *opts)
 {
 	xmlDocPtr notationRuleDoc;
 	xmlNodePtr notationRuleGroup;
@@ -1010,7 +1013,7 @@ static int check_brex_notations(char (*brex_fnames)[PATH_MAX], int nbrex_fnames,
 		xmlFreeDoc(brex);
 	}
 
-	invalid = check_brex_notation_rules(notationRuleDoc, notationRuleGroup, dmod_doc, documentNode);
+	invalid = check_brex_notation_rules(notationRuleDoc, notationRuleGroup, dmod_doc, documentNode, opts);
 
 	xmlFreeDoc(notationRuleDoc);
 
@@ -1095,7 +1098,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	}
 
 	if (opts->check_notations) {
-		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, documentNode);
+		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, documentNode, opts);
 		total += invalid_notations;
 	}
 
@@ -1107,7 +1110,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		brex_doc = load_brex(brex_fnames[i], dmod_doc);
 
 		if (!brex_doc) {
-			if (verbosity > SILENT) {
+			if (opts->verbosity > SILENT) {
 				fprintf(stderr, E_NODMOD, brex_fnames[i]);
 			}
 			exit(EXIT_BAD_DMODULE);
@@ -1120,7 +1123,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
 			brex_fnames[i], documentNode, opts);
 
-		if (verbosity >= VERBOSE) {
+		if (opts->verbosity >= VERBOSE) {
 			fprintf(stderr,
 				status || !valid_sns || invalid_notations ?
 				F_INVALIDDOC :
@@ -1165,11 +1168,11 @@ static bool brex_exists(char fname[PATH_MAX], char (*fnames)[PATH_MAX], int nfna
 }
 
 /* Add a path to a list of paths, extending its size if necessary. */
-static void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s)
+static void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char *s, struct opts *opts)
 {
 	if ((*n) == (*max)) {
 		if (!(*list = realloc(*list, (*max *= 2) * PATH_MAX))) {
-			if (verbosity > SILENT) {
+			if (opts->verbosity > SILENT) {
 				fprintf(stderr, E_MAXOBJS);
 			}
 			exit(EXIT_MAX_OBJS);
@@ -1180,7 +1183,7 @@ static void add_path(char (**list)[PATH_MAX], int *n, unsigned *max, const char 
 }
 
 /* Add the BREX referenced by another BREX DM in layered mode (-l).*/
-static int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames, xmlDocPtr dmod_doc)
+static int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spaths)[PATH_MAX], int nspaths, char (*dmod_fnames)[PATH_MAX], int num_dmod_fnames, xmlDocPtr dmod_doc, struct opts *opts)
 {
 	int i;
 	int total = nfnames;
@@ -1192,14 +1195,14 @@ static int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spath
 
 		doc = load_brex((*fnames)[i], dmod_doc);
 
-		err = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames);
+		err = find_brex_fname_from_doc(fname, doc, spaths, nspaths, dmod_fnames, num_dmod_fnames, opts);
 
 		if (err) {
 			fprintf(stderr, E_NOBREX_LAYER, (*fnames)[i]);
 			exit(EXIT_BREX_NOT_FOUND);
 		} else if (!brex_exists(fname, (*fnames), nfnames, spaths, nspaths)) {
-			add_path(fnames, &total, &BREX_MAX, fname);
-			total = add_layered_brex(fnames, total, spaths, nspaths, dmod_fnames, num_dmod_fnames, dmod_doc);
+			add_path(fnames, &total, &BREX_MAX, fname, opts);
+			total = add_layered_brex(fnames, total, spaths, nspaths, dmod_fnames, num_dmod_fnames, dmod_doc, opts);
 		}
 
 		xmlFreeDoc(doc);
@@ -1209,7 +1212,7 @@ static int add_layered_brex(char (**fnames)[PATH_MAX], int nfnames, char (*spath
 }
 
 /* Add CSDB objects to check from a list of filenames. */
-static void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int *num_dmod_fnames)
+static void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int *num_dmod_fnames, struct opts *opts)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -1225,7 +1228,7 @@ static void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		add_path(dmod_fnames, num_dmod_fnames, &DMOD_MAX, path);
+		add_path(dmod_fnames, num_dmod_fnames, &DMOD_MAX, path, opts);
 	}
 
 	if (fname) {
@@ -1320,6 +1323,7 @@ typedef enum {
 
 static void init_opts(struct opts *opts, int options)
 {
+	opts->verbosity       = SILENT;
 	opts->layered         = false;
 	opts->check_values    = optset(options, S1KD_BREXCHECK_VALUES);
 	opts->check_sns       = optset(options, S1KD_BREXCHECK_SNS);
@@ -1428,7 +1432,7 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 		xmlDocSetRootElement(notationRulesDoc, notationRulesGroup);
 		xmlAddChild(notationRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//notationRuleList"), 1));
 
-		err += check_brex_notation_rules(notationRulesDoc, notationRulesGroup, doc, node);
+		err += check_brex_notation_rules(notationRulesDoc, notationRulesGroup, doc, node, &opts);
 
 		xmlFreeDoc(notationRulesDoc);
 	}
@@ -1535,6 +1539,8 @@ int main(int argc, char *argv[])
 	xmlNodePtr brexCheck;
 
 	struct opts opts = {
+		/* verbosity */ NORMAL,
+		/* layered */ false,
 		/* check_values */ false,
 		/* check_sns */ false,
 		/* strict_sns */ false,
@@ -1590,18 +1596,18 @@ int main(int argc, char *argv[])
 				use_default_brex = true;
 				break;
 			case 'b':
-				add_path(&brex_fnames, &num_brex_fnames, &BREX_MAX, optarg);
+				add_path(&brex_fnames, &num_brex_fnames, &BREX_MAX, optarg, &opts);
 				break;
 			case 'd':
 				free(search_dir);
 				search_dir = strdup(optarg);
 				break;
 			case 'I':
-				add_path(&brex_search_paths, &num_brex_search_paths, &BREX_PATH_MAX, optarg);
+				add_path(&brex_search_paths, &num_brex_search_paths, &BREX_PATH_MAX, optarg, &opts);
 				break;
 			case 'x': xmlout = true; break;
-			case 'q': verbosity = SILENT; break;
-			case 'v': verbosity = VERBOSE; break;
+			case 'q': opts.verbosity = SILENT; break;
+			case 'v': opts.verbosity = VERBOSE; break;
 			case 's': shortmsg = true; break;
 			case 'l': opts.layered = true; break;
 			case 'w': brsl_fname = strdup(optarg); break;
@@ -1638,13 +1644,13 @@ int main(int argc, char *argv[])
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (is_list) {
-				add_dmod_list(argv[i], &dmod_fnames, &num_dmod_fnames);
+				add_dmod_list(argv[i], &dmod_fnames, &num_dmod_fnames, &opts);
 			} else {
-				add_path(&dmod_fnames, &num_dmod_fnames, &DMOD_MAX, argv[i]);
+				add_path(&dmod_fnames, &num_dmod_fnames, &DMOD_MAX, argv[i], &opts);
 			}
 		}
 	} else if (is_list) {
-		add_dmod_list(NULL, &dmod_fnames, &num_dmod_fnames);
+		add_dmod_list(NULL, &dmod_fnames, &num_dmod_fnames, &opts);
 	} else {
 		strcpy(dmod_fnames[num_dmod_fnames++], "-");
 		use_stdin = true;
@@ -1677,9 +1683,9 @@ int main(int argc, char *argv[])
 			if (ignore_empty) {
 				continue;
 			} else if (use_stdin) {
-				if (verbosity > SILENT) fprintf(stderr, E_NODMOD_STDIN);
+				if (opts.verbosity > SILENT) fprintf(stderr, E_NODMOD_STDIN);
 			} else {
-				if (verbosity > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
+				if (opts.verbosity > SILENT) fprintf(stderr, E_NODMOD, dmod_fnames[i]);
 			}
 			exit(EXIT_BAD_DMODULE);
 		}
@@ -1709,11 +1715,12 @@ int main(int argc, char *argv[])
 					brex_search_paths,
 					num_brex_search_paths,
 					dmod_fnames,
-					num_dmod_fnames))) {
+					num_dmod_fnames,
+					&opts))) {
 				if (use_stdin) {
-					if (verbosity > SILENT) fprintf(stderr, err == 1 ? E_NOBREX_STDIN : W_NOBREX_STDIN);
+					if (opts.verbosity > SILENT) fprintf(stderr, err == 1 ? E_NOBREX_STDIN : W_NOBREX_STDIN);
 				} else {
-					if (verbosity > SILENT) fprintf(stderr, err == 1 ? E_NOBREX : W_NOBREX, dmod_fnames[i]);
+					if (opts.verbosity > SILENT) fprintf(stderr, err == 1 ? E_NOBREX : W_NOBREX, dmod_fnames[i]);
 				}
 
 				/* BREX DM was referenced but not found. */
@@ -1731,7 +1738,7 @@ int main(int argc, char *argv[])
 			/* When using brexDmRef, if the data module is itself a
 			 * BREX data module, include it as a BREX. */
 			if (strcmp(brex_fnames[0], dmod_fnames[i]) != 0 && firstXPathNode(dmod_doc, NULL, "//brex")) {
-				add_path(&brex_fnames, &num_brex_fnames, &BREX_MAX, dmod_fnames[i]);
+				add_path(&brex_fnames, &num_brex_fnames, &BREX_MAX, dmod_fnames[i], &opts);
 			}
 		}
 
@@ -1739,7 +1746,7 @@ int main(int argc, char *argv[])
 			num_brex_fnames = add_layered_brex(&brex_fnames,
 				num_brex_fnames, brex_search_paths,
 				num_brex_search_paths,
-				dmod_fnames, num_dmod_fnames, dmod_doc);
+				dmod_fnames, num_dmod_fnames, dmod_doc, &opts);
 		}
 
 		status += check_brex(dmod_doc, dmod_fnames[i],

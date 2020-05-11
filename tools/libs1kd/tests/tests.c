@@ -10,23 +10,23 @@ void test_brexcheck(void)
 	int err;
 	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
 	xmlDocPtr brex;
-	char *report;
-	int size;
+	xmlDocPtr report;
 	int opts;
 
 	opts = S1KD_BREXCHECK_VALUES | S1KD_BREXCHECK_SNS | S1KD_BREXCHECK_STRICT_SNS | S1KD_BREXCHECK_NOTATIONS;
 
-	err = s1kdDocCheckDefaultBREX(doc, opts, NULL);
-
+	err = s1kdDocCheckDefaultBREX(doc, opts, &report);
 	printf("Default BREX: %s\n", err ? "FAIL" : "PASS");
+	xmlSaveFile("-", report);
+	xmlFreeDoc(report);
 
 	brex = xmlReadFile("brex.xml", NULL, 0);
-
-	err = s1kdDocCheckBREX(doc, brex, opts, NULL);
-
+	err = s1kdDocCheckBREX(doc, brex, opts, &report);
 	printf("Custom BREX: %s\n", err ? "FAIL" : "PASS");
-
+	xmlSaveFile("-", report);
+	xmlFreeDoc(report);
 	xmlFreeDoc(brex);
+
 	xmlFreeDoc(doc);
 }
 
