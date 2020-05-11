@@ -83,11 +83,7 @@ namespace S1kdTools {
 
 		private enum Option
 		{
-			Values = 1,
-			SNS = 2,
-			StrictSNS = 4,
-			UnstrictSNS = 8,
-			Notation = 16
+			Values = 1
 		}
 
 		private bool GetOpt(Option opt)
@@ -110,38 +106,6 @@ namespace S1kdTools {
 		public bool CheckValues {
 			get { return GetOpt(Option.Values); }
 			set { SetOpt(Option.Values, value); }
-		}
-
-		/// <summary>
-		/// Check SNS definitions.
-		/// </summary>
-		public bool CheckSNS {
-			get { return GetOpt(Option.SNS); }
-			set { SetOpt(Option.SNS, value); }
-		}
-
-		/// <summary>
-		/// Use strict SNS check.
-		/// </summary>
-		public bool StrictSNS {
-			get { return GetOpt(Option.StrictSNS); }
-			set { SetOpt(Option.StrictSNS, value); }
-		}
-
-		/// <summary>
-		/// Use unstrict SNS check.
-		/// </summary>
-		public bool UnstrictSNS {
-			get { return GetOpt(Option.UnstrictSNS); }
-			set { SetOpt(Option.UnstrictSNS, value); }
-		}
-
-		/// <summary>
-		/// Check allowed entity NOTATIONs.
-		/// </summary>
-		public bool CheckNotations {
-			get { return GetOpt(Option.Notation); }
-			set { SetOpt(Option.Notation, value); }
 		}
 	}
 

@@ -10,11 +10,7 @@
  * BREX check options.
  */
 typedef enum {
-	S1KD_BREXCHECK_VALUES       = 1,
-	S1KD_BREXCHECK_SNS          = 2,
-	S1KD_BREXCHECK_SNS_STRICT   = 4,
-	S1KD_BREXCHECK_SNS_UNSTRICT = 8,
-	S1KD_BREXCHECK_NOTATION     = 16
+	S1KD_BREXCHECK_VALUES = 1
 } s1kdBREXCheckOption;
 
 /**

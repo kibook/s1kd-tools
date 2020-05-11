@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.3"
+#define VERSION "3.6.4"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1292,21 +1292,17 @@ static void add_config_to_report(xmlNodePtr brexCheck, struct opts *opts)
 
 #ifdef LIBS1KD
 typedef enum {
-	S1KD_BREXCHECK_VALUES       = 1,
-	S1KD_BREXCHECK_SNS          = 2,
-	S1KD_BREXCHECK_SNS_STRICT   = 4,
-	S1KD_BREXCHECK_SNS_UNSTRICT = 8,
-	S1KD_BREXCHECK_NOTATION     = 16
+	S1KD_BREXCHECK_VALUES = 1
 } s1kdBREXCheckOption;
 
 static void init_opts(struct opts *opts, int options)
 {
 	opts->layered        = false;
 	opts->check_values   = optset(options, S1KD_BREXCHECK_VALUES);
-	opts->check_sns      = optset(options, S1KD_BREXCHECK_SNS);
-	opts->strict_sns     = optset(options, S1KD_BREXCHECK_SNS_STRICT);
-	opts->unstrict_sns   = optset(options, S1KD_BREXCHECK_SNS_UNSTRICT);
-	opts->check_notation = optset(options, S1KD_BREXCHECK_NOTATION);
+	opts->check_sns      = false;
+	opts->strict_sns     = false;
+	opts->unstrict_sns   = false;
+	opts->check_notation = false;
 }
 
 int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)

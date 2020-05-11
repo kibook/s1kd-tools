@@ -24,8 +24,6 @@ public class Test
 		XmlDocument report;
 
 		options.CheckValues = true;
-		options.CheckSNS = true;
-		options.StrictSNS = true;
 
 		report = dm.CheckAgainstDefaultBREX();
 		PrintResults(report);
