@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.4"
+#define VERSION "3.6.5"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -815,39 +815,18 @@ static bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNo
 	return ret || firstXPathNode(snsRulesDoc, ctx, path);
 }
 
-/* Check the SNS rules of BREX DMs against a CSDB object. */
-static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
-	const char *dmod_fname, xmlNodePtr documentNode, struct opts *opts)
+static bool check_brex_sns_rules(xmlDocPtr snsRulesDoc, xmlNodePtr snsRulesGroup, xmlDocPtr dmod_doc, xmlNodePtr documentNode, struct opts *opts)
 {
-	xmlNodePtr dmcode;
+	xmlNodePtr dmcode, snsCheck, snsError;
 	xmlChar *systemCode, *subSystemCode, *subSubSystemCode, *assyCode;
+	char value[256];
 	char xpath[256];
 	xmlNodePtr ctx = NULL;
-	xmlNodePtr snsError;
-	char value[256];
-	int i;
-	xmlDocPtr snsRulesDoc;
-	xmlNodePtr snsRulesGroup, snsCheck;
 	bool correct = true;
 
 	/* Only check SNS in data modules. */
 	if (xmlStrcmp(xmlDocGetRootElement(dmod_doc)->name, BAD_CAST "dmodule") != 0)
 		return correct;
-
-	/* The valid SNS is taken as a combination of the snsRules from all specified BREX data modules. */
-	snsRulesDoc = xmlNewDoc(BAD_CAST "1.0");
-	xmlDocSetRootElement(snsRulesDoc, xmlNewNode(NULL, BAD_CAST "snsRulesGroup"));
-	snsRulesGroup = xmlDocGetRootElement(snsRulesDoc);
-
-	for (i = 0; i < nbrex_fnames; ++i) {
-		xmlDocPtr brex;
-
-		brex = load_brex(brex_fnames[i], dmod_doc);
-
-		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
-
-		xmlFreeDoc(brex);
-	}
 
 	dmcode = firstXPathNode(dmod_doc, NULL, "//dmIdent/dmCode");
 
@@ -919,6 +898,36 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 	xmlFree(subSystemCode);
 	xmlFree(subSubSystemCode);
 	xmlFree(assyCode);
+
+	return correct;
+}
+
+/* Check the SNS rules of BREX DMs against a CSDB object. */
+static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
+	const char *dmod_fname, xmlNodePtr documentNode, struct opts *opts)
+{
+	int i;
+	xmlDocPtr snsRulesDoc;
+	xmlNodePtr snsRulesGroup;
+	bool correct;
+
+	/* The valid SNS is taken as a combination of the snsRules from all specified BREX data modules. */
+	snsRulesDoc = xmlNewDoc(BAD_CAST "1.0");
+	xmlDocSetRootElement(snsRulesDoc, xmlNewNode(NULL, BAD_CAST "snsRulesGroup"));
+	snsRulesGroup = xmlDocGetRootElement(snsRulesDoc);
+
+	for (i = 0; i < nbrex_fnames; ++i) {
+		xmlDocPtr brex;
+
+		brex = load_brex(brex_fnames[i], dmod_doc);
+
+		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
+
+		xmlFreeDoc(brex);
+	}
+
+	correct = check_brex_sns_rules(snsRulesDoc, snsRulesGroup, dmod_doc, documentNode, opts);
+
 	xmlFreeDoc(snsRulesDoc);
 
 	return correct;
@@ -1292,16 +1301,19 @@ static void add_config_to_report(xmlNodePtr brexCheck, struct opts *opts)
 
 #ifdef LIBS1KD
 typedef enum {
-	S1KD_BREXCHECK_VALUES = 1
+	S1KD_BREXCHECK_VALUES = 1,
+	S1KD_BREXCHECK_SNS = 2,
+	S1KD_BREXCHECK_STRICT_SNS = 4,
+	S1KD_BREXCHECK_UNSTRICT_SNS = 8
 } s1kdBREXCheckOption;
 
 static void init_opts(struct opts *opts, int options)
 {
 	opts->layered        = false;
 	opts->check_values   = optset(options, S1KD_BREXCHECK_VALUES);
-	opts->check_sns      = false;
-	opts->strict_sns     = false;
-	opts->unstrict_sns   = false;
+	opts->check_sns      = optset(options, S1KD_BREXCHECK_SNS);
+	opts->strict_sns     = optset(options, S1KD_BREXCHECK_STRICT_SNS);
+	opts->unstrict_sns   = optset(options, S1KD_BREXCHECK_UNSTRICT_SNS);
 	opts->check_notation = false;
 }
 
@@ -1366,7 +1378,7 @@ int s1kdCheckDefaultBREX(const char *object_xml, int object_size, int options, c
 
 int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *report)
 {
-	int err;
+	int err = 0;
 	xmlDocPtr rep;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -1386,7 +1398,19 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 	ctx = xmlXPathNewContext(brex);
 	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
 
-	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts);
+	if (opts.check_sns) {
+		xmlDocPtr snsRulesDoc = xmlNewDoc(BAD_CAST "1.0");
+		xmlNodePtr snsRulesGroup = xmlNewNode(NULL, BAD_CAST "snsRules");
+
+		xmlDocSetRootElement(snsRulesDoc, snsRulesGroup);
+		xmlAddChild(snsRulesGroup, xmlCopyNode(firstXPathNode(brex, NULL, "//snsRules"), 1));
+
+		err += check_brex_sns_rules(snsRulesDoc, snsRulesGroup, doc, node, &opts);
+
+		xmlFreeDoc(snsRulesDoc);
+	}
+
+	err += check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts);
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);

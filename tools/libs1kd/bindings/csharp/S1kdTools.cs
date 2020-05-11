@@ -83,15 +83,18 @@ namespace S1kdTools {
 
 		private enum Option
 		{
-			Values = 1
+			Values = 1,
+			Sns = 2,
+			StrictSns = 4,
+			UnstrictSns = 8
 		}
 
-		private bool GetOpt(Option opt)
+		private bool Get(Option opt)
 		{
 			return (bits & (int) opt) == (int) opt;
 		}
 
-		private void SetOpt(Option opt, bool val)
+		private void Set(Option opt, bool val)
 		{
 			if (val) {
 				bits |= (int) opt;
@@ -104,8 +107,32 @@ namespace S1kdTools {
 		/// Check object values.
 		/// </summary>
 		public bool CheckValues {
-			get { return GetOpt(Option.Values); }
-			set { SetOpt(Option.Values, value); }
+			get { return Get(Option.Values); }
+			set { Set(Option.Values, value); }
+		}
+
+		/// <summary>
+		/// Check BREX SNS rules.
+		/// </summary>
+		public bool CheckSns {
+			get { return Get(Option.Sns); }
+			set { Set(Option.Sns, value); }
+		}
+
+		/// <summary>
+		/// Use the strict SNS check method.
+		/// </summary>
+		public bool StrictSns {
+			get { return Get(Option.StrictSns); }
+			set { Set(Option.StrictSns, value); }
+		}
+
+		/// <summary>
+		/// Uset the unstrict SNS check method.
+		/// </summary>
+		public bool UnstrictSns {
+			get { return Get(Option.UnstrictSns); }
+			set { Set(Option.UnstrictSns, value); }
 		}
 	}
 

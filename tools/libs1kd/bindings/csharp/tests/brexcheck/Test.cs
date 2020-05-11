@@ -24,6 +24,8 @@ public class Test
 		XmlDocument report;
 
 		options.CheckValues = true;
+		options.CheckSns = true;
+		options.StrictSns = true;
 
 		report = dm.CheckAgainstDefaultBREX();
 		PrintResults(report);
