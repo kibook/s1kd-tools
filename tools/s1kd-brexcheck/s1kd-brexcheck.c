@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.1"
+#define VERSION "3.6.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -71,31 +71,6 @@ static bool shortmsg = false;
 static char *brsl_fname = NULL;
 static xmlDocPtr brsl;
 
-/* Whether to check the SNS of specified data modules against the SNS rules
- * defined in the BREX data modules.
- *
- * In normal SNS check mode, optional levels that are omitted from the SNS
- * rules only allow the value of '0' (or '00'/'0000' for the assyCode). Any
- * other code is treated as invalid.
- */
-static bool check_sns = false;
-/* In strict SNS check mode, all levels of the SNS must be explicitly defined
- * in the SNS rules, otherwise an error will be reported.
- */
-static bool strict_sns = false;
-/* In unstrict SNS check mode, if an optional level is omitted from the SNS
- * rules, that is interpreted as allowing ANY code.
- */
-static bool unstrict_sns = false;
-
-/* Whether to check notation rules, that is, what NOTATIONs are allowed in
- * the DTD.
- */
-static bool check_notation = false;
-
-/* Whether to check object values. */
-static bool check_values = false;
-
 /* Print the filenames of invalid objects. */
 static enum show_fnames { SHOW_NONE, SHOW_INVALID, SHOW_VALID } show_fnames = SHOW_NONE;
 
@@ -113,6 +88,38 @@ static bool ignore_empty = false;
 
 /* Remove elements marked as "delete" before check. */
 static bool rem_delete = false;
+
+struct opts {
+	/* Whether to check layered BREX DMs. */
+	bool layered;
+
+	/* Whether to check object values. */
+	bool check_values;
+
+	/* Whether to check the SNS of specified data modules against the SNS
+	 * rules defined in the BREX data modules.
+	 *
+	 * In normal SNS check mode, optional levels that are omitted from the
+	 * SNS rules only allow the value of '0' (or '00'/'0000' for the
+	 * assyCode). Any other code is treated as invalid.
+	 */
+	bool check_sns;
+
+	/* In strict SNS check mode, all levels of the SNS must be explicitly
+	 * defined in the SNS rules, otherwise an error will be reported.
+	 */
+	bool strict_sns;
+
+	/* In unstrict SNS check mode, if an optional level is omitted from the
+	 * SNS rules, that is interpreted as allowing ANY code.
+	 */
+	bool unstrict_sns;
+
+	/* Whether to check notation rules, that is, what NOTATIONs are allowed in
+	 * the DTD.
+	 */
+	bool check_notation;
+};
 
 /* Return the first node in a set matching an XPath expression. */
 static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr context, const char *xpath)
@@ -232,7 +239,7 @@ static bool check_objects_values(xmlNodePtr rule, xmlNodeSetPtr nodes)
 }
 
 /* Determine whether a BREX context rule is violated. */
-static bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj)
+static bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectPtr obj, struct opts *opts)
 {
 	bool invalid = false;
 
@@ -252,14 +259,14 @@ static bool is_invalid(xmlNodePtr rule, char *allowedObjectFlag, xmlXPathObjectP
 		}
 	}
 
-	if (!invalid && check_values)
+	if (!invalid && opts->check_values)
 		invalid = !check_objects_values(rule, obj->nodesetval);
 
 	return invalid;
 }
 
 /* Dump the XML branches that violate a given BREX context rule. */
-static void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule)
+static void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr brexError, xmlNodePtr rule, struct opts *opts)
 {
 	int i;
 
@@ -269,7 +276,7 @@ static void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr br
 		char line_s[16];
 		xmlChar *xpath;
 
-		if (check_values && check_single_object_values(rule, node)) {
+		if (opts->check_values && check_single_object_values(rule, node)) {
 			continue;
 		}
 
@@ -634,7 +641,7 @@ static void print_node(xmlNodePtr node)
 
 /* Check the context rules of a BREX DM against a CSDB object. */
 static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
-	const char *brexfname, xmlNodePtr documentNode)
+	const char *brexfname, xmlNodePtr documentNode, struct opts *opts)
 {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
@@ -676,7 +683,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 				exit(EXIT_INVALID_OBJ_PATH);
 			}
 
-			if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object)) {
+			if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object, opts)) {
 				xmlChar *severity;
 				xmlNodePtr err_path;
 
@@ -710,7 +717,8 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 
 				if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 					dump_nodes_xml(object->nodesetval, fname,
-						brexError, rules->nodeTab[i]);
+						brexError, rules->nodeTab[i],
+						opts);
 				}
 
 				if (severity) {
@@ -789,13 +797,13 @@ static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 }
 
 /* Determine which parts of the SNS rules to check. */
-static bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx)
+static bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNodePtr ctx, struct opts *opts)
 {
 	bool ret;
 
-	if (strict_sns) return true;
+	if (opts->strict_sns) return true;
 
-	if (unstrict_sns)
+	if (opts->unstrict_sns)
 		return firstXPathNode(snsRulesDoc, ctx, path);
 
 	if (strcmp(path, ".//snsSubSystem") == 0 || strcmp(path, ".//snsSubSubSystem") == 0) {
@@ -809,7 +817,7 @@ static bool should_check(xmlChar *code, char *path, xmlDocPtr snsRulesDoc, xmlNo
 
 /* Check the SNS rules of BREX DMs against a CSDB object. */
 static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlDocPtr dmod_doc,
-	const char *dmod_fname, xmlNodePtr documentNode)
+	const char *dmod_fname, xmlNodePtr documentNode, struct opts *opts)
 {
 	xmlNodePtr dmcode;
 	xmlChar *systemCode, *subSystemCode, *subSubSystemCode, *assyCode;
@@ -854,7 +862,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 	/* Check the SNS of the data module against the SNS rules in descending order. */
 
 	/* System code. */
-	if (should_check(systemCode, "//snsSystem", snsRulesDoc, ctx)) {
+	if (should_check(systemCode, "//snsSystem", snsRulesDoc, ctx, opts)) {
 		sprintf(xpath, "//snsSystem[snsCode = '%s']", (char *) systemCode);
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "systemCode");
@@ -865,7 +873,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 	}
 
 	/* Subsystem code. */
-	if (correct && should_check(subSystemCode, ".//snsSubSystem", snsRulesDoc, ctx)) {
+	if (correct && should_check(subSystemCode, ".//snsSubSystem", snsRulesDoc, ctx, opts)) {
 		sprintf(xpath, ".//snsSubSystem[snsCode = '%s']", (char *) subSystemCode);
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSystemCode");
@@ -877,7 +885,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 	}
 
 	/* Subsubsystem code. */
-	if (correct && should_check(subSubSystemCode, ".//snsSubSubSystem", snsRulesDoc, ctx)) {
+	if (correct && should_check(subSubSystemCode, ".//snsSubSubSystem", snsRulesDoc, ctx, opts)) {
 		sprintf(xpath, ".//snsSubSubSystem[snsCode = '%s']", (char *) subSubSystemCode);
 		if (!(ctx = firstXPathNode(snsRulesDoc, ctx, xpath))) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "subSubSystemCode");
@@ -889,7 +897,7 @@ static bool check_brex_sns(char (*brex_fnames)[PATH_MAX], int nbrex_fnames, xmlD
 	}
 
 	/* Assembly code. */
-	if (correct && should_check(assyCode, ".//snsAssy", snsRulesDoc, ctx)) {
+	if (correct && should_check(assyCode, ".//snsAssy", snsRulesDoc, ctx, opts)) {
 		sprintf(xpath, ".//snsAssy[snsCode = '%s']", (char *) assyCode);
 		if (!firstXPathNode(snsRulesDoc, ctx, xpath)) {
 			xmlNewChild(snsError, NULL, BAD_CAST "code", BAD_CAST "assyCode");
@@ -1026,7 +1034,8 @@ static void print_valid_fnames(xmlNodePtr node)
 
 /* Check context, SNS, and notation rules of BREX DMs against a CSDB object. */
 static int check_brex(xmlDocPtr dmod_doc, const char *docname,
-	char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck)
+	char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck,
+	struct opts *opts)
 {
 	xmlDocPtr brex_doc;
 	xmlNodePtr documentNode;
@@ -1059,10 +1068,14 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	documentNode = xmlNewChild(brexCheck, NULL, BAD_CAST "document", NULL);
 	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST docname);
 
-	if (check_sns && !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc, docname, documentNode)))
+	if (opts->check_sns &&
+	    !(valid_sns = check_brex_sns(brex_fnames, num_brex_fnames, dmod_doc,
+			                 docname, documentNode, opts)))
+	{
 		++total;
+	}
 
-	if (check_notation) {
+	if (opts->check_notation) {
 		invalid_notations = check_brex_notations(brex_fnames, num_brex_fnames, dmod_doc, docname, documentNode);
 		total += invalid_notations;
 	}
@@ -1086,7 +1099,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
 
 		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
-			brex_fnames[i], documentNode);
+			brex_fnames[i], documentNode, opts);
 
 		if (verbosity >= VERBOSE) {
 			fprintf(stderr,
@@ -1243,8 +1256,59 @@ static void print_stats(xmlDocPtr doc)
 	xsltFreeStylesheet(style);
 }
 
+/* Add configuration information to report. */
+static void add_config_to_report(xmlNodePtr brexCheck, struct opts *opts)
+{
+	if (opts->layered) {
+		xmlSetProp(brexCheck, BAD_CAST "layered", BAD_CAST "yes");
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "layered", BAD_CAST "no");
+	}
+
+	if (opts->check_values) {
+		xmlSetProp(brexCheck, BAD_CAST "checkObjectValues", BAD_CAST "yes");
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "checkObjectValues", BAD_CAST "no");
+	}
+
+	if (opts->check_sns) {
+		if (opts->strict_sns) {
+			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "strict");
+		} else if (opts->unstrict_sns) {
+			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "unstrict");
+		} else {
+			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "normal");
+		}
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "no");
+	}
+
+	if (opts->check_notation) {
+		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "yes");
+	} else {
+		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "no");
+	}
+}
+
 #ifdef LIBS1KD
-int s1kdDocCheckDefaultBREX(xmlDocPtr doc, xmlDocPtr *report)
+typedef enum {
+	S1KD_BREXCHECK_VALUES       = 1,
+	S1KD_BREXCHECK_SNS          = 2,
+	S1KD_BREXCHECK_SNS_STRICT   = 4,
+	S1KD_BREXCHECK_SNS_UNSTRICT = 8,
+	S1KD_BREXCHECK_NOTATION     = 16
+} s1kdBREXCheckOption;
+
+static void init_opts(struct opts *opts, int options)
+{
+	opts->check_values   = optset(options, S1KD_BREXCHECK_VALUES);
+	opts->check_sns      = optset(options, S1KD_BREXCHECK_SNS);
+	opts->strict_sns     = optset(options, S1KD_BREXCHECK_SNS_STRICT);
+	opts->unstrict_sns   = optset(options, S1KD_BREXCHECK_SNS_UNSTRICT);
+	opts->check_notation = optset(options, S1KD_BREXCHECK_NOTATION);
+}
+
+int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 {
 	int err;
 	xmlDocPtr brex;
@@ -1253,10 +1317,14 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, xmlDocPtr *report)
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
 	const char *brex_dmc;
+	struct opts opts;
+
+	init_opts(&opts, options);
 
 	rep = xmlNewDoc(BAD_CAST "1.0");
 	node = xmlNewNode(NULL, BAD_CAST "brexCheck");
 	xmlDocSetRootElement(rep, node);
+	add_config_to_report(node, &opts);
 
 	node = xmlNewChild(node, NULL, BAD_CAST "document", NULL);
 	xmlSetProp(node, BAD_CAST "path", doc->URL);
@@ -1267,7 +1335,7 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, xmlDocPtr *report)
 	ctx = xmlXPathNewContext(brex);
 	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
 
-	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node);
+	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node, &opts);
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
@@ -1282,13 +1350,13 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, xmlDocPtr *report)
 	return err;
 }
 
-int s1kdCheckDefaultBREX(const char *object_xml, int object_size, char **report_xml, int *report_size)
+int s1kdCheckDefaultBREX(const char *object_xml, int object_size, int options, char **report_xml, int *report_size)
 {
 	xmlDocPtr doc, rep;
 	int err;
 
 	doc = read_xml_mem(object_xml, object_size);
-	err = s1kdDocCheckDefaultBREX(doc, &rep);
+	err = s1kdDocCheckDefaultBREX(doc, options, &rep);
 	xmlFreeDoc(doc);
 
 	if (report_xml && report_size) {
@@ -1299,17 +1367,21 @@ int s1kdCheckDefaultBREX(const char *object_xml, int object_size, char **report_
 	return err;
 }
 
-int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, xmlDocPtr *report)
+int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *report)
 {
 	int err;
 	xmlDocPtr rep;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
+	struct opts opts;
+
+	init_opts(&opts, options);
 
 	rep = xmlNewDoc(BAD_CAST "1.0");
 	node = xmlNewNode(NULL, BAD_CAST "brexCheck");
 	xmlDocSetRootElement(rep, node);
+	add_config_to_report(node, &opts);
 
 	node = xmlNewChild(node, NULL, BAD_CAST "document", NULL);
 	xmlSetProp(node, BAD_CAST "path", doc->URL);
@@ -1317,7 +1389,7 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, xmlDocPtr *report)
 	ctx = xmlXPathNewContext(brex);
 	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
 
-	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node);
+	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts);
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
@@ -1331,14 +1403,14 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, xmlDocPtr *report)
 	return err;
 }
 
-int s1kdCheckBREX(const char *object_xml, int object_size, const char *brex_xml, int brex_size, char **report_xml, int *report_size)
+int s1kdCheckBREX(const char *object_xml, int object_size, const char *brex_xml, int brex_size, int options, char **report_xml, int *report_size)
 {
 	xmlDocPtr doc, brex, rep;
 	int err;
 
 	doc = read_xml_mem(object_xml, object_size);
 	brex = read_xml_mem(brex_xml, brex_size);
-	err = s1kdDocCheckBREX(doc, brex, &rep);
+	err = s1kdDocCheckBREX(doc, brex, options, &rep);
 	xmlFreeDoc(doc);
 	xmlFreeDoc(brex);
 
@@ -1410,7 +1482,6 @@ int main(int argc, char *argv[])
 
 	bool use_stdin = false;
 	bool xmlout = false;
-	bool layered = false;
 	bool progress = false;
 	bool is_list = false;
 	bool use_default_brex = false;
@@ -1418,6 +1489,14 @@ int main(int argc, char *argv[])
 
 	xmlDocPtr outdoc;
 	xmlNodePtr brexCheck;
+
+	struct opts opts = {
+		/* check_values */ false,
+		/* check_sns */ false,
+		/* strict_sns */ false,
+		/* unstrict_sns */ false,
+		/* check_notation */ false
+	};
 
 	const char *sopts = "Bb:eI:xvqslw:StupFfncLTrd:o^h?";
 	struct option lopts[] = {
@@ -1480,16 +1559,16 @@ int main(int argc, char *argv[])
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 's': shortmsg = true; break;
-			case 'l': layered = true; break;
+			case 'l': opts.layered = true; break;
 			case 'w': brsl_fname = strdup(optarg); break;
-			case 'S': check_sns = true; break;
-			case 't': strict_sns = true; break;
-			case 'u': unstrict_sns = true; break;
+			case 'S': opts.check_sns = true; break;
+			case 't': opts.strict_sns = true; break;
+			case 'u': opts.unstrict_sns = true; break;
 			case 'p': progress = true; break;
 			case 'F': show_fnames = SHOW_VALID; break;
 			case 'f': show_fnames = SHOW_INVALID; break;
-			case 'n': check_notation = true; break;
-			case 'c': check_values = true; break;
+			case 'n': opts.check_notation = true; break;
+			case 'c': opts.check_values = true; break;
 			case 'L': is_list = true; break;
 			case 'T': show_stats = true; break;
 			case 'r': recursive_search = true; break;
@@ -1536,35 +1615,7 @@ int main(int argc, char *argv[])
 	xmlDocSetRootElement(outdoc, brexCheck);
 
 	/* Add configuration info to XML report. */
-	if (layered) {
-		xmlSetProp(brexCheck, BAD_CAST "layered", BAD_CAST "yes");
-	} else {
-		xmlSetProp(brexCheck, BAD_CAST "layered", BAD_CAST "no");
-	}
-
-	if (check_values) {
-		xmlSetProp(brexCheck, BAD_CAST "checkObjectValues", BAD_CAST "yes");
-	} else {
-		xmlSetProp(brexCheck, BAD_CAST "checkObjectValues", BAD_CAST "no");
-	}
-
-	if (check_sns) {
-		if (strict_sns) {
-			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "strict");
-		} else if (unstrict_sns) {
-			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "unstrict");
-		} else {
-			xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "normal");
-		}
-	} else {
-		xmlSetProp(brexCheck, BAD_CAST "snsCheck", BAD_CAST "no");
-	}
-
-	if (check_notation) {
-		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "yes");
-	} else {
-		xmlSetProp(brexCheck, BAD_CAST "notationCheck", BAD_CAST "no");
-	}
+	add_config_to_report(brexCheck, &opts);
 
 	for (i = 0; i < num_dmod_fnames; ++i) {
 		/* Indicates if a referenced BREX data module is used as
@@ -1640,7 +1691,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		if (layered) {
+		if (opts.layered) {
 			num_brex_fnames = add_layered_brex(&brex_fnames,
 				num_brex_fnames, brex_search_paths,
 				num_brex_search_paths,
@@ -1648,7 +1699,7 @@ int main(int argc, char *argv[])
 		}
 
 		status += check_brex(dmod_doc, dmod_fnames[i],
-			brex_fnames, num_brex_fnames, brexCheck);
+			brex_fnames, num_brex_fnames, brexCheck, &opts);
 
 		xmlFreeDoc(dmod_doc);
 

@@ -52,6 +52,7 @@
       <para applicRefId="app-A">A</para>
       <para applicRefId="app-B">B</para>
       <para><emphasis>C</emphasis></para>
+      <para><emphasis emphasisType="em40">D</emphasis></para>
     </description>
   </content>
 </dmodule>

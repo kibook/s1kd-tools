@@ -12,14 +12,17 @@ void test_brexcheck(void)
 	xmlDocPtr brex;
 	char *report;
 	int size;
+	int opts;
 
-	err = s1kdDocCheckDefaultBREX(doc, NULL);
+	opts = S1KD_BREXCHECK_VALUES;
+
+	err = s1kdDocCheckDefaultBREX(doc, opts, NULL);
 
 	printf("Default BREX: %s\n", err ? "FAIL" : "PASS");
 
 	brex = xmlReadFile("brex.xml", NULL, 0);
 
-	err = s1kdDocCheckBREX(doc, brex, NULL);
+	err = s1kdDocCheckBREX(doc, brex, opts, NULL);
 
 	printf("Custom BREX: %s\n", err ? "FAIL" : "PASS");
 
@@ -31,12 +34,15 @@ void test_brexcheck_2(void)
 {
 	char *report;
 	int size;
+	int opts;
 
-	s1kdCheckDefaultBREX("<root/>", 7, &report, &size);
+	opts = S1KD_BREXCHECK_VALUES;
+
+	s1kdCheckDefaultBREX("<root/>", 7, opts, &report, &size);
 	puts(report);
 	free(report);
 
-	s1kdCheckBREX("<root/>", 7, "<root/>", 7, &report, &size);
+	s1kdCheckBREX("<root/>", 7, "<root/>", 7, opts, &report, &size);
 	puts(report);
 	free(report);
 }
