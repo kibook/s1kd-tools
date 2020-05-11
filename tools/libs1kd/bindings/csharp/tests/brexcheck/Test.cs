@@ -13,16 +13,30 @@ public class Test
 		} else {
 			Console.WriteLine("There were no BREX errors");
 		}
+
+		Console.WriteLine(report.OuterXml);
 	}
 
 	public static void Main(string[] args)
 	{
 		CsdbObject dm = new CsdbObject("test.xml");
+		BrexCheckOptions options = new BrexCheckOptions();
+		XmlDocument report;
 
-		XmlDocument report = dm.CheckAgainstDefaultBREX();
+		options.CheckValues = true;
+		options.CheckSNS = true;
+		options.StrictSNS = true;
+
+		report = dm.CheckAgainstDefaultBREX();
+		PrintResults(report);
+
+		report = dm.CheckAgainstDefaultBREX(options);
 		PrintResults(report);
 
 		report = dm.CheckAgainstBREX("brex.xml");
+		PrintResults(report);
+
+		report = dm.CheckAgainstBREX("brex.xml", options);
 		PrintResults(report);
 	}
 }

@@ -75,6 +75,77 @@ namespace S1kdTools {
 	}
 
 	/// <summary>
+	/// BREX check options.
+	/// </summary>
+	public class BrexCheckOptions
+	{
+		internal int bits = 0;
+
+		private enum Option
+		{
+			Values = 1,
+			SNS = 2,
+			StrictSNS = 4,
+			UnstrictSNS = 8,
+			Notation = 16
+		}
+
+		private bool GetOpt(Option opt)
+		{
+			return (bits & (int) opt) == (int) opt;
+		}
+
+		private void SetOpt(Option opt, bool val)
+		{
+			if (val) {
+				bits |= (int) opt;
+			} else {
+				bits &= ~((int ) opt);
+			}
+		}
+
+		/// <summary>
+		/// Check object values.
+		/// </summary>
+		public bool CheckValues {
+			get { return GetOpt(Option.Values); }
+			set { SetOpt(Option.Values, value); }
+		}
+
+		/// <summary>
+		/// Check SNS definitions.
+		/// </summary>
+		public bool CheckSNS {
+			get { return GetOpt(Option.SNS); }
+			set { SetOpt(Option.SNS, value); }
+		}
+
+		/// <summary>
+		/// Use strict SNS check.
+		/// </summary>
+		public bool StrictSNS {
+			get { return GetOpt(Option.StrictSNS); }
+			set { SetOpt(Option.StrictSNS, value); }
+		}
+
+		/// <summary>
+		/// Use unstrict SNS check.
+		/// </summary>
+		public bool UnstrictSNS {
+			get { return GetOpt(Option.UnstrictSNS); }
+			set { SetOpt(Option.UnstrictSNS, value); }
+		}
+
+		/// <summary>
+		/// Check allowed entity NOTATIONs.
+		/// </summary>
+		public bool CheckNotations {
+			get { return GetOpt(Option.Notation); }
+			set { SetOpt(Option.Notation, value); }
+		}
+	}
+
+	/// <summary>
 	/// A CSDB object.
 	/// </summary>
 	public class CsdbObject
@@ -82,10 +153,10 @@ namespace S1kdTools {
 		private XmlDocument doc;
 
 		[DllImport("libs1kd")]
-		unsafe private static extern int s1kdCheckDefaultBREX(string object_xml, int object_size, out string report_xml, out int report_size);
+		unsafe private static extern int s1kdCheckDefaultBREX(string object_xml, int object_size, int options, out string report_xml, out int report_size);
 
 		[DllImport("libs1kd")]
-		unsafe private static extern int s1kdCheckBREX(string object_xml, int object_size, String brex_xml, int brex_size, out string report_xml, out int report_size);
+		unsafe private static extern int s1kdCheckBREX(string object_xml, int object_size, String brex_xml, int brex_size, int options, out string report_xml, out int report_size);
 
 		[DllImport("libs1kd")]
 		unsafe private static extern int s1kdFilter(string object_xml, int object_size, void *app, FilterMode mode, out string result_xml, out int result_size);
@@ -96,14 +167,14 @@ namespace S1kdTools {
 		[DllImport("libs1kd")]
 		unsafe private static extern int s1kdSetMetadata(string object_xml, int object_size, string name, string val, out string result_xml, out int result_size);
 
-		unsafe private XmlDocument CheckAgainstBREXImpl(XmlDocument brex)
+		unsafe private XmlDocument CheckAgainstBREXImpl(XmlDocument brex, BrexCheckOptions options)
 		{
 			string objectXml = doc.OuterXml;
 			string brexXml = brex.OuterXml;
 			string reportXml;
 			int size;
 			
-			s1kdCheckBREX(objectXml, objectXml.Length, brexXml, brexXml.Length, out reportXml, out size);
+			s1kdCheckBREX(objectXml, objectXml.Length, brexXml, brexXml.Length, options.bits, out reportXml, out size);
 
 			XmlDocument report = new XmlDocument();
 			report.LoadXml(reportXml);
@@ -111,13 +182,13 @@ namespace S1kdTools {
 			return report;
 		}
 
-		unsafe private XmlDocument CheckAgainstDefaultBREXImpl()
+		unsafe private XmlDocument CheckAgainstDefaultBREXImpl(BrexCheckOptions options)
 		{
 			string objectXml = doc.OuterXml;
 			string reportXml;
 			int size;
 
-			s1kdCheckDefaultBREX(objectXml, objectXml.Length, out reportXml, out size);
+			s1kdCheckDefaultBREX(objectXml, objectXml.Length, options.bits, out reportXml, out size);
 
 			XmlDocument report = new XmlDocument();
 			report.LoadXml(reportXml);
@@ -283,12 +354,38 @@ namespace S1kdTools {
 		/// <summary>
 		/// Check the CSDB object against the appropriate S1000D default BREX.
 		/// </summary>
+		/// <param name="options">BREX check options</param>
+		/// <returns>
+		/// An XML report of the results of the BREX check
+		/// </returns>
+		public XmlDocument CheckAgainstDefaultBREX(BrexCheckOptions options)
+		{
+			return CheckAgainstDefaultBREXImpl(options);
+		}
+
+		/// <summary>
+		/// Check the CSDB object against the appropriate S1000D default BREX.
+		/// </summary>
 		/// <returns>
 		/// An XML report of the results of the BREX check
 		/// </returns>
 		public XmlDocument CheckAgainstDefaultBREX()
 		{
-			return CheckAgainstDefaultBREXImpl();
+			BrexCheckOptions options = new BrexCheckOptions();
+			return CheckAgainstDefaultBREXImpl(options);
+		}
+
+		/// <summary>
+		/// Check the CSDB object against a specified BREX data module.
+		/// </summary>
+		/// <param name="brex">The BREX data module to check against</para>
+		/// <param name="options">BREX check options</param>
+		/// <returns>
+		/// An XML report of the results of the BREX check
+		/// </returns>
+		public XmlDocument CheckAgainstBREX(CsdbObject brex, BrexCheckOptions options)
+		{
+			return CheckAgainstBREXImpl(brex.XmlDocument, options);
 		}
 
 		/// <summary>
@@ -300,7 +397,22 @@ namespace S1kdTools {
 		/// </returns>
 		public XmlDocument CheckAgainstBREX(CsdbObject brex)
 		{
-			return CheckAgainstBREXImpl(brex.XmlDocument);
+			BrexCheckOptions options = new BrexCheckOptions();
+			return CheckAgainstBREXImpl(brex.XmlDocument, options);
+		}
+
+		/// <summary>
+		/// Check the CSDB object against a BREX data module XML file.
+		/// </summary>
+		/// <param name="path">The path to the BREX file</param>
+		/// <param name="options">BREX check options</param>
+		/// <returns>
+		/// An XML report of the results of the BREX check
+		/// </returns>
+		public XmlDocument CheckAgainstBREX(string path, BrexCheckOptions options)
+		{
+			CsdbObject brex = new CsdbObject(path);
+			return CheckAgainstBREX(brex, options);
 		}
 
 		/// <summary>
@@ -313,7 +425,8 @@ namespace S1kdTools {
 		public XmlDocument CheckAgainstBREX(string path)
 		{
 			CsdbObject brex = new CsdbObject(path);
-			return CheckAgainstBREX(brex);
+			BrexCheckOptions options = new BrexCheckOptions();
+			return CheckAgainstBREX(brex, options);
 		}
 
 		/// <summary>
