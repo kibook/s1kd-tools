@@ -87,7 +87,9 @@ namespace S1kdTools {
 			Sns = 2,
 			StrictSns = 4,
 			UnstrictSns = 8,
-			Notations = 16
+			Notations = 16,
+			NormalLog = 32,
+			VerboseLog = 64
 		}
 
 		private bool Get(Option opt)
@@ -142,6 +144,22 @@ namespace S1kdTools {
 		public bool CheckNotations {
 			get { return Get(Option.Notations); }
 			set { Set(Option.Notations, value); }
+		}
+
+		/// <summary>
+		/// Output errors to console.
+		/// </summary>
+		public bool NormalLog {
+			get { return Get(Option.NormalLog); }
+			set { Set(Option.NormalLog, value); }
+		}
+
+		/// <summary>
+		/// Output errors and informative messages to console.
+		/// </summary>
+		public bool VerboseLog {
+			get { return Get(Option.VerboseLog); }
+			set { Set(Option.VerboseLog, value); }
 		}
 	}
 

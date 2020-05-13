@@ -27,6 +27,7 @@ public class Test
 		options.CheckSns = true;
 		options.StrictSns = true;
 		options.CheckNotations = true;
+		options.VerboseLog = true;
 
 		report = dm.CheckAgainstDefaultBREX();
 		PrintResults(report);

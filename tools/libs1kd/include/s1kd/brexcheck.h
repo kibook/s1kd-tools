@@ -10,11 +10,13 @@
  * BREX check options.
  */
 typedef enum {
-	S1KD_BREXCHECK_VALUES = 1,
-	S1KD_BREXCHECK_SNS = 2,
-	S1KD_BREXCHECK_STRICT_SNS = 4,
-	S1KD_BREXCHECK_UNSTRICT_SNS = 8,
-	S1KD_BREXCHECK_NOTATIONS = 16
+	S1KD_BREXCHECK_VALUES = 1, /**< Check object values. */
+	S1KD_BREXCHECK_SNS = 2, /**< Check SNS rules. */
+	S1KD_BREXCHECK_STRICT_SNS = 4, /**< Use strict SNS checking. */
+	S1KD_BREXCHECK_UNSTRICT_SNS = 8, /**< Use unstrict SNS checking. */
+	S1KD_BREXCHECK_NOTATIONS = 16, /**< Check notation rules. */
+	S1KD_BREXCHECK_NORMAL_LOG = 32, /**< Output errors to console. */
+	S1KD_BREXCHECK_VERBOSE_LOG = 64 /**< Output errors and informative messages to console. */
 } s1kdBREXCheckOption;
 
 /**

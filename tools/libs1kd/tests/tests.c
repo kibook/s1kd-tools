@@ -21,7 +21,7 @@ void test_brexcheck(void)
 	xmlFreeDoc(report);
 
 	brex = xmlReadFile("brex.xml", NULL, 0);
-	err = s1kdDocCheckBREX(doc, brex, opts, &report);
+	err = s1kdDocCheckBREX(doc, brex, opts | S1KD_BREXCHECK_VERBOSE_LOG, &report);
 	printf("Custom BREX: %s\n", err ? "FAIL" : "PASS");
 	xmlSaveFile("-", report);
 	xmlFreeDoc(report);
