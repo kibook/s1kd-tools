@@ -67,7 +67,8 @@ xmlDocPtr s1kdDocFilter(xmlDocPtr doc, s1kdApplicability app, s1kdFilterMode mod
  * @param mode Filtering mode
  * @param result_xml Output buffer containing the XML of the resulting instance
  * @param result_size Size of the result XML buffer
+ * @return 0 if filtering was successful, non-zero otherwise
  */
-void s1kdFilter(const char *object_xml, int object_size, s1kdApplicability app, s1kdFilterMode mode, char **result_xml, int *result_size);
+int s1kdFilter(const char *object_xml, int object_size, s1kdApplicability app, s1kdFilterMode mode, char **result_xml, int *result_size);
 
 #endif
