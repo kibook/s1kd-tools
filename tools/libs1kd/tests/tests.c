@@ -50,7 +50,17 @@ void test_brexcheck_2(void)
 void test_metadata(void)
 {
 	xmlDocPtr doc = xmlReadFile("test.xml", NULL, 0);
-	xmlChar *date;
+	xmlChar *issue, *date;
+
+	issue = s1kdDocGetMetadata(doc, BAD_CAST "issue");
+	printf("ISSUE: %s\n", (char *) issue);
+	xmlFree(issue);
+
+	s1kdDocSetMetadata(doc, BAD_CAST "issue", BAD_CAST "4.1");
+
+	issue = s1kdDocGetMetadata(doc, BAD_CAST "issue");
+	printf("ISSUE: %s\n", (char *) issue);
+	xmlFree(issue);
 
 	date = s1kdDocGetMetadata(doc, BAD_CAST "issueDate");
 	printf("DATE: %s\n", (char *) date);
