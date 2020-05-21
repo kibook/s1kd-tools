@@ -21,7 +21,7 @@
 #include "addTags.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.4.1"
+#define VERSION "3.4.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -726,7 +726,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:F:fG:gklNpqrt:vxh?";
+	const char *sopts = "A:a:C:cDd:F:fG:gklNpqrt:vh?";
 	struct option lopts[] = {
 		{"version"     , no_argument      , 0, 0},
 		{"help"        , no_argument      , 0, 'h'},
