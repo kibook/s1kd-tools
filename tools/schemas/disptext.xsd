@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  version="1.0">
+  <xs:element name="disptext" type="disptextElemType"/>
+  <xs:complexType name="disptextElemType">
+    <xs:sequence>
+      <xs:element ref="default"/>
+      <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="default" type="defaultElemType"/>
+  <xs:complexType name="defaultElemType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="name"/>
+      <xs:element ref="text"/>
+      <xs:element ref="values"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="property" type="propertyElemType"/>
+  <xs:complexType name="propertyElemType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="name"/>
+      <xs:element ref="text"/>
+      <xs:element ref="values"/>
+    </xs:choice>
+    <xs:attribute name="ident" type="xs:NCName" use="required"/>
+    <xs:attribute name="type" type="applicPropertyTypeAttType" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="applicPropertyTypeAttType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="condition"/>
+      <xs:enumeration value="prodattr"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="name" type="nameElemType"/>
+  <xs:complexType name="nameElemType"/>
+  <xs:element name="text" type="xs:string"/>
+  <xs:element name="values" type="valuesElemType"/>
+  <xs:complexType name="valuesElemType">
+    <xs:sequence>
+      <xs:element ref="value" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="value" type="valueElemType"/>
+  <xs:complexType name="valueElemType" mixed="true">
+    <xs:attribute name="match" type="applicPropertyValueAttType"/>
+  </xs:complexType>
+  <xs:simpleType name="applicPropertyValueAttType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^|~]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

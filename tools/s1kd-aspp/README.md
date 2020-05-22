@@ -6,12 +6,7 @@ s1kd-aspp - Applicability statement preprocessor
 SYNOPSIS
 ========
 
-    s1kd-aspp -h?
-    s1kd-aspp -D
-    s1kd-aspp -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>]
-                 [-cfklNqrv] [<object>...]
-    s1kd-aspp -p [-a <ID>] [-flqv] [<object>...]
-    s1kd-aspp -t <mode> [<object>...]
+    s1kd-aspp [options] [<object> ...]
 
 DESCRIPTION
 ===========
@@ -40,6 +35,13 @@ applicability statements on elements without the attribute.
 OPTIONS
 =======
 
+-., --dump-disptext  
+Dump the built-in .disptext file.
+
+-,, --dump-xsl  
+Dump the built-in XSLT used to generate display text for applicability
+statements.
+
 -A, --act &lt;ACT&gt;  
 Add an ACT to use when generating display text for product attributes.
 Multiple ACT data modules can be used by specifying this option multiple
@@ -58,10 +60,6 @@ Search for the ACT and CCT referenced by each data module, and add them
 to the list of ACTs/CCTs to use when generating display text for that
 data module.
 
--D, --dump  
-Dump the built-in XSLT used to generate display text for applicability
-statements.
-
 -d, --dir &lt;dir&gt;  
 Directory to start searching for ACT/CCT data modules in. By default,
 the current directory is used.
@@ -72,8 +70,8 @@ Use a custom format string to generate display text.
 -f, --overwrite  
 Overwrite input data module(s) rather than outputting to stdout.
 
--G, --xsl &lt;XSLT&gt;  
-Use custom XSLT to generate display text for applicability statements.
+-G, --disptext &lt;disptext&gt;  
+Specify a custom .disptext file.
 
 -g, --generate  
 Generate display text for applicability statements.
@@ -120,10 +118,13 @@ ones. This only applies to the processing instruction tags.
 -v, --verbose  
 Verbose output.
 
+-x, --xsl &lt;XSLT&gt;  
+Use custom XSLT to generate display text for applicability statements.
+
 --version  
 Show version information.
 
-&lt;object&gt;...  
+&lt;object&gt; ...  
 The object(s) to preprocess. This can include both individual objects
 and combined files such as those produced by s1kd-flatten(1).
 
@@ -150,6 +151,55 @@ Emit warnings from parser.
 
 --xinclude  
 Do XInclude processing.
+
+`.disptext` file
+----------------
+
+This file specifies rules for generating display text. Each `<property>`
+element specifies the format used for an individual property. The
+`<default>` element specifies the format for any property not listed.
+
+The format is specified using a combination of the following elements:
+
+&lt;name&gt;  
+Replaced by the name of the property.
+
+&lt;text&gt;  
+Text that is included as-is.
+
+&lt;values&gt;  
+Replaced by the values specified for the property in the applicability
+assertion.
+
+Optionally, `<values>` may contain a list of custom labels for
+individual values. Any values not included in this list will use their
+normal label.
+
+By default, the program will search for a file named `.disptext` in the
+current directory and parent directories, but any file can be specified
+using the -G (--disptext) option.
+
+Example of a `.disptext` file:
+
+    <disptext>
+    <default>
+    <name/>
+    <text>: </text>
+    <values/>
+    </default>
+    <property ident="model" type="prodattr">
+    <values>
+    <value match="BRKTRKR">Brook trekker</value>
+    <value match="MNTSTRM">Mountain storm</value>
+    </values>
+    <text> </text>
+    <name/>
+    </property>
+    </disptext>
+
+Given the above example, the display text for a value of "BRKTRKR" for
+the property "model" would be "Brook trekker Model", rather than "Model:
+BRKTRKR".
 
 EXAMPLES
 ========
@@ -201,11 +251,11 @@ The resulting XML would instead contain:
     </displayText>
     </applic>
 
-The methods for generating display text can be changed by supplying a
-custom XSLT script with the -G option. The -D option can be used to dump
-the built-in XSLT as a starting point for a custom script. An identity
-template is automatically added to the script, equivalent to the
-following:
+The methods for generating display text can be changed either via the
+`.disptext` file, or by supplying a custom XSLT script with the -x
+option. The -, option can be used to dump the built-in XSLT as a
+starting point for a custom script. An identity template is
+automatically added to the script, equivalent to the following:
 
     <xsl:template match="@*|node()">
     <xsl:copy>
@@ -219,10 +269,10 @@ template in the script are copied.
 Display text format string (-F)
 -------------------------------
 
-The -F option allows for simple customizations to generated display text
-without needing to create a custom XSLT script (-G). The string
-determines the format of the display text of each `<assert>` element in
-the annotation.
+The -F option allows for very simple customizations to generated display
+text without needing to create a custom `.disptext` file or XSLT script
+(-x). The string determines the format of the display text of each
+`<assert>` element in the annotation.
 
 The following variables can be used within the format string:
 

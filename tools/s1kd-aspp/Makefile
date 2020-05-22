@@ -18,20 +18,12 @@ INSTALL=install -s
 
 all: $(OUTPUT)
 
-$(OUTPUT): $(SOURCE) elements_list.h generateDisplayText.h identity.h addTags.h
+$(OUTPUT): $(SOURCE) resources.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-elements_list.h: elements.list
-	xxd -i $< > $@
-
-generateDisplayText.h: generateDisplayText.xsl
-	xxd -i $< > $@
-
-addTags.h: addTags.xsl
-	xxd -i $< > $@
-
-identity.h: ../common/identity.xsl
-	xxd -i $< > $@
+resources.h: elements.list disptext.xsl disptext.xml addTags.xsl ../common/identity.xsl
+	> $@
+	for f in $+; do xxd -i $$f >> $@; done
 
 .PHONY: docs clean maintainer-clean install uninstall
 
@@ -39,7 +31,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) elements_list.h generateDisplayText.h identity.h
+	rm -f $(OUTPUT) resources.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean

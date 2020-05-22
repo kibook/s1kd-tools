@@ -32,6 +32,7 @@
 #define DEFAULT_UOM_FNAME ".uom"
 #define DEFAULT_UOMDISP_FNAME ".uomdisplay"
 #define DEFAULT_EXTPUBS_FNAME ".externalpubs"
+#define DEFAULT_DISPTEXT_FNAME ".disptext"
 
 /* Default global XML parsing options. */
 extern int DEFAULT_PARSE_OPTS;

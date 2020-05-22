@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="05" day="22"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -t (--tags) option.</simplePara>
+        <simplePara>Add .disptext configuration file.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,12 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">s1kd-aspp -h?
-s1kd-aspp -D
-s1kd-aspp -g [-A &lt;ACT&gt;] [-C &lt;CCT&gt;] [-d &lt;dir&gt;] [-F &lt;fmt&gt;] [-G &lt;XSL&gt;]
-             [-cfklNqrv] [&lt;object&gt;...]
-s1kd-aspp -p [-a &lt;ID&gt;] [-flqv] [&lt;object&gt;...]
-s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-aspp [options] [<object> ...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -80,6 +75,18 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
         <title>OPTIONS</title>
         <para>
           <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-., --dump-disptext</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in .disptext file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-,, --dump-xsl</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-A, --act &lt;ACT&gt;</listItemTerm>
               <listItemDefinition>
@@ -105,12 +112,6 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>-D, --dump</listItemTerm>
-              <listItemDefinition>
-                <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
               <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Directory to start searching for ACT/CCT data modules in. By default, the current directory is used.</para>
@@ -128,10 +129,10 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
                 <para>Overwrite input data module(s) rather than outputting to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-G, --xsl &lt;XSLT&gt;</listItemTerm>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-G, --disptext &lt;disptext&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Use custom XSLT to generate display text for applicability statements.</para>
+                <para>Specify a custom .disptext file.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -176,7 +177,7 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
                 <para>Search for ACT/CCT data modules recursively.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-t, --tags &lt;mode&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Add tags before elements containing the display text of the applicability annotation they reference, simulating the typical presentation of applicability annotations within the XML.</para>
@@ -191,6 +192,12 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-x, --xsl &lt;XSLT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use custom XSLT to generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
@@ -198,7 +205,7 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemTerm>&lt;object&gt; ...</listItemTerm>
               <listItemDefinition>
                 <para>The object(s) to preprocess. This can include both individual objects and combined files such as those produced by s1kd-flatten(1).</para>
               </listItemDefinition>
@@ -252,6 +259,53 @@ s1kd-aspp -t &lt;mode&gt; [&lt;object&gt;...]</verbatimText>
             </definitionListItem>
           </definitionList>
         </para>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title><verbatimText verbatimStyle="vs02">.disptext</verbatimText> file</title>
+          <para>This file specifies rules for generating display text. Each <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> element specifies the format used for an individual property. The <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> element specifies the format for any property not listed.</para>
+          <para>The format is specified using a combination of the following elements:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>&lt;name&gt;</listItemTerm>
+                <listItemDefinition>
+                  <para>Replaced by the name of the property.</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>&lt;text&gt;</listItemTerm>
+                <listItemDefinition>
+                  <para>Text that is included as-is.</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>&lt;values&gt;</listItemTerm>
+                <listItemDefinition>
+                  <para>Replaced by the values specified for the property in the applicability assertion.</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>Optionally, <verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText> may contain a list of custom labels for individual values. Any values not included in this list will use their normal label.</para>
+          <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.disptext</verbatimText> in the current directory and parent directories, but any file can be specified using the -G (--disptext) option.</para>
+          <para>Example of a <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<disptext>
+<default>
+<name/>
+<text>: </text>
+<values/>
+</default>
+<property ident="model" type="prodattr">
+<values>
+<value match="BRKTRKR">Brook trekker</value>
+<value match="MNTSTRM">Mountain storm</value>
+</values>
+<text> </text>
+<name/>
+</property>
+</disptext>]]></verbatimText>
+          </para>
+          <para>Given the above example, the display text for a value of "BRKTRKR" for the property "model" would be "Brook trekker Model", rather than "Model: BRKTRKR".</para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXAMPLES</title>
@@ -297,7 +351,7 @@ applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
 &lt;/displayText&gt;
 &lt;/applic&gt;</verbatimText>
           </para>
-          <para>The methods for generating display text can be changed by supplying a custom XSLT script with the -G option. The -D option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods for generating display text can be changed either via the <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file, or by supplying a custom XSLT script with the -x option. The -, option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
           <para>
             <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
 &lt;xsl:copy&gt;
@@ -309,7 +363,7 @@ applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
         </levelledPara>
         <levelledPara>
           <title>Display text format string (-F)</title>
-          <para>The -F option allows for simple customizations to generated display text without needing to create a custom XSLT script (-G). The string determines the format of the display text of each <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> element in the annotation.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The -F option allows for very simple customizations to generated display text without needing to create a custom <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file or XSLT script (-x). The string determines the format of the display text of each <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> element in the annotation.</para>
           <para>The following variables can be used within the format string:
             <definitionList>
               <definitionListItem>

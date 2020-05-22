@@ -1,10 +1,3 @@
-/* Applicability Preprocessor
- *
- * Preprocesses a data module's applicability annotations (@applicRefId) in to a
- * simpler format which is easier for an XSL stylesheet to process.
- *
- * The applicability in the resulting output will not be semantically correct. */
-
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
@@ -15,13 +8,10 @@
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 #include "s1kd_tools.h"
-#include "elements_list.h"
-#include "generateDisplayText.h"
-#include "identity.h"
-#include "addTags.h"
+#include "resources.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "3.4.2"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -42,9 +32,6 @@ static xmlChar *dmApplicId;
  *
  * Read from elements_list.h*/
 static xmlChar *applicElemsXPath;
-
-/* Custom XSL for generating display text. */
-static char *customGenDispTextXsl = NULL;
 
 /* Search for ACTs/CCTs recursively. */
 static bool recursive_search = false;
@@ -221,9 +208,36 @@ static void addDmApplic(xmlNodePtr dmodule)
 	}
 }
 
+static xmlDocPtr parse_disptext(xmlDocPtr config)
+{
+	xmlDocPtr doc1, doc2, res;
+	xsltStylesheetPtr style;
+
+	doc1 = read_xml_mem((const char *) disptext_xsl, disptext_xsl_len);
+	style = xsltParseStylesheetDoc(doc1);
+
+	doc2 = xsltApplyStylesheet(style, config, NULL);
+	xsltFreeStylesheet(style);
+
+	res = xmlCopyDoc(doc2, 1);
+	xmlFreeDoc(doc2);
+
+	return res;
+}
+
 static void dumpGenDispTextXsl(void)
 {
-	printf("%.*s", generateDisplayText_xsl_len, generateDisplayText_xsl);
+	xmlDocPtr doc1, doc2;
+	doc1 = read_xml_mem((const char *) disptext_xml, disptext_xml_len);
+	doc2 = parse_disptext(doc1);
+	xmlFreeDoc(doc1);
+	save_xml_doc(doc2, "-");
+	xmlFreeDoc(doc2);
+}
+
+static void dumpDispText(void)
+{
+	printf("%.*s", disptext_xml_len, disptext_xml);
 }
 
 static void addIdentity(xmlDocPtr style)
@@ -313,10 +327,9 @@ static void apply_format_str(xmlDocPtr doc, const char *fmt)
 	}
 }
 
-static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts, const char *format)
+static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts, xsltStylesheetPtr style)
 {
-	xmlDocPtr styledoc, res, muxdoc;
-	xsltStylesheetPtr style;
+	xmlDocPtr res, muxdoc;
 	xmlNodePtr mux, cur, muxacts, muxccts, new, old;
 	const char *params[3];
 
@@ -346,21 +359,6 @@ static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts,
 		xmlFree(path);
 	}
 
-	if (customGenDispTextXsl) {
-		styledoc = read_xml_doc(customGenDispTextXsl);
-	} else {
-		styledoc = read_xml_mem((const char *) generateDisplayText_xsl,
-			generateDisplayText_xsl_len);
-	}
-
-	addIdentity(styledoc);
-
-	if (format) {
-		apply_format_str(styledoc, format);
-	}
-
-	style = xsltParseStylesheetDoc(styledoc);
-
 	params[0] = "overwrite-display-text";
 	params[1] = overwriteDispText ? "true()" : "false()";
 	params[2] = NULL;
@@ -373,7 +371,6 @@ static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts,
 
 	xmlFreeDoc(res);
 	xmlFreeDoc(muxdoc);
-	xsltFreeStylesheet(style);
 }
 
 static void processDmodule(xmlNodePtr dmodule)
@@ -591,7 +588,7 @@ static void addTags(xmlDocPtr doc, const char *tags)
 
 static void processFile(const char *in, const char *out, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
-	const char *format, const char *tags)
+	xsltStylesheetPtr style, const char *tags)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -627,7 +624,7 @@ static void processFile(const char *in, const char *out, bool process,
 	}
 
 	if (genDispText) {
-		generateDisplayText(doc, all_acts, all_ccts, format);
+		generateDisplayText(doc, all_acts, all_ccts, style);
 	}
 
 	if (tags) {
@@ -648,7 +645,7 @@ static void processFile(const char *in, const char *out, bool process,
 
 static void process_list(const char *path, bool overwrite, bool process,
 	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
-	const char *format, const char *tags)
+	xsltStylesheetPtr style, const char *tags)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -666,7 +663,7 @@ static void process_list(const char *path, bool overwrite, bool process,
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		processFile(line, overwrite ? line : "-", process, genDispText, acts, ccts, findcts, format, tags);
+		processFile(line, overwrite ? line : "-", process, genDispText, acts, ccts, findcts, style, tags);
 	}
 
 	if (path) {
@@ -677,21 +674,19 @@ static void process_list(const char *path, bool overwrite, bool process,
 static void show_help(void)
 {
 	puts("Usage:");
-	puts("  " PROG_NAME " -h?");
-	puts("  " PROG_NAME " -D");
-	puts("  " PROG_NAME " -g [-A <ACT>] [-C <CCT>] [-d <dir>] [-F <fmt>] [-G <XSL>] [-cfklNqrv] [<object>...]");
-	puts("  " PROG_NAME " -p [-a <ID>] [-flqv] [<object>...]");
+	puts("  " PROG_NAME " [options] [<object> ...]");
 	puts("");
 	puts("Options:");
+	puts("  -., --dump-disptext   Dump the built-in .disptext file.");
+	puts("  -,, --dump-xsl        Dump the built-in XSLT for generating display text.");
 	puts("  -A, --act <ACT>       Use <ACT> when generating display text.");
 	puts("  -a, --id <ID>  Use <ID> for DM-level applic.");
 	puts("  -C, --cct <CCT>       Use <CCT> when generating display text.");
 	puts("  -c, --search          Search for ACT/CCT data modules.");
-	puts("  -D, --dump            Dump built-in XSLT for generating display text.");
 	puts("  -d, --dir <dir>       Directory to start search for ACT/CCT in.");
 	puts("  -F, --format <fmt>    Use a custom format string for generating display text.");
 	puts("  -f, --overwrite       Overwrite input file(s).");
-	puts("  -G, --xsl <XSL>       Use custom XSLT script to generate display text.");
+	puts("  -G, --disptext        Specify .disptext file.");
 	puts("  -g, --generate        Generate display text for applicability annotations.");
 	puts("  -k, --keep            Do not overwrite existing display text.");
 	puts("  -l, --list            Treat input as list of modules.");
@@ -700,9 +695,10 @@ static void show_help(void)
 	puts("  -q, --quiet           Quiet mode.");
 	puts("  -r, --recursive       Search for ACT/CCT recursively.");
 	puts("  -v, --verbose         Verbose output.");
+	puts("  -x, --xsl <XSL>       Use custom XSLT script to generate display text.");
 	puts("  -h, -?, --help        Show help/usage message.");
 	puts("  --version             Show version information.");
-	puts("  <object>...           CSDB objects to process.");
+	puts("  <object> ...          CSDB objects to process.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -723,31 +719,37 @@ int main(int argc, char **argv)
 	bool islist = false;
 	char *format = NULL;
 	char *tags = NULL;
+	char *customGenDispTextFile = NULL;
+	xmlDocPtr disptext = NULL;
+	xmlDocPtr styledoc;
+	xsltStylesheetPtr style;
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = "A:a:C:cDd:F:fG:gklNpqrt:vh?";
+	const char *sopts = ".,A:a:C:cd:F:fG:gklNpqrt:vx:h?";
 	struct option lopts[] = {
-		{"version"     , no_argument      , 0, 0},
-		{"help"        , no_argument      , 0, 'h'},
-		{"act"         , required_argument, 0, 'A'},
-		{"id"          , required_argument, 0, 'a'},
-		{"cct"         , required_argument, 0, 'C'},
-		{"search"      , no_argument      , 0, 'c'},
-		{"dump"        , no_argument      , 0, 'D'},
-		{"dir"         , required_argument, 0, 'd'},
-		{"format"      , required_argument, 0, 'F'},
-		{"overwrite"   , no_argument      , 0, 'f'},
-		{"xsl"         , required_argument, 0, 'G'},
-		{"generate"    , no_argument      , 0, 'g'},
-		{"keep"        , no_argument      , 0, 'k'},
-		{"list"        , no_argument      , 0, 'l'},
-		{"omit-issue"  , no_argument      , 0, 'N'},
-		{"presentation", no_argument      , 0, 'p'},
-		{"quiet"       , no_argument      , 0, 'q'},
-		{"recursive"   , no_argument      , 0, 'r'},
-		{"tags"        , required_argument, 0, 't'},
-		{"verbose"     , no_argument      , 0, 'v'},
+		{"version"      , no_argument      , 0, 0},
+		{"help"         , no_argument      , 0, 'h'},
+		{"dump-disptext", no_argument      , 0, '.'},
+		{"dump-xsl"     , no_argument      , 0, ','},
+		{"act"          , required_argument, 0, 'A'},
+		{"id"           , required_argument, 0, 'a'},
+		{"cct"          , required_argument, 0, 'C'},
+		{"search"       , no_argument      , 0, 'c'},
+		{"dir"          , required_argument, 0, 'd'},
+		{"format"       , required_argument, 0, 'F'},
+		{"overwrite"    , no_argument      , 0, 'f'},
+		{"disptext"     , required_argument, 0, 'G'},
+		{"generate"     , no_argument      , 0, 'g'},
+		{"keep"         , no_argument      , 0, 'k'},
+		{"list"         , no_argument      , 0, 'l'},
+		{"omit-issue"   , no_argument      , 0, 'N'},
+		{"presentation" , no_argument      , 0, 'p'},
+		{"quiet"        , no_argument      , 0, 'q'},
+		{"recursive"    , no_argument      , 0, 'r'},
+		{"tags"         , required_argument, 0, 't'},
+		{"verbose"      , no_argument      , 0, 'v'},
+		{"xsl"          , required_argument, 0, 'x'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -773,6 +775,12 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;
+			case '.':
+				dumpDispText();
+				return 0;
+			case ',':
+				dumpGenDispTextXsl();
+				return 0;
 			case 'A':
 				xmlNewChild(acts, NULL, BAD_CAST "act", BAD_CAST optarg);
 				findcts = false;
@@ -788,9 +796,6 @@ int main(int argc, char **argv)
 			case 'c':
 				findcts = true;
 				break;
-			case 'D':
-				dumpGenDispTextXsl();
-				exit(0);
 			case 'd':
 				free(search_dir);
 				search_dir = strdup(optarg);
@@ -805,8 +810,8 @@ int main(int argc, char **argv)
 				break;
 			case 'G':
 				genDispText = true;
-				free(customGenDispTextXsl);
-				customGenDispTextXsl = strdup(optarg);
+				xmlFreeDoc(disptext);
+				disptext = read_xml_doc(optarg);
 				break;
 			case 'g':
 				genDispText = true;
@@ -836,28 +841,55 @@ int main(int argc, char **argv)
 			case 'v':
 				++verbosity;
 				break;
+			case 'x':
+				genDispText = true;
+				free(customGenDispTextFile);
+				customGenDispTextFile = strdup(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
-				exit(0);
+				return 0;
 		}
 	}
 
+	if (customGenDispTextFile == NULL) {
+		if (disptext == NULL) {
+			char disptext_fname[PATH_MAX];
+
+			if (find_config(disptext_fname, DEFAULT_DISPTEXT_FNAME)) {
+				disptext = read_xml_doc(disptext_fname);
+			} else {
+				disptext = read_xml_mem((const char *) disptext_xml, disptext_xml_len);
+			}
+		}
+
+		styledoc = parse_disptext(disptext);
+	} else {
+		styledoc = read_xml_doc(customGenDispTextFile);
+	}
+
+	addIdentity(styledoc);
+	if (format) {
+		apply_format_str(styledoc, format);
+	}
+	style = xsltParseStylesheetDoc(styledoc);
+
 	if (optind >= argc) {
 		if (islist) {
-			process_list(NULL, overwrite, process, genDispText, acts, ccts, findcts, format, tags);
+			process_list(NULL, overwrite, process, genDispText, acts, ccts, findcts, style, tags);
 		} else {
-			processFile("-", "-", process, genDispText, acts, ccts, findcts, format, tags);
+			processFile("-", "-", process, genDispText, acts, ccts, findcts, style, tags);
 		}
 	} else {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
 				process_list(argv[i], overwrite, process,
-					genDispText, acts, ccts, findcts, format, tags);
+					genDispText, acts, ccts, findcts, style, tags);
 			} else {
 				processFile(argv[i], overwrite ? argv[i] : "-",
 					process, genDispText, acts,
-					ccts, findcts, format, tags);
+					ccts, findcts, style, tags);
 			}
 		}
 	}
@@ -868,10 +900,12 @@ int main(int argc, char **argv)
 	xmlFreeNode(acts);
 	xmlFreeNode(ccts);
 
-	free(customGenDispTextXsl);
+	free(customGenDispTextFile);
 	free(search_dir);
 	free(format);
 	free(tags);
+	xmlFreeDoc(disptext);
+	xsltFreeStylesheet(style);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();
