@@ -19,7 +19,7 @@
         <xsl:element name="xsl:apply-templates"/>
       </xsl:element>
       <xsl:element name="xsl:template">
-        <xsl:attribute name="select">evaluate</xsl:attribute>
+        <xsl:attribute name="match">evaluate</xsl:attribute>
         <xsl:attribute name="mode">text</xsl:attribute>
         <xsl:element name="xsl:variable">
           <xsl:attribute name="name">op</xsl:attribute>
