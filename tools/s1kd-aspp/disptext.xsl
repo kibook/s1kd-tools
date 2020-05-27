@@ -226,7 +226,8 @@
         <xsl:attribute name="select">@applicPropertyType|@actreftype</xsl:attribute>
       </xsl:element>
       <xsl:element name="xsl:choose">
-        <xsl:apply-templates select="property|conditionType"/>
+        <xsl:apply-templates select="property"/>
+        <xsl:apply-templates select="conditionType"/>
         <xsl:apply-templates select="productAttributes|conditions"/>
         <xsl:apply-templates select="default"/>
       </xsl:element>

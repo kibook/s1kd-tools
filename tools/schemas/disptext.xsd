@@ -13,10 +13,8 @@
           <xs:element ref="conditions"/>
         </xs:sequence>
       </xs:choice>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="property"/>
-        <xs:element ref="conditionType"/>
-      </xs:choice>
+      <xs:element ref="conditionType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="operators" type="operatorsElemType"/>
