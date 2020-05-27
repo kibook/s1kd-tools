@@ -624,3 +624,36 @@ The element `<property>` defines the format for a specific property.
 
 -   `<values>`, replaced by the values specified for the property in the
     applicability assertion.
+
+Values
+------
+
+The element `<values>` is replaced by the values specified for a
+property in an applicability assertion, and may specify custom labels
+for certain values.
+
+*Markup element:* `<values>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<value>`
+
+Custom value label
+------------------
+
+The element `<value>` specifies a custom label for an individual value
+of a property.
+
+*Markup element:* `<value>`
+
+*Attributes:*
+
+-   `match` (M), the value to apply the custom label for.
+
+*Child elements:*
+
+-   None

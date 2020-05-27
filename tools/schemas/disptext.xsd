@@ -67,7 +67,7 @@
   </xs:complexType>
   <xs:element name="value" type="valueElemType"/>
   <xs:complexType name="valueElemType" mixed="true">
-    <xs:attribute name="match" type="applicPropertyValueAttType"/>
+    <xs:attribute name="match" type="applicPropertyValueAttType" use="required"/>
   </xs:complexType>
   <xs:simpleType name="applicPropertyValueAttType">
     <xs:restriction base="xs:string">

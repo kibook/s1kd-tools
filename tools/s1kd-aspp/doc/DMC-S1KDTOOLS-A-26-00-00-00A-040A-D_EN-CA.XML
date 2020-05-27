@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="04"/>
+        <issueInfo issueNumber="025" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="05" day="27"/>
@@ -843,6 +843,64 @@ applicPropertyValues="A"/&gt;
               </listItem>
               <listItem>
                 <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the property in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Values</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText> is replaced by the values specified for a property in an applicability assertion, and may specify custom labels for certain values.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;value&gt;</verbatimText>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Custom value label</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;value&gt;</verbatimText> specifies a custom label for an individual value of a property.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;value&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">match</verbatimText> (M), the value to apply the custom label for.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
               </listItem>
             </randomList>
           </para>
