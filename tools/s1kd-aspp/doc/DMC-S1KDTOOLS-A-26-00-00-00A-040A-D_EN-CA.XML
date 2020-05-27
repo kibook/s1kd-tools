@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="03"/>
+        <issueInfo issueNumber="025" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="05" day="27"/>
@@ -578,6 +578,274 @@ applicPropertyValues="A"/&gt;
 &lt;/dmodule&gt;</verbatimText>
           </para>
           <para>With attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> only on those elements where a statement should be shown, and an additional inline applicability to represent the whole data module's applicability. This XML is semantically incorrect but easier for a stylesheet to transform for page-oriented output.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>DISPTEXT FILE SCHEMA</title>
+        <levelledPara>
+          <title>Display text rules</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;disptext&gt;</verbatimText> contains all the rules for the formatting of generated display text in applicability annotations.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">disptext</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;conditionType&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Operator rules</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> defines the format of operators used in applicability evaluations.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;and&gt;</verbatimText>, text used for the <verbatimText verbatimStyle="vs14">and</verbatimText> operator between assertions in an evaluation.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;or&gt;</verbatimText>, text used for the <verbatimText verbatimStyle="vs14">or</verbatimText> operator between assertions in an evaluation.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;openGroup&gt;</verbatimText>, text used to open a group of assertions.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;closeGroup&gt;</verbatimText>, text used to close a group of assertions.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Default property format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> defines the default format for all properties which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the property.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the property in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Product attributes format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText> defines the default format for all product attributes which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the product attribute.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the product attribute in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Conditions format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText> defines the default format for all conditions which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the condition.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the condition in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Condition type format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;conditionType&gt;</verbatimText> defines the format for all conditions of a given type which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;conditionType&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">ident</verbatimText> (M), the ID of the condition type in the CCT.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the condition.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the condition in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Property format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> defines the format for a specific property.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">ident</verbatimText> (M), the ID of the property in the ACT or CCT.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">type</verbatimText> (M), the type of the property, either "<verbatimText verbatimStyle="vs14">condition</verbatimText>" or "<verbatimText verbatimStyle="vs14">prodattr</verbatimText>".</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the property.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the property in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
         </levelledPara>
       </levelledPara>
     </description>

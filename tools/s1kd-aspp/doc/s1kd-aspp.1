@@ -592,5 +592,151 @@ statement should be shown, and an additional inline applicability to
 represent the whole data module\[aq]s applicability.
 This XML is semantically incorrect but easier for a stylesheet to
 transform for page\-oriented output.
+.SH DISPTEXT FILE SCHEMA
+.SS Display text rules
+.PP
+The element \f[C]<disptext>\f[] contains all the rules for the
+formatting of generated display text in applicability annotations.
+.PP
+\f[I]Markup element:\f[] \f[C]disptext\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+None
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<operators>\f[]
+.IP \[bu] 2
+\f[C]<default>\f[]
+.IP \[bu] 2
+\f[C]<productAttributes>\f[]
+.IP \[bu] 2
+\f[C]<conditions>\f[]
+.IP \[bu] 2
+\f[C]<conditionType>\f[]
+.IP \[bu] 2
+\f[C]<property>\f[]
+.SS Operator rules
+.PP
+The element \f[C]<operators>\f[] defines the format of operators used in
+applicability evaluations.
+.PP
+\f[I]Markup element:\f[] \f[C]<operators>\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+None
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<and>\f[], text used for the \f[C]and\f[] operator between
+assertions in an evaluation.
+.IP \[bu] 2
+\f[C]<or>\f[], text used for the \f[C]or\f[] operator between assertions
+in an evaluation.
+.IP \[bu] 2
+\f[C]<openGroup>\f[], text used to open a group of assertions.
+.IP \[bu] 2
+\f[C]<closeGroup>\f[], text used to close a group of assertions.
+.SS Default property format
+.PP
+The element \f[C]<default>\f[] defines the default format for all
+properties which are not matched by a more specific rule.
+.PP
+\f[I]Markup element:\f[] \f[C]<default>\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+None
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<name>\f[], replaced by the name of the property.
+.IP \[bu] 2
+\f[C]<text>\f[], text that is included as\-is.
+.IP \[bu] 2
+\f[C]<values>\f[], replaced by the values specified for the property in
+the applicability assertion.
+.SS Product attributes format
+.PP
+The element \f[C]<productAttributes>\f[] defines the default format for
+all product attributes which are not matched by a more specific rule.
+.PP
+\f[I]Markup element:\f[] \f[C]<productAttributes>\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+None
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<name>\f[], replaced by the name of the product attribute.
+.IP \[bu] 2
+\f[C]<text>\f[], text that is included as\-is.
+.IP \[bu] 2
+\f[C]<values>\f[], replaced by the values specified for the product
+attribute in the applicability assertion.
+.SS Conditions format
+.PP
+The element \f[C]<conditions>\f[] defines the default format for all
+conditions which are not matched by a more specific rule.
+.PP
+\f[I]Markup element:\f[] \f[C]<conditions>\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+None
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<name>\f[], replaced by the name of the condition.
+.IP \[bu] 2
+\f[C]<text>\f[], text that is included as\-is.
+.IP \[bu] 2
+\f[C]<values>\f[], replaced by the values specified for the condition in
+the applicability assertion.
+.SS Condition type format
+.PP
+The element \f[C]<conditionType>\f[] defines the format for all
+conditions of a given type which are not matched by a more specific
+rule.
+.PP
+\f[I]Markup element:\f[] \f[C]<conditionType>\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+\f[C]ident\f[] (M), the ID of the condition type in the CCT.
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<name>\f[], replaced by the name of the condition.
+.IP \[bu] 2
+\f[C]<text>\f[], text that is included as\-is.
+.IP \[bu] 2
+\f[C]<values>\f[], replaced by the values specified for the condition in
+the applicability assertion.
+.SS Property format
+.PP
+The element \f[C]<property>\f[] defines the format for a specific
+property.
+.PP
+\f[I]Markup element:\f[] \f[C]<property>\f[]
+.PP
+\f[I]Attributes:\f[]
+.IP \[bu] 2
+\f[C]ident\f[] (M), the ID of the property in the ACT or CCT.
+.IP \[bu] 2
+\f[C]type\f[] (M), the type of the property, either "\f[C]condition\f[]"
+or "\f[C]prodattr\f[]".
+.PP
+\f[I]Child elements:\f[]
+.IP \[bu] 2
+\f[C]<name>\f[], replaced by the name of the property.
+.IP \[bu] 2
+\f[C]<text>\f[], text that is included as\-is.
+.IP \[bu] 2
+\f[C]<values>\f[], replaced by the values specified for the property in
+the applicability assertion.
 .SH AUTHORS
 khzae.net.

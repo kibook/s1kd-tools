@@ -464,3 +464,163 @@ With attribute `applicRefId` only on those elements where a statement
 should be shown, and an additional inline applicability to represent the
 whole data module's applicability. This XML is semantically incorrect
 but easier for a stylesheet to transform for page-oriented output.
+
+DISPTEXT FILE SCHEMA
+====================
+
+Display text rules
+------------------
+
+The element `<disptext>` contains all the rules for the formatting of
+generated display text in applicability annotations.
+
+*Markup element:* `disptext`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<operators>`
+
+-   `<default>`
+
+-   `<productAttributes>`
+
+-   `<conditions>`
+
+-   `<conditionType>`
+
+-   `<property>`
+
+Operator rules
+--------------
+
+The element `<operators>` defines the format of operators used in
+applicability evaluations.
+
+*Markup element:* `<operators>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<and>`, text used for the `and` operator between assertions in an
+    evaluation.
+
+-   `<or>`, text used for the `or` operator between assertions in an
+    evaluation.
+
+-   `<openGroup>`, text used to open a group of assertions.
+
+-   `<closeGroup>`, text used to close a group of assertions.
+
+Default property format
+-----------------------
+
+The element `<default>` defines the default format for all properties
+which are not matched by a more specific rule.
+
+*Markup element:* `<default>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<name>`, replaced by the name of the property.
+
+-   `<text>`, text that is included as-is.
+
+-   `<values>`, replaced by the values specified for the property in the
+    applicability assertion.
+
+Product attributes format
+-------------------------
+
+The element `<productAttributes>` defines the default format for all
+product attributes which are not matched by a more specific rule.
+
+*Markup element:* `<productAttributes>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<name>`, replaced by the name of the product attribute.
+
+-   `<text>`, text that is included as-is.
+
+-   `<values>`, replaced by the values specified for the product
+    attribute in the applicability assertion.
+
+Conditions format
+-----------------
+
+The element `<conditions>` defines the default format for all conditions
+which are not matched by a more specific rule.
+
+*Markup element:* `<conditions>`
+
+*Attributes:*
+
+-   None
+
+*Child elements:*
+
+-   `<name>`, replaced by the name of the condition.
+
+-   `<text>`, text that is included as-is.
+
+-   `<values>`, replaced by the values specified for the condition in
+    the applicability assertion.
+
+Condition type format
+---------------------
+
+The element `<conditionType>` defines the format for all conditions of a
+given type which are not matched by a more specific rule.
+
+*Markup element:* `<conditionType>`
+
+*Attributes:*
+
+-   `ident` (M), the ID of the condition type in the CCT.
+
+*Child elements:*
+
+-   `<name>`, replaced by the name of the condition.
+
+-   `<text>`, text that is included as-is.
+
+-   `<values>`, replaced by the values specified for the condition in
+    the applicability assertion.
+
+Property format
+---------------
+
+The element `<property>` defines the format for a specific property.
+
+*Markup element:* `<property>`
+
+*Attributes:*
+
+-   `ident` (M), the ID of the property in the ACT or CCT.
+
+-   `type` (M), the type of the property, either "`condition`" or
+    "`prodattr`".
+
+*Child elements:*
+
+-   `<name>`, replaced by the name of the property.
+
+-   `<text>`, text that is included as-is.
+
+-   `<values>`, replaced by the values specified for the property in the
+    applicability assertion.
