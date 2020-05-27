@@ -155,9 +155,33 @@ Do XInclude processing.
 `.disptext` file
 ----------------
 
-This file specifies rules for generating display text. Each `<property>`
-element specifies the format used for an individual property. The
-`<default>` element specifies the format for any property not listed.
+This file specifies rules for generating display text. It consists of:
+
+-   operator rules
+
+-   default property rules
+
+-   specific property rules
+
+The `<operators>` element specifies the format of operators used in
+display text evaluations:
+
+and  
+Text to use for the `and` operator between assertions. Default is " and
+".
+
+or  
+Text to use for the `or` operator between assertions. Default is " or ".
+
+openGroup  
+Text to use to open a group of assertions. Default is "(".
+
+closeGroup  
+Text to use to close a group of assertions. Default is ")".
+
+Each `<property>` element specifies the format used for an individual
+property. The `<default>` element specifies the format for any property
+not listed.
 
 The format is specified using a combination of the following elements:
 
@@ -182,6 +206,12 @@ using the -G (--disptext) option.
 Example of a `.disptext` file:
 
     <disptext>
+    <operators>
+    <and> + </and>
+    <or>, </or>
+    <openGroup>[</openGroup>
+    <closeGroup>]</closeGroup>
+    </operators>
     <default>
     <name/>
     <text>: </text>
@@ -199,7 +229,10 @@ Example of a `.disptext` file:
 
 Given the above example, the display text for a value of "BRKTRKR" for
 the property "model" would be "Brook trekker Model", rather than "Model:
-BRKTRKR".
+BRKTRKR". The display text for an evaluation of "(Model: BRKTRKR and
+Version: Mk9) or (Model: MNTSTRM and Version: Mk1)" would be "\[Brook
+trekker Model + Version: Mk9\], \[Mountain storm Model + Version:
+Mk1\]".
 
 EXAMPLES
 ========

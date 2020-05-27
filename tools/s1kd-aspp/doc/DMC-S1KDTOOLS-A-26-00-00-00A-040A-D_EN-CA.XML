@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="01"/>
+        <issueInfo issueNumber="025" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="22"/>
+        <issueDate year="2020" month="05" day="26"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -261,7 +261,49 @@
         </para>
         <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
           <title><verbatimText verbatimStyle="vs02">.disptext</verbatimText> file</title>
-          <para>This file specifies rules for generating display text. Each <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> element specifies the format used for an individual property. The <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> element specifies the format for any property not listed.</para>
+          <para>
+            This file specifies rules for generating display text. It consists of:
+            <randomList>
+              <listItem>
+                <para>operator rules</para>
+              </listItem>
+              <listItem>
+                <para>default property rules</para>
+              </listItem>
+              <listItem>
+                <para>specific property rules</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> element specifies the format of operators used in display text evaluations:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>and</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use for the <verbatimText verbatimStyle="vs14">and</verbatimText> operator between assertions. Default is " and ".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>or</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use for the <verbatimText verbatimStyle="vs14">or</verbatimText> operator between assertions. Default is " or ".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>openGroup</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use to open a group of assertions. Default is "(".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>closeGroup</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use to close a group of assertions. Default is ")".</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>Each <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> element specifies the format used for an individual property. The <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> element specifies the format for any property not listed.</para>
           <para>The format is specified using a combination of the following elements:
             <definitionList>
               <definitionListItem>
@@ -289,6 +331,12 @@
           <para>Example of a <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file:</para>
           <para>
             <verbatimText verbatimStyle="vs11"><![CDATA[<disptext>
+<operators>
+<and> + </and>
+<or>, </or>
+<openGroup>[</openGroup>
+<closeGroup>]</closeGroup>
+</operators>
 <default>
 <name/>
 <text>: </text>
@@ -304,7 +352,7 @@
 </property>
 </disptext>]]></verbatimText>
           </para>
-          <para>Given the above example, the display text for a value of "BRKTRKR" for the property "model" would be "Brook trekker Model", rather than "Model: BRKTRKR".</para>
+          <para>Given the above example, the display text for a value of "BRKTRKR" for the property "model" would be "Brook trekker Model", rather than "Model: BRKTRKR". The display text for an evaluation of "(Model: BRKTRKR and Version: Mk9) or (Model: MNTSTRM and Version: Mk1)" would be "[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]".</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

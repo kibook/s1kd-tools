@@ -5,10 +5,24 @@
   <xs:element name="disptext" type="disptextElemType"/>
   <xs:complexType name="disptextElemType">
     <xs:sequence>
+      <xs:element ref="operators"/>
       <xs:element ref="default"/>
       <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:element name="operators" type="operatorsElemType"/>
+  <xs:complexType name="operatorsElemType">
+    <xs:sequence>
+      <xs:element ref="and"/>
+      <xs:element ref="or"/>
+      <xs:element ref="openGroup"/>
+      <xs:element ref="closeGroup"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="and" type="xs:string"/>
+  <xs:element name="or" type="xs:string"/>
+  <xs:element name="openGroup" type="xs:string"/>
+  <xs:element name="closeGroup" type="xs:string"/>
   <xs:element name="default" type="defaultElemType"/>
   <xs:complexType name="defaultElemType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">

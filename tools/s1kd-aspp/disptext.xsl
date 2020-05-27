@@ -29,7 +29,9 @@
           <xsl:attribute name="select">assert|evaluate</xsl:attribute>
           <xsl:element name="xsl:if">
             <xsl:attribute name="test">self::evaluate and (@andOr|@operator) != $op</xsl:attribute>
-            <xsl:element name="xsl:text">(</xsl:element>
+            <xsl:element name="xsl:text">
+              <xsl:value-of select="disptext/operators/openGroup"/>
+            </xsl:element>
           </xsl:element>
           <xsl:element name="xsl:apply-templates">
             <xsl:attribute name="select">.</xsl:attribute>
@@ -37,18 +39,21 @@
           </xsl:element>
           <xsl:element name="xsl:if">
             <xsl:attribute name="test">self::evaluate and (@andOr|@operator) != $op</xsl:attribute>
-            <xsl:element name="xsl:text">)</xsl:element>
+            <xsl:element name="xsl:text">
+              <xsl:value-of select="disptext/operators/closeGroup"/>
+            </xsl:element>
           </xsl:element>
           <xsl:element name="xsl:if">
             <xsl:attribute name="test">position() != last()</xsl:attribute>
-            <xsl:element name="xsl:text">
-              <xsl:text> </xsl:text>
-            </xsl:element>
-            <xsl:element name="xsl:value-of">
-              <xsl:attribute name="select">$op</xsl:attribute>
-            </xsl:element>
-            <xsl:element name="xsl:text">
-              <xsl:text> </xsl:text>
+            <xsl:element name="xsl:choose">
+              <xsl:element name="xsl:when">
+                <xsl:attribute name="test">$op = 'and'</xsl:attribute>
+                <xsl:value-of select="disptext/operators/and"/>
+              </xsl:element>
+              <xsl:element name="xsl:when">
+                <xsl:attribute name="test">$op = 'or'</xsl:attribute>
+                <xsl:value-of select="disptext/operators/or"/>
+              </xsl:element>
             </xsl:element>
           </xsl:element>
         </xsl:element>

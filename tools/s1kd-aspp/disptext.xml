@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <disptext>
+  <operators>
+    <and> and </and>
+    <or> or </or>
+    <openGroup>(</openGroup>
+    <closeGroup>)</closeGroup>
+  </operators>
   <default>
     <name/>
     <text>: </text>
