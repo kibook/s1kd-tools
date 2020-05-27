@@ -159,9 +159,7 @@ This file specifies rules for generating display text. It consists of:
 
 -   operator rules
 
--   default property rules
-
--   specific property rules
+-   property rules
 
 The `<operators>` element specifies the format of operators used in
 display text evaluations:
@@ -180,8 +178,10 @@ closeGroup
 Text to use to close a group of assertions. Default is ")".
 
 Each `<property>` element specifies the format used for an individual
-property. The `<default>` element specifies the format for any property
-not listed.
+property. The `<productAttributes>` and `<conditions>` elements specify
+the default format for product attributes and conditions that are not
+listed. Alternatively, the `<default>` element specifies the default
+format for both product attributes and conditions together.
 
 The format is specified using a combination of the following elements:
 

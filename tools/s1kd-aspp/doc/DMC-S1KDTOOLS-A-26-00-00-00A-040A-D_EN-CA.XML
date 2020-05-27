@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="02"/>
+        <issueInfo issueNumber="025" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="26"/>
+        <issueDate year="2020" month="05" day="27"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -268,10 +268,7 @@
                 <para>operator rules</para>
               </listItem>
               <listItem>
-                <para>default property rules</para>
-              </listItem>
-              <listItem>
-                <para>specific property rules</para>
+                <para>property rules</para>
               </listItem>
             </randomList>
           </para>
@@ -303,7 +300,7 @@
               </definitionListItem>
             </definitionList>
           </para>
-          <para>Each <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> element specifies the format used for an individual property. The <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> element specifies the format for any property not listed.</para>
+          <para>Each <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> element specifies the format used for an individual property. The <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText> and <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText> elements specify the default format for product attributes and conditions that are not listed. Alternatively, the <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> element specifies the default format for both product attributes and conditions together.</para>
           <para>The format is specified using a combination of the following elements:
             <definitionList>
               <definitionListItem>

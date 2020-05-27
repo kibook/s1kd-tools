@@ -6,8 +6,17 @@
   <xs:complexType name="disptextElemType">
     <xs:sequence>
       <xs:element ref="operators"/>
-      <xs:element ref="default"/>
-      <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice>
+        <xs:element ref="default"/>
+        <xs:sequence>
+          <xs:element ref="productAttributes"/>
+          <xs:element ref="conditions"/>
+        </xs:sequence>
+      </xs:choice>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="property"/>
+        <xs:element ref="conditionType"/>
+      </xs:choice>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="operators" type="operatorsElemType"/>
@@ -23,24 +32,26 @@
   <xs:element name="or" type="xs:string"/>
   <xs:element name="openGroup" type="xs:string"/>
   <xs:element name="closeGroup" type="xs:string"/>
+  <xs:group name="rulesElemGroup">
+    <xs:choice>
+      <xs:element ref="name"/>
+      <xs:element ref="text"/>
+      <xs:element ref="values"/>
+    </xs:choice>
+  </xs:group>
   <xs:element name="default" type="defaultElemType"/>
   <xs:complexType name="defaultElemType">
-    <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element ref="name"/>
-      <xs:element ref="text"/>
-      <xs:element ref="values"/>
-    </xs:choice>
+    <xs:group ref="rulesElemGroup" minOccurs="0" maxOccurs="unbounded"/>
   </xs:complexType>
+  <xs:element name="productAttributes" type="defaultElemType"/>
+  <xs:element name="conditions" type="defaultElemType"/>
   <xs:element name="property" type="propertyElemType"/>
   <xs:complexType name="propertyElemType">
-    <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element ref="name"/>
-      <xs:element ref="text"/>
-      <xs:element ref="values"/>
-    </xs:choice>
-    <xs:attribute name="ident" type="xs:NCName" use="required"/>
+    <xs:group ref="rulesElemGroup" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:attribute ref="ident" use="required"/>
     <xs:attribute name="type" type="applicPropertyTypeAttType" use="required"/>
   </xs:complexType>
+  <xs:attribute name="ident" type="xs:NCName"/>
   <xs:simpleType name="applicPropertyTypeAttType">
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="condition"/>
@@ -65,4 +76,9 @@
       <xs:pattern value="[^|~]*"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:element name="conditionType" type="conditionTypeElemType"/>
+  <xs:complexType name="conditionTypeElemType">
+    <xs:group ref="rulesElemGroup" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:attribute ref="ident" use="required"/>
+  </xs:complexType>
 </xs:schema>

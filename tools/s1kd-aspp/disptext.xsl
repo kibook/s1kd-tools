@@ -217,8 +217,17 @@
     <xsl:element name="xsl:template">
       <xsl:attribute name="match">assert</xsl:attribute>
       <xsl:attribute name="mode">text</xsl:attribute>
+      <xsl:element name="xsl:variable">
+        <xsl:attribute name="name">ident</xsl:attribute>
+        <xsl:attribute name="select">@applicPropertyIdent|@actidref</xsl:attribute>
+      </xsl:element>
+      <xsl:element name="xsl:variable">
+        <xsl:attribute name="name">type</xsl:attribute>
+        <xsl:attribute name="select">@applicPropertyType|@actreftype</xsl:attribute>
+      </xsl:element>
       <xsl:element name="xsl:choose">
-        <xsl:apply-templates select="property"/>
+        <xsl:apply-templates select="property|conditionType"/>
+        <xsl:apply-templates select="productAttributes|conditions"/>
         <xsl:apply-templates select="default"/>
       </xsl:element>
     </xsl:element>
@@ -226,15 +235,21 @@
   <xsl:template match="property">
     <xsl:element name="xsl:when">
       <xsl:attribute name="test">
-        <xsl:text>(@applicPropertyIdent='</xsl:text>
+        <xsl:text>$ident='</xsl:text>
         <xsl:value-of select="@ident"/>
-        <xsl:text>' or @actidref='</xsl:text>
+        <xsl:text>' and $type='</xsl:text>
+        <xsl:value-of select="@type"/>
+        <xsl:text>'</xsl:text>
+      </xsl:attribute>
+      <xsl:apply-templates select="name|text|values"/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="conditionType">
+    <xsl:element name="xsl:when">
+      <xsl:attribute name="test">
+        <xsl:text>$type='condition' and (//cond[@id=$ident]/@condTypeRefId|//condition[@id=$ident]/@condtyperef)='</xsl:text>
         <xsl:value-of select="@ident"/>
-        <xsl:text>') and (@applicPropertyType='</xsl:text>
-        <xsl:value-of select="@type"/>
-        <xsl:text>' or @actreftype='</xsl:text>
-        <xsl:value-of select="@type"/>
-        <xsl:text>')</xsl:text>
+        <xsl:text>'</xsl:text>
       </xsl:attribute>
       <xsl:apply-templates select="name|text|values"/>
     </xsl:element>
@@ -242,7 +257,19 @@
   <xsl:template match="default">
     <xsl:element name="xsl:when">
       <xsl:attribute name="test">true()</xsl:attribute>
-      <xsl:apply-templates/>
+      <xsl:apply-templates select="name|text|values"/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="productAttributes">
+    <xsl:element name="xsl:when">
+      <xsl:attribute name="test">$type='prodattr'</xsl:attribute>
+      <xsl:apply-templates select="name|text|values"/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="conditions">
+    <xsl:element name="xsl:when">
+      <xsl:attribute name="test">$type='condition'</xsl:attribute>
+      <xsl:apply-templates select="name|text|values"/>
     </xsl:element>
   </xsl:template>
   <xsl:template match="name">
