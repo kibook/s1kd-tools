@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="05"/>
+        <issueInfo issueNumber="025" inWork="06"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="27"/>
+        <issueDate year="2020" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -580,7 +580,7 @@ applicPropertyValues="A"/&gt;
           <para>With attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> only on those elements where a statement should be shown, and an additional inline applicability to represent the whole data module's applicability. This XML is semantically incorrect but easier for a stylesheet to transform for page-oriented output.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara>
+      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
         <title>DISPTEXT FILE SCHEMA</title>
         <levelledPara>
           <title>Display text rules</title>
