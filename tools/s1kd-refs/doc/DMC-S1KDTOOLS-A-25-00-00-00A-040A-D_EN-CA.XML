@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="030" inWork="00"/>
+        <issueInfo issueNumber="030" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add debug level of verbose output.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -273,7 +273,7 @@
             <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Verbose output. Specify multiple times to increase the verbosity.</para>
+                <para>Verbose output. Specify multiple times to increase the verbosity.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

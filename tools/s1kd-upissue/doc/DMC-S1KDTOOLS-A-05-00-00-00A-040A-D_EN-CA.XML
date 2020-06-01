@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="00"/>
+        <issueInfo issueNumber="026" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,20 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -0 (--unverified) option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -q, -1 and -2 options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -I (--keep-date/--change-date) to --s.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -s (--status) to -z (--issue-type).</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0005" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change -z (--date) to -I.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -64,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0003 rfu-0004 rfu-0005"><![CDATA[s1kd-upissue [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-upissue [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>]
              [-c <reason>] [-I <date>] [-t <urt>] [-z <type>]
              [<file>...]]]></verbatimText>
         </para>
@@ -78,7 +66,7 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-0, --unverified</listItemTerm>
               <listItemDefinition>
                 <para>Set the quality assurance to unverified.</para>
@@ -139,7 +127,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0005">-I, --date &lt;date&gt;</listItemTerm>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify the issue date to use for the upissued object(s). Otherwise, the current date will be used.</para>
               </listItemDefinition>
@@ -188,7 +176,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">-s, --(keep|change)-date</listItemTerm>
+              <listItemTerm>-s, --(keep|change)-date</listItemTerm>
               <listItemDefinition>
                 <para>Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date, or the date specified with the -z option. This option will keep the date of the previous inwork or official issue.</para>
                 <para>In -m mode, this option has the opposite effect, causing the date to be changed. The two alternative long option names, --keep-date and --change-date, allow for the intended meaning of this option to be expressed clearly in each mode.</para>
@@ -219,7 +207,7 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0004">-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue type of the new issue.</para>
                 <para>

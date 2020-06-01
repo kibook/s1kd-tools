@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="007" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -F (--valid-filenames) option.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -107,7 +107,7 @@
                 <para>The commands used to validate objects. Multiple commands can be used by specifying this option multiple times. The objects will be passed to each command on stdin, and the exit status of the command will be used to determine if the object is valid (with a non-zero exit status indicating it is invalid). This overrides the default commands (s1kd-validate, and s1kd-brexcheck if -b is specified).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-F, --valid-filenames</listItemTerm>
               <listItemDefinition>
                 <para>Print the filenames of valid objects.</para>

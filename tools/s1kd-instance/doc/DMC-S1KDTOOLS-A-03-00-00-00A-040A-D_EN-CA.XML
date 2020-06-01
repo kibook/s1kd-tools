@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="050" inWork="00"/>
+        <issueInfo issueNumber="050" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="06" day="01"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change issue type behaviour with -n (--issue).</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -308,10 +308,10 @@
                     <listItem>
                       <para>If the issue is 000-01 thru 001-00, the default issue type will be "new".</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>If the issue is 001-01 and up and the master is not "new", the default issue type will be that of the master.</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>If the issue is 001-01 and up but the master is "new", the default issue type will be "status".</para>
                     </listItem>
                   </randomList>
