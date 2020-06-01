@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="06"/>
+        <issueInfo issueNumber="025" inWork="07"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="06" day="01"/>
@@ -587,7 +587,7 @@ applicPropertyValues="A"/&gt;
           <para>The element <verbatimText verbatimStyle="vs12">&lt;disptext&gt;</verbatimText> contains all the rules for the formatting of generated display text in applicability annotations.</para>
           <para>
             <emphasis>Markup element:</emphasis>
-            <verbatimText verbatimStyle="vs12">disptext</verbatimText>
+            <verbatimText verbatimStyle="vs12">&lt;disptext&gt;</verbatimText>
           </para>
           <para>
             <emphasis>Attributes:</emphasis>

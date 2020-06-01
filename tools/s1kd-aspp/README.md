@@ -474,7 +474,7 @@ Display text rules
 The element `<disptext>` contains all the rules for the formatting of
 generated display text in applicability annotations.
 
-*Markup element:* `disptext`
+*Markup element:* `<disptext>`
 
 *Attributes:*
 
