@@ -60,6 +60,10 @@ Search for the ACT and CCT referenced by each data module, and add them
 to the list of ACTs/CCTs to use when generating display text for that
 data module.
 
+-D, --delete  
+Remove the display text from all applicability annotations, except those
+that consist of only display text (and no computer processing part).
+
 -d, --dir &lt;dir&gt;  
 Directory to start searching for ACT/CCT data modules in. By default,
 the current directory is used.

@@ -11,7 +11,7 @@
 #include "resources.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "4.2.1"
+#define VERSION "4.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -586,9 +586,40 @@ static void addTags(xmlDocPtr doc, const char *tags)
 	xsltFreeStylesheet(style);
 }
 
+/* Recursively delete display text nodes. */
+static void deleteDisplayTextNode(xmlNodePtr node)
+{
+	xmlNodePtr cur;
+
+	/* 3.0-: displaytext
+	 * 4.0+: displayText
+	 *
+	 * Ignore display text nodes without any siblings. */
+	if ((xmlStrcmp(node->name, BAD_CAST "displayText") == 0 || xmlStrcmp(node->name, BAD_CAST "displaytext") == 0) && xmlChildElementCount(node->parent) > 1) {
+		xmlUnlinkNode(node);
+		xmlFreeNode(node);
+		return;
+	}
+
+	/* Call recursively on all children. */
+	cur = node->children;
+	while (cur) {
+		xmlNodePtr next = cur->next;
+		deleteDisplayTextNode(cur);
+		cur = next;
+	}
+
+}
+
+/* Delete all display text nodes in a document. */
+static void deleteDisplayText(xmlDocPtr doc)
+{
+	deleteDisplayTextNode(xmlDocGetRootElement(doc));
+}
+
 static void processFile(const char *in, const char *out, bool process,
-	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
-	xsltStylesheetPtr style, const char *tags)
+	bool genDispText, bool delDispText, xmlNodePtr acts, xmlNodePtr ccts,
+	bool findcts, xsltStylesheetPtr style, const char *tags)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr ctx;
@@ -623,7 +654,9 @@ static void processFile(const char *in, const char *out, bool process,
 		xmlXPathFreeContext(ctx);
 	}
 
-	if (genDispText) {
+	if (delDispText) {
+		deleteDisplayText(doc);
+	} else if (genDispText) {
 		generateDisplayText(doc, all_acts, all_ccts, style);
 	}
 
@@ -644,8 +677,8 @@ static void processFile(const char *in, const char *out, bool process,
 }
 
 static void process_list(const char *path, bool overwrite, bool process,
-	bool genDispText, xmlNodePtr acts, xmlNodePtr ccts, bool findcts,
-	xsltStylesheetPtr style, const char *tags)
+	bool genDispText, bool delDispText, xmlNodePtr acts, xmlNodePtr ccts,
+	bool findcts, xsltStylesheetPtr style, const char *tags)
 {
 	FILE *f;
 	char line[PATH_MAX];
@@ -663,7 +696,7 @@ static void process_list(const char *path, bool overwrite, bool process,
 
 	while (fgets(line, PATH_MAX, f)) {
 		strtok(line, "\t\r\n");
-		processFile(line, overwrite ? line : "-", process, genDispText, acts, ccts, findcts, style, tags);
+		processFile(line, overwrite ? line : "-", process, genDispText, delDispText, acts, ccts, findcts, style, tags);
 	}
 
 	if (path) {
@@ -683,6 +716,7 @@ static void show_help(void)
 	puts("  -a, --id <ID>  Use <ID> for DM-level applic.");
 	puts("  -C, --cct <CCT>       Use <CCT> when generating display text.");
 	puts("  -c, --search          Search for ACT/CCT data modules.");
+	puts("  -D, --delete          Remove all display text.");
 	puts("  -d, --dir <dir>       Directory to start search for ACT/CCT in.");
 	puts("  -F, --format <fmt>    Use a custom format string for generating display text.");
 	puts("  -f, --overwrite       Overwrite input file(s).");
@@ -715,6 +749,7 @@ int main(int argc, char **argv)
 	bool overwrite = false;
 	bool genDispText = false;
 	bool process = false;
+	bool delDispText = false;
 	bool findcts = false;
 	bool islist = false;
 	char *format = NULL;
@@ -726,7 +761,7 @@ int main(int argc, char **argv)
 	
 	xmlNodePtr acts, ccts;
 
-	const char *sopts = ".,A:a:C:cd:F:fG:gklNpqrt:vx:h?";
+	const char *sopts = ".,A:a:C:cDd:F:fG:gklNpqrt:vx:h?";
 	struct option lopts[] = {
 		{"version"      , no_argument      , 0, 0},
 		{"help"         , no_argument      , 0, 'h'},
@@ -736,6 +771,7 @@ int main(int argc, char **argv)
 		{"id"           , required_argument, 0, 'a'},
 		{"cct"          , required_argument, 0, 'C'},
 		{"search"       , no_argument      , 0, 'c'},
+		{"delete"       , no_argument      , 0, 'D'},
 		{"dir"          , required_argument, 0, 'd'},
 		{"format"       , required_argument, 0, 'F'},
 		{"overwrite"    , no_argument      , 0, 'f'},
@@ -795,6 +831,9 @@ int main(int argc, char **argv)
 				break;
 			case 'c':
 				findcts = true;
+				break;
+			case 'D':
+				delDispText = true;
 				break;
 			case 'd':
 				free(search_dir);
@@ -877,19 +916,16 @@ int main(int argc, char **argv)
 
 	if (optind >= argc) {
 		if (islist) {
-			process_list(NULL, overwrite, process, genDispText, acts, ccts, findcts, style, tags);
+			process_list(NULL, overwrite, process, genDispText, delDispText, acts, ccts, findcts, style, tags);
 		} else {
-			processFile("-", "-", process, genDispText, acts, ccts, findcts, style, tags);
+			processFile("-", "-", process, genDispText, delDispText, acts, ccts, findcts, style, tags);
 		}
 	} else {
 		for (i = optind; i < argc; ++i) {
 			if (islist) {
-				process_list(argv[i], overwrite, process,
-					genDispText, acts, ccts, findcts, style, tags);
+				process_list(argv[i], overwrite, process, genDispText, delDispText, acts, ccts, findcts, style, tags);
 			} else {
-				processFile(argv[i], overwrite ? argv[i] : "-",
-					process, genDispText, acts,
-					ccts, findcts, style, tags);
+				processFile(argv[i], overwrite ? argv[i] : "-", process, genDispText, delDispText, acts, ccts, findcts, style, tags);
 			}
 		}
 	}
