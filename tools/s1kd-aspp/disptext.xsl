@@ -48,11 +48,15 @@
             <xsl:element name="xsl:choose">
               <xsl:element name="xsl:when">
                 <xsl:attribute name="test">$op = 'and'</xsl:attribute>
-                <xsl:value-of select="disptext/operators/and"/>
+                <xsl:element name="xsl:text">
+                  <xsl:value-of select="disptext/operators/and"/>
+                </xsl:element>
               </xsl:element>
               <xsl:element name="xsl:when">
                 <xsl:attribute name="test">$op = 'or'</xsl:attribute>
-                <xsl:value-of select="disptext/operators/or"/>
+                <xsl:element name="xsl:text">
+                  <xsl:value-of select="disptext/operators/or"/>
+                </xsl:element>
               </xsl:element>
             </xsl:element>
           </xsl:element>
