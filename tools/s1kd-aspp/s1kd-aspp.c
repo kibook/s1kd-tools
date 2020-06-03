@@ -11,7 +11,7 @@
 #include "resources.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "4.3.1"
+#define VERSION "4.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "

@@ -70,7 +70,7 @@
         </xsl:element>
       </xsl:element>
       <xsl:element name="xsl:template">
-        <xsl:attribute name="match">applic</xsl:attribute>
+        <xsl:attribute name="match">applic[assert|evaluate|expression]</xsl:attribute>
         <xsl:element name="xsl:variable">
           <xsl:attribute name="name">disp-name</xsl:attribute>
           <xsl:element name="xsl:choose">
@@ -115,17 +115,9 @@
                 <xsl:attribute name="name">{$disp-name}</xsl:attribute>
                 <xsl:element name="xsl:element">
                   <xsl:attribute name="name">{$para-name}</xsl:attribute>
-                  <xsl:element name="xsl:choose">
-                    <xsl:element name="xsl:when">
-                      <xsl:attribute name="test">assert|evaluate|expression</xsl:attribute>
-                      <xsl:element name="xsl:apply-templates">
-                        <xsl:attribute name="select">assert|evaluate|expression</xsl:attribute>
-                        <xsl:attribute name="mode">text</xsl:attribute>
-                      </xsl:element>
-                    </xsl:element>
-                    <xsl:element name="xsl:otherwise">
-                      <xsl:text>All</xsl:text>
-                    </xsl:element>
+                  <xsl:element name="xsl:apply-templates">
+                    <xsl:attribute name="select">assert|evaluate|expression</xsl:attribute>
+                    <xsl:attribute name="mode">text</xsl:attribute>
                   </xsl:element>
                 </xsl:element>
               </xsl:element>
