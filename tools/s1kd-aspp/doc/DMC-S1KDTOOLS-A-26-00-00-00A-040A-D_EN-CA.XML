@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="09"/>
+        <issueInfo issueNumber="025" inWork="10"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="06" day="04"/>
@@ -422,7 +422,7 @@ applicPropertyType="prodattr"
 applicPropertyValues="Mk1~Mk9"/>
 </evaluate>]]></verbatimText>
             Human-readable format:
-            <verbatimText verbatimStyle="vs23">"Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9</verbatimText>
+            <verbatimText verbatimStyle="vs23">"Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9"</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>

@@ -297,7 +297,7 @@ Evaluate annotation:
 
 Human-readable format:
 
-    "Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9
+    "Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9"
 
 EXAMPLES
 ========
