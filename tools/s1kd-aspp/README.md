@@ -166,7 +166,7 @@ This file specifies rules for generating display text. It consists of:
 -   property rules
 
 The `<operators>` element specifies the format of operators used in
-display text evaluations:
+display text:
 
 and  
 Text to use for the `and` operator between assertions. Default is " and
@@ -180,6 +180,12 @@ Text to use to open a group of assertions. Default is "(".
 
 closeGroup  
 Text to use to close a group of assertions. Default is ")".
+
+set  
+Text to use between items in a set (a\|b\|c).
+
+range  
+Text to use between the start and end of a range (a\~c).
 
 Each `<property>` element specifies the format used for an individual
 property. The `<productAttributes>` and `<conditions>` elements specify
@@ -215,6 +221,8 @@ Example of a `.disptext` file:
     <or>, </or>
     <openGroup>[</openGroup>
     <closeGroup>]</closeGroup>
+    <set> or </set>
+    <range> thru </range>
     </operators>
     <default>
     <name/>
@@ -231,12 +239,65 @@ Example of a `.disptext` file:
     </property>
     </disptext>
 
-Given the above example, the display text for a value of "BRKTRKR" for
-the property "model" would be "Brook trekker Model", rather than "Model:
-BRKTRKR". The display text for an evaluation of "(Model: BRKTRKR and
-Version: Mk9) or (Model: MNTSTRM and Version: Mk1)" would be "\[Brook
-trekker Model + Version: Mk9\], \[Mountain storm Model + Version:
-Mk1\]".
+Given the above example, the following display would be generated for
+each annotation:
+
+Assert annotation:
+
+    <assert
+    applicPropertyIdent="model"
+    applicPropertyType="prodattr"
+    applicPropertyValues="BRKTRKR"/>
+
+Human-readable format:
+
+    "Brook trekker Model"
+
+Evaluate annotation:
+
+    <evaluate andOr="or">
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="model"
+    applicPropertyType="prodattr"
+    applicPropertyValues="BRKTRKR"/>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="Mk1"/>
+    </evaluate>
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="model"
+    applicPropertyType="prodattr"
+    applicPropertyValues="MNTSTRM"/>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="Mk9"/>
+    </evaluate>
+    </evaluate>
+
+Human-readable format:
+
+    "[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]"
+
+Evaluate annotation:
+
+    <evaluate andOr="and">
+    <assert
+    applicPropertyIdent="model"
+    applicPropertyType="prodattr"
+    applicPropertyValues="BRKTRKR|MNTSTRM"/>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="Mk1~Mk9"/>
+    </evaluate>
+
+Human-readable format:
+
+    "Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9
 
 EXAMPLES
 ========
@@ -502,7 +563,7 @@ Operator rules
 --------------
 
 The element `<operators>` defines the format of operators used in
-applicability evaluations.
+applicability display text.
 
 *Markup element:* `<operators>`
 
@@ -521,6 +582,10 @@ applicability evaluations.
 -   `<openGroup>`, text used to open a group of assertions.
 
 -   `<closeGroup>`, text used to close a group of assertions.
+
+-   `<set>`, text used between items in a set.
+
+-   `<range>`, text used between the start and end of a range.
 
 Default property format
 -----------------------

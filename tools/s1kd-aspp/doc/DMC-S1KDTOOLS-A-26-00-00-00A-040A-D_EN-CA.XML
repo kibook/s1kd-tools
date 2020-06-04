@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="08"/>
+        <issueInfo issueNumber="025" inWork="09"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="06" day="02"/>
+        <issueDate year="2020" month="06" day="04"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -281,7 +281,7 @@
               </listItem>
             </randomList>
           </para>
-          <para>The <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> element specifies the format of operators used in display text evaluations:
+          <para>The <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> element specifies the format of operators used in display text:
             <definitionList>
               <definitionListItem>
                 <listItemTerm>and</listItemTerm>
@@ -305,6 +305,18 @@
                 <listItemTerm>closeGroup</listItemTerm>
                 <listItemDefinition>
                   <para>Text to use to close a group of assertions. Default is ")".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>set</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use between items in a set (a|b|c).</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>range</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use between the start and end of a range (a~c).</para>
                 </listItemDefinition>
               </definitionListItem>
             </definitionList>
@@ -342,6 +354,8 @@
 <or>, </or>
 <openGroup>[</openGroup>
 <closeGroup>]</closeGroup>
+<set> or </set>
+<range> thru </range>
 </operators>
 <default>
 <name/>
@@ -358,7 +372,58 @@
 </property>
 </disptext>]]></verbatimText>
           </para>
-          <para>Given the above example, the display text for a value of "BRKTRKR" for the property "model" would be "Brook trekker Model", rather than "Model: BRKTRKR". The display text for an evaluation of "(Model: BRKTRKR and Version: Mk9) or (Model: MNTSTRM and Version: Mk1)" would be "[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]".</para>
+          <para>Given the above example, the following display would be generated for each annotation:</para>
+          <para>
+            Assert annotation:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="BRKTRKR"/>]]></verbatimText>
+            Human-readable format:
+            <verbatimText verbatimStyle="vs23">"Brook trekker Model"</verbatimText>
+          </para>
+          <para>
+            Evaluate annotation:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<evaluate andOr="or">
+<evaluate andOr="and">
+<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="BRKTRKR"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="Mk1"/>
+</evaluate>
+<evaluate andOr="and">
+<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="MNTSTRM"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="Mk9"/>
+</evaluate>
+</evaluate>]]></verbatimText>
+            Human-readable format:
+            <verbatimText verbatimStyle="vs23">"[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]"</verbatimText>
+          </para>
+          <para>
+            Evaluate annotation:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<evaluate andOr="and">
+<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="BRKTRKR|MNTSTRM"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="Mk1~Mk9"/>
+</evaluate>]]></verbatimText>
+            Human-readable format:
+            <verbatimText verbatimStyle="vs23">"Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9</verbatimText>
+          </para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
@@ -648,7 +713,7 @@ applicPropertyValues="A"/&gt;
         </levelledPara>
         <levelledPara>
           <title>Operator rules</title>
-          <para>The element <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> defines the format of operators used in applicability evaluations.</para>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> defines the format of operators used in applicability display text.</para>
           <para>
             <emphasis>Markup element:</emphasis>
             <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText>
@@ -679,6 +744,12 @@ applicPropertyValues="A"/&gt;
               </listItem>
               <listItem>
                 <para><verbatimText verbatimStyle="vs12">&lt;closeGroup&gt;</verbatimText>, text used to close a group of assertions.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;set&gt;</verbatimText>, text used between items in a set.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;range&gt;</verbatimText>, text used between the start and end of a range.</para>
               </listItem>
             </randomList>
           </para>

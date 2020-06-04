@@ -5,6 +5,8 @@
     <or> or </or>
     <openGroup>(</openGroup>
     <closeGroup>)</closeGroup>
+    <set>, </set>
+    <range>-</range>
   </operators>
   <default>
     <name/>

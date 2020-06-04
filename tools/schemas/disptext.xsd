@@ -24,12 +24,16 @@
       <xs:element ref="or"/>
       <xs:element ref="openGroup"/>
       <xs:element ref="closeGroup"/>
+      <xs:element ref="set"/>
+      <xs:element ref="range"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="and" type="xs:string"/>
   <xs:element name="or" type="xs:string"/>
   <xs:element name="openGroup" type="xs:string"/>
   <xs:element name="closeGroup" type="xs:string"/>
+  <xs:element name="set" type="xs:string"/>
+  <xs:element name="range" type="xs:string"/>
   <xs:group name="rulesElemGroup">
     <xs:choice>
       <xs:element ref="name"/>

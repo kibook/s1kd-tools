@@ -12,6 +12,14 @@
         <xsl:attribute name="name">overwrite-display-text</xsl:attribute>
         <xsl:attribute name="select">true()</xsl:attribute>
       </xsl:element>
+      <xsl:element name="xsl:variable">
+        <xsl:attribute name="name">set-operator</xsl:attribute>
+        <xsl:value-of select="disptext/operators/set"/>
+      </xsl:element>
+      <xsl:element name="xsl:variable">
+        <xsl:attribute name="name">range-operator</xsl:attribute>
+        <xsl:value-of select="disptext/operators/range"/>
+      </xsl:element>
       <xsl:apply-templates select="disptext"/>
       <xsl:element name="xsl:template">
         <xsl:attribute name="match">assert[text()]</xsl:attribute>
@@ -66,7 +74,7 @@
         <xsl:attribute name="match">@applicPropertyValues|@actvalues</xsl:attribute>
         <xsl:attribute name="mode">text</xsl:attribute>
         <xsl:element name="xsl:value-of">
-          <xsl:attribute name="select">translate(str:replace(., '|', ', '), '~', '-')</xsl:attribute>
+          <xsl:attribute name="select">str:replace(str:replace(., '|', $set-operator), '~', $range-operator)</xsl:attribute>
         </xsl:element>
       </xsl:element>
       <xsl:element name="xsl:template">
