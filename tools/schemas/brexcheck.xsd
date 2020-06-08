@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:simpleType name="yesNoAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="allowedObjectFlag" type="allowedObjectFlagAttType"/>
+  <xs:simpleType name="allowedObjectFlagAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="brSeverityLevel" type="brSeverityLevelAttType"/>
+  <xs:simpleType name="brSeverityLevelAttType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="brsl01"/>
+      <xs:enumeration value="brsl02"/>
+      <xs:enumeration value="brsl03"/>
+      <xs:enumeration value="brsl04"/>
+      <xs:enumeration value="brsl05"/>
+      <xs:enumeration value="brsl06"/>
+      <xs:enumeration value="brsl07"/>
+      <xs:enumeration value="brsl08"/>
+      <xs:enumeration value="brsl09"/>
+      <xs:enumeration value="brsl10"/>
+      <xs:enumeration value="brsl11"/>
+      <xs:enumeration value="brsl12"/>
+      <xs:enumeration value="brsl13"/>
+      <xs:enumeration value="brsl14"/>
+      <xs:enumeration value="brsl15"/>
+      <xs:enumeration value="brsl16"/>
+      <xs:enumeration value="brsl17"/>
+      <xs:enumeration value="brsl18"/>
+      <xs:enumeration value="brsl19"/>
+      <xs:enumeration value="brsl20"/>
+      <xs:enumeration value="brsl21"/>
+      <xs:enumeration value="brsl22"/>
+      <xs:enumeration value="brsl23"/>
+      <xs:enumeration value="brsl24"/>
+      <xs:enumeration value="brsl25"/>
+      <xs:enumeration value="brsl26"/>
+      <xs:enumeration value="brsl27"/>
+      <xs:enumeration value="brsl28"/>
+      <xs:enumeration value="brsl29"/>
+      <xs:enumeration value="brsl30"/>
+      <xs:enumeration value="brsl31"/>
+      <xs:enumeration value="brsl32"/>
+      <xs:enumeration value="brsl33"/>
+      <xs:enumeration value="brsl34"/>
+      <xs:enumeration value="brsl35"/>
+      <xs:enumeration value="brsl36"/>
+      <xs:enumeration value="brsl37"/>
+      <xs:enumeration value="brsl38"/>
+      <xs:enumeration value="brsl39"/>
+      <xs:enumeration value="brsl40"/>
+      <xs:enumeration value="brsl41"/>
+      <xs:enumeration value="brsl42"/>
+      <xs:enumeration value="brsl43"/>
+      <xs:enumeration value="brsl44"/>
+      <xs:enumeration value="brsl45"/>
+      <xs:enumeration value="brsl46"/>
+      <xs:enumeration value="brsl47"/>
+      <xs:enumeration value="brsl48"/>
+      <xs:enumeration value="brsl49"/>
+      <xs:enumeration value="brsl50"/>
+      <xs:enumeration value="brsl51"/>
+      <xs:enumeration value="brsl52"/>
+      <xs:enumeration value="brsl53"/>
+      <xs:enumeration value="brsl54"/>
+      <xs:enumeration value="brsl55"/>
+      <xs:enumeration value="brsl56"/>
+      <xs:enumeration value="brsl57"/>
+      <xs:enumeration value="brsl58"/>
+      <xs:enumeration value="brsl59"/>
+      <xs:enumeration value="brsl60"/>
+      <xs:enumeration value="brsl61"/>
+      <xs:enumeration value="brsl62"/>
+      <xs:enumeration value="brsl63"/>
+      <xs:enumeration value="brsl64"/>
+      <xs:enumeration value="brsl65"/>
+      <xs:enumeration value="brsl66"/>
+      <xs:enumeration value="brsl67"/>
+      <xs:enumeration value="brsl68"/>
+      <xs:enumeration value="brsl69"/>
+      <xs:enumeration value="brsl70"/>
+      <xs:enumeration value="brsl71"/>
+      <xs:enumeration value="brsl72"/>
+      <xs:enumeration value="brsl73"/>
+      <xs:enumeration value="brsl74"/>
+      <xs:enumeration value="brsl75"/>
+      <xs:enumeration value="brsl76"/>
+      <xs:enumeration value="brsl77"/>
+      <xs:enumeration value="brsl78"/>
+      <xs:enumeration value="brsl79"/>
+      <xs:enumeration value="brsl80"/>
+      <xs:enumeration value="brsl81"/>
+      <xs:enumeration value="brsl82"/>
+      <xs:enumeration value="brsl83"/>
+      <xs:enumeration value="brsl84"/>
+      <xs:enumeration value="brsl85"/>
+      <xs:enumeration value="brsl86"/>
+      <xs:enumeration value="brsl87"/>
+      <xs:enumeration value="brsl88"/>
+      <xs:enumeration value="brsl89"/>
+      <xs:enumeration value="brsl90"/>
+      <xs:enumeration value="brsl91"/>
+      <xs:enumeration value="brsl92"/>
+      <xs:enumeration value="brsl93"/>
+      <xs:enumeration value="brsl94"/>
+      <xs:enumeration value="brsl95"/>
+      <xs:enumeration value="brsl96"/>
+      <xs:enumeration value="brsl97"/>
+      <xs:enumeration value="brsl98"/>
+      <xs:enumeration value="brsl99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="path" type="xs:string"/>
+  <xs:attribute name="fail" type="yesNoAttType"/>
+  <xs:attribute name="line" type="xs:positiveInteger"/>
+  <xs:attribute name="xpath" type="xs:string"/>
+  <xs:attribute name="valueAllowed" type="xs:string"/>
+  <xs:element name="type" type="xs:string"/>
+  <xs:element name="brDecisionRef" type="brDecisionRefElemType"/>
+  <xs:complexType name="brDecisionRefElemType">
+    <xs:attribute ref="brDecisionIdentNumber"/>
+  </xs:complexType>
+  <xs:attribute name="brDecisionIdentNumber" type="xs:string"/>
+  <xs:element name="objectPath" type="objectPathElemType"/>
+  <xs:complexType mixed="true" name="objectPathElemType">
+    <xs:attribute ref="allowedObjectFlag"/>
+  </xs:complexType>
+  <xs:element name="objectUse" type="xs:string"/>
+  <xs:element name="objectValue" type="objectValueElemType"/>
+  <xs:complexType mixed="true" name="objectValueElemType">
+    <xs:attribute ref="valueAllowed"/>
+  </xs:complexType>
+  <xs:element name="object" type="objectElemType"/>
+  <xs:complexType name="objectElemType">
+    <xs:sequence>
+      <xs:any processContents="skip"/>
+    </xs:sequence>
+    <xs:attribute ref="line" use="required"/>
+    <xs:attribute ref="xpath" use="required"/>
+  </xs:complexType>
+  <xs:element name="error" type="errorElemType"/>
+  <xs:complexType name="errorElemType">
+    <xs:sequence>
+      <xs:element ref="type" minOccurs="0"/>
+      <xs:element ref="brDecisionRef"/>
+      <xs:element ref="objectPath"/>
+      <xs:element ref="objectUse"/>
+      <xs:element ref="objectValue" minOccurs="0"/>
+      <xs:element ref="object" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute ref="brSeverityLevel"/>
+    <xs:attribute ref="fail" use="required"/>
+  </xs:complexType>
+  <xs:element name="brex" type="brexElemType"/>
+  <xs:complexType name="brexElemType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="noErrors"/>
+        <xs:element ref="error" maxOccurs="unbounded"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute ref="path" use="required"/>
+  </xs:complexType>
+  <xs:element name="document" type="documentElemType"/>
+  <xs:complexType name="documentElemType">
+    <xs:sequence>
+      <xs:element ref="brex" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute ref="path" use="required"/>
+  </xs:complexType>
+  <xs:element name="brexCheck" type="brexCheckElemType"/>
+  <xs:complexType name="brexCheckElemType">
+    <xs:sequence>
+      <xs:element ref="document" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="layered" type="yesNoAttType"/>
+    <xs:attribute name="checkObjectValues" type="yesNoAttType"/>
+    <xs:attribute name="snsCheck" type="yesNoAttType"/>
+    <xs:attribute name="notationCheck" type="yesNoAttType"/>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE dmodule [
+ ]>
+<dmodule
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_3-0/xml_schema_flat/brex.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:dc="http://www.purl.org/dc/elements/1.1/">
+<idstatus>
+<dmaddres><dmc><avee><modelic>AE</modelic>
+<sdc>A</sdc>
+<chapnum>04</chapnum>
+<section>1</section>
+<subsect>0</subsect>
+<subject>0301</subject>
+<discode>00</discode>
+<discodev>A</discodev>
+<incode>022</incode>
+<incodev>A</incodev>
+<itemloc>D</itemloc>
+</avee></dmc>
+<dmtitle><techname>S1000D</techname>
+<infoname>Default business rules exchange data module</infoname>
+</dmtitle>
+<issno issno ="003" inwork ="00" type ="changed"/>
+<issdate year ="2007" month ="07" day ="31"/>
+</dmaddres>
+<status>
+<security class ="01"/>
+<rpc rpcname ="SIOM">SF815</rpc>
+<orig origname ="SIOM">SF815</orig>
+<applic>
+<displaytext>All</displaytext>
+</applic>
+<brexref><refdm>
+<avee><modelic>AE</modelic>
+<sdc>A</sdc>
+<chapnum>04</chapnum>
+<section>1</section>
+<subsect>0</subsect>
+<subject>0301</subject>
+<discode>00</discode>
+<discodev>A</discodev>
+<incode>022</incode>
+<incodev>A</incodev>
+<itemloc>D</itemloc>
+</avee><issno issno ="003"/></refdm></brexref>
+<qa><firstver type ="tabtop"/>
+</qa>
+<rfu><p>The DM has been amended to reflect Issue 3.0, e.g. Chap 3.9.6</p>
+<p>Attribute mntlvl was removed</p>
+<p>Attribute tccode was removed</p>
+<p>Rule for use of seqlists in data modules was corrected</p>
+</rfu>
+</status>
+</idstatus>
+<content>
+<brex>
+<contextrules context ="http://www.s1000d.org/S1000D_3-0/xml_schema_flat/brex.xsd">
+<structrules>
+<objrule><objpath>//idstatus/status/brexref</objpath>
+<objuse>All BREX data modules must be based on the business rules given in the S1000D default BREX data module!</objuse>
+</objrule>
+</structrules>
+</contextrules>
+<contextrules>
+<structrules>
+<objrule change="modify" mark="1"><objpath objappl ="0">//descendant-or-self::seqlist[not(ancestor-or-self::descript)]</objpath>
+<objuse>Sequential (numbered) lists not allowed unless in descriptive data modules</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//note[ancestor-or-self::warning]</objpath>
+<objuse>Notes are not allowed in Warnings</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//warning/seqlist</objpath>
+<objuse>Sequential lists are not allowed in Warnings</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//warning/deflist</objpath>
+<objuse>Definition lists are not allowed in Warnings</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//warning/randlist/item/randlist</objpath>
+<objuse>Random lists must not be nested within Warnings</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//warning/randlist/title</objpath>
+<objuse>Random list titles are not allowed in Warnings</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//note[ancestor-or-self::caution]</objpath>
+<objuse>Notes are not allowed in Cautions</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//caution/seqlist</objpath>
+<objuse>Sequential lists are not allowed in Cautions</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//caution/deflist</objpath>
+<objuse>Definition lists are not allowed in Cautions</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//caution/randlist/item/randlist</objpath>
+<objuse>Random lists must not be nested within Cautions</objuse>
+</objrule>
+<objrule><objpath objappl ="0">//caution/randlist/title</objpath>
+<objuse>Random list titles are not allowed in Cautions</objuse>
+</objrule>
+<objrule><objpath>//@accpnltype</objpath>
+<objuse>Type of access panel</objuse>
+<objval valtype ="single" val1 ="accpnl01">Access is a door</objval>
+<objval valtype ="single" val1 ="accpnl02">Access is a panel</objval>
+<objval valtype ="single" val1 ="accpnl03">Access is an electrical panel</objval>
+</objrule>
+<objrule><objpath>//acronym/@acrotype</objpath>
+<objuse>Type of acronym or abbreviation</objuse>
+<objval valtype ="single" val1 ="at01">Acronym (Candidate for list of abbreviations) - Default value</objval>
+<objval valtype ="single" val1 ="at02">Term (Candidate for list of terms)</objval>
+<objval valtype ="single" val1 ="at03">Symbol (Candidate for list of symbols)</objval>
+<objval valtype ="single" val1 ="at04">Spec (Candidate for list of applicable specs)</objval>
+</objrule>
+<objrule><objpath>//dialog/@cancel-caption</objpath>
+<objuse>Caption for dialog cancel function</objuse>
+<objval valtype ="single" val1 ="ca01">Sets the caption to "CANCEL"</objval>
+<objval valtype ="single" val1 ="ca02">Sets the caption to "ABORT"</objval>
+<objval valtype ="single" val1 ="ca03">Sets the caption to "NO"</objval>
+<objval valtype ="single" val1 ="ca04">Sets the caption to "END"</objval>
+<objval valtype ="single" val1 ="ca05">Sets the caption to "QUIT"</objval>
+</objrule>
+<objrule><objpath>//security/@class</objpath>
+<objuse>Security classification</objuse>
+<objval valtype ="single" val1 ="01">1 (lowest level of security classification, eg Unclassified)</objval>
+<objval valtype ="single" val1 ="02">2 (next higher level of security classification, eg Restricted)</objval>
+<objval valtype ="single" val1 ="03">3 (next higher level of security classification, eg Confidential)</objval>
+<objval valtype ="single" val1 ="04">4 (next higher level of security classification, eg Secret)</objval>
+<objval valtype ="single" val1 ="05">5 (next higher level of security classification, eg Top secret)</objval>
+<objval valtype ="single" val1 ="06">6 (another level of security classification)</objval>
+<objval valtype ="single" val1 ="07">7 (another level of security classification)</objval>
+<objval valtype ="single" val1 ="08">8 (another level of security classification)</objval>
+<objval valtype ="single" val1 ="09">9 (another level of security classification)</objval>
+</objrule>
+<objrule><objpath>//caption/@colour</objpath>
+<objuse>Caption color</objuse>
+<objval valtype ="single" val1 ="co00">None</objval>
+<objval valtype ="single" val1 ="co01">Green</objval>
+<objval valtype ="single" val1 ="co02">Amber</objval>
+<objval valtype ="single" val1 ="co03">Yellow</objval>
+<objval valtype ="single" val1 ="co04">Red</objval>
+<objval valtype ="single" val1 ="co07">White</objval>
+<objval valtype ="single" val1 ="co08">Grey</objval>
+<objval valtype ="single" val1 ="co09">Clear - Default value</objval>
+</objrule>
+<objrule><objpath>//priority/@cprio</objpath>
+<objuse>Priority level of a comment</objuse>
+<objval valtype ="single" val1 ="cp01">Routine</objval>
+<objval valtype ="single" val1 ="cp02">Emergency</objval>
+<objval valtype ="single" val1 ="cp03">Safty critical</objval>
+</objrule>
+<objrule><objpath>//crewmem/@crewmem</objpath>
+<objuse>Type of crew member required for drill or procedural step</objuse>
+<objval valtype ="single" val1 ="cm01">All</objval>
+<objval valtype ="single" val1 ="cm02">Pilot</objval>
+<objval valtype ="single" val1 ="cm03">Co-pilot</objval>
+<objval valtype ="single" val1 ="cm04">Navigator</objval>
+<objval valtype ="single" val1 ="cm05">Engineer</objval>
+<objval valtype ="single" val1 ="cm06">Ground crew</objval>
+<objval valtype ="single" val1 ="cm07">Load master</objval>
+<objval valtype ="single" val1 ="cm08">Cabin supervisor</objval>
+</objrule>
+<objrule><objpath>//drill/@drilltyp</objpath>
+<objuse>Type of aircrew drill (Flight deck presentation)</objuse>
+<objval valtype ="single" val1 ="dt00">None - Default value</objval>
+<objval valtype ="single" val1 ="dt01">Green</objval>
+<objval valtype ="single" val1 ="dt02">Amber</objval>
+<objval valtype ="single" val1 ="dt03">Yellow</objval>
+<objval valtype ="single" val1 ="dt04">Red</objval>
+<objval valtype ="single" val1 ="dt05">Orange</objval>
+<objval valtype ="single" val1 ="dt06">Blue</objval>
+</objrule>
+<objrule><objpath>//emphasis/@emph</objpath>
+<objuse>Type of emphasis</objuse>
+<objval valtype ="single" val1 ="em01">Bold - Default value</objval>
+<objval valtype ="single" val1 ="em02">Italic (only for legacy data, see Chap 3.9.1)</objval>
+<objval valtype ="single" val1 ="em03">Underline (only for legacy data, see Chap 3.9.1)</objval>
+<objval valtype ="single" val1 ="em04">Overline (only for marking vectors)</objval>
+<objval valtype ="single" val1 ="em05">Strikethrough (not to be used to mark deleted text)</objval>
+</objrule>
+<objrule><objpath>//instloc/@instloctyp</objpath>
+<objuse>Type of install location</objuse>
+<objval valtype ="single" val1 ="instloctyp01">Zone</objval>
+<objval valtype ="single" val1 ="instloctyp02">Section</objval>
+<objval valtype ="single" val1 ="instloctyp03">Station</objval>
+<objval valtype ="single" val1 ="instloctyp04">Water line</objval>
+<objval valtype ="single" val1 ="instloctyp05">Buttock line</objval>
+</objrule>
+<objrule><objpath>//@originator</objpath>
+<objuse>Origin of equipment/harness/wire</objuse>
+<objval valtype ="single" val1 ="orig01">Manufacturer</objval>
+<objval valtype ="single" val1 ="orig02">Vendor</objval>
+<objval valtype ="single" val1 ="orig03">Partner</objval>
+</objrule>
+<objrule><objpath>//randlist/@prefix</objpath>
+<objuse>Prefix of 'randlist' items</objuse>
+<objval valtype ="single" val1 ="pf01">Simple (No prefix, only indent)</objval>
+<objval valtype ="single" val1 ="pf02">Unorder (Depending on list level, prefix with short dash for first level, bullet for second, and short dash for third level - ISOpub: bull, dash) - Default value</objval>
+<objval valtype ="single" val1 ="pf03">Dash (short dash - ISOpub: dash)</objval>
+<objval valtype ="single" val1 ="pf04">Disc (filled circle in circle - ISOamsb: ofcir)</objval>
+<objval valtype ="single" val1 ="pf05">Circle (outline - ISOpub: cir)</objval>
+<objval valtype ="single" val1 ="pf06">Square (outline - ISOtech: square)</objval>
+</objrule>
+<objrule><objpath>//parasigdata/@psdtype</objpath>
+<objuse>Paragraph significant data type</objuse>
+<objval valtype ="single" val1 ="psd01">Ammunition</objval>
+<objval valtype ="single" val1 ="psd02">Instruction disposition</objval>
+<objval valtype ="single" val1 ="psd03">Lubricant</objval>
+<objval valtype ="single" val1 ="psd04">Maintenance level</objval>
+<objval valtype ="single" val1 ="psd05">Manufacturer code</objval>
+<objval valtype ="single" val1 ="psd06">Manufacturers recommendation</objval>
+<objval valtype ="single" val1 ="psd07">Modification code</objval>
+<objval valtype ="single" val1 ="psd08">Qualification code</objval>
+<objval valtype ="single" val1 ="psd09">Training level</objval>
+</objrule>
+<objrule><objpath>//quantity/@qtytype</objpath>
+<objuse>Quantity data type</objuse>
+<objval valtype ="single" val1 ="qty01">Length</objval>
+<objval valtype ="single" val1 ="qty02">Price</objval>
+<objval valtype ="single" val1 ="qty03">Temperature</objval>
+<objval valtype ="single" val1 ="qty04">Time</objval>
+<objval valtype ="single" val1 ="qty05">Torque value</objval>
+<objval valtype ="single" val1 ="qty06">Voltage</objval>
+<objval valtype ="single" val1 ="qty07">Volume</objval>
+<objval valtype ="single" val1 ="qty08">Mass</objval>
+</objrule>
+<objrule><objpath>//dialog/@reset-caption</objpath>
+<objuse>Caption for dialog reset caption</objuse>
+<objval valtype ="single" val1 ="re01">Sets the caption to "RESET"</objval>
+<objval valtype ="single" val1 ="re02">Sets the caption to "CLEAR"</objval>
+</objrule>
+<objrule><objpath>//response/@rsptype</objpath>
+<objuse>Type of response to a comment</objuse>
+<objval valtype ="single" val1 ="rt01">Accepted</objval>
+<objval valtype ="single" val1 ="rt02">Pending</objval>
+<objval valtype ="single" val1 ="rt03">Partially accepted</objval>
+<objval valtype ="single" val1 ="rt04">Rejected</objval>
+</objrule>
+<objrule><objpath>//@skill</objpath>
+<objuse>Personnel skill level</objuse>
+<objval valtype ="single" val1 ="sk01">Basic</objval>
+<objval valtype ="single" val1 ="sk02">Intermediate</objval>
+<objval valtype ="single" val1 ="sk03">Advanced</objval>
+</objrule>
+<objrule><objpath>//deftask/@skilltype</objpath>
+<objuse>Personnel skill category</objuse>
+<objval valtype ="single" val1 ="st01">Airframe (AIRPL)</objval>
+<objval valtype ="single" val1 ="st02">Electrical (ELEC)</objval>
+<objval valtype ="single" val1 ="st03">Avionic (AVION)</objval>
+<objval valtype ="single" val1 ="st04">Engine (ENGIN)</objval>
+</objrule>
+<objrule><objpath>//@submit-caption</objpath>
+<objuse>Caption for dialog submit function</objuse>
+<objval valtype ="single" val1 ="ok01">Sets the caption to "OK"</objval>
+<objval valtype ="single" val1 ="ok02">Sets the caption to "SUBMIT"</objval>
+<objval valtype ="single" val1 ="ok03">Sets the caption to "YES"</objval>
+<objval valtype ="single" val1 ="ok04">Sets the caption to "CONTINUE"</objval>
+<objval valtype ="single" val1 ="ok01">Sets the caption to "EXIT"</objval>
+</objrule>
+<objrule><objpath>//supervis/@sup.lev</objpath>
+<objuse>Supervisor level</objuse>
+<objval valtype ="single" val1 ="sl01">Low</objval>
+<objval valtype ="single" val1 ="sl02">Low intermediate</objval>
+<objval valtype ="single" val1 ="sl03">High intermediate</objval>
+<objval valtype ="single" val1 ="sl04">High</objval>
+</objrule>
+<objrule><objpath>//@taskcode</objpath>
+<objuse>Task code</objuse>
+<objval valtype ="single" val1 ="taskcd01">Detailed inspection (DET)</objval>
+<objval valtype ="single" val1 ="taskcd02">Discard (DIS)</objval>
+<objval valtype ="single" val1 ="taskcd03">Functional Check (FNC)</objval>
+<objval valtype ="single" val1 ="taskcd04">General visual inspection (GVI)</objval>
+<objval valtype ="single" val1 ="taskcd05">Lubrication (LUB)</objval>
+<objval valtype ="single" val1 ="taskcd06">Operational check (OPC)</objval>
+<objval valtype ="single" val1 ="taskcd07">Restoration (RST)</objval>
+<objval valtype ="single" val1 ="taskcd08">Servicing (SVC)</objval>
+<objval valtype ="single" val1 ="taskcd09">Visual check (VCK)</objval>
+</objrule>
+<objrule><objpath>//limittype/@type</objpath>
+<objuse>Limit type</objuse>
+<objval valtype ="single" val1 ="lt01">Time between overhaul</objval>
+<objval valtype ="single" val1 ="lt02">Hard time</objval>
+<objval valtype ="single" val1 ="lt03">Since last maintenance</objval>
+<objval valtype ="single" val1 ="lt04">Out time limit</objval>
+<objval valtype ="single" val1 ="lt05">On condition</objval>
+<objval valtype ="single" val1 ="lt06">Check maintenance</objval>
+<objval valtype ="single" val1 ="lt07">Functional check</objval>
+</objrule>
+<objrule><objpath>//threshold/@uom</objpath>
+<objuse>Unit of measurement for the threshold interval</objuse>
+<objval valtype ="single" val1 ="th01">Flight hours</objval>
+<objval valtype ="single" val1 ="th02">Flight cycles</objval>
+<objval valtype ="single" val1 ="th03">Months</objval>
+<objval valtype ="single" val1 ="th04">Weeks</objval>
+<objval valtype ="single" val1 ="th05">Years</objval>
+<objval valtype ="single" val1 ="th06">Days</objval>
+<objval valtype ="single" val1 ="th07">Supersonic cycles</objval>
+<objval valtype ="single" val1 ="th08">Pressure cycles</objval>
+<objval valtype ="single" val1 ="th09">Engine cycles</objval>
+<objval valtype ="single" val1 ="th10">Engine change</objval>
+<objval valtype ="single" val1 ="th11">Shop visits</objval>
+<objval valtype ="single" val1 ="th12">Auxiliary power unit change</objval>
+<objval valtype ="single" val1 ="th13">Landing gear change</objval>
+<objval valtype ="single" val1 ="th14">Wheel change</objval>
+<objval valtype ="single" val1 ="th15">Engine start</objval>
+</objrule>
+<objrule><objpath>//verbatim/@vstyle</objpath>
+<objuse>Verbatim style</objuse>
+<objval valtype ="single" val1 ="vs01">Generic verbatim</objval>
+<objval valtype ="single" val1 ="vs02">Filename</objval>
+<objval valtype ="single" val1 ="vs11">XML/SGML markup</objval>
+<objval valtype ="single" val1 ="vs12">XML/SGML element name</objval>
+<objval valtype ="single" val1 ="vs13">XML/SGML attribute name</objval>
+<objval valtype ="single" val1 ="vs14">XML/SGML attribute value</objval>
+<objval valtype ="single" val1 ="vs15">XML/SGML entity name</objval>
+<objval valtype ="single" val1 ="vs16">XML/SGML processing instruction</objval>
+<objval valtype ="single" val1 ="vs21">Program prompt</objval>
+<objval valtype ="single" val1 ="vs22">User input</objval>
+<objval valtype ="single" val1 ="vs23">Computer output</objval>
+<objval valtype ="single" val1 ="vs24">Program listing</objval>
+<objval valtype ="single" val1 ="vs25">Program variable name</objval>
+<objval valtype ="single" val1 ="vs26">Program variable value</objval>
+<objval valtype ="single" val1 ="vs27">Constant</objval>
+<objval valtype ="single" val1 ="vs28">Class name</objval>
+<objval valtype ="single" val1 ="vs29">Parameter name</objval>
+</objrule>
+<objrule><objpath>//@qtyuom</objpath>
+<objuse>Quantity data unit of measure - for further information refer to Chap 3.9.6.2 and the corresponding xml table</objuse>
+</objrule>
+</structrules>
+</contextrules>
+</brex>
+</content>
+</dmodule>
+

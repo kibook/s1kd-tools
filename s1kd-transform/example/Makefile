@@ -1,6 +1,0 @@
-SRC=DMC-TRNSFRM-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-OUT=DMC-TRNSFRM-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
-
-$(OUT): $(SRC)
-	s1kd-upissue $(SRC)
-	s1kd-transform -i -s autoid.xsl $(OUT)

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="13" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="022" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="05" day="01"/>
+        <dmTitle>
+          <techName>s1kd-newimf(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-newimf - Create a new S1000D ICN metadata file</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-newimf [options] &lt;ICNs&gt;...</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-newimf</emphasis> tool creates a new S1000D ICN metadata file for specified ICN files.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-$, --issue &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>5.0 (default)</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.2</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-@, --out &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new IMF to &lt;path&gt;. If &lt;path&gt; is an existing directory, the IMF will be created in it instead of the current directory. Otherwise, the IMF will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use the XML template in &lt;dir&gt; instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">icnmetadata.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (5.0).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-~, --dump-templates &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XML template to the specified directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b, --brex &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --security &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --defaults &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue date of the new ICN metadata file in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the remarks for the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n, --issno &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue number of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-O, --origcode &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the originator.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --origname &lt;orig&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The originator enterprise name of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --prompt</listItemTerm>
+              <listItemDefinition>
+                <para>Prompts the user for any values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Do not report an error when the file already exists.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R, --rpccode &lt;CAGE&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The CAGE code of the responsible partner company.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --rpcname &lt;RPC&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The responsible partner company enterprise name of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --title &lt;title&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The ICN title (if creating multiple ICNs, they will all use this title).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created IMF.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w, --inwork &lt;inwork&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The inwork issue of the new ICN metadata file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>Refer to s1kd-newdm(1) for information on the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file used by all the s1kd-new* tools.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-newimf ICN-EX-00001-001-01.PNG</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

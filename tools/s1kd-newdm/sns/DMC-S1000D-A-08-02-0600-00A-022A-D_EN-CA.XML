@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/brex.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000D" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="2" assyCode="0600" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="04" day="29"/>
+        <dmTitle>
+          <techName>Maintained SNS - Tactical missiles</techName>
+          <infoName>Business rules</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany/>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <brex>
+      <snsRules>
+        <snsDescr>
+          <snsSystem>
+            <snsCode>00</snsCode>
+            <snsTitle>Tactical missile (or ammunition), General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>Tactical missile (or ammunition) description</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Tactical missile (or ammunition) safety</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Technical publication</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>05</snsCode>
+            <snsTitle>Scheduled/unscheduled maintenance</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Time limits</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Maintenance checks</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>09</snsCode>
+            <snsTitle>Handling and transporting</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Handling</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Transporting</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>11</snsCode>
+            <snsTitle>Placards and markings</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Missile placards and markings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Launching container placards and markings</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>24</snsCode>
+            <snsTitle>Electrical power</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>AC generation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>DC generation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Voltage adaptation</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>28</snsCode>
+            <snsTitle>Fuel</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Storage</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Distribution</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>31</snsCode>
+            <snsTitle>Data acquisition</snsTitle>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Recorders</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Telemetry</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>34</snsCode>
+            <snsTitle>Navigation guidance control</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Independent position determining</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Flight management system</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Target acquisition</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Mechanical command system</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Braking system</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>44</snsCode>
+            <snsTitle>Interconnections</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Wirings and circuits</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Interconnection boxes</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>50</snsCode>
+            <snsTitle>Structures and dynamic surfaces</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Structures</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Dynamic surfaces</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>58</snsCode>
+            <snsTitle>Armament and payload</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Conventional warheads and explosive trains</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Safety and arming systems</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Proximity detection and impact detection</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Nuclear warheads and explosive trains</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Sub-ammunition</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>72</snsCode>
+            <snsTitle>Propulsion</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Rocket motors</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Turbojet engines</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Ramjet engines</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Reciprocating engines</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>85</snsCode>
+            <snsTitle>Launching container</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+        </snsDescr>
+      </snsRules>
+      <contextRules/>
+    </brex>
+  </content>
+</dmodule>

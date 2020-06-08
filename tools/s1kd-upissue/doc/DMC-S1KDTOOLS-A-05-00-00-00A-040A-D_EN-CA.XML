@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="026" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="01"/>
+        <dmTitle>
+          <techName>s1kd-upissue(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-upissue - Upissue S1000D data</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-upissue [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>]
+             [-c <reason>] [-I <date>] [-t <urt>] [-z <type>]
+             [<file>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-upissue</emphasis> tool increases the in-work or issue number of an S1000D CSDB object.</para>
+        <para>Any files using an S1000D-esque naming convention, placing the issue and in-work numbers after the first underscore (_) character, can also be "upissued". Files which do not contain the appropriate S1000D metadata are simply copied.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-0, --unverified</listItemTerm>
+              <listItemDefinition>
+                <para>Set the quality assurance to unverified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-1, --first-ver &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set first verification type (tabtop, onobject, ttandoo). If the object is second verified and this option is specified without -2 (--second-ver), the second verification will be unset.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-2, --second-ver &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set second verification type (tabtop, onobject, ttandoo). If the object is unverified and this option is specified without -1 (--first-ver), the first verification will be set as the same type as the second verification.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-4, --remove-marks</listItemTerm>
+              <listItemDefinition>
+                <para>Remove change markup on elements, but not RFUs, in the upissued object. This is automatically applied if the issue type (-s) is not <verbatimText verbatimStyle="vs14">"changed"</verbatimText> or <verbatimText verbatimStyle="vs14">"rinstate-changed"</verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --reason &lt;reason&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add a reason for update to the upissued objects. Multiple RFUs can be added by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dry-run</listItemTerm>
+              <listItemDefinition>
+                <para>Do not actually create or modify any files, only print the name of the file that would be created or modified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e, --erase</listItemTerm>
+              <listItemDefinition>
+                <para>Remove old issue file after upissuing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing upissued CSDB objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-H, --highlight</listItemTerm>
+              <listItemDefinition>
+                <para>Mark the last specified reason for update (-c) as a highlight.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the issue date to use for the upissued object(s). Otherwise, the current date will be used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i, --official</listItemTerm>
+              <listItemDefinition>
+                <para>Increase the issue number of the CSDB object. By default, the in-work issue is increased.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of CSDB objects to upissue, rather than CSDB objects themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m, --modify</listItemTerm>
+              <listItemDefinition>
+                <para>Modify issue-related metadata on objects without incrementing the issue or inwork numbers. The -I and -r options have the opposite effect in this mode. The modified objects are written to stdout by default, and the -f option can be used to change them in-place.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Omit issue/inwork numbers from filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --keep-qa</listItemTerm>
+              <listItemDefinition>
+                <para>Keep quality assurance information from old issue. Normally, when upissuing an official CSDB object to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the CSDB object, and so does not require it to be re-verified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R, --keep-unassoc-marks</listItemTerm>
+              <listItemDefinition>
+                <para>Delete only change markup on elements associated with an RFU (by use of the attribute <verbatimText verbatimStyle="vs13">reasonForUpdateRefIds</verbatimText>). Change markup on other elements is ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --(keep|remove)-changes</listItemTerm>
+              <listItemDefinition>
+                <para>Keep old RFUs and change marks. Normally, when upissuing an offical CSDB object to the first in-work issue, any reasons for update are deleted automatically, along with any change markup attributes on elements (when change type is "add" or "modify") or the elements themselves (when change type is "delete"). This option prevents their deletion.</para>
+                <para>In -m mode, this option has the opposite effect, causing the current RFUs and change marks to be removed. The two alternative long option names, --keep-changes and --remove-changes, allow for the intended meaning of this option to be expressed clearly in each mode.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s, --(keep|change)-date</listItemTerm>
+              <listItemDefinition>
+                <para>Do not change issue date. Normally, when upissuing to the next inwork or official issue, the issue date is changed to the current date, or the date specified with the -z option. This option will keep the date of the previous inwork or official issue.</para>
+                <para>In -m mode, this option has the opposite effect, causing the date to be changed. The two alternative long option names, --keep-date and --change-date, allow for the intended meaning of this option to be expressed clearly in each mode.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --type &lt;urt&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the updateReasonType of the last specified reason for update (-c).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-u, --clean-rfus</listItemTerm>
+              <listItemDefinition>
+                <para>Remove RFUs which are not associated with any change markup (by use of the attribute <verbatimText verbatimStyle="vs13">reasonForUpdateRefIds</verbatimText>).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the upissued CSDB object.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w, --lock</listItemTerm>
+              <listItemDefinition>
+                <para>Make the old issue file read-only after upissuing. Official issues (-i) will also be made read-only when they are created.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue type of the new issue.</para>
+                <para>
+                  If this option is not specified, then the issue type of the new issue will be set as follows:
+                  <randomList>
+                    <listItem>
+                      <para>if the previous issue is not an official issue (in-work 00), the issue type of the new issue will be the same as the previous issue.</para>
+                    </listItem>
+                    <listItem>
+                      <para>if the previous issue is an official issue, the issue type of the new issue will default to "status".</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Remove elements with change type of "delete". These elements are automatically removed along with all change marks and RFUs when an object is upissued from official to the next inwork issue. This option will remove them when upissuing between inwork issues, or when making the object official.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;file&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Any number of CSDB objects or other files to upissue. If none are specified, the object will be read from stdin and the upissued object will be written to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Data module with issue/inwork in filename</title>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ ls
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+
+$ s1kd-upissue DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+$ ls
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
+
+$ s1kd-upissue \
+  -i DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
+$ ls
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Data module without issue/inwork in filename</title>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ ls
+DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-US.XML
+
+$ s1kd-metadata DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
+  -n issueInfo
+000-01
+$ s1kd-upissue -N DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
+$ s1kd-metadata DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML \
+  -n issueInfo
+000-02</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Non-XML file with issue/inwork in filename</title>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ ls
+TXT-S1KDTOOLS-KHZAE-FOOBAR_000-01_EN-CA.TXT
+
+$ s1kd-upissue TXT-S1KDTOOLS-KHZAE-00001_000-01_EN-CA.TXT
+$ ls
+TXT-S1KDTOOLS-KHZAE-FOOBAR_000-01_EN-CA.TXT
+TXT-S1KDTOOLS-KHZAE-FOOBAR_000-02_EN-CA.TXT</verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

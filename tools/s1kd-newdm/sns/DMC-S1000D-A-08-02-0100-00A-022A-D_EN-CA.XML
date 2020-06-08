@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/brex.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000D" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="2" assyCode="0100" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="04" day="28"/>
+        <dmTitle>
+          <techName>Maintained SNS - Generic</techName>
+          <infoName>Business rules</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany/>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <brex>
+      <snsRules>
+        <snsDescr>
+          <snsSystem>
+            <snsCode>00</snsCode>
+            <snsTitle>Product, General</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>Product, Description</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Product, General maintenance</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Product, Safety</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Safety and protective devices</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Technical publication</snsTitle>
+              <snsSubSubSystem>
+                <snsCode>0</snsCode>
+                <snsTitle>Technical publications</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>1</snsCode>
+                <snsTitle>Publications</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>2</snsCode>
+                <snsTitle>Information Sets</snsTitle>
+              </snsSubSubSystem>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Material data</snsTitle>
+            </snsSubSystem>
+            <!-- 60 thru 80 Available for projects -->
+            <snsSubSystem>
+              <snsCode>9</snsCode>
+              <snsTitle>Battle damage repair</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>04</snsCode>
+            <snsTitle>Worthiness (fit for purpose) limitations</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Fatigue index calculations</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Operating spectrums</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>05</snsCode>
+            <snsTitle>Scheduled/unscheduled maintenance</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Time limits</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Scheduled maintenance checks lists</snsTitle>
+            </snsSubSystem>
+            <!-- 30 Available for projects -->
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Scheduled maintenance checks</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Unscheduled maintenance checks</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Acceptance and functional check usage</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Maintenance allocation</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>06</snsCode>
+            <snsTitle>Dimensions and areas</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Principal dimensions</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Reference lines</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Zones and areas</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Access provisions</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Master shapes</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>07</snsCode>
+            <snsTitle>Lifting, shoring, recovering and transporting</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Jacking</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Shoring</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Slinging</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Recovering</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Transporting</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>08</snsCode>
+            <snsTitle>Leveling and weighing</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Mass and balance</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Leveling</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Weighing</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Mass and c.g. data</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Static stability</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>09</snsCode>
+            <snsTitle>Handling and maneuvering</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Handling</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Maneuvering</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>10</snsCode>
+            <snsTitle>Parking, mooring, storing and return to service</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Parking</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Mooring</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Storing</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Return to Service</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>11</snsCode>
+            <snsTitle>Placards and markings</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Exterior color schemes and markings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Exterior placards and markings</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Interior placards and markings</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>12</snsCode>
+            <snsTitle>Servicing</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Replenishing and depleting</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Scheduled servicing</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Unscheduled servicing</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>14</snsCode>
+            <snsTitle>Product loading and offloading</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Support equipment</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Cargo</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Internal and external stores</snsTitle>
+              <snsSubSubSystem>
+                <snsCode>0</snsCode>
+                <snsTitle>Internal and external stores</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>1</snsCode>
+                <snsTitle>Basic information</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>2</snsCode>
+                <snsTitle>Supplementary information</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>3</snsCode>
+                <snsTitle>Loading procedures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>4</snsCode>
+                <snsTitle>Offloading procedures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>5</snsCode>
+                <snsTitle>Loading and offloading procedures checklists</snsTitle>
+              </snsSubSubSystem>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Non-nuclear munitions</snsTitle>
+              <snsSubSubSystem>
+                <snsCode>0</snsCode>
+                <snsTitle>Non-nuclear munitions</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>1</snsCode>
+                <snsTitle>Basic information</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>2</snsCode>
+                <snsTitle>Supplementary information</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>3</snsCode>
+                <snsTitle>Loading procedures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>4</snsCode>
+                <snsTitle>Offloading procedures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>5</snsCode>
+                <snsTitle>Loading and offloading procedures checklists</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>6</snsCode>
+                <snsTitle>Integrated combat turnaround procedures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>7</snsCode>
+                <snsTitle>Integrated combat turnaround procedures checklists</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>8</snsCode>
+                <snsTitle>Cross servicing checklists</snsTitle>
+              </snsSubSubSystem>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Nuclear munitions</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>15</snsCode>
+            <snsTitle>Crew information</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Aircraft release/operating limitations</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Operational characteristics</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Normal procedures</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Emergency procedures</snsTitle>
+              <snsSubSubSystem>
+                <snsCode>0</snsCode>
+                <snsTitle>Emergency procedures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>1</snsCode>
+                <snsTitle>General</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>2</snsCode>
+                <snsTitle>Ground emergencies</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>3</snsCode>
+                <snsTitle>Initialization emergencies</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>4</snsCode>
+                <snsTitle>System related emergencies</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>5</snsCode>
+                <snsTitle>Single or multi-engine failures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>6</snsCode>
+                <snsTitle>Arrival/Disembarking emergencies</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>7</snsCode>
+                <snsTitle>Control system failures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>8</snsCode>
+                <snsTitle>Other emergencies or failures</snsTitle>
+              </snsSubSubSystem>
+              <snsSubSubSystem>
+                <snsCode>9</snsCode>
+                <snsTitle>Multi-function display readouts giving emergency information</snsTitle>
+              </snsSubSubSystem>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Special conditions</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Performance data</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>7</snsCode>
+              <snsTitle>Role Operation/Weapon system procedures</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>8</snsCode>
+              <snsTitle>Configuration</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>16</snsCode>
+            <snsTitle>Change of role</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Role changes</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>18</snsCode>
+            <snsTitle>Vibration and noise analysis and attenuation</snsTitle>
+            <snsSubSystem>
+              <snsCode>0</snsCode>
+              <snsTitle>General</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>1</snsCode>
+              <snsTitle>Vibration analysis</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>2</snsCode>
+              <snsTitle>Noise analysis</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>3</snsCode>
+              <snsTitle>Active attenuation/actuation</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>4</snsCode>
+              <snsTitle>Sensing</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>5</snsCode>
+              <snsTitle>Control/computing</snsTitle>
+            </snsSubSystem>
+            <snsSubSystem>
+              <snsCode>6</snsCode>
+              <snsTitle>Passive attenuation</snsTitle>
+            </snsSubSystem>
+          </snsSystem>
+          <!-- 19 Available for projects -->
+        </snsDescr>
+      </snsRules>
+      <contextRules/>
+    </brex>
+  </content>
+</dmodule>

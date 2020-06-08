@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<fmtypes>
+  <fm infoCode="001" type="TP"/>
+  <fm infoCode="005" type="LOA"/>
+  <fm infoCode="006" type="LOT"/>
+  <fm infoCode="00S" type="LOEDM"/>
+  <fm infoCode="00U" type="HIGH"/>
+  <fm infoCode="00V" type="LOASD"/>
+</fmtypes>

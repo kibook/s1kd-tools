@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comment>
+<comment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/comment.xsd">
+  <identAndStatusSection>
+    <commentAddress>
+      <commentIdent>
+        <commentCode modelIdentCode="" senderIdent="" yearOfDataIssue="" seqNumber="" commentType=""/>
+        <language languageIsoCode="" countryIsoCode=""/>
+      </commentIdent>
+      <commentAddressItems>
+        <issueDate year="" month="" day=""/>
+        <commentOriginator>
+          <dispatchAddress>
+            <enterprise>
+              <enterpriseName/>
+            </enterprise>
+            <address>
+              <city/>
+              <country/>
+            </address>
+          </dispatchAddress>
+        </commentOriginator>
+      </commentAddressItems>
+    </commentAddress>
+    <commentStatus>
+      <security securityClassification=""/>
+      <commentPriority commentPriorityCode=""/>
+      <commentResponse responseType="rt02"/>
+      <commentRefs>
+        <noReferences/>
+      </commentRefs>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <remarks/>
+    </commentStatus>
+  </identAndStatusSection>
+  <commentContent>
+    <simplePara/>
+  </commentContent>
+</comment>

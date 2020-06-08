@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<dmtypes>
+  <type infoCode="014" schema="descript"/>
+  <type infoCode="018" schema="descript"/>
+  <type infoCode="040" schema="descript"/>
+  <type infoCode="130" schema="descript"/>
+  <type infoCode="720" schema="descript"/>
+  <type infoCode="C30" schema="descript"/>
+</dmtypes>

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/brex.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1000D" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="2" assyCode="0200" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2018" month="04" day="29"/>
+        <dmTitle>
+          <techName>Maintained SNS - Support and training equipment</techName>
+          <infoName>Business rules</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany/>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <brex>
+      <snsRules>
+        <snsDescr>
+          <snsSystem>
+            <snsCode>AA</snsCode>
+            <snsTitle>Voltage, current and resistance measuring and indicating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AB</snsCode>
+            <snsTitle>Standing wave ratio and impedance measuring</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AC</snsCode>
+            <snsTitle>Waveform measuring and analyzing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AD</snsCode>
+            <snsTitle>Power and mechanical energy measuring</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AE</snsCode>
+            <snsTitle>Intensity measuring</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AF</snsCode>
+            <snsTitle>Acceleration, velocity, rate, frequency and time measuring and counting</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AG</snsCode>
+            <snsTitle>Optical measuring, testing and aligning</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AH</snsCode>
+            <snsTitle>Material measuring and testing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AJ</snsCode>
+            <snsTitle>Multifunction measuring and testing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AK</snsCode>
+            <snsTitle>Standards and calibration equipment for measuring and testing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AL</snsCode>
+            <snsTitle>Active devices for test purposes</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AM</snsCode>
+            <snsTitle>Passive devices for test purposes</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>AN</snsCode>
+            <snsTitle>Nondestructive inspection and oil analysis</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>BA</snsCode>
+            <snsTitle>Signal generating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>BB</snsCode>
+            <snsTitle>Electrical power supplying, generating, storing and converting</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>BC</snsCode>
+            <snsTitle>Mechanical, hydraulic, pneumatic and vacuum power supplying, storing and converting</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>CA</snsCode>
+            <snsTitle>Communicating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>CB</snsCode>
+            <snsTitle>Signaling</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>CC</snsCode>
+            <snsTitle>Lighting</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>DA</snsCode>
+            <snsTitle>Engine checkout and testing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>DB</snsCode>
+            <snsTitle>Missile system checkout and testing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>EA</snsCode>
+            <snsTitle>Gas storage, processing, supplying and shipping</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>EB</snsCode>
+            <snsTitle>Liquid storage, processing, supplying and shipping</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>FA</snsCode>
+            <snsTitle>Shelters and chambers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>FB</snsCode>
+            <snsTitle>Protective deflectors, shields, screens and coverings</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>FC</snsCode>
+            <snsTitle>Supports for shoring and shipping</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>FD</snsCode>
+            <snsTitle>Special purpose and multipurpose devices</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>FE</snsCode>
+            <snsTitle>Flight clothing and accessories</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GA</snsCode>
+            <snsTitle>General mechanical cleaning, degreasing and scaling</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GB</snsCode>
+            <snsTitle>Deicing and decontaminating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GC</snsCode>
+            <snsTitle>Road and runway cleaning and repairing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GD</snsCode>
+            <snsTitle>Lubricating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GE</snsCode>
+            <snsTitle>Wheel, tire and mechanical system servicing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GF</snsCode>
+            <snsTitle>Special purpose and multipurpose servicing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GG</snsCode>
+            <snsTitle>Maintenance platform, stands, supports and accessories</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>GH</snsCode>
+            <snsTitle>Special machines</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>HA</snsCode>
+            <snsTitle>Hoisting, jacking, lifting, towing and positioning</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>HB</snsCode>
+            <snsTitle>Transporting of equipment and solid material</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>HC</snsCode>
+            <snsTitle>Launching</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>HD</snsCode>
+            <snsTitle>Arresting, parking and securing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>HE</snsCode>
+            <snsTitle>Special purpose and multipurpose handling and moving</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>HF</snsCode>
+            <snsTitle>Propulsion system</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JA</snsCode>
+            <snsTitle>Heating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JB</snsCode>
+            <snsTitle>Air cooling and air conditioning</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JC</snsCode>
+            <snsTitle>Ventilating and air circulation</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JD</snsCode>
+            <snsTitle>Humidity controlling</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JE</snsCode>
+            <snsTitle>Refrigerating</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JF</snsCode>
+            <snsTitle>Multipurpose and special purpose equipment</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JG</snsCode>
+            <snsTitle>Pressurizing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JH</snsCode>
+            <snsTitle>Water cooling</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>JI</snsCode>
+            <snsTitle>Filtering</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>KA</snsCode>
+            <snsTitle>Fire fighting, crash and rescue equipment</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>KB</snsCode>
+            <snsTitle>Survival equipment and devices</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LA</snsCode>
+            <snsTitle>Pilot and flight crew flight simulators</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LB</snsCode>
+            <snsTitle>Ground crew training flight simulators</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LC</snsCode>
+            <snsTitle>Armament trainers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LD</snsCode>
+            <snsTitle>Navigation trainers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LE</snsCode>
+            <snsTitle>Radar and communications trainers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LF</snsCode>
+            <snsTitle>Psychological and psycho-physiological trainers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LG</snsCode>
+            <snsTitle>Ground-to-ground and ground-to-air missile trainers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LH</snsCode>
+            <snsTitle>Special project trainers</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LJ</snsCode>
+            <snsTitle>Training aids</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LK</snsCode>
+            <snsTitle>Command training programs</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>LL</snsCode>
+            <snsTitle>Miscellaneous training and simulating devices</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>MA</snsCode>
+            <snsTitle>Detecting, ranging and fire control</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>MB</snsCode>
+            <snsTitle>Directing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>MC</snsCode>
+            <snsTitle>Miscellaneous fire control</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>NA</snsCode>
+            <snsTitle>Guns</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>NB</snsCode>
+            <snsTitle>Ammunition</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>NC</snsCode>
+            <snsTitle>Bombs, rockets and missiles</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>OA</snsCode>
+            <snsTitle>Automatic flight or remote control</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>OB</snsCode>
+            <snsTitle>Navigation</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>PA</snsCode>
+            <snsTitle>Engine ignition system</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>PB</snsCode>
+            <snsTitle>Special ignition systems</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>QA</snsCode>
+            <snsTitle>Picture taking equipment</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>QB</snsCode>
+            <snsTitle>Picture processing equipment</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>QC</snsCode>
+            <snsTitle>Picture using equipment</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>RA</snsCode>
+            <snsTitle>Analog computing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>RB</snsCode>
+            <snsTitle>Digital computing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>RC</snsCode>
+            <snsTitle>Hybrid computing</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>RD</snsCode>
+            <snsTitle>Input/output and storage</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>RE</snsCode>
+            <snsTitle>Collating, reading and interpreting</snsTitle>
+          </snsSystem>
+          <snsSystem>
+            <snsCode>RF</snsCode>
+            <snsTitle>Special purpose equipment</snsTitle>
+          </snsSystem>
+        </snsDescr>
+      </snsRules>
+      <contextRules/>
+    </brex>
+  </content>
+</dmodule>

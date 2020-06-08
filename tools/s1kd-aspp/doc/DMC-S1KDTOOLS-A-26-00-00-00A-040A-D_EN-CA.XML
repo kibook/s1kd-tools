@@ -1,0 +1,991 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="025" inWork="10"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="04"/>
+        <dmTitle>
+          <techName>s1kd-aspp(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add .disptext configuration file.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D (--delete) option.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-aspp - Applicability statement preprocessor</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-aspp [options] [<object> ...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-aspp</emphasis> tool has two main functions:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>Generates display text for applicability statements. The text is derived from the logic described by the <verbatimText verbatimStyle="vs12">assert</verbatimText> and <verbatimText verbatimStyle="vs12">evaluate</verbatimText> elements.</para>
+            </listItem>
+            <listItem>
+              <para>Preprocesses "semantic" applicability statements in a data module to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet.</para>
+            </listItem>
+          </randomList>
+        </para>
+        <para>"Semantic" applicability statements are those entered by the author to encode the applicability of elements within a data module. "Presentation" applicability statements are those that are actually displayed in page-oriented output, also referred to as the "human-readable" statements.</para>
+        <para>The applicability in the resulting XML is longer semantically correct, but an XSLT stylesheet can simply place a statement on any element with attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> without needing to consider inherited applicability statements on elements without the attribute.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-., --dump-disptext</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in .disptext file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-,, --dump-xsl</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-A, --act &lt;ACT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add an ACT to use when generating display text for product attributes. Multiple ACT data modules can be used by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a, --id &lt;ID&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The ID to use for the inline applicability annotation representing the whole data module's applicability. Default is "app-0000".</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C, --cct &lt;CCT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add a CCT to use when generating display text for conditions. Multiple CCT data modules can be used by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --search</listItemTerm>
+              <listItemDefinition>
+                <para>Search for the ACT and CCT referenced by each data module, and add them to the list of ACTs/CCTs to use when generating display text for that data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-D, --delete</listItemTerm>
+              <listItemDefinition>
+                <para>Remove the display text from all applicability annotations, except those that consist of only display text (and no computer processing part).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Directory to start searching for ACT/CCT data modules in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F, --format &lt;fmt&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom format string to generate display text.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite input data module(s) rather than outputting to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-G, --disptext &lt;disptext&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a custom .disptext file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-g, --generate</listItemTerm>
+              <listItemDefinition>
+                <para>Generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-k, --keep</listItemTerm>
+              <listItemDefinition>
+                <para>When generating display text, do not overwrite existing display text on statements, only generate display text for statements which have none.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of filenames of objects, rather than objects themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the filenames for the ACT and CCT do not include issue info, i.e. they were created using the -N option of the s1kd-newdm tool.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --presentation</listItemTerm>
+              <listItemDefinition>
+                <para>Preprocess applicability statements to produce "presentation" applicability statements which are simpler to parse in an XSLT stylesheet. The applicability in the resulting XML is no longer semantically correct.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Search for ACT/CCT data modules recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --tags &lt;mode&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add tags before elements containing the display text of the applicability annotation they reference, simulating the typical presentation of applicability annotations within the XML.</para>
+                <para>If &lt;mode&gt; is "pi", the tags are inserted as processing instructions, named "s1kd-aspp". This allows existing tags to be removed automatically before adding new ones.</para>
+                <para>If &lt;mode&gt; is "comment", the tags are inserted as XML comments. Existing comments will not be removed automatically.</para>
+                <para>If &lt;mode&gt; is "remove", tags will be removed without adding new ones. This only applies to the processing instruction tags.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-x, --xsl &lt;XSLT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use custom XSLT to generate display text for applicability statements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt; ...</listItemTerm>
+              <listItemDefinition>
+                <para>The object(s) to preprocess. This can include both individual objects and combined files such as those produced by s1kd-flatten(1).</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title><verbatimText verbatimStyle="vs02">.disptext</verbatimText> file</title>
+          <para>
+            This file specifies rules for generating display text. It consists of:
+            <randomList>
+              <listItem>
+                <para>operator rules</para>
+              </listItem>
+              <listItem>
+                <para>property rules</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>The <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> element specifies the format of operators used in display text:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>and</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use for the <verbatimText verbatimStyle="vs14">and</verbatimText> operator between assertions. Default is " and ".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>or</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use for the <verbatimText verbatimStyle="vs14">or</verbatimText> operator between assertions. Default is " or ".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>openGroup</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use to open a group of assertions. Default is "(".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>closeGroup</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use to close a group of assertions. Default is ")".</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>set</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use between items in a set (a|b|c).</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>range</listItemTerm>
+                <listItemDefinition>
+                  <para>Text to use between the start and end of a range (a~c).</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>Each <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> element specifies the format used for an individual property. The <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText> and <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText> elements specify the default format for product attributes and conditions that are not listed. Alternatively, the <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> element specifies the default format for both product attributes and conditions together.</para>
+          <para>The format is specified using a combination of the following elements:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>&lt;name&gt;</listItemTerm>
+                <listItemDefinition>
+                  <para>Replaced by the name of the property.</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>&lt;text&gt;</listItemTerm>
+                <listItemDefinition>
+                  <para>Text that is included as-is.</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>&lt;values&gt;</listItemTerm>
+                <listItemDefinition>
+                  <para>Replaced by the values specified for the property in the applicability assertion.</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>Optionally, <verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText> may contain a list of custom labels for individual values. Any values not included in this list will use their normal label.</para>
+          <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.disptext</verbatimText> in the current directory and parent directories, but any file can be specified using the -G (--disptext) option.</para>
+          <para>Example of a <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<disptext>
+<operators>
+<and> + </and>
+<or>, </or>
+<openGroup>[</openGroup>
+<closeGroup>]</closeGroup>
+<set> or </set>
+<range> thru </range>
+</operators>
+<default>
+<name/>
+<text>: </text>
+<values/>
+</default>
+<property ident="model" type="prodattr">
+<values>
+<value match="BRKTRKR">Brook trekker</value>
+<value match="MNTSTRM">Mountain storm</value>
+</values>
+<text> </text>
+<name/>
+</property>
+</disptext>]]></verbatimText>
+          </para>
+          <para>Given the above example, the following display would be generated for each annotation:</para>
+          <para>
+            Assert annotation:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="BRKTRKR"/>]]></verbatimText>
+            Human-readable format:
+            <verbatimText verbatimStyle="vs23">"Brook trekker Model"</verbatimText>
+          </para>
+          <para>
+            Evaluate annotation:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<evaluate andOr="or">
+<evaluate andOr="and">
+<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="BRKTRKR"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="Mk1"/>
+</evaluate>
+<evaluate andOr="and">
+<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="MNTSTRM"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="Mk9"/>
+</evaluate>
+</evaluate>]]></verbatimText>
+            Human-readable format:
+            <verbatimText verbatimStyle="vs23">"[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]"</verbatimText>
+          </para>
+          <para>
+            Evaluate annotation:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<evaluate andOr="and">
+<assert
+applicPropertyIdent="model"
+applicPropertyType="prodattr"
+applicPropertyValues="BRKTRKR|MNTSTRM"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="Mk1~Mk9"/>
+</evaluate>]]></verbatimText>
+            Human-readable format:
+            <verbatimText verbatimStyle="vs23">"Brook trekker or Mountain storm Model + Version: Mk1 thru Mk9"</verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Generating display text</title>
+          <para>The built-in XSLT for generating display text follows the guidance in Chap 7.8 of the S1000D 5.0 specification. For example, given the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;</verbatimText>
+          </para>
+          <para>The resulting XML would contain:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;prodversion: A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;</verbatimText>
+          </para>
+          <para>If ACTs or CCTs are supplied which define display names for a property, this will be used instead of the ident. For example, the ACT defines the display name for the "<verbatimText verbatimStyle="vs14">prodversion</verbatimText>" product attribute:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;productAttribute id="prodversion"&gt;
+&lt;name&gt;Product version&lt;/name&gt;
+&lt;displayName&gt;Version&lt;/displayName&gt;
+&lt;descr&gt;The version of the product.&lt;/descr&gt;
+&lt;enumeration applicPropertyValues="A|B|C"/&gt;
+&lt;/productAttribute&gt;</verbatimText>
+          </para>
+          <para>When supplied with the -A option:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-aspp -g -A &lt;ACT&gt; &lt;DM&gt;</verbatimText>
+          </para>
+          <para>The resulting XML would instead contain:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A&lt;/simplePara&gt;
+&lt;assert applicPropertyIdent="prodversion"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;</verbatimText>
+          </para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods for generating display text can be changed either via the <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file, or by supplying a custom XSLT script with the -x option. The -, option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
+&lt;xsl:copy&gt;
+&lt;xsl:apply-templates select="@*|node()"/&gt;
+&lt;/xsl:copy&gt;
+&lt;/xsl:template&gt;</verbatimText>
+          </para>
+          <para>This means any elements or attributes not matched by a more specific template in the script are copied.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Display text format string (-F)</title>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The -F option allows for very simple customizations to generated display text without needing to create a custom <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file or XSLT script (-x). The string determines the format of the display text of each <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> element in the annotation.</para>
+          <para>The following variables can be used within the format string:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>%name%</listItemTerm>
+                <listItemDefinition>
+                  <para>The name of the property.</para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>%values%</listItemTerm>
+                <listItemDefinition>
+                  <para>The applicable value(s) of the property.</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>For example:
+            <verbatimText verbatimStyle="vs24">$ s1kd-aspp -g &lt;DM&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+...
+
+$ s1kd-aspp -F '%name% = %values%' -g &lt;DM&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version = A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+...</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Creating presentation applicability statements</title>
+          <para>Given the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+&lt;identAndStatusSection&gt;
+&lt;dmAddress&gt;...&lt;/dmAddress&gt;
+&lt;dmStatus&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+...
+&lt;/dmStatus&gt;
+&lt;/identAndStatusSection&gt;
+&lt;content&gt;
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-B"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;procedure&gt;
+&lt;preliminaryRqmts&gt;...&lt;/preliminaryRqmts&gt;
+&lt;mainProcedure&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-B"&gt;
+&lt;para&gt;This step is applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-B"&gt;
+&lt;para&gt;This step is also applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is also applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;/mainProcedure&gt;
+&lt;closeRqmts&gt;...&lt;/closeRqmts&gt;
+&lt;/procedure&gt;
+&lt;/content&gt;
+&lt;/dmodule&gt;</verbatimText>
+          </para>
+          <para>Applicability statements should be displayed whenever applicability changes:</para>
+          <para>
+            <sequentialList>
+              <listItem>
+                <para>This step is applicable to A or B.</para>
+              </listItem>
+              <listItem>
+                <para>
+                  <emphasis>Applicable to: B</emphasis>
+                </para>
+                <para>This step is applicable to B only.</para>
+              </listItem>
+              <listItem>
+                <para>This step is also applicable to B only.</para>
+              </listItem>
+              <listItem>
+                <para>
+                  <emphasis>Applicable to: A or B</emphasis>
+                </para>
+                <para>This step is also applicable to A or B.</para>
+              </listItem>
+            </sequentialList>
+          </para>
+          <para>There are two parts which are difficult to do in an XSLT stylesheet:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>No statement is shown on Step 3 despite having attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> because the applicability has not changed since the last statement on Step 2.</para>
+              </listItem>
+              <listItem>
+                <para>A statement is shown on Step 4 despite not having attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> because the applicability has changed back to that of the whole data module.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>Using the s1kd-aspp tool, the above XML would produce the following output:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+&lt;identAndStatusSection&gt;
+&lt;dmAddress&gt;...&lt;/dmAddress&gt;
+&lt;dmStatus&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+...
+&lt;/dmStatus&gt;
+&lt;/identAndStatusSection&gt;
+&lt;content&gt;
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-B"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0000"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;procedure&gt;
+&lt;preliminaryRqmts&gt;...&lt;/preliminaryRqmts&gt;
+&lt;mainProcedure&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-B"&gt;
+&lt;para&gt;This step is applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;This step is also applicable to B only.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-0000"&gt;
+&lt;para&gt;This step is also applicable to A or B.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;/mainProcedure&gt;
+&lt;/procedure&gt;
+&lt;/content&gt;
+&lt;/dmodule&gt;</verbatimText>
+          </para>
+          <para>With attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> only on those elements where a statement should be shown, and an additional inline applicability to represent the whole data module's applicability. This XML is semantically incorrect but easier for a stylesheet to transform for page-oriented output.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <title>DISPTEXT FILE SCHEMA</title>
+        <levelledPara>
+          <title>Display text rules</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;disptext&gt;</verbatimText> contains all the rules for the formatting of generated display text in applicability annotations.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;disptext&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;conditionType&gt;</verbatimText>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Operator rules</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText> defines the format of operators used in applicability display text.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;operators&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;and&gt;</verbatimText>, text used for the <verbatimText verbatimStyle="vs14">and</verbatimText> operator between assertions in an evaluation.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;or&gt;</verbatimText>, text used for the <verbatimText verbatimStyle="vs14">or</verbatimText> operator between assertions in an evaluation.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;openGroup&gt;</verbatimText>, text used to open a group of assertions.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;closeGroup&gt;</verbatimText>, text used to close a group of assertions.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;set&gt;</verbatimText>, text used between items in a set.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;range&gt;</verbatimText>, text used between the start and end of a range.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Default property format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> defines the default format for all properties which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the property.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the property in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Product attributes format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText> defines the default format for all product attributes which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;productAttributes&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the product attribute.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the product attribute in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Conditions format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText> defines the default format for all conditions which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;conditions&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the condition.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the condition in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Condition type format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;conditionType&gt;</verbatimText> defines the format for all conditions of a given type which are not matched by a more specific rule.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;conditionType&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">ident</verbatimText> (M), the ID of the condition type in the CCT.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the condition.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the condition in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Property format</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText> defines the format for a specific property.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;property&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">ident</verbatimText> (M), the ID of the property in the ACT or CCT.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">type</verbatimText> (M), the type of the property, either "<verbatimText verbatimStyle="vs14">condition</verbatimText>" or "<verbatimText verbatimStyle="vs14">prodattr</verbatimText>".</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;name&gt;</verbatimText>, replaced by the name of the property.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;text&gt;</verbatimText>, text that is included as-is.</para>
+              </listItem>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>, replaced by the values specified for the property in the applicability assertion.</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Values</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText> is replaced by the values specified for a property in an applicability assertion, and may specify custom labels for certain values.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;values&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>
+                  <verbatimText verbatimStyle="vs12">&lt;value&gt;</verbatimText>
+                </para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Custom value label</title>
+          <para>The element <verbatimText verbatimStyle="vs12">&lt;value&gt;</verbatimText> specifies a custom label for an individual value of a property.</para>
+          <para>
+            <emphasis>Markup element:</emphasis>
+            <verbatimText verbatimStyle="vs12">&lt;value&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis>Attributes:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para><verbatimText verbatimStyle="vs13">match</verbatimText> (M), the value to apply the custom label for.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>
+            <emphasis>Child elements:</emphasis>
+          </para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>None</para>
+              </listItem>
+            </randomList>
+          </para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

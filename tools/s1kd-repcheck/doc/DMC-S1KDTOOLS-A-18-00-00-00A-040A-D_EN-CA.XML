@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="005" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="01"/>
+        <dmTitle>
+          <techName>s1kd-repcheck(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-repcheck - Validate CIR references in S1000D CSDB objects</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-repcheck [options] [&lt;objects&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-repcheck</emphasis> tool validates references to <acronym><acronymTerm>CIR</acronymTerm><acronymDefinition>Common Information Repository</acronymDefinition></acronym> items within S1000D CSDB objects. Any CIR references which cannot be resolved to a specification within a CIR data module will cause the tool to report an error.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-A, --all-refs</listItemTerm>
+              <listItemDefinition>
+                <para>Validate indirect tool/supply/part CIR references using the element <verbatimText verbatimStyle="vs12">&lt;identNumber&gt;</verbatimText>. Normally, only the direct reference elements <verbatimText verbatimStyle="vs12">&lt;toolRef&gt;</verbatimText>, <verbatimText verbatimStyle="vs12">&lt;supplyRef&gt;</verbatimText> and <verbatimText verbatimStyle="vs12">&lt;partRef&gt;</verbatimText> are validated.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a, --all</listItemTerm>
+              <listItemDefinition>
+                <para>In addition to CIR data modules specified with -R or explicitly linked in CIR references, allow CIR references to be resolved against any CIR data modules that were specified as objects to check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The directory to start searching for CIR data modules in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F, --valid-filenames</listItemTerm>
+              <listItemDefinition>
+                <para>Print the filenames of valid objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --filenames</listItemTerm>
+              <listItemDefinition>
+                <para>Print the filenames of invalid objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L, --list-refs</listItemTerm>
+              <listItemDefinition>
+                <para>List CIR references found in objects instead of validating them.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of CSDB objects to check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the issue/inwork numbers are omitted from object filenames (they were created with the -N option).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --output-valid</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --progress</listItemTerm>
+              <listItemDefinition>
+                <para>Display a progress bar.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Error messages will not be printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R, --cir &lt;CIR&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>A CIR to resolve references in CSDB objects against. Multiple CIRs can be specified by using this option multiple times.</para>
+                <para>If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Search for CIR data modules recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T, --summary</listItemTerm>
+              <listItemDefinition>
+                <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output. Specify multiple times to increase the verbosity.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x, --xml</listItemTerm>
+              <listItemDefinition>
+                <para>Print an XML report of the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Validate with elements that have a change type of "delete" removed. CIR data modules with an issue type of "deleted" will also be ignored in the automatic search when this option is specified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Object(s) to check CIR references in.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>The check completed successfully, and all CIR references were resolved.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>The check completed successfully, but some CIR references could not be resolved.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>The number of CSDB objects specified exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          Part repository:
+          <verbatimText verbatimStyle="vs11"><![CDATA[<partRepository>
+<partSpec>
+<partIdent manufacturerCodeValue="12345" partNumberValue="ABC"/>
+<itemIdentData>
+<descrForPart>ABC part</descrForPart>
+</itemIdentData>
+</partSpec>
+</partRepository>]]></verbatimText>
+          Part references in a procedure:
+          <verbatimText verbatimStyle="vs11"><![CDATA[<spareDescrGroup>
+<spareDescr>
+<partRef manufacturerCodeValue="12345" partNumberValue="ABC"/>
+<reqQuantity>1</reqQuantity>
+</spareDescr>
+<spareDescr>
+<partRef manufacturerCodeValue="12345" partNumberValue="DEF"/>
+<reqQuantity>1</reqQuantity>
+</spareDescr>
+</spareDescrGroup>]]></verbatimText>
+          Command and results:
+          <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-repcheck -R <CIR> ... <DM>
+s1kd-repcheck: ERROR: <DM> (<line>): Part 12345/DEF not found.]]></verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

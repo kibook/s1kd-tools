@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="014" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="05" day="01"/>
+        <dmTitle>
+          <techName>s1kd-defaults(5) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate updateReasonType="urt01">
+        <simplePara>Fix issue type.</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>General</title>
+        <para>This document contains an alphabetic index of all valid <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file identifiers, and a description of the values they may be assigned. It also contains examples of a <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file using all identifiers in both the XML format and simple text format.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>Alphabetic index</title>
+        <table pgwide="1" frame="topbot" rowsep="0" colsep="0">
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file - Identifier value descriptions</title>
+          <tgroup cols="2">
+            <colspec colname="c1"/>
+            <colspec colname="c2"/>
+            <thead>
+              <row rowsep="1">
+                <entry>
+                  <para>Identifier</para>
+                </entry>
+                <entry>
+                  <para>Value description</para>
+                </entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">act</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Data module code of ACT data module</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">assyCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 to 4 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">authorization</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">brex</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Data module code of BREX data module</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">city</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string (Sender city)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">commentPriorityCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>cp01-cp99</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">commentType</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Q, I, or R</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">countryIsoCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>ISO 2-character country code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">country</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string (Sender country)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">disassyCodeVariant</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 to 3 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">disassyCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">dmlType</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>C, P, or S</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>true or false</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">infoCodeVariant</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 alphanumeric character</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">infoCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>3 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">infoName</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">infoNameVariant</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">inWork</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 digits</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">issueNumber</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>3 digits</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">issueType</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>S1000D issue type (new, changed, ...)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">issue</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>S1000D issue number (5.0, 4.2, 4.1, ...)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">itemLocationCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>A, B, C, D, or T</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">languageIsoCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 to 3 character ISO language code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">learnCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>3 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">learnEventCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>A, B, C, D, or E</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">maintainedSns</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">modelIdentCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 to 14 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">originatorCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">originator</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">pmIssuer</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">pmNumber</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">pmVolume</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 digits</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">receiver</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">receiverCity</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">receiverCountry</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">receiverIdent</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">remarks</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">responsiblePartnerCompanyCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">responsiblePartnerCompany</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">schema</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>URI</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">scormContentPackageIssuer</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">scormContentPackageNumber</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">scormContentPackageVolume</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 digits</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">securityClassification</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 digits</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">sender</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">senderIdent</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>5-character NCAGE code</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">seqNumber</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>00001-99999</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">skillLevelCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>sk01-sk99</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">sns</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Data module code of BREX data module</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">subSubSystemCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 alphanumeric character</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">subSystemCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 alphanumeric character</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">systemCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>2 to 3 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">systemDiffCode</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 to 4 alphanumeric characters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">techName</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>string</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">templates</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Path to custom XML templates directory</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">yearOfDataIssue</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>4 digits</para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </levelledPara>
+      <levelledPara>
+        <title>Example - XML format</title>
+        <para>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
+<defaults>
+<default ident="act" value="MYPRJ-A-00-00-00-00A-00WA-D"/>
+<default ident="assyCode" value="00"/>
+<default ident="authorization" value="khzae.net"/>
+<default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/>
+<default ident="city" value="Toronto"/>
+<default ident="commentPriorityCode" value="cp01"/>
+<default ident="commentType" value="Q"/>
+<default ident="countryIsoCode" value="CA"/>
+<default ident="country" value="Canada"/>
+<default ident="disassyCodeVariant" value="A"/>
+<default ident="disassyCode" value="00"/>
+<default ident="dmlType" value="C"/>
+<default ident="includePrevSnsTitle" value="true"/>
+<default ident="infoCodeVariant" value="A"/>
+<default ident="infoCode" value="258"/>
+<default ident="infoName" value="Other procedure to clean"/>
+<default ident="infoNameVariant" value="Clean with water"/>
+<default ident="inWork" value="01"/>
+<default ident="issueNumber" value="000"/>
+<default ident="issueType" value="new"/>
+<default ident="issue" value="5.0"/>
+<default ident="itemLocationCode" value="D"/>
+<default ident="languageIsoCode" value="en"/>
+<default ident="learnCode" value="H10"/>
+<default ident="learnEventCode" value="A"/>
+<default ident="maintainedSns" value="General sea vehicles"/>
+<default ident="modelIdentCode" value="MYPRJ"/>
+<default ident="omitIssueInfo" value="true"/>
+<default ident="originatorCode" value="12345"/>
+<default ident="originator" value="khzae.net"/>
+<default ident="pmIssuer" value="12345"/>
+<default ident="pmNumber" value="00000"/>
+<default ident="pmVolume" value="00"/>
+<default ident="receiver" value="khzae.net"/>
+<default ident="receiverCity" value="Toronto"/>
+<default ident="receiverCountry" value="Canada"/>
+<default ident="receiverIdent" value="12345"/>
+<default ident="remarks" value="Comments on a data module"/>
+<default ident="responsiblePartnerCompanyCode" value="12345"/>
+<default ident="responsiblePartnerCompany" value="khzae.net"/>
+<default ident="schema" value="descript.xsd"/>
+<default ident="securityClassification" value="01"/>
+<default ident="senderIdent" value="12345"/>
+<default ident="seqNumber" value="00001"/>
+<default ident="skillLevelCode" value="sk01"/>
+<default ident="sns" value="MYPRJ-A-00-00-00-00A-022A-D"/>
+<default ident="subSubSystem" value="0"/>
+<default ident="subSystem" value="0"/>
+<default ident="systemCode" value="00"/>
+<default ident="techName" value="My project"/>
+<default ident="templates" value="/usr/share/s1kd-tools/templ"/>
+<default ident="yearOfDataIssue" value="2017"/>
+</defaults>]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>Example - Simple text format</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">act                            MYPRJ-A-00-00-00-00A-00WA-D
+assyCode                       00
+authorization                  khzae.net
+brex                           MYPRJ-A-00-00-00-00A-022A-D
+city                           Toronto
+commentPriorityCode            cp01
+commentType                    Q
+countryIsoCode                 CA
+country                        Canada
+disassyCodeVariant             A
+disassyCode                    00
+dmlType                        C
+includePrevSnsTitle            true
+infoCodeVariant                A
+infoCode                       258
+infoName                       Other procedure to clean
+infoNameVariant                Clean with water
+inWork                         01
+issueNumber                    000
+issueType                      new
+issue                          5.0
+itemLocationCode               D
+languageIsoCode                en
+learnCode                      H10
+learnEventCode                 A
+maintainedSns                  General sea vehicles
+modelIdentCode                 MYPRJ
+omitIssueInfo                  true
+originatorCode                 12345
+originator                     khzae.net
+pmIssuer                       12345
+pmNumber                       00000
+pmVolume                       00
+receiver                       khzae.net
+receiverCity                   Toronto
+receiverCountry                Canada
+receiverIdent                  12345
+remarks                        Comments on a data module
+responsiblePartnerCompanyCode  12345
+responsiblePartnerCompany      khzae.net
+schema                         descript.xsd
+securityClassification         01
+sender                         khzae.net
+senderIdent                    12345
+seqNumber                      00001
+skillLevelCode                 sk01
+sns                            MYPRJ-A-00-00-00-00A-022A-D
+subSubSystem                   0
+subSystem                      0
+systemCode                     00
+techName                       My project
+templates                      /usr/share/s1kd-tools/templ
+yearOfDataIssue                2017</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

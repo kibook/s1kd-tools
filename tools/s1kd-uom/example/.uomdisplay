@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uomDisplay>
+  <format name="SI" decimalSeparator="," groupingSeparator=" "/>
+  <format name="imperial" decimalSeparator="." groupingSeparator=","/>
+  <uoms>
+    <uom name="degC"> °C</uom>
+    <uom name="degF"> °F</uom>
+    <uom name="lbm"> lb</uom>
+  </uoms>
+  <currencies>
+    <currency name="CAD">
+      <prefix>$</prefix>
+      <postfix> CAD</postfix>
+    </currency>
+    <currency name="EUR">
+      <prefix>€</prefix>
+      <postfix> EUR</postfix>
+    </currency>
+    <currency name="USD">
+      <prefix>$</prefix>
+      <postfix> USD</postfix>
+    </currency>
+  </currencies>
+</uomDisplay>

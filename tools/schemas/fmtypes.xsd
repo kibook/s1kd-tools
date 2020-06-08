@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:element name="fm" type="fmElemType"/>
+  <xs:complexType name="fmElemType">
+    <xs:attribute name="infoCode" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="xs:string" use="required"/>
+    <xs:attribute name="ignoreDel" type="yesNoAttType"/>
+    <xs:attribute name="xsl" type="xs:string"/>
+  </xs:complexType>
+  <xs:simpleType name="yesNoAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="fmtypes" type="fmtypesElemType"/>
+  <xs:complexType name="fmtypesElemType">
+    <xs:sequence>
+      <xs:element ref="fm" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

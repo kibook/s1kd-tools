@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<defaults>
+  <default ident="countryIsoCode" value="CA"/>
+  <default ident="languageIsoCode" value="en"/>
+  <default ident="originator" value="khzae.net"/>
+  <default ident="responsiblePartnerCompany" value="khzae.net"/>
+</defaults>

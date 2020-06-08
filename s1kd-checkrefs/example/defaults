@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<defaults>
-  <default ident="languageIsoCode" value="en"/>
-  <default ident="countryIsoCode" value="CA"/>
-</defaults>

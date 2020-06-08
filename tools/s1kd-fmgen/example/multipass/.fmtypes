@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<fmtypes>
+  <fm infoCode="001" type="TP" xsl="xsl/titlepage.xpl"/>
+</fmtypes>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="16" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="027" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="05" day="01"/>
+        <dmTitle>
+          <techName>s1kd-newcom(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-newcom - Create a new S1000D comment.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-newcom [options]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-newcom</emphasis> tool creates a new S1000D comment with the code and metadata specified.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-#, --code &lt;code&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The code of the comment, in the form of MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-$, --issue &lt;issue&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>5.0 (default)</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.2</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>4.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>3.0</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.3</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.2</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.1</para>
+                    </listItem>
+                    <listItem>
+                      <para>2.0</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-@, --out &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Save the new comment to &lt;path&gt;. If &lt;path&gt; is an existing directory, the comment will be created in it instead of the current directory. Otherwise, the comment will be saved as the filename &lt;path&gt; instead of being automatically named.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">comment.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (5.0).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-~, --dump-templates &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dump the built-in XML template to the specified directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b, --brex &lt;BREX&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>BREX data module code.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C, --country &lt;country&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The country ISO code of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --security &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The security classification of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --defaults &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file name.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>Overwrite existing file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue date of the new comment in the form of YYYY-MM-DD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L, --language &lt;lang&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The language ISO code of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the remarks for the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --origname &lt;orig&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The enterprise name of the originator of the comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P, --priority &lt;code&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The priority code of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --prompt</listItemTerm>
+              <listItemDefinition>
+                <para>Prompt the user for values left unspecified.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Do not report an error when the file already exists.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --response &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The response type of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --title &lt;title&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The title of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file name of the newly created comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The issue type of the new comment.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>Refer to s1kd-newdm(1) for information on the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file which is used by all the s1kd-new* commands.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-newcom -# EX-12345-2018-00001-Q</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

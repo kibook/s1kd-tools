@@ -1,0 +1,1258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="050" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="01"/>
+        <dmTitle>
+          <techName>s1kd-instance(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-instance - Create instances of S1000D CSDB objects</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-instance [options] [&lt;object&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-instance</emphasis> tool produces "instances" of S1000D CSDB objects, derived from "master" (or "source") objects. The tool supports multiple methods of instantiating objects:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>Filtering on user-supplied applicability definitions, so that non-applicable elements and (optionally) unused applicability annotations are removed in the instance. The definitions can be supplied directly or read from a <acronym acronymType="at01">
+                  <acronymTerm>PCT</acronymTerm>
+                  <acronymDefinition id="acr-PCT">Product Cross-reference Table</acronymDefinition>
+                </acronym>.</para>
+            </listItem>
+            <listItem>
+              <para>Filtering on skill levels and security classifications to remove sensitive data.</para>
+            </listItem>
+            <listItem>
+              <para>Using a <acronym acronymType="at01">
+                  <acronymTerm>CIR</acronymTerm>
+                  <acronymDefinition id="acr-CIR">Common Information Repository</acronymDefinition>
+                </acronym> to produce a standalone instance from a CIR-dependent master.</para>
+            </listItem>
+          </randomList>
+        </para>
+        <para>Any combination of these methods can be used when producing an instance.</para>
+        <para>The applications for this tool include:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>Delivering customized data modules or publications to different customers.</para>
+            </listItem>
+            <listItem>
+              <para>Creating customized instances of CSDB objects which are maintained within the CSDB.</para>
+            </listItem>
+            <listItem>
+              <para>As a backend to filter content or resolve CIR dependencies at runtime in an electronic viewer application.</para>
+            </listItem>
+          </randomList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-A, --simplify</listItemTerm>
+              <listItemDefinition>
+                <para>Simplify inline applicability annotations, and remove annotations which are unambiguously valid or invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a, --reduce</listItemTerm>
+              <listItemDefinition>
+                <para>Remove applicability annotations which are unambiguously valid or invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C, --comment &lt;comment&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Add an XML comment to an instance. Useful as another way of identifying an object as an instance aside from the source address or extended code, or giving additional information about a particular instance. By default, the comment is inserted at the top of the document, but this can be customized with the -X option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --code &lt;code&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a new data module code (DMC) or publication module code (PMC) for the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-D, --dump &lt;CIR&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Dumps the built-in XSLT used to resolve dependencies for &lt;CIR&gt; CIR type to stdout. This can be used as a starting point for a custom XSLT script to be specified with the -x option.</para>
+                <para>The following types currently have built-in XSLT and can therefore be used as values for &lt;CIR&gt;:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>accessPointRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>applicRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>cautionRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>circuitBreakerRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>controlIndicatorRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>enterpriseRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>functionalItemRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>illustratedPartsCatalog</para>
+                    </listItem>
+                    <listItem>
+                      <para>partRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>supplyRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>toolRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>warningRepository</para>
+                    </listItem>
+                    <listItem>
+                      <para>zoneRepository</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Directory to start searching for referenced objects in. By default, the current directory will be searched. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), or when searching for source objects (-@).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-E, --no-extension</listItemTerm>
+              <listItemDefinition>
+                <para>Remove the extension from an instance produced from an already extended object.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e, --extension &lt;ext&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify an extension on the data module code (DME) or publication module code (PME) for the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F, --flatten-alts</listItemTerm>
+              <listItemDefinition>
+                <para>After filtering, "alts" elements containing only one child element will be "flattened" by replacing them with the applicable child element. Alts elements with multiple child elements are left untouched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>Force overwriting of files.</para>
+                <para>By itself, this will cause the source object(s) to be overwritten instead of being printed to stdout.</para>
+                <para>When used with the -o or -O options, if a file exists with the same name as the one specified (-o) or automatically generated by the tool (-O), this will force it to be overwritten. Otherwise, a warning will be printed and the existing file will not be overwritten.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-G, --custom-orig &lt;CODE&gt;/&lt;NAME&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Similar to the -g option, but instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-g, --set-orig</listItemTerm>
+              <listItemDefinition>
+                <para>Set the originator of the instance. When this option is specified, the code "<verbatimText verbatimStyle="vs14">S1KDI</verbatimText>" and the name "<verbatimText verbatimStyle="vs14">s1kd-instance tool</verbatimText>" are used by default to identify that the instance was produced by this tool. A different code and name can be specified with the -G option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-H, --list-properties &lt;method&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>
+                  Create an XML report of all the applicability properties used in the specified CSDB objects. &lt;method&gt; determines how to include values in the report:
+                  <randomList>
+                    <listItem>
+                      <para>"standalone" - Only include the values that are explicitly used in the object.</para>
+                    </listItem>
+                    <listItem>
+                      <para>"all" - Include all values as defined in the ACT and CCT.</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --date &lt;date&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue date of the instance. By default, the issue date is taken from the source. If - is given for &lt;date&gt;, the current date will be used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i, --infoname &lt;infoName&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Give the data module instance a different infoName.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-J, --clean-display-text</listItemTerm>
+              <listItemDefinition>
+                <para>Remove display text from annotations which are simplified in -A or -9 mode.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-j, --clean-ents</listItemTerm>
+              <listItemDefinition>
+                <para>After filtering, remove external entities (such as ICNs) which are no longer used from the resulting instances.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-K, --skill-levels &lt;levels&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Filter the object on the specified skill levels. Elements which are marked with skill levels not contained in the string &lt;levels&gt; are removed in the resulting instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-k, --skill &lt;level&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the skill level of the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-L, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Source is a list of object filenames to create instances of, rather than an object itself.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --language &lt;lang&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the language and country of the instance. For example, to create an instance for US English, lang would be "en-US".</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m, --remarks &lt;remarks&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the remarks for the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Omit issue/inwork numbers from automatically generated filenames.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n, --issue &lt;iss&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue and inwork numbers of the instance. By default, the issue and inwork number are taken from the source.</para>
+                <para>When updating an instance (-@), if + is given for &lt;iss&gt;, the updated instance will have the same issue number with an inwork number incremented by one.</para>
+                <para>
+                  Setting the issue of the instance will also set a default issue type:
+                  <randomList>
+                    <listItem>
+                      <para>If the issue is 000-01 thru 001-00, the default issue type will be "new".</para>
+                    </listItem>
+                    <listItem>
+                      <para>If the issue is 001-01 and up and the master is not "new", the default issue type will be that of the master.</para>
+                    </listItem>
+                    <listItem>
+                      <para>If the issue is 001-01 and up but the master is "new", the default issue type will be "status".</para>
+                    </listItem>
+                  </randomList>
+                  A different issue type than the default can be set with the -z (--issue-type) option.
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-O, --outdir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Output instance(s) in &lt;dir&gt;, automatically naming them based on:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>the extension specified with -e</para>
+                    </listItem>
+                    <listItem>
+                      <para>the code specified with -c</para>
+                    </listItem>
+                    <listItem>
+                      <para>The issue info specified with -n</para>
+                    </listItem>
+                    <listItem>
+                      <para>the language and country specified with -L</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>If any of the above are not specified, the information is copied from the source object.</para>
+                <para>If &lt;dir&gt; does not exist, it will be created.</para>
+                <para>If a file exists with the same name in the specified directory, a warning will be display and the file will not be overwritten, unless the -f option is specified.</para>
+                <para>When using this option, non-XML files, such as external publications, may be specified as objects. They will be copied to &lt;dir&gt;.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --out &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Output instance to file instead of stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P, --pct &lt;PCT&gt;</listItemTerm>
+              <listItemDefinition>
+                <para><acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> file to read product definitions from (-p). If a product is specified but no PCT is given, the tool will attempt to use the ACT reference of each source data module to find the ACT and PCT data modules in the current directory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --product &lt;product&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The ID or primary key of a product in the specified <acronymTerm internalRefId="acr-PCT">PCT</acronymTerm> data module (-P), the PCT referenced by the ACT data module specified with -1, or the PCT data module referenced by the source data module itself. A primary key is given in the same form as the -s option and should match a unique assign of a product instance, e.g., "<verbatimText>serialno:prodattr=12345</verbatimText>". If the key matches multiple products within the PCT, then the objects will be filtered on the combination of all matching products.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-Q, --resolve-containers</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve references to container data modules, selecting the appropriate reference for the specified applicability. If zero or more than one references are applicable, the reference to the container will be left untouched.</para>
+                <para>Additionally, if the object being filtered is itself a container data module, the applicability of the referenced data modules will be copied in to it as inline annotations prior to filtering.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Errors are not printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R, --cir &lt;CIR&gt; ...</listItemTerm>
+              <listItemDefinition>
+                <para>Use a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> to resolve external dependencies in the master object, making the instance object standalone. Additional CIRs can be used by specifying the -R option multiple times.</para>
+                <para>The following CIRs have some built-in support:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>Access points</para>
+                    </listItem>
+                    <listItem>
+                      <para>Applicability</para>
+                    </listItem>
+                    <listItem>
+                      <para>Cautions</para>
+                    </listItem>
+                    <listItem>
+                      <para>Circuit breakers</para>
+                    </listItem>
+                    <listItem>
+                      <para>Controls/indicators</para>
+                    </listItem>
+                    <listItem>
+                      <para>Enterprises</para>
+                    </listItem>
+                    <listItem>
+                      <para>Functional items</para>
+                    </listItem>
+                    <listItem>
+                      <para>Illustrated parts data</para>
+                    </listItem>
+                    <listItem>
+                      <para>Parts</para>
+                    </listItem>
+                    <listItem>
+                      <para>Supplies</para>
+                    </listItem>
+                    <listItem>
+                      <para>Tools</para>
+                    </listItem>
+                    <listItem>
+                      <para>Warnings</para>
+                    </listItem>
+                    <listItem>
+                      <para>Zones</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>The methods of resolving the dependencies for a <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> can be changed by specifying a custom XSLT script with the -x option. The built-in XSLT used for the above <acronymTerm internalRefId="acr-CIR">CIR</acronymTerm> data modules can be dumped with the -D option.</para>
+                <para>If "*" is given for &lt;CIR&gt;, the tool will search for CIR data modules automatically.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Search for referenced objects recursively. This applies for the ACT and PCT data modules when a product is specified (-p) without specifying the PCT explicitly (-P), when searching for source objects (-@), or when searching for CIR data modules (-R).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-S, --no-source-ident</listItemTerm>
+              <listItemDefinition>
+                <para>Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s, --assign &lt;applic&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>An applicability definition in the form of "<verbatimText>&lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</verbatimText>". Any number of values can be defined by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T, --tag</listItemTerm>
+              <listItemDefinition>
+                <para>Tag non-applicable elements with the processing instruction &lt;?notApplicable?&gt; instead of removing them.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --techname &lt;techName&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Give the instance a different techName/pmTitle.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-U, --security-classes &lt;classes&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Filter the object on the specified security classes. Elements marked with security classes not contained in the string &lt;classes&gt; are removed in the resulting instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-u, --security &lt;sec&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the security classification of the instance. An instance may have a lower security classification than the source if classified information is removed for a particular customer.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-V, --infoname-variant &lt;variant&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Give the instance a different info name variant.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-W, --set-applic</listItemTerm>
+              <listItemDefinition>
+                <para>Set the applicability for the whole object, overwriting the current applicability with the user-defined applicability values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w, --whole-objects</listItemTerm>
+              <listItemDefinition>
+                <para>Check the applicability, skill level, and security classification of the whole object against the user-defined applicability, skill levels, and security classifications. If the whole object is not applicable, then no instance is created.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-X, --comment-xpath &lt;path&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The XPath expression indicating where the comment specified with -C will be inserted. This should be the path to an element where the comment will be inserted as the first child node. By default, this is the top of the document.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x, --xsl &lt;XSL&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom XSLT script to resolve CIR dependencies. If this option follows -R, the specified XSLT script will only be used for the last specified CIR. If it precedes any -R, the specified XSLT script will be used for all CIRs that do not override it with a following -x.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-Y, --applic &lt;text&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Update the applicability for the whole object using the user-defined applicability values, and using &lt;text&gt; as the new display text.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-y, --update-applic</listItemTerm>
+              <listItemDefinition>
+                <para>Update the applicability for the whole object using the user-defined applicability values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-Z, --add-required</listItemTerm>
+              <listItemDefinition>
+                <para>Fix certain elements automatically after filtering. For example, if all support equipment is removed due to filtering, a <verbatimText verbatimStyle="vs12">&lt;noSupportEquips&gt;</verbatimText> element will be inserted automatically.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Set the issue type of the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-1, --act</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the ACT to use to find the CCT and/or PCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-2, --cct</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the CCT to read dependency tests from (-~).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-4, --flatten-alts-refs</listItemTerm>
+              <listItemDefinition>
+                <para>Same as the -F option, but in addition to flattening alts elements, the <verbatimText verbatimStyle="vs13">internalRefTargetType</verbatimText> of cross-references to them will be changed to the appropriate type (e.g., <verbatimText verbatimStyle="vs14">"irtt01"</verbatimText> for a <verbatimText verbatimStyle="vs12">&lt;figure&gt;</verbatimText> in a <verbatimText verbatimStyle="vs12">&lt;figureAlts&gt;</verbatimText>). This is specifically useful for S1000D Issue 4.1, where the Default BREX does not allow the standard <verbatimText verbatimStyle="vs13">internalRefTargetType</verbatimText> values to be used with the alts elements.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-5, --print</listItemTerm>
+              <listItemDefinition>
+                <para>When -O is used, print the automatically generated file name of the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-6, --clean-annotations</listItemTerm>
+              <listItemDefinition>
+                <para>Remove unused applicability annotations.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-7, --dry-run</listItemTerm>
+              <listItemDefinition>
+                <para>Do not actually create or update any instances. This can be combined with options like -5 (--print) or -0 (--print-non-applic) to print information about what objects would/would not be created or updated, but nothing will actually be written out.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-8, --reapply</listItemTerm>
+              <listItemDefinition>
+                <para>Automatically reapply the applicability of the source object when filtering.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-9, --prune</listItemTerm>
+              <listItemDefinition>
+                <para>Remove only invalid parts of applicability annotations.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-0, --print-non-applic</listItemTerm>
+              <listItemDefinition>
+                <para>Print the file names of objects which are not applicable, and therefore no instance for them will be created. Since this would only have an effect in the -w (--whole-objects) mode, that option is implied.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-@, --update-instances</listItemTerm>
+              <listItemDefinition>
+                <para>Rather than source objects, the objects specified are existing instances that will be updated.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-%, --read-only</listItemTerm>
+              <listItemDefinition>
+                <para>Make instance objects read-only.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-!, --no-infoname</listItemTerm>
+              <listItemDefinition>
+                <para>Do not include an infoName in the instance.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-~, --dependencies</listItemTerm>
+              <listItemDefinition>
+                <para>Add dependency tests from the CCT to assertions that use the dependant values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Remove elements with change type of "delete" in the resulting instance. If -w (--whole-objects) is specified, then no instance will be created for objects with an issue type of "deleted".</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Source CSDB objects to instantiate.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title>Identifying the source of an instance</title>
+          <para>The resulting data module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>
+          <para>Additionally, the data module instance will contain an element <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> for each CIR specified with the -R option.</para>
+          <para>If the -S option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>/<verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements or <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Removing/simplifying/pruning applicability annotations</title>
+          <para>By default, filtering on applicability will remove invalid elements from the resulting instance. In some cases, though, it may be desirable to remove redundant applicability annotations on valid elements. The -a (--reduce), -A (--simplify) and -9 (--prune) options provide different methods of doing this.</para>
+          <para>The -a (--reduce) option will remove applicability annotations (<verbatimText verbatimStyle="vs13">applicRefId</verbatimText>) from elements which are deemed to be unambiguously valid or invalid (their validity does not rely on applicability values left undefined by the user). The unused occurrences of the corresponding <verbatimText verbatimStyle="vs12">&lt;applic&gt;</verbatimText> elements are removed as well.</para>
+          <para>The -A (--simplify) option will do the same as the -a option, but will also attempt to simplify unused parts of applicability annotations. It simplifies an annotation by removing <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> elements determined to be either unambiguously valid or invalid given the user-defined values, and removing unneeded <verbatimText verbatimStyle="vs12">&lt;evaluate&gt;</verbatimText> elements when they contain only one remaining <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText>.</para>
+          <para>The -9 (--prune) option works similarly to the -A option, except that only invalid parts of applicability annotations are removed.</para>
+          <para>For example, given the following input:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0001"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0002"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0003"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="normal"/&gt;
+&lt;/evaluate&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para applicRefId="app-0001"&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0002"&gt;This applies to version B.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
+This applies to version A if the weather is normal, or version B if
+the weather is icy.
+&lt;/para&gt;</verbatimText>
+          </para>
+          <para>If this data is filtered for version A, without specifying a value for the weather, and the -a, -A or -9 options are not used, the following will be the result:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0001"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0002"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;applic id="app-0003"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="normal"/&gt;
+&lt;/evaluate&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para applicRefId="app-0001"&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
+This applies to version A if the weather is normal, or version B if
+the weather is icy.
+&lt;/para&gt;</verbatimText>
+          </para>
+          <para>The second paragraph is removed, because it only applies to version B.</para>
+          <para>If the -a option is used, the following would be the result:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0003"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="normal"/&gt;
+&lt;/evaluate&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
+This applies to version A if the weather is normal, or version B if
+the weather is icy.
+&lt;/para&gt;</verbatimText>
+          </para>
+          <para>The applicability annotation reference for the first paragraph is removed because, given that the version is A, it must be true. The corresponding applicability annotations, which are no longer referenced, are also removed. The applicability on the third paragraph remains, however, because it is only true if the version is A <emphasis>and</emphasis> the weather is normal, and no value has been given for the weather.</para>
+          <para>If the -A option is used, the following would be the result:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="app-0003"&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="normal"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- snip --&gt;
+&lt;para&gt;This applies to version A.&lt;/para&gt;
+&lt;para applicRefId="app-0003"&gt;
+This applies to version A if the weather is normal, or version B if
+the weather is icy.
+&lt;/para&gt;</verbatimText>
+          </para>
+          <para>The annotation is now simplified to remove resolved assertions. Because the version must be A, any assertions restating this can be removed as redundant, and any portions of the annotation in which the version is <emphasis>not</emphasis> A can be removed as invalid. This leaves only the assertion about the weather.</para>
+          <para>
+            If the -9 option is used, the following would be the result:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
+<applic id="app-0001">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+<applic id="app-0003">
+<evaluate andOr="and">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="normal"/>
+</evaluate>
+</applic>
+</referencedApplicGroup>
+<!-- snip -->
+<para applicRefId="app-0001">This applies to version A.</para>
+<para applicRefId="app-0003">
+This applies to version A if the weather is normal, or version B if
+the weather is icy.
+</para>]]></verbatimText>
+            The first annotation is kept because it is entirely valid. The third annotation is simplified by removing the invalid assertions, but the valid assertions are preserved.
+          </para>
+          <note>
+            <notePara>The -A and -9 options may change the <emphasis>meaning</emphasis> of certain applicability annotations without changing the <emphasis>display text</emphasis>. Display text is always left untouched, so using this option may cause display text to be technically incorrect.</notePara>
+            <notePara>These options are best used when display text will be automatically generated after filtering, such as with the s1kd-aspp tool. The -J option of this tool can be combined with the -k option of the s1kd-aspp tool to only generate display text for annotations which are modified.</notePara>
+          </note>
+        </levelledPara>
+        <levelledPara>
+          <title>Applicability of an instance (-W, -Y, -y)</title>
+          <para>The applicability of an instance may change as a result of filtering. For example, a source data module which is applicable to two versions of a product may produce two instances which are each only applicable to one version. There are three options which control how the applicability of the whole instance object is updated.</para>
+          <para>The -W option will create an applicability annotation for the instance using only the user-defined applicability values. This means, for example, that given the following command:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=A -W ...</verbatimText>
+          </para>
+          <para>The instance would contain the following annotation:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
+          </para>
+          <para>regardless of what the applicability of the source object was.</para>
+          <para>The -y option will create an applicability annotation for the instance by combining the user-defined applicability with the applicability of the source object. For example, given the following annotation in the source object:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
+          </para>
+          <para>and the following command:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s weather:condition=icy -y ...</verbatimText>
+          </para>
+          <para>The annotation for the instance would be as follows:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;evaluate andOr="and"&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;assert applicPropertyIdent="weather"
+applicPropertyType="condition" applicPropertyValues="icy"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
+          </para>
+          <para>The -Y option by itself works the same as the -y option, but allows custom display text to be set for the annotation. It can also be combined with the -W option to add custom display text to the overwriting annotation:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=A -WY "Version A" ...</verbatimText>
+          </para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- snip --&gt;
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version A&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert applicPropertyIdent="version"
+applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;!-- snip --&gt;
+&lt;/dmStatus&gt;</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Filtering for multiple values of a single property</title>
+          <para>Though not usually the case, it is possible to create an instance which is filtered on multiple values of the same applicabilty property. Given the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;referencedApplicGroup&gt;
+&lt;applic id="apA"&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="apB"&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;applic id="apC"&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- ... --&gt;
+&lt;para applicRefId="apA"&gt;Applies to A&lt;/para&gt;
+&lt;para applicRefId="apB"&gt;Applies to B&lt;/para&gt;
+&lt;para applicRefId="apC"&gt;Applies to C&lt;/para&gt;</verbatimText>
+          </para>
+          <para>filtering can be applied such that the instance will be applicable to both A and C, but not B. This is done by specifying a property multiple times in the applicability definition arguments. For example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -A -Y "A or C" -s attr:prodattr=A -s attr:prodattr=C ...</verbatimText>
+          </para>
+          <para>This would produce the following in the instance:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+&lt;!-- ... --&gt;
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;A or C&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+&lt;!-- ... -&gt;
+&lt;/dmStatus&gt;
+&lt;!-- ... --&gt;
+&lt;referencedApplicGroup&gt;
+&lt;applic id="apA"&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;/applic&gt;
+&lt;applic id="apC"&gt;
+&lt;assert applicPropertyIdent="attr"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+&lt;!-- ... --&gt;
+&lt;para applicRefId="apA"&gt;Applies to A&lt;/para&gt;
+&lt;para applicRefId="apC"&gt;Applies to C&lt;/para&gt;</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Resolving CIR dependencies with a custom XSLT script (-x)</title>
+          <para>A CIR contains more information about an item than can be captured in a data module's reference to it. If this additional information is required, there are two methods to include it:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>Distribute the CIR with the data module so the extra information can be linked to</para>
+              </listItem>
+              <listItem>
+                <para>"Flatten" the information to fit in the data module's schema.</para>
+              </listItem>
+            </randomList>
+          </para>
+          <para>A custom XSLT script can be supplied with the -x option, which is then used to resolve the CIR dependencies of the last CIR specified with -R. For example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;xsl:stylesheet
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+version="1.0"&gt;
+&lt;xsl:template match="functionalItemRef"&gt;
+&lt;xsl:variable name="fin" select"@functionalItemNumber"/&gt;
+&lt;xsl:variable name="spec" select="//functionalItemSpec[
+functionalItemIdent/@functionalItemNumber = $fin]"/&gt;
+&lt;xsl:value-of select="$spec/name"/&gt;
+&lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;</verbatimText>
+          </para>
+          <para>This script would resolve a <verbatimText verbatimStyle="vs12">functionalItemRef</verbatimText> by "flattening" it to the value of the <verbatimText verbatimStyle="vs12">name</verbatimText> element obtained from the CIR.</para>
+          <para>The example CIR would contain a specification like:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;functionalItemSpec&gt;
+&lt;functionalItemIdent functionalItemNumber="ABC"
+functionalItemType="fit01"/&gt;
+&lt;name&gt;Hydraulic pump&lt;/name&gt;
+&lt;functionalItemAlts&gt;
+&lt;functionalItem/&gt;
+&lt;/functionalItemAlts&gt;
+&lt;/functionalItemSpec&gt;</verbatimText>
+          </para>
+          <para>The source data module would contain a reference:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;para&gt;
+The
+&lt;functionalItemRef functionalItemNumber="ABC"/&gt;
+is an item in the system.
+&lt;/para&gt;</verbatimText>
+          </para>
+          <para>The command would resemble:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-instance -R &lt;CIR&gt; -x &lt;custom XSLT&gt; &lt;src&gt;</verbatimText>
+          </para>
+          <para>And the resulting XML would be:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;para&gt;The Hydraulic pump is an item in the system.&lt;/para&gt;</verbatimText>
+          </para>
+          <para>The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element <verbatimText verbatimStyle="vs12">mux</verbatimText> contains two <verbatimText verbatimStyle="vs12">dmodule</verbatimText> elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.</para>
+          <para>An "identity" template is automatically inserted in to the custom XSLT script, equivalent to the following:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
+&lt;xsl:copy&gt;
+&lt;xsl:apply-templates select="@*|node()"/&gt;
+&lt;/xsl:copy&gt;
+&lt;/xsl:template&gt;</verbatimText>
+          </para>
+          <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
+          <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -D option.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Updating instances (-@)</title>
+          <para>The -@ option is used to automatically update instance objects from their source objects.</para>
+          <para>The tool will use the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>/<verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> in each instance to find the source object they were derived from, and filter it based on the instance's metadata in order to produce an updated version of the instance. CIRs identified by <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements in the instance will also be used to update it.</para>
+          <para>Only objects which identify a source object will be processed in this mode. All other non-instance objects specified are ignored. The elements <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> and <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> identify a specific issue of an object that the instance was last updated from, but this is ignored and the latest issue found of a source object will be used instead.</para>
+          <para>This feature is primarily useful when instances of objects are stored in the CSDB, rather than only being generated during publication or dynamically in a viewer. For example, imagine you have a descriptive data module:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
+          </para>
+          <para>and you deliver to two customers, C1 and C2. The data module contains information for both:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;description&gt;
+&lt;para&gt;This text applies to all customers.&lt;/para&gt;
+&lt;para applicRefId="app-C1"&gt;This only applies to Customer 1.&lt;/para&gt;
+&lt;para applicRefId="app-C2"&gt;This only applies to Customer 2.&lt;/para&gt;
+&lt;/description&gt;</verbatimText>
+          </para>
+          <para>Neither customer wants to see information that applies only to the other, so you can create two customized instances of this data module, identified with the extended code:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">DMC-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+DME-12345-C1-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML
+DME-12345-C2-EX-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
+          </para>
+          <para>Each instance data module identifies the original data module as its source:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;sourceDmIdent&gt;
+&lt;dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/&gt;
+&lt;language languageIsoCode="en" countryIsoCode="CA"/&gt;
+&lt;issueInfo issueNumber="001" inWork="00"/&gt;
+&lt;/sourceDmIdent&gt;</verbatimText>
+          </para>
+          <para>and is set to apply only to the correct customer:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus&gt;
+...
+&lt;applic&gt;
+&lt;assert applicPropertyIdent="customer" applicPropertyType="prodattr"
+applicPropertyValues="1"/&gt;
+&lt;/applic&gt;
+...
+&lt;/dmStatus&gt;</verbatimText>
+          </para>
+          <note>
+            <notePara>The assertions in the applicability of an instance must use single values in order to work in this mode. Ranges (~) and sets (|) are not supported.</notePara>
+          </note>
+          <para>Now, when a change is made to the master data module, this tool can be used to update these instances automatically:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-instance -@ -f DME-*.XML</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Reapplying source applicability (-8)</title>
+          <para>Normally, filtering is based only on the assertions specified by the user with the -s or -p options. However, in some cases it may be desirable to take the applicability of the source object itself in to account, particularly when inline applicability annotations contain redundant assertions. For example:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[...
+<dmStatus ...>
+...
+<applic>
+<displayText>
+<simplePara>Version: A</simplePara>
+</displayText>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+...
+</dmStatus>
+...
+<referencedApplicGroup>
+<applic id="app-0001">
+<displayText>
+<simplePara>Version: A and Weather: Icy</simplePara>
+</displayText>
+<evaluate andOr="and">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+<assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Icy"/>
+</evaluate>
+</applic>
+...
+<para applicRefId="app-0001">
+Applies to version A when the weather is icy.
+</para>]]></verbatimText>
+          </para>
+          <para>If this data module is filtered with <verbatimText>-a -s weather:condition=Icy</verbatimText>, the annotation shown will not be removed, because the tool cannot fully resolve it, as it is only has a value for the weather condition.</para>
+          <para>The -8 (--reapply) option will reapply the applicability of each individual object when filtering it. In the example above, the whole data module is applicable to version A, and therefore, when the -8 option is specified, this is added to the user-defined assertions automatically for the given data module. Now the annotation is fully resolved, and can be removed in accordance with the -a option.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>No errors.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>Missing or incomplete argument.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>Specified file does not exist.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>Source object for an instance could not be found.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>4</listItemTerm>
+              <listItemDefinition>
+                <para>Malformed applicability definition.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>6</listItemTerm>
+              <listItemDefinition>
+                <para>XML was invalid or does not conform to S1000D.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>7</listItemTerm>
+              <listItemDefinition>
+                <para>Value given for an argument was malformed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>8</listItemTerm>
+              <listItemDefinition>
+                <para>Issue date specified with -I is invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>9</listItemTerm>
+              <listItemDefinition>
+                <para>The number of CIR data modules found when searching exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <para>Filtering a data module on specified applicability and writing to stdout:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-instance -s version:prodattr=A &lt;DM&gt;</verbatimText>
+        </para>
+        <para>Filtering a data module on a specified product instance and writing to stdout:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-instance -P &lt;PCT&gt; -p versionA &lt;DM&gt;</verbatimText>
+        </para>
+        <para>Filtering a data module on specified skill levels and writing to stdout:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-instance -k sk01/sk02 &lt;DMs&gt;</verbatimText>
+        </para>
+        <para>Filtering data modules for a particular customer and outputting with extended identification:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-instance -s version:prodattr=A -e 12345-54321 -O . &lt;DMs&gt;</verbatimText>
+        </para>
+        <para>Writing out a data module from stdin to a directory with automatic naming:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ xml-transform -s &lt;xsl&gt; &lt;DM&gt; | s1kd-instance -SO &lt;dir&gt;</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

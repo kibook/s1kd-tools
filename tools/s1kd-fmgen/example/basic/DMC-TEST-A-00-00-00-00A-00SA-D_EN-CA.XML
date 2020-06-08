@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/frontmatter.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="00S" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2019" month="10" day="21"/>
+        <dmTitle>
+          <techName>Test</techName>
+          <infoName>List of effective data modules</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <referencedApplicGroup>
+      <applic id="idm47927546611232">
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+    </referencedApplicGroup>
+    <frontMatter>
+      <frontMatterList frontMatterType="fm02">
+        <issueInfo issueNumber="001" inWork="00"/>
+        <issueDate year="2019" month="10" day="21"/>
+        <reducedPara>The listed documents are included in issue 001, dated 2019-10-21, of this publication.</reducedPara>
+        <reducedPara>C = Changed data module</reducedPara>
+        <reducedPara>N = New data module</reducedPara>
+        <frontMatterSubList>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="001" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="001" inWork="00"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>Test</techName>
+                  <infoName>Title page</infoName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="00S" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="001" inWork="00"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>Test</techName>
+                  <infoName>List of effective data modules</infoName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="00U" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="001" inWork="00"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>Test</techName>
+                  <infoName>Highlights</infoName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="005" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="001" inWork="00"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>Test</techName>
+                  <infoName>List of abbreviations</infoName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="006" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="000" inWork="01"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>Test</techName>
+                  <infoName>List of terms</infoName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="00V" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="000" inWork="01"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>Test</techName>
+                  <infoName>List of applicabile specifications and documentation</infoName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="001" inWork="00"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>DM 1</techName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+          <frontMatterDmEntry issueType="new">
+            <dmRef applicRefId="idm47927546611232">
+              <dmRefIdent>
+                <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="01" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+                <issueInfo issueNumber="001" inWork="00"/>
+                <language languageIsoCode="en" countryIsoCode="CA"/>
+              </dmRefIdent>
+              <dmRefAddressItems>
+                <dmTitle>
+                  <techName>DM 2</techName>
+                </dmTitle>
+                <issueDate year="2019" month="10" day="21"/>
+              </dmRefAddressItems>
+            </dmRef>
+          </frontMatterDmEntry>
+        </frontMatterSubList>
+      </frontMatterList>
+    </frontMatter>
+  </content>
+</dmodule>

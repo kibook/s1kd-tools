@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="007" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="01"/>
+        <dmTitle>
+          <techName>s1kd-appcheck(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-appcheck - Validate applicability of S1000D CSDB objects</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-appcheck [options] [&lt;object&gt;...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-appcheck</emphasis> tool validates the applicability of S1000D CSDB objects, detecting potential errors that could occur when the object is filtered.</para>
+        <para>By default, the tool validates an object against only the product attribute and condition values which are explicitly used within the object. The products check (-t) and full check (-a) modes allow objects to be checked for issues with implicit applicability, that is, product attribute or condition values which are not explicitly used within an object, but may still affect it.</para>
+        <para>The s1kd-instance and s1kd-validate tools are used by default to perform the actual validation.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-A, --act &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the ACT to read product attributes from, and to use to find the CCT or PCT. This will override the ACT reference within the individual objects being validated.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-a, --all</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects against all possible combinations of relevant product attribute and condition values as defined in the ACT and CCT. Relevant product attributes and conditions are those that are used by an object with any value.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b, --brexcheck</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects with a BREX check (using the s1kd-brexcheck tool) in addition to the schema check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C, --cct &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the CCT to read conditions from. This will override the CCT reference within the ACT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --custom</listItemTerm>
+              <listItemDefinition>
+                <para>Perform a customized check. The default standalone applicability check is disabled. This can then be combined with the -s option, to only check that all product attributes and conditions are defined in the ACT and CCT respectively, and/or the -n option, to only check nested applicability annotations. If neither of these options are specified, no checks will be performed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The directory to start searching for ACT/CCT/PCT data modules in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The commands used to validate objects. Multiple commands can be used by specifying this option multiple times. The objects will be passed to each command on stdin, and the exit status of the command will be used to determine if the object is valid (with a non-zero exit status indicating it is invalid). This overrides the default commands (s1kd-validate, and s1kd-brexcheck if -b is specified).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F, --valid-filenames</listItemTerm>
+              <listItemDefinition>
+                <para>Print the filenames of valid objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --filenames</listItemTerm>
+              <listItemDefinition>
+                <para>Print the filenames of invalid objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-K, --filter &lt;cmd&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The command used to filter objects prior to validation. The objects will be passed to the command on stdin, and the filters will be supplied as arguments in the form of "<verbatimText>-s &lt;ident&gt;:&lt;type&gt;=&lt;value&gt;</verbatimText>". This overrides the default command (s1kd-instance).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-k, --args &lt;args&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>The arguments to the filter command when filtering objects prior to validation.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of CSDB objects to validate.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the issue/inwork numbers are omitted from object filenames (they were created with the -N option).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n, --nested</listItemTerm>
+              <listItemDefinition>
+                <para>Check that all product attribute and condition values used in nested applicability annotations are subsets of the values used in their parents.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --output-valid</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P, --pct &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the PCT to read product instances from. This will override the PCT reference in the ACT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --progress</listItemTerm>
+              <listItemDefinition>
+                <para>Display a progress bar.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Error messages will not be printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Search for the ACT/CCT/PCT recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s, --strict</listItemTerm>
+              <listItemDefinition>
+                <para>Check whether product attributes and conditions used by an object are declared in the ACT and CCT respectively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T, --summary</listItemTerm>
+              <listItemDefinition>
+                <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --products</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects against the defined product instances within the PCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output. Specify multiple times to increase the verbosity.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x, --xml</listItemTerm>
+              <listItemDefinition>
+                <para>Print an XML report of the check.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-~, --dependencies</listItemTerm>
+              <listItemDefinition>
+                <para>Check with CCT dependency tests added to assertions which use the dependant values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>Validate objects with elements that have a change type of "delete" removed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Object(s) to validate.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>The check completed successfully, and all CSDB objects were valid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>The check completed successfully, but some CSDB objects were invalid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>One or more CSDB objects could not be read.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>The number of CSDB objects specified exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>Standalone validation</title>
+          <para>Consider the following data module snippet:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A or Version: B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;
+...
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-VersionB"&gt;
+&lt;assert applicPropertyIdent="version" applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+...
+&lt;levelledPara id="par-0001" applicRefId="app-VersionB"&gt;
+&lt;title&gt;Features of version B&lt;/title&gt;
+&lt;para&gt;...&lt;/para&gt;
+&lt;/levelledPara&gt;
+...
+&lt;levelledPara&gt;
+&lt;title&gt;More information&lt;/title&gt;
+&lt;para&gt;...&lt;/para&gt;
+&lt;para&gt;Refer to &lt;internalRef internalRefId="par-0001"/&gt;.&lt;/para&gt;
+&lt;/levelledPara&gt;
+...
+&lt;/dmodule&gt;</verbatimText>
+          </para>
+          <para>There are two versions of the product, A and B, and the data module is meant to apply to both.</para>
+          <para>By itself, the data module is valid:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-validate -v &lt;DM&gt;
+s1kd-validate: SUCCESS: &lt;DM&gt; validates against schema &lt;url&gt;</verbatimText>
+          </para>
+          <para>Checking it with this tool, however, reveals an issue: </para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt; is invalid when:
+s1kd-appcheck: ERROR:   prodattr version = A</verbatimText>
+          </para>
+          <para>When the data module is filtered for version A, the first levelled paragraph will be removed, which causes the reference to it in the second levelled paragraph to become broken.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Full validation</title>
+          <para>Consider the following data module snippet:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;All&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;/applic&gt;
+...
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-IcyOrHot"&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Icy"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Hot"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+...
+&lt;proceduralStep&gt;
+&lt;para&gt;Locate the handle.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep id="stp-0001" applicRefId="app-IcyOrHot"&gt;
+&lt;para&gt;Put on gloves prior to touching the handle.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;Grab the handle and turn it clockwise.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+...
+&lt;proceduralStep&gt;
+&lt;para&gt;Remove the gloves you put on in &lt;internalRef internalRefId="stp-0001"/&gt;.&lt;/para&gt;
+&lt;/proceduralStep&gt;
+...
+&lt;/dmodule&gt;</verbatimText>
+          </para>
+          <para>Once again, this data module is valid by itself:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-validate -v &lt;DM&gt;
+s1kd-validate: SUCCESS: &lt;DM&gt; validates against schema &lt;url&gt;</verbatimText>
+          </para>
+          <para>This time, however, it also initially appears valid when this tool is used:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -v &lt;DM&gt;
+s1kd-appcheck: SUCCESS: &lt;DM&gt; passed the applicability check.</verbatimText>
+          </para>
+          <para>However, now consider this snippet from the CCT:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;condCrossRefTable&gt;
+...
+&lt;condType id="weatherType"&gt;
+&lt;name&gt;Weather type&lt;/name&gt;
+&lt;descr&gt;Possible types of weather conditions.&lt;/descr&gt;
+&lt;enumeration applicPropertyValues="Normal"/&gt;
+&lt;enumeration applicPropertyValues="Icy"/&gt;
+&lt;enumeration applicPropertyValues="Hot"/&gt;
+&lt;/condType&gt;
+...
+&lt;cond id="weather" condTypeRefId="weatherType"&gt;
+&lt;name&gt;Weather&lt;/name&gt;
+&lt;descr&gt;The current weather conditions.&lt;/descr&gt;
+&lt;/cond&gt;
+...
+&lt;/condCrossRefTable&gt;</verbatimText>
+          </para>
+          <para>There is a third value for the <verbatimText verbatimStyle="vs14">weather</verbatimText> condition which is not explicitly used within the data module, and therefore will not be validated against in the default standalone check. When <verbatimText verbatimStyle="vs14">weather</verbatimText> has a value of <verbatimText verbatimStyle="vs14">Normal</verbatimText>, the cross-reference in the last step in the example above becomes broken.</para>
+          <para>To catch errors with implicit applicability, the full check (-a) can be used instead, which reads the values to check not from the data module itself, but from the ACT and CCT referenced by the data module:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -a &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt; is invalid when:
+s1kd-appcheck: ERROR:   condition weather = Normal</verbatimText>
+          </para>
+          <para>This can also be fixed by making the applicability of the data module explicit:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Weather: Normal or Weather: Icy or
+Weather: Hot&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;evaluate andOr="or"&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Normal"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Icy"/&gt;
+&lt;assert
+applicPropertyIdent="weather"
+applicPropertyType="condition"
+applicPropertyValues="Hot"/&gt;
+&lt;/evaluate&gt;
+&lt;/applic&gt;</verbatimText>
+          </para>
+          <para>In which case, the standalone check will now also detect the error:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt; is invalid when:
+s1kd-appcheck: ERROR:   condition weather = Normal</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Nested applicability annotations</title>
+          <para>Consider the following data module snippet:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;dmodule&gt;
+...
+&lt;applic&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: A, B&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/&gt;
+&lt;/applic&gt;
+...
+&lt;referencedApplicGroup&gt;
+&lt;applic id="app-C"&gt;
+&lt;displayText&gt;
+&lt;simplePara&gt;Version: C&lt;/simplePara&gt;
+&lt;/displayText&gt;
+&lt;assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="C"/&gt;
+&lt;/applic&gt;
+&lt;/referencedApplicGroup&gt;
+...
+&lt;proceduralStep&gt;
+&lt;para&gt;Step A&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep applicRefId="app-C"&gt;
+&lt;para&gt;Step B&lt;/para&gt;
+&lt;/proceduralStep&gt;
+&lt;proceduralStep&gt;
+&lt;para&gt;Step C&lt;/para&gt;
+&lt;/proceduralStep&gt;
+...
+&lt;/dmodule&gt;</verbatimText>
+          </para>
+          <para>Here, the whole data module is applicable to versions A and B, but an individual step has been made applicable to version C. Normally, this is not reported as an error, since the removal of this step would not cause the data module to become invalid:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -v &lt;DM&gt;
+s1kd-appcheck: SUCCESS: &lt;DM&gt; passed the applicability check</verbatimText>
+          </para>
+          <para>However, the content is essentially useless, since it will never appear. The -n option will report when the applicability of an element is incompatible with the applicability of any parent elements or the whole object:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -n &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt;: proceduralStep on line 62 is applicable
+when prodattr version = C, which is not a subset of the applicability
+of the whole object.</verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

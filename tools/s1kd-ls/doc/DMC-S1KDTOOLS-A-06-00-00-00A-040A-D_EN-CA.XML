@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="06" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="025" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="05" day="01"/>
+        <dmTitle>
+          <techName>s1kd-ls(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-ls - List CSDB objects in a directory hierarchy</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">s1kd-ls [-0CDGIiLlMNnoPRrSUwX7] [-e &lt;cmd&gt;]
+        [&lt;object&gt;|&lt;dir&gt; ...]</verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-ls</emphasis> tool searches the current directory or specified directory trees and lists the file names of CSDB objects matching certain criteria.</para>
+        <para>The files representing the CSDB objects must use either the standard S1000D file naming conventions, or the alternate naming convention supported by these tools using the -N option.</para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-0, --null</listItemTerm>
+              <listItemDefinition>
+                <para>Output a null-delimited list of CSDB object paths.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-C, -D, -G, -L, -M, -P, -S, -U, -X</listItemTerm>
+              <listItemDefinition>
+                <para>List comments, data modules, ICNs, data management lists, ICN metadata files, publication modules, SCORM content packages, data update files, and data dispatch notes respectively. If none are specified, -CDGLMPSUX is assumed.</para>
+                <para>The following long options can also be used for each: --com, --dm, --icn, --dml, --imf, --pm, --smc, --upf, --ddn.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Execute a command for each CSDB object instead of listing them. The string "{}" is replaced by the current CSDB object file name everywhere it occurs in the arguments to the command.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show the usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --inwork</listItemTerm>
+              <listItemDefinition>
+                <para>Show only inwork issues of objects (inwork != 00).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i, --official</listItemTerm>
+              <listItemDefinition>
+                <para>Show only official issues of objects (inwork = 00).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --latest</listItemTerm>
+              <listItemDefinition>
+                <para>Show only the latest official/inwork issue of objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the files being listed do not include the issue info in their filenames, i.e. they were created using the -N option of the s1kd-new* tools.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n, --other</listItemTerm>
+              <listItemDefinition>
+                <para>List non-S1000D files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --old</listItemTerm>
+              <listItemDefinition>
+                <para>Show only old official/inwork issues of objects.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R, --read-only</listItemTerm>
+              <listItemDefinition>
+                <para>Show only non-writable object files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Recursively descend in to directories.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w, --writable</listItemTerm>
+              <listItemDefinition>
+                <para>Show only writable object files.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-7, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input as a list of CSDB objects to process.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;|&lt;dir&gt; ...</listItemTerm>
+              <listItemDefinition>
+                <para>An optional list of CSDB objects to list or directories to search for CSDB objects in. If none are specified, CSDB objects in  the current directory are listed by default.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLE</title>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-ls
+DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
+DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-001-01.JPG
+ICN-12345-00001-002-01.JPG
+PMC-EX-12345-00001-00_000-01_EN-CA.XML
+
+$ s1kd-ls -l
+DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
+DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-002-01.JPG
+PMC-EX-12345-00001-00_000-01_EN-CA.XML
+
+$ s1kd-ls -o
+DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+ICN-12345-00001-001-01.JPG
+
+$ s1kd-ls -D | s1kd-metadata -lt -ntechName -ninfoName -nissueDate
+Example A    Description    2018-03-20
+Example A    Description    2018-03-29
+Example B    Description    2018-03-29
+
+$ s1kd-ls -Dl -e 'stat --printf="%n %Y\n" {}'
+DMC-EX-A-00-00-00-00A-040A-D_000-02_EN-CA.XML 1553738720
+DMC-EX-B-00-00-00-00A-040A-D_000-01_EN-CA.XML 1553738751</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

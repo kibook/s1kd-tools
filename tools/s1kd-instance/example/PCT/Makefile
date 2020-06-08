@@ -1,0 +1,23 @@
+SRC=DMC-S1000DBIKE-AAA-D00-00-00-00AA-258A-A_009-00_en-US.XML
+PCT=DMC-S1000DBIKE-AAA-D00-00-00-00AA-00PA-D_006-00_en-US.XML
+
+MK9_SN=1B070643
+MK1_SN=1B070701
+
+MK9=DME-B6865-$(MK9_SN)-S1000DBIKE-AAA-D00-00-00-00AA-258A-A_009-00_EN-US.XML
+MK1=DME-B6865-$(MK1_SN)-S1000DBIKE-AAA-D00-00-00-00AA-258A-A_009-00_EN-US.XML
+
+all: $(MK9) $(MK1)
+
+$(MK9): $(SRC)
+	s1kd-instance -e B6865-$(MK9_SN) -O . \
+		-P $(PCT) -p SerialNo:prodattr=$(MK9_SN) \
+		$(SRC)
+
+$(MK1): $(SRC)
+	s1kd-instance -e B6865-$(MK1_SN) -O . \
+		-P $(PCT) -p SerialNo:prodattr=$(MK1_SN) \
+		$(SRC)
+
+clean:
+	rm -f $(MK9) $(MK1)

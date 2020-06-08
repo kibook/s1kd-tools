@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule [
+<!NOTATION PNG SYSTEM "PNG" >
+<!NOTATION GIF SYSTEM "GIF" >
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG" NDATA PNG>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF" NDATA GIF>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF" NDATA GIF>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01.GIF" NDATA GIF>
+<!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF" NDATA GIF>
+]>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="130" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="027" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="01"/>
+        <dmTitle>
+          <techName>s1kd-tools</techName>
+          <infoName>Usage examples</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <referencedApplicGroup>
+      <applic id="app-Web">
+        <assert applicPropertyIdent="media" applicPropertyType="prodattr" applicPropertyValues="web"/>
+      </applic>
+    </referencedApplicGroup>
+    <description>
+      <levelledPara>
+        <title>General</title>
+        <para>This document provides examples of the usage of the <emphasis>s1kd-tools</emphasis>.</para>
+        <para>The sample commands have been written as they would be used on a Linux or other Unix-like system, but should work more-or-less the same on most operating systems. OS-specific commands used in examples (e.g., <verbatimText>mkdir</verbatimText>) may need to be adapted.</para>
+        <figure>
+          <title>Example - Authoring with Vim + MuPDF</title>
+          <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01"/>
+        </figure>
+      </levelledPara>
+      <levelledPara>
+        <title>Initial setup</title>
+        <figure applicRefId="app-Web">
+          <title>Initial setup</title>
+          <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01"/>
+        </figure>
+        <para>This first step is to create a folder for the new S1000D project. Example:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ mkdir myproject
+$ cd myproject</verbatimText>
+        </para>
+        <para>After that, you should create two files: <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText>. These files can be created automatically using the <emphasis>s1kd-defaults</emphasis> tool to initialize the new CSDB:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-defaults -i</verbatimText>
+        </para>
+        <para>Afterwards, these files can be edited to customize them for your project. More information on the contents of these files is provided below.</para>
+        <note>
+          <notePara>If the tools are run in a directory that does not have these configuration files, they will search for them in the parent directories to find the top of the CSDB directory tree.</notePara>
+        </note>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
+          <para>The <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file is used by all of the s1kd-new* tools. It provides default values for various S1000D metadata. The <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file can be written in either a simple text format or an XML format.</para>
+          <para>
+            <emphasis emphasisType="em01">Example of simple text format:</emphasis>
+          </para>
+          <para>
+            <verbatimText verbatimStyle="vs23">languageIsoCode            en
+countryIsoCode             CA
+responsiblePartnerCompany  khzae.net
+originator                 khzae.net
+brex                       MYPRJ-A-00-00-00-00A-022A-D
+techName                   My project</verbatimText>
+          </para>
+          <para>
+            <emphasis emphasisType="em01">Example of XML format:</emphasis>
+          </para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+&lt;defaults&gt;
+&lt;default ident="languageIsoCode" value="en"/&gt;
+&lt;default ident="countryIsoCode" value="CA"/&gt;
+&lt;default ident="responsiblePartnerCompany" value="khzae.net"/&gt;
+&lt;default ident="originator" value="khzae.net"/&gt;
+&lt;default ident="brex" value="MYPRJ-A-00-00-00-00A-022A-D"/&gt;
+&lt;default ident="techName" value="My project"/&gt;
+&lt;/defaults&gt;</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file</title>
+          <para>The <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file is used by the <emphasis>s1kd-newdm</emphasis> tool. It contains a list of information codes and associated info names and schemas to be used when creating new data modules. Like the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file, it can be written using either the simple text format or XML format.</para>
+          <para>
+            <emphasis emphasisType="em01">Example of simple text format:</emphasis>
+          </para>
+          <para>
+            <verbatimText verbatimStyle="vs23">009  frontmatter  Table of contents
+022  brex         Business rules exchange
+040  descript     Description
+130  proced       Normal operation</verbatimText>
+          </para>
+          <para>
+            <emphasis emphasisType="em01">Example of XML format:</emphasis>
+          </para>
+          <para>
+            <verbatimText verbatimStyle="vs11">&lt;?xml version="1.0"?&gt;
+&lt;dmtypes&gt;
+&lt;type infoCode="009" infoName="Table of contents"
+schema="frontmatter"/&gt;
+&lt;type infoCode="022" infoName="Business rules exchange"
+schema="brex"/&gt;
+&lt;type infoCode="040" infoName="Description"
+schema="descript"/&gt;
+&lt;type infoCode="130" infoName="Normal operation"
+schema="proced"/&gt;
+&lt;/dmtypes&gt;</verbatimText>
+          </para>
+          <para>The s1kd-newdm tool contains a default set of information code definitions. This can be used to create a default <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file by use of the <verbatimText>-.</verbatimText> (simple text format) or <verbatimText>-,</verbatimText> (XML) options:</para>
+          <para>
+            <verbatimText>$ s1kd-newdm -, &gt; .dmtypes</verbatimText>
+          </para>
+          <para>The generated <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file can then be customized to fit your project.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>Creating the DMRL and populating the CSDB</title>
+        <figure applicRefId="app-Web">
+          <title>Creating the DMRL and populating the CSDB</title>
+          <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01"/>
+        </figure>
+        <para>The next step is to prepare the Data Management Requirements List (DMRL) for the project. The DMRL will contain a list of all the CSDB objects initially required by your project, and can be used to automatically populate your CSDB.</para>
+        <para>If you do not already have a DMRL, the <emphasis>s1kd-newdml</emphasis> tool can be used to create a new one:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-newdml -# MYPRJ-NCAGE-C-2017-00001</verbatimText>
+        </para>
+        <para>This would create the file <verbatimText verbatimStyle="vs02">DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText> in your CSDB folder.</para>
+        <levelledPara>
+          <title>Adding DMRL entries</title>
+          <para>Each entry in the DMRL describes a data module that is planned to be created:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<dmlContent>
+<dmlEntry>
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" 
+disassyCode="00" disassyCodeVariant="A" infoCode="040"
+infoCodeVariant="A" itemLocationCode="D"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>My project</techName>
+<infoName>Description</infoName>
+</dmTitle>
+</dmRefAddressItems>
+</dmRef>
+<security securityClassification="01"/>
+<responsiblePartnerCompany>
+<enterpriseName>khzae.net</enterpriseName>
+</responsiblePartnerCompany>
+</dmlEntry>
+...
+</dmlContent>]]></verbatimText>
+          </para>
+          <para>The XML for the <verbatimText verbatimStyle="vs12">dmRef</verbatimText> of each entry can be quickly generated using the <emphasis>s1kd-ref</emphasis> tool:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-ref DMC-MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Populating the CSDB from the DMRL</title>
+          <para>Once the DMRL is prepared, the <emphasis>s1kd-dmrl</emphasis> tool can be used to automatically populate the CSDB based on the CSDB objects listed in the DMRL:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
+          </para>
+          <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
+          <para>The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the <emphasis>s1kd-dmrl</emphasis> tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Creating CSDB objects on-the-fly</title>
+          <para>Data modules and other CSDB objects can also be created in an "on-the-fly" manner, without the use of a DMRL, by invoking the s1kd-new* set of tools directly, as with s1kd-newdml above. For example, to create a new data module:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-newdm -# MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
+          </para>
+          <para>This would create the file <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText> in your CSDB folder.</para>
+          <para>Each of the s1kd-new* tools has various options for setting specific metadata, and information not included as arguments to these commands is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>Data module workflow</title>
+        <para>Data modules are put through the general S1000D workflow with the <emphasis>s1kd-upissue</emphasis> tool. Whenever a data module will be changed, the s1kd-upissue tool should first be used to indicate the forthcoming change, creating the next inwork issue of the data module.</para>
+        <levelledPara>
+          <title>Inwork data modules</title>
+          <para>To increment the inwork issue of a data module, the s1kd-upissue tool is called without any additional options:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-upissue DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
+          </para>
+          <para>Assuming this data module was just created, it would be incremented from initial inwork issue 000-01 to initial inwork issue 000-02. After upissuing, make the changes. For example:</para>
+          <para>
+            <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>:</emphasis>
+            <verbatimText verbatimStyle="vs11">&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML</verbatimText>:</emphasis>
+            <verbatimText verbatimStyle="vs11">&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;para&gt;My project is maintained using S1000D.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Making data modules official</title>
+          <para>Before a data module can be made official, it must be validated. This means:</para>
+          <para>
+            <randomList>
+              <listItem>
+                <para>It is a valid XML file</para>
+              </listItem>
+              <listItem>
+                <para>It is valid according to the relevant S1000D schema</para>
+              </listItem>
+              <listItem>
+                <para>It is valid according to the relevant business rules</para>
+              </listItem>
+              <listItem>
+                <para>Any applicability filtering applied will not affect the above</para>
+              </listItem>
+              <listItem>
+                <para>The actual narrative (content) is correct</para>
+              </listItem>
+            </randomList>
+          </para>
+          <figure applicRefId="app-Web">
+            <title>Data module validation tests</title>
+            <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01"/>
+          </figure>
+          <levelledPara>
+            <title>Validating against the schema</title>
+            <para>The first two points can be verified with the <emphasis>s1kd-validate</emphasis> tool. This tool will indicate any problems with the data module in terms of XML syntax and its correctness regarding its S1000D schema:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-validate DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+          </levelledPara>
+          <levelledPara>
+            <title>Validating against a BREX data module</title>
+            <para>The third point can be verified using the <emphasis>s1kd-brexcheck</emphasis> tool. This tool will indicate any places where a data module violates computable business rules as specified in a Business Rules Exchange (BREX) data module.</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-brexcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+            <para>The BREX allows a project to customize S1000D, for example, by disallowing certain elements or attributes:</para>
+            <para>
+              <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
+<objectPath allowedObjectFlag="0">//emphasis</objectPath>
+<objectUse>The emphasis element is not allowed.</objectUse>
+</structureObjectRule>]]></verbatimText>
+            </para>
+            <para>Or by tailoring the allowed values of certain elements or attributes:</para>
+            <para>
+              <verbatimText verbatimStyle="vs11"><![CDATA[<structureObjectRule>
+<objectPath allowedObjectFlag="2">
+//@securityClassification
+</objectPath>
+<objectUse>
+The security classification must be 01 (Unclassified)
+or 02 (Classified).
+</objectUse>
+<objectValue valueAllowed="01">Unclassified</objectValue>
+<objectValue valueAllowed="02">Classified</objectValue>
+</structureObjectRule>]]></verbatimText>
+            </para>
+            <para>Each data module references the BREX it should be checked against, and BREX data modules can reference other BREX data modules to create a layered set of business rules, for example, Project-related rules and Organization-related rules.</para>
+            <para>Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.</para>
+            <para>To get started with your project's own business rules, you can create a simple BREX data module based on the current defaults of your CSDB using the -B option of the s1kd-newdm tool:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-newdm -B# MYPRJ-A-00-00-00-00A-022A-D</verbatimText>
+            </para>
+            <para>This will use the customized <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to generate a basic set of business rules.</para>
+          </levelledPara>
+          <levelledPara>
+            <title>Checking applicability</title>
+            <para>The fourth point can be tested using the <emphasis>s1kd-appcheck</emphasis> tool:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-appcheck DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+            <para>The S1000D applicability model allows for conditional processing to be applied both to whole data modules as well as parts of a data module. However, this latter functionality means that, if elements are removed as part of applicability filtering, the validity of the data module in regards to the S1000D schema and business rules can change.</para>
+            <para>The s1kd-appcheck tool can report product attribute or condition assignments which would cause the data module to become invalid after filtering.</para>
+          </levelledPara>
+          <levelledPara>
+            <title>Quality assurance verification</title>
+            <para>In contrast to the first four points, which can be verified automatically, the last point is generally not an automatic process, and involves quality assurance testing by a human. That a data module has been first or second QA tested can be indicated with the s1kd-upissue tool:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-upissue -1 tabtop -2 ttandoo ...</verbatimText>
+            </para>
+            <para>Once the data module is validated, the s1kd-upissue tool is used to make it official with the <verbatimText>-i</verbatimText> option:</para>
+            <para>
+              <verbatimText verbatimStyle="vs23">$ s1kd-upissue -i DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML</verbatimText>
+            </para>
+          </levelledPara>
+        </levelledPara>
+        <levelledPara>
+          <title>Changes to official data modules</title>
+          <para>When a change must be made to an official data module (for example, as a result of feedback), the s1kd-upissue tool is used again to bring the data module back to the inwork state:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-upissue DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
+          </para>
+          <para>Changes between official issues of a data module are indicated with reasons for update and change marking. For example:</para>
+          <para>
+            <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>:</emphasis>
+            <verbatimText verbatimStyle="vs11">&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;para&gt;My project is maintained using S1000D.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
+          </para>
+          <para>
+            <emphasis emphasisType="em01"><verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_001-01_EN-CA.XML</verbatimText>:</emphasis>
+            <verbatimText verbatimStyle="vs11">&lt;dmStatus issueType="changed"&gt;
+&lt;!-- ...... --&gt;
+&lt;reasonForUpdate id="rfu-0001"&gt;
+&lt;simplePara&gt;Added reference to tools used.&lt;/simplePara&gt;
+&lt;/reasonForUpdate&gt;
+&lt;/dmStatus&gt;
+&lt;!-- ...... --&gt;
+&lt;content&gt;
+&lt;description&gt;
+&lt;levelledPara&gt;
+&lt;title&gt;General&lt;/title&gt;
+&lt;para&gt;This is my project.&lt;/para&gt;
+&lt;para changeType="modify" changeMark="1"
+reasonForUpdateRefIds="rfu-0001"&gt;My project is maintained using
+S1000D and s1kd-tools.&lt;/para&gt;
+&lt;/levelledPara&gt;
+&lt;/description&gt;
+&lt;/content&gt;</verbatimText>
+          </para>
+          <para>Reasons for update from the previous official issue are automatically removed when upissuing to the first inwork issue.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Deleting data modules</title>
+          <para>The basic cycle continues until a data module is deleted. "Deleting" a data module is a special case of upissuing:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-upissue -i -z deleted ...</verbatimText>
+          </para>
+          <para>The data module is upissued to the next official issue, and it's issue type is set to "<verbatimText verbatimStyle="vs14">deleted</verbatimText>".</para>
+          <para>Deleted data modules may be reinstated later in a similar way:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-upissue -z rinstate-status ...</verbatimText>
+          </para>
+          <para>The data module is upissued to the next inwork issue, and the issue type is set to one of the "<verbatimText verbatimStyle="vs14">rinstate-x"</verbatimText> types.</para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>Building publications</title>
+        <para>S1000D publications are managed by use of publication modules. Like data modules, publication modules may be created as part of the project's DMRL:</para>
+        <para>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<dmlEntry>
+<pmRef>
+<pmRefIdent>
+<pmCode modelIdentCode="MYPRJ" pmIssuer="12345" pmNumber="00001"
+pmVolume="00"/>
+</pmRefIdent>
+<pmRefAddressItems>
+<pmTitle>My publication</pmTitle>
+</pmRefAddressItems>
+</pmRef>
+<responsiblePartnerCompany>
+<enterpriseName>khzae.net</enterpriseName>
+</responsiblePartnerCompany>
+</dmlEntry>]]></verbatimText>
+        </para>
+        <para>or "on-the-fly" with the <emphasis>s1kd-newpm</emphasis> tool:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-newpm -# MYPRJ-12345-00001-00</verbatimText>
+        </para>
+        <levelledPara>
+          <title>Publication module content</title>
+          <para>The publication module lays out the hierarchical structure of the data modules in a publication:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<content>
+<pmEntry>
+<pmEntryTitle>Front matter</pmEntryTitle>
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="001" infoCodeVariant="A"
+itemLocationCode="D"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>My project</techName>
+<infoName>Title page</infoName>
+</dmTitle>
+</dmRefAddressItems>
+</dmRef>
+</pmEntry>
+<pmEntry>
+<pmEntryTitle>General info</pmEntryTitle>
+<dmRef>
+<dmRefIdent>
+<dmCode modelIdentCode="MYPRJ" systemDiffCode="A" systemCode="00"
+subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00"
+disassyCodeVariant="A" infoCode="040" infoCodeVariant="A"
+itemLocationCode="D"/>
+</dmRefIdent>
+<dmRefAddressItems>
+<dmTitle>
+<techName>My project</techName>
+<infoName>Description</infoName>
+</dmTitle>
+</dmRefAddressItems>
+</dmRef>
+</pmEntry>
+</content>]]></verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>Creating a customized publication</title>
+          <figure applicRefId="app-Web">
+            <title>Applicability filtering example</title>
+            <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01"/>
+          </figure>
+          <para>The S1000D applicability model and the <emphasis>s1kd-instance</emphasis> tool enable the creation of customized publications, which are filtered for a particular customer or product. For example, a data module may contain applicabilty for two versions of a product:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<para>
+This is some common information about the product.
+</para>
+<para applicRefId="app-versionA">
+This information only applies to version A.
+</para>
+<para applicRefId="app-versionB">
+This information only applies to version B.
+</para>]]></verbatimText>
+          </para>
+          <para>When you deliver this data module to a customer with Version B, you can exclude information which is not applicable to them by filtering it:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B &lt;DM&gt;</verbatimText>
+          </para>
+          <para>To filter a whole publication, use the -O option of the s1kd-instance tool to output multiple filtered objects into a directory:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-instance -s version:prodattr=B -O customerB DMC-*.XML</verbatimText>
+          </para>
+          <para>The newly created <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory will contain the filtered versions of these data modules.</para>
+          <para>If your CSDB contains multiple, separate publications, the <emphasis>s1kd-refs</emphasis> tool can be used to select only those data modules which apply to a particular publication module:</para>
+          <para>
+            <verbatimText verbatimStyle="vs23">$ s1kd-refs -s &lt;PM&gt; |
+&gt; xargs s1kd-instance -s version:prodattr=B -O customerB</verbatimText>
+          </para>
+          <para>The above command will filter the publication module and all included data modules, and output the resulting objects to the <verbatimText verbatimStyle="vs02">customerB</verbatimText> directory.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Creating a script for publishing</title>
+          <para>The publishing process will often involve many different steps, and many different tools, so it's a good idea to create a script to automate it. Below is an example of a script which publishes a CSDB for a given product serial number:
+            <verbatimText verbatimStyle="vs24"><![CDATA[#!/bin/sh
+
+# Usage: sh build.sh <zip> <csdb> <serialno>
+zip="$1"
+csdb="$2"
+serialno="$3"
+
+# Create a temporary directory.
+tmp=$(mktemp -d)
+
+# Copy all CSDB objects to the temp directory. The CSDB objects
+# are filtered for a given serial number.
+s1kd-ls "$csdb" |
+  xargs s1kd-instance -O "$tmp" -s serialno:prodattr="$serialno"
+
+# Synchronize references in the filtered DMs. This is necessary
+# since some references may have been removed during filtering.
+s1kd-ls -D "$tmp" |
+  xargs s1kd-syncrefs -f
+
+# Create the ZIP package.
+zip -jr "$zip" "$tmp"
+
+# Clean up the temp directory.
+rm -r "$tmp"]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>Use with other version control systems</title>
+        <para>The issue/inwork numbers and S1000D file naming conventions as seen above provide a basic form of version control. In this case, each file represents a single issue of a CSDB object, and multiple files together represent the whole logical object. For example, all of the following files represent different versions of the same object:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>
+                <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML</verbatimText>
+              </para>
+            </listItem>
+            <listItem>
+              <para>
+                <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML</verbatimText>
+              </para>
+            </listItem>
+            <listItem>
+              <para>
+                <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML</verbatimText>
+              </para>
+            </listItem>
+          </randomList>
+        </para>
+        <para>However, if you prefer to use an existing version control system such as Git or SVN, it is often more useful for each file to represent a whole object.</para>
+        <para>The s1kd-tools support an alternate naming convention for this case. Specifying the -N option to certain tools will omit the issue and inwork numbers from filenames of CSDB objects. Taking the s1kd-newdm tool example from above, but adding the -N option as follows:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-newdm -N -# MYPRJ-A-00-00-00-00A-040A-D</verbatimText>
+        </para>
+        <para>would create the file <verbatimText verbatimStyle="vs02">DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText> in your CSDB folder. The s1kd-upissue tool works similarly:</para>
+        <para>
+          <verbatimText verbatimStyle="vs23">$ s1kd-upissue -N -i DMC-MYPRJ-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+        </para>
+        <para>The issue and inwork numbers are updated in the XML metadata, but instead of creating a new file, the original is overwritten. The previous inwork issues are therefore stored as part of the external version control system's history, rather than as individual files.</para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

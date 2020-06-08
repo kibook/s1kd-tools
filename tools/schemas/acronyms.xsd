@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:attribute name="id" type="xs:ID"/>
+  <xs:element name="subScript" type="xs:string"/>
+  <xs:element name="superScript" type="xs:string"/>
+  <xs:group name="subOrSuperScriptElemGroup">
+    <xs:choice>
+      <xs:element ref="subScript"/>
+      <xs:element ref="superScript"/>
+    </xs:choice>
+  </xs:group>
+  <xs:element name="acronym" type="acronymElemType"/>
+  <xs:complexType name="acronymElemType">
+    <xs:sequence>
+      <xs:element ref="acronymTerm"/>
+      <xs:element ref="acronymDefinition"/>
+    </xs:sequence>
+    <xs:attribute ref="acronymType"/>
+  </xs:complexType>
+  <xs:element name="acronymTerm" type="acronymTermElemType"/>
+  <xs:complexType mixed="true" name="acronymTermElemType">
+    <xs:group maxOccurs="unbounded" minOccurs="0" ref="subOrSuperScriptElemGroup"/>
+  </xs:complexType>
+  <xs:element name="acronymDefinition" type="acronymDefinitionElemType"/>
+  <xs:complexType mixed="true" name="acronymDefinitionElemType">
+    <xs:group maxOccurs="unbounded" minOccurs="0" ref="subOrSuperScriptElemGroup"/>
+    <xs:attribute ref="id"/>
+  </xs:complexType>
+  <xs:attribute default="at01" name="acronymType" type="acronymTypeAttType"/>
+  <xs:simpleType name="acronymTypeAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="at01"/>
+      <xs:enumeration value="at02"/>
+      <xs:enumeration value="at03"/>
+      <xs:enumeration value="at04"/>
+      <xs:enumeration value="at05"/>
+      <xs:enumeration value="at06"/>
+      <xs:enumeration value="at07"/>
+      <xs:enumeration value="at08"/>
+      <xs:enumeration value="at09"/>
+      <xs:enumeration value="at10"/>
+      <xs:enumeration value="at11"/>
+      <xs:enumeration value="at12"/>
+      <xs:enumeration value="at13"/>
+      <xs:enumeration value="at14"/>
+      <xs:enumeration value="at15"/>
+      <xs:enumeration value="at16"/>
+      <xs:enumeration value="at17"/>
+      <xs:enumeration value="at18"/>
+      <xs:enumeration value="at19"/>
+      <xs:enumeration value="at20"/>
+      <xs:enumeration value="at21"/>
+      <xs:enumeration value="at22"/>
+      <xs:enumeration value="at23"/>
+      <xs:enumeration value="at24"/>
+      <xs:enumeration value="at25"/>
+      <xs:enumeration value="at26"/>
+      <xs:enumeration value="at27"/>
+      <xs:enumeration value="at28"/>
+      <xs:enumeration value="at29"/>
+      <xs:enumeration value="at30"/>
+      <xs:enumeration value="at31"/>
+      <xs:enumeration value="at32"/>
+      <xs:enumeration value="at33"/>
+      <xs:enumeration value="at34"/>
+      <xs:enumeration value="at35"/>
+      <xs:enumeration value="at36"/>
+      <xs:enumeration value="at37"/>
+      <xs:enumeration value="at38"/>
+      <xs:enumeration value="at39"/>
+      <xs:enumeration value="at40"/>
+      <xs:enumeration value="at41"/>
+      <xs:enumeration value="at42"/>
+      <xs:enumeration value="at43"/>
+      <xs:enumeration value="at44"/>
+      <xs:enumeration value="at45"/>
+      <xs:enumeration value="at46"/>
+      <xs:enumeration value="at47"/>
+      <xs:enumeration value="at48"/>
+      <xs:enumeration value="at49"/>
+      <xs:enumeration value="at50"/>
+      <xs:enumeration value="at51"/>
+      <xs:enumeration value="at52"/>
+      <xs:enumeration value="at53"/>
+      <xs:enumeration value="at54"/>
+      <xs:enumeration value="at55"/>
+      <xs:enumeration value="at56"/>
+      <xs:enumeration value="at57"/>
+      <xs:enumeration value="at58"/>
+      <xs:enumeration value="at59"/>
+      <xs:enumeration value="at60"/>
+      <xs:enumeration value="at61"/>
+      <xs:enumeration value="at62"/>
+      <xs:enumeration value="at63"/>
+      <xs:enumeration value="at64"/>
+      <xs:enumeration value="at65"/>
+      <xs:enumeration value="at66"/>
+      <xs:enumeration value="at67"/>
+      <xs:enumeration value="at68"/>
+      <xs:enumeration value="at69"/>
+      <xs:enumeration value="at70"/>
+      <xs:enumeration value="at71"/>
+      <xs:enumeration value="at72"/>
+      <xs:enumeration value="at73"/>
+      <xs:enumeration value="at74"/>
+      <xs:enumeration value="at75"/>
+      <xs:enumeration value="at76"/>
+      <xs:enumeration value="at77"/>
+      <xs:enumeration value="at78"/>
+      <xs:enumeration value="at79"/>
+      <xs:enumeration value="at80"/>
+      <xs:enumeration value="at81"/>
+      <xs:enumeration value="at82"/>
+      <xs:enumeration value="at83"/>
+      <xs:enumeration value="at84"/>
+      <xs:enumeration value="at85"/>
+      <xs:enumeration value="at86"/>
+      <xs:enumeration value="at87"/>
+      <xs:enumeration value="at88"/>
+      <xs:enumeration value="at89"/>
+      <xs:enumeration value="at90"/>
+      <xs:enumeration value="at91"/>
+      <xs:enumeration value="at92"/>
+      <xs:enumeration value="at93"/>
+      <xs:enumeration value="at94"/>
+      <xs:enumeration value="at95"/>
+      <xs:enumeration value="at96"/>
+      <xs:enumeration value="at97"/>
+      <xs:enumeration value="at98"/>
+      <xs:enumeration value="at99"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="acronyms" type="acronymsElemType"/>
+  <xs:complexType name="acronymsElemType">
+    <xs:sequence>
+      <xs:element ref="acronym" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

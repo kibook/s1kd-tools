@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="TEST" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2019" month="10" day="21"/>
+        <dmTitle>
+          <techName>DM 1</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <para>
+        <acronym acronymType="at01">
+          <acronymTerm>HP</acronymTerm>
+          <acronymDefinition>High pressure</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at01">
+          <acronymTerm>HPS1</acronymTerm>
+          <acronymDefinition>Hydraulic pressure system 1</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at01">
+          <acronymTerm>HPS2</acronymTerm>
+          <acronymDefinition>Hydraulic pressure system 2</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at01">
+          <acronymTerm>LLW</acronymTerm>
+          <acronymDefinition>Low level, warning</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at01">
+          <acronymTerm>LPW</acronymTerm>
+          <acronymDefinition>Low pressure, warning</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at01">
+          <acronymTerm>PI1</acronymTerm>
+          <acronymDefinition>Pressure indicator HPS1</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at02">
+          <acronymTerm>Bare engine</acronymTerm>
+          <acronymDefinition>An engine which is fully completed internally, but on which no external parts or components have been installed.</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at02">
+          <acronymTerm>Engine</acronymTerm>
+          <acronymDefinition>An engine which is equipped with external parts and components supplied by the engine manufacturer.</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at02">
+          <acronymTerm>Maximum conversion assembly</acronymTerm>
+          <acronymDefinition>Two or more components, fittings and/or packings, or any externally mounted accessories which, for practical reasons, shall be assembled prior to being installed on the power plant.</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at02">
+          <acronymTerm>Sequential grouping</acronymTerm>
+          <acronymDefinition>Any coherent package of logically sequenced information which describes a complete action. The action may consist of the completion of either a maximum convenience assembly or the installation of an accessory or system.</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at04">
+          <acronymTerm>S1000D</acronymTerm>
+          <acronymDefinition>International specification for technical publications using a common source database</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at04">
+          <acronymTerm>XML</acronymTerm>
+          <acronymDefinition>Extensible Markup Language (XML) 1.0 (Fifth Edition)</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at04">
+          <acronymTerm>ASD STE-100</acronymTerm>
+          <acronymDefinition>Simplified Technical English (ASD-STE100)</acronymDefinition>
+        </acronym>
+        <acronym acronymType="at04">
+          <acronymTerm>ISO 8601</acronymTerm>
+          <acronymDefinition>Data elements and interchange formats - Information interchange - Representation of dates and times</acronymDefinition>
+        </acronym>
+      </para>
+    </description>
+  </content>
+</dmodule>

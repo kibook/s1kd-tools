@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:complexType name="typeElemType">
+    <xs:attribute name="infoCode" type="xs:string" use="required"/>
+    <xs:attribute name="schema" type="xs:string" use="required"/>
+    <xs:attribute name="infoName" type="xs:string"/>
+    <xs:attribute name="infoNameVariant" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="dmtypesElemType">
+    <xs:sequence>
+      <xs:element name="type" type="typeElemType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="dmtypes" type="dmtypesElemType"/>
+</xs:schema>

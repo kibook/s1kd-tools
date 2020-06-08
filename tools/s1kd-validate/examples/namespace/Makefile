@@ -1,0 +1,9 @@
+.PHONY: all clean
+
+all: DMC-EX-A-00-00-00-00A-000A-D_000-01_EN-CA.pdf
+
+DMC-EX-A-00-00-00-00A-000A-D_000-01_EN-CA.pdf: DMC-EX-A-00-00-00-00A-000A-D_000-01_EN-CA.XML
+	s1kd2pdf -o $@ $<
+
+clean:
+	rm -f DMC-EX-A-00-00-00-00A-000A-D_000-01_EN-CA.pdf

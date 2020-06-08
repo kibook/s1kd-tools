@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Validate all documentation data modules before committing.
+
+# Data modules to check
+DMODULES='doc/DMC-S1KDTOOLS-*.XML tools/s1kd-*/doc/DMC-S1KDTOOLS-*.XML'
+
+# Check data modules against schemas
+s1kd-validate $DMODULES || exit 1
+
+# Check data modules against BREX
+s1kd-brexcheck $DMODULES || exit 1

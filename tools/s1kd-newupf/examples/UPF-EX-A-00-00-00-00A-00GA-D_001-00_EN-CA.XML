@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataUpdateFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/update.xsd">
+  <updateIdentAndStatusSection>
+    <updateAddress>
+      <updateIdent>
+        <updateCode modelIdentCode="EX" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="00G" infoCodeVariant="A" itemLocationCode="D" objectIdentCode="UPF"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </updateIdent>
+      <issueDate year="2018" month="03" day="31"/>
+    </updateAddress>
+    <updateStatus>
+      <sourceDmIdent>
+        <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="00G" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </sourceDmIdent>
+      <targetDmIssueInfo issueNumber="002" inWork="00"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </updateStatus>
+    <targetDmStatus issueType="changed">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </targetDmStatus>
+  </updateIdentAndStatusSection>
+  <content>
+    <update>
+      <deleteObjectGroup>
+        <deleteObject>
+          <partIdent partNumberValue="GHI" manufacturerCodeValue="12345"/>
+        </deleteObject>
+      </deleteObjectGroup>
+      <insertObjectGroup>
+        <insertObject targetPath="//partSpec[partIdent/@partNumberValue='DEF' and partIdent/@manufacturerCodeValue='12345']" insertionOrder="after">
+          <partSpec>
+            <partIdent partNumberValue="JKL" manufacturerCodeValue="12345"/>
+            <itemIdentData>
+              <descrForPart>JKL part</descrForPart>
+            </itemIdentData>
+          </partSpec>
+        </insertObject>
+      </insertObjectGroup>
+      <replaceObjectGroup>
+        <replaceObject>
+          <partSpec>
+            <partIdent partNumberValue="DEF" manufacturerCodeValue="12345"/>
+            <itemIdentData>
+              <descrForPart>DEF part</descrForPart>
+              <shortName>DEF</shortName>
+            </itemIdentData>
+          </partSpec>
+        </replaceObject>
+      </replaceObjectGroup>
+    </update>
+  </content>
+</dataUpdateFile>

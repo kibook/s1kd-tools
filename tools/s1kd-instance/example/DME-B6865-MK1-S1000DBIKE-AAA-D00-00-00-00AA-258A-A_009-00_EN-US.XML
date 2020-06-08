@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dmodule [
+<!NOTATION png PUBLIC "-//W3C//NOTATION Portable Network Graphics//EN" >
+<!NOTATION cgm PUBLIC "-//USA-DOD//NOTATION Computer Graphics Metafile//EN" >
+<!ENTITY ICN-S3627-S1000D0619-001-01 SYSTEM "ICN-S3627-S1000D0619-001-01.PNG" NDATA png>
+<!ENTITY ICN-C0419-S1000D0359-001-01 SYSTEM "ICN-C0419-S1000D0359-001-01.CGM" NDATA cgm>
+<!ENTITY ICN-C0419-S1000D0400-001-01 SYSTEM "ICN-C0419-S1000D0400-001-01.CGM" NDATA cgm>
+]>
+<dmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/proced.xsd">
+	  <identAndStatusSection>
+		    <dmAddress>
+			      <dmIdent>
+				        <identExtension extensionProducer="B6865" extensionCode="MK1"/><dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="258" infoCodeVariant="A" itemLocationCode="A"/>
+				        <language countryIsoCode="US" languageIsoCode="en"/>
+				        <issueInfo issueNumber="009" inWork="00"/>
+			      </dmIdent>
+			      <dmAddressItems>
+				        <issueDate day="31" month="12" year="2016"/>
+				        <dmTitle>
+					          <techName>Bicycle</techName>
+					          <infoName>Other procedures to clean</infoName>
+				        </dmTitle>
+			      </dmAddressItems>
+		    </dmAddress>
+		    <dmStatus issueType="changed">
+			      <sourceDmIdent>
+				        <dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="258" infoCodeVariant="A" itemLocationCode="A"/>
+				        <language countryIsoCode="US" languageIsoCode="en"/>
+				        <issueInfo issueNumber="009" inWork="00"/>
+			      </sourceDmIdent><security securityClassification="01" commercialClassification="cc51" caveat="cv51"/>
+			      <dataRestrictions>
+            <restrictionInstructions>
+               <dataDistribution>To be made available to all S1000D users.</dataDistribution>
+               <exportControl>
+                  <exportRegistrationStmt>
+                     <simplePara>Export of this data module to all countries that are the residence of
+                    organizations that are users of S1000D is permitted. Storage of this data module
+                    is to be at the discretion of the organization.</simplePara>
+                  </exportRegistrationStmt>
+               </exportControl>
+               <dataHandling>There are no specific handling instructions for this data
+            module.</dataHandling>
+               <dataDestruction>Users may destroy this data module in accordance with their own local
+            procedures.</dataDestruction>
+               <dataDisclosure>There are no dissemination limitations that apply to this data
+            module.</dataDisclosure>
+            </restrictionInstructions>
+            <restrictionInfo>
+               <copyright>
+                  <copyrightPara>
+                     <emphasis>Copyright (C) 2016</emphasis> by each of the following organizations: <randomList>
+                        <listItem>
+                           <para>AeroSpace and Defence Industries Associations of Europe - ASD.</para>
+                        </listItem>
+                        <listItem>
+                           <para>Ministries of Defence of the member countries of ASD.</para>
+                        </listItem>
+                     </randomList>
+                  </copyrightPara>
+                  <copyrightPara>
+                     <emphasis>Limitations of liability:</emphasis>
+                  </copyrightPara>
+                  <copyrightPara>
+                     <randomList>
+                        <listItem>
+                           <para>This material is provided "As is" and neither ASD nor any person who
+                            has contributed to the creation, revision or maintenance of the material
+                            makes any representations or warranties, express or implied, including
+                            but not limited to, warranties of merchantability or fitness for any
+                            particular purpose.</para>
+                        </listItem>
+                        <listItem>
+                           <para>Neither ASD nor any person who has contributed to the creation,
+                            revision or maintenance of this material shall be liable for any direct,
+                            indirect, special or consequential damages or any other liability
+                            arising from any use of this material.</para>
+                        </listItem>
+                        <listItem>
+                           <para>Revisions to this document may occur after its issuance. The user is
+                            responsible for determining if revisions to the material contained in
+                            this document have occurred and are applicable.</para>
+                        </listItem>
+                     </randomList>
+                  </copyrightPara>
+               </copyright>
+               <policyStatement>S1000D-SC-2016-017-002-00 Steering Committee TOR</policyStatement>
+               <dataConds>There are no known conditions that would change the data restrictions for, or
+            security classification of, this data module.</dataConds>
+            </restrictionInfo>
+         </dataRestrictions>
+			      <logo>
+				        <symbol infoEntityIdent="ICN-S3627-S1000D0619-001-01"/>
+			      </logo>
+			      <responsiblePartnerCompany enterpriseCode="B6865">
+            <enterpriseName>AEROSPACE AND DEFENCE INDUSTRIES ASSOCIATION OF EUROPE</enterpriseName>
+         </responsiblePartnerCompany>
+			      <originator enterpriseCode="B6865">
+            <enterpriseName>AEROSPACE AND DEFENCE INDUSTRIES ASSOCIATION OF EUROPE</enterpriseName>
+         </originator>
+			      <applicCrossRefTableRef>
+				        <dmRef>
+					          <dmRefIdent>
+						            <dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="00W" infoCodeVariant="A" itemLocationCode="D"/>
+					          </dmRefIdent>
+				        </dmRef>
+			      </applicCrossRefTableRef>
+			      <applic>
+				        <displayText>
+					          <simplePara>Mountain bicycle and (Mountain storm Mk1 or Brook trekker Mk9)</simplePara>
+				        </displayText>
+				        <evaluate andOr="and">
+					          <assert applicPropertyIdent="type" applicPropertyType="prodattr" applicPropertyValues="Mountain bicycle"/>
+					          <evaluate andOr="or">
+						            <evaluate andOr="and">
+							              <assert applicPropertyIdent="model" applicPropertyType="prodattr" applicPropertyValues="Mountain storm"/>
+							              <assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="Mk1"/>
+						            </evaluate>
+						            <evaluate andOr="and">
+							              <assert applicPropertyIdent="model" applicPropertyType="prodattr" applicPropertyValues="Brook trekker"/>
+							              <assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="Mk9"/>
+						            </evaluate>
+					          </evaluate>
+				        </evaluate>
+			      </applic>
+			      <techStandard>
+				        <authorityInfoAndTp>
+					          <authorityInfo>20010131</authorityInfo>
+					          <techPubBase>Bike book</techPubBase>
+				        </authorityInfoAndTp>
+				        <authorityExceptions/>
+				        <authorityNotes/>
+			      </techStandard>
+			      <brexDmRef>
+            <dmRef>
+               <dmRefIdent>
+                  <dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="D00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+               </dmRefIdent>
+            </dmRef>
+         </brexDmRef>
+			      <qualityAssurance>
+            <firstVerification verificationType="tabtop"/>
+         </qualityAssurance>
+			      <systemBreakdownCode>BY</systemBreakdownCode>
+			      <skillLevel skillLevelCode="sk02"/>			
+			      <reasonForUpdate id="rfu-Detergent" updateReasonType="urt03">
+            <simplePara>Detergent B substituted by Detergent C</simplePara>
+         </reasonForUpdate>
+			      <reasonForUpdate id="logo" updateReasonType="urt03">
+            <simplePara>Logo harmonized with Chapter</simplePara>
+         </reasonForUpdate>			
+			      <reasonForUpdate id="rfu-applic" updateReasonType="urt03">
+            <simplePara>Applicability added/changed</simplePara>
+         </reasonForUpdate>
+			      <reasonForUpdate id="CommonInfo" updateReasonType="urt03">
+            <simplePara>Common Information added</simplePara>
+         </reasonForUpdate>
+      </dmStatus>
+	  </identAndStatusSection>
+	  <content>
+      <refs>
+         <dmRef>
+            <dmRefIdent>
+               <dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="DA4" subSystemCode="1" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="241" infoCodeVariant="A" itemLocationCode="A"/>
+            </dmRefIdent>
+         </dmRef>
+         <pmRef>
+            <pmRefIdent>
+               <pmCode modelIdentCode="S1000DBIKE" pmIssuer="B6865" pmNumber="SAFE1" pmVolume="00"/>
+            </pmRefIdent>
+         </pmRef>
+         <externalPubRef>
+            <externalPubRefIdent>
+								       <externalPubCode>SafeS-12-156B</externalPubCode>
+								       <externalPubTitle>Sticky stuff - Safety sheet</externalPubTitle>
+								       <externalPubIssueInfo>
+									         <externalPubIssue>2014</externalPubIssue>
+								       </externalPubIssueInfo>								
+							     </externalPubRefIdent>
+         </externalPubRef>
+      </refs>
+		
+		    <referencedApplicGroup>
+			      <applic id="app-0001">
+				        <displayText>
+					          <simplePara>Mountain bicycle Brook trekker Mk9</simplePara>
+				        </displayText>
+				        <evaluate andOr="and">
+					          <assert applicPropertyIdent="type" applicPropertyType="prodattr" applicPropertyValues="Mountain bicycle"/>
+					          <assert applicPropertyIdent="model" applicPropertyType="prodattr" applicPropertyValues="Brook trekker"/>
+					          <assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="Mk9"/>
+				        </evaluate>
+			      </applic>
+			      <applic id="app-0002">
+				        <displayText>
+					          <simplePara>Mountain bicycle Mountain storm Mk1</simplePara>
+				        </displayText>
+				        <evaluate andOr="and">
+					          <assert applicPropertyIdent="type" applicPropertyType="prodattr" applicPropertyValues="Mountain bicycle"/>
+					          <assert applicPropertyIdent="model" applicPropertyType="prodattr" applicPropertyValues="Mountain storm"/>
+					          <assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="Mk1"/>		
+				        </evaluate>
+			      </applic>
+		    </referencedApplicGroup>
+		    <procedure>
+			      <commonInfo reasonForUpdateRefIds="CommonInfo" changeMark="1" changeType="add">
+				        <commonInfoDescrPara>
+					          <para>According to The International Bikers' Association (IBA) code of honor you are kindly requested to drive a properly maintained bicycle, which means the bike has to be regularly cleaned.</para>
+				        </commonInfoDescrPara>
+			      </commonInfo>
+			      <preliminaryRqmts>
+				        <reqCondGroup>
+					          <reqCondNoRef>
+						            <reqCond>The bicycle is outdoors</reqCond>
+					          </reqCondNoRef>
+				        </reqCondGroup>
+				        <reqPersons>
+					          <person man="A">
+						            <personCategory personCategoryCode="Chemical technician"/>
+						            <personSkill skillLevelCode="sk02"/>
+						            <trade>Bike cleaner</trade>
+						            <estimatedTime unitOfMeasure="h">1,0</estimatedTime>
+					          </person>
+				        </reqPersons>
+				        <reqPersons applicRefId="app-0002">
+					          <person man="B">
+						            <personCategory personCategoryCode="Operator"/>
+						            <personSkill skillLevelCode="sk02"/>
+						            <trade>Bike rider</trade>
+						            <estimatedTime unitOfMeasure="h">1,0</estimatedTime>
+					          </person>
+				        </reqPersons>
+				        
+				        <reqTechInfoGroup>
+					          <reqTechInfo reqTechInfoCategory="ti01">
+						            <pmRef>
+							              <pmRefIdent>
+								                <pmCode modelIdentCode="S1000DBIKE" pmIssuer="B6865" pmNumber="SAFE1" pmVolume="00"/>
+							              </pmRefIdent>
+							              <pmRefAddressItems>
+                        <pmTitle>Safety Handbook - Greasy Bikes</pmTitle>
+                     </pmRefAddressItems>
+						            </pmRef>
+					          </reqTechInfo>
+					          <reqTechInfo reqTechInfoCategory="ti06">
+						            <externalPubRef>
+							              <externalPubRefIdent>
+								                <externalPubCode>SafeS-12-156B</externalPubCode>
+								                <externalPubTitle>Sticky stuff - Safety sheet</externalPubTitle>
+								                <externalPubIssueInfo>
+									                  <externalPubIssue>2014</externalPubIssue>
+								                </externalPubIssueInfo>								
+							              </externalPubRefIdent>
+						            </externalPubRef>
+					          </reqTechInfo>
+				        </reqTechInfoGroup>
+				        <reqSupportEquips>
+					          <supportEquipDescrGroup>
+						            <supportEquipDescr id="seq-0001">
+							              <name>Water hose</name>
+							              <identNumber>
+								                <manufacturerCode>KZ666</manufacturerCode>
+								                <partAndSerialNumber>
+									                  <partNumber>BSK-TLST-001-09</partNumber>
+								                </partAndSerialNumber>
+							              </identNumber>
+							              <reqQuantity unitOfMeasure="EA">1</reqQuantity>
+						            </supportEquipDescr>
+						            <supportEquipDescr id="seq-0002">
+							              <name>Stiff bristle brush</name>
+							              <identNumber>
+								                <manufacturerCode>KZ666</manufacturerCode>
+								                <partAndSerialNumber>
+									                  <partNumber>BSK-TLST-001-02</partNumber>
+								                </partAndSerialNumber>
+							              </identNumber>
+							              <reqQuantity unitOfMeasure="EA">1</reqQuantity>
+						            </supportEquipDescr>
+						            <supportEquipDescr id="seq-0003">
+							              <name>Sponge</name>
+							              <identNumber>
+								                <manufacturerCode>KZ666</manufacturerCode>
+								                <partAndSerialNumber>
+									                  <partNumber>BSK-TLST-001-11</partNumber>
+								                </partAndSerialNumber>
+							              </identNumber>
+							              <reqQuantity unitOfMeasure="EA">1</reqQuantity>
+						            </supportEquipDescr>
+					          </supportEquipDescrGroup>
+				        </reqSupportEquips>
+				        <reqSupplies>
+					          <supplyDescrGroup>
+						            <supplyDescr id="sup-0001">
+							              <name>ACME super 45 Agent</name>
+							              <shortName>Degreasing agent</shortName>
+							              <identNumber>
+								                <manufacturerCode>KZ222</manufacturerCode>
+								                <partAndSerialNumber>
+									                  <partNumber>LL-004</partNumber>
+								                </partAndSerialNumber>
+							              </identNumber>
+							              <reqQuantity unitOfMeasure="L">1</reqQuantity>
+						            </supplyDescr>
+						            <supplyDescr id="sup-0002">
+							              <name>ACME Middling Detergent 69</name>
+							              <shortName>Detergent A</shortName>
+							              <identNumber>
+								                <manufacturerCode>KZ666</manufacturerCode>
+								                <partAndSerialNumber>
+									                  <partNumber>BSK-TLST-023-14</partNumber>
+								                </partAndSerialNumber>
+							              </identNumber>
+							              <reqQuantity unitOfMeasure="L">1</reqQuantity>
+						            </supplyDescr>
+						            
+					          </supplyDescrGroup>
+				        </reqSupplies>
+				        <reqSpares>
+					          <noSpares/>
+				        </reqSpares>
+				        <reqSafety>
+					          <safetyRqmts>
+						            <warning>
+							              <warningAndCautionPara>Do not get <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> into your eyes. If it gets into your eyes, wash them immediately in clean warm water.</warningAndCautionPara>
+						            </warning>
+						            
+						            <caution>
+							              <warningAndCautionPara>Do not use a <internalRef internalRefId="seq-0001" internalRefTargetType="irtt05"/> that has high pressure. A water hose that has high pressure can cause some parts to become loose or full of water.</warningAndCautionPara>
+						            </caution>
+						            <caution>
+							              <warningAndCautionPara>Do not point the hose directly at the hub or at the bottom bracket bearings. This can cause damage to the parts.</warningAndCautionPara>
+						            </caution>
+						            
+					          </safetyRqmts>
+				        </reqSafety>
+			      </preliminaryRqmts>
+			      <mainProcedure>
+				        <proceduralStep>
+					          <para>Clean the bicycle with water to remove all dirt. Refer to <internalRef internalRefId="fig-0001" internalRefTargetType="irtt01"/>.</para>
+					          <figure id="fig-0001">
+						            <title>Cleaning the bike</title>
+						            <graphic infoEntityIdent="ICN-C0419-S1000D0359-001-01"/>
+					          </figure>
+				        </proceduralStep>
+				        <proceduralStep>
+					          <para>Use a <internalRef internalRefId="seq-0002" internalRefTargetType="irtt05"/> to get access to areas that are not easy to clean. These are the shift levers, the knobbly tires, and the brakes.</para>
+				        </proceduralStep>
+				        <proceduralStep>
+					          <para>Clean the caked grime from the chain and the sprockets with a screwdriver that has a small blade.</para>
+				        </proceduralStep>
+				        <proceduralStep>
+					          <para>Remove the grease from the freewheel assembly with the <internalRef internalRefId="sup-0001" internalRefTargetType="irtt04"/> as shown in <internalRef internalRefId="fig-0002" internalRefTargetType="irtt01"/>.</para>
+					          <para>Use a brush to remove the grease from these parts: <randomList listItemPrefix="pf02">
+							              <listItem>
+								                <para>sprockets</para>
+							              </listItem>
+							              <listItem>
+								                <para>guide and tension wheels of the derailleur</para>
+							              </listItem>
+							              <listItem>
+								                <para>chain ring teeth</para>
+							              </listItem>
+						            </randomList>
+					          </para>
+					          <figure id="fig-0002">
+						            <title>Degreasing the freehub</title>
+						            <graphic infoEntityIdent="ICN-C0419-S1000D0400-001-01"/>
+					          </figure>
+				        </proceduralStep>
+				        <proceduralStep>
+					          <para>Flush the sprockets, the derailleurs, the chain rings and the chain with water.</para>
+					          <note>
+						            <notePara>If necessary, do the flush procedure again.</notePara>
+					          </note>
+				        </proceduralStep>
+				        <proceduralStep applicRefId="app-0002">
+					          <para>Wash the Bike</para>
+					          <proceduralStep>
+						            <para>Soak the <internalRef internalRefId="seq-0003" internalRefTargetType="irtt05" changeType="modify" changeMark="1" reasonForUpdateRefIds="rfu-Detergent"/> into <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> and water.</para>
+					          </proceduralStep>
+					          <proceduralStep>
+						            <para>Clean the bicycle with the soaked sponge.</para>
+					          </proceduralStep>
+					          <proceduralStep>
+						            <para>Flush the bicycle and make sure that all <internalRef internalRefId="sup-0002" internalRefTargetType="irtt04"/> is removed.</para>
+					          </proceduralStep>
+					          <proceduralStep>
+						            <para>Move the bicycle up and down on its tires to remove all water.</para>
+					          </proceduralStep>
+				        </proceduralStep>
+				        
+				        <proceduralStep>
+					          <para>Lubricate the bicycle. Refer to <dmRef>
+							              <dmRefIdent>
+								                <dmCode modelIdentCode="S1000DBIKE" systemDiffCode="AAA" systemCode="DA4" subSystemCode="1" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="AA" infoCode="241" infoCodeVariant="A" itemLocationCode="A"/>
+							              </dmRefIdent>
+						            </dmRef>.</para>
+				        </proceduralStep>
+			      </mainProcedure>
+			      <closeRqmts>
+				        <reqCondGroup>
+					          <reqCondNoRef>
+						            <reqCond>Make sure the bicycle is dry</reqCond>
+					          </reqCondNoRef>
+				        </reqCondGroup>
+			      </closeRqmts>
+		    </procedure>
+	  </content>
+</dmodule>

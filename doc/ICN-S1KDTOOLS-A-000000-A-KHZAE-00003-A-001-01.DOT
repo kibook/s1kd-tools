@@ -1,0 +1,93 @@
+digraph {
+	fontname = Helvetica
+	rankdir = LR
+	style = filled
+
+	node [
+		fontname = Helvetica
+		style = filled
+		fillcolor = gainsboro
+	]
+
+	edge [
+		fontname = "Helvetica"
+	]
+
+	subgraph cluster_traditional {
+		label = <Traditional publications<br/><font point-size="10">(Monolithic)</font>>
+		fillcolor = khaki1
+
+		node [
+			shape = record
+		]
+
+		pub_traditional1 [
+			label = "<f0>Publication\l|. Chapter 1\l|.. Section 1.1\l|<f1>.. Section 1.2\l|. Chapter 2\l|.. Section 2.1"
+		]
+
+		pub_traditional2 [
+			label = "<f0>Publication\l|. Chapter 1\l|.. Section 1.1\l|. Chapter 2\l|.. Section 2.1\l|<f1>.. Section 2.2\l"
+		]
+
+		pub_traditional1:f1 -> pub_traditional2:f1 [
+			color = red
+			label = "SAME CONTENT"
+			fontcolor = red
+			style = bold
+			dir = both
+		]
+	}
+
+	subgraph cluster_s1000d {
+		label = <CSDB<br/><font point-size="10">(Modular)</font>>
+		fillcolor = khaki1
+
+		pub_s1000d1 [
+			label = "Publication module"
+		]
+
+		dm1 [
+			label = "Data module"
+		]
+
+		dm2 [
+			label = "Data module"
+		]
+
+		dm3 [
+			label = "Data module"
+		]
+
+		pub_s1000d2 [
+			label = "Publication module"
+		]
+
+		dm4 [
+			label = "Data module"
+		]
+
+		dm5 [
+			label = "Data module"
+		]
+		
+		pub_s1000d1 -> dm1
+		pub_s1000d1 -> dm2
+		pub_s1000d1 -> dm3 [
+			color = green2
+			//label = "SHARED"
+			fontcolor = green2
+		]
+
+		pub_s1000d2 -> dm3 [
+			color = green2
+			//label = "SHARED"
+			fontcolor = green2
+		]
+		pub_s1000d2 -> dm4
+		pub_s1000d2 -> dm5
+	}
+
+	pub_traditional2 -> pub_s1000d1 [
+		style = invis
+	]
+}

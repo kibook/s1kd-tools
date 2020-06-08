@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:complexType name="notationElemType">
+    <xs:attribute name="name" type="xs:ID" use="required"/>
+    <xs:attribute name="publicId" type="xs:string"/>
+    <xs:attribute name="systemId" type="xs:string"/>
+  </xs:complexType>
+  <xs:element name="notation" type="notationElemType"/>
+  <xs:complexType name="icnElemType">
+    <xs:attribute name="type" type="typeAttType"/>
+    <xs:attribute name="infoEntityIdent" type="xs:string" use="required"/>
+    <xs:attribute name="uri" type="xs:string" use="required"/>
+    <xs:attribute name="notation" type="xs:IDREF"/>
+  </xs:complexType>
+  <xs:simpleType name="typeAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="single"/>
+      <xs:enumeration value="pattern"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="icn" type="icnElemType"/>
+  <xs:complexType name="mediaElemType">
+    <xs:sequence>
+      <xs:element ref="icn" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+  <xs:element name="media" type="mediaElemType"/>
+  <xs:complexType name="icnCatalogElemType">
+    <xs:sequence>
+      <xs:element ref="notation" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="media" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="icn" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="icnCatalog" type="icnCatalogElemType"/>
+</xs:schema>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<defaults>
+  <default ident="countryIsoCode" value="CA"/>
+  <default ident="inWork" value="01"/>
+  <default ident="issue" value="5.0"/>
+  <default ident="issueNumber" value="000"/>
+  <default ident="languageIsoCode" value="en"/>
+  <default ident="securityClassification" value="01"/>
+  <default ident="responsiblePartnerCompany" value="khzae.net"/>
+  <default ident="techName" value="Test"/>
+</defaults>

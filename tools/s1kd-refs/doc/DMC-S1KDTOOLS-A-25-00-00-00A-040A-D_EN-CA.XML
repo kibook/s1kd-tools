@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="030" inWork="01"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="06" day="01"/>
+        <dmTitle>
+          <techName>s1kd-refs(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-refs - Manage references between CSDB objects</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
+          [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
+          [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-refs</emphasis> tool lists external references in CSDB objects, optionally matching them to a filename in the CSDB directory hierarchy.</para>
+        <para>This allows you to:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>obtain a list of dependencies for CSDB objects, such as ICNs, to ensure they are delivered together</para>
+            </listItem>
+            <listItem>
+              <para>check for references to objects which do not exist in the current CSDB</para>
+            </listItem>
+            <listItem>
+              <para>update reference metadata, such as titles, from the matched objects</para>
+            </listItem>
+          </randomList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-a, --all</listItemTerm>
+              <listItemDefinition>
+                <para>List all references, both matched and unmatched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-B, -C, -D, -E, -G, -H, -K, -L, -P, -S, -T, -Y, -Z</listItemTerm>
+              <listItemDefinition>
+                <para>List references to IPDs, comments, data modules, external publications, ICNs, hotspots, CSNs, data management lists, publication modules, SCORM content packages, referred fragments, repository source DMs and source objects respectively. If none are specified, -BCDEGHKLPSTYZ is assumed.</para>
+                <para>The following long options can also be used for each: --ipd, --com, --dm, --epr, --icn, --hotspot, --csn, --dml, --pm, --smc, --fragment, --repository, --source.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-b, --ipd-sns &lt;SNS&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify the SNS for non-chapterized IPD data modules, in the form of SYSTEM-SUBSYSTEM-ASSY (for example, "ZD-00-35"). This code is used to resolve non-chapterized CSN references.</para>
+                <para>If "-" is given for &lt;SNS&gt;, then the SNS will be derived from current data module.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-c, --content</listItemTerm>
+              <listItemDefinition>
+                <para>List references in the <verbatimText verbatimStyle="vs12"><![CDATA[content]]></verbatimText> section of a CSDB object only.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --dir &lt;dir&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Directory to search for matches to references in. By default, the current directory is used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Execute a command for each referenced CSDB object matched. The string "{}" is replaced by the current CSDB object file name everywhere it occurs in the arguments to the command.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-F, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>When using the -U or -X options, overwrite the input objects that have been updated or tagged.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --filename</listItemTerm>
+              <listItemDefinition>
+                <para>Include the filename of the source object where each reference was found in the output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --update-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Update the issue number, issue date, language, and title of references to that of the latest matched object. This option implies the -U and -i options.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i, --ignore-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Ignore issue info when matching. This will always match the latest issue of an object found, regardless of the issue specified in the reference.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-J &lt;ns=URL&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Registers an XML namespace prefix, which can then be used in the hotspot XPath expression (-j). Multiple namespaces can be registered by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-j &lt;xpath&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a custom XPath expression to use when matching hotspots (-H) in XML-based ICN formats.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-k, --ipd-dcv &lt;pattern&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a pattern used to determine the disassembly code variant for IPD data modules when resolving CSN references.</para>
+                <para>
+                  Within the pattern, the following characters have special meaning:
+                  <randomList>
+                    <listItem>
+                      <para>% - The figure number variant code.</para>
+                    </listItem>
+                    <listItem>
+                      <para>? - A wildcard that matches any single character.</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>The default pattern is "%", which means the disassembly code variant is exactly the same as the figure number variant. Projects that use a 2- or 3-character disassembly code variant must specify a pattern of the appropriate length in order for their IPD DMs to be matched (for example, "%?" or "%??").</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m, --strict-match</listItemTerm>
+              <listItemDefinition>
+                <para>Be more strict when matching codes of CSDB objects to filenames. By default, the name of a file (minus the extension) only needs to start with the code to be matched. When this option is specified, the name must match the code exactly.</para>
+                <para>For example, the code "ABC" will normally match either of the files "ABC.PDF" or "ABC_1.PDF", but when strict matching is enabled, it will only match the former.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume filenames of referenced CSDB objects omit the issue info, i.e. they were created with the -N option to the s1kd-new* tools.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n, --lineno</listItemTerm>
+              <listItemDefinition>
+                <para>Include the filename of the source object where each reference was found, and display the line number where the reference occurs in the source file after its filename.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --output-valid</listItemTerm>
+              <listItemDefinition>
+                <para>Output valid CSDB objects to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Errors are not printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-R, --recursively</listItemTerm>
+              <listItemDefinition>
+                <para>List references in matched objects recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-r, --recursive</listItemTerm>
+              <listItemDefinition>
+                <para>Search for matches to references in directories recursively.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-s, --include-src</listItemTerm>
+              <listItemDefinition>
+                <para>Include the source object as a reference. This is helpful when the output of this tool is used to apply some operation to a source object and all its dependencies together.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --format &lt;fmt&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specify a custom format for printed references. &lt;fmt&gt; is a format string, where the following variables can be given:</para>
+                <para>
+                  <randomList>
+                    <listItem>
+                      <para>%file% - The filename of the referenced object (nothing is printed if no file is matched).</para>
+                    </listItem>
+                    <listItem>
+                      <para>%line% - The line number where the reference occurs in the source.</para>
+                    </listItem>
+                    <listItem>
+                      <para>%ref% - The reference. May be a code (if no file is matched), a file name (for objects where a file is matched) or a file name + fragment name.</para>
+                    </listItem>
+                    <listItem>
+                      <para>%src% - The source of the reference.</para>
+                    </listItem>
+                    <listItem>
+                      <para>%xpath% - The XPath denoting where the reference occurs in the source.</para>
+                    </listItem>
+                  </randomList>
+                </para>
+                <para>For example, <verbatimText>-t '%src% (%line%): %ref%'</verbatimText> is equivalent to the -n option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-U, --update</listItemTerm>
+              <listItemDefinition>
+                <para>Update the title of matched references from the corresponding object.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-u, --unmatched</listItemTerm>
+              <listItemDefinition>
+                <para>Show only unmatched reference errors, or unmatched codes if combined with the -a option.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output. Specify multiple times to increase the verbosity.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-w, --where-used</listItemTerm>
+              <listItemDefinition>
+                <para>Instead of listing references contained within specified objects, list places within other objects where the specified objects are referenced.</para>
+                <para>In this case, &lt;object&gt; may also be a code (with the appropriate prefix) instead of an actual file. For example: <verbatimText>s1kd-refs -w DMC-TEST-A-00-00-00-00A-040A-D</verbatimText></para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-X, --tag-unmatched</listItemTerm>
+              <listItemDefinition>
+                <para>Tag unmatched references with the processing instruction <verbatimText><![CDATA[<?unmatched?>]]></verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x, --xml</listItemTerm>
+              <listItemDefinition>
+                <para>Output a detailed XML report instead of plain text messages.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-3, --externalpubs &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use a custom <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>List references with elements that have a change type of "delete" removed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;object&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>CSDB object(s) to list references in. If none are specified, the tool will read from stdin.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file</title>
+          <para>The <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file contains definitions of external publication references. This can be used to update external publication references in CSDB objects with -U.</para>
+          <para>By default, the tool will search the current directory and parent directories for a file named .externalpubs, but any file can be specified by using the -e option.</para>
+          <para>Example of a <verbatimText verbatimStyle="vs02"><![CDATA[.externalpubs]]></verbatimText> file:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<externalPubs>
+<externalPubRef>
+<externalPubRefIdent>
+<externalPubCode>ABC</externalPubCode>
+<externalPubTitle>ABC Manual</externalPubTitle>
+</externalPubRefIdent>
+</externalPubRef>
+</externalPubs>]]></verbatimText></para>
+          <para>External publication references will be updated whether they are matched to a file or not.</para>
+        </levelledPara>
+        <levelledPara>
+          <title>Hotspot matching (-H)</title>
+          <para>Hotspots can be matched in XML-based ICN formats, such as SVG or X3D. By default, matching is based on the APS ID of the hotspot and the following attributes:</para>
+          <para>
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>SVG</listItemTerm>
+                <listItemDefinition>
+                  <para>
+                    <verbatimText verbatimStyle="vs13"><![CDATA[@id]]></verbatimText>
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>X3D</listItemTerm>
+                <listItemDefinition>
+                  <para>
+                    <verbatimText verbatimStyle="vs13"><![CDATA[@DEF]]></verbatimText>
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+          </para>
+          <para>If hotspots are identified in a different way in a project's ICNs, a custom XPath expression can be specified with the -j option. In this XPath expression, the variable <verbatimText verbatimStyle="vs01"><![CDATA[$id]]></verbatimText> represents the hotspot APS ID:</para>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -H -j "//*[@attr = $id]" <DM>]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXIT STATUS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>0</listItemTerm>
+              <listItemDefinition>
+                <para>No errors, all references were matched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>1</listItemTerm>
+              <listItemDefinition>
+                <para>Some references were unmatched.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>2</listItemTerm>
+              <listItemDefinition>
+                <para>The number of objects found in a recursive check (-R) exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>3</listItemTerm>
+              <listItemDefinition>
+                <para>stdin did not contain valid XML and not in list mode (-l).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>4</listItemTerm>
+              <listItemDefinition>
+                <para>The non-chapterized SNS specified (-b) is not valid.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <levelledPara>
+          <title>General</title>
+          <para>
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+  DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
+  DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
+  ICN-12345-00001-001-01.JPG]]></verbatimText>
+          </para>
+        </levelledPara>
+        <levelledPara>
+          <title>CSN references</title>
+          <para>
+            These examples are based on the following CSN reference:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<catalogSeqNumberRef figureNumber="01" item="004"/>]]></verbatimText>
+            in the following data module:
+            <verbatimText verbatimStyle="vs24"><![CDATA[DM=DMC-EX-A-00-00-00-00AA-100A-D_001-00_EN-CA.XML]]></verbatimText>
+          </para>
+          <para>
+            Because the CSN reference is not chapterized, it cannot be matched to an IPD DM without more information:
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -K $DM
+Unmatched reference: Fig 01 Item 004]]></verbatimText>
+          </para>
+          <para>
+            The SNS for non-chapterized IPDs can be specified with -b. In this case, the project uses the SNS "ZD-00-35" for their IPDs:
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -K -b ZD-00-35 $DM
+Unmatched reference: DMC-EX-A-ZD-00-35-010-941A-D Item 004]]></verbatimText>
+          </para>
+          <para>
+            This project uses a 2-character disassembly code variant, so the figure number variant is not sufficient to resolve the DMC of the referenced IPD data module. The -k option can be used in this case to specify the pattern for the disassembly code variant of IPDs. Since the second character of the disassembly code variant of all IPD DMs in this project is A, the pattern "%A" can be used:
+            <verbatimText verbatimStyle="vs24"><![CDATA[$ s1kd-refs -K -b ZD-00-35 -k %A $DM
+DMC-EX-A-ZD-00-35-010A-941A-D_001-00_EN-CA.XML Item 004]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

@@ -1,0 +1,3 @@
+descendant-or-self::dmlEntry/text()|
+descendant-or-self::dmlRefGroup/text()|
+descendant-or-self::dmlStatus/text()

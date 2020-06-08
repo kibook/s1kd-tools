@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<disptext>
+  <operators>
+    <and> and </and>
+    <or> or </or>
+    <openGroup>(</openGroup>
+    <closeGroup>)</closeGroup>
+    <set>, </set>
+    <range>-</range>
+  </operators>
+  <default>
+    <name/>
+    <text>: </text>
+    <values/>
+  </default>
+</disptext>

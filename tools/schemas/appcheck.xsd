@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:element name="appCheck" type="appCheckElemType"/>
+  <xs:complexType name="appCheckElemType">
+    <xs:sequence>
+      <xs:element ref="object" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="appCheckAttType"/>
+    <xs:attribute name="strict" type="yesNoAttType"/>
+    <xs:attribute name="checkNestedApplic" type="yesNoAttType"/>
+  </xs:complexType>
+  <xs:simpleType name="appCheckAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="standalone"/>
+      <xs:enumeration value="pct"/>
+      <xs:enumeration value="all"/>
+      <xs:enumeration value="custom"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="yesNoAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="object" type="objectElemType"/>
+  <xs:complexType name="objectElemType">
+    <xs:sequence>
+      <xs:element ref="asserts" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="path" type="xs:string"/>
+    <xs:attribute name="valid" type="yesNoAttType"/>
+  </xs:complexType>
+  <xs:element name="asserts" type="assertsElemType"/>
+  <xs:complexType name="assertsElemType">
+    <xs:sequence>
+      <xs:element ref="assign" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="valid" type="yesNoAttType"/>
+  </xs:complexType>
+  <xs:element name="assign" type="assignElemType"/>
+  <xs:complexType name="assignElemType">
+    <xs:attribute name="applicPropertyIdent" type="xs:string"/>
+    <xs:attribute name="applicPropertyType" type="applicPropertyTypeAttType"/>
+    <xs:attribute name="applicPropertyValue" type="xs:string"/>
+  </xs:complexType>
+  <xs:simpleType name="applicPropertyTypeAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="condition"/>
+      <xs:enumeration value="prodattr"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

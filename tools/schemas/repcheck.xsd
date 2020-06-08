@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:element name="ref" type="refElemType"/>
+  <xs:complexType name="refElemType">
+    <xs:sequence>
+      <xs:any processContents="skip"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="line" type="xs:integer"/>
+    <xs:attribute name="xpath" type="xs:string"/>
+    <xs:attribute name="cir" type="xs:string"/>
+  </xs:complexType>
+  <xs:element name="object" type="objectElemType"/>
+  <xs:complexType name="objectElemType">
+    <xs:sequence>
+      <xs:element name="ref" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="path" type="xs:string"/>
+    <xs:attribute name="valid" type="yesNoType"/>
+  </xs:complexType>
+  <xs:simpleType name="yesNoType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="repCheck" type="repCheckElemType"/>
+  <xs:complexType name="repCheckElemType">
+    <xs:sequence>
+      <xs:element ref="object" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

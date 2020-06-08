@@ -1,0 +1,388 @@
+<?xml version="1.0"?>
+<uom>
+  <convert from="1/degC" to="1/degC"/>
+  <convert from="1/degF" to="1/degF"/>
+  <convert from="1/degR" to="1/degR"/>
+  <convert from="1/K" to="1/K"/>
+  <convert from="cm" to="cm"/>
+  <convert from="cm2" to="cm2"/>
+  <convert from="cm3" to="cm3"/>
+  <convert from="cm4" to="cm4"/>
+  <convert from="ddegC" to="ddegC"/>
+  <convert from="ddegF" to="ddegF"/>
+  <convert from="ddegK" to="ddegK"/>
+  <convert from="ddegR" to="ddegR"/>
+  <convert from="dega" to="dega"/>
+  <convert from="degC" to="degC"/>
+  <convert from="degF" to="degF"/>
+  <convert from="degR" to="degR"/>
+  <convert from="fathom" to="fathom"/>
+  <convert from="flozUS" to="flozUS"/>
+  <convert from="ft" to="ft"/>
+  <convert from="ft2" to="ft2"/>
+  <convert from="ft3" to="ft3"/>
+  <convert from="g" to="g"/>
+  <convert from="galUK" to="galUK"/>
+  <convert from="galUS" to="galUS"/>
+  <convert from="GHz" to="GHz"/>
+  <convert from="h" to="h"/>
+  <convert from="Hz" to="Hz"/>
+  <convert from="in" to="in"/>
+  <convert from="in2" to="in2"/>
+  <convert from="in3" to="in3"/>
+  <convert from="in4" to="in4"/>
+  <convert from="K" to="K"/>
+  <convert from="kg" to="kg"/>
+  <convert from="km" to="km"/>
+  <convert from="km/h" to="km/h"/>
+  <convert from="km2" to="km2"/>
+  <convert from="km3" to="km3"/>
+  <convert from="knot" to="knot"/>
+  <convert from="L" to="L"/>
+  <convert from="lbf.ft" to="lbf.ft"/>
+  <convert from="lbf.in" to="lbf.in"/>
+  <convert from="lbf/ft" to="lbf/ft"/>
+  <convert from="lbf/in" to="lbf/in"/>
+  <convert from="lbm" to="lbm"/>
+  <convert from="m" to="m"/>
+  <convert from="m2" to="m2"/>
+  <convert from="m3" to="m3"/>
+  <convert from="mg" to="mg"/>
+  <convert from="MHz" to="MHz"/>
+  <convert from="mHz" to="mHz"/>
+  <convert from="mi" to="mi"/>
+  <convert from="mi/h" to="mi/h"/>
+  <convert from="mi2" to="mi2"/>
+  <convert from="mi3" to="mi3"/>
+  <convert from="min" to="min"/>
+  <convert from="mL" to="mL"/>
+  <convert from="mm" to="mm"/>
+  <convert from="mm2" to="mm2"/>
+  <convert from="mm3" to="mm3"/>
+  <convert from="N.m" to="N.m"/>
+  <convert from="N/m" to="N/m"/>
+  <convert from="nautmi" to="nautmi"/>
+  <convert from="rad" to="rad"/>
+  <convert from="s" to="s"/>
+  <convert from="tonUK" to="tonUK"/>
+  <convert from="tonUS" to="tonUS"/>
+  <convert from="yd" to="yd"/>
+  <convert from="yd2" to="yd2"/>
+  <convert from="yd3" to="yd3"/>
+  <convert from="1/degC" to="1/degF" formula="$value * (9 div 5) + 32"/>
+  <convert from="1/degC" to="1/degR" formula="$value * (9 div 5) + 491.67"/>
+  <convert from="1/degC" to="1/K" formula="$value + 273.15"/>
+  <convert from="1/degF" to="1/degC" formula="($value - 32) * (5 div 9)"/>
+  <convert from="1/degF" to="1/degR" formula="$value + 459.67"/>
+  <convert from="1/degF" to="1/K" formula="($value - 32) * (5 div 9) + 273.15"/>
+  <convert from="1/degR" to="1/degC" formula="($value - 491.67) * (5 div 9)"/>
+  <convert from="1/degR" to="1/degF" formula="$value - 459.67"/>
+  <convert from="1/degR" to="1/K" formula="$value * (5 div 9)"/>
+  <convert from="1/K" to="1/degC" formula="$value - 273.15"/>
+  <convert from="1/K" to="1/degF" formula="($value - 273.15) * (9 div 5) + 32"/>
+  <convert from="1/K" to="1/degR" formula="$value * 1.8"/>
+  <convert from="cm" to="fathom" formula="$value div 182.88"/>
+  <convert from="cm" to="ft" formula="$value div 30.48"/>
+  <convert from="cm" to="in" formula="$value div 2.54"/>
+  <convert from="cm" to="km" formula="$value div 1e+5"/>
+  <convert from="cm" to="m" formula="$value div 100"/>
+  <convert from="cm" to="mi" formula="$value div 160934.4"/>
+  <convert from="cm" to="mm" formula="$value * 10"/>
+  <convert from="cm" to="nautmi" formula="$value div 185200"/>
+  <convert from="cm" to="yd" formula="$value div 91.44"/>
+  <convert from="cm2" to="ft2" formula="$value div 929.03"/>
+  <convert from="cm2" to="in2" formula="$value div 6.452"/>
+  <convert from="cm2" to="km2" formula="$value div 1e+10"/>
+  <convert from="cm2" to="m2" formula="$value div 10000"/>
+  <convert from="cm2" to="mi2" formula="$value div 2.59e+10"/>
+  <convert from="cm2" to="mm2" formula="$value * 100"/>
+  <convert from="cm2" to="yd2" formula="$value div 8361.274"/>
+  <convert from="cm3" to="ft3" formula="$value div 28316.847"/>
+  <convert from="cm3" to="in3" formula="$value div 16.387"/>
+  <convert from="cm3" to="km3" formula="$value div 1e+15"/>
+  <convert from="cm3" to="m3" formula="$value div 1000000"/>
+  <convert from="cm3" to="mi3" formula="$value div 4.168e+15"/>
+  <convert from="cm3" to="mm3" formula="$value * 1000"/>
+  <convert from="cm3" to="yd3" formula="$value div 764554.858"/>
+  <convert from="cm4" to="in4" formula="$value * 0.24025147994538"/>
+  <convert from="ddegC" to="ddegF" formula="$value * (9 div 5) + 32"/>
+  <convert from="ddegC" to="ddegK" formula="$value + 273.15"/>
+  <convert from="ddegC" to="ddegR" formula="$value * (9 div 5) + 491.67"/>
+  <convert from="ddegF" to="ddegC" formula="($value - 32) * (5 div 9)"/>
+  <convert from="ddegF" to="ddegK" formula="($value - 32) * (5 div 9) + 273.15"/>
+  <convert from="ddegF" to="ddegR" formula="$value + 459.67"/>
+  <convert from="ddegK" to="ddegC" formula="$value - 273.15"/>
+  <convert from="ddegK" to="ddegF" formula="($value - 273.15) * (9 div 5) + 32"/>
+  <convert from="ddegK" to="ddegR" formula="$value * 1.8"/>
+  <convert from="ddegR" to="ddegC" formula="($value - 491.67) * (5 div 9)"/>
+  <convert from="ddegR" to="ddegF" formula="$value - 459.67"/>
+  <convert from="ddegR" to="ddegK" formula="$value * (5 div 9)"/>
+  <convert from="dega" to="rad" formula="$value * ($pi div 180)"/>
+  <convert from="degC" to="degF" formula="$value * (9 div 5) + 32"/>
+  <convert from="degC" to="degR" formula="$value * (9 div 5) + 491.67"/>
+  <convert from="degC" to="K" formula="$value + 273.15"/>
+  <convert from="degF" to="degC" formula="($value - 32) * (5 div 9)"/>
+  <convert from="degF" to="degR" formula="$value + 459.67"/>
+  <convert from="degF" to="K" formula="($value - 32) * (5 div 9) + 273.15"/>
+  <convert from="degR" to="degC" formula="($value - 491.67) * (5 div 9)"/>
+  <convert from="degR" to="degF" formula="$value - 459.67"/>
+  <convert from="degR" to="K" formula="$value * (5 div 9)"/>
+  <convert from="fathom" to="cm" formula="$value * 182.88"/>
+  <convert from="fathom" to="ft" formula="$value * 6"/>
+  <convert from="fathom" to="in" formula="$value * 72"/>
+  <convert from="fathom" to="km" formula="$value div 546.807"/>
+  <convert from="fathom" to="m" formula="$value * 1.8288"/>
+  <convert from="fathom" to="mi" formula="$value div 880"/>
+  <convert from="fathom" to="mm" formula="$value * 1828.8"/>
+  <convert from="fathom" to="nautmi" formula="$value div 1012.686"/>
+  <convert from="fathom" to="yd" formula="$value * 2"/>
+  <convert from="flozUS" to="galUS" formula="$value div 128"/>
+  <convert from="flozUS" to="L" formula="$value div 33.814"/>
+  <convert from="flozUS" to="mL" formula="$value * 29.574"/>
+  <convert from="ft" to="cm" formula="$value * 30.48"/>
+  <convert from="ft" to="fathom" formula="$value div 6"/>
+  <convert from="ft" to="in" formula="$value * 12"/>
+  <convert from="ft" to="km" formula="$value div 3280.84"/>
+  <convert from="ft" to="m" formula="$value div 3.281"/>
+  <convert from="ft" to="mi" formula="$value div 5280"/>
+  <convert from="ft" to="mm" formula="$value * 304.8"/>
+  <convert from="ft" to="nautmi" formula="$value div 6076.115"/>
+  <convert from="ft" to="yd" formula="$value div 3"/>
+  <convert from="ft2" to="cm2" formula="$value * 929.03"/>
+  <convert from="ft2" to="in2" formula="$value * 144"/>
+  <convert from="ft2" to="km2" formula="$value div 1.076e+7"/>
+  <convert from="ft2" to="m2" formula="$value div 10.764"/>
+  <convert from="ft2" to="mi2" formula="$value div 2.788e+7"/>
+  <convert from="ft2" to="mm2" formula="$value * 92903.04"/>
+  <convert from="ft2" to="yd2" formula="$value div 9"/>
+  <convert from="ft3" to="cm3" formula="$value * 28316.847"/>
+  <convert from="ft3" to="in3" formula="$value * 1728"/>
+  <convert from="ft3" to="km3" formula="$value div 3.531e+10"/>
+  <convert from="ft3" to="m3" formula="$value div 35.315"/>
+  <convert from="ft3" to="mi3" formula="$value div 1.472e+11"/>
+  <convert from="ft3" to="mm3" formula="$value * 2.832e+7"/>
+  <convert from="ft3" to="yd3" formula="$value div 27"/>
+  <convert from="g" to="kg" formula="$value div 1000"/>
+  <convert from="g" to="lbm" formula="$value div 453.592"/>
+  <convert from="g" to="mg" formula="$value * 1000"/>
+  <convert from="g" to="tonUS" formula="$value div 907184.74"/>
+  <convert from="galUK" to="L" formula="$value * 4.546"/>
+  <convert from="galUS" to="flozUS" formula="$value * 128"/>
+  <convert from="galUS" to="L" formula="$value * 3.78541"/>
+  <convert from="galUS" to="mL" formula="$value * 3785.412"/>
+  <convert from="GHz" to="Hz" formula="$value * 1e+9"/>
+  <convert from="GHz" to="MHz" formula="$value * 1000"/>
+  <convert from="GHz" to="mHz" formula="$value * 1e+12"/>
+  <convert from="h" to="min" formula="$value * 60"/>
+  <convert from="h" to="s" formula="$value * 3600"/>
+  <convert from="Hz" to="GHz" formula="$value div 1e+9"/>
+  <convert from="Hz" to="MHz" formula="$value div 1e+6"/>
+  <convert from="Hz" to="mHz" formula="$value * 1000"/>
+  <convert from="in" to="cm" formula="$value * 2.54"/>
+  <convert from="in" to="fathom" formula="$value div 72"/>
+  <convert from="in" to="ft" formula="$value div 12"/>
+  <convert from="in" to="km" formula="$value div 39370.079"/>
+  <convert from="in" to="m" formula="$value div 39.37"/>
+  <convert from="in" to="mi" formula="$value div 63360"/>
+  <convert from="in" to="mm" formula="$value * 25.4"/>
+  <convert from="in" to="nautmi" formula="$value div 72913.386"/>
+  <convert from="in" to="yd" formula="$value div 36"/>
+  <convert from="in2" to="cm2" formula="$value * 6.452"/>
+  <convert from="in2" to="ft2" formula="$value div 144"/>
+  <convert from="in2" to="km2" formula="$value div 1.55e+9"/>
+  <convert from="in2" to="m2" formula="$value div 1550.003"/>
+  <convert from="in2" to="mi2" formula="$value div 4.014e+9"/>
+  <convert from="in2" to="mm2" formula="$value * 645.16"/>
+  <convert from="in2" to="yd2" formula="$value div 1296"/>
+  <convert from="in3" to="cm3" formula="$value * 16.387"/>
+  <convert from="in3" to="ft3" formula="$value div 1728"/>
+  <convert from="in3" to="km3" formula="$value div 6.102e+13"/>
+  <convert from="in3" to="m3" formula="$value div 61023.744"/>
+  <convert from="in3" to="mi3" formula="$value div 2.544e+14"/>
+  <convert from="in3" to="mm3" formula="$value * 16387.064"/>
+  <convert from="in3" to="yd3" formula="$value div 46656"/>
+  <convert from="in4" to="cm4" formula="$value div 0.24025147994538"/>
+  <convert from="K" to="degC" formula="$value - 273.15"/>
+  <convert from="K" to="degF" formula="($value - 273.15) * (9 div 5) + 32"/>
+  <convert from="K" to="degR" formula="$value * 1.8"/>
+  <convert from="kg" to="g" formula="$value * 1000"/>
+  <convert from="kg" to="lbm" formula="$value * 2.205"/>
+  <convert from="kg" to="mg" formula="$value * 1000000"/>
+  <convert from="kg" to="tonUK" formula="$value div 1016.047"/>
+  <convert from="kg" to="tonUS" formula="$value div 907.185"/>
+  <convert from="km" to="cm" formula="$value * 100000"/>
+  <convert from="km" to="fathom" formula="$value * 546.807"/>
+  <convert from="km" to="ft" formula="$value * 3280.84"/>
+  <convert from="km" to="in" formula="$value * 39370.079"/>
+  <convert from="km" to="m" formula="$value * 1000"/>
+  <convert from="km" to="mi" formula="$value div 1.609"/>
+  <convert from="km" to="mm" formula="$value * 1e+6"/>
+  <convert from="km" to="nautmi" formula="$value div 1.852"/>
+  <convert from="km" to="yd" formula="$value * 1093.613"/>
+  <convert from="km/h" to="knot" formula="$value div 1.852"/>
+  <convert from="km/h" to="mi/h" formula="$value div 1.609"/>
+  <convert from="km2" to="cm2" formula="$value * 1e+10"/>
+  <convert from="km2" to="ft2" formula="$value * 1.076e+7"/>
+  <convert from="km2" to="in2" formula="$value * 1.55e+9"/>
+  <convert from="km2" to="m2" formula="$value * 1000000"/>
+  <convert from="km2" to="mi2" formula="$value div 2.59"/>
+  <convert from="km2" to="mm2" formula="$value * 1e+12"/>
+  <convert from="km2" to="yd2" formula="$value * 1.196e+6"/>
+  <convert from="km3" to="cm3" formula="$value * 1e+15"/>
+  <convert from="km3" to="ft3" formula="$value * 3.531e+10"/>
+  <convert from="km3" to="in3" formula="$value * 6.102e+13"/>
+  <convert from="km3" to="m3" formula="$value * 1e+9"/>
+  <convert from="km3" to="mi3" formula="$value div 4.168"/>
+  <convert from="km3" to="mm3" formula="$value * 1e+18"/>
+  <convert from="km3" to="yd3" formula="$value * 1.308e+9"/>
+  <convert from="knot" to="km/h" formula="$value * 1.852"/>
+  <convert from="knot" to="mi/h" formula="$value * 1.151"/>
+  <convert from="L" to="flozUS" formula="$value * 33.814"/>
+  <convert from="L" to="galUK" formula="$value div 4.546"/>
+  <convert from="L" to="galUS" formula="$value div 3.785"/>
+  <convert from="L" to="mL" formula="$value * 1000"/>
+  <convert from="lbf.ft" to="lbf.in" formula="$value * 12"/>
+  <convert from="lbf.ft" to="N.m" formula="$value * 1.356"/>
+  <convert from="lbf.in" to="lbf.ft" formula="$value div 12"/>
+  <convert from="lbf.in" to="N.m" formula="$value div 8.851"/>
+  <convert from="lbf/ft" to="lbf/in" formula="$value * 12"/>
+  <convert from="lbf/ft" to="N/m" formula="$value * 14.594"/>
+  <convert from="lbf/in" to="lbf/ft" formula="$value div 12"/>
+  <convert from="lbf/in" to="N/m" formula="$value * 175.127"/>
+  <convert from="lbm" to="g" formula="$value * 453.592"/>
+  <convert from="lbm" to="kg" formula="$value div 2.205"/>
+  <convert from="lbm" to="mg" formula="$value * 453592.37"/>
+  <convert from="lbm" to="tonUS" formula="$value div 2000"/>
+  <convert from="m" to="cm" formula="$value * 100"/>
+  <convert from="m" to="fathom" formula="$value div 1.8288"/>
+  <convert from="m" to="ft" formula="$value * 3.281"/>
+  <convert from="m" to="in" formula="$value * 39.37"/>
+  <convert from="m" to="km" formula="$value div 1000"/>
+  <convert from="m" to="mi" formula="$value div 1609.344"/>
+  <convert from="m" to="mm" formula="$value * 1000"/>
+  <convert from="m" to="nautmi" formula="$value div 1852"/>
+  <convert from="m" to="yd" formula="$value * 1.094"/>
+  <convert from="m2" to="cm2" formula="$value * 10000"/>
+  <convert from="m2" to="ft2" formula="$value * 10.764"/>
+  <convert from="m2" to="in2" formula="$value * 1550.003"/>
+  <convert from="m2" to="km2" formula="$value div 1e+6"/>
+  <convert from="m2" to="mi2" formula="$value div 2.59e+6"/>
+  <convert from="m2" to="mm2" formula="$value * 1000000"/>
+  <convert from="m2" to="yd2" formula="$value * 1.196"/>
+  <convert from="m3" to="cm3" formula="$value * 1e+6"/>
+  <convert from="m3" to="ft3" formula="$value * 35.315"/>
+  <convert from="m3" to="in3" formula="$value * 61023.744"/>
+  <convert from="m3" to="km3" formula="$value div 1e+9"/>
+  <convert from="m3" to="mi3" formula="$value div 4.168e+9"/>
+  <convert from="m3" to="mm3" formula="$value * 1e+9"/>
+  <convert from="m3" to="yd3" formula="$value * 1.308"/>
+  <convert from="mg" to="g" formula="$value div 1000"/>
+  <convert from="mg" to="kg" formula="$value div 1e+6"/>
+  <convert from="mg" to="lbm" formula="$value div 453592.37"/>
+  <convert from="mg" to="tonUS" formula="$value div 9.027e+8"/>
+  <convert from="MHz" to="GHz" formula="$value div 1000"/>
+  <convert from="mHz" to="GHz" formula="$value div 1e+12"/>
+  <convert from="MHz" to="Hz" formula="$value * 1e+6"/>
+  <convert from="mHz" to="Hz" formula="$value div 1000"/>
+  <convert from="MHz" to="mHz" formula="$value * 1e+9"/>
+  <convert from="mHz" to="MHz" formula="$value div 1e+9"/>
+  <convert from="mi" to="cm" formula="$value * 160934"/>
+  <convert from="mi" to="fathom" formula="$value * 880"/>
+  <convert from="mi" to="ft" formula="$value * 5280"/>
+  <convert from="mi" to="in" formula="$value * 63360"/>
+  <convert from="mi" to="km" formula="$value * 1.60934"/>
+  <convert from="mi" to="m" formula="$value * 1609.34"/>
+  <convert from="mi" to="mm" formula="$value * 1609344"/>
+  <convert from="mi" to="nautmi" formula="$value div 1.151"/>
+  <convert from="mi" to="yd" formula="$value * 1760"/>
+  <convert from="mi/h" to="km/h" formula="$value * 1.609"/>
+  <convert from="mi/h" to="knot" formula="$value div 1.151"/>
+  <convert from="mi2" to="cm2" formula="$value * 2.59e+10"/>
+  <convert from="mi2" to="ft2" formula="$value * 2.788e+7"/>
+  <convert from="mi2" to="in2" formula="$value * 4.014e+9"/>
+  <convert from="mi2" to="km2" formula="$value * 2.59"/>
+  <convert from="mi2" to="m2" formula="$value * 2.59e+6"/>
+  <convert from="mi2" to="mm2" formula="$value * 2.59e+12"/>
+  <convert from="mi2" to="yd2" formula="$value * 3.098e+6"/>
+  <convert from="mi3" to="cm3" formula="$value * 4.168e+15"/>
+  <convert from="mi3" to="ft3" formula="$value * 1.472e+11"/>
+  <convert from="mi3" to="in3" formula="$value * 2.544e+14"/>
+  <convert from="mi3" to="km3" formula="$value * 4.168"/>
+  <convert from="mi3" to="m3" formula="$value * 4.168e+9"/>
+  <convert from="mi3" to="mm3" formula="$value * 4.168e+18"/>
+  <convert from="mi3" to="yd3" formula="$value * 5.452e+9"/>
+  <convert from="min" to="h" formula="$value div 60"/>
+  <convert from="min" to="s" formula="$value * 60"/>
+  <convert from="mL" to="flozUS" formula="$value div 29.574"/>
+  <convert from="mL" to="galUS" formula="$value div 3785.412"/>
+  <convert from="mL" to="L" formula="$value div 1000"/>
+  <convert from="mm" to="cm" formula="$value div 10"/>
+  <convert from="mm" to="fathom" formula="$value div 1828.8"/>
+  <convert from="mm" to="ft" formula="$value div 304.8"/>
+  <convert from="mm" to="in" formula="$value div 25.4"/>
+  <convert from="mm" to="km" formula="$value div 1e+6"/>
+  <convert from="mm" to="m" formula="$value div 1000"/>
+  <convert from="mm" to="mi" formula="$value div 1.609e+6"/>
+  <convert from="mm" to="nautmi" formula="$value div 1.852e+6"/>
+  <convert from="mm" to="yd" formula="$value div 914.4"/>
+  <convert from="mm2" to="cm2" formula="$value div 100"/>
+  <convert from="mm2" to="ft2" formula="$value div 92903.04"/>
+  <convert from="mm2" to="in2" formula="$value div 645.16"/>
+  <convert from="mm2" to="km2" formula="$value div 1e+12"/>
+  <convert from="mm2" to="m2" formula="$value div 1000000"/>
+  <convert from="mm2" to="mi2" formula="$value div 2.59e+12"/>
+  <convert from="mm2" to="yd2" formula="$value div 836127.36"/>
+  <convert from="mm3" to="cm3" formula="$value div 1000"/>
+  <convert from="mm3" to="ft3" formula="$value div 2.832e+7"/>
+  <convert from="mm3" to="in3" formula="$value div 16387.064"/>
+  <convert from="mm3" to="km3" formula="$value div 1e+18"/>
+  <convert from="mm3" to="m3" formula="$value div 1e+9"/>
+  <convert from="mm3" to="mi3" formula="$value div 4.168e+18"/>
+  <convert from="mm3" to="yd3" formula="$value div 7.646e+8"/>
+  <convert from="N.m" to="lbf.ft" formula="$value div 1.356"/>
+  <convert from="N.m" to="lbf.in" formula="$value * 8.851"/>
+  <convert from="N/m" to="lbf/ft" formula="$value div 14.594"/>
+  <convert from="N/m" to="lbf/in" formula="$value div 175.127"/>
+  <convert from="nautmi" to="cm" formula="$value * 185200"/>
+  <convert from="nautmi" to="fathom" formula="$value * 1012.686"/>
+  <convert from="nautmi" to="ft" formula="$value * 6076.115"/>
+  <convert from="nautmi" to="in" formula="$value * 72913.386"/>
+  <convert from="nautmi" to="km" formula="$value * 1.852"/>
+  <convert from="nautmi" to="m" formula="$value * 1852"/>
+  <convert from="nautmi" to="mi" formula="$value * 1.151"/>
+  <convert from="nautmi" to="mm" formula="$value * 1.852e+6"/>
+  <convert from="nautmi" to="yd" formula="$value * 2025.372"/>
+  <convert from="rad" to="dega" formula="$value * (180 div $pi)"/>
+  <convert from="s" to="h" formula="$value div 3600"/>
+  <convert from="s" to="min" formula="$value div 60"/>
+  <convert from="tonUK" to="kg" formula="$value * 1016.047"/>
+  <convert from="tonUK" to="tonUS" formula="$value * 1.12"/>
+  <convert from="tonUS" to="g" formula="$value * 907184.74"/>
+  <convert from="tonUS" to="kg" formula="$value * 907.185"/>
+  <convert from="tonUS" to="lbm" formula="$value * 2000"/>
+  <convert from="tonUS" to="mg" formula="$value * 9.072e+8"/>
+  <convert from="tonUS" to="tonUK" formula="$value div 1.12"/>
+  <convert from="yd" to="cm" formula="$value * 91.44"/>
+  <convert from="yd" to="fathom" formula="$value div 2"/>
+  <convert from="yd" to="ft" formula="$value * 3"/>
+  <convert from="yd" to="in" formula="$value * 36"/>
+  <convert from="yd" to="km" formula="$value div 1093.613"/>
+  <convert from="yd" to="m" formula="$value div 1.094"/>
+  <convert from="yd" to="mi" formula="$value div 1760"/>
+  <convert from="yd" to="mm" formula="$value * 914.4"/>
+  <convert from="yd" to="nautmi" formula="$value div 2025.372"/>
+  <convert from="yd2" to="cm2" formula="$value * 8361.274"/>
+  <convert from="yd2" to="ft2" formula="$value * 9"/>
+  <convert from="yd2" to="in2" formula="$value * 1296"/>
+  <convert from="yd2" to="km2" formula="$value div 1.196e+6"/>
+  <convert from="yd2" to="m2" formula="$value div 1.196"/>
+  <convert from="yd2" to="mi2" formula="$value div 3.098e+6"/>
+  <convert from="yd2" to="mm2" formula="$value * 836127.36"/>
+  <convert from="yd3" to="cm3" formula="$value * 764554.858"/>
+  <convert from="yd3" to="ft3" formula="$value * 27"/>
+  <convert from="yd3" to="in3" formula="$value * 46656"/>
+  <convert from="yd3" to="km3" formula="$value div 1.308e+9"/>
+  <convert from="yd3" to="m3" formula="$value div 1.308"/>
+  <convert from="yd3" to="mi3" formula="$value div 5.452e+9"/>
+  <convert from="yd3" to="mm3" formula="$value * 7.646e+8"/>
+</uom>

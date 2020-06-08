@@ -1,0 +1,17 @@
+name: Build s1kd-tools
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Update repositories
+      run: sudo apt-get update -qq
+    - name: Install dependencies
+      run: sudo apt-get install -y -qq libxml2-dev libxslt1-dev vim-common
+    - name: make
+      run: make

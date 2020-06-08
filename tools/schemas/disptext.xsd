@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  version="1.0">
+  <xs:element name="disptext" type="disptextElemType"/>
+  <xs:complexType name="disptextElemType">
+    <xs:sequence>
+      <xs:element ref="operators"/>
+      <xs:choice>
+        <xs:element ref="default"/>
+        <xs:sequence>
+          <xs:element ref="productAttributes"/>
+          <xs:element ref="conditions"/>
+        </xs:sequence>
+      </xs:choice>
+      <xs:element ref="conditionType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="operators" type="operatorsElemType"/>
+  <xs:complexType name="operatorsElemType">
+    <xs:sequence>
+      <xs:element ref="and"/>
+      <xs:element ref="or"/>
+      <xs:element ref="openGroup"/>
+      <xs:element ref="closeGroup"/>
+      <xs:element ref="set"/>
+      <xs:element ref="range"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="and" type="xs:string"/>
+  <xs:element name="or" type="xs:string"/>
+  <xs:element name="openGroup" type="xs:string"/>
+  <xs:element name="closeGroup" type="xs:string"/>
+  <xs:element name="set" type="xs:string"/>
+  <xs:element name="range" type="xs:string"/>
+  <xs:group name="rulesElemGroup">
+    <xs:choice>
+      <xs:element ref="name"/>
+      <xs:element ref="text"/>
+      <xs:element ref="values"/>
+    </xs:choice>
+  </xs:group>
+  <xs:element name="default" type="defaultElemType"/>
+  <xs:complexType name="defaultElemType">
+    <xs:group ref="rulesElemGroup" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:complexType>
+  <xs:element name="productAttributes" type="defaultElemType"/>
+  <xs:element name="conditions" type="defaultElemType"/>
+  <xs:element name="property" type="propertyElemType"/>
+  <xs:complexType name="propertyElemType">
+    <xs:group ref="rulesElemGroup" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:attribute ref="ident" use="required"/>
+    <xs:attribute name="type" type="applicPropertyTypeAttType" use="required"/>
+  </xs:complexType>
+  <xs:attribute name="ident" type="xs:NCName"/>
+  <xs:simpleType name="applicPropertyTypeAttType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="condition"/>
+      <xs:enumeration value="prodattr"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="name" type="nameElemType"/>
+  <xs:complexType name="nameElemType"/>
+  <xs:element name="text" type="xs:string"/>
+  <xs:element name="values" type="valuesElemType"/>
+  <xs:complexType name="valuesElemType">
+    <xs:sequence>
+      <xs:element ref="value" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="value" type="valueElemType"/>
+  <xs:complexType name="valueElemType" mixed="true">
+    <xs:attribute name="match" type="applicPropertyValueAttType" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="applicPropertyValueAttType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^|~]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="conditionType" type="conditionTypeElemType"/>
+  <xs:complexType name="conditionTypeElemType">
+    <xs:group ref="rulesElemGroup" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:attribute ref="ident" use="required"/>
+  </xs:complexType>
+</xs:schema>

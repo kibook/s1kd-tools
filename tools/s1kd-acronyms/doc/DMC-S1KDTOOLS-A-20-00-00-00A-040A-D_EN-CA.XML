@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="20" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="025" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2020" month="05" day="01"/>
+        <dmTitle>
+          <techName>s1kd-acronyms(1) | s1kd-tools</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="status">
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany>
+        <enterpriseName>khzae.net</enterpriseName>
+      </responsiblePartnerCompany>
+      <originator>
+        <enterpriseName>khzae.net</enterpriseName>
+      </originator>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="G" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissue</simplePara>
+      </reasonForUpdate>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>NAME</title>
+        <para>s1kd-acronyms - Manage acronyms in S1000D data modules</para>
+      </levelledPara>
+      <levelledPara>
+        <title>SYNOPSIS</title>
+        <para>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-acronyms -h?
+s1kd-acronyms [-dlpqtvx^] [-n <#>] [-o <file>] [-T <types>]
+              [<dmodule>...]
+s1kd-acronyms [-flqv] [-i|-I|-!] [-m|-M <acr>] [-o <file>] [-X <xpath>]
+              [<dmodule>...]
+s1kd-acronyms [-D|-P] [-flqv] [-o <file>] [<dmodule>...]]]></verbatimText>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>DESCRIPTION</title>
+        <para>The <emphasis>s1kd-acronyms</emphasis> tool is used to manage acronyms in S1000D data modules in one of three ways:</para>
+        <para>
+          <randomList>
+            <listItem>
+              <para>Generate a list of unique acronyms used in all specified data modules.</para>
+            </listItem>
+            <listItem>
+              <para>Mark up acronyms automatically based on a specified list.</para>
+            </listItem>
+            <listItem>
+              <para>Remove acronym markup.</para>
+            </listItem>
+          </randomList>
+        </para>
+      </levelledPara>
+      <levelledPara>
+        <title>OPTIONS</title>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>-D, --delete</listItemTerm>
+              <listItemDefinition>
+                <para>Remove acronym markup, flattening it to the acronym term.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-d, --deflist</listItemTerm>
+              <listItemDefinition>
+                <para>Format XML output as an S1000D <verbatimText verbatimStyle="vs12">&lt;definitionList&gt;</verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-f, --overwrite</listItemTerm>
+              <listItemDefinition>
+                <para>When marking up acronyms with the -m option, overwrite the input data modules instead of writing to stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-h, -?, --help</listItemTerm>
+              <listItemDefinition>
+                <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-I, --always-ask</listItemTerm>
+              <listItemDefinition>
+                <para>In interactive mode, show a prompt for all acronyms, not just those with multiple definitions. This can be useful if some occurrences of acronym terms should be ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-i, --interactive</listItemTerm>
+              <listItemDefinition>
+                <para>Markup acronyms in interactive mode. If the specified acronyms list contains multiple definitions for a given acronym term, the tool will prompt the user with the context in which the acronym is used and present a list of the definitions for them to choose from.</para>
+                <para>When not in interactive mode, the first definition found will be used.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-l, --list</listItemTerm>
+              <listItemDefinition>
+                <para>Treat input (stdin or arguments) as lists of filenames of data modules to find or markup acronyms in, rather than data modules themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-M, --acronym-list &lt;list&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Like the -m option, but use a custom list of acronyms instead of the default <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-m, --markup</listItemTerm>
+              <listItemDefinition>
+                <para>Instead of listing acronyms in the specified data modules, automatically markup acronyms in the data module using the <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-n, --width &lt;#&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Minimum number of spaces after the term in pretty-printed text output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-o, --out &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Output to &lt;file&gt; instead of stdout.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-P, --preformat</listItemTerm>
+              <listItemDefinition>
+                <para>Remove acronym markup by preformatting it. The element <verbatimText verbatimStyle="vs12">&lt;acronym&gt;</verbatimText> is flattened to the definition, followed by the term in brackets [()]. The element <verbatimText verbatimStyle="vs12">&lt;acronymTerm&gt;</verbatimText> is flattened to the term.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-p, --pretty</listItemTerm>
+              <listItemDefinition>
+                <para>Pretty print text/XML acronym list output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-q, --quiet</listItemTerm>
+              <listItemDefinition>
+                <para>Quiet mode. Errors are not printed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-T, --types &lt;types&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Only search for acronyms with an attribute <verbatimText verbatimStyle="vs13">acronymType</verbatimText> whose value is contained within the string &lt;types&gt;.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-t, --table</listItemTerm>
+              <listItemDefinition>
+                <para>Format XML output as an S1000D <verbatimText verbatimStyle="vs12">&lt;table&gt;</verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-v, --verbose</listItemTerm>
+              <listItemDefinition>
+                <para>Verbose output.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-X, --select &lt;xpath&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>When marking up acronyms with -m/-M, use a custom XPath expression to specify which text nodes to search for acronyms in. By default, this is all text nodes in any element where acronyms are allowed. This must be the path to the text() nodes, not the elements, e.g. <verbatimText>//para/text()</verbatimText> and not simply <verbatimText>//para</verbatimText>.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-x, --xml</listItemTerm>
+              <listItemDefinition>
+                <para>Use XML output instead of plain text.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-!, --defer-choice</listItemTerm>
+              <listItemDefinition>
+                <para>Mark where acronyms are found using a <verbatimText verbatimStyle="vs12">&lt;chooseAcronym&gt;</verbatimText> element, whose child elements are all possible acronyms matching the term. Another program can then use this as input to actually prompt the user.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>-^, --remove-deleted</listItemTerm>
+              <listItemDefinition>
+                <para>List acronyms with elements that have a change type of "delete" removed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--version</listItemTerm>
+              <listItemDefinition>
+                <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>&lt;dmodule&gt;...</listItemTerm>
+              <listItemDefinition>
+                <para>Data modules to find acronyms in. If none are specified, input is taken from stdin.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
+        <para>
+          <definitionList>
+            <definitionListItem>
+              <listItemTerm>--dtdload</listItemTerm>
+              <listItemDefinition>
+                <para>Load the external DTD.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--huge</listItemTerm>
+              <listItemDefinition>
+                <para>Remove any internal arbitrary parser limits.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--net</listItemTerm>
+              <listItemDefinition>
+                <para>Allow network access to load external DTD and entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--noent</listItemTerm>
+              <listItemDefinition>
+                <para>Resolve entities.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Emit errors from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--parser-warnings</listItemTerm>
+              <listItemDefinition>
+                <para>Emit warnings from parser.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>--xinclude</listItemTerm>
+              <listItemDefinition>
+                <para>Do XInclude processing.</para>
+              </listItemDefinition>
+            </definitionListItem>
+          </definitionList>
+        </para>
+        <levelledPara>
+          <title><verbatimText verbatimStyle="vs02">.acronyms</verbatimText> file</title>
+          <para>This file specifies a list of acronyms for a project. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.acronyms</verbatimText> in the current directory and parent directories, but any file can be specified using the -M option.</para>
+          <para>Example of .acronyms file format:</para>
+          <para>
+            <verbatimText verbatimStyle="vs11"><![CDATA[<acronyms>
+<acronym acronymType="at01">
+<acronymTerm>BREX</acronymTerm>
+<acronymDefinition>Business Rules Exchange</acronymDefinition>
+</acronym>
+<acronym acronymType="at01">
+<acronymTerm>SNS</acronymTerm>
+<acronymDefinition>Standard Numbering System</acronymDefinition>
+</acronym>
+</acronyms>]]></verbatimText>
+          </para>
+        </levelledPara>
+      </levelledPara>
+      <levelledPara>
+        <title>EXAMPLES</title>
+        <para>List all acronyms used in all data modules:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms DMC-*.XML</verbatimText>
+        </para>
+        <para>Markup predefined acronyms in a data module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms -mf DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+        </para>
+        <para>Unmarkup acronyms in a data module:</para>
+        <para>
+          <verbatimText verbatimStyle="vs24">$ s1kd-acronyms -Df DMC-EX-A-00-00-00-00A-040A-D_EN-CA.XML</verbatimText>
+        </para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>
