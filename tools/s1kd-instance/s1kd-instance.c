@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.4.4"
+#define VERSION "9.5.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -133,17 +133,14 @@ struct ident {
 	char *imfIdentIcn;
 };
 
-/* User-defined applicability */
-static xmlNodePtr applicability;
-
-/* Number of user-defined applicability definitions. */
-static int napplics = 0;
-
 /* Assume objects were created with -N. */
 static bool no_issue = false;
 
 /* Verbosity level */
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
+
+/* Method for listing properties. */
+enum listprops { STANDALONE, APPLIC, ALL };
 
 /* Determine whether an applicability definition may be modified.
  * User-definitions may only be modified by other user-definitions.
@@ -155,7 +152,7 @@ static bool allow_def_modify(bool userdefined, const xmlChar *attr)
 }
 
 /* Define a value for a product attribute or condition. */
-static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm, bool userdefined)
+static void define_applic(xmlNodePtr defs, int *napplics, const xmlChar *ident, const xmlChar *type, const xmlChar *value, bool perdm, bool userdefined)
 {
 	xmlNodePtr assert = NULL;
 	xmlNodePtr cur;
@@ -165,7 +162,7 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 	}
 
 	/* Check if an assert has already been created for this property. */
-	for (cur = applicability->children; cur; cur = cur->next) {
+	for (cur = defs->children; cur; cur = cur->next) {
 		xmlChar *cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
 		xmlChar *cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
 
@@ -179,14 +176,14 @@ static void define_applic(const xmlChar *ident, const xmlChar *type, const xmlCh
 
 	/* If no assert exists, add a new one. */
 	if (!assert) {
-		assert = xmlNewChild(applicability, NULL, BAD_CAST "assert", NULL);
+		assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
 		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", ident);
 		xmlSetProp(assert, BAD_CAST "applicPropertyType",  type);
 		xmlSetProp(assert, BAD_CAST "applicPropertyValues", value);
 		xmlSetProp(assert, BAD_CAST "userDefined", BAD_CAST (userdefined ? "true" : "false"));
 
 		if (userdefined) {
-			++napplics;
+			++(*napplics);
 		}
 	/* Or, if an assert already exists... */
 	} else {
@@ -1465,7 +1462,7 @@ static xmlNodePtr create_or(xmlChar *ident, xmlChar *type, xmlNodePtr values, en
 }
 
 /* Set the applicability for the whole data module instance */
-static void set_applic(xmlDocPtr doc, char *new_text, bool combine)
+static void set_applic(xmlDocPtr doc, xmlNodePtr defs, int napplics, char *new_text, bool combine)
 {
 	xmlNodePtr new_applic, new_displayText, new_simplePara, new_evaluate, cur, applic;
 	enum issue iss;
@@ -1509,7 +1506,7 @@ static void set_applic(xmlDocPtr doc, char *new_text, bool combine)
 		new_evaluate = new_applic;
 	}
 
-	for (cur = applicability->children; cur; cur = cur->next) {
+	for (cur = defs->children; cur; cur = cur->next) {
 		xmlChar *user_def;
 
 		user_def = xmlGetProp(cur, BAD_CAST "userDefined");
@@ -2204,7 +2201,7 @@ static bool check_wholedm_applic(xmlDocPtr dm, xmlNodePtr defs)
 /* Read applicability definitions from the <assign> elements of a
  * product instance in the specified PCT data module.\
  */
-static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char *product)
+static void load_applic_from_pct(xmlNodePtr defs, int *napplics, xmlDocPtr pct, const char *pctfname, const char *product)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2256,7 +2253,7 @@ static void load_applic_from_pct(xmlDocPtr pct, const char *pctfname, const char
 			value = xmlGetProp(obj->nodesetval->nodeTab[i],
 				BAD_CAST "applicPropertyValue");
 
-			define_applic(ident, type, value, true, true);
+			define_applic(defs, napplics, ident, type, value, true, true);
 
 			xmlFree(ident);
 			xmlFree(type);
@@ -2346,7 +2343,7 @@ static void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 }
 
 /* Read an applicability assign in the form of ident:type=value */
-static void read_applic(char *s)
+static void read_applic(xmlNodePtr defs, int *napplics, char *s)
 {
 	char *ident, *type, *value;
 
@@ -2361,7 +2358,7 @@ static void read_applic(char *s)
 	type  = strtok(NULL, "=");
 	value = strtok(NULL, "");
 
-	define_applic(BAD_CAST ident, BAD_CAST type, BAD_CAST value, false, true);
+	define_applic(defs, napplics, BAD_CAST ident, BAD_CAST type, BAD_CAST value, false, true);
 }
 
 /* Set the remarks for the object */
@@ -2738,17 +2735,17 @@ static bool find_pct_fname(char *dst, xmlDocPtr act)
 }
 
 /* Unset all applicability assigned on a per-DM basis. */
-static void clear_perdm_applic(void)
+static void clear_perdm_applic(xmlNodePtr defs, int *napplics)
 {
 	xmlNodePtr cur;
-	cur = applicability->children;
+	cur = defs->children;
 	while (cur) {
 		xmlNodePtr next;
 		next = cur->next;
 		if (xmlHasProp(cur, BAD_CAST "perDm")) {
 			xmlUnlinkNode(cur);
 			xmlFreeNode(cur);
-			--napplics;
+			--(*napplics);
 		}
 		cur = next;
 	}
@@ -2815,7 +2812,7 @@ static int find_source(char *src, xmlDocPtr *doc)
 	return !found;
 }
 
-static void load_applic_from_inst(xmlDocPtr doc)
+static void load_applic_from_inst(xmlNodePtr defs, xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2834,7 +2831,7 @@ static void load_applic_from_inst(xmlDocPtr doc)
 			value = first_xpath_value(doc, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyValues");
 
 			/* userdefined = false so that user-defined assertions override those in the instance. */
-			define_applic(ident, type, value, true, false);
+			define_applic(defs, NULL, ident, type, value, true, false);
 
 			xmlFree(ident);
 			xmlFree(type);
@@ -3291,11 +3288,12 @@ static void resolve_containers(xmlDocPtr doc, xmlNodePtr defs)
 	xmlXPathFreeContext(ctx);
 }
 
-static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, const xmlChar *type, xmlNodePtr p)
+static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, const xmlChar *type, xmlNodePtr p, xmlNodePtr defs)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	xmlNodePtr property = NULL;
+	xmlNodePtr prop_desc = NULL;
+	xmlNodePtr prop_vals = NULL;
 
 	if (act && xmlStrcmp(type, BAD_CAST "prodattr") == 0) {
 		ctx = xmlXPathNewContext(act);
@@ -3303,7 +3301,8 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 		obj = xmlXPathEvalExpression(BAD_CAST "//productAttribute[@id=$id]|//prodattr[@id=$id]", ctx);
 
 		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			property = obj->nodesetval->nodeTab[0];
+			prop_desc = obj->nodesetval->nodeTab[0];
+			prop_vals = prop_desc;
 		}
 	} else if (cct && xmlStrcmp(type, BAD_CAST "condition") == 0) {
 		xmlChar *condtype;
@@ -3317,6 +3316,8 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 			return;
 		}
 
+		prop_desc = obj->nodesetval->nodeTab[0]->parent;
+
 		condtype = xmlNodeGetContent(obj->nodesetval->nodeTab[0]);
 		xmlXPathFreeObject(obj);
 		xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(condtype));
@@ -3325,7 +3326,7 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 		obj = xmlXPathEvalExpression(BAD_CAST "//condType[@id=$id]|//conditiontype[@id=$id]", ctx);
 
 		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			property = obj->nodesetval->nodeTab[0];
+			prop_vals = obj->nodesetval->nodeTab[0];
 		}
 	} else {
 		fprintf(stderr, S_NO_CT, (char *) id, (char *) type, xmlStrcmp(type, BAD_CAST "prodattr") == 0 ? "ACT" : "CCT");
@@ -3334,31 +3335,31 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 
 	xmlXPathFreeObject(obj);
 
-	if (property) {
+	if (prop_desc && prop_vals) {
 		xmlChar *s;
 
 		/* Copy information about the property from ACT/CCT. */
-		if ((s = first_xpath_value(NULL, property, BAD_CAST "@valuePattern|@pattern"))) {
+		if ((s = first_xpath_value(NULL, prop_vals, BAD_CAST "@valuePattern|@pattern"))) {
 			xmlSetProp(p, BAD_CAST "pattern", s);
 			xmlFree(s);
 		}
 
-		if ((s = first_xpath_value(NULL, property, BAD_CAST "name"))) {
+		if ((s = first_xpath_value(NULL, prop_desc, BAD_CAST "name"))) {
 			xmlNewTextChild(p, p->ns, BAD_CAST "name", s);
 			xmlFree(s);
 		}
 
-		if ((s = first_xpath_value(NULL, property, BAD_CAST "descr|description"))) {
+		if ((s = first_xpath_value(NULL, prop_desc, BAD_CAST "descr|description"))) {
 			xmlNewTextChild(p, p->ns, BAD_CAST "descr", s);
 			xmlFree(s);
 		}
 
-		if ((s = first_xpath_value(NULL, property, BAD_CAST "displayName|displayname"))) {
+		if ((s = first_xpath_value(NULL, prop_desc, BAD_CAST "displayName|displayname"))) {
 			xmlNewTextChild(p, p->ns, BAD_CAST "displayName", s);
 			xmlFree(s);
 		}
 
-		xmlXPathSetContextNode(property, ctx);
+		xmlXPathSetContextNode(prop_vals, ctx);
 
 		obj = xmlXPathEvalExpression(BAD_CAST "enumeration|enum", ctx);
 
@@ -3382,6 +3383,10 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 						cv = xmlNodeGetContent(cur);
 						add = xmlStrcmp(c, cv) != 0;
 						xmlFree(cv);
+					}
+
+					if (defs) {
+						add &= is_applic(defs, (char *) id, (char *) type, (char *) c, true);
 					}
 
 					if (add) {
@@ -3409,7 +3414,7 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 }
 
 /* Add a property used in an object to the properties report. */
-static void add_prop(xmlNodePtr object, xmlNodePtr assert, bool all, xmlDocPtr act, xmlDocPtr cct)
+static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listprops, xmlDocPtr act, xmlDocPtr cct)
 {
 	xmlChar *i, *t;
 	xmlNodePtr p = NULL, cur;
@@ -3436,12 +3441,21 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert, bool all, xmlDocPtr a
 		xmlSetProp(p, BAD_CAST "id", i);
 		xmlSetProp(p, BAD_CAST "type", t);
 
-		if (all) {
-			add_ct_prop_vals(act, cct, i, t, p);
+		if (listprops == ALL) {
+			add_ct_prop_vals(act, cct, i, t, p, NULL);
+		} else if (listprops == APPLIC) {
+			xmlNodePtr defs;
+
+			defs = xmlNewNode(NULL, BAD_CAST "applic");
+			load_applic_from_inst(defs, assert->doc);
+
+			add_ct_prop_vals(act, cct, i, t, p, defs);
+
+			xmlFreeNode(defs);
 		}
 	}
 
-	if (!all) {
+	if (listprops == STANDALONE) {
 		xmlChar *v, *c = NULL;
 
 		v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
@@ -3473,7 +3487,7 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert, bool all, xmlDocPtr a
 }
 
 /* Add the properties used in an object to the properties report. */
-static void add_props(xmlNodePtr report, const char *path, bool all, const char *useract, const char *usercct)
+static void add_props(xmlNodePtr report, const char *path, enum listprops listprops, const char *useract, const char *usercct)
 {
 	xmlDocPtr doc, act = NULL, cct = NULL;
 	xmlXPathContextPtr ctx;
@@ -3484,7 +3498,7 @@ static void add_props(xmlNodePtr report, const char *path, bool all, const char 
 		return;
 	}
 
-	if (all) {
+	if (listprops != STANDALONE) {
 		char fname[PATH_MAX];
 
 		if (useract) {
@@ -3528,7 +3542,7 @@ static void add_props(xmlNodePtr report, const char *path, bool all, const char 
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			add_prop(object, obj->nodesetval->nodeTab[i], all, act, cct);
+			add_prop(object, obj->nodesetval->nodeTab[i], listprops, act, cct);
 		}
 	}
 
@@ -3541,7 +3555,7 @@ static void add_props(xmlNodePtr report, const char *path, bool all, const char 
 }
 
 /* Add the properties used in objects in a list to the properties report. */
-static void add_props_list(xmlNodePtr report, const char *fname, bool all, const char *useract, const char *usercct)
+static void add_props_list(xmlNodePtr report, const char *fname, enum listprops listprops, const char *useract, const char *usercct)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -3559,7 +3573,7 @@ static void add_props_list(xmlNodePtr report, const char *fname, bool all, const
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		add_props(report, path, all, useract, usercct);
+		add_props(report, path, listprops, useract, usercct);
 	}
 
 	if (fname) {
@@ -4038,6 +4052,12 @@ int main(int argc, char **argv)
 
 	int i, c;
 
+	/* User-defined applicability */
+	xmlNodePtr applicability;
+
+	/* Number of user-defined applicability definitions. */
+	int napplics = 0;
+
 	char code[256] = "";
 	char out[PATH_MAX] = "-";
 	bool clean = false;
@@ -4106,7 +4126,7 @@ int main(int argc, char **argv)
 	xmlDocPtr def_cir_xsl = NULL;
 
 	xmlDocPtr props_report = NULL;
-	bool all_props = false;
+	enum listprops listprops = STANDALONE;
 
 	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4567890~H:^";
 	struct option lopts[] = {
@@ -4315,7 +4335,7 @@ int main(int argc, char **argv)
 				add_source_ident = false;
 				break;
 			case 's':
-				read_applic(optarg);
+				read_applic(applicability, &napplics, optarg);
 				break;
 			case 'T':
 				tag_non_applic = true;
@@ -4407,7 +4427,9 @@ int main(int argc, char **argv)
 					props_report = xmlNewDoc(BAD_CAST "1.0");
 
 					if (strcmp(optarg, "all") == 0) {
-						all_props = true;
+						listprops = ALL;
+					} else if (strcmp(optarg, "applic") == 0) {
+						listprops = APPLIC;
 					}
 				}
 				break;
@@ -4433,15 +4455,15 @@ int main(int argc, char **argv)
 
 			for (i = optind; i < argc; ++i) {
 				if (dmlist) {
-					add_props_list(properties, argv[i], all_props, useract, usercct);
+					add_props_list(properties, argv[i], listprops, useract, usercct);
 				} else {
-					add_props(properties, argv[i], all_props, useract, usercct);
+					add_props(properties, argv[i], listprops, useract, usercct);
 				}
 			}
 		} else if (dmlist) {
-			add_props_list(properties, NULL, all_props, useract, usercct);
+			add_props_list(properties, NULL, listprops, useract, usercct);
 		} else {
-			add_props(properties, "-", all_props, useract, usercct);
+			add_props(properties, "-", listprops, useract, usercct);
 		}
 
 		transform_doc(props_report, xsl_sort_props_xsl, xsl_sort_props_xsl_len, NULL);
@@ -4523,7 +4545,7 @@ int main(int argc, char **argv)
 		/* If a PCT filename is specified with -P, use that for all data
 		 * modules and ignore their individual ACT->PCT refs. */
 		if (pct) {
-			load_applic_from_pct(pct, userpct, product);
+			load_applic_from_pct(applicability, &napplics, pct, userpct, product);
 		/* Otherwise the PCT must be loaded separately for each data
 		 * module, since they may reference different ones. */
 		} else {
@@ -4622,7 +4644,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, I_UPDATE_INST, inst_src, src);
 			}
 
-			load_applic_from_inst(inst);
+			load_applic_from_inst(applicability, inst);
 			load_skill_from_inst(inst, &skill_codes);
 			load_sec_from_inst(inst, &sec_classes);
 			load_metadata_from_inst(inst,
@@ -4687,7 +4709,7 @@ int main(int argc, char **argv)
 				char fname[PATH_MAX];
 				if (find_pct_fname(fname, act)) {
 					if ((pct = read_xml_doc(fname))) {
-						load_applic_from_pct(pct, fname, product);
+						load_applic_from_pct(applicability, &napplics, pct, fname, product);
 						xmlFreeDoc(pct);
 					}
 				}
@@ -4699,7 +4721,7 @@ int main(int argc, char **argv)
 			}
 
 			if (re_applic) {
-				load_applic_from_inst(doc);
+				load_applic_from_inst(applicability, doc);
 			}
 
 			if (!wholedm || create_instance(doc, applicability, skill_codes, sec_classes, delete)) {
@@ -4832,7 +4854,7 @@ int main(int argc, char **argv)
 						simpl_whole_applic(applicability, doc, remtrue);
 					}
 
-					set_applic(doc, new_display_text, combine_applic);
+					set_applic(doc, applicability, napplics, new_display_text, combine_applic);
 				}
 
 				if (strcmp(issinfo, "") != 0) {
@@ -4928,7 +4950,7 @@ int main(int argc, char **argv)
 			 * assigns must be cleared. Those directly set with -s will
 			 * carry over. */
 			if (load_applic_per_dm) {
-				clear_perdm_applic();
+				clear_perdm_applic(applicability, &napplics);
 			}
 
 			xmlFreeDoc(doc);

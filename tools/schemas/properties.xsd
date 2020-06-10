@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:element name="properties" type="propertiesElemType"/>
+  <xs:complexType name="propertiesElemType">
+    <xs:sequence>
+      <xs:element ref="object" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="object" type="objectElemType"/>
+  <xs:complexType name="objectElemType">
+    <xs:sequence>
+      <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute ref="path"/>
+  </xs:complexType>
+  <xs:attribute name="path" type="xs:string"/>
+  <xs:element name="property" type="propertyElemType"/>
+  <xs:complexType name="propertyElemType">
+    <xs:sequence>
+      <xs:element ref="name"/>
+      <xs:element ref="descr"/>
+      <xs:element ref="value" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute ref="id"/>
+    <xs:attribute ref="type"/>
+  </xs:complexType>
+  <xs:attribute name="id" type="xs:NCName"/>
+  <xs:attribute name="type" type="typeAttType"/>
+  <xs:simpleType name="typeAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="condition"/>
+      <xs:enumeration value="prodattr"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="name" type="xs:string"/>
+  <xs:element name="descr" type="xs:string"/>
+  <xs:element name="value" type="xs:string"/>
+</xs:schema>

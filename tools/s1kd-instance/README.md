@@ -146,6 +146,9 @@ in the report:
 -   "standalone" - Only include the values that are explicitly used in
     the object.
 
+-   "applic" - Only include the values, as defined in the ACT and CCT,
+    that are within the applicability of the object.
+
 -   "all" - Include all values as defined in the ACT and CCT.
 
 -h, -?, --help  
