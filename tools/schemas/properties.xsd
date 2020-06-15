@@ -21,13 +21,13 @@
       <xs:element ref="descr"/>
       <xs:element ref="value" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute ref="id"/>
-    <xs:attribute ref="type"/>
+    <xs:attribute ref="ident" use="required"/>
+    <xs:attribute ref="type" use="required"/>
   </xs:complexType>
-  <xs:attribute name="id" type="xs:NCName"/>
+  <xs:attribute name="ident" type="xs:NCName"/>
   <xs:attribute name="type" type="typeAttType"/>
   <xs:simpleType name="typeAttType">
-    <xs:restriction base="xs:string">
+    <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="condition"/>
       <xs:enumeration value="prodattr"/>
     </xs:restriction>

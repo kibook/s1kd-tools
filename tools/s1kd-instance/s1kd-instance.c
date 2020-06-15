@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "9.5.1"
+#define VERSION "10.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3438,7 +3438,7 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listpr
 
 	if (!p) {
 		p = xmlNewChild(object, NULL, BAD_CAST "property", NULL);
-		xmlSetProp(p, BAD_CAST "id", i);
+		xmlSetProp(p, BAD_CAST "ident", i);
 		xmlSetProp(p, BAD_CAST "type", t);
 
 		if (listprops == ALL) {
