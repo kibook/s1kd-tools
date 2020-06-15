@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "10.0.0"
+#define VERSION "10.0.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3425,7 +3425,7 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listpr
 	for (cur = object->children; cur && !p; cur = cur->next) {
 		xmlChar *ci, *ct;
 
-		ci = first_xpath_value(NULL, cur, BAD_CAST "@id");
+		ci = first_xpath_value(NULL, cur, BAD_CAST "@ident");
 		ct = first_xpath_value(NULL, cur, BAD_CAST "@type");
 
 		if (xmlStrcmp(i, ci) == 0 && xmlStrcmp(t, ct) == 0) {
