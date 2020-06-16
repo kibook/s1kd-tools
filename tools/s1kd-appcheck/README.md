@@ -111,6 +111,9 @@ Display a progress bar.
 -q, --quiet  
 Quiet mode. Error messages will not be printed.
 
+-R, --redundant  
+Check for redundant annotations.
+
 -r, --recursive  
 Search for the ACT/CCT/PCT recursively.
 
@@ -427,3 +430,33 @@ object:
     s1kd-appcheck: ERROR: <DM>: proceduralStep on line 62 is applicable
     when prodattr version = C, which is not a subset of the applicability
     of the whole object.
+
+Redundant applicability annotations
+-----------------------------------
+
+Consider the following data module snippet:
+
+    <proceduralStep applicRefId="app-A">
+    <para>Step A</para>
+    <figure applicRefId="app-A">
+    ...
+    </figure>
+    </proceduralStep>
+
+This is technically correct, but the annotation on the figure can be
+considered redundant, since it has the same applicability as its
+ancestor, and the applicability of an element is already inherited by
+all its descendants automatically.
+
+The -R (--redundant) option will report when the applicability of a
+nested element is redundant:
+
+    $ s1kd-appcheck -R <DM>
+    s1kd-appcheck: ERROR: <DM>: figure on line 85 has the same
+    applicability as its parent proceduralStep on line 83 (app-A)
+
+> **Note**
+>
+> Currently, this check only detects when the exact same annotation
+> (with the same ID) is nested within itself. In the future, this should
+> also detect redundant logic between different nested annotations.

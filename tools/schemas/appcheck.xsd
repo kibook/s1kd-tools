@@ -8,6 +8,7 @@
     <xs:attribute name="type" type="appCheckAttType"/>
     <xs:attribute name="strict" type="yesNoAttType"/>
     <xs:attribute name="checkNestedApplic" type="yesNoAttType"/>
+    <xs:attribute name="checkRedundantApplic" type="yesNoAttType"/>
   </xs:complexType>
   <xs:simpleType name="appCheckAttType">
     <xs:restriction base="xs:string">
@@ -26,11 +27,66 @@
   <xs:element name="object" type="objectElemType"/>
   <xs:complexType name="objectElemType">
     <xs:sequence>
+      <xs:element ref="act" minOccurs="0"/>
+      <xs:element ref="cct" minOccurs="0"/>
+      <xs:element ref="undefined" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="nestedApplicError"/>
+        <xs:element ref="redundantApplicError"/>
+      </xs:choice>
       <xs:element ref="asserts" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="path" type="xs:string"/>
     <xs:attribute name="valid" type="yesNoAttType"/>
   </xs:complexType>
+  <xs:element name="act" type="ctElemType"/>
+  <xs:element name="cct" type="ctElemType"/>
+  <xs:complexType name="ctElemType">
+    <xs:attribute name="path" type="xs:string"/>
+  </xs:complexType>
+  <xs:element name="undefined" type="undefinedElemType"/>
+  <xs:complexType name="undefinedElemType">
+    <xs:attribute ref="applicPropertyIdent" use="required"/>
+    <xs:attribute ref="applicPropertyType" use="required"/>
+    <xs:attribute ref="applicPropertyValue"/>
+    <xs:attribute ref="line" use="required"/>
+    <xs:attribute ref="xpath" use="required"/>
+  </xs:complexType>
+  <xs:element name="nestedApplicError" type="nestedApplicErrorElemType"/>
+  <xs:complexType name="nestedApplicErrorElemType">
+    <xs:attribute ref="applicPropertyIdent" use="required"/>
+    <xs:attribute ref="applicPropertyType" use="required"/>
+    <xs:attribute ref="applicPropertyValue" use="required"/>
+    <xs:attribute ref="line" use="required"/>
+    <xs:attribute ref="xpath" use="required"/>
+    <xs:attribute ref="parentLine"/>
+    <xs:attribute ref="parentXpath"/>
+  </xs:complexType>
+  <xs:element name="redundantApplicError" type="redundantApplicErrorElemType"/>
+  <xs:complexType name="redundantApplicErrorElemType">
+    <xs:attribute ref="line" use="required"/>
+    <xs:attribute ref="xpath" use="required"/>
+    <xs:attribute ref="parentLine"/>
+    <xs:attribute ref="parentXpath"/>
+  </xs:complexType>
+  <xs:attribute name="applicPropertyIdent" type="xs:NCName"/>
+  <xs:attribute name="applicPropertyType" type="applicPropertyTypeAttType"/>
+  <xs:simpleType name="applicPropertyTypeAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="condition"/>
+      <xs:enumeration value="prodattr"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="applicPropertyValue" type="applicPropertyValueAttType"/>
+  <xs:simpleType name="applicPropertyValueAttType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^|~]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attribute name="line" type="xs:positiveInteger"/>
+  <xs:attribute name="xpath" type="xs:string"/>
+  <xs:attribute name="parentLine" type="xs:positiveInteger"/>
+  <xs:attribute name="parentXpath" type="xs:string"/>
   <xs:element name="asserts" type="assertsElemType"/>
   <xs:complexType name="assertsElemType">
     <xs:sequence>
@@ -40,14 +96,8 @@
   </xs:complexType>
   <xs:element name="assign" type="assignElemType"/>
   <xs:complexType name="assignElemType">
-    <xs:attribute name="applicPropertyIdent" type="xs:string"/>
-    <xs:attribute name="applicPropertyType" type="applicPropertyTypeAttType"/>
-    <xs:attribute name="applicPropertyValue" type="xs:string"/>
+    <xs:attribute ref="applicPropertyIdent"/>
+    <xs:attribute ref="applicPropertyType"/>
+    <xs:attribute ref="applicPropertyValue"/>
   </xs:complexType>
-  <xs:simpleType name="applicPropertyTypeAttType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="condition"/>
-      <xs:enumeration value="prodattr"/>
-    </xs:restriction>
-  </xs:simpleType>
 </xs:schema>
