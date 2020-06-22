@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "10.0.1"
+#define VERSION "10.0.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1816,7 +1816,7 @@ static void undepend_cir_xsl(xmlDocPtr dm, xmlDocPtr cir, xsltStylesheetPtr styl
 
 	res = xsltApplyStylesheet(style, muxdoc, NULL);
 
-	old = xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, BAD_CAST "/mux/dmodule[1]"), 1));
+	old = xmlDocSetRootElement(dm, xmlCopyNode(first_xpath_node(res, NULL, BAD_CAST "/mux/*[1]"), 1));
 	xmlFreeNode(old);
 
 	xmlFreeDoc(res);
