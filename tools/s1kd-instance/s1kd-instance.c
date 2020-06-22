@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "10.0.2"
+#define VERSION "10.0.3"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3536,7 +3536,14 @@ static void add_props(xmlNodePtr report, const char *path, enum listprops listpr
 	xmlSetProp(object, BAD_CAST "path", BAD_CAST path);
 
 	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST "(//content|//inlineapplics)//assert", ctx);
+
+	/* Use assertions from the whole object applic in standalone mode. */
+	if (listprops == STANDALONE) {
+		obj = xmlXPathEvalExpression(BAD_CAST "//assert", ctx);
+	/* Otherwise, only use assertions from inline annotations. */
+	} else {
+		obj = xmlXPathEvalExpression(BAD_CAST "(//content|//inlineapplics)//assert", ctx);
+	}
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
