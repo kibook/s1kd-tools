@@ -150,9 +150,9 @@
   <xs:complexType name="errorElemType">
     <xs:sequence>
       <xs:element ref="type" minOccurs="0"/>
-      <xs:element ref="brDecisionRef"/>
+      <xs:element ref="brDecisionRef" minOccurs="0"/>
       <xs:element ref="objectPath"/>
-      <xs:element ref="objectUse"/>
+      <xs:element ref="objectUse" minOccurs="0"/>
       <xs:element ref="objectValue" minOccurs="0"/>
       <xs:element ref="object" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
@@ -180,10 +180,45 @@
   <xs:element name="document" type="documentElemType"/>
   <xs:complexType name="documentElemType">
     <xs:sequence>
+      <xs:element ref="sns" minOccurs="0"/>
+      <xs:element ref="notations" minOccurs="0"/>
       <xs:element ref="brex" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute ref="path" use="required"/>
   </xs:complexType>
+  <xs:element name="sns" type="snsElemType"/>
+  <xs:complexType name="snsElemType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="noErrors"/>
+        <xs:element name="error" type="snsErrorElemType" maxOccurs="unbounded"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="snsErrorElemType">
+    <xs:sequence>
+      <xs:element ref="code"/>
+      <xs:element ref="invalidValue"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="code" type="xs:string"/>
+  <xs:element name="invalidValue" type="xs:string"/>
+  <xs:element name="notations" type="notationsElemType"/>
+  <xs:complexType name="notationsElemType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="noErrors"/>
+        <xs:element name="error" type="notationErrorElemType" maxOccurs="unbounded"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="notationErrorElemType">
+    <xs:sequence>
+      <xs:element ref="invalidNotation"/>
+      <xs:element ref="objectUse" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="invalidNotation" type="xs:string"/>
   <xs:element name="brexCheck" type="brexCheckElemType"/>
   <xs:complexType name="brexCheckElemType">
     <xs:sequence>
@@ -191,7 +226,15 @@
     </xs:sequence>
     <xs:attribute name="layered" type="yesNoAttType"/>
     <xs:attribute name="checkObjectValues" type="yesNoAttType"/>
-    <xs:attribute name="snsCheck" type="yesNoAttType"/>
+    <xs:attribute name="snsCheck" type="snsCheckAttType"/>
     <xs:attribute name="notationCheck" type="yesNoAttType"/>
   </xs:complexType>
+  <xs:simpleType name="snsCheckAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="no"/>
+      <xs:enumeration value="normal"/>
+      <xs:enumeration value="strict"/>
+      <xs:enumeration value="unstrict"/>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>
