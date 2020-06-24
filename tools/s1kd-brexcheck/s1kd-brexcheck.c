@@ -22,10 +22,8 @@
 	"//contextrules[not(@context) or @context='%s']//objrule"
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
-#define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
-
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.0.0"
+#define VERSION "4.0.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -647,18 +645,27 @@ static void print_node(xmlNodePtr node)
 	}
 }
 
+/* Register all namespaces applicable to a node in a new XPath context. */
+static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
+{
+	xmlNodePtr cur;
+	for (cur = node; cur; cur = cur->parent) {
+		if (cur->nsDef) {
+			xmlNsPtr cur_ns;
+			for (cur_ns = cur->nsDef; cur_ns; cur_ns = cur_ns->next) {
+				xmlXPathRegisterNs(ctx, cur_ns->prefix, cur_ns->href);
+			}
+		}
+	}
+}
+
 /* Check the context rules of a BREX DM against a CSDB object. */
 static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
 	const char *brexfname, xmlNodePtr documentNode, struct opts *opts)
 {
-	xmlXPathContextPtr context;
-	xmlXPathObjectPtr object;
 	xmlChar *defaultBrSeverityLevel;
 	int nerr = 0;
 	xmlNodePtr brexNode;
-
-	context = xmlXPathNewContext(doc);
-	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
 
 	defaultBrSeverityLevel = xmlGetProp(firstXPathNode(brex_doc, NULL, "//brex"), BAD_CAST "defaultBrSeverityLevel");
 
@@ -669,6 +676,8 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 		int i;
 
 		for (i = 0; i < rules->nodeNr; ++i) {
+			xmlXPathContextPtr context;
+			xmlXPathObjectPtr object;
 			xmlNodePtr brDecisionRef, objectPath, objectUse;
 			xmlChar *allowedObjectFlag, *path, *use, *brdp;
 
@@ -680,6 +689,9 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			allowedObjectFlag = firstXPathValue(objectPath, "@allowedObjectFlag|@objappl");
 			path = xmlNodeGetContent(objectPath);
 			use  = xmlNodeGetContent(objectUse);
+
+			context = xmlXPathNewContext(doc);
+			register_namespaces(context, objectPath);
 
 			object = xmlXPathEvalExpression(path, context);
 
@@ -763,6 +775,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			/* FIXME: If the XPath expression was invalid, xmlXPathFreeObject doesn't
 			 *        seem to free everything, so there will be a memory leak. */
 			xmlXPathFreeObject(object);
+			xmlXPathFreeContext(context);
 			xmlFree(brdp);
 			xmlFree(allowedObjectFlag);
 			xmlFree(path);
@@ -775,7 +788,6 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 	}
 
 	xmlFree(defaultBrSeverityLevel);
-	xmlXPathFreeContext(context);
 
 	return nerr;
 }
