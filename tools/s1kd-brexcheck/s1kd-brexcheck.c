@@ -25,7 +25,7 @@
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "3.6.8"
+#define VERSION "4.0.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -34,26 +34,31 @@
 #define S_PREFIX PROG_NAME ": SUCCESS: "
 #define I_PREFIX PROG_NAME ": INFO: "
 
-/* Error message templates. */
+/* Error messages. */
 #define E_NODMOD E_PREFIX "Could not read file \"%s\".\n"
 #define E_NODMOD_STDIN E_PREFIX "stdin does not contain valid XML.\n"
-#define E_INVOBJPATH E_PREFIX "Invalid object path in BREX %s (%ld): %s\n"
 #define E_BAD_LIST E_PREFIX "Could not read list: %s\n"
 #define E_MAXOBJS E_PREFIX "Out of memory\n"
 #define E_NOBREX_LAYER E_PREFIX "No BREX data module found for BREX %s.\n"
 #define E_BREX_NOT_FOUND E_PREFIX "Could not find BREX data module: %s\n"
 #define E_NOBREX E_PREFIX "No BREX data module found for %s.\n"
 #define E_NOBREX_STDIN E_PREFIX "No BREX data module found for object on stdin.\n"
+
+/* Warning messages. */
 #define W_NOBREX W_PREFIX "%s does not reference a BREX data module.\n"
 #define W_NOBREX_STDIN W_PREFIX "Object on stdin does not reference a BREX data module.\n"
+#define W_INVOBJPATH W_PREFIX "Ignoring invalid object path in BREX %s (%ld): %s\n"
+
+/* Failure messages. */
 #define F_INVALIDDOC F_PREFIX "%s failed to validate against BREX %s.\n"
+
+/* Success messages. */
 #define S_VALIDDOC S_PREFIX "%s validated successfully against BREX %s.\n"
 
 /* Exit status codes. */
 #define EXIT_BREX_ERROR 1
 #define EXIT_BAD_DMODULE 2
 #define EXIT_BREX_NOT_FOUND 3
-#define EXIT_INVALID_OBJ_PATH 4
 #define EXIT_MAX_OBJS 5
 
 /* Initial maximum numbers of CSDB objects/search paths. */
@@ -650,7 +655,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 	xmlXPathObjectPtr object;
 	xmlChar *defaultBrSeverityLevel;
 	int nerr = 0;
-	xmlNodePtr brexNode, brexError;
+	xmlNodePtr brexNode;
 
 	context = xmlXPathNewContext(doc);
 	xmlXPathRegisterNs(context, BAD_CAST "xsi", XSI_URI);
@@ -678,69 +683,85 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 
 			object = xmlXPathEvalExpression(path, context);
 
-			if (!object) {
-				if (opts->verbosity > SILENT) {
-					fprintf(stderr, E_INVOBJPATH, brexfname, xmlGetLineNo(objectPath), path);
-				}
+			if (object != NULL) {
+				if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object, opts)) {
+					xmlChar *severity;
+					xmlNodePtr brexError, err_path;
 
-				exit(EXIT_INVALID_OBJ_PATH);
-			}
-
-			if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object, opts)) {
-				xmlChar *severity;
-				xmlNodePtr err_path;
-
-				if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
-					severity = xmlStrdup(defaultBrSeverityLevel);
-				}
-
-				brexError = xmlNewChild(brexNode, NULL, BAD_CAST "error", NULL);
-
-				if (severity) {
-					xmlSetProp(brexError, BAD_CAST "brSeverityLevel", severity);
-
-					if (brsl_fname) {
-						xmlChar *type = brsl_type(severity);
-						xmlNewChild(brexError, NULL, BAD_CAST "type", type);
-						xmlFree(type);
+					if (!(severity = xmlGetProp(rules->nodeTab[i], BAD_CAST "brSeverityLevel"))) {
+						severity = xmlStrdup(defaultBrSeverityLevel);
 					}
-				} else {
-					xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "yes");
-				}
 
-				if (brDecisionRef) {
-					xmlAddChild(brexError, xmlCopyNode(brDecisionRef, 1));
-				}
+					brexError = xmlNewChild(brexNode, NULL, BAD_CAST "error", NULL);
 
-				err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
-				xmlSetProp(err_path, BAD_CAST "allowedObjectFlag", allowedObjectFlag);
-				xmlNewChild(brexError, NULL, BAD_CAST "objectUse", use);
+					if (severity) {
+						xmlSetProp(brexError, BAD_CAST "brSeverityLevel", severity);
 
-				add_object_values(brexError, rules->nodeTab[i]);
-
-				if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
-					dump_nodes_xml(object->nodesetval, fname,
-						brexError, rules->nodeTab[i],
-						opts);
-				}
-
-				if (severity) {
-					if (is_failure(severity)) {
-						++nerr;
+						if (brsl_fname) {
+							xmlChar *type = brsl_type(severity);
+							xmlNewChild(brexError, NULL, BAD_CAST "type", type);
+							xmlFree(type);
+						}
 					} else {
-						xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "no");
+						xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "yes");
 					}
-				} else {
-					++nerr;
-				}
 
-				xmlFree(severity);
+					if (brDecisionRef) {
+						xmlAddChild(brexError, xmlCopyNode(brDecisionRef, 1));
+					}
+
+					err_path = xmlNewChild(brexError, NULL, BAD_CAST "objectPath", path);
+					xmlSetProp(err_path, BAD_CAST "allowedObjectFlag", allowedObjectFlag);
+					xmlNewChild(brexError, NULL, BAD_CAST "objectUse", use);
+
+					add_object_values(brexError, rules->nodeTab[i]);
+
+					if (!xmlXPathNodeSetIsEmpty(object->nodesetval)) {
+						dump_nodes_xml(object->nodesetval, fname,
+							brexError, rules->nodeTab[i],
+							opts);
+					}
+
+					if (severity) {
+						if (is_failure(severity)) {
+							++nerr;
+						} else {
+							xmlSetProp(brexError, BAD_CAST "fail", BAD_CAST "no");
+						}
+					} else {
+						++nerr;
+					}
+
+					xmlFree(severity);
+
+					if (opts->verbosity > SILENT) {
+						print_node(brexError);
+					}
+				}
+			} else {
+				long int line;
+				xmlChar line_s[16];
+				xmlChar *xpath;
+				xmlNodePtr xpath_err;
+
+				line = xmlGetLineNo(objectPath);
+				xmlStrPrintf(line_s, 16, "%ld", line);
+
+				xpath = xpath_of(objectPath);
+
+				xpath_err = xmlNewChild(brexNode, brexNode->ns, BAD_CAST "xpathError", path);
+				xmlSetProp(xpath_err, BAD_CAST "line", line_s);
+				xmlSetProp(xpath_err, BAD_CAST "xpath", xpath);
+
+				xmlFree(xpath);
 
 				if (opts->verbosity > SILENT) {
-					print_node(brexError);
+					fprintf(stderr, W_INVOBJPATH, brexfname, line, path);
 				}
 			}
 
+			/* FIXME: If the XPath expression was invalid, xmlXPathFreeObject doesn't
+			 *        seem to free everything, so there will be a memory leak. */
 			xmlXPathFreeObject(object);
 			xmlFree(brdp);
 			xmlFree(allowedObjectFlag);

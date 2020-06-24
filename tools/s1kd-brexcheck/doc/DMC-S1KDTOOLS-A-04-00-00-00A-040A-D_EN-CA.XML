@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="037" inWork="01"/>
+        <issueInfo issueNumber="037" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="06" day="01"/>
+        <issueDate year="2020" month="06" day="24"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="status">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissue</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change handling of rules with invalid XPath expressions.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -58,7 +58,10 @@
       </levelledPara>
       <levelledPara>
         <title>DESCRIPTION</title>
-        <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates S1000D CSDB objects using the context, SNS, and/or notation rules of one or multiple <acronym acronymType="at01"><acronymTerm>BREX</acronymTerm><acronymDefinition>Business Rules EXchange</acronymDefinition></acronym> data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.</para>
+        <para>The <emphasis>s1kd-brexcheck</emphasis> tool validates S1000D CSDB objects using the context, SNS, and/or notation rules of one or multiple <acronym acronymType="at01">
+            <acronymTerm>BREX</acronymTerm>
+            <acronymDefinition>Business Rules EXchange</acronymDefinition>
+          </acronym> data modules. All errors are displayed with the &lt;objectUse&gt; message, the line number, and a representation of the invalid XML tree.</para>
       </levelledPara>
       <levelledPara>
         <title>OPTIONS</title>
@@ -164,7 +167,10 @@
             <definitionListItem>
               <listItemTerm>-S[tu], --sns [--strict|--unstrict]</listItemTerm>
               <listItemDefinition>
-                <para>Check <acronym acronymType="at01"><acronymTerm>SNS</acronymTerm><acronymDefinition>Standard Numbering System</acronymDefinition></acronym> rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
+                <para>Check <acronym acronymType="at01">
+                    <acronymTerm>SNS</acronymTerm>
+                    <acronymDefinition>Standard Numbering System</acronymDefinition>
+                  </acronym> rules. The SNS of each specified data module is checked against the combination of all SNS rules of all specified BREX data modules.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -348,11 +354,15 @@
           </para>
           <para>The s1kd-brexcheck tool supports all three types. If the <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute is omitted, it will assume the value is in the <verbatimText verbatimStyle="vs14">"single"</verbatimText> notation.</para>
         </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>XPath support</title>
+          <para>The s1kd-brexcheck tool only supports XPath 1.0 expressions. If the XPath given for the <verbatimText verbatimStyle="vs12">&lt;objectPath&gt;</verbatimText> of a rule is not a valid XPath 1.0 expression, the rule will be ignored when validating objects. A warning will be printed to stderr, and the XML report will contain an <verbatimText verbatimStyle="vs12">&lt;xpathError&gt;</verbatimText> element for each error.</para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXIT STATUS</title>
         <para>
-          <definitionList>
+          <definitionList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
             <definitionListItem>
               <listItemTerm>0</listItemTerm>
               <listItemDefinition>
@@ -375,12 +385,6 @@
               <listItemTerm>3</listItemTerm>
               <listItemDefinition>
                 <para>A referenced BREX data module could not be found.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>4</listItemTerm>
-              <listItemDefinition>
-                <para>An XPath expression given for a BREX rule was invalid.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

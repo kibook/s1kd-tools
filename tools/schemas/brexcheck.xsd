@@ -164,10 +164,18 @@
     <xs:sequence>
       <xs:choice>
         <xs:element name="noErrors"/>
-        <xs:element ref="error" maxOccurs="unbounded"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="error"/>
+          <xs:element ref="xpathError"/>
+        </xs:choice>
       </xs:choice>
     </xs:sequence>
     <xs:attribute ref="path" use="required"/>
+  </xs:complexType>
+  <xs:element name="xpathError" type="xpathErrorElemType"/>
+  <xs:complexType name="xpathErrorElemType" mixed="true">
+    <xs:attribute ref="line" use="required"/>
+    <xs:attribute ref="xpath" use="required"/>
   </xs:complexType>
   <xs:element name="document" type="documentElemType"/>
   <xs:complexType name="documentElemType">

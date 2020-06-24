@@ -265,6 +265,15 @@ The s1kd-brexcheck tool supports all three types. If the `valueForm`
 attribute is omitted, it will assume the value is in the `"single"`
 notation.
 
+XPath support
+-------------
+
+The s1kd-brexcheck tool only supports XPath 1.0 expressions. If the
+XPath given for the `<objectPath>` of a rule is not a valid XPath 1.0
+expression, the rule will be ignored when validating objects. A warning
+will be printed to stderr, and the XML report will contain an
+`<xpathError>` element for each error.
+
 EXIT STATUS
 ===========
 
@@ -279,9 +288,6 @@ One or more CSDB objects specified could not be read.
 
 3  
 A referenced BREX data module could not be found.
-
-4  
-An XPath expression given for a BREX rule was invalid.
 
 5  
 The number of paths or CSDB objects specified exceeded the available
