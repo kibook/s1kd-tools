@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="30" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="020" inWork="00"/>
+        <issueInfo issueNumber="020" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="06" day="25"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="status">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissue</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Add id attribute to brexmap rules.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -221,6 +221,7 @@
 &lt;default path="//@countryIsoCode" ident="countryIsoCode"/&gt;
 &lt;/brexMap&gt;</verbatimText>
           </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">More exact matches can be made by using the attribute <verbatimText verbatimStyle="vs13">id</verbatimText> on the <verbatimText verbatimStyle="vs12">&lt;dmtypes&gt;</verbatimText> or <verbatimText verbatimStyle="vs12">&lt;default&gt;</verbatimText> elements. This overrides the <verbatimText verbatimStyle="vs13">path</verbatimText> attribute, and will only match a BREX rule with the specified ID.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

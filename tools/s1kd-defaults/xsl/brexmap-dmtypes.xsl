@@ -29,9 +29,20 @@
   <xsl:template match="dmtypes">
     <xsl:element name="xsl:apply-templates">
       <xsl:attribute name="select">
-        <xsl:text>//structureObjectRule[objectPath = '</xsl:text>
-        <xsl:value-of select="@path"/>
-        <xsl:text>']</xsl:text>
+        <xsl:text>//structureObjectRule[</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@id">
+            <xsl:text>@id = '</xsl:text>
+            <xsl:value-of select="@id"/>
+            <xsl:text>'</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>objectPath ='</xsl:text>
+            <xsl:value-of select="@path"/>
+            <xsl:text>'</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>]</xsl:text>
       </xsl:attribute>
     </xsl:element>
   </xsl:template>

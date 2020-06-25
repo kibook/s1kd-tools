@@ -12,6 +12,7 @@
 
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 
@@ -21,7 +22,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "3.1.1"
+#define VERSION "3.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1215,28 +1216,39 @@ static void set_env_lang(void)
 
 static void add_brex_rule(xmlNodePtr rules, xmlDocPtr brexmap, const char *key, const char *val)
 {
-	xmlNodePtr rule, objpath, objval;
-	char *path;
-	xmlChar use[256];
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
 
-	/* Read the object path from the .brexmap file. */
-	xmlStrPrintf(use, 256, "//default[@ident='%s']/@path", key);
-	path = (char *) xmlNodeGetContent(firstXPathNode(brexmap, NULL, (char *) use));
-	if (!path) {
-		return;
+	ctx = xmlXPathNewContext(brexmap);
+	xmlXPathRegisterVariable(ctx, BAD_CAST "key", xmlXPathNewString(BAD_CAST key));
+	obj = xmlXPathEval(BAD_CAST "//default[@ident=$key]", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		xmlChar *id, *path, use[256];
+		xmlNodePtr rule, objpath, objval;
+
+		id   = xmlGetProp(obj->nodesetval->nodeTab[0], BAD_CAST "id");
+		path = xmlGetProp(obj->nodesetval->nodeTab[0], BAD_CAST "path");
+
+		xmlStrPrintf(use, 256, "%s must be %s", key, val);
+
+		rule = xmlNewChild(rules, NULL, BAD_CAST "structureObjectRule", NULL);
+		if (id) {
+			xmlSetProp(rule, BAD_CAST "id", id);
+		}
+		objpath = xmlNewChild(rule, NULL, BAD_CAST "objectPath", BAD_CAST path);
+		xmlNewChild(rule, NULL, BAD_CAST "objectUse", use);
+		objval = xmlNewChild(rule, NULL, BAD_CAST "objectValue", NULL);
+
+		xmlSetProp(objpath, BAD_CAST "allowedObjectFlag", BAD_CAST "2");
+		xmlSetProp(objval, BAD_CAST "valueAllowed", BAD_CAST val);
+
+		xmlFree(id);
+		xmlFree(path);
 	}
 
-	xmlStrPrintf(use, 256, "%s must be %s", key, val);
-
-	rule = xmlNewChild(rules, NULL, BAD_CAST "structureObjectRule", NULL);
-	objpath = xmlNewChild(rule, NULL, BAD_CAST "objectPath", BAD_CAST path);
-	xmlNewChild(rule, NULL, BAD_CAST "objectUse", use);
-	objval = xmlNewChild(rule, NULL, BAD_CAST "objectValue", NULL);
-
-	xmlSetProp(objpath, BAD_CAST "allowedObjectFlag", BAD_CAST "2");
-	xmlSetProp(objval, BAD_CAST "valueAllowed", BAD_CAST val);
-
-	xmlFree(path);
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
 }
 
 static xmlDocPtr read_default_brexmap(void)
@@ -1572,18 +1584,25 @@ int main(int argc, char **argv)
 	}
 
 	if (brex_rules) {
-		xmlNodePtr dmtypes_brex_rule, objpath;
-		xmlChar *path;
+		xmlNodePtr dmtypes_brex_rule, objpath, def;
+		xmlChar *id, *path;
 
-		path = xmlNodeGetContent(firstXPathNode(brexmap, NULL, "//dmtypes/@path"));
+		def  = xpath_first_node(brexmap, NULL, BAD_CAST "//dmtypes");
+		id   = xmlGetProp(def, BAD_CAST "id");
+		path = xmlGetProp(def, BAD_CAST "path");
 
 		dmtypes_brex_rule = xmlNewChild(brex_rules, NULL, BAD_CAST "structureObjectRule", NULL);
+
+		if (id) {
+			xmlSetProp(dmtypes_brex_rule, BAD_CAST "id", id);
+		}
 
 		objpath = xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectPath", path);
 		xmlSetProp(objpath, BAD_CAST "allowedObjectFlag", BAD_CAST "2");
 
 		xmlNewChild(dmtypes_brex_rule, NULL, BAD_CAST "objectUse", BREX_INFOCODE_USE);
 
+		xmlFree(id);
 		xmlFree(path);
 	}
 

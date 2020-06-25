@@ -127,6 +127,10 @@ Example of `.brexmap` file:
     <default path="//@countryIsoCode" ident="countryIsoCode"/>
     </brexMap>
 
+More exact matches can be made by using the attribute `id` on the
+`<dmtypes>` or `<default>` elements. This overrides the `path`
+attribute, and will only match a BREX rule with the specified ID.
+
 EXAMPLES
 ========
 

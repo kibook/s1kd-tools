@@ -34,9 +34,18 @@
   <xsl:template match="default">
     <xsl:element name="xsl:when">
       <xsl:attribute name="test">
-        <xsl:text>objectPath = '</xsl:text>
-        <xsl:value-of select="@path"/>
-        <xsl:text>'</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@id">
+            <xsl:text>@id = '</xsl:text>
+            <xsl:value-of select="@id"/>
+            <xsl:text>'</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>objectPath = '</xsl:text>
+            <xsl:value-of select="@path"/>
+            <xsl:text>'</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
       <xsl:value-of select="@ident"/>
     </xsl:element>
