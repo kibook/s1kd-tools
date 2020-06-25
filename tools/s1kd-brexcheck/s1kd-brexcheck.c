@@ -4,16 +4,11 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
-#include <libgen.h>
-
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/debugXML.h>
-#include <libxml/xmlregexp.h>
-
 #include <libxslt/transform.h>
-
 #include "brex.h"
 #include "s1kd_tools.h"
 
@@ -23,7 +18,7 @@
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.0.1"
+#define VERSION "4.0.2"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
