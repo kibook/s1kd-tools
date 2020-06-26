@@ -18,7 +18,7 @@
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.0.2"
+#define VERSION "4.0.3"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "

@@ -85,6 +85,9 @@ xmlChar *xpath_of(xmlNodePtr node)
 				break;
 		}
 
+		if (node->ns != NULL) {
+			xmlSetProp(e, BAD_CAST "ns", node->ns->prefix);
+		}
 		xmlSetProp(e, BAD_CAST "name", name);
 
 		/* Locate the node's position within its parent. */
@@ -109,14 +112,19 @@ xmlChar *xpath_of(xmlNodePtr node)
 
 	/* Convert XPath expression node to string. */
 	for (cur = path->last; cur; cur = cur->prev) {
-		xmlChar *name, *pos;
+		xmlChar *ns, *name, *pos;
 
+		ns   = xmlGetProp(cur, BAD_CAST "ns");
 		name = xmlGetProp(cur, BAD_CAST "name");
-		pos = xmlGetProp(cur, BAD_CAST "pos");
+		pos  = xmlGetProp(cur, BAD_CAST "pos");
 
 		dst = xmlStrcat(dst, BAD_CAST "/");
 		if (!pos) {
 			dst = xmlStrcat(dst, BAD_CAST "@");
+		}
+		if (ns) {
+			dst = xmlStrcat(dst, ns);
+			dst = xmlStrcat(dst, BAD_CAST ":");
 		}
 		dst = xmlStrcat(dst, name);
 		if (pos) {
@@ -125,6 +133,7 @@ xmlChar *xpath_of(xmlNodePtr node)
 			dst = xmlStrcat(dst, BAD_CAST "]");
 		}
 
+		xmlFree(ns);
 		xmlFree(name);
 		xmlFree(pos);
 	}
