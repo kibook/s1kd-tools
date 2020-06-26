@@ -1,8 +1,8 @@
-SOURCE=s1kd-brexcheck.c ../common/s1kd_tools.c
+SOURCE=s1kd-brexcheck.c ../common/s1kd_tools.c libxpath2/libxpath2.c
 OUTPUT=s1kd-brexcheck
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I ../common -I libxpath2 `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
 	CFLAGS+=-g
@@ -10,7 +10,7 @@ else
 	CFLAGS+=-O3
 endif
 
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin

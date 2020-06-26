@@ -9,6 +9,8 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/debugXML.h>
 #include <libxslt/transform.h>
+#include <libexslt/exslt.h>
+#include "libxpath2.h"
 #include "brex.h"
 #include "s1kd_tools.h"
 
@@ -18,7 +20,7 @@
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.0.3"
+#define VERSION "4.1.0"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -119,6 +121,9 @@ struct opts {
 	 * the DTD.
 	 */
 	bool check_notations;
+
+	/* Enable experimental XPath 2.0 functions. */
+	bool xpath2;
 };
 
 /* Return the first node in a set matching an XPath expression. */
@@ -640,6 +645,19 @@ static void print_node(xmlNodePtr node)
 	}
 }
 
+/* Register extra XPath functions in a new XPath context. */
+static void register_functions(xmlXPathContextPtr ctx, struct opts *opts)
+{
+	exsltDateXpathCtxtRegister(ctx, BAD_CAST "date");
+	exsltMathXpathCtxtRegister(ctx, BAD_CAST "math");
+	exsltSetsXpathCtxtRegister(ctx, BAD_CAST "set");
+	exsltStrXpathCtxtRegister(ctx, BAD_CAST "str");
+
+	if (opts->xpath2) {
+		xpath2RegisterFunctions(ctx);
+	}
+}
+
 /* Register all namespaces applicable to a node in a new XPath context. */
 static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
 {
@@ -686,6 +704,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			use  = xmlNodeGetContent(objectUse);
 
 			context = xmlXPathNewContext(doc);
+			register_functions(context, opts);
 			register_namespaces(context, objectPath);
 
 			object = xmlXPathEvalExpression(path, context);
@@ -1537,6 +1556,7 @@ static void show_help(void)
 	puts("  -x, --xml                            XML output.");
 	puts("  -^, --remove-deleted                 Check with elements marked as \"delete\" removed.");
 	puts("  --version                            Show version information.");
+	puts("  --xpath2                             Enable experimental XPath 2.0 functions.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1544,7 +1564,7 @@ static void show_help(void)
 static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
-	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
+	printf("Using libxml %s, libxslt %s and libexslt %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);
 }
 
 int main(int argc, char *argv[])
@@ -1582,12 +1602,14 @@ int main(int argc, char *argv[])
 		/* check_sns */ false,
 		/* strict_sns */ false,
 		/* unstrict_sns */ false,
-		/* check_notations */ false
+		/* check_notations */ false,
+		/* xpath2 */ false
 	};
 
 	const char *sopts = "Bb:eI:xvqslw:StupFfncLTrd:o^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
+		{"xpath2"         , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
 		{"default-brex"   , no_argument      , 0, 'B'},
 		{"brex"           , required_argument, 0, 'b'},
@@ -1626,6 +1648,8 @@ int main(int argc, char *argv[])
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
 					return 0;
+				} else if (strcmp(lopts[loptind].name, "xpath2") == 0) {
+					opts.xpath2 = true;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
 				break;

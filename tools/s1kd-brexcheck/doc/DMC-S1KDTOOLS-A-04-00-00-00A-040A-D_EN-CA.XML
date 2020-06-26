@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="037" inWork="02"/>
+        <issueInfo issueNumber="037" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="06" day="24"/>
+        <issueDate year="2020" month="06" day="26"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Change handling of rules with invalid XPath expressions.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add partial EXSLT and experimental XPath 2.0 support.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -215,6 +218,12 @@
                 <para>Show version information.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>--xpath2</listItemTerm>
+              <listItemDefinition>
+                <para>Enable experimental XPath 2.0 functions.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
         <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
@@ -354,9 +363,10 @@
           </para>
           <para>The s1kd-brexcheck tool supports all three types. If the <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute is omitted, it will assume the value is in the <verbatimText verbatimStyle="vs14">"single"</verbatimText> notation.</para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001 rfu-0002">
           <title>XPath support</title>
-          <para>The s1kd-brexcheck tool only supports XPath 1.0 expressions. If the XPath given for the <verbatimText verbatimStyle="vs12">&lt;objectPath&gt;</verbatimText> of a rule is not a valid XPath 1.0 expression, the rule will be ignored when validating objects. A warning will be printed to stderr, and the XML report will contain an <verbatimText verbatimStyle="vs12">&lt;xpathError&gt;</verbatimText> element for each error.</para>
+          <para>The s1kd-brexcheck tool only fully supports XPath 1.0 expressions, with partial support for EXSLT and XPath 2.0 functions. The XPath 2.0 function support is considered experimental, and must be enabled with the --xpath2 option.</para>
+          <para>If the XPath given for the <verbatimText verbatimStyle="vs12">&lt;objectPath&gt;</verbatimText> of a rule is invalid, the rule will be ignored when validating objects. A warning will be printed to stderr, and the XML report will contain an <verbatimText verbatimStyle="vs12">&lt;xpathError&gt;</verbatimText> element for each error.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

@@ -118,6 +118,9 @@ removed.
 --version  
 Show version information.
 
+--xpath2  
+Enable experimental XPath 2.0 functions.
+
 In addition, the following options enable features of the XML parser
 that are disabled as a precaution by default:
 
@@ -268,11 +271,15 @@ notation.
 XPath support
 -------------
 
-The s1kd-brexcheck tool only supports XPath 1.0 expressions. If the
-XPath given for the `<objectPath>` of a rule is not a valid XPath 1.0
-expression, the rule will be ignored when validating objects. A warning
-will be printed to stderr, and the XML report will contain an
-`<xpathError>` element for each error.
+The s1kd-brexcheck tool only fully supports XPath 1.0 expressions, with
+partial support for EXSLT and XPath 2.0 functions. The XPath 2.0
+function support is considered experimental, and must be enabled with
+the --xpath2 option.
+
+If the XPath given for the `<objectPath>` of a rule is invalid, the rule
+will be ignored when validating objects. A warning will be printed to
+stderr, and the XML report will contain an `<xpathError>` element for
+each error.
 
 EXIT STATUS
 ===========
