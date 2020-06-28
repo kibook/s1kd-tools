@@ -20,7 +20,7 @@
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.1.0"
+#define VERSION "4.1.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -1647,7 +1647,7 @@ int main(int argc, char *argv[])
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
-					return 0;
+					goto cleanup;
 				} else if (strcmp(lopts[loptind].name, "xpath2") == 0) {
 					opts.xpath2 = true;
 				}
@@ -1691,7 +1691,7 @@ int main(int argc, char *argv[])
 			case 'h':
 			case '?':
 				show_help();
-				return 0;
+				goto cleanup;
 		}
 	}
 
@@ -1845,6 +1845,7 @@ int main(int argc, char *argv[])
 		free(brsl_fname);
 	}
 
+cleanup:
 	xsltCleanupGlobals();
 	xmlCleanupParser();
 
