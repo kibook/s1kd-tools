@@ -19,7 +19,7 @@
 #define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.2.0"
+#define VERSION "4.2.1"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -642,7 +642,7 @@ static void print_node(xmlNodePtr node)
 }
 
 /* Register extra XPath functions in a new XPath context. */
-static void register_functions(xmlXPathContextPtr ctx, struct opts *opts)
+static void register_functions(xmlXPathContextPtr ctx)
 {
 	exsltDateXpathCtxtRegister(ctx, BAD_CAST "date");
 	exsltMathXpathCtxtRegister(ctx, BAD_CAST "math");
@@ -696,7 +696,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			use  = xmlNodeGetContent(objectUse);
 
 			context = xmlXPathNewContext(doc);
-			register_functions(context, opts);
+			register_functions(context);
 			register_namespaces(context, objectPath);
 
 			object = xmlXPathEvalExpression(path, context);
