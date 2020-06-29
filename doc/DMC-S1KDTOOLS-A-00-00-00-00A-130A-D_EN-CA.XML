@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule [
-<!NOTATION PNG SYSTEM "PNG" >
 <!NOTATION GIF SYSTEM "GIF" >
+<!NOTATION PNG SYSTEM "PNG" >
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG" NDATA PNG>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF" NDATA GIF>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF" NDATA GIF>
@@ -17,14 +17,14 @@
         <issueInfo issueNumber="027" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="06" day="01"/>
+        <issueDate year="2020" month="06" day="29"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Usage examples</infoName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="status">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -47,8 +47,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissue</simplePara>
+      <reasonForUpdate updateHighlight="1" updateReasonType="urt01">
+        <simplePara>Editorial fixes</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -74,7 +74,7 @@
           <title>Initial setup</title>
           <graphic infoEntityIdent="ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01"/>
         </figure>
-        <para>This first step is to create a folder for the new S1000D project. Example:</para>
+        <para>The first step is to create a folder for the new S1000D project. Example:</para>
         <para>
           <verbatimText verbatimStyle="vs23">$ mkdir myproject
 $ cd myproject</verbatimText>
@@ -203,7 +203,7 @@ infoCodeVariant="A" itemLocationCode="D"/>
             <verbatimText verbatimStyle="vs23">$ s1kd-dmrl DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML</verbatimText>
           </para>
           <para>Information not included in the DMRL entry for a CSDB object is pulled from the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file (and the <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> file for data modules).</para>
-          <para>The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the <emphasis>s1kd-dmrl</emphasis> tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress those messages indicating that a data module that already exists will not be overwritten:</para>
+          <para>The DMRL should be updated throughout the lifecycle of a project. When new entries are added, simply use the <emphasis>s1kd-dmrl</emphasis> tool again to create the newly added data modules. Already existing data modules will not be overwritten, unless the -f option is specified. The -q option will suppress the messages indicating that a data module that already exists will not be overwritten:</para>
           <para>
             <verbatimText verbatimStyle="vs23">$ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML</verbatimText>
           </para>
@@ -316,7 +316,7 @@ or 02 (Classified).
             <para>Unless otherwise specified, data modules will reference the S1000D default BREX, which contains a base set of business rules.</para>
             <para>To get started with your project's own business rules, you can create a simple BREX data module based on the current defaults of your CSDB using the -B option of the s1kd-newdm tool:</para>
             <para>
-              <verbatimText verbatimStyle="vs23">$ s1kd-newdm -B# MYPRJ-A-00-00-00-00A-022A-D</verbatimText>
+              <verbatimText verbatimStyle="vs23">$ s1kd-newdm -B -# MYPRJ-A-00-00-00-00A-022A-D</verbatimText>
             </para>
             <para>This will use the customized <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files to generate a basic set of business rules.</para>
           </levelledPara>
@@ -502,9 +502,9 @@ This information only applies to version B.
             <verbatimText verbatimStyle="vs24"><![CDATA[#!/bin/sh
 
 # Usage: sh build.sh <zip> <csdb> <serialno>
-zip="$1"
-csdb="$2"
-serialno="$3"
+zip=$1
+csdb=$2
+serialno=$3
 
 # Create a temporary directory.
 tmp=$(mktemp -d)
