@@ -57,6 +57,8 @@ To build the executables:
 
 -   xxd
 
+-   pkg-config
+
 -   [libxml2, libxslt, libexslt](http://xmlsoft.org)
 
 To build the documentation from source:
@@ -64,6 +66,14 @@ To build the documentation from source:
 -   [s1kd2db](http://github.com/kibook/s1kd2db)
 
 -   [pandoc](https://pandoc.org/)
+
+Windows build environment
+-------------------------
+
+To build the executables on Windows, an environment such as MinGW or
+Cygwin is recommended. These provide POSIX-compatible tools, such as
+make, that allow the s1kd-tools to be built and installed on a Windows
+system in the same way as on a Linux system.
 
 Building and installing
 -----------------------
