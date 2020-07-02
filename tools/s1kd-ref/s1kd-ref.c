@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.7.0"
+#define VERSION "3.7.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -288,7 +288,7 @@ static xmlNodePtr new_smc_ref(const char *ref, const char *fname, int opts)
 		if (optset(opts, OPT_ISSUE)) {
 			if (doc) {
 				issue_info = xmlCopyNode(find_child(ref_smc_ident, "issueInfo"), 1);
-			} else if (s && isdigit(s[1])) {
+			} else if (s && isdigit((unsigned char) s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
 				if (verbosity > QUIET) {
@@ -482,7 +482,7 @@ static xmlNodePtr new_pm_ref(const char *ref, const char *fname, int opts)
 
 				xmlFree(issno);
 				xmlFree(inwork);
-			} else if (s && isdigit(s[1])) {
+			} else if (s && isdigit((unsigned char) s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
 				if (verbosity > QUIET) {
@@ -731,7 +731,7 @@ static xmlNodePtr new_dm_ref(const char *ref, const char *fname, int opts)
 
 				xmlFree(issno);
 				xmlFree(inwork);
-			} else if (s && isdigit(s[1])) {
+			} else if (s && isdigit((unsigned char) s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
 				if (verbosity > QUIET) {
@@ -982,7 +982,7 @@ static xmlNodePtr new_dml_ref(const char *ref, const char *fname, int opts)
 
 			if (doc) {
 				issue_info = xmlCopyNode(find_child(ref_dml_ident, "issueInfo"), 1);
-			} else if (s && isdigit(s[1])) {
+			} else if (s && isdigit((unsigned char) s[1])) {
 				issue_info = new_issue_info(s);
 			} else {
 				if (verbosity > QUIET) {
@@ -1416,12 +1416,12 @@ static char *trim(char *str)
 {
 	char *end;
 
-	while (isspace(*str)) str++;
+	while (isspace((unsigned char) *str)) str++;
 
 	if (*str == 0) return str;
 
 	end = str + strlen(str) - 1;
-	while (end > str && isspace(*end)) end--;
+	while (end > str && isspace((unsigned char) *end)) end--;
 
 	*(end + 1) = 0;
 
@@ -1507,7 +1507,7 @@ static void transform_ref(xmlNodePtr *node, const char *path, xmlChar **content,
 			type = "unknown";
 		}
 
-		fprintf(stderr, INF_PREFIX "%s: Found %s ref %.*s\n", path, type, eo - so, (*content) + so);
+		fprintf(stderr, INF_PREFIX "%s: Found %s ref %.*s\n", path, type, (int) eo - so, (*content) + so);
 	}
 
 	/* If prefixes are not required, some types of references have

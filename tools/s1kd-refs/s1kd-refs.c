@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.16.1"
+#define VERSION "4.16.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1221,7 +1221,7 @@ static xmlChar *formatFigNumVar(const xmlChar *figureNumberVariant)
 static int str_is_blank(const char *s) {
 	int i;
 	for (i = 0; s[i]; ++i) {
-		if (!isspace(s[i])) {
+		if (!isspace((unsigned char) s[i])) {
 			return 0;
 		}
 	}
