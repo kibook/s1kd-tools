@@ -12,7 +12,7 @@ endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
-ifeq ($(OS),Windows_NT)
+ifeq ($(OSTYPE),msys)
 	LDFLAGS+=-lregex2
 endif
 
