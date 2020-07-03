@@ -14,7 +14,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install -s
+INSTALL=install -Ds
 
 all: $(OUTPUT)
 

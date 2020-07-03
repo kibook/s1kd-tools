@@ -14,7 +14,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install -s
+INSTALL=install -Ds
 
 all: $(OUTPUT)
 
@@ -38,7 +38,7 @@ maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	cp $(OUTPUT) $(INSTALL_PREFIX)/
+	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)
 	$(MAKE) -C doc install
 
 uninstall:

@@ -18,7 +18,7 @@ endif
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install -s
+INSTALL=install -Ds
 
 all: $(OUTPUT)
 

@@ -14,7 +14,7 @@ LDFLAGS=`pkg-config --libs libxml-2.0`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install
+INSTALL=install -Ds
 
 all: $(OUTPUT)
 

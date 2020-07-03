@@ -4,7 +4,7 @@ README=../README.md
 
 PREFIX=/usr/local
 MAN_PREFIX=$(PREFIX)/share/man/man1
-INSTALL=install
+INSTALL=install -D
 
 all: $(OUTPUT) $(README)
 

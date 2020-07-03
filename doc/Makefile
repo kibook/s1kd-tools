@@ -24,7 +24,7 @@ PANDOC_MAN=pandoc -f docbook -t man -s
 PREFIX=/usr/local
 MAN1_PREFIX=$(PREFIX)/share/man/man1
 MAN5_PREFIX=$(PREFIX)/share/man/man5
-INSTALL=install
+INSTALL=install -D
 
 all:
 
