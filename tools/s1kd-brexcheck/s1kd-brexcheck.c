@@ -13,13 +13,13 @@
 #include "brex.h"
 #include "s1kd_tools.h"
 
-#define STRUCT_OBJ_RULE_PATH \
-	"//contextRules[not(@rulesContext) or @rulesContext='%s']//structureObjectRule|" \
-	"//contextrules[not(@context) or @context='%s']//objrule"
-#define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
-
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.2.1"
+#define VERSION "4.2.2"
+
+#define STRUCT_OBJ_RULE_PATH BAD_CAST \
+	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
+	"//contextrules[not(@context) or @context=$schema]//objrule"
+#define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -54,6 +54,9 @@
 #define EXIT_BAD_DMODULE 2
 #define EXIT_BREX_NOT_FOUND 3
 #define EXIT_MAX_OBJS 5
+
+/* URI for the XMLSchema-instance namespace. */
+#define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 /* Initial maximum numbers of CSDB objects/search paths. */
 static unsigned BREX_MAX = 1;
@@ -487,13 +490,11 @@ static xmlChar *brsl_type(xmlChar *severity)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	char xpath[256];
 	xmlChar *type;
 
-	sprintf(xpath, "//brSeverityLevel[@value = '%s']", (char *) severity);
-
 	ctx = xmlXPathNewContext(brsl);
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
+	xmlXPathRegisterVariable(ctx, BAD_CAST "severity", xmlXPathNewString(severity));
+	obj = xmlXPathEvalExpression(BAD_CAST "//brSeverityLevel[@value=$severity]", ctx);
 
 	if (xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		type = NULL;
@@ -1106,8 +1107,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	bool valid_sns = true;
 	int invalid_notations = 0;
 
-	char *schema;
-	char xpath[512];
+	xmlChar *schema;
 
 	xmlDocPtr validtree = NULL;
 
@@ -1122,9 +1122,7 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		rem_delete_elems(dmod_doc);
 	}
 
-	schema = (char *) xmlGetProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation");
-	sprintf(xpath, STRUCT_OBJ_RULE_PATH, schema, schema);
-	xmlFree(schema);
+	schema = xmlGetNsProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
 
 	documentNode = xmlNewChild(brexCheck, NULL, BAD_CAST "document", NULL);
 	xmlSetProp(documentNode, BAD_CAST "path", BAD_CAST docname);
@@ -1156,8 +1154,9 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		}
 
 		context = xmlXPathNewContext(brex_doc);
+		xmlXPathRegisterVariable(context, BAD_CAST "schema", xmlXPathNewString(schema));
 
-		result = xmlXPathEvalExpression(BAD_CAST xpath, context);
+		result = xmlXPathEvalExpression(STRUCT_OBJ_RULE_PATH, context);
 
 		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
 			brex_fnames[i], documentNode, opts);
@@ -1175,6 +1174,8 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		xmlXPathFreeContext(context);
 		xmlFreeDoc(brex_doc);
 	}
+
+	xmlFree(schema);
 
 	switch (show_fnames) {
 		case SHOW_NONE: break;
@@ -1278,18 +1279,18 @@ static void add_dmod_list(const char *fname, char (**dmod_fnames)[PATH_MAX], int
 /* Return the default BREX DMC for a given issue of the spec. */
 static const char *default_brex_dmc(xmlDocPtr doc)
 {
-	char *schema;
+	xmlChar *schema;
 	const char *code;
 
-	schema = (char *) xmlGetProp(xmlDocGetRootElement(doc), BAD_CAST "noNamespaceSchemaLocation");
+	schema = xmlGetNsProp(xmlDocGetRootElement(doc), BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
 
-	if (!schema || strstr(schema, "S1000D_5-0")) {
+	if (schema == NULL || xmlStrstr(schema, BAD_CAST "S1000D_5-0")) {
 		code = "DMC-S1000D-G-04-10-0301-00A-022A-D";
-	} else if (strstr(schema, "S1000D_4-2")) {
+	} else if (xmlStrstr(schema, BAD_CAST "S1000D_4-2")) {
 		code = "DMC-S1000D-F-04-10-0301-00A-022A-D";
-	} else if (strstr(schema, "S1000D_4-1")) {
+	} else if (xmlStrstr(schema, BAD_CAST "S1000D_4-1")) {
 		code = "DMC-S1000D-E-04-10-0301-00A-022A-D";
-	} else if (strstr(schema, "S1000D_4-0")) {
+	} else if (xmlStrstr(schema, BAD_CAST "S1000D_4-0")) {
 		code = "DMC-S1000D-A-04-10-0301-00A-022A-D";
 	} else {
 		code = "DMC-AE-A-04-10-0301-00A-022A-D";
