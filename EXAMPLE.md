@@ -49,7 +49,7 @@ Initial setup
 
 ![Initial setup](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF)
 
-This first step is to create a folder for the new S1000D project.
+The first step is to create a folder for the new S1000D project.
 Example:
 
     $ mkdir myproject
@@ -207,8 +207,8 @@ The DMRL should be updated throughout the lifecycle of a project. When
 new entries are added, simply use the **s1kd-dmrl** tool again to create
 the newly added data modules. Already existing data modules will not be
 overwritten, unless the -f option is specified. The -q option will
-suppress those messages indicating that a data module that already
-exists will not be overwritten:
+suppress the messages indicating that a data module that already exists
+will not be overwritten:
 
     $ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML
 
@@ -342,7 +342,7 @@ To get started with your project's own business rules, you can create a
 simple BREX data module based on the current defaults of your CSDB using
 the -B option of the s1kd-newdm tool:
 
-    $ s1kd-newdm -B# MYPRJ-A-00-00-00-00A-022A-D
+    $ s1kd-newdm -B -# MYPRJ-A-00-00-00-00A-022A-D
 
 This will use the customized `.defaults` and `.dmtypes` files to
 generate a basic set of business rules.
@@ -569,9 +569,9 @@ product serial number:
     #!/bin/sh
 
     # Usage: sh build.sh <zip> <csdb> <serialno>
-    zip="$1"
-    csdb="$2"
-    serialno="$3"
+    zip=$1
+    csdb=$2
+    serialno=$3
 
     # Create a temporary directory.
     tmp=$(mktemp -d)
