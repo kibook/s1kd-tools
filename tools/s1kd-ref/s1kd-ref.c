@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.7.1"
+#define VERSION "3.7.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -1507,7 +1507,7 @@ static void transform_ref(xmlNodePtr *node, const char *path, xmlChar **content,
 			type = "unknown";
 		}
 
-		fprintf(stderr, INF_PREFIX "%s: Found %s ref %.*s\n", path, type, (int) eo - so, (*content) + so);
+		fprintf(stderr, INF_PREFIX "%s: Found %s ref %.*s\n", path, type, (int) (eo - so), (*content) + so);
 	}
 
 	/* If prefixes are not required, some types of references have
