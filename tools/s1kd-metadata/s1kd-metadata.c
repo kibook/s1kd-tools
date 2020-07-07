@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.3.3"
+#define VERSION "4.4.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -3082,7 +3082,7 @@ int main(int argc, char **argv)
 					show_version();
 					goto cleanup;
 				}
-				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case '0': opts.endl = '\0'; break;
 			case 'c': opts.metadata_fname = strdup(optarg); break;

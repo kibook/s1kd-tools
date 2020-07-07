@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "4.0.0"
+#define VERSION "4.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -876,7 +876,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
-				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case '0':
 				set_unverif = true;

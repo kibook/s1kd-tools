@@ -18,7 +18,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-defaults"
-#define VERSION "2.7.0"
+#define VERSION "2.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -606,7 +606,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
-				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case 'b':
 				if (!brex) brex = read_xml_doc(optarg);

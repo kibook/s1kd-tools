@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="051" inWork="00"/>
+        <issueInfo issueNumber="051" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="03"/>
+        <issueDate year="2020" month="07" day="07"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add "applic" method for -H (--list-properties).</simplePara>
+      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add --xml-catalog parser option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -224,7 +224,7 @@
                     <listItem>
                       <para>"standalone" - Only include the values that are explicitly used in the object.</para>
                     </listItem>
-                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                    <listItem>
                       <para>"applic" - Only include the values, as defined in the ACT and CCT, that are within the applicability of the object.</para>
                     </listItem>
                     <listItem>
@@ -631,8 +631,8 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
         <para>
+          In addition, the following options allow configuration of the XML parser:
           <definitionList>
             <definitionListItem>
               <listItemTerm>--dtdload</listItemTerm>
@@ -676,8 +676,14 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-catalog">
+              <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
-        </para>
+        </para> 
         <levelledPara>
           <title>Identifying the source of an instance</title>
           <para>The resulting data module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>

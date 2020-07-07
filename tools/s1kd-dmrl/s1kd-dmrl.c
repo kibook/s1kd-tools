@@ -12,7 +12,7 @@
 #include "dmrl.h"
 
 #define PROG_NAME "s1kd-dmrl"
-#define VERSION "1.11.0"
+#define VERSION "1.12.0"
 
 static void showHelp(void)
 {
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
-				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case 'd':
 				defaultsFname = strdup(optarg);

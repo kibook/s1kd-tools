@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="038" inWork="00"/>
+        <issueInfo issueNumber="038" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="03"/>
+        <issueDate year="2020" month="07" day="07"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change handling of rules with invalid XPath expressions.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add partial EXSLT function support.</simplePara>
+      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add --xml-catalog parser option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -220,8 +217,8 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
         <para>
+          In addition, the following options allow configuration of the XML parser:
           <definitionList>
             <definitionListItem>
               <listItemTerm>--dtdload</listItemTerm>
@@ -265,8 +262,14 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+              <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
-        </para>
+        </para> 
         <levelledPara>
           <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
           <para>The attribute <verbatimText verbatimStyle="vs13">brSeverityLevel</verbatimText> on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
@@ -357,7 +360,7 @@
           </para>
           <para>The s1kd-brexcheck tool supports all three types. If the <verbatimText verbatimStyle="vs13">valueForm</verbatimText> attribute is omitted, it will assume the value is in the <verbatimText verbatimStyle="vs14">"single"</verbatimText> notation.</para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001 rfu-0002">
+        <levelledPara>
           <title>XPath support</title>
           <para>The s1kd-brexcheck tool only fully supports XPath 1.0 expressions, with partial support for EXSLT functions.</para>
           <para>If the XPath given for the <verbatimText verbatimStyle="vs12">&lt;objectPath&gt;</verbatimText> of a rule is invalid, the rule will be ignored when validating objects. A warning will be printed to stderr, and the XML report will contain an <verbatimText verbatimStyle="vs12">&lt;xpathError&gt;</verbatimText> element for each error.</para>
@@ -366,7 +369,7 @@
       <levelledPara>
         <title>EXIT STATUS</title>
         <para>
-          <definitionList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+          <definitionList>
             <definitionListItem>
               <listItemTerm>0</listItemTerm>
               <listItemDefinition>

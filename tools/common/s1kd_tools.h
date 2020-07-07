@@ -15,6 +15,7 @@
 #include <libxml/tree.h>
 #include <libxml/xinclude.h>
 #include <libxml/xpath.h>
+#include <libxml/catalog.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -45,8 +46,9 @@ extern int DEFAULT_PARSE_OPTS;
 	{"noent", no_argument, 0, 0},\
 	{"parser-errors", no_argument, 0, 0},\
 	{"parser-warnings", no_argument, 0, 0},\
-	{"xinclude", no_argument, 0, 0},
-#define LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind) \
+	{"xinclude", no_argument, 0, 0},\
+	{"xml-catalog", required_argument, 0, 0},
+#define LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg) \
 	else if (strcmp(lopts[loptind].name, "dtdload") == 0) {\
 		DEFAULT_PARSE_OPTS |= XML_PARSE_DTDLOAD;\
 	} else if (strcmp(lopts[loptind].name, "huge") == 0) {\
@@ -61,17 +63,20 @@ extern int DEFAULT_PARSE_OPTS;
 		DEFAULT_PARSE_OPTS &= ~XML_PARSE_NOWARNING;\
 	} else if (strcmp(lopts[loptind].name, "xinclude") == 0) {\
 		DEFAULT_PARSE_OPTS |= XML_PARSE_XINCLUDE | XML_PARSE_NOBASEFIX | XML_PARSE_NOXINCNODE;\
+	} else if (strcmp(lopts[loptind].name, "xml-catalog") == 0) {\
+		xmlLoadCatalog(optarg);\
 	}
 #define LIBXML2_PARSE_LONGOPT_HELP \
 	puts("");\
 	puts("XML parser options:");\
-	puts("  --dtdload          Load external DTD.");\
-	puts("  --huge             Remove any internal arbitrary parser limits.");\
-	puts("  --net              Allow network access.");\
-	puts("  --noent            Resolve entities.");\
-	puts("  --parser-errors    Emit errors from parser.");\
-	puts("  --parser-warnings  Emit warnings from parser.");\
-	puts("  --xinclude         Do XInclude processing.");
+	puts("  --dtdload             Load external DTD.");\
+	puts("  --huge                Remove any internal arbitrary parser limits.");\
+	puts("  --net                 Allow network access.");\
+	puts("  --noent               Resolve entities.");\
+	puts("  --parser-errors       Emit errors from parser.");\
+	puts("  --parser-warnings     Emit warnings from parser.");\
+	puts("  --xinclude            Do XInclude processing.");\
+	puts("  --xml-catalog <file>  Use an XML catalog.");
 
 #define LIBXML2_PARSE_INIT \
 	if (optset(DEFAULT_PARSE_OPTS, XML_PARSE_NONET)) {\

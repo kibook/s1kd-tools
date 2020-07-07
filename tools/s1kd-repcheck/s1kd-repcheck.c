@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.5.1"
+#define VERSION "1.6.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -673,6 +673,7 @@ int main(int argc, char **argv)
 		{"verbose"        , no_argument      , 0, 'v'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"remove-deleted" , no_argument      , 0, '^'},
+		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
 	int loptind = 0;
@@ -709,6 +710,7 @@ int main(int argc, char **argv)
 					show_version();
 					goto cleanup;
 				}
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case 'A':
 				opts.all_refs = true;

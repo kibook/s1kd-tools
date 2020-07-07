@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="00"/>
+        <issueInfo issueNumber="026" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="03"/>
+        <issueDate year="2020" month="07" day="07"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add .disptext configuration file.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -D (--delete) option.</simplePara>
+      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add --xml-catalog parser option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-aspp [options] [<object> ...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-aspp [options] [<object> ...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -78,13 +75,13 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-., --dump-disptext</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in .disptext file.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-,, --dump-xsl</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XSLT used to generate display text for applicability statements.</para>
@@ -114,7 +111,7 @@
                 <para>Search for the ACT and CCT referenced by each data module, and add them to the list of ACTs/CCTs to use when generating display text for that data module.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-D, --delete</listItemTerm>
               <listItemDefinition>
                 <para>Remove the display text from all applicability annotations, except those that consist of only display text (and no computer processing part).</para>
@@ -138,7 +135,7 @@
                 <para>Overwrite input data module(s) rather than outputting to stdout.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-G, --disptext &lt;disptext&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Specify a custom .disptext file.</para>
@@ -201,7 +198,7 @@
                 <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-x, --xsl &lt;XSLT&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use custom XSLT to generate display text for applicability statements.</para>
@@ -221,8 +218,8 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <para>In addition, the following options enable features of the XML parser that are disabled as a precaution by default:</para>
         <para>
+          In addition, the following options allow configuration of the XML parser:
           <definitionList>
             <definitionListItem>
               <listItemTerm>--dtdload</listItemTerm>
@@ -266,9 +263,15 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+              <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
-        </para>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        </para> 
+        <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.disptext</verbatimText> file</title>
           <para>
             This file specifies rules for generating display text. It consists of:
@@ -470,7 +473,7 @@ applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
 &lt;/displayText&gt;
 &lt;/applic&gt;</verbatimText>
           </para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods for generating display text can be changed either via the <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file, or by supplying a custom XSLT script with the -x option. The -, option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
+          <para>The methods for generating display text can be changed either via the <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file, or by supplying a custom XSLT script with the -x option. The -, option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
           <para>
             <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
 &lt;xsl:copy&gt;
@@ -482,7 +485,7 @@ applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
         </levelledPara>
         <levelledPara>
           <title>Display text format string (-F)</title>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The -F option allows for very simple customizations to generated display text without needing to create a custom <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file or XSLT script (-x). The string determines the format of the display text of each <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> element in the annotation.</para>
+          <para>The -F option allows for very simple customizations to generated display text without needing to create a custom <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file or XSLT script (-x). The string determines the format of the display text of each <verbatimText verbatimStyle="vs12">&lt;assert&gt;</verbatimText> element in the annotation.</para>
           <para>The following variables can be used within the format string:
             <definitionList>
               <definitionListItem>
@@ -654,7 +657,7 @@ applicPropertyValues="A"/&gt;
           <para>With attribute <verbatimText verbatimStyle="vs13">applicRefId</verbatimText> only on those elements where a statement should be shown, and an additional inline applicability to represent the whole data module's applicability. This XML is semantically incorrect but easier for a stylesheet to transform for page-oriented output.</para>
         </levelledPara>
       </levelledPara>
-      <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+      <levelledPara>
         <title>DISPTEXT FILE SCHEMA</title>
         <levelledPara>
           <title>Display text rules</title>

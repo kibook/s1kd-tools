@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.14.0"
+#define VERSION "1.15.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -617,7 +617,7 @@ int main(int argc, char **argv)
 					show_version();
 					return 0;
 				}
-				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind)
+				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case '0': sep = '\0'; break;
 			case 'C': show |= SHOW_COM; break;
