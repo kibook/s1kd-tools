@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "2.6.1"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -20,6 +20,22 @@
 #define EXIT_MAX_SCHEMAS 2
 #define EXIT_MISSING_SCHEMA 3
 
+/* FIXME:
+ *
+ * libxml2 XML schema validation does not currently check IDREF/IDREFS, so this
+ * tool implements its own checks. If libxml2 ever expands its XML schema
+ * validation to include IDREF/IDREFS checking, this can probably be removed.
+ *
+ * Because this tool is designed for use only with S1000D CSDB objects, the
+ * check can be done more efficiently by hardcoding all attributes that are
+ * type IDREF/IDREFS.
+ *
+ * xml-utils/xml-validate has a more general-purpose implementation which
+ * parses the XML schema for ID, IDS, IDREF and IDREFS types, but it is
+ * noticeably slower.
+ */
+
+/* XPath to match all invalid IDREF attributes. */
 #define INVALID_ID_XPATH BAD_CAST \
 	"//@applicMapRefId[not(//@id=.)]|" \
         "//@applicRefId[not(//@id=.)]|" \
@@ -35,9 +51,11 @@
 	"//@refid[not(//@id=.)]|" \
 	"//@xrefid[not(//@id=.)]"
 
+/* XPath to match all IDREFS attributes to check their validity. */
 #define INVALID_IDS_XPATH BAD_CAST \
 	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs|//@controlAuthorityRefs"
 
+/* URI for XML schema instance namespace. */
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
 
 static enum verbosity_level {SILENT, NORMAL, VERBOSE} verbosity = NORMAL;
@@ -132,10 +150,9 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-s <path>] [-x <URI>] [-efloqv^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-s <path>] [-x <URI>] [-efloqv^h?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -d, --schemas <dir>   Search for schemas in <dir> instead of using the URL.");
 	puts("  -e, --ignore-empty    Ignore empty/non-XML documents.");
 	puts("  -f, --filenames       List invalid files.");
 	puts("  -h, -?, --help        Show help/usage message.");
@@ -276,7 +293,7 @@ static void resize_schema_parsers(void)
 	}
 }
 
-static int validate_file(const char *fname, const char *schema_dir, const char *schema, xmlNodePtr ignore_ns, enum show_fnames show_fnames, int ignore_empty, int rem_del)
+static int validate_file(const char *fname, const char *schema, xmlNodePtr ignore_ns, enum show_fnames show_fnames, int ignore_empty, int rem_del)
 {
 	xmlDocPtr doc;
 	xmlDocPtr validtree = NULL;
@@ -329,37 +346,6 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 		return 1;
 	}
 
-	if (strcmp(schema_dir, "") != 0) {
-		char *last_slash, *slash1, *slash2, *schema_name, schema_file[256];
-
-		/* Check if directory is in multi-spec format */
-		slash1 = strrchr(url, '/');
-		slash1[0] = 0;
-		slash2 = strrchr(url, '/');
-		slash2[0] = 0;
-		last_slash = strrchr(url, '/');
-		slash1[0] = slash2[0] = '/';
-		schema_name = url + (last_slash - url) + 1;
-		snprintf(schema_file, 256, "%s/%s", schema_dir, schema_name);
-
-		/* Otherwise, try single-spec format */
-		if (access(schema_file, F_OK) == -1) {
-			last_slash = strrchr(url, '/');
-			schema_name = url + (last_slash - url) + 1;
-			snprintf(schema_file, 256, "%s/%s", schema_dir, schema_name);
-		}
-
-		if (access(schema_file, F_OK) == -1) {
-			if (verbosity > SILENT) {
-				fprintf(stderr, ERR_PREFIX "Schema %s not found in %s\n", schema_name, schema_dir);
-			}
-			exit(EXIT_MISSING_SCHEMA);
-		}
-
-		xmlFree(url);
-		url = (char *) xmlStrdup((xmlChar *) schema_file);
-	}
-
 	if ((parser = get_schema_parser(url))) {
 		xmlFree(url);
 	} else {
@@ -399,7 +385,7 @@ static int validate_file(const char *fname, const char *schema_dir, const char *
 	return err;
 }
 
-static int validate_file_list(const char *fname, char *schema_dir, const char *schema, xmlNodePtr ignore_ns, enum show_fnames show_fnames, int ignore_empty, int rem_del)
+static int validate_file_list(const char *fname, const char *schema, xmlNodePtr ignore_ns, enum show_fnames show_fnames, int ignore_empty, int rem_del)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -418,7 +404,7 @@ static int validate_file_list(const char *fname, char *schema_dir, const char *s
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		err += validate_file(path, schema_dir, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+		err += validate_file(path, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
 	}
 
 	if (fname) {
@@ -431,7 +417,6 @@ static int validate_file_list(const char *fname, char *schema_dir, const char *s
 int main(int argc, char *argv[])
 {
 	int c, i;
-	char schema_dir[256] = "";
 	int err = 0;
 	enum show_fnames show_fnames = SHOW_NONE;
 	int is_list = 0;
@@ -441,11 +426,10 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqd:x:Ffloes:^h?";
+	const char *sopts = "vqx:Ffloes:^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
-		{"schemas"        , required_argument, 0, 'd'},
 		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
 		{"list"           , no_argument      , 0, 'l'},
@@ -476,7 +460,6 @@ int main(int argc, char *argv[])
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
-			case 'd': strcpy(schema_dir, optarg); break;
 			case 'x': add_ignore_ns(ignore_ns, optarg); break;
 			case 'F': show_fnames = SHOW_VALID; break;
 			case 'f': show_fnames = SHOW_INVALID; break;
@@ -503,15 +486,15 @@ int main(int argc, char *argv[])
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
 			if (is_list) {
-				err += validate_file_list(argv[i], schema_dir, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+				err += validate_file_list(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
 			} else {
-				err += validate_file(argv[i], schema_dir, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+				err += validate_file(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
 			}
 		}
 	} else if (is_list) {
-		err = validate_file_list(NULL, schema_dir, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+		err = validate_file_list(NULL, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
 	} else {
-		err = validate_file("-", schema_dir, schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+		err = validate_file("-", schema, ignore_ns, show_fnames, ignore_empty, rem_del);
 	}
 
 	for (i = 0; i < schema_parser_count; ++i) {

@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="03"/>
+        <issueDate year="2020" month="07" day="06"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="status">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissue</simplePara>
+      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
+        <simplePara>Remove -d (--schemas) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-validate [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
               [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -64,13 +64,6 @@
         <title>OPTIONS</title>
         <para>
           <definitionList>
-            <definitionListItem>
-              <listItemTerm>-d, --schemas &lt;dir&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is used to fetch it locally or over a network, but this option will force searching to be performed only in the specified directory.</para>
-                <para>This can also be accomplished through the use of XML catalogs.</para>
-              </listItemDefinition>
-            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-e, --ignore-empty</listItemTerm>
               <listItemDefinition>
@@ -199,32 +192,20 @@
           </definitionList>
         </para>
         <levelledPara>
-          <title>Multi-spec directory with -d option</title>
-          <para>The -d option can point either to a directory containing the XSD schema files for a single S1000D spec (i.e. the last part of the schema URI), or to a directory containing schemas for multiple specs. The latter must follow a particular format for the tool to locate the appropriate schemas for a given spec:</para>
-          <para>
-            <verbatimText verbatimStyle="vs23">schemas/    &lt;-- The directory passed to -d
-    S1000D_4-1/
-        xml_schema_flat/
-            [4.1 XSD files...]
-    S1000D_4-2/
-        xml_schema_flat/
-            [4.2 XSD files...]
-    S1000D_5-0/
-        xml_schema_flat/
-            [5.0 XSD files...]</verbatimText>
-          </para>
-        </levelledPara>
-        <levelledPara>
-          <title>XML catalogs vs. -d option</title>
-          <para>XML catalogs provide a more standard method of redirecting public, network-based resources to local copies. As part of using libxml2, there are several locations and environment variables from which this tool will load catalogs.</para>
+          <title>XML catalogs</title>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">XML catalogs allow redirecting the canonical URIs of XML schemas and other external resources to local files, so as to avoid the unnecessary overhead of downloading those static resources over the Internet.</para>
           <para>Below is an example of a catalog file which maps the S1000D schemas to a local directory:</para>
           <para>
             <verbatimText verbatimStyle="vs11">&lt;catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"&gt;
-&lt;rewriteURI uriStartString="http://www.s1000d.org/"
-rewritePrefix="/usr/share/s1kd/schemas/"/&gt;
+&lt;rewriteURI
+uriStartString="http://www.s1000d.org"
+rewritePrefix="/usr/share/s1kd/schemas"/&gt;
 &lt;/catalog&gt;</verbatimText>
           </para>
-          <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>) to remove the need to use the -d option.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>):</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <verbatimText verbatimStyle="vs24">$ XML_CATALOG_FILES=catalog.xml s1kd-validate &lt;DMs...&gt;</verbatimText>
+          </para>
         </levelledPara>
       </levelledPara>
       <levelledPara>

@@ -6,7 +6,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 SYNOPSIS
 ========
 
-    s1kd-validate [-d <dir>] [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
+    s1kd-validate [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
                   [<object>...]
 
 DESCRIPTION
@@ -18,13 +18,6 @@ schemas.
 
 OPTIONS
 =======
-
--d, --schemas &lt;dir&gt;  
-Search for schemas in &lt;dir&gt;. Normally, the URI of the schema is
-used to fetch it locally or over a network, but this option will force
-searching to be performed only in the specified directory.
-
-This can also be accomplished through the use of XML catalogs.
 
 -e, --ignore-empty  
 Ignore validation for empty or non-XML documents.
@@ -95,46 +88,27 @@ Emit warnings from parser.
 --xinclude  
 Do XInclude processing.
 
-Multi-spec directory with -d option
------------------------------------
+XML catalogs
+------------
 
-The -d option can point either to a directory containing the XSD schema
-files for a single S1000D spec (i.e. the last part of the schema URI),
-or to a directory containing schemas for multiple specs. The latter must
-follow a particular format for the tool to locate the appropriate
-schemas for a given spec:
-
-    schemas/    <-- The directory passed to -d
-        S1000D_4-1/
-            xml_schema_flat/
-                [4.1 XSD files...]
-        S1000D_4-2/
-            xml_schema_flat/
-                [4.2 XSD files...]
-        S1000D_5-0/
-            xml_schema_flat/
-                [5.0 XSD files...]
-
-XML catalogs vs. -d option
---------------------------
-
-XML catalogs provide a more standard method of redirecting public,
-network-based resources to local copies. As part of using libxml2, there
-are several locations and environment variables from which this tool
-will load catalogs.
+XML catalogs allow redirecting the canonical URIs of XML schemas and
+other external resources to local files, so as to avoid the unnecessary
+overhead of downloading those static resources over the Internet.
 
 Below is an example of a catalog file which maps the S1000D schemas to a
 local directory:
 
     <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-    <rewriteURI uriStartString="http://www.s1000d.org/"
-    rewritePrefix="/usr/share/s1kd/schemas/"/>
+    <rewriteURI
+    uriStartString="http://www.s1000d.org"
+    rewritePrefix="/usr/share/s1kd/schemas"/>
     </catalog>
 
 This can be placed in a catalog file automatically loaded by libxml2
 (e.g., `/etc/xml/catalog`) or saved to a file which is then specified in
-an environment variable used by libxml2 (e.g., `XML_CATALOG_FILES`) to
-remove the need to use the -d option.
+an environment variable used by libxml2 (e.g., `XML_CATALOG_FILES`):
+
+    $ XML_CATALOG_FILES=catalog.xml s1kd-validate <DMs...>
 
 EXIT STATUS
 ===========
