@@ -114,6 +114,10 @@ an environment variable used by libxml2 (e.g., `XML_CATALOG_FILES`):
 
     $ XML_CATALOG_FILES=catalog.xml s1kd-validate <DMs...>
 
+Alternatively, the --xml-catalog option may be used:
+
+    $ s1kd-validate --xml-catalog=catalog.xml <DMs>...
+
 EXIT STATUS
 ===========
 

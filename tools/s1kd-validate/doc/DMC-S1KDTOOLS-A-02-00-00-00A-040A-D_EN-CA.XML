@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="03"/>
+        <issueInfo issueNumber="025" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="07" day="07"/>
@@ -214,6 +214,10 @@ rewritePrefix="/usr/share/s1kd/schemas"/&gt;
           <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>):</para>
           <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
             <verbatimText verbatimStyle="vs24">$ XML_CATALOG_FILES=catalog.xml s1kd-validate &lt;DMs...&gt;</verbatimText>
+          </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+            Alternatively, the --xml-catalog option may be used:
+            <verbatimText verbatimStyle="vs24">$ s1kd-validate --xml-catalog=catalog.xml &lt;DMs&gt;...</verbatimText>
           </para>
         </levelledPara>
       </levelledPara>
