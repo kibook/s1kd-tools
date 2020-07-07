@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="02"/>
+        <issueInfo issueNumber="025" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="07" day="07"/>
@@ -192,14 +192,14 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
         <levelledPara>
           <title>XML catalogs</title>
           <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">XML catalogs allow redirecting the canonical URIs of XML schemas and other external resources to local files, so as to avoid the unnecessary overhead of downloading those static resources over the Internet.</para>

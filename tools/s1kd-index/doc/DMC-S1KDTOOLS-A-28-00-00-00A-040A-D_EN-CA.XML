@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="28" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="017" inWork="01"/>
+        <issueInfo issueNumber="017" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="07" day="07"/>
@@ -166,14 +166,14 @@ s1kd-index -D [-filqv] [&lt;module&gt;...]</verbatimText>
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.indexflags</verbatimText> file</title>
           <para>This file specifies the list of indexable keywords for the project and their level. By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.indexflags</verbatimText> in the current directory or parent directories, but any file can be specified using the -I option.</para>

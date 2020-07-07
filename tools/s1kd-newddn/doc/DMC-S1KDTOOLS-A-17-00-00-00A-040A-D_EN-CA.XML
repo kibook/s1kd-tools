@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="17" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="01"/>
+        <issueInfo issueNumber="028" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2020" month="07" day="07"/>
@@ -276,14 +276,14 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.defaults</verbatimText> file</title>
           <para>Refer to s1kd-newdm(1) for information on the <verbatimText verbatimStyle="vs02">.defaults</verbatimText> file which is used by all the s1kd-new* commands.</para>
