@@ -30,6 +30,7 @@
       <xs:element ref="act" minOccurs="0"/>
       <xs:element ref="cct" minOccurs="0"/>
       <xs:element ref="undefined" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="pct" minOccurs="0"/>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="nestedApplicError"/>
         <xs:element ref="redundantApplicError"/>
@@ -41,6 +42,7 @@
   </xs:complexType>
   <xs:element name="act" type="ctElemType"/>
   <xs:element name="cct" type="ctElemType"/>
+  <xs:element name="pct" type="ctElemType"/>
   <xs:complexType name="ctElemType">
     <xs:attribute name="path" type="xs:string"/>
   </xs:complexType>
@@ -92,7 +94,10 @@
     <xs:sequence>
       <xs:element ref="assign" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute name="valid" type="yesNoAttType"/>
+    <xs:attribute name="product" type="xs:NCName"/>
+    <xs:attribute ref="line"/>
+    <xs:attribute ref="xpath"/>
+    <xs:attribute name="valid" type="yesNoAttType" use="required"/>
   </xs:complexType>
   <xs:element name="assign" type="assignElemType"/>
   <xs:complexType name="assignElemType">

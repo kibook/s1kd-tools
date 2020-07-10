@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "5.9.0"
+#define VERSION "6.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1296,7 +1296,7 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 				id = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "id");
 
 				if (id) {
-					xmlSetProp(asserts, BAD_CAST "id", id);
+					xmlSetProp(asserts, BAD_CAST "product", id);
 				}
 
 				xmlStrPrintf(line_s, 16, "%ld", xmlGetLineNo(obj->nodesetval->nodeTab[i]));
