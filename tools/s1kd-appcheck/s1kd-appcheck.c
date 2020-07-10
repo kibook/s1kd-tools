@@ -11,7 +11,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.0.0"
+#define VERSION "6.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1643,7 +1643,7 @@ static int check_pct_instances(xmlDocPtr doc, const char *path, xmlDocPtr act, s
 
 			if (find_act_fname(actfname, opts->useract, doc)) {
 				if ((act = read_xml_doc(actfname))) {
-					add_object_node(report, "act", cctfname);
+					add_object_node(report, "act", actfname);
 				}
 			}
 
