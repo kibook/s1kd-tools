@@ -13,8 +13,12 @@
 #include "brex.h"
 #include "s1kd_tools.h"
 
+#ifdef USE_SAXON
+#include "saxon/saxon.h"
+#endif
+
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.3.0"
+#define VERSION "4.4.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -123,6 +127,10 @@ struct opts {
 	 * the DTD.
 	 */
 	bool check_notations;
+
+	#ifdef USE_SAXON
+	void *saxon_processor;
+	#endif
 };
 
 /* Return the first node in a set matching an XPath expression. */
@@ -652,14 +660,24 @@ static void register_functions(xmlXPathContextPtr ctx)
 }
 
 /* Register all namespaces applicable to a node in a new XPath context. */
+#ifdef USE_SAXON
+static void register_namespaces(xmlXPathContextPtr ctx, void *saxon_xpath, xmlNodePtr node)
+#else
 static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
+#endif
 {
 	xmlNodePtr cur;
+
 	for (cur = node; cur; cur = cur->parent) {
 		if (cur->nsDef) {
 			xmlNsPtr cur_ns;
 			for (cur_ns = cur->nsDef; cur_ns; cur_ns = cur_ns->next) {
 				xmlXPathRegisterNs(ctx, cur_ns->prefix, cur_ns->href);
+
+				#ifdef USE_SAXON
+				saxon_register_namespace(saxon_xpath, cur_ns->prefix, cur_ns->href);
+				#endif
+
 			}
 		}
 	}
@@ -687,6 +705,10 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			xmlNodePtr brDecisionRef, objectPath, objectUse;
 			xmlChar *allowedObjectFlag, *path, *use, *brdp;
 
+			#ifdef USE_SAXON
+			void *saxon_xpath = saxon_new_xpath_processor(opts->saxon_processor);
+			#endif
+
 			brDecisionRef = firstXPathNode(brex_doc, rules->nodeTab[i], "brDecisionRef");
 			objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
 			objectUse  = firstXPathNode(brex_doc, rules->nodeTab[i], "objectUse|objuse");
@@ -698,9 +720,16 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 
 			context = xmlXPathNewContext(doc);
 			register_functions(context);
+
+			#ifdef USE_SAXON
+			register_namespaces(context, saxon_xpath, objectPath);
+
+			object = saxon_eval_xpath(opts->saxon_processor, saxon_xpath, objectPath, path, context);
+			#else
 			register_namespaces(context, objectPath);
 
 			object = xmlXPathEvalExpression(path, context);
+			#endif
 
 			if (object != NULL) {
 				if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object, opts)) {
@@ -1379,6 +1408,17 @@ static void init_opts(struct opts *opts, int options)
 	opts->strict_sns      = optset(options, S1KD_BREXCHECK_STRICT_SNS);
 	opts->unstrict_sns    = optset(options, S1KD_BREXCHECK_UNSTRICT_SNS);
 	opts->check_notations = optset(options, S1KD_BREXCHECK_NOTATIONS);
+
+	#ifdef USE_SAXON
+	opts->saxon_path_processor = saxon_new_processor();
+	#endif
+}
+
+static void free_opts(struct opts *opts)
+{
+	#ifdef USE_SAXON
+	saxon_free(opts->saxon_processor);
+	#endif
 }
 
 int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
@@ -1419,6 +1459,8 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 	} else {
 		xmlFreeDoc(rep);
 	}
+
+	free_opts(&opts);
 
 	return err;
 }
@@ -1497,6 +1539,8 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 		xmlFreeDoc(rep);
 	}
 
+	free_opts(&opts);
+
 	return err;
 }
 
@@ -1553,11 +1597,21 @@ static void show_help(void)
 }
 
 /* Show version information. */
+#ifdef USE_SAXON
+static void show_version(void *saxon_processor)
+{
+	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(saxon_processor));
+	puts("XPath engine: Saxon");
+}
+#else
 static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s, libxslt %s and libexslt %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);
+	puts("XPath engine: libxml2");
 }
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -1632,11 +1686,19 @@ int main(int argc, char *argv[])
 
 	search_dir = strdup(".");
 
+	#ifdef USE_SAXON
+	opts.saxon_processor = saxon_new_processor();
+	#endif
+
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
+					#ifdef USE_SAXON
+					show_version(opts.saxon_processor);
+					#else
 					show_version();
+					#endif
 					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
@@ -1841,6 +1903,10 @@ cleanup:
 	free(brex_search_paths);
 	free(dmod_fnames);
 	free(search_dir);
+
+	#ifdef USE_SAXON
+	saxon_free(opts.saxon_processor);
+	#endif
 
 	if (status > 0) {
 		return EXIT_BREX_ERROR;

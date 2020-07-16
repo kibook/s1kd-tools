@@ -371,8 +371,29 @@ If the \f[C]valueForm\f[] attribute is omitted, it will assume the value
 is in the \f[C]"single"\f[] notation.
 .SS XPath support
 .PP
-The s1kd\-brexcheck tool only fully supports XPath 1.0 expressions, with
-partial support for EXSLT functions.
+Supported XPath syntax depends on what XPath engine was selected at
+compile\-time:
+.TP
+.B libxml2 (default)
+.IP \[bu] 2
+XPath 1.0
+.IP \[bu] 2
+Partial support for EXSLT functions
+.RS
+.RE
+.TP
+.B Saxon (experimental)
+.IP \[bu] 2
+XPath 1.0
+.IP \[bu] 2
+XPath 2.0
+.IP \[bu] 2
+XPath 3.0
+.RS
+.RE
+.PP
+Information on which XPath engine is in use can be obtained from the
+\-\-version option.
 .PP
 If the XPath given for the \f[C]<objectPath>\f[] of a rule is invalid,
 the rule will be ignored when validating objects.

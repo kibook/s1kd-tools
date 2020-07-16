@@ -272,8 +272,23 @@ notation.
 XPath support
 -------------
 
-The s1kd-brexcheck tool only fully supports XPath 1.0 expressions, with
-partial support for EXSLT functions.
+Supported XPath syntax depends on what XPath engine was selected at
+compile-time:
+
+libxml2 (default)  
+-   XPath 1.0
+
+-   Partial support for EXSLT functions
+
+Saxon (experimental)  
+-   XPath 1.0
+
+-   XPath 2.0
+
+-   XPath 3.0
+
+Information on which XPath engine is in use can be obtained from the
+--version option.
 
 If the XPath given for the `<objectPath>` of a rule is invalid, the rule
 will be ignored when validating objects. A warning will be printed to

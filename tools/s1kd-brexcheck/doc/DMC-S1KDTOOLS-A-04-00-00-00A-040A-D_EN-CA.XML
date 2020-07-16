@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --xml-catalog parser option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add experimental Saxon support.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -362,7 +365,45 @@
         </levelledPara>
         <levelledPara>
           <title>XPath support</title>
-          <para>The s1kd-brexcheck tool only fully supports XPath 1.0 expressions, with partial support for EXSLT functions.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+            Supported XPath syntax depends on what XPath engine was selected at compile-time:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>libxml2 (default)</listItemTerm>
+                <listItemDefinition>
+                  <para>
+                    <randomList>
+                      <listItem>
+                        <para>XPath 1.0</para>
+                      </listItem>
+                      <listItem>
+                        <para>Partial support for EXSLT functions</para>
+                      </listItem>
+                    </randomList>
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>Saxon (experimental)</listItemTerm>
+                <listItemDefinition>
+                  <para>
+                    <randomList>
+                      <listItem>
+                        <para>XPath 1.0</para>
+                      </listItem>
+                      <listItem>
+                        <para>XPath 2.0</para>
+                      </listItem>
+                      <listItem>
+                        <para>XPath 3.0</para>
+                      </listItem>
+                    </randomList>
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+            Information on which XPath engine is in use can be obtained from the --version option.
+          </para>
           <para>If the XPath given for the <verbatimText verbatimStyle="vs12">&lt;objectPath&gt;</verbatimText> of a rule is invalid, the rule will be ignored when validating objects. A warning will be printed to stderr, and the XML report will contain an <verbatimText verbatimStyle="vs12">&lt;xpathError&gt;</verbatimText> element for each error.</para>
         </levelledPara>
       </levelledPara>
