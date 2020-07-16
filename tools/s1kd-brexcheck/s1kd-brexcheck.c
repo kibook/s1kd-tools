@@ -18,7 +18,7 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.4.1"
+#define VERSION "4.4.2"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -808,6 +808,9 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 				}
 			}
 
+			#ifdef USE_SAXON
+			saxon_free_xpath_processor(saxon_xpath);
+			#endif
 			/* FIXME: If the XPath expression was invalid, xmlXPathFreeObject doesn't
 			 *        seem to free everything, so there will be a memory leak. */
 			xmlXPathFreeObject(object);
@@ -1417,7 +1420,7 @@ static void init_opts(struct opts *opts, int options)
 static void free_opts(struct opts *opts)
 {
 	#ifdef USE_SAXON
-	saxon_free(opts->saxon_processor);
+	saxon_free_processor(opts->saxon_processor);
 	#endif
 }
 
@@ -1905,7 +1908,7 @@ cleanup:
 	free(search_dir);
 
 	#ifdef USE_SAXON
-	saxon_free(opts.saxon_processor);
+	saxon_free_processor(opts.saxon_processor);
 	#endif
 
 	if (status > 0) {

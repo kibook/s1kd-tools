@@ -8,10 +8,11 @@
 #include "saxon.h"
 
 /* Return the string value of the first node matched by an XPath expression. */
-static const char *first_xpath_value(SaxonProcessor *processor, XdmNode *node, const char *expr)
+static char *first_xpath_value(SaxonProcessor *processor, XdmNode *node, const char *expr)
 {
 	XPathProcessor *xpath_proc;
 	XdmValue *res;
+	char *ret;
 
 	xpath_proc = processor->newXPathProcessor();
 	xpath_proc->setContextItem(node);
@@ -19,10 +20,15 @@ static const char *first_xpath_value(SaxonProcessor *processor, XdmNode *node, c
 	res = xpath_proc->evaluateSingle(expr);
 
 	if (res == NULL) {
-		return NULL;
+		ret = NULL;
 	} else {
-		return res->toString();
+		ret = strdup(res->toString());
 	}
+
+	delete res;
+	delete xpath_proc;
+
+	return ret;
 }
 
 /* Generate an XPath expression to an XdmNode. */
@@ -46,7 +52,7 @@ static xmlChar *xpath_of(XdmNode *node, SaxonProcessor *processor)
 		const xmlChar *name;
 		XdmNode *parent;
 		XDM_NODE_KIND node_kind;
-		const char *node_ns, *node_name;
+		char *node_ns, *node_name;
 
 		node_kind = node->getNodeKind();
 
@@ -59,20 +65,12 @@ static xmlChar *xpath_of(XdmNode *node, SaxonProcessor *processor)
 		/* Get namespace prefix of node. */
 		node_ns = first_xpath_value(processor, node, "substring-before(name(), ':')");
 
-		if (node_ns == NULL) {
-			node_ns = "";
-		}
-
 		/* Get local name of node. */
 		node_name = first_xpath_value(processor, node, "local-name()");
 
-		if (node_name == NULL) {
-			node_name = "";
-		}
-
 		e = xmlNewChild(path, NULL, BAD_CAST "node", NULL);
 
-		if (strcmp(node_ns, "") != 0) {
+		if (node_ns != NULL && strcmp(node_ns, "") != 0) {
 			xmlSetProp(e, BAD_CAST "ns", BAD_CAST node_ns);
 		}
 
@@ -109,8 +107,11 @@ static xmlChar *xpath_of(XdmNode *node, SaxonProcessor *processor)
 			} else if (node_kind == TEXT) {
 				preceding_xpath = "preceding-sibling::text()";
 			} else {
-				xpath_proc->setParameter("name", (XdmValue *) processor->makeStringValue(node_name));
-				preceding_xpath = "preceding-sibling::*[name()=$name]";
+				XdmAtomicValue *ns_val   = processor->makeStringValue(node_ns);
+				XdmAtomicValue *name_val = processor->makeStringValue(node_name);
+				xpath_proc->setParameter("ns", ns_val);
+				xpath_proc->setParameter("name", name_val);
+				preceding_xpath = "preceding-sibling::*[namespace-uri()=$ns and local-name()=$name]";
 			}
 
 			preceding = xpath_proc->evaluate(preceding_xpath);
@@ -122,9 +123,15 @@ static xmlChar *xpath_of(XdmNode *node, SaxonProcessor *processor)
 			} else{
 				xmlSetProp(e, BAD_CAST "pos", BAD_CAST "1");
 			}
+
+			delete preceding;
+			delete xpath_proc;
 		}
 
 		node = parent;
+
+		free(node_ns);
+		free(node_name);
 	}
 
 	/* Convert XPath expression node to string. */
@@ -172,16 +179,23 @@ extern "C" void *saxon_new_processor(void)
 	return new SaxonProcessor(false);
 }
 
+/* Free Saxon processor. */
+extern "C" void saxon_free_processor(void *saxon_processor)
+{
+	((SaxonProcessor *) saxon_processor)->release();
+}
+
 /* Create new Saxon XPath processor. */
 extern "C" void *saxon_new_xpath_processor(void *saxon_processor)
 {
-	return ((SaxonProcessor *) saxon_processor)->newXPathProcessor();
+	XPathProcessor *p;
+	p = ((SaxonProcessor *) saxon_processor)->newXPathProcessor();
+	return p;
 }
 
-/* Free Saxon processor. */
-extern "C" void saxon_free(void *saxon_processor)
+extern "C" void saxon_free_xpath_processor(void *xpath_processor)
 {
-	((SaxonProcessor *) saxon_processor)->release();
+	delete (XPathProcessor *) xpath_processor;
 }
 
 /* Register a namespace prefix in a Saxon XPath processor. */
@@ -249,6 +263,7 @@ extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath
 					xmlXPathNodeSetAdd(nodeset, o->nodesetval->nodeTab[0]);
 				}
 
+				xmlFree(xpath);
 				xmlXPathFreeObject(o);
 			}
 
@@ -259,6 +274,9 @@ extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath
 		/* Default XPath object if nothing was found. */
 		obj = xmlXPathNewBoolean(false);
 	}
+
+	delete value;
+	delete node;
 
 	return obj;
 }
