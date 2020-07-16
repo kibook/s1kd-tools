@@ -127,10 +127,6 @@ struct opts {
 	 * the DTD.
 	 */
 	bool check_notations;
-
-	#ifdef USE_SAXON
-	void *saxon_processor;
-	#endif
 };
 
 /* Return the first node in a set matching an XPath expression. */
@@ -706,7 +702,8 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			xmlChar *allowedObjectFlag, *path, *use, *brdp;
 
 			#ifdef USE_SAXON
-			void *saxon_xpath = saxon_new_xpath_processor(opts->saxon_processor);
+			void *saxon_processor = saxon_new_processor();
+			void *xpath_processor = saxon_new_xpath_processor(saxon_processor);
 			#endif
 
 			brDecisionRef = firstXPathNode(brex_doc, rules->nodeTab[i], "brDecisionRef");
@@ -722,9 +719,9 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			register_functions(context);
 
 			#ifdef USE_SAXON
-			register_namespaces(context, saxon_xpath, objectPath);
+			register_namespaces(context, xpath_processor, objectPath);
 
-			object = saxon_eval_xpath(opts->saxon_processor, saxon_xpath, objectPath, path, context);
+			object = saxon_eval_xpath(saxon_processor, xpath_processor, objectPath, path, context);
 			#else
 			register_namespaces(context, objectPath);
 
@@ -809,7 +806,8 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			}
 
 			#ifdef USE_SAXON
-			saxon_free_xpath_processor(saxon_xpath);
+			saxon_free_xpath_processor(xpath_processor);
+			saxon_free_processor(saxon_processor);
 			#endif
 			/* FIXME: If the XPath expression was invalid, xmlXPathFreeObject doesn't
 			 *        seem to free everything, so there will be a memory leak. */
@@ -1411,17 +1409,10 @@ static void init_opts(struct opts *opts, int options)
 	opts->strict_sns      = optset(options, S1KD_BREXCHECK_STRICT_SNS);
 	opts->unstrict_sns    = optset(options, S1KD_BREXCHECK_UNSTRICT_SNS);
 	opts->check_notations = optset(options, S1KD_BREXCHECK_NOTATIONS);
-
-	#ifdef USE_SAXON
-	opts->saxon_path_processor = saxon_new_processor();
-	#endif
 }
 
 static void free_opts(struct opts *opts)
 {
-	#ifdef USE_SAXON
-	saxon_free_processor(opts->saxon_processor);
-	#endif
 }
 
 int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
@@ -1600,21 +1591,24 @@ static void show_help(void)
 }
 
 /* Show version information. */
-#ifdef USE_SAXON
-static void show_version(void *saxon_processor)
-{
-	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
-	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(saxon_processor));
-	puts("XPath engine: Saxon");
-}
-#else
 static void show_version(void)
 {
+	#ifdef USE_SAXON
+	void *processor = saxon_new_processor();
+	#endif
+
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
+
+	#ifdef USE_SAXON
+	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(processor));
+	puts("XPath engine: Saxon");
+
+	saxon_free_processor(processor);
+	#else
 	printf("Using libxml %s, libxslt %s and libexslt %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);
 	puts("XPath engine: libxml2");
+	#endif
 }
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -1689,19 +1683,11 @@ int main(int argc, char *argv[])
 
 	search_dir = strdup(".");
 
-	#ifdef USE_SAXON
-	opts.saxon_processor = saxon_new_processor();
-	#endif
-
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
-					#ifdef USE_SAXON
-					show_version(opts.saxon_processor);
-					#else
 					show_version();
-					#endif
 					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
@@ -1908,7 +1894,7 @@ cleanup:
 	free(search_dir);
 
 	#ifdef USE_SAXON
-	saxon_free_processor(opts.saxon_processor);
+	saxon_cleanup();
 	#endif
 
 	if (status > 0) {

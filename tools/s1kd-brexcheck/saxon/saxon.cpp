@@ -182,20 +182,27 @@ extern "C" void *saxon_new_processor(void)
 /* Free Saxon processor. */
 extern "C" void saxon_free_processor(void *saxon_processor)
 {
-	((SaxonProcessor *) saxon_processor)->release();
+	SaxonProcessor *p = (SaxonProcessor *) saxon_processor;
+	delete p;
+}
+
+/* Cleanup Saxon JVM. */
+extern "C" void saxon_cleanup(void)
+{
+	SaxonProcessor::release();
 }
 
 /* Create new Saxon XPath processor. */
 extern "C" void *saxon_new_xpath_processor(void *saxon_processor)
 {
-	XPathProcessor *p;
-	p = ((SaxonProcessor *) saxon_processor)->newXPathProcessor();
-	return p;
+	SaxonProcessor *p = (SaxonProcessor *) saxon_processor;
+	return p->newXPathProcessor();
 }
 
 extern "C" void saxon_free_xpath_processor(void *xpath_processor)
 {
-	delete (XPathProcessor *) xpath_processor;
+	XPathProcessor *p = (XPathProcessor *) xpath_processor;
+	delete p;
 }
 
 /* Register a namespace prefix in a Saxon XPath processor. */
