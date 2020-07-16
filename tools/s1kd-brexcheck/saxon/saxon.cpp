@@ -4,6 +4,7 @@
 #include "XdmValue.h"
 #include "XdmItem.h"
 #include "XdmNode.h"
+#include "XdmAtomicValue.h"
 #include "saxon.h"
 
 /* Return the string value of the first node matched by an XPath expression. */
@@ -30,8 +31,9 @@ static xmlChar *xpath_of(XdmNode *node, SaxonProcessor *processor)
 	xmlNodePtr path, cur;
 	xmlChar *dst = NULL;
 
-	/* FIXME: Not sure how to determine the XPath for atomic values, so
-	 *        just returning XPath to the root element for now. */
+	/* FIXME: Not sure how to handle node types besides XDM_ATOMIC_VALUE
+	 *        and XDM_NODE, so just returning an XPath expression to the
+	 *        root of the document. */
 	if (node->getType() != XDM_NODE) {
 		return xmlCharStrdup("/*");
 	}
@@ -194,13 +196,12 @@ extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath
 {
 	SaxonProcessor *saxon_proc = (SaxonProcessor *) saxon_processor;
 	XPathProcessor *xpath_proc = (XPathProcessor *) xpath_processor;
+	xmlDocPtr doc;
 	xmlChar *xml;
 	int size;
 	XdmNode *node;
 	XdmValue *value;
 	xmlXPathObjectPtr obj;
-	xmlNodeSetPtr nodeset;
-	xmlDocPtr doc;
 
 	/* Perform some sanity checks. */
 	if (ctx == NULL) {
@@ -218,34 +219,46 @@ extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath
 	node = saxon_proc->parseXmlFromString((const char *) xml);
 	xmlFree(xml);
 
-	/* Create an empty libxml2 nodeset. */
-	nodeset = xmlXPathNodeSetCreate(NULL);
-
 	/* Evaluate the XPath expression. */
 	xpath_proc->setContextItem(node);
 	value = xpath_proc->evaluate((const char *) expr);
 
 	if (value) {
-		int count, i;
+		XDM_TYPE type = value->getType();
 
-		/* For each Saxon node, construct an XPath 1.0 expression to it
-		 * in the document, and use that to add the libxml2 node to the
-		 * nodeset. */
-		for (i = 0, count = value->size(); i < count; ++i) {
-			XdmNode *n = (XdmNode *) value->itemAt(i);
-			xmlChar *xpath = xpath_of(n, saxon_proc);
-			xmlXPathObjectPtr o = xmlXPathEval(xpath, ctx);
+		/* Create XPath object with boolean interpretation of atomic value. */
+		if (type == XDM_ATOMIC_VALUE) {
+			obj = xmlXPathNewBoolean(((XdmAtomicValue *) value)->getBooleanValue());
+		/* Create XPath object with a nodeset of the matched nodes. */
+		} else {
+			xmlNodeSetPtr nodeset;
+			int count, i;
 
-			if (o && !xmlXPathNodeSetIsEmpty(o->nodesetval)) {
-				xmlXPathNodeSetAdd(nodeset, o->nodesetval->nodeTab[0]);
+			/* Create an empty libxml2 nodeset. */
+			nodeset = xmlXPathNodeSetCreate(NULL);
+
+			/* For each Saxon node, construct an XPath 1.0 expression to it
+			 * in the document, and use that to add the libxml2 node to the
+			 * nodeset. */
+			for (i = 0, count = value->size(); i < count; ++i) {
+				XdmNode *n = (XdmNode *) value->itemAt(i);
+				xmlChar *xpath = xpath_of(n, saxon_proc);
+				xmlXPathObjectPtr o = xmlXPathEval(xpath, ctx);
+
+				if (o && !xmlXPathNodeSetIsEmpty(o->nodesetval)) {
+					xmlXPathNodeSetAdd(nodeset, o->nodesetval->nodeTab[0]);
+				}
+
+				xmlXPathFreeObject(o);
 			}
 
-			xmlXPathFreeObject(o);
+			/* Wrap the nodeset in a libxml2 XPath object. */
+			obj = xmlXPathNewNodeSetList(nodeset);
 		}
+	} else {
+		/* Default XPath object if nothing was found. */
+		obj = xmlXPathNewBoolean(false);
 	}
-
-	/* Wrap the nodeset in a libxml2 XPath object. */
-	obj = xmlXPathNewNodeSetList(nodeset);
 
 	return obj;
 }
