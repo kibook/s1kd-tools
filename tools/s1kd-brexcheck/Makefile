@@ -37,7 +37,19 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
 
   SOURCE+=$(SAXON_OBJECTS)
   CFLAGS+=-DUSE_SAXON
-  LDFLAGS+=-ldl -lstdc++
+  LDFLAGS+=-lstdc++
+
+  ifneq ($(OSTYPE),msys)
+    LDFLAGS+=-ldl
+  endif
+
+  # Treat MinGW/Cygwin as Linux when compiling Saxon/C API
+  ifeq ($(OSTYPE),msys)
+    SAXON_CFLAGS+=-D__linux__
+  endif
+  ifeq ($(OSTYPE),cygwin)
+    SAXON_CFLAGS+=-D__linux__
+  endif
 
   ifeq ($(DEBUG),1)
     SAXON_CFLAGS+=-g
