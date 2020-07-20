@@ -23,9 +23,9 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-xsl.h: xsl/cirrefs.xsl xsl/stats.xsl
-	xxd -i xsl/cirrefs.xsl > xsl.h
-	xxd -i xsl/stats.xsl >> xsl.h
+xsl.h: xsl/cirrefs.xsl xsl/cirrefsall.xsl xsl/stats.xsl
+	>xsl.h
+	for f in $+; do xxd -i "$$f" >>xsl.h; done
 
 .PHONY: docs clean maintainer-clean install uninstall
 

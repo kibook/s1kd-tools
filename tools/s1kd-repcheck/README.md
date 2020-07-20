@@ -29,6 +29,9 @@ In addition to CIR data modules specified with -R or explicitly linked
 in CIR references, allow CIR references to be resolved against any CIR
 data modules that were specified as objects to check.
 
+-D, --dump-xsl  
+Dump the built-in XSLT used to extract CIR references.
+
 -d, --dir &lt;dir&gt;  
 The directory to start searching for CIR data modules in. By default,
 the current directory is used.
@@ -77,6 +80,9 @@ the number of objects that passed/failed the check.
 
 -v, --verbose  
 Verbose output. Specify multiple times to increase the verbosity.
+
+-X, --xsl &lt;file&gt;  
+Use custom XSLT to extract CIR references.
 
 -x, --xml  
 Print an XML report of the check.

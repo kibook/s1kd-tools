@@ -272,4 +272,121 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="identNumber[partAndSerialNumber]|identno[pnr]">
+    <xsl:variable name="mfc" select="manufacturerCode|mfc"/>
+    <xsl:variable name="pnr" select="partAndSerialNumber/partNumber|pnr"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:attribute name="repcheck_name">
+        <xsl:text>Ident No. </xsl:text>
+        <xsl:value-of select="$mfc"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="$pnr"/>
+      </xsl:attribute>
+      <xsl:attribute name="repcheck_test">
+        <xsl:text>//partIdent[@manufacturerCodeValue='</xsl:text>
+        <xsl:value-of select="$mfc"/>
+        <xsl:text>' and @partNumberValue='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']|//partid[@mfc='</xsl:text>
+        <xsl:value-of select="$mfc"/>
+        <xsl:text>' and @pnr='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']|//supplyIdent[@supplyNumber='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']|//conitemid[@itemnbr='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']|//toolIdent[</xsl:text>
+        <xsl:text>@manufacturerCodeValue='</xsl:text>
+        <xsl:value-of select="$mfc"/>
+        <xsl:text>' and </xsl:text>
+        <xsl:text>@toolNumber='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']|//toolid[</xsl:text>
+        <xsl:text>@mfc='</xsl:text>
+        <xsl:value-of select="$mfc"/>
+        <xsl:text>' and</xsl:text>
+        <xsl:text>@toolnbr='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']</xsl:text>
+      </xsl:attribute>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="spareDescr/identNumber[partAndSerialNumber]|spare/identno[pnr]">
+    <xsl:variable name="mcv" select="manufacturerCode|mfc"/>
+    <xsl:variable name="pnr" select="partAndSerialNumber/partNumber|pnr"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:attribute name="repcheck_name">
+        <xsl:text>Part </xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="$pnr"/>
+      </xsl:attribute>
+      <xsl:attribute name="repcheck_test">
+        <xsl:text>//partIdent[@manufacturerCodeValue='</xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>' and @partNumberValue='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']|//partid[@mfc='</xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>' and @pnr='</xsl:text>
+        <xsl:value-of select="$pnr"/>
+        <xsl:text>']</xsl:text>
+      </xsl:attribute>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="supplyDescr/identNumber[partAndSerialNumber]|supply/identno[pnr]">
+    <xsl:variable name="sn" select="partAndSerialNumber/partNumber|pnr"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:attribute name="repcheck_name">
+        <xsl:text>Supply </xsl:text>
+        <xsl:value-of select="$sn"/>
+      </xsl:attribute>
+      <xsl:attribute name="repcheck_test">
+        <xsl:text>//supplyIdent[@supplyNumber='</xsl:text>
+        <xsl:value-of select="$sn"/>
+        <xsl:text>']|//conitemid[@itemnbr='</xsl:text>
+        <xsl:value-of select="$sn"/>
+        <xsl:text>']</xsl:text>
+      </xsl:attribute>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="supportEquipDescr/identNumber[partAndSerialNumber]|supequi/identno[pnr]">
+    <xsl:variable name="mcv" select="manufacturerCode|mfc"/>
+    <xsl:variable name="tn" select="partAndSerialNumber/partNumber|pnr"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:attribute name="repcheck_name">
+        <xsl:text>Tool </xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="$tn"/>
+      </xsl:attribute>
+      <xsl:attribute name="repcheck_test">
+        <xsl:text>//toolIdent[</xsl:text>
+        <xsl:text>@manufacturerCodeValue='</xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>' and </xsl:text>
+        <xsl:text>@toolNumber='</xsl:text>
+        <xsl:value-of select="$tn"/>
+        <xsl:text>']|//toolid[</xsl:text>
+        <xsl:text>@mfc='</xsl:text>
+        <xsl:value-of select="$mcv"/>
+        <xsl:text>' and</xsl:text>
+        <xsl:text>@toolnbr='</xsl:text>
+        <xsl:value-of select="$tn"/>
+        <xsl:text>']</xsl:text>
+      </xsl:attribute>
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+
 </xsl:transform>

@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.6.0"
+#define VERSION "1.7.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -71,8 +71,8 @@ struct opts {
 	bool search_all_objs;
 	bool output_valid;
 	bool list_refs;
-	bool all_refs;
 	bool rem_delete;
+	xmlDocPtr cir_refs_xsl;
 	struct objects objects;
 	struct objects cirs;
 	xmlNodePtr report;
@@ -378,7 +378,6 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 	xmlNodePtr rpt;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	const char *params[3];
 
 	/* Add object to report. */
 	if (opts->report) {
@@ -388,14 +387,10 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 		rpt = NULL;
 	}
 
-	styledoc = read_xml_mem((const char *) xsl_cirrefs_xsl, xsl_cirrefs_xsl_len);
+	styledoc = xmlCopyDoc(opts->cir_refs_xsl, 1);
 	style = xsltParseStylesheetDoc(styledoc);
 
-	params[0] = "all-refs";
-	params[1] = opts->all_refs ? "true()" : "false()";
-	params[2] = NULL;
-
-	res = xsltApplyStylesheet(style, doc, params);
+	res = xsltApplyStylesheet(style, doc, NULL);
 
 	ctx = xmlXPathNewContext(res);
 	obj = xmlXPathEvalExpression(BAD_CAST "//*[@repcheck_test]", ctx);
@@ -634,6 +629,7 @@ static void show_help(void)
 	puts("  -r, --recursive        Search for CIRs recursively.");
 	puts("  -T, --summary          Print a summary of the check.");
 	puts("  -v, --verbose          Verbose output.");
+	puts("  -X, --xsl <file>       Custom XSLT for extracting CIR references.");
 	puts("  -x, --xml              Output XML report.");
 	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
 	puts("  --version              Show version information.");
@@ -652,12 +648,13 @@ int main(int argc, char **argv)
 {
 	int i, err = 0;
 
-	const char *sopts = "Aad:FfLlNopqR:rTvx^h?";
+	const char *sopts = "AaDd:FfLlNopqR:rTvX:x^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
 		{"all-refs"       , no_argument      , 0, 'A'},
 		{"all"            , no_argument      , 0, 'a'},
+		{"dump-xsl"       , no_argument      , 0, 'D'},
 		{"dir"            , required_argument, 0, 'd'},
 		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
@@ -671,6 +668,7 @@ int main(int argc, char **argv)
 		{"recursive"      , no_argument      , 0, 'r'},
 		{"summary"        , no_argument      , 0, 'T'},
 		{"verbose"        , no_argument      , 0, 'v'},
+		{"xsl"            , required_argument, 0, 'X'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -684,6 +682,8 @@ int main(int argc, char **argv)
 	bool find_cir = false;
 	bool show_stats = false;
 	bool xml_report = false;
+	bool all_refs = false;
+	bool dump_xsl = false;
 
 	xmlDocPtr report_doc = NULL;
 
@@ -695,8 +695,8 @@ int main(int argc, char **argv)
 	opts.search_all_objs = false;
 	opts.output_valid = false;
 	opts.list_refs = false;
-	opts.all_refs = false;
 	opts.rem_delete = false;
+	opts.cir_refs_xsl = NULL;
 
 	init_objects(&opts.objects);
 	init_objects(&opts.cirs);
@@ -713,10 +713,13 @@ int main(int argc, char **argv)
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
 			case 'A':
-				opts.all_refs = true;
+				all_refs = true;
 				break;
 			case 'a':
 				opts.search_all_objs = true;
+				break;
+			case 'D':
+				dump_xsl = true;
 				break;
 			case 'd':
 				free(opts.search_dir);
@@ -762,6 +765,10 @@ int main(int argc, char **argv)
 			case 'v':
 				++opts.verbosity;
 				break;
+			case 'X':
+				free(opts.cir_refs_xsl);
+				opts.cir_refs_xsl = read_xml_doc(optarg);
+				break;
 			case 'x':
 				xml_report = true;
 				break;
@@ -773,6 +780,19 @@ int main(int argc, char **argv)
 				show_help();
 				goto cleanup;
 		}
+	}
+
+	if (opts.cir_refs_xsl == NULL) {
+		if (all_refs) {
+			opts.cir_refs_xsl = read_xml_mem((const char *) xsl_cirrefsall_xsl, xsl_cirrefsall_xsl_len);
+		} else {
+			opts.cir_refs_xsl = read_xml_mem((const char *) xsl_cirrefs_xsl, xsl_cirrefs_xsl_len);
+		}
+	}
+
+	if (dump_xsl) {
+		save_xml_doc(opts.cir_refs_xsl, "-");
+		goto cleanup;
 	}
 
 	if (xml_report || show_stats) {
@@ -839,6 +859,7 @@ cleanup:
 	free_objects(&opts.objects);
 	free_objects(&opts.cirs);
 	free(opts.search_dir);
+	xmlFreeDoc(opts.cir_refs_xsl);
 	xmlFreeDoc(report_doc);
 
 	xmlCleanupParser();
