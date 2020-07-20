@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="051" inWork="02"/>
+        <issueInfo issueNumber="051" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="07"/>
+        <issueDate year="2020" month="07" day="20"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --xml-catalog parser option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Remove automatic inclusion of XSLT identity template.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -1070,15 +1073,6 @@ is an item in the system.
             <verbatimText verbatimStyle="vs11">&lt;para&gt;The Hydraulic pump is an item in the system.&lt;/para&gt;</verbatimText>
           </para>
           <para>The source data module and CIR are combined in to a single XML document which is used as the input to the XSLT script. The root element <verbatimText verbatimStyle="vs12">mux</verbatimText> contains two <verbatimText verbatimStyle="vs12">dmodule</verbatimText> elements. The first is the source data module, and the second is the CIR data module specified with the corresponding -R option. The CIR data module is first filtered on the defined applicability.</para>
-          <para>An "identity" template is automatically inserted in to the custom XSLT script, equivalent to the following:</para>
-          <para>
-            <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
-&lt;xsl:copy&gt;
-&lt;xsl:apply-templates select="@*|node()"/&gt;
-&lt;/xsl:copy&gt;
-&lt;/xsl:template&gt;</verbatimText>
-          </para>
-          <para>This means any elements or attributes which are not matched with a more specific template in the custom XSLT script are automatically copied.</para>
           <para>The set of built-in XSLT scripts used to resolve dependencies can be dumped using the -D option.</para>
         </levelledPara>
         <levelledPara>

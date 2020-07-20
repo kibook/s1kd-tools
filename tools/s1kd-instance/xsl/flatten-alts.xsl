@@ -3,6 +3,12 @@
 
   <xsl:param name="fix-alts-refs"/>
 
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+
   <xsl:template match="assocWarningMalfunctionAlts|
                        bitMessageAlts|
                        commonInfoDescrParaAlts|

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="01"/>
+        <issueInfo issueNumber="026" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="07"/>
+        <issueDate year="2020" month="07" day="20"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --xml-catalog parser option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Remove automatic inclusion of XSLT identity template.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -473,15 +476,7 @@ applicPropertyType="prodattr" applicPropertyValues="A"/&gt;
 &lt;/displayText&gt;
 &lt;/applic&gt;</verbatimText>
           </para>
-          <para>The methods for generating display text can be changed either via the <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file, or by supplying a custom XSLT script with the -x option. The -, option can be used to dump the built-in XSLT as a starting point for a custom script. An identity template is automatically added to the script, equivalent to the following:</para>
-          <para>
-            <verbatimText verbatimStyle="vs11">&lt;xsl:template match="@*|node()"&gt;
-&lt;xsl:copy&gt;
-&lt;xsl:apply-templates select="@*|node()"/&gt;
-&lt;/xsl:copy&gt;
-&lt;/xsl:template&gt;</verbatimText>
-          </para>
-          <para>This means any elements or attributes not matched by a more specific template in the script are copied.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">The methods for generating display text can be changed either via the <verbatimText verbatimStyle="vs02">.disptext</verbatimText> file, or by supplying a custom XSLT script with the -x option. The -, option can be used to dump the built-in XSLT as a starting point for a custom script.</para>
         </levelledPara>
         <levelledPara>
           <title>Display text format string (-F)</title>

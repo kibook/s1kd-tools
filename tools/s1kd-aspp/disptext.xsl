@@ -20,6 +20,14 @@
         <xsl:attribute name="name">range-operator</xsl:attribute>
         <xsl:value-of select="disptext/operators/range"/>
       </xsl:element>
+      <xsl:element name="xsl:template">
+        <xsl:attribute name="match">@*|node()</xsl:attribute>
+        <xsl:element name="xsl:copy">
+          <xsl:element name="xsl:apply-templates">
+            <xsl:attribute name="select">@*|node()</xsl:attribute>
+          </xsl:element>
+        </xsl:element>
+      </xsl:element>
       <xsl:apply-templates select="disptext"/>
       <xsl:element name="xsl:template">
         <xsl:attribute name="match">assert[text()]</xsl:attribute>

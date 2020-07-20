@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "10.1.0"
+#define VERSION "11.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1712,28 +1712,6 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 	return true;
 }
 
-/* Add an "identity" template to an XSL stylesheet */
-static void add_identity(xmlDocPtr style)
-{
-	xmlDocPtr identity;
-	xmlNodePtr stylesheet, first, template;
-
-	identity = read_xml_mem((const char *) ___common_identity_xsl, ___common_identity_xsl_len);
-	template = xmlFirstElementChild(xmlDocGetRootElement(identity));
-
-	stylesheet = xmlDocGetRootElement(style);
-
-	first = xmlFirstElementChild(stylesheet);
-
-	if (first) {
-		xmlAddPrevSibling(first, xmlCopyNode(template, 1));
-	} else {
-		xmlAddChild(stylesheet, xmlCopyNode(template, 1));
-	}
-
-	xmlFreeDoc(identity);
-}
-
 /* Get the appropriate built-in CIR repository XSLT by name */
 static bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *len)
 {
@@ -1899,7 +1877,6 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 
 	if (styledoc) {
 		xsltStylesheetPtr style;
-		add_identity(styledoc);
 		style = xsltParseStylesheetDoc(styledoc);
 		undepend_cir_xsl(dm, cir, style);
 		xsltFreeStylesheet(style);
@@ -2284,7 +2261,6 @@ static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, c
 	xmlNodePtr old;
 
 	styledoc = read_xml_mem((const char *) xml, len);
-	add_identity(styledoc);
 	style = xsltParseStylesheetDoc(styledoc);
 
 	src = xmlCopyDoc(doc, 1);

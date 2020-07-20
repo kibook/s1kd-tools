@@ -21,7 +21,7 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) resources.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-resources.h: elements.list disptext.xsl disptext.xml addTags.xsl ../common/identity.xsl
+resources.h: elements.list disptext.xsl disptext.xml addTags.xsl
 	> $@
 	for f in $+; do xxd -i $$f >> $@; done
 
