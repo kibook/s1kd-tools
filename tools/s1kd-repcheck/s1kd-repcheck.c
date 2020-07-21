@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.7.0"
+#define VERSION "1.8.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -48,6 +48,9 @@
 
 /* Exit status codes. */
 #define EXIT_MAX_OBJECTS 2
+
+/* Namespace for special attributes used to extract CIR references. */
+#define S1KD_REPCHECK_NS BAD_CAST "urn:s1kd-tools:s1kd-repcheck"
 
 /* Verbosity of messages. */
 enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG };
@@ -276,10 +279,48 @@ static bool find_dmod_fname(char *dst, xmlNodePtr dmRefIdent, struct opts *opts)
 	return false;
 }
 
+/* Remove namespace declaration added by tool. */
+static void remove_repcheck_ns(xmlNodePtr node)
+{
+	xmlNsPtr cur, prev;
+
+	cur  = node->nsDef;
+	prev = NULL;
+
+	while (cur) {
+		xmlNsPtr next;
+
+		next = cur->next;
+
+		if (xmlStrcmp(cur->href, S1KD_REPCHECK_NS) == 0) {
+			if (prev == NULL) {
+				node->nsDef = next;
+			} else {
+				prev->next = next;
+			}
+
+			xmlFreeNode((xmlNodePtr) cur);
+		} else {
+			prev = cur;
+		}
+
+		cur = next;
+	}
+}
+
+/* Remove attributes added by tool. */
+static void remove_repcheck_attrs(xmlNodePtr ref, xmlNsPtr ns)
+{
+	xmlUnsetNsProp(ref, ns, BAD_CAST "name");
+	xmlUnsetNsProp(ref, ns, BAD_CAST "test");
+	remove_repcheck_ns(ref);
+}
+
 /* Check a specific CIR reference. */
 static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struct opts *opts)
 {
 	int i, err = 0;
+	xmlAttrPtr ident_attr, xpath_attr;
 	xmlChar *ident, *xpath;
 	long int lineno;
 	xmlXPathContextPtr ctx;
@@ -287,10 +328,13 @@ static int check_cir_ref(xmlNodePtr ref, const char *path, xmlNodePtr rpt, struc
 
 	lineno = xmlGetLineNo(ref);
 
-	ident = xmlGetProp(ref, BAD_CAST "repcheck_name");
-	xpath = xmlGetProp(ref, BAD_CAST "repcheck_test");
-	xmlUnsetProp(ref, BAD_CAST "repcheck_name");
-	xmlUnsetProp(ref, BAD_CAST "repcheck_test");
+	ident_attr = xmlHasNsProp(ref, BAD_CAST "name", S1KD_REPCHECK_NS);
+	xpath_attr = xmlHasNsProp(ref, BAD_CAST "test", S1KD_REPCHECK_NS);
+
+	ident = xmlNodeGetContent((xmlNodePtr) ident_attr);
+	xpath = xmlNodeGetContent((xmlNodePtr) xpath_attr);
+
+	remove_repcheck_attrs(ref, ident_attr->ns);
 
 	/* Check if there is an explicit CIR reference. */
 	ctx = xmlXPathNewContext(ref->doc);
@@ -348,17 +392,15 @@ done:
 /* List a CIR reference without validating it. */
 static void list_cir_ref(const xmlNodePtr ref, const char *path, xmlNodePtr rpt, struct opts *opts)
 {
+	xmlAttrPtr ident_attr;
 	xmlChar *ident;
 	long int lineno;
 
 	lineno = xmlGetLineNo(ref);
 
-	ident = xmlGetProp(ref, BAD_CAST "repcheck_name");
-	xmlUnsetProp(ref, BAD_CAST "repcheck_name");
-	xmlUnsetProp(ref, BAD_CAST "repcheck_test");
-
-	xmlUnsetProp(ref, BAD_CAST "repcheck_name");
-	xmlUnsetProp(ref, BAD_CAST "repcheck_test");
+	ident_attr = xmlHasNsProp(ref, BAD_CAST "name", S1KD_REPCHECK_NS);
+	ident = xmlNodeGetContent((xmlNodePtr) ident_attr);
+	remove_repcheck_attrs(ref, ident_attr->ns);
 
 	if (rpt) {
 		add_ref_to_report(rpt, ref, ident, lineno, NULL, opts);
@@ -393,7 +435,8 @@ static int check_cir_refs(xmlDocPtr doc, const char *path, struct opts *opts)
 	res = xsltApplyStylesheet(style, doc, NULL);
 
 	ctx = xmlXPathNewContext(res);
-	obj = xmlXPathEvalExpression(BAD_CAST "//*[@repcheck_test]", ctx);
+	xmlXPathRegisterNs(ctx, BAD_CAST "s1kd-repcheck", S1KD_REPCHECK_NS);
+	obj = xmlXPathEvalExpression(BAD_CAST "//*[@s1kd-repcheck:test]", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;

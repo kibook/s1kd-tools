@@ -1,3 +1,5 @@
+.PHONY: docs clean maintainer-clean install uninstall
+
 COMMON=../common
 
 SOURCE=s1kd-repcheck.c $(COMMON)/s1kd_tools.c
@@ -26,8 +28,6 @@ $(OUTPUT): $(SOURCE) xsl.h
 xsl.h: xsl/cirrefs.xsl xsl/cirrefsall.xsl xsl/stats.xsl
 	>xsl.h
 	for f in $+; do xxd -i "$$f" >>xsl.h; done
-
-.PHONY: docs clean maintainer-clean install uninstall
 
 docs:
 	$(MAKE) -C doc

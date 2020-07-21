@@ -126,6 +126,83 @@ Do XInclude processing.
 Use an XML catalog when resolving entities. Multiple catalogs may be
 loaded by specifying this option multiple times.
 
+Custom XSLT (-X)
+----------------
+
+What elements are extracted as CIR references for validating, and how
+they are validated, can be configured through a custom XSLT script
+specified with the -X (--xsl) option.
+
+The custom XSLT script should add two attributes to elements which
+should be validated as CIR references:
+
+`name`  
+A descriptive name for the CIR reference that can be used in reports.
+
+For example, the CIR reference:
+
+    <functionalItemRef functionalItemNumber="fin-00001"/>
+
+could be named: "Functional item fin-00001".
+
+`test`  
+An XPath expression used to match the corresponding CIR identification
+element.
+
+For example, the test for the above example could be:
+`//functionalItemIdent[@functionalItemNumber='fin-00001']`.
+
+The namespace for both attributes must be:
+`urn:s1kd-tools:s1kd-repcheck`
+
+Example XSLT template to extract functional item references:
+
+    <xsl:template match="functionalItemRef">
+    <xsl:variable name="fin" select="@functionalItemNumber"/>
+    <xsl:copy>
+    <xsl:apply-templates select="@*"/>
+    <xsl:attribute name="s1kd-repcheck:name">
+    <xsl:text>Functional item </xsl:text>
+    <xsl:value-of select="$fin"/>
+    </xsl:attribute>
+    <xsl:attribute name="s1kd-repcheck:test">
+    <xsl:text>//functionalItemIdent[@functionalItemNumber='</xsl:text>
+    <xsl:value-of select="$fin"/>
+    <xsl:text>']</xsl:text>
+    </xsl:attribute>
+    <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+    </xsl:template>
+
+A custom script also allows validating non-standard types of "CIR"
+references. For example, if a project wants to validate acronyms used in
+data modules against a central repository of acronyms, this could be
+done like so:
+
+    <xsl:template match="acronym">
+    <xsl:variable name="term" select="acronymTerm"/>
+    <xsl:copy>
+    <xsl:apply-templates select="@*"/>
+    <xsl:attribute name="s1kd-repcheck:name">
+    <xsl:text>Acronym </xsl:text>
+    <xsl:value-of select="$term"/>
+    </xsl:attribute>
+    <xsl:attribute name="s1kd-repcheck:test">
+    <xsl:text>//acronym[acronymTerm = '</xsl:text>
+    <xsl:value-of select="$term"/>
+    <xsl:text>']</xsl:text>
+    </xsl:attribute>
+    <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+    </xsl:template>
+
+As there is no standard "acronym" CIR type, the object containing the
+repository would need to be specified explicitly with -R.
+
+The built-in XSLT for extracting CIR references can be dumped as a
+starting point for a custom script by specifying the -D (--dump-xsl)
+option.
+
 EXIT STATUS
 ===========
 

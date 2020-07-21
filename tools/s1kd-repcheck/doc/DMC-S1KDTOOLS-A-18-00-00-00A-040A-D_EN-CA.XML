@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="006" inWork="03"/>
+        <issueInfo issueNumber="006" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="20"/>
+        <issueDate year="2020" month="07" day="21"/>
         <dmTitle>
           <techName>s1kd-repcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -257,6 +257,80 @@
             </definitionListItem>
           </definitionList>
         </para>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Custom XSLT (-X)</title>
+          <para>What elements are extracted as CIR references for validating, and how they are validated, can be configured through a custom XSLT script specified with the -X (--xsl) option.</para>
+          <para>
+            The custom XSLT script should add two attributes to elements which should be validated as CIR references:
+            <definitionList>
+              <definitionListItem>
+                <listItemTerm>
+                  <verbatimText verbatimStyle="vs13">name</verbatimText>
+                </listItemTerm>
+                <listItemDefinition>
+                  <para>A descriptive name for the CIR reference that can be used in reports.</para>
+                  <para>
+                    For example, the CIR reference:
+                    <verbatimText verbatimStyle="vs11"><![CDATA[<functionalItemRef functionalItemNumber="fin-00001"/>]]></verbatimText>
+                    could be named: "Functional item fin-00001".
+                  </para>
+                </listItemDefinition>
+              </definitionListItem>
+              <definitionListItem>
+                <listItemTerm>
+                  <verbatimText verbatimStyle="vs13">test</verbatimText>
+                </listItemTerm>
+                <listItemDefinition>
+                  <para>An XPath expression used to match the corresponding CIR identification element.</para>
+                  <para>
+                    For example, the test for the above example could be: <verbatimText>//functionalItemIdent[@functionalItemNumber='fin-00001']</verbatimText>.</para>
+                </listItemDefinition>
+              </definitionListItem>
+            </definitionList>
+            The namespace for both attributes must be: <verbatimText>urn:s1kd-tools:s1kd-repcheck</verbatimText>
+          </para>
+          <para>
+            Example XSLT template to extract functional item references:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="functionalItemRef">
+<xsl:variable name="fin" select="@functionalItemNumber"/>
+<xsl:copy>
+<xsl:apply-templates select="@*"/>
+<xsl:attribute name="s1kd-repcheck:name">
+<xsl:text>Functional item </xsl:text>
+<xsl:value-of select="$fin"/>
+</xsl:attribute>
+<xsl:attribute name="s1kd-repcheck:test">
+<xsl:text>//functionalItemIdent[@functionalItemNumber='</xsl:text>
+<xsl:value-of select="$fin"/>
+<xsl:text>']</xsl:text>
+</xsl:attribute>
+<xsl:apply-templates select="node()"/>
+</xsl:copy>
+</xsl:template>]]></verbatimText>
+          </para>
+          <para>
+            A custom script also allows validating non-standard types of "CIR" references.
+            For example, if a project wants to validate acronyms used in data modules against a central repository of acronyms, this could be done like so:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<xsl:template match="acronym">
+<xsl:variable name="term" select="acronymTerm"/>
+<xsl:copy>
+<xsl:apply-templates select="@*"/>
+<xsl:attribute name="s1kd-repcheck:name">
+<xsl:text>Acronym </xsl:text>
+<xsl:value-of select="$term"/>
+</xsl:attribute>
+<xsl:attribute name="s1kd-repcheck:test">
+<xsl:text>//acronym[acronymTerm = '</xsl:text>
+<xsl:value-of select="$term"/>
+<xsl:text>']</xsl:text>
+</xsl:attribute>
+<xsl:apply-templates select="node()"/>
+</xsl:copy>
+</xsl:template>]]></verbatimText>
+            As there is no standard "acronym" CIR type, the object containing the repository would need to be specified explicitly with -R.
+          </para>
+          <para>The built-in XSLT for extracting CIR references can be dumped as a starting point for a custom script by specifying the -D (--dump-xsl) option.</para>
+        </levelledPara>
       </levelledPara>
       <levelledPara>
         <title>EXIT STATUS</title>
