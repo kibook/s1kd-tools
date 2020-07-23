@@ -1,15 +1,22 @@
+.PHONY: docs clean maintainer-clean install uninstall
+
 COMMON=../common
 
 SOURCE=s1kd-appcheck.c $(COMMON)/s1kd_tools.c
-OUTPUT=s1kd-appcheck
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-appcheck.exe
+else
+  OUTPUT=s1kd-appcheck
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
 CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -24,10 +31,7 @@ $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 stylesheets.h: combos.xsl stats.xsl
-	> $@
-	for f in $+; do xxd -i $$f >> $@; done
-
-.PHONY: docs clean maintainer-clean install uninstall
+	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 docs:
 	$(MAKE) -C doc

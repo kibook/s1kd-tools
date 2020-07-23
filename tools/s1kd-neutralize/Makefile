@@ -1,13 +1,22 @@
-SOURCE=s1kd-neutralize.c ../common/s1kd_tools.c
-OUTPUT=s1kd-neutralize
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-neutralize.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-neutralize.exe
+else
+  OUTPUT=s1kd-neutralize
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -19,15 +28,10 @@ INSTALL=install -Ds
 all: $(OUTPUT)
 
 stylesheets.h: stylesheets/*.xsl
-	xxd -i stylesheets/rdf.xsl > stylesheets.h
-	xxd -i stylesheets/xlink.xsl >> stylesheets.h
-	xxd -i stylesheets/namespace.xsl >> stylesheets.h
-	xxd -i stylesheets/delete.xsl >> stylesheets.h
+	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
 $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
-
-.PHONY: docs clean maintainer-clean install uninstall
 
 docs:
 	$(MAKE) -C doc

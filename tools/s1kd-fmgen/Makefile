@@ -1,13 +1,22 @@
-SOURCE=s1kd-fmgen.c ../common/s1kd_tools.c
-OUTPUT=s1kd-fmgen
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-fmgen.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-fmgen.exe
+else
+  OUTPUT=s1kd-fmgen
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -22,11 +31,7 @@ $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 xsl.h: fmtypes.xml fmtypes.txt xsl/*
-	xxd -i fmtypes.xml > xsl.h
-	xxd -i fmtypes.txt >> xsl.h
-	for f in xsl/*; do xxd -i "$$f" >> xsl.h; done
-
-.PHONY: docs clean maintainer-clean install uninstall
+	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
 docs:
 	$(MAKE) -C doc

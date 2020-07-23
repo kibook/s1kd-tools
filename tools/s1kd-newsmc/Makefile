@@ -1,13 +1,22 @@
-SOURCE=s1kd-newsmc.c ../common/s1kd_tools.c
-OUTPUT=s1kd-newsmc
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-newsmc.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-newsmc.exe
+else
+  OUTPUT=s1kd-newsmc
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -18,15 +27,11 @@ INSTALL=install -Ds
 
 all: $(OUTPUT)
 
-template.h: scormcontentpackage.xml ../common/to41.xsl ../common/to42.xsl
-	xxd -i scormcontentpackage.xml > template.h
-	xxd -i ../common/to41.xsl >> template.h
-	xxd -i ../common/to42.xsl >> template.h
+template.h: scormcontentpackage.xml $(COMMON)/to41.xsl $(COMMON)/to42.xsl
+	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 $(OUTPUT): $(SOURCE) template.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
-
-.PHONY: docs clean maintainer-clean install uninstall
 
 docs:
 	$(MAKE) -C doc

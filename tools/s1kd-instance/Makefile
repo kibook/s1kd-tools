@@ -1,13 +1,22 @@
-SOURCE=s1kd-instance.c ../common/s1kd_tools.c
-OUTPUT=s1kd-instance
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-instance.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-instance.exe
+else
+  OUTPUT=s1kd-instance
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt libexslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
@@ -18,14 +27,11 @@ INSTALL=install -Ds
 
 all: $(OUTPUT)
 
-xsl.h: ../common/remove-empty-pmentries.xsl xsl/*.xsl cirxsl/*.xsl
-	> xsl.h
-	for f in $+; do xxd -i "$$f" >> xsl.h; done
+xsl.h: $(COMMON)/remove-empty-pmentries.xsl xsl/*.xsl cirxsl/*.xsl
+	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
 $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
-
-.PHONY: docs clean maintainer-clean install uninstall
 
 docs:
 	$(MAKE) -C doc

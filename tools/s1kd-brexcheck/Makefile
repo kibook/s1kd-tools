@@ -1,10 +1,17 @@
 .PHONY: docs clean maintainer-clean install uninstall
 
-SOURCE=s1kd-brexcheck.c ../common/s1kd_tools.c
-OUTPUT=s1kd-brexcheck
+COMMON=../common
+
+SOURCE=s1kd-brexcheck.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-brexcheck.exe
+else
+  OUTPUT=s1kd-brexcheck
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt libexslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
   CFLAGS+=-g
@@ -78,7 +85,7 @@ saxon/saxon.o: saxon/saxon.cpp
 	$(CXX) $(SAXON_CFLAGS) -c -I$(SAXON_C_API) -o $@ `pkg-config --cflags libxml-2.0` $+
 
 brex.h: brex/DMC-*.XML stats.xsl
-	>brex.h; for f in $+; do xxd -i "$$f" >>brex.h; done
+	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
 docs:
 	$(MAKE) -C doc

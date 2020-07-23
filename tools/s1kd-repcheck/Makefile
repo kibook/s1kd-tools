@@ -3,15 +3,20 @@
 COMMON=../common
 
 SOURCE=s1kd-repcheck.c $(COMMON)/s1kd_tools.c
-OUTPUT=s1kd-repcheck
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-repcheck.exe
+else
+  OUTPUT=s1kd-repcheck
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
 CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -26,8 +31,7 @@ $(OUTPUT): $(SOURCE) xsl.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 xsl.h: xsl/cirrefs.xsl xsl/cirrefsall.xsl xsl/stats.xsl
-	>xsl.h
-	for f in $+; do xxd -i "$$f" >>xsl.h; done
+	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
 docs:
 	$(MAKE) -C doc

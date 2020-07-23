@@ -1,13 +1,22 @@
-SOURCE=s1kd-newdm.c ../common/s1kd_tools.c
-OUTPUT=s1kd-newdm
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-newdm.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-newdm.exe
+else
+  OUTPUT=s1kd-newdm
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -18,24 +27,17 @@ INSTALL=install -Ds
 
 all: $(OUTPUT)
 
-templates.h: templates/*.xml ../common/to*.xsl ../common/brexmap.xml
-	> templates.h
-	for t in templates/*.xml; do xxd -i $$t >> templates.h; done
-	for f in ../common/to*.xsl; do xxd -i $$f >> templates.h; done
-	xxd -i ../common/brexmap.xml >> templates.h
+templates.h: templates/*.xml $(COMMON)/to*.xsl $(COMMON)/brexmap.xml
+	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 dmtypes.h: dmtypes.xml dmtypes.txt
-	xxd -i dmtypes.xml > dmtypes.h
-	xxd -i dmtypes.txt >> dmtypes.h
+	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 sns.h: sns/*.XML
-	> sns.h
-	for s in sns/*.XML; do xxd -i $$s >> sns.h; done
+	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 $(OUTPUT): $(SOURCE) templates.h dmtypes.h sns.h
 	$(CC) $(CFLAGS) $(SOURCE) -o $(OUTPUT) $(LDFLAGS)
-
-.PHONY: docs clean maintainer-clean install uninstall
 
 docs:
 	$(MAKE) -C doc

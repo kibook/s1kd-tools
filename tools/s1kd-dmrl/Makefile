@@ -1,13 +1,22 @@
-SOURCE=s1kd-dmrl.c ../common/s1kd_tools.c
-OUTPUT=s1kd-dmrl
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-dmrl.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-dmrl.exe
+else
+  OUTPUT=s1kd-dmrl
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -22,9 +31,7 @@ $(OUTPUT): $(SOURCE) dmrl.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
 dmrl.h: dmrl.xsl
-	xxd -i dmrl.xsl > dmrl.h
-
-.PHONY: docs clean maintainer-clean install uninstall
+	xxd -i $+ > $@
 
 docs:
 	$(MAKE) -C doc

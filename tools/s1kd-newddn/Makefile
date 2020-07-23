@@ -1,13 +1,22 @@
-SOURCE=s1kd-newddn.c ../common/s1kd_tools.c
-OUTPUT=s1kd-newddn
+.PHONY: docs clean maintainer-clean install uninstall
+
+COMMON=../common
+
+SOURCE=s1kd-newddn.c $(COMMON)/s1kd_tools.c
+
+ifeq ($(OS),Windows_NT)
+  OUTPUT=s1kd-newddn.exe
+else
+  OUTPUT=s1kd-newddn
+endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I ../common `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifeq ($(DEBUG),1)
-	CFLAGS+=-g
+  CFLAGS+=-g
 else
-	CFLAGS+=-O3
+  CFLAGS+=-O3
 endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
@@ -18,14 +27,11 @@ INSTALL=install -Ds
 
 all: $(OUTPUT)
 
-templates.h: templates/ddn.xml ../common/to*.xsl
-	xxd -i templates/ddn.xml > templates.h
-	for f in ../common/to*.xsl; do xxd -i $$f >> templates.h; done
+templates.h: templates/ddn.xml $(COMMON)/to*.xsl
+	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 $(OUTPUT): $(SOURCE) templates.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
-
-.PHONY: docs clean maintainer-clean install uninstall
 
 docs:
 	$(MAKE) -C doc
