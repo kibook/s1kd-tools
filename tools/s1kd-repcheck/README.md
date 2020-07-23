@@ -78,6 +78,34 @@ Search for CIR data modules recursively.
 Print a summary of the check after it completes, including statistics on
 the number of objects that passed/failed the check.
 
+-t, --type &lt;type&gt;  
+Validate or list only CIR references of the specified type. The built-in
+types are:
+
+-   acp (Access point)
+
+-   app (Applicability annotation)
+
+-   caut (Caution)
+
+-   cbr (Circuit breaker)
+
+-   cin (Control/Indicator)
+
+-   ent (Enterprise)
+
+-   fin (Functional item)
+
+-   part
+
+-   supply
+
+-   tool
+
+-   warn (Warning)
+
+-   zone
+
 -v, --verbose  
 Verbose output. Specify multiple times to increase the verbosity.
 
@@ -133,26 +161,20 @@ What elements are extracted as CIR references for validating, and how
 they are validated, can be configured through a custom XSLT script
 specified with the -X (--xsl) option.
 
-The custom XSLT script should add two attributes to elements which
-should be validated as CIR references:
+The custom XSLT script should add the following attributes to elements
+which will be validated as CIR references:
+
+`type`  
+A name for the type of CIR reference.
 
 `name`  
 A descriptive name for the CIR reference that can be used in reports.
-
-For example, the CIR reference:
-
-    <functionalItemRef functionalItemNumber="fin-00001"/>
-
-could be named: "Functional item fin-00001".
 
 `test`  
 An XPath expression used to match the corresponding CIR identification
 element.
 
-For example, the test for the above example could be:
-`//functionalItemIdent[@functionalItemNumber='fin-00001']`.
-
-The namespace for both attributes must be:
+The namespace for these attributes must be:
 `urn:s1kd-tools:s1kd-repcheck`
 
 Example XSLT template to extract functional item references:
@@ -161,6 +183,7 @@ Example XSLT template to extract functional item references:
     <xsl:variable name="fin" select="@functionalItemNumber"/>
     <xsl:copy>
     <xsl:apply-templates select="@*"/>
+    <xsl:attribute name="s1kd-repcheck:type">fin</xsl:attribute>
     <xsl:attribute name="s1kd-repcheck:name">
     <xsl:text>Functional item </xsl:text>
     <xsl:value-of select="$fin"/>
@@ -183,6 +206,7 @@ done like so:
     <xsl:variable name="term" select="acronymTerm"/>
     <xsl:copy>
     <xsl:apply-templates select="@*"/>
+    <xsl:attribute name="s1kd-repcheck:type">acr</xsl:attribute>
     <xsl:attribute name="s1kd-repcheck:name">
     <xsl:text>Acronym </xsl:text>
     <xsl:value-of select="$term"/>

@@ -5,6 +5,7 @@
     <xs:sequence>
       <xs:any processContents="skip"/>
     </xs:sequence>
+    <xs:attribute name="type" type="xs:string"/>
     <xs:attribute name="name" type="xs:string"/>
     <xs:attribute name="line" type="xs:integer"/>
     <xs:attribute name="xpath" type="xs:string"/>

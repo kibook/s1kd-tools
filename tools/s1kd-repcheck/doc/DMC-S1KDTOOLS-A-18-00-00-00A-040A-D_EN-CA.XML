@@ -42,7 +42,7 @@
         <simplePara>Add --xml-catalog parser option.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -D (--dump-xsl) and -X (--xsl) options.</simplePara>
+        <simplePara>Add -D (--dump-xsl), -t (--type) and -X (--xsl) options.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -166,6 +166,52 @@
                 <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-t, --type &lt;type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>
+                  Validate or list only CIR references of the specified type. The built-in types are:
+                  <randomList>
+                    <listItem>
+                      <para>acp (Access point)</para>
+                    </listItem>
+                    <listItem>
+                      <para>app (Applicability annotation)</para>
+                    </listItem>
+                    <listItem>
+                      <para>caut (Caution)</para>
+                    </listItem>
+                    <listItem>
+                      <para>cbr (Circuit breaker)</para>
+                    </listItem>
+                    <listItem>
+                      <para>cin (Control/Indicator)</para>
+                    </listItem>
+                    <listItem>
+                      <para>ent (Enterprise)</para>
+                    </listItem>
+                    <listItem>
+                      <para>fin (Functional item)</para>
+                    </listItem>
+                    <listItem>
+                      <para>part</para>
+                    </listItem>
+                    <listItem>
+                      <para>supply</para>
+                    </listItem>
+                    <listItem>
+                      <para>tool</para>
+                    </listItem>
+                    <listItem>
+                      <para>warn (Warning)</para>
+                    </listItem>
+                    <listItem>
+                      <para>zone</para>
+                    </listItem>
+                  </randomList>
+                </para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
@@ -261,19 +307,22 @@
           <title>Custom XSLT (-X)</title>
           <para>What elements are extracted as CIR references for validating, and how they are validated, can be configured through a custom XSLT script specified with the -X (--xsl) option.</para>
           <para>
-            The custom XSLT script should add two attributes to elements which should be validated as CIR references:
+            The custom XSLT script should add the following attributes to elements which will be validated as CIR references:
             <definitionList>
+              <definitionListItem>
+                <listItemTerm>
+                  <verbatimText verbatimStyle="vs13">type</verbatimText>
+                </listItemTerm>
+                <listItemDefinition>
+                  <para>A name for the type of CIR reference.</para>
+                </listItemDefinition>
+              </definitionListItem>
               <definitionListItem>
                 <listItemTerm>
                   <verbatimText verbatimStyle="vs13">name</verbatimText>
                 </listItemTerm>
                 <listItemDefinition>
                   <para>A descriptive name for the CIR reference that can be used in reports.</para>
-                  <para>
-                    For example, the CIR reference:
-                    <verbatimText verbatimStyle="vs11"><![CDATA[<functionalItemRef functionalItemNumber="fin-00001"/>]]></verbatimText>
-                    could be named: "Functional item fin-00001".
-                  </para>
                 </listItemDefinition>
               </definitionListItem>
               <definitionListItem>
@@ -282,12 +331,10 @@
                 </listItemTerm>
                 <listItemDefinition>
                   <para>An XPath expression used to match the corresponding CIR identification element.</para>
-                  <para>
-                    For example, the test for the above example could be: <verbatimText>//functionalItemIdent[@functionalItemNumber='fin-00001']</verbatimText>.</para>
                 </listItemDefinition>
               </definitionListItem>
             </definitionList>
-            The namespace for both attributes must be: <verbatimText>urn:s1kd-tools:s1kd-repcheck</verbatimText>
+            The namespace for these attributes must be: <verbatimText>urn:s1kd-tools:s1kd-repcheck</verbatimText>
           </para>
           <para>
             Example XSLT template to extract functional item references:
@@ -295,6 +342,7 @@
 <xsl:variable name="fin" select="@functionalItemNumber"/>
 <xsl:copy>
 <xsl:apply-templates select="@*"/>
+<xsl:attribute name="s1kd-repcheck:type">fin</xsl:attribute>
 <xsl:attribute name="s1kd-repcheck:name">
 <xsl:text>Functional item </xsl:text>
 <xsl:value-of select="$fin"/>
@@ -315,6 +363,7 @@
 <xsl:variable name="term" select="acronymTerm"/>
 <xsl:copy>
 <xsl:apply-templates select="@*"/>
+<xsl:attribute name="s1kd-repcheck:type">acr</xsl:attribute>
 <xsl:attribute name="s1kd-repcheck:name">
 <xsl:text>Acronym </xsl:text>
 <xsl:value-of select="$term"/>
