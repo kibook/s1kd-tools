@@ -60,10 +60,8 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
 
   ifeq ($(DEBUG),1)
     SAXON_CFLAGS+=-g
-    SAXON_GLUE_CFLAGS+=-g
   else
     SAXON_CFLAGS+=-O3
-    SAXON_GLUE_CFLAGS+=-O3
   endif
 endif
 
@@ -77,9 +75,6 @@ saxon/%.o: $(SAXON_C_API)/%.cpp
 
 saxon/SaxonC%.o: $(SAXON_C_API)/SaxonC%.c
 	$(CC) $(SAXON_CFLAGS) -c -o $@ $+
-
-saxon/SaxonCGlue.o: $(SAXON_C_API)/SaxonCGlue.c
-	$(CC) $(SAXON_GLUE_CFLAGS) -c -o $@ $+
 
 saxon/saxon.o: saxon/saxon.cpp
 	$(CXX) $(SAXON_CFLAGS) -c -I$(SAXON_C_API) -o $@ `pkg-config --cflags libxml-2.0` $+
