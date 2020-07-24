@@ -20,7 +20,7 @@ clean:
 	rm -f $(OUTPUT) $(README)
 
 install:
-	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)
+	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)/$(OUTPUT)
 
 uninstall:
 	rm -f $(MAN_PREFIX)/$(OUTPUT)

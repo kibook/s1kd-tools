@@ -43,7 +43,7 @@ maintainer-clean: clean
 	$(MAKE) -C doc clean
 
 install: $(OUTPUT)
-	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)
+	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)/$(OUTPUT)
 	$(MAKE) -C doc install
 
 uninstall:
