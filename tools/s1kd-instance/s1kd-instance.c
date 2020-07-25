@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "11.0.0"
+#define VERSION "11.0.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1829,33 +1829,36 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 	ctxt = xmlXPathNewContext(cir);
 
 	results = xmlXPathEvalExpression(BAD_CAST "//content", ctxt);
-	content = results->nodesetval->nodeTab[0];
-	xmlXPathFreeObject(results);
-
-	results = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroup", ctxt);
-
-	if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
-		referencedApplicGroup = results->nodesetval->nodeTab[0];
-		strip_applic(defs, referencedApplicGroup, content);
-	}
-
-	xmlXPathFreeObject(results);
-
-	results = xmlXPathEvalExpression(BAD_CAST
-		"//content/commonRepository/*[position()=last()]|"
-		"//content/techRepository/*[position()=last()]|"
-		"//content/techrep/*[position()=last()]|"
-		"//content/illustratedPartsCatalog",
-		ctxt);
 
 	if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
-		if (verbosity > QUIET) {
-			fprintf(stderr, S_INVALID_CIR, cirdocfname);
+		cirnode = xmlDocGetRootElement(cir);
+	} else {
+		content = results->nodesetval->nodeTab[0];
+		xmlXPathFreeObject(results);
+
+		results = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroup", ctxt);
+
+		if (!xmlXPathNodeSetIsEmpty(results->nodesetval)) {
+			referencedApplicGroup = results->nodesetval->nodeTab[0];
+			strip_applic(defs, referencedApplicGroup, content);
 		}
-		exit(EXIT_BAD_XML);
+
+		xmlXPathFreeObject(results);
+
+		results = xmlXPathEvalExpression(BAD_CAST
+			"//content/commonRepository/*[position()=last()]|"
+			"//content/techRepository/*[position()=last()]|"
+			"//content/techrep/*[position()=last()]|"
+			"//content/illustratedPartsCatalog",
+			ctxt);
+
+		if (xmlXPathNodeSetIsEmpty(results->nodesetval)) {
+			cirnode = xmlDocGetRootElement(cir);
+		} else {
+			cirnode = results->nodesetval->nodeTab[0];
+		}
 	}
 
-	cirnode = results->nodesetval->nodeTab[0];
 	xmlXPathFreeObject(results);
 
 	cirtype = (char *) cirnode->name;
@@ -1889,25 +1892,21 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 	}
 
 	if (add_src) {
-		xmlNodePtr security, dmIdent, repositorySourceDmIdent, cur;
+		xmlNodePtr dmIdent;
 
-		ctxt = xmlXPathNewContext(dm);
-		results = xmlXPathEvalExpression(BAD_CAST "//security", ctxt);
-		security = results->nodesetval->nodeTab[0];
-		xmlXPathFreeObject(results);
-		xmlXPathFreeContext(ctxt);
+		dmIdent = xpath_first_node(cir, NULL, BAD_CAST "//dmIdent");
 
-		repositorySourceDmIdent = xmlNewNode(NULL, BAD_CAST "repositorySourceDmIdent");
-		repositorySourceDmIdent = xmlAddPrevSibling(security, repositorySourceDmIdent);
+		if (dmIdent) {
+			xmlNodePtr security, repositorySourceDmIdent, cur;
 
-		ctxt = xmlXPathNewContext(cir);
-		results = xmlXPathEvalExpression(BAD_CAST "//dmIdent", ctxt);
-		dmIdent = results->nodesetval->nodeTab[0];
-		xmlXPathFreeObject(results);
-		xmlXPathFreeContext(ctxt);
+			security = xpath_first_node(dm, NULL, BAD_CAST "//security");
 
-		for (cur = dmIdent->children; cur; cur = cur->next) {
-			xmlAddChild(repositorySourceDmIdent, xmlCopyNode(cur, 1));
+			repositorySourceDmIdent = xmlNewNode(NULL, BAD_CAST "repositorySourceDmIdent");
+			repositorySourceDmIdent = xmlAddPrevSibling(security, repositorySourceDmIdent);
+
+			for (cur = dmIdent->children; cur; cur = cur->next) {
+				xmlAddChild(repositorySourceDmIdent, xmlCopyNode(cur, 1));
+			}
 		}
 	}
 
