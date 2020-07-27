@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.4.0"
+#define VERSION "4.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -60,6 +60,7 @@ struct metadata {
 
 struct icn_metadata {
 	char *key;
+	xmlChar *(*get)(const char *, struct opts *);
 	void (*show)(const char *, struct opts *);
 };
 
@@ -2289,14 +2290,22 @@ static struct metadata metadata[] = {
 	{NULL}
 };
 
-static void show_icn_code(const char *bname, struct opts *opts)
+static xmlChar *get_icn_code(const char *bname, struct opts *opts)
 {
 	int n;
 	n = strchr(bname, '.') - bname;
-	printf("%.*s", n, bname);
+	return xmlCharStrndup(bname, n);
 }
 
-static void show_icn_sec(const char *bname, struct opts *opts)
+static void show_icn_code(const char *bname, struct opts *opts)
+{
+	xmlChar *s;
+	s = get_icn_code(bname, opts);
+	printf("%s", (char *) s);
+	free(s);
+}
+
+static xmlChar *get_icn_sec(const char *bname, struct opts *opts)
 {
 	char *s, *e;
 	int n;
@@ -2304,10 +2313,18 @@ static void show_icn_sec(const char *bname, struct opts *opts)
 	++s;
 	e = strchr(s, '.');
 	n = e - s;
-	printf("%.*s", n, s);
+	return xmlCharStrndup(s, n);
 }
 
-static void show_icn_iss(const char *bname, struct opts *opts)
+static void show_icn_sec(const char *bname, struct opts *opts)
+{
+	xmlChar *s;
+	s = get_icn_sec(bname, opts);
+	printf("%s", (char *) s);
+	free(s);
+}
+
+static xmlChar *get_icn_iss(const char *bname, struct opts *opts)
 {
 	char *s, *e;
 	int n;
@@ -2315,7 +2332,20 @@ static void show_icn_iss(const char *bname, struct opts *opts)
 	s = s - 3;
 	e = strchr(s, '-');
 	n = e - s;
-	printf("%.*s", n, s);
+	return xmlCharStrndup(s, n);
+}
+
+static void show_icn_iss(const char *bname, struct opts *opts)
+{
+	xmlChar *s;
+	s = get_icn_iss(bname, opts);
+	printf("%s", (char *) s);
+	free(s);
+}
+
+static xmlChar *get_icn_type(const char *bname, struct opts *opts)
+{
+	return xmlCharStrdup("icn");
 }
 
 static void show_icn_type(const char *bname, struct opts *opts)
@@ -2324,10 +2354,10 @@ static void show_icn_type(const char *bname, struct opts *opts)
 }
 
 static struct icn_metadata icn_metadata[] = {
-	{"code", show_icn_code},
-	{"issueNumber", show_icn_iss},
-	{"securityClassification", show_icn_sec},
-	{"type", show_icn_type},
+	{"code", get_icn_code, show_icn_code},
+	{"issueNumber", get_icn_iss, show_icn_iss},
+	{"securityClassification", get_icn_sec, show_icn_sec},
+	{"type", get_icn_type, show_icn_type},
 	{NULL}
 };
 
@@ -2662,7 +2692,28 @@ static xmlChar *get_cond_content(int i, xmlXPathContextPtr ctx, const char *fnam
 	return NULL;
 }
 
-static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname, struct opts *opts)
+static int condition_cmp(const xmlChar *op, const xmlChar *content, const xmlChar *val, const xmlChar *regex)
+{
+	int cmp;
+
+	if (regex) {
+		switch (op[0]) {
+			case '=': cmp = val == NULL ? content != NULL : match_pattern(content, val); break;
+			case '~': cmp = val == NULL ? content == NULL : !match_pattern(content, val); break;
+			default: cmp = 0; break;
+		}
+	} else {
+		switch (op[0]) {
+			case '=': cmp = val == NULL ? content != NULL : xmlStrcmp(content, val) == 0; break;
+			case '~': cmp = val == NULL ? content == NULL : xmlStrcmp(content, val) != 0; break;
+			default: cmp = 0; break;
+		}
+	}
+
+	return cmp;
+}
+
+static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fname, const char *bname, struct opts *opts)
 {
 	xmlChar *key, *val, *op, *regex;
 	int i, cmp = 0;
@@ -2672,27 +2723,29 @@ static int condition_met(xmlXPathContextPtr ctx, xmlNodePtr cond, const char *fn
 	op = xmlGetProp(cond, BAD_CAST "op");
 	regex = xmlGetProp(cond, BAD_CAST "regex");
 
-	for (i = 0; metadata[i].key; ++i) {
-		if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
-			xmlChar *content;
+	if (is_icn(bname)) {
+		for (i = 0; icn_metadata[i].key; ++i) {
+			if (xmlStrcmp(key, BAD_CAST icn_metadata[i].key) == 0) {
+				xmlChar *content;
 
-			content = get_cond_content(i, ctx, fname, opts);
+				content = icn_metadata[i].get(bname, opts);
+				cmp = condition_cmp(op, content, val, regex);
+				xmlFree(content);
 
-			if (regex) {
-				switch (op[0]) {
-					case '=': cmp = val == NULL ? content != NULL : match_pattern(content, val); break;
-					case '~': cmp = val == NULL ? content == NULL : !match_pattern(content, val); break;
-				}
-			} else {
-				switch (op[0]) {
-					case '=': cmp = val == NULL ? content != NULL : xmlStrcmp(content, val) == 0; break;
-					case '~': cmp = val == NULL ? content == NULL : xmlStrcmp(content, val) != 0; break;
-					default: break;
-				}
+				break;
 			}
+		}
+	} else {
+		for (i = 0; metadata[i].key; ++i) {
+			if (xmlStrcmp(key, BAD_CAST metadata[i].key) == 0) {
+				xmlChar *content;
 
-			xmlFree(content);
-			break;
+				content = get_cond_content(i, ctx, fname, opts);
+				cmp = condition_cmp(op, content, val, regex);
+				xmlFree(content);
+
+				break;
+			}
 		}
 	}
 
@@ -2751,23 +2804,21 @@ static int show_or_edit_metadata(const char *fname, struct opts *opts)
 	xmlXPathContextPtr ctxt;
 	int edit = 0;
 	xmlNodePtr cond;
+	char *s, *bname;
 
 	doc = read_xml_doc(fname);
-
 	ctxt = xmlXPathNewContext(doc);
 
+	s = strdup(fname);
+	bname = basename(s);
+
 	for (cond = opts->conds->children; cond; cond = cond->next) {
-		if (!condition_met(ctxt, cond, fname, opts)) {
+		if (!condition_met(ctxt, cond, fname, bname, opts)) {
 			err = EXIT_CONDITION_UNMET;
 		}
 	}
 
 	if (!err) {
-		char *s, *bname;
-
-		s = strdup(fname);
-		bname = basename(s);
-
 		if (opts->execstr) {
 			err = execfile(opts->execstr, fname) != 0;
 		} else if (opts->fmtstr) {
@@ -2823,8 +2874,6 @@ static int show_or_edit_metadata(const char *fname, struct opts *opts)
 		} else {
 			err = show_all_metadata(ctxt, opts);
 		}
-
-		free(s);
 	}
 
 	xmlXPathFreeContext(ctxt);
@@ -2844,6 +2893,7 @@ static int show_or_edit_metadata(const char *fname, struct opts *opts)
 		putchar('\n');
 	}
 
+	free(s);
 	xmlFreeDoc(doc);
 
 	return err;
