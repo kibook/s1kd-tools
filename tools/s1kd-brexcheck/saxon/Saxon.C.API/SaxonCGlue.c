@@ -175,6 +175,7 @@ void initJavaRT(HANDLE myDllHandle, JavaVM** pjvm, JNIEnv** penv)
 #endif
 		int result;
 		JavaVMInitArgs args;
+/*
 		JNI_GetDefaultJavaVMInitArgs_func =
 			(jint(JNICALL *) (void *args))
 #if !(defined (__linux__) || (defined (__APPLE__) && defined(__MACH__)))
@@ -204,11 +205,13 @@ void initJavaRT(HANDLE myDllHandle, JavaVM** pjvm, JNIEnv** penv)
 			fprintf(stderr, "%s doesn't contain public JNI_CreateJavaVM\n", getDllname());
 			exit(1);
 		}
+*/
 
 		memset(&args, 0, sizeof(args));
 
 		args.version = JNI_VERSION_1_2;
-		result = JNI_GetDefaultJavaVMInitArgs_func(&args);
+		/*result = JNI_GetDefaultJavaVMInitArgs_func(&args);*/
+		result = JNI_GetDefaultJavaVMInitArgs(&args);
 		if (result != JNI_OK) {
 			fprintf(stderr, "JNI_GetDefaultJavaVMInitArgs() failed with result\n");
 			exit(1);
@@ -218,7 +221,8 @@ void initJavaRT(HANDLE myDllHandle, JavaVM** pjvm, JNIEnv** penv)
 		 * NOTE: no JVM is actually created
 		 * this call to JNI_CreateJavaVM is intended for JET RT initialization
 		 */
-		result = JNI_CreateJavaVM_func(pjvm, (void **)penv, &args);
+		/*result = JNI_CreateJavaVM_func(pjvm, (void **)penv, &args);*/
+		result = JNI_CreateJavaVM(pjvm, (void **)penv, &args);
 		if (result != JNI_OK) {
 			fprintf(stderr, "JNI_CreateJavaVM() failed with result: %i\n", result);
 			exit(1);

@@ -44,7 +44,7 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
 
   SOURCE+=$(SAXON_OBJECTS)
   CFLAGS+=-DUSE_SAXON
-  LDFLAGS+=-lstdc++
+  LDFLAGS+=-lstdc++ -lsaxonhec
 
   ifneq ($(OSTYPE),msys)
     LDFLAGS+=-ldl
@@ -59,7 +59,7 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
   endif
 
   ifeq ($(DEBUG),1)
-    SAXON_CFLAGS+=-g
+    SAXON_CFLAGS+=-g -DDEBUG
   else
     SAXON_CFLAGS+=-O3
   endif

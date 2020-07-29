@@ -181,7 +181,7 @@ SaxonProcessor::SaxonProcessor(bool l){
      * By the time of JET initialization, all components should be loaded.
      */
 
-    SaxonProcessor::sxn_environ->myDllHandle = loadDefaultDll ();
+    /*SaxonProcessor::sxn_environ->myDllHandle = loadDefaultDll ();*/
 	
     /*
      * Initialize JET run-time.
@@ -228,7 +228,7 @@ SaxonProcessor::SaxonProcessor(const char * configFile){
      * By the time of JET initialization, all components should be loaded.
      */
 
-    SaxonProcessor::sxn_environ->myDllHandle = loadDefaultDll ();
+    /*SaxonProcessor::sxn_environ->myDllHandle = loadDefaultDll ();*/
 
     /*
      * Initialize JET run-time.
@@ -493,7 +493,7 @@ const char * SaxonProcessor::version() {
          int verLen = strlen(tempVersionStr)+22+strlen(CVERSION)+1;
          versionStr =new char [verLen];
          snprintf(versionStr, verLen, "Saxon/C %s %s %s", CVERSION, "running with", tempVersionStr);
-         delete tempVersionStr;
+         //delete tempVersionStr;
 
     }
     return versionStr;
