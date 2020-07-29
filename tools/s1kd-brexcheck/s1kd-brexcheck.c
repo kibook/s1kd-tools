@@ -18,7 +18,7 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.4.4"
+#define VERSION "4.4.5"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -670,9 +670,9 @@ static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
 			for (cur_ns = cur->nsDef; cur_ns; cur_ns = cur_ns->next) {
 				xmlXPathRegisterNs(ctx, cur_ns->prefix, cur_ns->href);
 
-				#ifdef USE_SAXON
+#ifdef USE_SAXON
 				saxon_register_namespace(saxon_xpath, cur_ns->prefix, cur_ns->href);
-				#endif
+#endif
 
 			}
 		}
@@ -680,8 +680,11 @@ static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
 }
 
 /* Check the context rules of a BREX DM against a CSDB object. */
-static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname,
-	const char *brexfname, xmlNodePtr documentNode, struct opts *opts)
+#ifdef USE_SAXON
+static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname, const char *brexfname, xmlNodePtr documentNode, struct opts *opts, void *saxon_processor, void *saxon_node)
+#else
+static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname, const char *brexfname, xmlNodePtr documentNode, struct opts *opts)
+#endif
 {
 	xmlChar *defaultBrSeverityLevel;
 	int nerr = 0;
@@ -701,10 +704,9 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			xmlNodePtr brDecisionRef, objectPath, objectUse;
 			xmlChar *allowedObjectFlag, *path, *use, *brdp;
 
-			#ifdef USE_SAXON
-			void *saxon_processor = saxon_new_processor();
+#ifdef USE_SAXON
 			void *xpath_processor = saxon_new_xpath_processor(saxon_processor);
-			#endif
+#endif
 
 			brDecisionRef = firstXPathNode(brex_doc, rules->nodeTab[i], "brDecisionRef");
 			objectPath = firstXPathNode(brex_doc, rules->nodeTab[i], "objectPath|objpath");
@@ -718,15 +720,15 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			context = xmlXPathNewContext(doc);
 			register_functions(context);
 
-			#ifdef USE_SAXON
+#ifdef USE_SAXON
 			register_namespaces(context, xpath_processor, objectPath);
 
-			object = saxon_eval_xpath(saxon_processor, xpath_processor, objectPath, path, context);
-			#else
+			object = saxon_eval_xpath(saxon_processor, xpath_processor, saxon_node, objectPath, path, context);
+#else
 			register_namespaces(context, objectPath);
 
 			object = xmlXPathEvalExpression(path, context);
-			#endif
+#endif
 
 			if (object != NULL) {
 				if (is_invalid(rules->nodeTab[i], (char *) allowedObjectFlag, object, opts)) {
@@ -805,10 +807,9 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 				}
 			}
 
-			#ifdef USE_SAXON
+#ifdef USE_SAXON
 			saxon_free_xpath_processor(xpath_processor);
-			saxon_free_processor(saxon_processor);
-			#endif
+#endif
 			/* FIXME: If the XPath expression was invalid, xmlXPathFreeObject doesn't
 			 *        seem to free everything, so there will be a memory leak. */
 			xmlXPathFreeObject(object);
@@ -1125,9 +1126,11 @@ static void print_valid_fnames(xmlNodePtr node)
 }
 
 /* Check context, SNS, and notation rules of BREX DMs against a CSDB object. */
-static int check_brex(xmlDocPtr dmod_doc, const char *docname,
-	char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck,
-	struct opts *opts)
+#ifdef USE_SAXON
+static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck, struct opts *opts, void *saxon_processor)
+#else
+static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck, struct opts *opts)
+#endif
 {
 	xmlDocPtr brex_doc;
 	xmlNodePtr documentNode;
@@ -1141,6 +1144,10 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 	xmlDocPtr validtree = NULL;
 
+#ifdef USE_SAXON
+	void *saxon_node;
+#endif
+
 	/* Make a copy of the original XML tree before performing extra
 	 * processing on it. */
 	if (output_tree) {
@@ -1151,6 +1158,10 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 	if (rem_delete) {
 		rem_delete_elems(dmod_doc);
 	}
+
+#ifdef USE_SAXON
+	saxon_node = saxon_new_node(saxon_processor, dmod_doc);
+#endif
 
 	schema = xmlGetNsProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
 
@@ -1188,8 +1199,11 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 
 		result = xmlXPathEvalExpression(STRUCT_OBJ_RULE_PATH, context);
 
-		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname,
-			brex_fnames[i], documentNode, opts);
+#ifdef USE_SAXON
+		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname, brex_fnames[i], documentNode, opts, saxon_processor, saxon_node);
+#else
+		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname, brex_fnames[i], documentNode, opts);
+#endif
 
 		if (opts->verbosity >= VERBOSE) {
 			fprintf(stderr,
@@ -1219,6 +1233,10 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname,
 		}
 		xmlFreeDoc(validtree);
 	}
+
+#ifdef USE_SAXON
+	saxon_free_node(saxon_node);
+#endif
 
 	return total;
 }
@@ -1425,6 +1443,9 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 	xmlNodePtr node;
 	const char *brex_dmc;
 	struct opts opts;
+#ifdef USE_SAXON
+	void *saxon_processor;
+#endif
 
 	init_opts(&opts, options);
 
@@ -1442,7 +1463,17 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 	ctx = xmlXPathNewContext(brex);
 	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
 
+#ifdef USE_SAXON
+	saxon_processor = saxon_new_processor();
+	saxon_node = saxon_new_node(saxon_processor, doc);
+
+	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node, &opts, saxon_processor, saxon_node);
+
+	saxon_free_node(saxon_node);
+	saxon_free_processor(saxon_processor);
+#else
 	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node, &opts);
+#endif
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
@@ -1484,6 +1515,9 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
 	struct opts opts;
+#ifdef USE_SAXON
+	void *saxon_processor, *saxon_node;
+#endif
 
 	init_opts(&opts, options);
 
@@ -1522,7 +1556,17 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 		xmlFreeDoc(notationRulesDoc);
 	}
 
+#ifdef USE_SAXON
+	saxon_processor = saxon_new_processor();
+	saxon_node = saxon_new_node(saxon_processor, doc);
+
+	err += check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts, saxon_processor, saxon_node);
+
+	saxon_free_node(saxon_node);
+	saxon_free_processor(saxon_processor);
+#else
 	err += check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts);
+#endif
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
@@ -1591,31 +1635,27 @@ static void show_help(void)
 }
 
 /* Show version information. */
+#ifdef USE_SAXON
+static void show_version(void *saxon_processor)
+#else
 static void show_version(void)
+#endif
 {
-	#ifdef USE_SAXON
-	void *processor = saxon_new_processor();
-	#endif
-
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 
-	#ifdef USE_SAXON
-	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(processor));
+#ifdef USE_SAXON
+	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(saxon_processor));
 	puts("XPath engine: Saxon");
-
-	saxon_free_processor(processor);
-	#else
+#else
 	printf("Using libxml %s, libxslt %s and libexslt %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);
 	puts("XPath engine: libxml2");
-	#endif
+#endif
 }
 
 int main(int argc, char *argv[])
 {
 	int c;
 	int i;
-
-	xmlDocPtr dmod_doc;
 
 	char (*brex_fnames)[PATH_MAX] = malloc(BREX_MAX * PATH_MAX);
 	int num_brex_fnames = 0;
@@ -1681,13 +1721,23 @@ int main(int argc, char *argv[])
 	};
 	int loptind = 0;
 
+#ifdef USE_SAXON
+	void *saxon_processor;
+
+	saxon_processor = saxon_new_processor();
+#endif
+
 	search_dir = strdup(".");
 
 	while ((c = getopt_long(argc, argv, sopts, lopts, &loptind)) != -1) {
 		switch (c) {
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
+#ifdef USE_SAXON
+					show_version(saxon_processor);
+#else
 					show_version();
+#endif
 					goto cleanup;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
@@ -1777,7 +1827,7 @@ int main(int argc, char *argv[])
 		 * module which referenced it. */
 		bool ref_brex = false;
 
-		dmod_doc = read_xml_doc(dmod_fnames[i]);
+		xmlDocPtr dmod_doc = read_xml_doc(dmod_fnames[i]);
 
 		if (!dmod_doc) {
 			if (ignore_empty) {
@@ -1849,8 +1899,11 @@ int main(int argc, char *argv[])
 				dmod_fnames, num_dmod_fnames, dmod_doc, &opts);
 		}
 
-		status += check_brex(dmod_doc, dmod_fnames[i],
-			brex_fnames, num_brex_fnames, brexCheck, &opts);
+#ifdef USE_SAXON
+		status += check_brex(dmod_doc, dmod_fnames[i], brex_fnames, num_brex_fnames, brexCheck, &opts, saxon_processor);
+#else
+		status += check_brex(dmod_doc, dmod_fnames[i], brex_fnames, num_brex_fnames, brexCheck, &opts);
+#endif
 
 		xmlFreeDoc(dmod_doc);
 
@@ -1893,9 +1946,10 @@ cleanup:
 	free(dmod_fnames);
 	free(search_dir);
 
-	#ifdef USE_SAXON
+#ifdef USE_SAXON
+	saxon_free_processor(saxon_processor);
 	saxon_cleanup();
-	#endif
+#endif
 
 	if (status > 0) {
 		return EXIT_BREX_ERROR;

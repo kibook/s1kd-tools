@@ -199,6 +199,7 @@ extern "C" void *saxon_new_xpath_processor(void *saxon_processor)
 	return p->newXPathProcessor();
 }
 
+/* Free Saxon XPath processor. */
 extern "C" void saxon_free_xpath_processor(void *xpath_processor)
 {
 	XPathProcessor *p = (XPathProcessor *) xpath_processor;
@@ -211,34 +212,39 @@ extern "C" void saxon_register_namespace(void *xpath_processor, const xmlChar *p
 	((XPathProcessor *) xpath_processor)->declareNamespace((const char *) prefix, (const char *) href);
 }
 
-/* Use Saxon to evaluate an XPath expression in a libxml2 XPath context,
- * returning a libxml2 nodeset. */
-extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath_processor, xmlNodePtr ns, const xmlChar *expr, xmlXPathContextPtr ctx)
+/* Create a Saxon XdmNode from a libxml2 doc. */
+extern "C" void *saxon_new_node(void *saxon_processor, xmlDocPtr doc)
 {
-	SaxonProcessor *saxon_proc = (SaxonProcessor *) saxon_processor;
-	XPathProcessor *xpath_proc = (XPathProcessor *) xpath_processor;
-	xmlDocPtr doc;
+	SaxonProcessor *p = (SaxonProcessor *) saxon_processor;
 	xmlChar *xml;
 	int size;
 	XdmNode *node;
-	XdmValue *value;
-	xmlXPathObjectPtr obj;
-
-	/* Perform some sanity checks. */
-	if (ctx == NULL) {
-		return NULL;
-	}
-
-	doc = ctx->doc;
-
-	if (doc == NULL) {
-		return NULL;
-	}
 
 	/* Pass libxml2 doc to Saxon processor as string. */
 	xmlDocDumpMemory(doc, &xml, &size);
-	node = saxon_proc->parseXmlFromString((const char *) xml);
+	node = p->parseXmlFromString((const char *) xml);
 	xmlFree(xml);
+
+	return node;
+}
+
+/* Free a Saxon XdmNode. */
+extern "C" void saxon_free_node(void *saxon_node)
+{
+	XdmNode *node = (XdmNode *) saxon_node;
+
+	delete node;
+}
+
+/* Use Saxon to evaluate an XPath expression in a libxml2 XPath context,
+ * returning a libxml2 nodeset. */
+extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath_processor, void *saxon_node, xmlNodePtr ns, const xmlChar *expr, xmlXPathContextPtr ctx)
+{
+	SaxonProcessor *saxon_proc = (SaxonProcessor *) saxon_processor;
+	XPathProcessor *xpath_proc = (XPathProcessor *) xpath_processor;
+	XdmNode *node = (XdmNode *) saxon_node;
+	XdmValue *value;
+	xmlXPathObjectPtr obj;
 
 	/* Evaluate the XPath expression. */
 	xpath_proc->setContextItem(node);
@@ -283,7 +289,6 @@ extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath
 	}
 
 	delete value;
-	delete node;
 
 	return obj;
 }
