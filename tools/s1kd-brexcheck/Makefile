@@ -26,6 +26,12 @@ INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -Ds
 
 ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
+  ifeq ($(OS),Windows_NT)
+    SAXON_C_DIR=/cygdrive/c/Progra~1/Saxonica/SaxonHEC1.2.1
+  else
+    SAXON_C_DIR=/usr/lib
+  endif
+
   SAXON_C_API=saxon/Saxon.C.API
 
   SAXON_OBJECTS+=saxon/saxon.o
@@ -44,7 +50,7 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
 
   SOURCE+=$(SAXON_OBJECTS)
   CFLAGS+=-DUSE_SAXON
-  LDFLAGS+=-lstdc++ -lsaxonhec
+  LDFLAGS+=-lstdc++ -L$(SAXON_C_DIR) -lsaxonhec
 
   ifneq ($(OSTYPE),msys)
     LDFLAGS+=-ldl
