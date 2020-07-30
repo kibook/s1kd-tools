@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.0.0"
+#define VERSION "12.0.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1576,11 +1576,20 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 {
 	struct ident ident = {0};
 	char iss[8] = "";
+	const char *dname, *sep;
+
+	if (strcmp(dir, ".") == 0) {
+		dname = "";
+		sep = "";
+	} else {
+		dname = dir;
+		sep = "/";
+	}
 
 	if (!init_ident(&ident, dm)) {
 		char *base;
 		base = basename(src);
-		snprintf(out, PATH_MAX, "%s/%s", dir, base);
+		snprintf(out, PATH_MAX, "%s%s%s", dname, sep, base);
 		return true;
 	}
 
@@ -1601,8 +1610,9 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 
 	if (ident.type == PM) {
 		if (ident.extended) {
-			sprintf(out, "%s/PME-%s-%s-%s-%s-%s-%s%s_%s-%s.XML",
-				dir,
+			sprintf(out, "%s%sPME-%s-%s-%s-%s-%s-%s%s_%s-%s.XML",
+				dname,
+				sep,
 				ident.extensionProducer,
 				ident.extensionCode,
 				ident.modelIdentCode,
@@ -1613,8 +1623,9 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 				ident.languageIsoCode,
 				ident.countryIsoCode);
 		} else {
-			sprintf(out, "%s/PMC-%s-%s-%s-%s%s_%s-%s.XML",
-				dir,
+			sprintf(out, "%s%sPMC-%s-%s-%s-%s%s_%s-%s.XML",
+				dname,
+				sep,
 				ident.modelIdentCode,
 				ident.senderIdent,
 				ident.pmNumber,
@@ -1624,8 +1635,9 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 				ident.countryIsoCode);
 		}
 	} else if (ident.type == DML) {
-		sprintf(out, "%s/DML-%s-%s-%s-%s-%s%s.XML",
-			dir,
+		sprintf(out, "%s%sDML-%s-%s-%s-%s-%s%s.XML",
+			dname,
+			sep,
 			ident.modelIdentCode,
 			ident.senderIdent,
 			ident.dmlCommentType,
@@ -1640,8 +1652,9 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 		}
 
 		if (ident.extended) {
-			sprintf(out, "%s/%s-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
-				dir,
+			sprintf(out, "%s%s%s-%s-%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+				dname,
+				sep,
 				ident.type == DM ? "DME" : "UPE",
 				ident.extensionProducer,
 				ident.extensionCode,
@@ -1661,8 +1674,9 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 				ident.languageIsoCode,
 				ident.countryIsoCode);
 		} else {
-			sprintf(out, "%s/%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
-				dir,
+			sprintf(out, "%s%s%s-%s-%s-%s-%s%s-%s-%s%s-%s%s-%s%s%s_%s-%s.XML",
+				dname,
+				sep,
 				ident.type == DM ? "DMC" : "UPF",
 				ident.modelIdentCode,
 				ident.systemDiffCode,
@@ -1681,8 +1695,9 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 				ident.countryIsoCode);
 		}
 	} else if (ident.type == COM) {
-		sprintf(out, "%s/COM-%s-%s-%s-%s-%s_%s-%s.XML",
-			dir,
+		sprintf(out, "%s%sCOM-%s-%s-%s-%s-%s_%s-%s.XML",
+			dname,
+			sep,
 			ident.modelIdentCode,
 			ident.senderIdent,
 			ident.yearOfDataIssue,
@@ -1691,16 +1706,18 @@ static bool auto_name(char *out, char *src, xmlDocPtr dm, const char *dir, bool 
 			ident.languageIsoCode,
 			ident.countryIsoCode);
 	} else if (ident.type == DDN) {
-		sprintf(out, "%s/DDN-%s-%s-%s-%s-%s.XML",
-			dir,
+		sprintf(out, "%s%sDDN-%s-%s-%s-%s-%s.XML",
+			dname,
+			sep,
 			ident.modelIdentCode,
 			ident.senderIdent,
 			ident.receiverIdent,
 			ident.yearOfDataIssue,
 			ident.seqNumber);
 	} else if (ident.type == IMF) {
-		sprintf(out, "%s/IMF-%s%s.XML",
-			dir,
+		sprintf(out, "%s%sIMF-%s%s.XML",
+			dname,
+			sep,
 			ident.imfIdentIcn,
 			iss);
 	} else {
