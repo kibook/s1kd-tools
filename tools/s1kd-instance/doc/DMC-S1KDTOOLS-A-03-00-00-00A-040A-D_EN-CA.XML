@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="051" inWork="03"/>
+        <issueInfo issueNumber="051" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="20"/>
+        <issueDate year="2020" month="07" day="30"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -43,6 +43,12 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Remove automatic inclusion of XSLT identity template.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Do not add source ident if the instance ident is the same as the source.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of -S option and add -3 option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -443,7 +449,7 @@
             <definitionListItem>
               <listItemTerm>-S, --no-source-ident</listItemTerm>
               <listItemDefinition>
-                <para>Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt; in the instance.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; in the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -546,6 +552,12 @@
               <listItemTerm>-2, --cct</listItemTerm>
               <listItemDefinition>
                 <para>Specify the CCT to read dependency tests from (-~).</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-3, --no-repository-ident</listItemTerm>
+              <listItemDefinition>
+                <para>Do not include a &lt;repositorySourceDmIdent&gt; in the instance for each CIR.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -689,9 +701,9 @@
         </para>
         <levelledPara>
           <title>Identifying the source of an instance</title>
-          <para>The resulting data module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data modules used to instantiate them. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">If the identification information (extension, code, issue or language) of an instance differs from that of the source, the resulting data module instance will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data module used to instantiate it. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>
           <para>Additionally, the data module instance will contain an element <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> for each CIR specified with the -R option.</para>
-          <para>If the -S option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>/<verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements or <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements are added. This can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
+          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">If the -S (--no-source-ident) option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText> or <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements are added. If the -3 (--no-repository-ident) option is used, no &lt;repositorySourceDmIdent&gt; elements will be added. These options can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
         </levelledPara>
         <levelledPara>
           <title>Removing/simplifying/pruning applicability annotations</title>

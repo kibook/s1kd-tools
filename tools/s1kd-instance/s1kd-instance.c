@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "11.0.1"
+#define VERSION "12.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3985,7 +3985,7 @@ static void show_help(void)
 	puts("  -q, --quiet                       Quiet mode.");
 	puts("  -R, --cir <CIR>                   Resolve externalized items using the given CIR.");
 	puts("  -r, --recursive                   Search for referenced data modules recursively.");
-	puts("  -S, --no-source-ident             Do not include <sourceDmIdent> or <repositorySourceDmIdent>.");
+	puts("  -S, --no-source-ident             Do not include <sourceDmIdent>/<sourcePmIdent>.");
 	puts("  -s, --assign <applic>             An assign in the form of <ident>:<type>=<value>");
 	puts("  -T, --tag                         Tag non-applicable elements instead of removing them.");
 	puts("  -t, --techname <techName>         Give the instance a different techName/pmTitle.");
@@ -4003,6 +4003,7 @@ static void show_help(void)
 	puts("  -z, --issue-type <type>           Set the issue type of the instance.");
 	puts("  -1, --act <file>                  Specify custom ACT.");
 	puts("  -2, --cct <file>                  Specify custom CCT.");
+	puts("  -3, --no-repository-ident         Do not include <repositorySourceDmIdent>.");
 	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
 	puts("  -5, --print                       Print the file name of the instance when -O is used.");
 	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
@@ -4056,6 +4057,7 @@ int main(int argc, char **argv)
 	char extension[256] = "";
 	char language[256] = "";
 	bool add_source_ident = true;
+	bool add_rep_ident = true;
 	bool force_overwrite = false;
 	bool use_stdin = false;
 	char issinfo[16] = "";
@@ -4110,72 +4112,73 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	enum listprops listprops = STANDALONE;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:4567890~H:^";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:34567890~H:^";
 	struct option lopts[] = {
-		{"version"           , no_argument      , 0, 0},
-		{"help"              , no_argument      , 0, 'h'},
-		{"reduce"            , no_argument      , 0, 'a'},
-		{"simplify"          , no_argument      , 0, 'A'},
-		{"code"              , required_argument, 0, 'c'},
-		{"comment"           , required_argument, 0, 'C'},
-		{"dump"              , required_argument, 0, 'D'},
-		{"dir"               , required_argument, 0, 'd'},
-		{"no-extension"      , no_argument      , 0, 'E'},
-		{"extension"         , required_argument, 0, 'e'},
-		{"flatten-alts"      , no_argument      , 0, 'F'},
-		{"overwrite"         , no_argument      , 0, 'f'},
-		{"set-orig"          , no_argument      , 0, 'g'},
-		{"custom-orig"       , required_argument, 0, 'G'},
-		{"infoname"          , required_argument, 0, 'i'},
-		{"date"              , required_argument, 0, 'I'},
-		{"clean-display-text", no_argument      , 0, 'J'},
-		{"clean-ents"        , no_argument      , 0, 'j'},
-		{"skill-levels"      , required_argument, 0, 'K'},
-		{"skill"             , required_argument, 0, 'k'},
-		{"list"              , no_argument      , 0, 'L'},
-		{"language"          , required_argument, 0, 'l'},
-		{"remarks"           , required_argument, 0, 'm'},
-		{"omit-issue"        , no_argument      , 0, 'N'},
-		{"issue"             , required_argument, 0, 'n'},
-		{"outdir"            , required_argument, 0, 'O'},
-		{"out"               , required_argument, 0, 'o'},
-		{"pct"               , required_argument, 0, 'P'},
-		{"product"           , required_argument, 0, 'p'},
-		{"quiet"             , no_argument      , 0, 'q'},
-		{"cir"               , required_argument, 0, 'R'},
-		{"recursive"         , no_argument      , 0, 'r'},
-		{"no-source-ident"   , no_argument      , 0, 'S'},
-		{"assign"            , required_argument, 0, 's'},
-		{"tag"               , no_argument      , 0, 'T'},
-		{"techname"          , required_argument, 0, 't'},
-		{"security-classes"  , required_argument, 0, 'U'},
-		{"security"          , required_argument, 0, 'u'},
-		{"print"             , no_argument      , 0, '5'},
-		{"verbose"           , no_argument      , 0, 'v'},
-		{"set-applic"        , no_argument      , 0, 'W'},
-		{"whole-objects"     , no_argument      , 0, 'w'},
-		{"comment-xpath"     , required_argument, 0, 'X'},
-		{"xsl"               , required_argument, 0, 'x'},
-		{"applic"            , required_argument, 0, 'Y'},
-		{"update-applic"     , no_argument      , 0 ,'y'},
-		{"add-required"      , no_argument      , 0, 'Z'},
-		{"issue-type"        , required_argument, 0, 'z'},
-		{"update-instances"  , no_argument      , 0, '@'},
-		{"read-only"         , no_argument      , 0, '%'},
-		{"no-infoname"       , no_argument      , 0, '!'},
-		{"act"               , required_argument, 0, '1'},
-		{"cct"               , required_argument, 0, '2'},
-		{"dependencies"      , no_argument      , 0, '~'},
-		{"resolve-containers", no_argument      , 0, 'Q'},
-		{"flatten-alts-refs" , no_argument      , 0, '4'},
-		{"list-properties"   , required_argument, 0, 'H'},
-		{"infoname-variant"  , required_argument, 0, 'V'},
-		{"clean-annotations" , no_argument      , 0, '6'},
-		{"dry-run"           , no_argument      , 0, '7'},
-		{"reapply"           , no_argument      , 0, '8'},
-		{"prune"             , no_argument      , 0, '9'},
-		{"print-non-applic"  , no_argument      , 0, '0'},
-		{"remove-deleted"    , no_argument      , 0, '^'},
+		{"version"            , no_argument      , 0, 0},
+		{"help"               , no_argument      , 0, 'h'},
+		{"reduce"             , no_argument      , 0, 'a'},
+		{"simplify"           , no_argument      , 0, 'A'},
+		{"code"               , required_argument, 0, 'c'},
+		{"comment"            , required_argument, 0, 'C'},
+		{"dump"               , required_argument, 0, 'D'},
+		{"dir"                , required_argument, 0, 'd'},
+		{"no-extension"       , no_argument      , 0, 'E'},
+		{"extension"          , required_argument, 0, 'e'},
+		{"flatten-alts"       , no_argument      , 0, 'F'},
+		{"overwrite"          , no_argument      , 0, 'f'},
+		{"set-orig"           , no_argument      , 0, 'g'},
+		{"custom-orig"        , required_argument, 0, 'G'},
+		{"infoname"           , required_argument, 0, 'i'},
+		{"date"               , required_argument, 0, 'I'},
+		{"clean-display-text" , no_argument      , 0, 'J'},
+		{"clean-ents"         , no_argument      , 0, 'j'},
+		{"skill-levels"       , required_argument, 0, 'K'},
+		{"skill"              , required_argument, 0, 'k'},
+		{"list"               , no_argument      , 0, 'L'},
+		{"language"           , required_argument, 0, 'l'},
+		{"remarks"            , required_argument, 0, 'm'},
+		{"omit-issue"         , no_argument      , 0, 'N'},
+		{"issue"              , required_argument, 0, 'n'},
+		{"outdir"             , required_argument, 0, 'O'},
+		{"out"                , required_argument, 0, 'o'},
+		{"pct"                , required_argument, 0, 'P'},
+		{"product"            , required_argument, 0, 'p'},
+		{"quiet"              , no_argument      , 0, 'q'},
+		{"cir"                , required_argument, 0, 'R'},
+		{"recursive"          , no_argument      , 0, 'r'},
+		{"no-source-ident"    , no_argument      , 0, 'S'},
+		{"assign"             , required_argument, 0, 's'},
+		{"tag"                , no_argument      , 0, 'T'},
+		{"techname"           , required_argument, 0, 't'},
+		{"security-classes"   , required_argument, 0, 'U'},
+		{"security"           , required_argument, 0, 'u'},
+		{"print"              , no_argument      , 0, '5'},
+		{"verbose"            , no_argument      , 0, 'v'},
+		{"set-applic"         , no_argument      , 0, 'W'},
+		{"whole-objects"      , no_argument      , 0, 'w'},
+		{"comment-xpath"      , required_argument, 0, 'X'},
+		{"xsl"                , required_argument, 0, 'x'},
+		{"applic"             , required_argument, 0, 'Y'},
+		{"update-applic"      , no_argument      , 0 ,'y'},
+		{"add-required"       , no_argument      , 0, 'Z'},
+		{"issue-type"         , required_argument, 0, 'z'},
+		{"update-instances"   , no_argument      , 0, '@'},
+		{"read-only"          , no_argument      , 0, '%'},
+		{"no-infoname"        , no_argument      , 0, '!'},
+		{"act"                , required_argument, 0, '1'},
+		{"cct"                , required_argument, 0, '2'},
+		{"dependencies"       , no_argument      , 0, '~'},
+		{"resolve-containers" , no_argument      , 0, 'Q'},
+		{"no-repository-ident", no_argument      , 0, '3'},
+		{"flatten-alts-refs"  , no_argument      , 0, '4'},
+		{"list-properties"    , required_argument, 0, 'H'},
+		{"infoname-variant"   , required_argument, 0, 'V'},
+		{"clean-annotations"  , no_argument      , 0, '6'},
+		{"dry-run"            , no_argument      , 0, '7'},
+		{"reapply"            , no_argument      , 0, '8'},
+		{"prune"              , no_argument      , 0, '9'},
+		{"print-non-applic"   , no_argument      , 0, '0'},
+		{"remove-deleted"     , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -4379,6 +4382,9 @@ int main(int argc, char **argv)
 			case '~':
 				add_deps = true;
 				break;
+			case '3':
+				add_rep_ident = false;
+				break;
 			case '4':
 				flat_alts = true;
 				fix_alts_refs = true;
@@ -4453,6 +4459,18 @@ int main(int argc, char **argv)
 		save_xml_doc(props_report, "-");
 
 		goto cleanup;
+	}
+
+	/* Except when in update mode, only add a source ident by default if
+	 * any of the following are changed in the instance:
+	 *
+	 * - extension
+	 * - code
+	 * - issue info
+	 * - language
+	 */
+	if (!update_inst && strcmp(extension, "") == 0 && strcmp(code, "") == 0 && strcmp(issinfo, "") == 0 && strcmp(language, "") == 0) {
+		add_source_ident = false;
 	}
 
 	if (find_cir) {
@@ -4740,7 +4758,7 @@ int main(int argc, char **argv)
 					if (ispm) {
 						root = undepend_cir(doc, applicability, cirdocfname, false, cirxsl, def_cir_xsl);
 					} else {
-						root = undepend_cir(doc, applicability, cirdocfname, add_source_ident, cirxsl, def_cir_xsl);
+						root = undepend_cir(doc, applicability, cirdocfname, add_rep_ident, cirxsl, def_cir_xsl);
 					}
 
 					xmlFree(cirdocfname);

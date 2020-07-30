@@ -316,9 +316,8 @@ PCT explicitly (-P), when searching for source objects (-@), or when
 searching for CIR data modules (-R).
 
 -S, --no-source-ident  
-Do not include
-&lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt;/&lt;repositorySourceDmIdent&gt;
-in the instance.
+Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; in the
+instance.
 
 -s, --assign &lt;applic&gt;  
 An applicability definition in the form of "`<ident>:<type>=<value>`".
@@ -391,6 +390,10 @@ Specify the ACT to use to find the CCT and/or PCT.
 
 -2, --cct  
 Specify the CCT to read dependency tests from (-\~).
+
+-3, --no-repository-ident  
+Do not include a &lt;repositorySourceDmIdent&gt; in the instance for
+each CIR.
 
 -4, --flatten-alts-refs  
 Same as the -F option, but in addition to flattening alts elements, the
@@ -481,19 +484,22 @@ loaded by specifying this option multiple times.
 Identifying the source of an instance
 -------------------------------------
 
-The resulting data module instances will contain the element
-`<sourceDmIdent>`, which will contain the identification elements of the
-source data modules used to instantiate them. Publication module
-instances will contain the element `<sourcePmIdent>` instead.
+If the identification information (extension, code, issue or language)
+of an instance differs from that of the source, the resulting data
+module instance will contain the element `<sourceDmIdent>`, which will
+contain the identification elements of the source data module used to
+instantiate it. Publication module instances will contain the element
+`<sourcePmIdent>` instead.
 
 Additionally, the data module instance will contain an element
 `<repositorySourceDmIdent>` for each CIR specified with the -R option.
 
-If the -S option is used, neither the
-`<sourceDmIdent>`/`<sourcePmIdent>` elements or
-`<repositorySourceDmIdent>` elements are added. This can be useful when
-this tool is not used to make an "instance" per se, but more generally
-to make a module based on an existing module.
+If the -S (--no-source-ident) option is used, neither the
+`<sourceDmIdent>` or `<sourcePmIdent>` elements are added. If the -3
+(--no-repository-ident) option is used, no
+&lt;repositorySourceDmIdent&gt; elements will be added. These options
+can be useful when this tool is not used to make an "instance" per se,
+but more generally to make a module based on an existing module.
 
 Removing/simplifying/pruning applicability annotations
 ------------------------------------------------------
