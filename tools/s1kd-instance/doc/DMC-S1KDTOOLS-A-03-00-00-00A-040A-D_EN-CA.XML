@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="051" inWork="04"/>
+        <issueInfo issueNumber="051" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="30"/>
+        <issueDate year="2020" month="07" day="31"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -48,7 +48,10 @@
         <simplePara>Do not add source ident if the instance ident is the same as the source.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -S option and add -3 option.</simplePara>
+        <simplePara>Change behaviour of -S (--no-source-ident) option and add -3 (--no-repository-ident) option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change behaviour of -H (--list-properties) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -227,17 +230,17 @@
             <definitionListItem>
               <listItemTerm>-H, --list-properties &lt;method&gt;</listItemTerm>
               <listItemDefinition>
-                <para>
-                  Create an XML report of all the applicability properties used in the specified CSDB objects. &lt;method&gt; determines how to include values in the report:
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+                  Create an XML report of all the applicability properties used in, and product instances relevant to, the specified CSDB objects. &lt;method&gt; determines how to include values and products in the report:
                   <randomList>
                     <listItem>
                       <para>"standalone" - Only include the values that are explicitly used in the object.</para>
                     </listItem>
                     <listItem>
-                      <para>"applic" - Only include the values, as defined in the ACT and CCT, that are within the applicability of the object.</para>
+                      <para>"all" - Include all values and products as defined in the ACT, CCT and PCT.</para>
                     </listItem>
                     <listItem>
-                      <para>"all" - Include all values as defined in the ACT and CCT.</para>
+                      <para>"applic" - Only include the values and products, as defined in the ACT, CCT and PCT, that are within the applicability of the object.</para>
                     </listItem>
                   </randomList>
                 </para>

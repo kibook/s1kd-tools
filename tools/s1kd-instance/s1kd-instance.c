@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.0.1"
+#define VERSION "12.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3406,7 +3406,7 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 }
 
 /* Add a property used in an object to the properties report. */
-static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listprops, xmlDocPtr act, xmlDocPtr cct)
+static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listprops, xmlDocPtr act, xmlDocPtr cct, xmlNodePtr defs)
 {
 	xmlChar *i, *t;
 	xmlNodePtr p = NULL, cur;
@@ -3433,17 +3433,8 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listpr
 		xmlSetProp(p, BAD_CAST "ident", i);
 		xmlSetProp(p, BAD_CAST "type", t);
 
-		if (listprops == ALL) {
-			add_ct_prop_vals(act, cct, i, t, p, NULL);
-		} else if (listprops == APPLIC) {
-			xmlNodePtr defs;
-
-			defs = xmlNewNode(NULL, BAD_CAST "applic");
-			load_applic_from_inst(defs, assert->doc);
-
+		if (listprops != STANDALONE) {
 			add_ct_prop_vals(act, cct, i, t, p, defs);
-
-			xmlFreeNode(defs);
 		}
 	}
 
@@ -3478,16 +3469,107 @@ static void add_prop(xmlNodePtr object, xmlNodePtr assert, enum listprops listpr
 	xmlFree(t);
 }
 
-/* Add the properties used in an object to the properties report. */
-static void add_props(xmlNodePtr report, const char *path, enum listprops listprops, const char *useract, const char *usercct)
+/* Determine whether a product instance is applicable to an object. */
+static bool product_is_applic(xmlNodePtr product, xmlNodePtr defs)
 {
-	xmlDocPtr doc, act = NULL, cct = NULL;
+	xmlNodePtr evaluate, cur;
+	bool is;
+
+	evaluate = xmlNewNode(NULL, BAD_CAST "evaluate");
+	xmlSetProp(evaluate, BAD_CAST "andOr", BAD_CAST "and");
+
+	for (cur = product->children; cur; cur = cur->next) {
+		xmlChar *i, *t, *v;
+		xmlNodePtr a;
+
+		if (cur->type != XML_ELEMENT_NODE) {
+			continue;
+		}
+
+		i = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent|@actidref");
+		t = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType|@actreftype");
+		v = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue|@actvalue");
+
+		a = xmlNewNode(evaluate->ns, BAD_CAST "assert");
+		xmlSetProp(a, BAD_CAST "applicPropertyIdent", i);
+		xmlSetProp(a, BAD_CAST "applicPropertyType", t);
+		xmlSetProp(a, BAD_CAST "applicPropertyValues", v);
+
+		xmlAddChild(evaluate, a);
+
+		xmlFree(i);
+		xmlFree(t);
+		xmlFree(v);
+	}
+
+	is = eval_evaluate(defs, evaluate, true);
+
+	xmlFreeNode(evaluate);
+
+	return is;
+}
+
+/* Add a PCT product instance to the properties report. */
+static void add_product(xmlNodePtr object, xmlNodePtr product, xmlNodePtr defs)
+{
+	xmlNodePtr p, cur;
+	xmlChar *id;
+
+	if (defs && !product_is_applic(product, defs)) {
+		return;
+	}
+
+	p = xmlNewNode(NULL, BAD_CAST "product");
+
+	if ((id = xmlGetProp(product, BAD_CAST "id"))) {
+		xmlSetProp(p, BAD_CAST "ident", id);
+		xmlFree(id);
+	}
+
+	for (cur = product->children; cur; cur = cur->next) {
+		xmlChar *i, *t, *v;
+		xmlNodePtr a;
+
+		if (cur->type != XML_ELEMENT_NODE) {
+			continue;
+		}
+
+		i = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent|@actidref");
+		t = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType|@actreftype");
+		v = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue|@actvalue");
+
+		a = xmlNewNode(p->ns, BAD_CAST "assign");
+		xmlSetProp(a, BAD_CAST "applicPropertyIdent", i);
+		xmlSetProp(a, BAD_CAST "applicPropertyType", t);
+		xmlSetProp(a, BAD_CAST "applicPropertyValue", v);
+
+		xmlAddChild(p, a);
+
+		xmlFree(i);
+		xmlFree(t);
+		xmlFree(v);
+	}
+
+	xmlAddChild(object, p);
+}
+
+/* Add the properties used in an object to the properties report. */
+static void add_props(xmlNodePtr report, const char *path, enum listprops listprops, const char *useract, const char *usercct, const char *userpct)
+{
+	xmlDocPtr doc, act = NULL, cct = NULL, pct = NULL;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
-	xmlNodePtr object;
+	xmlNodePtr object, defs;
 
 	if (!(doc = read_xml_doc(path))) {
 		return;
+	}
+
+	if (listprops == APPLIC) {
+		defs = xmlNewNode(NULL, BAD_CAST "applic");
+		load_applic_from_inst(defs, doc);
+	} else {
+		defs = NULL;
 	}
 
 	if (listprops != STANDALONE) {
@@ -3521,12 +3603,27 @@ static void add_props(xmlNodePtr report, const char *path, enum listprops listpr
 					}
 				}
 			}
+
+			if (userpct) {
+				if (!(pct = read_xml_doc(userpct))) {
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_MISSING_PCT, userpct);
+					}
+				}
+			} else if (find_pct_fname(fname, act)) {
+				if (!(pct = read_xml_doc(fname))) {
+					if (verbosity > QUIET) {
+						fprintf(stderr, S_MISSING_PCT, fname);
+					}
+				}
+			}
 		}
 	}
 
 	object = xmlNewChild(report, NULL, BAD_CAST "object", NULL);
 	xmlSetProp(object, BAD_CAST "path", BAD_CAST path);
 
+	/* Add properties from DM, ACT and/or CCT. */
 	ctx = xmlXPathNewContext(doc);
 
 	/* Use assertions from the whole object applic in standalone mode. */
@@ -3541,20 +3638,40 @@ static void add_props(xmlNodePtr report, const char *path, enum listprops listpr
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			add_prop(object, obj->nodesetval->nodeTab[i], listprops, act, cct);
+			add_prop(object, obj->nodesetval->nodeTab[i], listprops, act, cct, defs);
 		}
 	}
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
 
+	/* Add products from PCT. */
+	if (pct) {
+		ctx = xmlXPathNewContext(pct);
+		obj = xmlXPathEval(BAD_CAST "//product", ctx);
+
+		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+			int i;
+
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				add_product(object, obj->nodesetval->nodeTab[i], defs);
+			}
+		}
+
+		xmlXPathFreeObject(obj);
+		xmlXPathFreeContext(ctx);
+	}
+
+	xmlFreeNode(defs);
+
 	xmlFreeDoc(act);
 	xmlFreeDoc(cct);
+	xmlFreeDoc(pct);
 	xmlFreeDoc(doc);
 }
 
 /* Add the properties used in objects in a list to the properties report. */
-static void add_props_list(xmlNodePtr report, const char *fname, enum listprops listprops, const char *useract, const char *usercct)
+static void add_props_list(xmlNodePtr report, const char *fname, enum listprops listprops, const char *useract, const char *usercct, const char *userpct)
 {
 	FILE *f;
 	char path[PATH_MAX];
@@ -3572,7 +3689,7 @@ static void add_props_list(xmlNodePtr report, const char *fname, enum listprops 
 
 	while (fgets(path, PATH_MAX, f)) {
 		strtok(path, "\t\r\n");
-		add_props(report, path, listprops, useract, usercct);
+		add_props(report, path, listprops, useract, usercct, userpct);
 	}
 
 	if (fname) {
@@ -4455,20 +4572,32 @@ int main(int argc, char **argv)
 		properties = xmlNewNode(NULL, BAD_CAST "properties");
 		xmlDocSetRootElement(props_report, properties);
 
+		switch (listprops) {
+			case STANDALONE:
+				xmlSetProp(properties, BAD_CAST "method", BAD_CAST "standalone");
+				break;
+			case ALL:
+				xmlSetProp(properties, BAD_CAST "method", BAD_CAST "all");
+				break;
+			case APPLIC:
+				xmlSetProp(properties, BAD_CAST "method", BAD_CAST "applic");
+				break;
+		}
+
 		if (optind < argc) {
 			int i;
 
 			for (i = optind; i < argc; ++i) {
 				if (dmlist) {
-					add_props_list(properties, argv[i], listprops, useract, usercct);
+					add_props_list(properties, argv[i], listprops, useract, usercct, userpct);
 				} else {
-					add_props(properties, argv[i], listprops, useract, usercct);
+					add_props(properties, argv[i], listprops, useract, usercct, userpct);
 				}
 			}
 		} else if (dmlist) {
-			add_props_list(properties, NULL, listprops, useract, usercct);
+			add_props_list(properties, NULL, listprops, useract, usercct, userpct);
 		} else {
-			add_props(properties, "-", listprops, useract, usercct);
+			add_props(properties, "-", listprops, useract, usercct, userpct);
 		}
 
 		transform_doc(props_report, xsl_sort_props_xsl, xsl_sort_props_xsl_len, NULL);

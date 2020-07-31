@@ -139,17 +139,19 @@ to identify that the instance was produced by this tool. A different
 code and name can be specified with the -G option.
 
 -H, --list-properties &lt;method&gt;  
-Create an XML report of all the applicability properties used in the
-specified CSDB objects. &lt;method&gt; determines how to include values
-in the report:
+Create an XML report of all the applicability properties used in, and
+product instances relevant to, the specified CSDB objects.
+&lt;method&gt; determines how to include values and products in the
+report:
 
 -   "standalone" - Only include the values that are explicitly used in
     the object.
 
--   "applic" - Only include the values, as defined in the ACT and CCT,
-    that are within the applicability of the object.
+-   "all" - Include all values and products as defined in the ACT, CCT
+    and PCT.
 
--   "all" - Include all values as defined in the ACT and CCT.
+-   "applic" - Only include the values and products, as defined in the
+    ACT, CCT and PCT, that are within the applicability of the object.
 
 -h, -?, --help  
 Show help/usage message.

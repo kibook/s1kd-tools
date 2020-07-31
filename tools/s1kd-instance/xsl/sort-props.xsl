@@ -16,6 +16,9 @@
         <xsl:sort select="@ident"/>
         <xsl:sort select="@type"/>
       </xsl:apply-templates>
+      <xsl:apply-templates select="product">
+        <xsl:sort select="@id"/>
+      </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
 

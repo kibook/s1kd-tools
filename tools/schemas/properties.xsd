@@ -5,11 +5,20 @@
     <xs:sequence>
       <xs:element ref="object" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
+    <xs:attribute name="method" type="methodAttType" use="required"/>
   </xs:complexType>
+  <xs:simpleType name="methodAttType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="standalone"/>
+      <xs:enumeration value="all"/>
+      <xs:enumeration value="applic"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:element name="object" type="objectElemType"/>
   <xs:complexType name="objectElemType">
     <xs:sequence>
       <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="product" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute ref="path"/>
   </xs:complexType>
@@ -25,8 +34,8 @@
     <xs:attribute ref="type" use="required"/>
   </xs:complexType>
   <xs:attribute name="ident" type="xs:NCName"/>
-  <xs:attribute name="type" type="typeAttType"/>
-  <xs:simpleType name="typeAttType">
+  <xs:attribute name="type" type="applicPropertyTypeAttType"/>
+  <xs:simpleType name="applicPropertyTypeAttType">
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="condition"/>
       <xs:enumeration value="prodattr"/>
@@ -34,5 +43,23 @@
   </xs:simpleType>
   <xs:element name="name" type="xs:string"/>
   <xs:element name="descr" type="xs:string"/>
-  <xs:element name="value" type="xs:string"/>
+  <xs:element name="value" type="applicPropertyValueAttType"/>
+  <xs:simpleType name="applicPropertyValueAttType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^|~]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="product" type="productElemType"/>
+  <xs:complexType name="productElemType">
+    <xs:sequence>
+      <xs:element ref="assign" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute ref="ident"/>
+  </xs:complexType>
+  <xs:element name="assign" type="assignElemType"/>
+  <xs:complexType name="assignElemType">
+    <xs:attribute name="applicPropertyIdent" type="xs:NCName"/>
+    <xs:attribute name="applicPropertyType" type="applicPropertyTypeAttType"/>
+    <xs:attribute name="applicPropertyValue" type="applicPropertyValueAttType"/>
+  </xs:complexType>
 </xs:schema>
