@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.1.1"
+#define VERSION "12.1.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -978,13 +978,13 @@ static void simpl_applic_evals(xmlNodePtr node)
 }
 
 /* Remove <referencedApplicGroup> if all applic statements are removed */
-static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, bool remtrue)
+static xmlNodePtr simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup, bool remtrue)
 {
 	bool has_applic = false;
 	xmlNodePtr cur;
 
 	if (!referencedApplicGroup) {
-		return;
+		return NULL;
 	}
 
 	simpl_applic(defs, referencedApplicGroup, remtrue);
@@ -999,7 +999,10 @@ static void simpl_applic_clean(xmlNodePtr defs, xmlNodePtr referencedApplicGroup
 	if (!has_applic) {
 		xmlUnlinkNode(referencedApplicGroup);
 		xmlFreeNode(referencedApplicGroup);
+		return NULL;
 	}
+
+	return referencedApplicGroup;
 }
 
 /* Copy applic defs without non-user-definitions. */
@@ -4050,11 +4053,11 @@ xmlDocPtr s1kdDocFilter(const xmlDocPtr doc, s1kdApplicability app, s1kdFilterMo
 
 		clean_applic(referencedApplicGroup, root);
 
-		if (mode >= S1KD_FILTER_SIMPLIFY && xmlChildElementCount(referencedApplicGroup) != 0) {
-			simpl_applic_clean(app, referencedApplicGroup, mode == S1KD_FILTER_PRUNE);
+		if (mode >= S1KD_FILTER_SIMPLIFY && referencedApplicGroup) {
+			referencedApplicGroup = simpl_applic_clean(app, referencedApplicGroup, mode == S1KD_FILTER_PRUNE);
 		}
 
-		if (mode != S1KD_FILTER_PRUNE && xmlChildElementCount(referencedApplicGroup) != 0) {
+		if (mode != S1KD_FILTER_PRUNE && referencedApplicGroup) {
 			referencedApplicGroup = rem_supersets(app, referencedApplicGroup, root, mode < S1KD_FILTER_SIMPLIFY);
 		}
 	}
@@ -4943,17 +4946,17 @@ int main(int argc, char **argv)
 
 							clean_applic(referencedApplicGroup, root);
 
-							if (simpl && xmlChildElementCount(referencedApplicGroup) != 0) {
-								simpl_applic_clean(applicability, referencedApplicGroup, remtrue);
+							if (simpl && referencedApplicGroup) {
+								referencedApplicGroup = simpl_applic_clean(applicability, referencedApplicGroup, remtrue);
 							}
 
-							if (remtrue && xmlChildElementCount(referencedApplicGroup) != 0) {
+							if (remtrue && referencedApplicGroup) {
 								referencedApplicGroup = rem_supersets(applicability, referencedApplicGroup, root, !simpl);
 							}
 						}
 					}
 
-					if (rem_unused) {
+					if (rem_unused && referencedApplicGroup) {
 						referencedApplicGroup = rem_unused_annotations(doc, referencedApplicGroup);
 					}
 				}
