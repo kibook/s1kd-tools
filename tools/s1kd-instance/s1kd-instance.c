@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.1.0"
+#define VERSION "12.1.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -833,14 +833,20 @@ static void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 }
 
 /* Remove unused applicability annotations. */
-static void rem_unused_annotations(xmlDocPtr doc)
+static xmlNodePtr rem_unused_annotations(xmlDocPtr doc, xmlNodePtr referencedApplicGroup)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
 	ctx = xmlXPathNewContext(doc);
+	xmlXPathSetContextNode(referencedApplicGroup, ctx);
 
-	obj = xmlXPathEvalExpression(BAD_CAST "//referencedApplicGroup/applic[not(@id=//@applicRefId)]", ctx);
+	if (xmlStrcmp(referencedApplicGroup->name, BAD_CAST "referencedApplicGroup") == 0) {
+		obj = xmlXPathEval(BAD_CAST "applic[not(@id=//@applicRefId)]", ctx);
+	} else {
+		obj = xmlXPathEval(BAD_CAST "applic[not(@id=//@refapplic)]", ctx);
+	}
+
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
@@ -849,20 +855,17 @@ static void rem_unused_annotations(xmlDocPtr doc)
 			obj->nodesetval->nodeTab[i] = NULL;
 		}
 	}
-	xmlXPathFreeObject(obj);
 
-	obj = xmlXPathEvalExpression(BAD_CAST "//inlineapplics/applic[not(@id=//@refapplic)]", ctx);
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
 	xmlXPathFreeObject(obj);
-
 	xmlXPathFreeContext(ctx);
+
+	if (xmlChildElementCount(referencedApplicGroup) == 0) {
+		xmlUnlinkNode(referencedApplicGroup);
+		xmlFreeNode(referencedApplicGroup);
+		return NULL;
+	}
+
+	return referencedApplicGroup;
 }
 
 /* Remove display text from the containing annotation. */
@@ -4951,7 +4954,7 @@ int main(int argc, char **argv)
 					}
 
 					if (rem_unused) {
-						rem_unused_annotations(doc);
+						referencedApplicGroup = rem_unused_annotations(doc, referencedApplicGroup);
 					}
 				}
 
