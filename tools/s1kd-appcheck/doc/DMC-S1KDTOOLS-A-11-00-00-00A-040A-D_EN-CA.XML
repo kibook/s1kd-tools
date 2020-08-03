@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="01"/>
+        <issueInfo issueNumber="008" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="07"/>
+        <issueDate year="2020" month="08" day="03"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add --xml-catalog parser option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -D (--duplicate) option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -93,6 +96,12 @@
               <listItemTerm>-c, --custom</listItemTerm>
               <listItemDefinition>
                 <para>Perform a customized check. The default standalone applicability check is disabled. This can then be combined with the -s option, to only check that all product attributes and conditions are defined in the ACT and CCT respectively, and/or the -n option, to only check nested applicability annotations. If neither of these options are specified, no checks will be performed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>-D, --duplicate</listItemTerm>
+              <listItemDefinition>
+                <para>Check for duplicate annotations.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -299,7 +308,7 @@
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
       </levelledPara>
       <levelledPara>
         <title>EXIT STATUS</title>
@@ -576,6 +585,24 @@ applicability as its parent proceduralStep on line 83 (app-A)</verbatimText>
           <note>
             <notePara>Currently, this check only detects when the exact same annotation (with the same ID) is nested within itself. In the future, this should also detect redundant logic between different nested annotations.</notePara>
           </note>
+        </levelledPara>
+        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <title>Duplicate applicability annotations</title>
+          <para>
+            Consider the following data module snippet:
+            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
+<applic id="app-0001">
+<assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="A"/>
+</applic>
+<applic id="app-0002">
+<assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="A"/>
+</referencedApplicGroup>]]></verbatimText>
+          </para>
+          <para>
+            These annotations have duplicate logic, meaning only one is necessary. The -D (--duplicate) option will report when an applicability annotation is a duplicate of another annotation:
+            <verbatimText verbatimStyle="vs24">$ s1kd-appcheck -D &lt;DM&gt;
+s1kd-appcheck: ERROR: &lt;DM&gt;: Annotation on line 47 is a duplicate of annotation on line 24.</verbatimText>
+          </para>
         </levelledPara>
       </levelledPara>
     </description>

@@ -9,6 +9,7 @@
     <xs:attribute name="strict" type="yesNoAttType"/>
     <xs:attribute name="checkNestedApplic" type="yesNoAttType"/>
     <xs:attribute name="checkRedundantApplic" type="yesNoAttType"/>
+    <xs:attribute name="checkDuplicateApplic" type="yesNoAttType"/>
   </xs:complexType>
   <xs:simpleType name="appCheckAttType">
     <xs:restriction base="xs:string">
@@ -34,6 +35,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="nestedApplicError"/>
         <xs:element ref="redundantApplicError"/>
+        <xs:element ref="duplicateApplicError"/>
       </xs:choice>
       <xs:element ref="asserts" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
@@ -62,14 +64,21 @@
     <xs:attribute ref="line" use="required"/>
     <xs:attribute ref="xpath" use="required"/>
     <xs:attribute ref="parentLine"/>
-    <xs:attribute ref="parentXpath"/>
+    <xs:attribute ref="parentXPath"/>
   </xs:complexType>
   <xs:element name="redundantApplicError" type="redundantApplicErrorElemType"/>
   <xs:complexType name="redundantApplicErrorElemType">
     <xs:attribute ref="line" use="required"/>
     <xs:attribute ref="xpath" use="required"/>
     <xs:attribute ref="parentLine"/>
-    <xs:attribute ref="parentXpath"/>
+    <xs:attribute ref="parentXPath"/>
+  </xs:complexType>
+  <xs:element name="duplicateApplicError" type="duplicateApplicErrorElemType"/>
+  <xs:complexType name="duplicateApplicErrorElemType">
+    <xs:attribute ref="line" use="required"/>
+    <xs:attribute ref="xpath" use="required"/>
+    <xs:attribute ref="duplicateOfLine" use="required"/>
+    <xs:attribute ref="duplicateOfXPath" use="required"/>
   </xs:complexType>
   <xs:attribute name="applicPropertyIdent" type="xs:NCName"/>
   <xs:attribute name="applicPropertyType" type="applicPropertyTypeAttType"/>
@@ -88,7 +97,9 @@
   <xs:attribute name="line" type="xs:positiveInteger"/>
   <xs:attribute name="xpath" type="xs:string"/>
   <xs:attribute name="parentLine" type="xs:positiveInteger"/>
-  <xs:attribute name="parentXpath" type="xs:string"/>
+  <xs:attribute name="parentXPath" type="xs:string"/>
+  <xs:attribute name="duplicateOfLine" type="xs:positiveInteger"/>
+  <xs:attribute name="duplicateOfXPath" type="xs:string"/>
   <xs:element name="asserts" type="assertsElemType"/>
   <xs:complexType name="assertsElemType">
     <xs:sequence>

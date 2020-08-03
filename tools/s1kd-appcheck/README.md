@@ -55,6 +55,9 @@ CCT respectively, and/or the -n option, to only check nested
 applicability annotations. If neither of these options are specified, no
 checks will be performed.
 
+-D, --duplicate  
+Check for duplicate annotations.
+
 -d, --dir &lt;dir&gt;  
 The directory to start searching for ACT/CCT/PCT data modules in. By
 default, the current directory is used.
@@ -464,3 +467,23 @@ nested element is redundant:
 > Currently, this check only detects when the exact same annotation
 > (with the same ID) is nested within itself. In the future, this should
 > also detect redundant logic between different nested annotations.
+
+Duplicate applicability annotations
+-----------------------------------
+
+Consider the following data module snippet:
+
+    <referencedApplicGroup>
+    <applic id="app-0001">
+    <assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="A"/>
+    </applic>
+    <applic id="app-0002">
+    <assert applicPropertyIdent="version" applicPropertyType="prodattr" applicPropertyValues="A"/>
+    </referencedApplicGroup>
+
+These annotations have duplicate logic, meaning only one is necessary.
+The -D (--duplicate) option will report when an applicability annotation
+is a duplicate of another annotation:
+
+    $ s1kd-appcheck -D <DM>
+    s1kd-appcheck: ERROR: <DM>: Annotation on line 47 is a duplicate of annotation on line 24.

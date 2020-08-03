@@ -30,7 +30,7 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCE) stylesheets.h
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
 
-stylesheets.h: combos.xsl stats.xsl
+stylesheets.h: combos.xsl stats.xsl duplicate.xsl clean-duplicate.xsl
 	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 docs:
