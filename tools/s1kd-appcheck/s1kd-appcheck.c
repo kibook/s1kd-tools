@@ -14,7 +14,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.1.3"
+#define VERSION "6.1.4"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1272,7 +1272,7 @@ static bool same_annotation(xmlNodePtr app1, xmlNodePtr app2)
 {
 	xmlDocPtr d1, d2;
 	xmlChar *s1, *s2;
-	int same;
+	bool same;
 
 	/* Compare c14n representation of XML to
 	 * determine if the annotations are duplicates.
