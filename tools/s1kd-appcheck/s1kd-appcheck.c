@@ -14,7 +14,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.1.1"
+#define VERSION "6.1.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -46,7 +46,7 @@
 #define E_NESTEDCHECK ERR_PREFIX "%s: %s on line %ld is applicable when %s %s = %s, which is not a subset of the applicability of the parent %s on line %ld\n"
 #define E_NESTEDCHECK_WHOLE ERR_PREFIX "%s: %s on line %ld is applicable when %s %s = %s, which is not a subset of the applicability of the whole object.\n"
 #define E_NESTEDCHECK_REDUNDANT ERR_PREFIX "%s: %s on line %ld has the same applicability as its parent %s on line %ld (%s)\n"
-#define E_DUPLICATECHECK ERR_PREFIX "%s: Annontation on line %ld is a duplicate of annotation on line %ld.\n"
+#define E_DUPLICATECHECK ERR_PREFIX "%s: Annotation on line %ld is a duplicate of annotation on line %ld.\n"
 #define E_MAX_OBJECTS ERR_PREFIX "Out of memory\n"
 
 /* Warning messages. */
