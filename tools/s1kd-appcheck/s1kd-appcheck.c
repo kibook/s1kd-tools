@@ -14,7 +14,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.1.2"
+#define VERSION "6.1.3"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1268,6 +1268,35 @@ static xmlNodePtr add_duplicate_error(xmlNodePtr report, xmlNodePtr node1, xmlNo
 	return error;
 }
 
+static bool same_annotation(xmlNodePtr app1, xmlNodePtr app2)
+{
+	xmlDocPtr d1, d2;
+	xmlChar *s1, *s2;
+	int same;
+
+	/* Compare c14n representation of XML to
+	 * determine if the annotations are duplicates.
+	 */
+	d1 = xmlNewDoc(BAD_CAST "1.0");
+	d2 = xmlNewDoc(BAD_CAST "1.0");
+
+	xmlDocSetRootElement(d1, xmlCopyNode(app1, 1));
+	xmlDocSetRootElement(d2, xmlCopyNode(app2, 1));
+
+	xmlC14NDocDumpMemory(d1, NULL, XML_C14N_1_0, NULL, 0, &s1);
+	xmlC14NDocDumpMemory(d2, NULL, XML_C14N_1_0, NULL, 0, &s2);
+
+	same = xmlStrcmp(s1, s2) == 0;
+
+	xmlFree(s1);
+	xmlFree(s2);
+
+	xmlFreeDoc(d1);
+	xmlFreeDoc(d2);
+
+	return same;
+}
+
 /* Check for duplicate annotations. */
 static int check_duplicate_applic(xmlDocPtr doc, const char *path, struct appcheckopts *opts, xmlNodePtr report)
 {
@@ -1288,31 +1317,10 @@ static int check_duplicate_applic(xmlDocPtr doc, const char *path, struct appche
 			int j;
 
 			for (j = i + 1; j < obj->nodesetval->nodeNr; ++j) {
-				xmlDocPtr d1, d2;
-				xmlChar *s1, *s2;
-
-				/* Compare c14n representation of XML to
-				 * determine if the annotations are duplicates.
-				 */
-				d1 = xmlNewDoc(BAD_CAST "1.0");
-				d2 = xmlNewDoc(BAD_CAST "1.0");
-
-				xmlDocSetRootElement(d1, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
-				xmlDocSetRootElement(d2, xmlCopyNode(obj->nodesetval->nodeTab[j], 1));
-
-				xmlC14NDocDumpMemory(d1, NULL, XML_C14N_1_0, NULL, 0, &s1);
-				xmlC14NDocDumpMemory(d2, NULL, XML_C14N_1_0, NULL, 0, &s2);
-
-				if (xmlStrcmp(s1, s2) == 0) {
+				if (same_annotation(obj->nodesetval->nodeTab[i], obj->nodesetval->nodeTab[j])) {
 					add_duplicate_error(report, obj->nodesetval->nodeTab[i]->parent, obj->nodesetval->nodeTab[j]->parent, path);
 					err = 1;
 				}
-
-				xmlFree(s1);
-				xmlFree(s2);
-
-				xmlFreeDoc(d1);
-				xmlFreeDoc(d2);
 			}
 		}
 	}
