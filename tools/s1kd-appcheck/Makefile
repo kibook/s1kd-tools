@@ -11,7 +11,7 @@ else
 endif
 
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
+CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
   CFLAGS+=-g
@@ -19,7 +19,7 @@ else
   CFLAGS+=-O3
 endif
 
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
+LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
 
 PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin

@@ -6,13 +6,15 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
+#include <libxml/c14n.h>
 #include <libxslt/transform.h>
+#include <libexslt/exslt.h>
 #include "s1kd_tools.h"
 #include "stylesheets.h"
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.1.0"
+#define VERSION "6.1.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1277,7 +1279,7 @@ static int check_duplicate_applic(xmlDocPtr doc, const char *path, struct appche
 
 	ctx = xmlXPathNewContext(doc);
 	xmlXPathRegisterNs(ctx, BAD_CAST "s1kd-appcheck", S1KD_APPCHECK_NS);
-	obj = xmlXPathEval(BAD_CAST "//applic[@s1kd-appcheck:string]", ctx);
+	obj = xmlXPathEval(BAD_CAST "//applic/s1kd-appcheck:annotation", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -1286,18 +1288,31 @@ static int check_duplicate_applic(xmlDocPtr doc, const char *path, struct appche
 			int j;
 
 			for (j = i + 1; j < obj->nodesetval->nodeNr; ++j) {
+				xmlDocPtr d1, d2;
 				xmlChar *s1, *s2;
 
-				s1 = xmlGetNsProp(obj->nodesetval->nodeTab[i], BAD_CAST "string", S1KD_APPCHECK_NS);
-				s2 = xmlGetNsProp(obj->nodesetval->nodeTab[j], BAD_CAST "string", S1KD_APPCHECK_NS);
+				/* Compare c14n representation of XML to
+				 * determine if the annotations are duplicates.
+				 */
+				d1 = xmlNewDoc(BAD_CAST "1.0");
+				d2 = xmlNewDoc(BAD_CAST "1.0");
+
+				xmlDocSetRootElement(d1, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
+				xmlDocSetRootElement(d2, xmlCopyNode(obj->nodesetval->nodeTab[j], 1));
+
+				xmlC14NDocDumpMemory(d1, NULL, XML_C14N_1_0, NULL, 0, &s1);
+				xmlC14NDocDumpMemory(d2, NULL, XML_C14N_1_0, NULL, 0, &s2);
 
 				if (xmlStrcmp(s1, s2) == 0) {
-					add_duplicate_error(report, obj->nodesetval->nodeTab[i], obj->nodesetval->nodeTab[j], path);
+					add_duplicate_error(report, obj->nodesetval->nodeTab[i]->parent, obj->nodesetval->nodeTab[j]->parent, path);
 					err = 1;
 				}
 
 				xmlFree(s1);
 				xmlFree(s2);
+
+				xmlFreeDoc(d1);
+				xmlFreeDoc(d2);
 			}
 		}
 	}
@@ -2054,6 +2069,8 @@ int main(int argc, char **argv)
 
 	xmlDocPtr report;
 	xmlNodePtr appcheck;
+
+	exsltRegisterAll();
 
 	objects = malloc(OBJECT_MAX * PATH_MAX);
 

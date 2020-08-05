@@ -10,6 +10,6 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="@s1kd-appcheck:*"/>
+  <xsl:template match="s1kd-appcheck:*"/>
 
 </xsl:transform>
