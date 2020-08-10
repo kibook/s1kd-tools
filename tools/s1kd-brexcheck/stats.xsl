@@ -24,11 +24,17 @@
     <xsl:text>&#10;</xsl:text>
     <xsl:if test="$total &gt; 0">
       <xsl:variable name="errors" select="count(//error/object|//error[not(object)])"/>
+      <xsl:variable name="xpath-errors" select="count(//xpathError)"/>
       <xsl:variable name="fail" select="count(document[brex/error[@fail != 'no']])"/>
       <xsl:variable name="pass" select="count(document[not(brex/error) or brex/error/@fail = 'no'])"/>
       <xsl:text>Total BREX errors: </xsl:text>
       <xsl:value-of select="$errors"/>
       <xsl:text>&#10;</xsl:text>
+      <xsl:if test="$xpath-errors &gt; 0">
+        <xsl:text>XPath errors: </xsl:text>
+        <xsl:value-of select="$xpath-errors"/>
+        <xsl:text>&#10;</xsl:text>
+      </xsl:if>
       <xsl:text>Total documents that pass the check: </xsl:text>
       <xsl:value-of select="$pass"/>
       <xsl:text>&#10;</xsl:text>
