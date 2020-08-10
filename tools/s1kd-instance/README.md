@@ -498,10 +498,10 @@ Additionally, the data module instance will contain an element
 
 If the -S (--no-source-ident) option is used, neither the
 `<sourceDmIdent>` or `<sourcePmIdent>` elements are added. If the -3
-(--no-repository-ident) option is used, no
-&lt;repositorySourceDmIdent&gt; elements will be added. These options
-can be useful when this tool is not used to make an "instance" per se,
-but more generally to make a module based on an existing module.
+(--no-repository-ident) option is used, no `<repositorySourceDmIdent>`
+elements will be added. These options can be useful when this tool is
+not used to make an "instance" per se, but more generally to make a
+module based on an existing module.
 
 Removing/simplifying/pruning applicability annotations
 ------------------------------------------------------
