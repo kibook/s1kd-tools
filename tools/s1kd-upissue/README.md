@@ -6,9 +6,9 @@ s1kd-upissue - Upissue S1000D data
 SYNOPSIS
 ========
 
-    s1kd-upissue [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>]
-                 [-c <reason>] [-I <date>] [-t <urt>] [-z <type>]
-                 [<file>...]
+    s1kd-upissue [-045defilmNQqRsuvw^] [-1 <type>] [-2 <type>]
+                 [-c <reason> [-H] [-t <urt>]]
+                 [-I <date>] [-z <type>] [<file> ...]
 
 DESCRIPTION
 ===========
@@ -40,16 +40,18 @@ verification.
 
 -4, --remove-marks  
 Remove change markup on elements, but not RFUs, in the upissued object.
-This is automatically applied if the issue type (-s) is not `"changed"`
+This is automatically applied if the issue type (-z) is not `"changed"`
 or `"rinstate-changed"`.
+
+-5, --print  
+Print the file names of upissued objects.
 
 -c, --reason &lt;reason&gt;  
 Add a reason for update to the upissued objects. Multiple RFUs can be
 added by specifying this option multiple times.
 
 -d, --dry-run  
-Do not actually create or modify any files, only print the name of the
-file that would be created or modified.
+Do not actually create or modify any files.
 
 -e, --erase  
 Remove old issue file after upissuing.
@@ -84,12 +86,15 @@ the -f option can be used to change them in-place.
 -N, --omit-issue  
 Omit issue/inwork numbers from filename.
 
--q, --keep-qa  
+-Q, --keep-qa  
 Keep quality assurance information from old issue. Normally, when
 upissuing an official CSDB object to the first in-work issue, the
 quality assurance is set back to "unverified". Specify this option to
 indicate the upissue will not affect the contents of the CSDB object,
 and so does not require it to be re-verified.
+
+-q, --quiet  
+Quiet mode. Errors are not printed.
 
 -R, --keep-unassoc-marks  
 Delete only change markup on elements associated with an RFU (by use of
@@ -127,7 +132,7 @@ Remove RFUs which are not associated with any change markup (by use of
 the attribute `reasonForUpdateRefIds`).
 
 -v, --verbose  
-Print the file name of the upissued CSDB object.
+Verbose output.
 
 -w, --lock  
 Make the old issue file read-only after upissuing. Official issues (-i)

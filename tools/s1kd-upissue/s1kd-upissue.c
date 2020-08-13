@@ -9,17 +9,25 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "4.1.0"
+#define VERSION "5.0.0"
 
+/* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
+#define INF_PREFIX PROG_NAME ": INFO: "
 
+/* Error messages. */
 #define E_BAD_LIST ERR_PREFIX "Could not read list: %s\n"
 #define E_ICN_INWORK ERR_PREFIX "ICNs cannot have inwork issues.\n"
 #define E_BAD_FILENAME ERR_PREFIX "Filename does not contain issue info and -N not specified.\n"
 #define E_ISSUE_TOO_LARGE ERR_PREFIX "%s is at the max issue number.\n"
 #define E_INWORK_TOO_LARGE ERR_PREFIX "%s is at the max inwork number.\n"
 #define E_NON_XML_STDIN ERR_PREFIX "Cannot use -m, -N or read from stdin when file does not contain issue info metadata.\n"
+#define E_FILE_EXISTS ERR_PREFIX "%s already exists. Use -f to overwrite.\n"
 
+/* Info messages. */
+#define I_UPISSUE INF_PREFIX "Upissued %s to %s\n"
+
+/* Exit codes. */
 #define EXIT_NO_FILE 1
 #define EXIT_NO_OVERWRITE 2
 #define EXIT_BAD_FILENAME 3
@@ -27,17 +35,22 @@
 #define EXIT_ICN_INWORK 5
 #define EXIT_ISSUE_TOO_LARGE 6
 
+/* Verbosity of the output. */
+static enum verbosity { QUIET, NORMAL, VERBOSE } verbosity = NORMAL;
+
+/* Show help/usage information. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-04defHilmNqRrsuvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-I <date>] [-t <urt>] [-z <type>] [<file>...]");
+	puts("Usage: " PROG_NAME " [-045defHilmNQqRrsuvw^] [-1 <type>] [-2 <type>] [-c <reason>] [-I <date>] [-t <urt>] [-z <type>] [<file>...]");
 	putchar('\n');
 	puts("Options:");
 	puts("  -0, --unverified             Set the quality assurance to unverified.");
 	puts("  -1, --first-ver <type>       Set first verification type.");
 	puts("  -2, --second-ver <type>      Set second verification type.");
 	puts("  -4, --remove-marks           Remove change marks (but not RFUs).");
+	puts("  -5, --print                  Print filenames of upissued objects.");
 	puts("  -c, --reason <reason>        Add an RFU to the upissued object.");
-	puts("  -d, --dry-run                Do not write anything, only print new filename.");
+	puts("  -d, --dry-run                Do not create or modify any files.");
 	puts("  -e, --erase                  Remove old issue.");
 	puts("  -f, --overwrite              Overwrite existing upissued object.");
 	puts("  -H, --highlight              Highlight the last RFU.");
@@ -47,13 +60,13 @@ static void show_help(void)
 	puts("  -l, --list                   Treat input as list of objects.");
 	puts("  -m, --modify                 Modify metadata without upissuing.");
 	puts("  -N, --omit-issue             Omit issue/inwork numbers from filename.");
-	puts("  -q, --keep-qa                Keep quality assurance from old issue.");
+	puts("  -Q, --keep-qa                Keep quality assurance from old issue.");
+	puts("  -q, --quiet                  Quiet mode.");
 	puts("  -R, --keep-unassoc-marks     Only delete change marks associated with an RFU.");
 	puts("  -r, --(keep|remove)-changes  Keep RFUs and change marks from old issue. In -m mode, remove them.");
 	puts("  -s, --(keep|change)-date     Do not change issue date. In -m mode, change issue date.");
 	puts("  -t, --type <urt>             Set the updateReasonType of the last RFU.");
 	puts("  -u, --clean-rfus             Remove unassociated RFUs.");
-	puts("  -v, --verbose                Print filename of upissued objects.");
 	puts("  -w, --lock                   Make old and official issues read-only.");
 	puts("  -z, --issue-type <type>      Set the issue type of the new issue.");
 	puts("  -^, --remove-deleted         Remove \"delete\"d elements.");
@@ -61,30 +74,11 @@ static void show_help(void)
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
+/* Show version information. */
 static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 	printf("Using libxml %s\n", xmlParserVersion);
-}
-
-static xmlNodePtr firstXPathNode(const char *xpath, xmlDocPtr doc)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	xmlNodePtr node;
-
-	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
-
-	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		node = NULL;
-	else
-		node = obj->nodesetval->nodeTab[0];
-	
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return node;
 }
 
 /* Remove change markup attributes from elements referencing old RFUs */
@@ -327,7 +321,7 @@ static void set_unverified(xmlDocPtr doc, bool iss30)
 {
 	xmlNodePtr qa, cur;
 
-	qa = firstXPathNode(iss30 ? "//qa" : "//qualityAssurance", doc);
+	qa = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? "//qa" : "//qualityAssurance"));
 
 	if (!qa)
 		return;
@@ -350,25 +344,25 @@ static void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 	if (!(firstver || secondver))
 		return;
 
-	qa = firstXPathNode(iss30 ? "//qa" : "//qualityAssurance", doc);
+	qa = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? "//qa" : "//qualityAssurance"));
 
 	if (!qa)
 		return;
 
-	unverif = firstXPathNode(iss30 ? "//unverif" : "//unverified", doc);
+	unverif = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? "//unverif" : "//unverified"));
 
 	if (unverif) {
 		xmlUnlinkNode(unverif);
 		xmlFreeNode(unverif);
 	}
 
-	ver1 = firstXPathNode(iss30 ? "//firstver" : "//firstVerification", doc);
-	ver2 = firstXPathNode(iss30 ? "//secver" : "//secondVerification", doc);
+	ver1 = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? "//firstver" : "//firstVerification"));
+	ver2 = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? "//secver" : "//secondVerification"));
 
 	if (firstver) {
 		if (!secondver) {
 			xmlNodePtr ver2;
-			ver2 = firstXPathNode(iss30 ? "//secver" : "//secondVerification", doc);
+			ver2 = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? "//secver" : "//secondVerification"));
 			if (ver2) {
 				xmlUnlinkNode(ver2);
 				xmlFreeNode(ver2);
@@ -408,7 +402,7 @@ static void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 {
 	xmlNodePtr node, cur, next;
 
-	node = firstXPathNode(iss30 ? ISS_30_RFU_PATH : ISS_4X_RFU_PATH, doc);
+	node = xpath_first_node(doc, NULL, BAD_CAST (iss30 ? ISS_30_RFU_PATH : ISS_4X_RFU_PATH));
 
 	if (!node) {
 		return;
@@ -450,7 +444,7 @@ static void set_iss_date(xmlDocPtr dmdoc, const char *issdate)
 	char year_s[5], month_s[3], day_s[3];
 	xmlNodePtr issueDate;
 
-	issueDate = firstXPathNode("//issueDate|//issdate", dmdoc);
+	issueDate = xpath_first_node(dmdoc, NULL, BAD_CAST "//issueDate|//issdate");
 
 	if (issdate) {
 		sscanf(issdate, "%4s-%2s-%2s", year_s, month_s, day_s);
@@ -484,14 +478,14 @@ static void set_status(xmlDocPtr dmdoc, const char *status, bool iss30, xmlNodeP
 	if (iss30) {
 		xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
 	} else {
-		if ((dmStatus = firstXPathNode("//dmStatus|//pmStatus", dmdoc))) {
+		if ((dmStatus = xpath_first_node(dmdoc, NULL, BAD_CAST "//dmStatus|//pmStatus"))) {
 			xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
 		}
 	}
 }
 
 /* Upissue options */
-static bool verbose = false;
+static bool print_fnames = false;
 static bool newissue = false;
 static bool overwrite = false;
 static char *status = NULL;
@@ -533,20 +527,24 @@ static void upissue(const char *path)
 	strcpy(dmfile, path);
 
 	if (access(dmfile, F_OK) == -1 && strcmp(dmfile, "-") != 0) {
-		fprintf(stderr, ERR_PREFIX "Could not read file %s.\n", dmfile);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, ERR_PREFIX "Could not read file %s.\n", dmfile);
+		}
 		exit(EXIT_NO_FILE);
 	}
 
 	dmdoc = read_xml_doc(dmfile);
 
 	if (dmdoc) {
-		issueInfo = firstXPathNode("//issueInfo|//issno", dmdoc);
+		issueInfo = xpath_first_node(dmdoc, NULL, BAD_CAST "//issueInfo|//issno");
 	} else {
 		issueInfo = NULL;
 	}
 
 	if (!issueInfo && no_issue) {
-		fprintf(stderr, E_NON_XML_STDIN);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_NON_XML_STDIN);
+		}
 		exit(EXIT_NO_OVERWRITE);
 	}
 
@@ -624,7 +622,9 @@ static void upissue(const char *path)
 		i = p + 1;
 
 		if (i > dmfile + strlen(dmfile) - 6) {
-			fprintf(stderr, E_BAD_FILENAME);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_FILENAME);
+			}
 			exit(EXIT_BAD_FILENAME);
 		}
 
@@ -639,7 +639,9 @@ static void upissue(const char *path)
 		int l;
 
 		if (!newissue) {
-			fprintf(stderr, E_ICN_INWORK);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_ICN_INWORK);
+			}
 			exit(EXIT_ICN_INWORK);
 		}
 
@@ -659,24 +661,32 @@ static void upissue(const char *path)
 		i = dmfile + n + 1;
 
 		if (n == -1 || i > dmfile + l - 6) {
-			fprintf(stderr, E_BAD_FILENAME);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_FILENAME);
+			}
 			exit(EXIT_BAD_FILENAME);
 		}
 
 		issueNumber = calloc(4, 1);
 		strncpy(issueNumber, i, 3);
 	} else {
-		fprintf(stderr, E_BAD_FILENAME);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_BAD_FILENAME);
+		}
 		exit(EXIT_BAD_FILENAME);
 	}
 
 	if ((issueNumber_int = atoi(issueNumber)) >= 999) {
-		fprintf(stderr, E_ISSUE_TOO_LARGE, dmfile);
+		if (verbosity >= NORMAL) {
+			fprintf(stderr, E_ISSUE_TOO_LARGE, dmfile);
+		}
 		exit(EXIT_ISSUE_TOO_LARGE);
 	}
 	if (inWork) {
 		if ((inWork_int = atoi(inWork)) >= 99) {
-			fprintf(stderr, E_INWORK_TOO_LARGE, dmfile);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_INWORK_TOO_LARGE, dmfile);
+			}
 			exit(EXIT_ISSUE_TOO_LARGE);
 		}
 	}
@@ -774,7 +784,9 @@ static void upissue(const char *path)
 
 	if (!dry_run) {
 		if (!overwrite && access(dmfile, F_OK) != -1) {
-			fprintf(stderr, ERR_PREFIX "%s already exists.\n", dmfile);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_FILE_EXISTS, dmfile);
+			}
 			exit(EXIT_NO_OVERWRITE);
 		}
 
@@ -794,7 +806,11 @@ static void upissue(const char *path)
 		}
 	}
 
-	if (verbose) {
+	if (verbosity >= VERBOSE) {
+		fprintf(stderr, I_UPISSUE, path, dmfile);
+	}
+
+	if (print_fnames) {
 		puts(dmfile);
 	}
 
@@ -810,7 +826,9 @@ static void upissue_list(const char *path)
 
 	if (path) {
 		if (!(f = fopen(path, "r"))) {
-			fprintf(stderr, E_BAD_LIST, path);
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_BAD_LIST, path);
+			}
 			return;
 		}
 	} else {
@@ -832,7 +850,7 @@ int main(int argc, char **argv)
 	int i;
 	bool islist = false;
 
-	const char *sopts = "ivsNfrRI:q01:2:4delc:t:Hwmuz:^h?";
+	const char *sopts = "ivsNfrRI:Qq01:2:45delc:t:Hwmuz:^h?";
 	struct option lopts[] = {
 		{"version"           , no_argument      , 0, 0},
 		{"help"              , no_argument      , 0, 'h'},
@@ -840,6 +858,7 @@ int main(int argc, char **argv)
 		{"first-ver"         , required_argument, 0, '1'},
 		{"second-ver"        , required_argument, 0, '2'},
 		{"remove-marks"      , no_argument      , 0, '4'},
+		{"print"             , no_argument      , 0, '5'},
 		{"reason"            , required_argument, 0, 'c'},
 		{"dry-run"           , no_argument      , 0, 'd'},
 		{"erase"             , no_argument      , 0, 'e'},
@@ -850,7 +869,8 @@ int main(int argc, char **argv)
 		{"list"              , no_argument      , 0, 'l'},
 		{"modify"            , no_argument      , 0, 'm'},
 		{"omit-issue"        , no_argument      , 0, 'N'},
-		{"keep-qa"           , no_argument      , 0, 'q'},
+		{"keep-qa"           , no_argument      , 0, 'Q'},
+		{"quiet"             , no_argument      , 0, 'q'},
 		{"keep-unassoc-marks", no_argument      , 0, 'R'},
 		{"keep-changes"      , no_argument      , 0, 'r'},
 		{"remove-changes"    , no_argument      , 0, 'r'},
@@ -890,12 +910,14 @@ int main(int argc, char **argv)
 			case '4':
 				remove_marks = true;
 				break;
+			case '5':
+				print_fnames = true;
+				break;
 			case 'c':
 				xmlNewChild(rfus, NULL, BAD_CAST "reasonForUpdate", BAD_CAST optarg);
 				break;
 			case 'd':
 				dry_run = true;
-				verbose = true;
 				break;
 			case 'e':
 				remold = true;
@@ -920,8 +942,11 @@ int main(int argc, char **argv)
 				no_issue = true;
 				overwrite = true;
 				break;
-			case 'q':
+			case 'Q':
 				reset_qa = false;
+				break;
+			case 'q':
+				--verbosity;
 				break;
 			case 'R':
 				only_assoc_rfus = true;
@@ -942,7 +967,7 @@ int main(int argc, char **argv)
 				xmlSetProp(rfus->last, BAD_CAST "updateHighlight", BAD_CAST "1");
 				break;
 			case 'v':
-				verbose = true;
+				++verbosity;
 				break;
 			case 'w':
 				lock = true;
