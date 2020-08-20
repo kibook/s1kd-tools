@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.1.2"
+#define VERSION "12.2.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3358,7 +3358,6 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 		}
 
 		xmlXPathSetContextNode(prop_vals, ctx);
-
 		obj = xmlXPathEvalExpression(BAD_CAST "enumeration|enum", ctx);
 
 		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
@@ -3578,56 +3577,54 @@ static void add_props(xmlNodePtr report, const char *path, enum listprops listpr
 		defs = NULL;
 	}
 
+	object = xmlNewChild(report, NULL, BAD_CAST "object", NULL);
+	xmlSetProp(object, BAD_CAST "path", BAD_CAST path);
+
 	if (listprops != STANDALONE) {
 		char fname[PATH_MAX];
 
 		if (useract) {
-			if (!(act = read_xml_doc(useract))) {
-				if (verbosity > QUIET) {
-					fprintf(stderr, S_MISSING_ACT, useract);
-				}
+			if ((act = read_xml_doc(useract))) {
+				xmlSetProp(object, BAD_CAST "act", BAD_CAST useract);
+			} else if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_ACT, useract);
 			}
 		} else if (find_act_fname(fname, doc)) {
-			if (!(act = read_xml_doc(fname))) {
-				if (verbosity > QUIET) {
-					fprintf(stderr, S_MISSING_ACT, fname);
-				}
+			if ((act = read_xml_doc(fname))) {
+				xmlSetProp(object, BAD_CAST "act", BAD_CAST fname);
+			} else if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_ACT, fname);
 			}
 		}
 
-		if (act) {
-			if (usercct) {
-				if (!(cct = read_xml_doc(usercct))) {
-					if (verbosity > QUIET) {
-						fprintf(stderr, S_MISSING_CCT, usercct);
-					}
-				}
-			} else if (find_cct_fname(fname, act)) {
-				if (!(cct = read_xml_doc(fname))) {
-					if (verbosity > QUIET) {
-						fprintf(stderr, S_MISSING_CCT, fname);
-					}
-				}
+		if (usercct) {
+			if ((cct = read_xml_doc(usercct))) {
+				xmlSetProp(object, BAD_CAST "cct", BAD_CAST usercct);
+			} else if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_CCT, usercct);
 			}
+		} else if (act && find_cct_fname(fname, act)) {
+			if ((cct = read_xml_doc(fname))) {
+				xmlSetProp(object, BAD_CAST "cct", BAD_CAST fname);
+			} else if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_CCT, fname);
+			}
+		}
 
-			if (userpct) {
-				if (!(pct = read_xml_doc(userpct))) {
-					if (verbosity > QUIET) {
-						fprintf(stderr, S_MISSING_PCT, userpct);
-					}
-				}
-			} else if (find_pct_fname(fname, act)) {
-				if (!(pct = read_xml_doc(fname))) {
-					if (verbosity > QUIET) {
-						fprintf(stderr, S_MISSING_PCT, fname);
-					}
-				}
+		if (userpct) {
+			if ((pct = read_xml_doc(userpct))) {
+				xmlSetProp(object, BAD_CAST "pct", BAD_CAST userpct);
+			} else if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_PCT, userpct);
+			}
+		} else if (act && find_pct_fname(fname, act)) {
+			if ((pct = read_xml_doc(fname))) {
+				xmlSetProp(object, BAD_CAST "pct", BAD_CAST fname);
+			} else if (verbosity > QUIET) {
+				fprintf(stderr, S_MISSING_PCT, fname);
 			}
 		}
 	}
-
-	object = xmlNewChild(report, NULL, BAD_CAST "object", NULL);
-	xmlSetProp(object, BAD_CAST "path", BAD_CAST path);
 
 	/* Add properties from DM, ACT and/or CCT. */
 	ctx = xmlXPathNewContext(doc);

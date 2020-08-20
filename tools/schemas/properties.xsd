@@ -21,8 +21,14 @@
       <xs:element ref="product" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute ref="path"/>
+    <xs:attribute ref="act"/>
+    <xs:attribute ref="cct"/>
+    <xs:attribute ref="pct"/>
   </xs:complexType>
   <xs:attribute name="path" type="xs:string"/>
+  <xs:attribute name="act" type="xs:string"/>
+  <xs:attribute name="cct" type="xs:string"/>
+  <xs:attribute name="pct" type="xs:string"/>
   <xs:element name="property" type="propertyElemType"/>
   <xs:complexType name="propertyElemType">
     <xs:sequence>
