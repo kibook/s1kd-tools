@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="014" inWork="00"/>
+        <issueInfo issueNumber="014" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="05" day="01"/>
+        <issueDate year="2020" month="08" day="22"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="status">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate updateReasonType="urt01">
-        <simplePara>Fix issue type.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Replace includePrevSnsTitle with snsLevels.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -185,16 +185,6 @@
                 </entry>
                 <entry>
                   <para>C, P, or S</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <verbatimText verbatimStyle="vs14">includePrevSnsTitle</verbatimText>
-                  </para>
-                </entry>
-                <entry>
-                  <para>true or false</para>
                 </entry>
               </row>
               <row>
@@ -557,6 +547,16 @@
                   <para>Data module code of BREX data module</para>
                 </entry>
               </row>
+              <row changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                <entry>
+                  <para>
+                    <verbatimText verbatimStyle="vs14">snsLevels</verbatimText>
+                  </para>
+                </entry>
+                <entry>
+                  <para>1 thru 4</para>
+                </entry>
+              </row>
               <row>
                 <entry>
                   <para>
@@ -648,7 +648,6 @@
 <default ident="disassyCodeVariant" value="A"/>
 <default ident="disassyCode" value="00"/>
 <default ident="dmlType" value="C"/>
-<default ident="includePrevSnsTitle" value="true"/>
 <default ident="infoCodeVariant" value="A"/>
 <default ident="infoCode" value="258"/>
 <default ident="infoName" value="Other procedure to clean"/>
@@ -682,6 +681,7 @@
 <default ident="seqNumber" value="00001"/>
 <default ident="skillLevelCode" value="sk01"/>
 <default ident="sns" value="MYPRJ-A-00-00-00-00A-022A-D"/>
+<default ident="snsLevels" value="1"/>
 <default ident="subSubSystem" value="0"/>
 <default ident="subSystem" value="0"/>
 <default ident="systemCode" value="00"/>
@@ -706,7 +706,6 @@ country                        Canada
 disassyCodeVariant             A
 disassyCode                    00
 dmlType                        C
-includePrevSnsTitle            true
 infoCodeVariant                A
 infoCode                       258
 infoName                       Other procedure to clean
@@ -741,6 +740,7 @@ senderIdent                    12345
 seqNumber                      00001
 skillLevelCode                 sk01
 sns                            MYPRJ-A-00-00-00-00A-022A-D
+snsLevels                      1
 subSubSystem                   0
 subSystem                      0
 systemCode                     00

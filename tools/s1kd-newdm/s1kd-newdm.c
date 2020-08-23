@@ -22,7 +22,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "3.3.0"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -135,8 +135,7 @@ static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_
 static char *template_dir = NULL;
 
 /* Include the previous level of SNS title in a tech name. */
-static bool sns_prev_title = false;
-static bool sns_prev_title_set = false;
+static int sns_title_levels = 0;
 
 static bool no_info_name = false;
 
@@ -250,7 +249,7 @@ static void show_help(void)
 	puts("  -j, --brexmap <map>               Use a custom .brexmap file.");
 	puts("  -M, --maintained-sns <SNS>        Use one of the maintained SNS.");
 	puts("  -N, --omit-issue                  Omit issue/inwork from filename.");
-	puts("  -P, --two-sns-levels              Include previous level of SNS in tech name.");
+	puts("  -P, --sns-levels <levels>         Levels of SNS to include in tech name.");
 	puts("  -p, --prompt                      Prompt the user for each value.");
 	puts("  -q, --quiet                       Don't report an error if file exists.");
 	puts("  -S, --sns <BREX>                  Get tech name from BREX SNS.");
@@ -354,8 +353,8 @@ static void copy_default_value(const char *key, const char *val)
 		template_dir = strdup(val);
 	else if (strcmp(key, "maintainedSns") == 0 && !maint_sns)
 		maint_sns = strdup(val);
-	else if (strcmp(key, "includePrevSnsTitle") == 0 && !sns_prev_title_set)
-		sns_prev_title = strcasecmp(val, "true") == 0;
+	else if (strcmp(key, "snsLevels") == 0 && sns_title_levels == 0)
+		sns_title_levels = atoi(val);
 	else if (strcmp(key, "skillLevelCode") == 0 && !skill_level_code)
 		skill_level_code = xmlStrdup(BAD_CAST val);
 	else if (strcmp(key, "act") == 0 && !act_dmcode)
@@ -474,27 +473,47 @@ static void unset_act(xmlDocPtr doc)
 
 static void set_sns_title(xmlNodePtr snsTitle)
 {
-	char *title;
+	xmlChar *title, *last;
+	int n;
+	xmlNodePtr cur;
 
-	title = (char *) xmlNodeGetContent(snsTitle);
+	title = xmlNodeGetContent(snsTitle);
+	last = xmlStrdup(title);
 
 	strcpy(techName_content, "");
 
-	if (sns_prev_title) {
+	for (n = sns_title_levels, cur = snsTitle; n > 1 && cur; --n, cur = cur->parent) {
 		xmlNodePtr prev;
-		if ((prev = firstXPathNode(NULL, snsTitle, "parent::*/parent::*/snsTitle"))) {
-			char *p;
-			if (strcmp((p = (char *) xmlNodeGetContent(prev)), title) != 0) {
-				strcpy(techName_content, p);
+
+		if ((prev = firstXPathNode(NULL, cur, "parent::*/parent::*/snsTitle"))) {
+			xmlChar *p;
+
+			p = xmlNodeGetContent(prev);
+
+			if (xmlStrcmp(p, last) != 0) {
+				char *s;
+
+				s = strdup(techName_content);
+				strcpy(techName_content, (char *) p);
 				strcat(techName_content, " - ");
+				strcat(techName_content, s);
+
+				free(s);
 			}
+
+			xmlFree(last);
+			last = xmlStrdup(p);
+
 			xmlFree(p);
+		} else {
+			break;
 		}
 	}
 
-	strcat(techName_content, title);
+	strcat(techName_content, (char *) title);
 
 	xmlFree(title);
+	xmlFree(last);
 }
 
 /* Find the filename of the latest version of a BREX DM by its code. */
@@ -1458,7 +1477,7 @@ int main(int argc, char **argv)
 
 	char *outdir = NULL;
 
-	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P!k:j:~:z:V:h?";
+	const char *sopts = "a:pd:D:L:C:n:w:c:r:R:o:O:t:i:T:#:Ns:Bb:S:I:v$:@:fm:,.%:qM:P:!k:j:~:z:V:h?";
 	struct option lopts[] = {
 		{"version"               , no_argument      , 0, 0},
 		{"help"                  , no_argument      , 0, 'h'},
@@ -1495,7 +1514,7 @@ int main(int argc, char **argv)
 		{"templates"             , required_argument, 0, '%'},
 		{"quiet"                 , no_argument      , 0, 'q'},
 		{"maintained-sns"        , required_argument, 0, 'M'},
-		{"two-sns-levels"        , no_argument      , 0, 'P'},
+		{"sns-levels"            , required_argument, 0, 'P'},
 		{"no-infoname"           , no_argument      , 0, '!'},
 		{"skill"                 , required_argument, 0, 'k'},
 		{"brexmap"               , required_argument, 0, 'j'},
@@ -1558,7 +1577,7 @@ int main(int argc, char **argv)
 			case '%': template_dir = strdup(optarg); break;
 			case 'q': no_overwrite_error = true; break;
 			case 'M': maint_sns = strdup(optarg); break;
-			case 'P': sns_prev_title = true; sns_prev_title_set = true; break;
+			case 'P': sns_title_levels = atoi(optarg); break;
 			case '!': no_info_name = true; break;
 			case 'k': skill_level_code = xmlStrdup(BAD_CAST optarg); break;
 			case 'j': if (!brexmap) brexmap = read_xml_doc(optarg); break;
@@ -1809,6 +1828,10 @@ int main(int argc, char **argv)
 	}
 	for (i = 0; countryIsoCode[i]; ++i) {
 		countryIsoCode[i] = toupper(countryIsoCode[i]);
+	}
+
+	if (sns_title_levels == 0) {
+		sns_title_levels = 1;
 	}
 
 	dm = xml_skeleton(dmtype, issue);
