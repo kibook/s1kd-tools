@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="04"/>
+        <issueInfo issueNumber="025" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="07"/>
+        <issueDate year="2020" month="08" day="26"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -201,7 +201,7 @@
           </definitionList>
         </para>
         <levelledPara>
-          <title>XML catalogs</title>
+          <title changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">XML catalogs</title>
           <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">XML catalogs allow redirecting the canonical URIs of XML schemas and other external resources to local files, so as to avoid the unnecessary overhead of downloading those static resources over the Internet.</para>
           <para>Below is an example of a catalog file which maps the S1000D schemas to a local directory:</para>
           <para>
