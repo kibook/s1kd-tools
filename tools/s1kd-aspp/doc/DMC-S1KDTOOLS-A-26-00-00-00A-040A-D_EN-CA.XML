@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="26" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="02"/>
+        <issueInfo issueNumber="026" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="20"/>
+        <issueDate year="2020" month="08" day="26"/>
         <dmTitle>
           <techName>s1kd-aspp(1) | s1kd-tools</techName>
         </dmTitle>
@@ -273,7 +273,7 @@
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.disptext</verbatimText> file</title>
           <para>
@@ -413,7 +413,8 @@ applicPropertyValues="Mk9"/>
 </evaluate>
 </evaluate>]]></verbatimText>
             Human-readable format:
-            <verbatimText verbatimStyle="vs23">"[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]"</verbatimText>
+            <verbatimText verbatimStyle="vs23">"[Brook trekker Model + Version: Mk9],
+[Mountain storm Model + Version: Mk1]"</verbatimText>
           </para>
           <para>
             Evaluate annotation:

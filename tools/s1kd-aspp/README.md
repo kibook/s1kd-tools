@@ -284,7 +284,8 @@ Evaluate annotation:
 
 Human-readable format:
 
-    "[Brook trekker Model + Version: Mk9], [Mountain storm Model + Version: Mk1]"
+    "[Brook trekker Model + Version: Mk9],
+    [Mountain storm Model + Version: Mk1]"
 
 Evaluate annotation:
 
