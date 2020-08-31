@@ -18,12 +18,11 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.6.0"
+#define VERSION "4.7.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
 	"//contextrules[not(@context) or @context=$schema]//objrule"
-#define BREX_REF_DMCODE_PATH BAD_CAST "//brexDmRef//dmCode|//brexref//avee"
 
 /* Prefixes on console messages. */
 #define E_PREFIX PROG_NAME ": ERROR: "
@@ -127,6 +126,8 @@ struct opts {
 	 * the DTD.
 	 */
 	bool check_notations;
+
+	bool ignore_issue;
 };
 
 /* Return the first node in a set matching an XPath expression. */
@@ -332,7 +333,7 @@ static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[P
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr object;
 
-	xmlNodePtr dmCode;
+	xmlNodePtr brexDmRef, dmCode, issueInfo, language;
 
 	char *modelIdentCode;
 	char *systemDiffCode;
@@ -353,17 +354,42 @@ static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[P
 
 	context = xmlXPathNewContext(doc);
 
-	object = xmlXPathEvalExpression(BREX_REF_DMCODE_PATH, context);
-
+	object = xmlXPathEval(BAD_CAST "//brexDmRef|//brexref", context);
 	if (xmlXPathNodeSetIsEmpty(object->nodesetval)) {
 		xmlXPathFreeObject(object);
 		xmlXPathFreeContext(context);
 		return -1;
+	} else {
+		brexDmRef = object->nodesetval->nodeTab[0];
 	}
-
-	dmCode = object->nodesetval->nodeTab[0];
-
 	xmlXPathFreeObject(object);
+
+	xmlXPathSetContextNode(brexDmRef, context);
+
+	object = xmlXPathEval(BAD_CAST ".//dmCode|.//avee", context);
+	if (xmlXPathNodeSetIsEmpty(object->nodesetval)) {
+		dmCode = NULL;
+	} else {
+		dmCode = object->nodesetval->nodeTab[0];
+	}
+	xmlXPathFreeObject(object);
+
+	object = xmlXPathEval(BAD_CAST ".//issueInfo|.//issno", context);
+	if (xmlXPathNodeSetIsEmpty(object->nodesetval)) {
+		issueInfo = NULL;
+	} else {
+		issueInfo = object->nodesetval->nodeTab[0];
+	}
+	xmlXPathFreeObject(object);
+
+	object = xmlXPathEval(BAD_CAST ".//language", context);
+	if (xmlXPathNodeSetIsEmpty(object->nodesetval)) {
+		language = NULL;
+	} else {
+		language = object->nodesetval->nodeTab[0];
+	}
+	xmlXPathFreeObject(object);
+
 	xmlXPathFreeContext(context);
 
 	if (xmlStrcmp(dmCode->name, BAD_CAST "dmCode") == 0) {
@@ -416,6 +442,38 @@ static int find_brex_fname_from_doc(char *fname, xmlDocPtr doc, char (*spaths)[P
 	xmlFree(infoCode);
 	xmlFree(infoCodeVariant);
 	xmlFree(itemLocationCode);
+
+	if (!opts->ignore_issue) {
+		if (issueInfo) {
+			char *issue_number, *in_work;
+			char iss[8];
+
+			issue_number = (char *) firstXPathValue(issueInfo, "@issueNumber|@issno");
+			in_work      = (char *) firstXPathValue(issueInfo, "@inWork|@inwork");
+
+			snprintf(iss, 8, "_%s-%s", issue_number, in_work ? in_work : "00");
+			strcat(dmcode, iss);
+
+			xmlFree(issue_number);
+			xmlFree(in_work);
+		} else if (language) {
+			strcat(dmcode, "_\?\?\?-\?\?");
+		}
+	}
+
+	if (language) {
+		char *language_iso_code, *country_iso_code;
+		char lang[8];
+
+		language_iso_code = (char *) firstXPathValue(language, "@languageIsoCode|@language");
+		country_iso_code  = (char *) firstXPathValue(language, "@countryIsoCode|@country");
+
+		snprintf(lang, 8, "_%s-%s", language_iso_code, country_iso_code);
+		strcat(dmcode, lang);
+
+		xmlFree(language_iso_code);
+		xmlFree(country_iso_code);
+	}
 
 	len = strlen(dmcode);
 
@@ -1604,7 +1662,7 @@ int s1kdCheckBREX(const char *object_xml, int object_size, const char *brex_xml,
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-F|-f] [-BceLlnopqrS[tu]sTvx^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -B, --default-brex                   Use the default BREX.");
@@ -1618,6 +1676,7 @@ static void show_help(void)
 	puts("  -I, --include <path>                 Add <path> to search path for BREX data module.");
 	puts("  -L, --list                           Input is a list of data module filenames.");
 	puts("  -l, --layered                        Check BREX referenced by other BREX.");
+	puts("  -N, --omit-issue                     Assume issue/inwork numbers are omitted.");
 	puts("  -n, --notations                      Check notation rules.");
 	puts("  -o, --output-valid                   Output valid CSDB objects to stdout.");
 	puts("  -p, --progress                       Display progress bar.");
@@ -1685,10 +1744,11 @@ int main(int argc, char *argv[])
 		/* check_sns */ false,
 		/* strict_sns */ false,
 		/* unstrict_sns */ false,
-		/* check_notations */ false
+		/* check_notations */ false,
+		/* ignore_issue */ false
 	};
 
-	const char *sopts = "Bb:eI:xvqslw:StupFfncLTrd:o^h?";
+	const char *sopts = "Bb:eI:xvqslw:StupFfNncLTrd:o^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -1709,6 +1769,7 @@ int main(int argc, char *argv[])
 		{"progress"       , no_argument      , 0, 'p'},
 		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
+		{"omit-issue"     , no_argument      , 0, 'N'},
 		{"notations"      , no_argument      , 0, 'n'},
 		{"values"         , no_argument      , 0, 'c'},
 		{"list"           , no_argument      , 0, 'L'},
@@ -1767,6 +1828,7 @@ int main(int argc, char *argv[])
 			case 'p': progress = true; break;
 			case 'F': show_fnames = SHOW_VALID; break;
 			case 'f': show_fnames = SHOW_INVALID; break;
+			case 'N': opts.ignore_issue = true; break;
 			case 'n': opts.check_notations = true; break;
 			case 'c': opts.check_values = true; break;
 			case 'L': is_list = true; break;

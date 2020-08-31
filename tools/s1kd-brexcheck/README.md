@@ -7,7 +7,7 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-F|-f] [-BceLlnopqrS[tu]sTvx^h?] [<object>...]
+                   [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?] [<object>...]
 
 DESCRIPTION
 ===========
@@ -63,6 +63,10 @@ object itself.
 Use the layered BREX concept. BREX data modules referenced by other BREX
 data modules (either specified with -b or referenced by the specified
 CSDB objects) will also be checked against.
+
+-N, --omit-issue  
+Assume that the issue/inwork numbers are omitted from object filenames
+(they were created with the -N option).
 
 -n, --notations  
 Check notation rules. Any notation names listed in any of the BREX data

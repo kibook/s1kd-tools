@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="038" inWork="01"/>
+        <issueInfo issueNumber="038" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="07"/>
+        <issueDate year="2020" month="08" day="31"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add experimental Saxon support.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -N (--omit-issue) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,8 +58,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-               [-F|-f] [-BceLlnopqrS[tu]sTvx^h?] [<object>...]]]></verbatimText>
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
+               [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?] [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
       <levelledPara>
@@ -134,6 +137,12 @@
               <listItemTerm>-l, --layered</listItemTerm>
               <listItemDefinition>
                 <para>Use the layered BREX concept. BREX data modules referenced by other BREX data modules (either specified with -b or referenced by the specified CSDB objects) will also be checked against.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-N, --omit-issue</listItemTerm>
+              <listItemDefinition>
+                <para>Assume that the issue/inwork numbers are omitted from object filenames (they were created with the -N option).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -272,7 +281,7 @@
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
         <levelledPara>
           <title>Business rule severity levels (<verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText>)</title>
           <para>The attribute <verbatimText verbatimStyle="vs13">brSeverityLevel</verbatimText> on a BREX rule allows for distinguishing different kinds of errors. The <verbatimText verbatimStyle="vs02">.brseveritylevels</verbatimText> file contains a list of severity levels, their user-defined type, and optionally if they should not be counted as true errors (causing the tool to return a "failure" status) but merely warnings.</para>
