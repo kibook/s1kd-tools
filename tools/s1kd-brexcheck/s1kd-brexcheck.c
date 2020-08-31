@@ -18,7 +18,7 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.7.1"
+#define VERSION "4.7.2"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -312,14 +312,13 @@ static bool is_xml_file(const char *fname)
 /* Search for the BREX in the built-in default BREX data modules. */
 static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 {
-	return
-		(strcmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0 ||
-		 strcmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0 ||
-		 strcmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0 ||
-		 strcmp(dmcode, "DMC-S1000D-D-04-10-0301-00A-022A-D") == 0 ||
-		 strcmp(dmcode, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0 ||
-		 strcmp(dmcode, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) &&
-		strcpy(fname, dmcode);
+	if (strncasecmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-G-04-10-0301-00A-022A-D");
+	if (strncasecmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-F-04-10-0301-00A-022A-D");
+	if (strncasecmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D_012-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-E-04-10-0301-00A-022A-D");
+	if (strncasecmp(dmcode, "DMC-S1000D-D-04-10-0301-00A-022A-D_006-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-D-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-D-04-10-0301-00A-022A-D");
+	if (strncasecmp(dmcode, "DMC-S1000D-A-04-10-0301-00A-022A-D_005-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-A-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-A-04-10-0301-00A-022A-D");
+	if (strncasecmp(dmcode, "DMC-AE-A-04-10-0301-00A-022A-D_003-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-AE-A-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-AE-A-04-10-0301-00A-022A-D");
+	return false;
 }
 
 /* Find the filename of a BREX data module referenced by a CSDB object.
