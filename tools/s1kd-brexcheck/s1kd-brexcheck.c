@@ -18,7 +18,7 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.7.0"
+#define VERSION "4.7.1"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -316,6 +316,7 @@ static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int l
 		(strcmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0 ||
+		 strcmp(dmcode, "DMC-S1000D-D-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0 ||
 		 strcmp(dmcode, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) &&
 		strcpy(fname, dmcode);
@@ -914,11 +915,14 @@ static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 			xml = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML;
 			len = brex_DMC_S1000D_F_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
 		} else if (strcmp(name, "DMC-S1000D-E-04-10-0301-00A-022A-D") == 0) {
-			xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML;
-			len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_009_00_EN_US_XML_len;
+			xml = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_012_00_EN_US_XML;
+			len = brex_DMC_S1000D_E_04_10_0301_00A_022A_D_012_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-D-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_D_04_10_0301_00A_022A_D_006_00_EN_US_XML;
+			len = brex_DMC_S1000D_D_04_10_0301_00A_022A_D_006_00_EN_US_XML_len;
 		} else if (strcmp(name, "DMC-S1000D-A-04-10-0301-00A-022A-D") == 0) {
-			xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML;
-			len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_004_00_EN_US_XML_len;
+			xml = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_005_00_EN_US_XML;
+			len = brex_DMC_S1000D_A_04_10_0301_00A_022A_D_005_00_EN_US_XML_len;
 		} else if (strcmp(name, "DMC-AE-A-04-10-0301-00A-022A-D") == 0) {
 			xml = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML;
 			len = brex_DMC_AE_A_04_10_0301_00A_022A_D_003_00_XML_len;
@@ -1397,7 +1401,7 @@ static const char *default_brex_dmc(xmlDocPtr doc)
 	} else if (xmlStrstr(schema, BAD_CAST "S1000D_4-1")) {
 		code = "DMC-S1000D-E-04-10-0301-00A-022A-D";
 	} else if (xmlStrstr(schema, BAD_CAST "S1000D_4-0")) {
-		code = "DMC-S1000D-A-04-10-0301-00A-022A-D";
+		code = "DMC-S1000D-D-04-10-0301-00A-022A-D";
 	} else {
 		code = "DMC-AE-A-04-10-0301-00A-022A-D";
 	}

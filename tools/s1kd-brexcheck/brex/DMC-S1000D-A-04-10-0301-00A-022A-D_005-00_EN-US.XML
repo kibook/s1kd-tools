@@ -2,7 +2,7 @@
 <!DOCTYPE dmodule [
 ]>
 <dmodule 
-xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-0/xml_schema_flat/brex.xsd" 
+xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-0-1/xml_schema_flat/brex.xsd" 
 xmlns:dc="http://www.purl.org/dc/elements/1.1/" 
 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -23,17 +23,17 @@ infoCode="022"
 infoCodeVariant="A" 
 itemLocationCode="D"/>
 <language languageIsoCode="en" countryIsoCode="US"/>
-<issueInfo issueNumber="004" inWork="00" /> 
+<issueInfo issueNumber="005" inWork="00" /> 
 </dmIdent>
 <dmAddressItems>
-<issueDate year="2008" month="08" day="01"/>
+<issueDate year="2009" month="05" day="12"/>
 <dmTitle>
 <techName>S1000D</techName>
 <infoName>Default business rules exchange data module</infoName>
 </dmTitle>
 </dmAddressItems>
 </dmAddress>
-<dmStatus issueType="revised">
+<dmStatus issueType="changed">
 <security securityClassification="01"/>
 <responsiblePartnerCompany enterpriseCode="SF518"><enterpriseName>SI</enterpriseName></responsiblePartnerCompany>
 <originator enterpriseCode="SF518"><enterpriseName>SI</enterpriseName></originator>
@@ -55,15 +55,15 @@ disassyCodeVariant="A"
 infoCode="022" 
 infoCodeVariant="A" 
 itemLocationCode="D"/>
-<issueInfo issueNumber="004" inWork="00"/>
+<issueInfo issueNumber="005" inWork="00"/>
 </dmRefIdent>
 </dmRef>
 </brexDmRef>
 <qualityAssurance>
 <firstVerification verificationType="tabtop"/>
 </qualityAssurance>
-<reasonForUpdate>
-<simplePara>Due to the major revision of the specification itself, the default BREX module is totally revised in Issue 4.0. Refer to the Highlights pages and to Chap 7.3.1.1 and 7.3.1.4 for further information.</simplePara>
+<reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+<simplePara>Clarification of use of sequential lists: "Only one sequential list must be placed under a numbered title or paragraph (subheading)".</simplePara>
 </reasonForUpdate>
 </dmStatus>
 </identAndStatusSection>
@@ -201,9 +201,9 @@ itemLocationCode="D"/>
 						<objectUse>Sequential lists must not be used to provide procedural step information. (Chap 3.9.5.2.1.3, Para 2.1).</objectUse>
 					</structureObjectRule>
 					
-					<structureObjectRule>
+					<structureObjectRule reasonForUpdateRefIds="rfu-0001" changeType="modify" changeMark="1">
 						<objectPath>//sequentialList</objectPath>
-						<objectUse>Only one level of sequential (ordered) lists must be placed under a numbered title or paragraph (subheading) (Chap 3.9.5.2.1.3, Para 2.1).</objectUse>
+						<objectUse>Only one sequential (ordered) list must be placed under a numbered title or paragraph (subheading) (Chap 3.9.5.2.1.3, Para 2.1).</objectUse>
 					</structureObjectRule>
 
 <!-- 3.9.5.2.1.5 -->					

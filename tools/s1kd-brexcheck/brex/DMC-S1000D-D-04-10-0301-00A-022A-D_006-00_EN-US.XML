@@ -1,0 +1,1560 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dmodule [
+]>
+<dmodule 
+xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-0-2/xml_schema_flat/brex.xsd" 
+xmlns:dc="http://www.purl.org/dc/elements/1.1/" 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+xmlns:xlink="http://www.w3.org/1999/xlink" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<identAndStatusSection>
+<dmAddress>
+<dmIdent>
+<dmCode 
+modelIdentCode="S1000D" 
+systemDiffCode="D" 
+systemCode="04" 
+subSystemCode="1" 
+subSubSystemCode="0" 
+assyCode="0301" 
+disassyCode="00" 
+disassyCodeVariant="A" 
+infoCode="022" 
+infoCodeVariant="A" 
+itemLocationCode="D"/>
+<language languageIsoCode="en" countryIsoCode="US"/>
+<issueInfo issueNumber="006" inWork="00" /> 
+</dmIdent>
+<dmAddressItems>
+<issueDate year="2013" month="10" day="09"/>
+<dmTitle>
+<techName>S1000D</techName>
+<infoName>Default business rules exchange data module</infoName>
+</dmTitle>
+</dmAddressItems>
+</dmAddress>
+<dmStatus issueType="changed">
+<security securityClassification="01"/>
+<responsiblePartnerCompany enterpriseCode="SF518"><enterpriseName>SI</enterpriseName></responsiblePartnerCompany>
+<originator enterpriseCode="SF518"><enterpriseName>SI</enterpriseName></originator>
+<applic>
+<displayText><simplePara>All</simplePara></displayText>
+</applic>
+<brexDmRef>
+<dmRef>
+<dmRefIdent>
+<dmCode 
+modelIdentCode="S1000D" 
+systemDiffCode="D" 
+systemCode="04" 
+subSystemCode="1" 
+subSubSystemCode="0" 
+assyCode="0301" 
+disassyCode="00" 
+disassyCodeVariant="A" 
+infoCode="022" 
+infoCodeVariant="A" 
+itemLocationCode="D"/>
+<issueInfo issueNumber="006" inWork="00"/>
+</dmRefIdent>
+</dmRef>
+</brexDmRef>
+<qualityAssurance>
+<firstVerification verificationType="tabtop"/>
+</qualityAssurance>
+<!-- rfu-0001 was introduced in 005, affected //sequentialList
+<reasonForUpdate id="rfu-0001" updateReasonType="urt01">
+<simplePara>Clarification of use of sequential lists: "Only one sequential list must be placed under a numbered title or paragraph (subheading)".</simplePara>
+</reasonForUpdate> -->
+<reasonForUpdate id="rfu-0002" updateReasonType="urt02">
+<simplePara>2013-049EPWG: Specification of attribute crewStepCondition value set is change to allow multiple values.</simplePara>
+</reasonForUpdate>
+<reasonForUpdate id="rfu-0003" updateReasonType="urt02">
+<simplePara>2013-049EPWG: Specification of attribute itemCharacteristic value set is change to allow multiple values.</simplePara>
+</reasonForUpdate>
+<reasonForUpdate id="rfu-0004" updateReasonType="urt02">
+<simplePara>2013-049EPWG: Specification of attribute partCharacteristic value set is change to allow multiple values.</simplePara>
+</reasonForUpdate>
+<reasonForUpdate id="rfu-0005" updateReasonType="urt02">
+<simplePara>2013-065EPWG: Internal references to all kinds of steps, using target type "step", are recognized.</simplePara>
+</reasonForUpdate>
+<reasonForUpdate id="rfu-0006" updateReasonType="urt02">
+<simplePara>2009-130IGBRTT: The identity of this data module now applies an S1000D Issue sensitive coding.</simplePara>
+</reasonForUpdate>
+</dmStatus>
+</identAndStatusSection>
+	<content>
+		<brex>
+			<contextRules>
+				<structureObjectRuleGroup>
+<!-- 3.9.5 -->					
+					<structureObjectRule>
+						<objectPath>//dmodule</objectPath>
+						<objectUse>The root element of an interchanged data module must be element /dmodule/ (Chap 3.9.5).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.1 -->					
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//responsiblePartnerCompany[(not(attribute::enterpriseCode) or attribute::enterpriseCode = "") and (not(child::enterpriseName) or child::enterpriseName = "")]</objectPath>
+						<objectUse>Company or organization must be indicated by at least one of either the name of the company and/or the company’s CAGE code, .... However, if a responsible partner company has an enterprise code, then that code must be used (Chap 3.9.5.1, Para 2.2.5).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.1.1 -->					
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//identAndStatusSection/dmAddress/dmIdent/issueInfo[attribute::issueNumber = "001" and ancestor::dmodule[child::identAndStatusSection[child::dmStatus[child::reasonForUpdate]]]]</objectPath>
+						<objectUse>RFU must not be used on Issue 001 of a data module (Chap 3.9.5.2.1.1, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//dmodule[descendant-or-self::dmStatus[attribute::issueType != "changed"] and descendant-or-self::dmAddress[descendant-or-self::issueInfo[attribute::issueNumber != "000" and attribute::issueNumber != "001"]] and not(descendant-or-self::reasonForUpdate)]</objectPath>
+						<objectUse>Data modules that are not of issue type changed must also have at least one reason for update element if the issue number is greater than 001 (Chap 3.9.5.2.1.1, Para 2.2).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//reasonForUpdate</objectPath>
+						<objectUse>If attribute updateHighlight is set to the value 1, this indicates that the reason for update must appear in the highlights data module. If the attribute is not used or its value is 0, it means that the reason for update must not appear in the highlights data module (Chap 3.9.5.2.1.1, Para 2.2).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//*/changeInline</objectPath>
+						<objectUse>The element /changeInline/ must not be used to indicate that a complete element has been inserted (or modified) (Chap 3.9.5.2.1.1, Para 2.3.3).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//internalRef</objectPath>
+						<objectUse>There must be no cross-references to deleted information in the data module (Chap 3.9.5.2.1.1, Para 2.5.2).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//dmRef</objectPath>
+						<objectUse>There must be no cross-references to deleted information in other data modules (Chap 3.9.5.2.1.1, Para 2.5.2).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//figure[attribute::changeMark="1" and child::graphic[position() = 2] and child::graphic[attribute::changeMark="1"]]</objectPath>
+						<objectUse>If the element /figure/ is change marked, the change attributes on the element /graphic/ of multi-sheet figures must not be used (Chap 3.9.5.2.1.1, Para 2.9.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@changeMark</objectPath>
+						<objectUse>Editorial changes must not be marked (Chap 3.9.5.2.1.1, Para 3).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//*[attribute::changeMark = "1" and ancestor::dmodule[child::identAndStatusSection[child::dmStatus[attribute::issueType != "changed" and attribute::issueType != "rinstate-changed"]]]]</objectPath>
+						<objectUse>No change markers must appear if the issue type is not changed (Chap 3.9.5.2.1.1, Para 3.0).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.1.2 -->					
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="figure" and not(attribute::internalRefId = //figure/@id)]</objectPath>
+						<objectUse>When the reference target is a figure then the value of attribute internalRefTargetType must be figure (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="table" and not(attribute::internalRefId = //table/@id)]</objectPath>
+						<objectUse>When the reference target is a table then the value of attribute internalRefTargetType must be table (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="multimedia" and not(attribute::internalRefId = //multimedia/@id)]</objectPath>
+						<objectUse>When the reference target is multimedia (containing one or more objects) then the value of attribute internalRefTargetType must be multimedia (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="supply" and not(attribute::internalRefId = //supplyDescr/@id)]</objectPath>
+						<objectUse>When the reference target is a supply  then the value of attribute internalRefTargetType must be supply (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="supequip" and not(attribute::internalRefId = //supportEquipDescr/@id)]</objectPath>
+						<objectUse>When the reference target is support equipment then the value of attribute internalRefTargetType must be supequip (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="spares" and not(attribute::internalRefId = //spareDescr/@id)]</objectPath>
+						<objectUse>When the reference target is a spare then the value of attribute internalRefTargetType must be spares (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="para" and not(attribute::internalRefId = //levelledPara/@id)]</objectPath>
+						<objectUse>When the reference target is a paragraph then the value of attribute internalRefTargetType must be para (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule reasonForUpdateRefIds="rfu-0005" changeType="modify" changeMark="1">
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="step" and not(attribute::internalRefId = //proceduralStep/@id or attribute::internalRefId = //isolationStep/@id or attribute::internalRefId = //isolationProcedureEnd/@id or attribute::internalRefId = //crewDrillStep/@id or attribute::internalRefId = //checkListStep/@id)]</objectPath>
+						<objectUse>When the reference target is a step then the value of attribute internalRefTargetType must be step (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="graphic" and not(attribute::internalRefId = //graphic/@id)]</objectPath>
+						<objectUse>When the reference target is a graphic then the value of attribute internalRefTargetType must be graphic (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="multimediaobject" and not(attribute::internalRefId = //multimediaObject/@id)]</objectPath>
+						<objectUse>When the reference target is a single multimedia object then the value of attribute internalRefTargetType must be multimediaobject (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="hotspot" and not(attribute::internalRefId = //hotspot/@id)]</objectPath>
+						<objectUse>When the reference target is a hotspot then the value of attribute internalRefTargetType must be hotspot (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//internalRef[attribute::internalRefTargetType="param" and not(attribute::internalRefId = //parameter/@id)]</objectPath>
+						<objectUse>When the reference target is a parameter then the value of attribute internalRefTargetType must be param (Chap 3.9.5.2.1.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.1.3 -->					
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//sequentialList/listItem/para/sequentialList/listItem/para[child::sequentialList]</objectPath>
+						<objectUse>Sequential (ordered) lists are limited to a maximum of two levels (Chap 3.9.5.2.1.3, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//proceduralStep[descendant-or-self::sequentialList]</objectPath>
+						<objectUse>Sequential lists must not be used to provide procedural step information. (Chap 3.9.5.2.1.3, Para 2.1).</objectUse>
+					</structureObjectRule>
+					
+					<structureObjectRule>
+						<objectPath>//sequentialList</objectPath>
+						<objectUse>Only one sequential (ordered) list must be placed under a numbered title or paragraph (subheading) (Chap 3.9.5.2.1.3, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.1.5 -->					
+					<structureObjectRule>
+						<objectPath>//table/title</objectPath>
+						<objectUse>In procedural, process, crew and fault data modules, titles must be included for /table/ for formal tables. (Chap 3.9.5.2.1.5, Para 2).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.2 -->
+					<structureObjectRule>
+						<objectPath>//levelledPara</objectPath>
+						<objectUse>The depth of the /levelledPara/ structure is unlimited, however, it is recommended to not exceed five levels of depth (Chap 3.9.5.2.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//levelledPara/levelledPara/levelledPara/levelledPara/levelledPara/levelledPara/levelledPara/levelledPara/levelledPara</objectPath>
+						<objectUse>The subparagraph breakdown must never exceed eight levels of depth. (Chap 3.9.5.2.2, Para 2.1).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.3 -->
+					<structureObjectRule>
+						<objectPath>//proceduralStep</objectPath>
+						<objectUse>It is highly discouraged to exceed five levels of depth for proceduralStep. (Chap 3.9.5.2.3, Para 2.6.1).</objectUse>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//proceduralStep/proceduralStep/proceduralStep/proceduralStep/proceduralStep/proceduralStep/proceduralStep/proceduralStep/proceduralStep</objectPath>
+						<objectUse>The procedural substep breakdown must never exceed eight levels of depth (Chap 3.9.5.2.3, Para 2.6.1).</objectUse>
+					</structureObjectRule>
+
+<!-- 3.9.5.2.11.3 -->					
+					<structureObjectRule>
+						<objectPath>//@sparePartClassCode</objectPath>
+						<objectUse>Attribute sparePartClassCode - Spare part class (Chap 3.9.5.2.11.3, Para 2.1.1.4.1)</objectUse>
+						<objectValue valueForm="single" valueAllowed="0">Non-procurable part</objectValue>
+						<objectValue valueForm="single" valueAllowed="1">Expandable part</objectValue>
+						<objectValue valueForm="single" valueAllowed="2">Rotable part</objectValue>
+						<objectValue valueForm="single" valueAllowed="6">Repairable part</objectValue>
+					</structureObjectRule>
+
+<!-- 4.3.8 -->					
+					<structureObjectRule>
+						<objectPath>//@itemLocationCode</objectPath>
+						<objectUse>Attribute itemLocationCode - Data module item location (Chap 4.3.8, Para 2.1)</objectUse>
+						<objectValue valueForm="single" valueAllowed="A">Information related to items installed on the Product</objectValue>
+						<objectValue valueForm="single" valueAllowed="B">Information related to items installed on a major assembly removed from the Product</objectValue>
+						<objectValue valueForm="single" valueAllowed="C">Information related to items on the bench</objectValue>
+						<objectValue valueForm="single" valueAllowed="D">Information related to all three locations A, B, and C</objectValue>
+						<objectValue valueForm="single" valueAllowed="T">The data module contains training information</objectValue>
+					</structureObjectRule>
+
+<!-- 4.3.9 -->					
+					<structureObjectRule>
+						<objectPath>//@learnCode</objectPath>
+						<objectUse>Attribute learnCode - the first character of the learn code must be set to either "H" for human performance technology codes or "T" for training codes (Chap 4.3.9, Para 2; Chap 8.5).</objectUse>
+						<objectValue valueForm="single" valueAllowed="H10">Performance analysis</objectValue>
+						<objectValue valueForm="single" valueAllowed="H11">Organizational analysis - Vision statement</objectValue>
+						<objectValue valueForm="single" valueAllowed="H12">Organizational analysis - Mission statement</objectValue>
+						<objectValue valueForm="single" valueAllowed="H13">Organizational analysis - Values</objectValue>
+						<objectValue valueForm="single" valueAllowed="H14">Organizational analysis - Goal statement</objectValue>
+						<objectValue valueForm="single" valueAllowed="H15">Organizational analysis - Objective statement</objectValue>
+						<objectValue valueForm="single" valueAllowed="H16">Organizational analysis - Gap statement</objectValue>
+						<objectValue valueForm="single" valueAllowed="H17">Environmental analysis - Organizational environment</objectValue>
+						<objectValue valueForm="single" valueAllowed="H18">Environmental analysis - Work environment</objectValue>
+						<objectValue valueForm="single" valueAllowed="H19">Performer analysis - Worker</objectValue>
+						<objectValue valueForm="single" valueAllowed="H20">Cause Analysis</objectValue>
+						<objectValue valueForm="single" valueAllowed="H21">Environmental factor</objectValue>
+						<objectValue valueForm="single" valueAllowed="H22">Internal factor</objectValue>
+						<objectValue valueForm="single" valueAllowed="H30">Intervention definition</objectValue>
+						<objectValue valueForm="single" valueAllowed="H31">Performance support</objectValue>
+						<objectValue valueForm="single" valueAllowed="H32">Job/Work design</objectValue>
+						<objectValue valueForm="single" valueAllowed="H33">Personal development</objectValue>
+						<objectValue valueForm="single" valueAllowed="H34">Human resource development</objectValue>
+						<objectValue valueForm="single" valueAllowed="H35">Organizational communication</objectValue>
+						<objectValue valueForm="single" valueAllowed="H36">Organizational design and development</objectValue>
+						<objectValue valueForm="single" valueAllowed="H37">Training</objectValue>
+						<objectValue valueForm="single" valueAllowed="H40">Intervention implementation</objectValue>
+						<objectValue valueForm="single" valueAllowed="H50">Evaluation</objectValue>
+						<objectValue valueForm="single" valueAllowed="H51">Formative analysis</objectValue>
+						<objectValue valueForm="single" valueAllowed="H52">Summative - Immediate performance competence</objectValue>
+						<objectValue valueForm="single" valueAllowed="H53">Summative - Job transfer</objectValue>
+						<objectValue valueForm="single" valueAllowed="H54">Summative - Organizational impact/ROI</objectValue>
+						<objectValue valueForm="single" valueAllowed="T10">Attention</objectValue>
+						<objectValue valueForm="single" valueAllowed="T11">Perceptual - Concrete example</objectValue>
+						<objectValue valueForm="single" valueAllowed="T12">Perceptual - Incongruity/Conflict</objectValue>
+						<objectValue valueForm="single" valueAllowed="T13">Inquiry - Incongruity/Conflict</objectValue>
+						<objectValue valueForm="single" valueAllowed="T14">Inquiry - Participatory exercise</objectValue>
+						<objectValue valueForm="single" valueAllowed="T15">Inquiry - Relevance</objectValue>
+						<objectValue valueForm="single" valueAllowed="T20">Learning objectives</objectValue>
+						<objectValue valueForm="single" valueAllowed="T21">Terminal objective - Intellectual skill - Discriminations</objectValue>
+						<objectValue valueForm="single" valueAllowed="T22">Terminal objective - Intellectual skill - Concepts</objectValue>
+						<objectValue valueForm="single" valueAllowed="T23">Terminal objective - Intellectual skill - Rules/Principles</objectValue>
+						<objectValue valueForm="single" valueAllowed="T24">Terminal objective - Intellectual skill - Processes</objectValue>
+						<objectValue valueForm="single" valueAllowed="T25">Terminal objective - Intellectual skill - Procedures</objectValue>
+						<objectValue valueForm="single" valueAllowed="T26">Terminal objective - Intellectual skill - Higher order rules</objectValue>
+						<objectValue valueForm="single" valueAllowed="T27">Terminal objective - Verbal information - Facts</objectValue>
+						<objectValue valueForm="single" valueAllowed="T28">Terminal objective - Motor skill</objectValue>
+						<objectValue valueForm="single" valueAllowed="T29">Enabling objective - Intellectual skill- Discriminations</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2A">Enabling objective - Intellectual skill- Concepts</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2B">Enabling objective - Intellectual skill- Rules/Principles</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2C">Enabling objective - Intellectual skill- Processes</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2D">Enabling objective - Intellectual skill- Procedures</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2E">Enabling objective - Intellectual skill- Higher order rules</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2F">Enabling objective - Verbal information - Facts</objectValue>
+						<objectValue valueForm="single" valueAllowed="T2G">Enabling objective - Motor skill</objectValue>
+						<objectValue valueForm="single" valueAllowed="T30">Recall</objectValue>
+						<objectValue valueForm="single" valueAllowed="T31">Analogy</objectValue>
+						<objectValue valueForm="single" valueAllowed="T32">Demonstration</objectValue>
+						<objectValue valueForm="single" valueAllowed="T33">Informative practice</objectValue>
+						<objectValue valueForm="single" valueAllowed="T34">Comparative organizer</objectValue>
+						<objectValue valueForm="single" valueAllowed="T35">Metaphoric device</objectValue>
+						<objectValue valueForm="single" valueAllowed="T36">Prerequisite concept review</objectValue>
+						<objectValue valueForm="single" valueAllowed="T37">Question/problem</objectValue>
+						<objectValue valueForm="single" valueAllowed="T38">Similar-task review</objectValue>
+						<objectValue valueForm="single" valueAllowed="T40">Content</objectValue>
+						<objectValue valueForm="single" valueAllowed="T41">Static content - Discrimination Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T42">Static content - Fact Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T43">Static content - Concept Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T44">Static content - Rule/Principle Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T45">Static content - Procedure Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T46">Static content - Higher order rule Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T47">Static content - Processes Expositive</objectValue>
+						<objectValue valueForm="single" valueAllowed="T48">Animated content - Discrimination</objectValue>
+						<objectValue valueForm="single" valueAllowed="T49">Animated content - Fact</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4A">Animated content - Concept</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4B">Animated content - Rule/Principle</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4C">Animated content - Procedure</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4D">Animated content - Higher order rule</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4E">Animated content - Processes</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4F">Interactive content - Discrimination</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4R">Interactive content - Fact</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4G">Interactive content - Concept</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4H">Interactive content - Rule/Principle</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4J">Interactive content - Procedure</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4K">Interactive content - Higher order rule</objectValue>
+						<objectValue valueForm="single" valueAllowed="T4L">Interactive content - Processes</objectValue>
+						<objectValue valueForm="single" valueAllowed="T50">Learning guidance</objectValue>
+						<objectValue valueForm="single" valueAllowed="T51">Analogy</objectValue>
+						<objectValue valueForm="single" valueAllowed="T52">Metaphoric device</objectValue>
+						<objectValue valueForm="single" valueAllowed="T53">Drill and practice/informative practice</objectValue>
+						<objectValue valueForm="single" valueAllowed="T54">Case study</objectValue>
+						<objectValue valueForm="single" valueAllowed="T55">Comparative organizer</objectValue>
+						<objectValue valueForm="single" valueAllowed="T56">Concept map</objectValue>
+						<objectValue valueForm="single" valueAllowed="T57">Demonstration</objectValue>
+						<objectValue valueForm="single" valueAllowed="T58">Example/non-example</objectValue>
+						<objectValue valueForm="single" valueAllowed="T59">Game</objectValue>
+						<objectValue valueForm="single" valueAllowed="T5A">Mnemonic device</objectValue>
+						<objectValue valueForm="single" valueAllowed="T5B">Problem solving</objectValue>
+						<objectValue valueForm="single" valueAllowed="T5C">Simulation</objectValue>
+						<objectValue valueForm="single" valueAllowed="T5D">Story</objectValue>
+						<objectValue valueForm="single" valueAllowed="T60">Performance</objectValue>
+						<objectValue valueForm="single" valueAllowed="T61">Drag-and-drop/matching exercise</objectValue>
+						<objectValue valueForm="single" valueAllowed="T62">Multiple-choice - One selection</objectValue>
+						<objectValue valueForm="single" valueAllowed="T63">Multiple-choice -Multiple selection</objectValue>
+						<objectValue valueForm="single" valueAllowed="T64">Short answer free text Fill in the blank</objectValue>
+						<objectValue valueForm="single" valueAllowed="T65">Simulation</objectValue>
+						<objectValue valueForm="single" valueAllowed="T66">Game</objectValue>
+						<objectValue valueForm="single" valueAllowed="T70">Feedback</objectValue>
+						<objectValue valueForm="single" valueAllowed="T71">Knowledge of correct response</objectValue>
+						<objectValue valueForm="single" valueAllowed="T72">Knowledge of correct solution</objectValue>
+						<objectValue valueForm="single" valueAllowed="T73">Knowledge of consequence</objectValue>
+						<objectValue valueForm="single" valueAllowed="T80">Assessment</objectValue>
+						<objectValue valueForm="single" valueAllowed="T81">Drag-and-drop/matching exercise</objectValue>
+						<objectValue valueForm="single" valueAllowed="T82">Multiple-choice - One selection</objectValue>
+						<objectValue valueForm="single" valueAllowed="T83">Multiple-choice - Multiple selection</objectValue>
+						<objectValue valueForm="single" valueAllowed="T84">Short answer free text</objectValue>
+						<objectValue valueForm="single" valueAllowed="T85">Simulation</objectValue>
+						<objectValue valueForm="single" valueAllowed="T86">Game</objectValue>
+						<objectValue valueForm="single" valueAllowed="T87">Pre-test</objectValue>
+						<objectValue valueForm="single" valueAllowed="T88">Post-test</objectValue>
+						<objectValue valueForm="single" valueAllowed="T90">Retention and transfer</objectValue>
+						<objectValue valueForm="single" valueAllowed="T91">Drill and practice/informative practice</objectValue>
+						<objectValue valueForm="single" valueAllowed="T92">Case study</objectValue>
+						<objectValue valueForm="single" valueAllowed="T93">Comparative organizer</objectValue>
+						<objectValue valueForm="single" valueAllowed="T94">Demonstration</objectValue>
+						<objectValue valueForm="single" valueAllowed="T95">Example/non-example</objectValue>
+						<objectValue valueForm="single" valueAllowed="T96">Game</objectValue>
+						<objectValue valueForm="single" valueAllowed="T97">Problem solving</objectValue>
+						<objectValue valueForm="single" valueAllowed="T98">Simulation</objectValue>
+						<objectValue valueForm="single" valueAllowed="T99">Story</objectValue>
+					</structureObjectRule>
+
+<!-- 4.3.10 -->					
+					<structureObjectRule>
+						<objectPath>//@learnEventCode</objectPath>
+						<objectUse>Attribute learnEventCode - Used to store the learn event code (Chap 4.3.10, Para 1).</objectUse>
+						<objectValue valueForm="single" valueAllowed="A">Learning plan</objectValue>
+						<objectValue valueForm="single" valueAllowed="B">Learning overview</objectValue>
+						<objectValue valueForm="single" valueAllowed="C">Learning content</objectValue>
+						<objectValue valueForm="single" valueAllowed="D">Learning summary</objectValue>
+						<objectValue valueForm="single" valueAllowed="E">Learning assessment</objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//dmCode[attribute::learnCode and not(attribute::learnEventCode)]</objectPath>
+						<objectUse>Whenever a learn code is used, the learn event code must be used (Chap 4.3.10, Para 1).</objectUse>
+					</structureObjectRule>
+
+<!-- 6.2.2 -->					
+					<structureObjectRule>
+						<objectPath allowedObjectFlag="0">//randomList/listItem/para/randomList/listItem/para/randomList/listItem/para[child::randomList]</objectPath>
+						<objectUse>There are [at the most] three levels of random list (Chap 6.2.2, Para 2.6.2.1).</objectUse>
+					</structureObjectRule>
+
+<!-- 8.4.1 -->					
+					<structureObjectRule>
+						<objectPath>//dmIdent/dmCode/@infoCode</objectPath>
+						<objectUse>Attribute infoCode - The data module information code (Chap 8.4.1).</objectUse>
+						<objectValue valueForm="single" valueAllowed="000"></objectValue>
+						<objectValue valueForm="single" valueAllowed="001"></objectValue>
+						<objectValue valueForm="single" valueAllowed="002"></objectValue>
+						<objectValue valueForm="single" valueAllowed="003"></objectValue>
+						<objectValue valueForm="single" valueAllowed="004"></objectValue>
+						<objectValue valueForm="single" valueAllowed="005"></objectValue>
+						<objectValue valueForm="single" valueAllowed="006"></objectValue>
+						<objectValue valueForm="single" valueAllowed="007"></objectValue>
+						<objectValue valueForm="single" valueAllowed="008"></objectValue>
+						<objectValue valueForm="single" valueAllowed="009"></objectValue>
+						<objectValue valueForm="single" valueAllowed="010"></objectValue>
+						<objectValue valueForm="single" valueAllowed="011"></objectValue>
+						<objectValue valueForm="single" valueAllowed="012"></objectValue>
+						<objectValue valueForm="single" valueAllowed="013"></objectValue>
+						<objectValue valueForm="single" valueAllowed="014"></objectValue>
+						<objectValue valueForm="single" valueAllowed="015"></objectValue>
+						<objectValue valueForm="single" valueAllowed="016"></objectValue>
+						<objectValue valueForm="single" valueAllowed="017"></objectValue>
+						<objectValue valueForm="single" valueAllowed="018"></objectValue>
+						<objectValue valueForm="single" valueAllowed="019"></objectValue>
+						<objectValue valueForm="single" valueAllowed="020"></objectValue>
+						<objectValue valueForm="single" valueAllowed="021"></objectValue>
+						<objectValue valueForm="single" valueAllowed="022"></objectValue>
+						<objectValue valueForm="single" valueAllowed="023"></objectValue>
+<!-- Values within range 024~027 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="024~027"></objectValue>
+						<objectValue valueForm="single" valueAllowed="028"></objectValue>
+						<objectValue valueForm="single" valueAllowed="029"></objectValue>
+						<objectValue valueForm="single" valueAllowed="030"></objectValue>
+						<objectValue valueForm="single" valueAllowed="031"></objectValue>
+<!-- Values within range 032~032 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="032"></objectValue>
+						<objectValue valueForm="single" valueAllowed="033"></objectValue>
+						<objectValue valueForm="single" valueAllowed="034"></objectValue>
+<!-- Values within range 035~039 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="035~039"></objectValue>
+						<objectValue valueForm="single" valueAllowed="040"></objectValue>
+						<objectValue valueForm="single" valueAllowed="041"></objectValue>
+						<objectValue valueForm="single" valueAllowed="042"></objectValue>
+						<objectValue valueForm="single" valueAllowed="043"></objectValue>
+						<objectValue valueForm="single" valueAllowed="044"></objectValue>
+<!-- Values within range 045~049 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="045~049"></objectValue>
+						<objectValue valueForm="single" valueAllowed="050"></objectValue>
+						<objectValue valueForm="single" valueAllowed="051"></objectValue>
+						<objectValue valueForm="single" valueAllowed="052"></objectValue>
+						<objectValue valueForm="single" valueAllowed="053"></objectValue>
+						<objectValue valueForm="single" valueAllowed="054"></objectValue>
+						<objectValue valueForm="single" valueAllowed="055"></objectValue>
+						<objectValue valueForm="single" valueAllowed="056"></objectValue>
+						<objectValue valueForm="single" valueAllowed="057"></objectValue>
+						<objectValue valueForm="single" valueAllowed="058"></objectValue>
+						<objectValue valueForm="single" valueAllowed="059"></objectValue>
+						<objectValue valueForm="single" valueAllowed="060"></objectValue>
+						<objectValue valueForm="single" valueAllowed="061"></objectValue>
+						<objectValue valueForm="single" valueAllowed="062"></objectValue>
+						<objectValue valueForm="single" valueAllowed="063"></objectValue>
+						<objectValue valueForm="single" valueAllowed="064"></objectValue>
+						<objectValue valueForm="single" valueAllowed="065"></objectValue>
+						<objectValue valueForm="single" valueAllowed="066"></objectValue>
+						<objectValue valueForm="single" valueAllowed="067"></objectValue>
+<!-- Values within range 068~069 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="068~069"></objectValue>
+						<objectValue valueForm="single" valueAllowed="070"></objectValue>
+						<objectValue valueForm="single" valueAllowed="071"></objectValue>
+						<objectValue valueForm="single" valueAllowed="072"></objectValue>
+						<objectValue valueForm="single" valueAllowed="073"></objectValue>
+						<objectValue valueForm="single" valueAllowed="074"></objectValue>
+						<objectValue valueForm="single" valueAllowed="075"></objectValue>
+						<objectValue valueForm="single" valueAllowed="076"></objectValue>
+						<objectValue valueForm="single" valueAllowed="077"></objectValue>
+						<objectValue valueForm="single" valueAllowed="078"></objectValue>
+<!-- Values within range 079~079 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="079"></objectValue>
+						<objectValue valueForm="single" valueAllowed="080"></objectValue>
+						<objectValue valueForm="single" valueAllowed="081"></objectValue>
+						<objectValue valueForm="single" valueAllowed="082"></objectValue>
+<!-- Values within range 083~089 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="083~089"></objectValue>
+						<objectValue valueForm="single" valueAllowed="090"></objectValue>
+<!-- Values within range 091~095 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="091~095"></objectValue>
+						<objectValue valueForm="single" valueAllowed="096"></objectValue>
+<!-- Values within range 097~099 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="097~099"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00A"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00B"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00C"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00D"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00E"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00F"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00G"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00H"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00J"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00K"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00L"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00M"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00N"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00P"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00Q"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00R"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00S"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00T"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00U"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00V"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00W"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00X"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00Y"></objectValue>
+						<objectValue valueForm="single" valueAllowed="00Z"></objectValue>
+						<objectValue valueForm="single" valueAllowed="0A1"></objectValue>
+						<objectValue valueForm="single" valueAllowed="100"></objectValue>
+						<objectValue valueForm="single" valueAllowed="101"></objectValue>
+						<objectValue valueForm="single" valueAllowed="102"></objectValue>
+						<objectValue valueForm="single" valueAllowed="103"></objectValue>
+						<objectValue valueForm="single" valueAllowed="104"></objectValue>
+						<objectValue valueForm="single" valueAllowed="105"></objectValue>
+						<objectValue valueForm="single" valueAllowed="106"></objectValue>
+						<objectValue valueForm="single" valueAllowed="107"></objectValue>
+						<objectValue valueForm="single" valueAllowed="110"></objectValue>
+						<objectValue valueForm="single" valueAllowed="111"></objectValue>
+						<objectValue valueForm="single" valueAllowed="112"></objectValue>
+<!-- Values within range 113~119 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="113~119"></objectValue>
+						<objectValue valueForm="single" valueAllowed="120"></objectValue>
+						<objectValue valueForm="single" valueAllowed="121"></objectValue>
+						<objectValue valueForm="single" valueAllowed="122"></objectValue>
+						<objectValue valueForm="single" valueAllowed="123"></objectValue>
+<!-- Values within range 124~124 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="124"></objectValue>
+						<objectValue valueForm="single" valueAllowed="125"></objectValue>
+<!-- Values within range 126~129 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="126~129"></objectValue>
+						<objectValue valueForm="single" valueAllowed="130"></objectValue>
+						<objectValue valueForm="single" valueAllowed="131"></objectValue>
+<!-- Values within range 132~133 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="132~133"></objectValue>
+						<objectValue valueForm="single" valueAllowed="134"></objectValue>
+						<objectValue valueForm="single" valueAllowed="135"></objectValue>
+<!-- Values within range 136~138 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="136~138"></objectValue>
+						<objectValue valueForm="single" valueAllowed="139"></objectValue>
+						<objectValue valueForm="single" valueAllowed="140"></objectValue>
+						<objectValue valueForm="single" valueAllowed="141"></objectValue>
+						<objectValue valueForm="single" valueAllowed="142"></objectValue>
+						<objectValue valueForm="single" valueAllowed="143"></objectValue>
+						<objectValue valueForm="single" valueAllowed="144"></objectValue>
+						<objectValue valueForm="single" valueAllowed="145"></objectValue>
+<!-- Values within range 146~149 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="146~149"></objectValue>
+						<objectValue valueForm="single" valueAllowed="150"></objectValue>
+						<objectValue valueForm="single" valueAllowed="151"></objectValue>
+<!-- Values within range 152~154 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="152~154"></objectValue>
+						<objectValue valueForm="single" valueAllowed="155"></objectValue>
+<!-- Values within range 156~159 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="156~159"></objectValue>
+						<objectValue valueForm="single" valueAllowed="160"></objectValue>
+<!-- Values within range 161~168 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="161~168"></objectValue>
+						<objectValue valueForm="single" valueAllowed="169"></objectValue>
+						<objectValue valueForm="single" valueAllowed="200"></objectValue>
+						<objectValue valueForm="single" valueAllowed="201"></objectValue>
+						<objectValue valueForm="single" valueAllowed="202"></objectValue>
+						<objectValue valueForm="single" valueAllowed="203"></objectValue>
+						<objectValue valueForm="single" valueAllowed="204"></objectValue>
+						<objectValue valueForm="single" valueAllowed="205"></objectValue>
+						<objectValue valueForm="single" valueAllowed="206"></objectValue>
+						<objectValue valueForm="single" valueAllowed="207"></objectValue>
+						<objectValue valueForm="single" valueAllowed="210"></objectValue>
+						<objectValue valueForm="single" valueAllowed="211"></objectValue>
+						<objectValue valueForm="single" valueAllowed="212"></objectValue>
+						<objectValue valueForm="single" valueAllowed="213"></objectValue>
+						<objectValue valueForm="single" valueAllowed="214"></objectValue>
+						<objectValue valueForm="single" valueAllowed="215"></objectValue>
+						<objectValue valueForm="single" valueAllowed="216"></objectValue>
+						<objectValue valueForm="single" valueAllowed="217"></objectValue>
+						<objectValue valueForm="single" valueAllowed="218"></objectValue>
+						<objectValue valueForm="single" valueAllowed="219"></objectValue>
+						<objectValue valueForm="single" valueAllowed="220"></objectValue>
+						<objectValue valueForm="single" valueAllowed="221"></objectValue>
+						<objectValue valueForm="single" valueAllowed="222"></objectValue>
+						<objectValue valueForm="single" valueAllowed="223"></objectValue>
+						<objectValue valueForm="single" valueAllowed="224"></objectValue>
+						<objectValue valueForm="single" valueAllowed="225"></objectValue>
+						<objectValue valueForm="single" valueAllowed="226"></objectValue>
+						<objectValue valueForm="single" valueAllowed="227"></objectValue>
+						<objectValue valueForm="single" valueAllowed="228"></objectValue>
+						<objectValue valueForm="single" valueAllowed="229"></objectValue>
+						<objectValue valueForm="single" valueAllowed="230"></objectValue>
+						<objectValue valueForm="single" valueAllowed="231"></objectValue>
+						<objectValue valueForm="single" valueAllowed="232"></objectValue>
+						<objectValue valueForm="single" valueAllowed="233"></objectValue>
+<!-- Values within range 234~235 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="234~235"></objectValue>
+						<objectValue valueForm="single" valueAllowed="236"></objectValue>
+						<objectValue valueForm="single" valueAllowed="237"></objectValue>
+<!-- Values within range 238~239 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="238~239"></objectValue>
+						<objectValue valueForm="single" valueAllowed="240"></objectValue>
+						<objectValue valueForm="single" valueAllowed="241"></objectValue>
+						<objectValue valueForm="single" valueAllowed="242"></objectValue>
+						<objectValue valueForm="single" valueAllowed="243"></objectValue>
+<!-- Values within range 244~249 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="244~249"></objectValue>
+						<objectValue valueForm="single" valueAllowed="250"></objectValue>
+						<objectValue valueForm="single" valueAllowed="251"></objectValue>
+						<objectValue valueForm="single" valueAllowed="252"></objectValue>
+						<objectValue valueForm="single" valueAllowed="253"></objectValue>
+						<objectValue valueForm="single" valueAllowed="254"></objectValue>
+						<objectValue valueForm="single" valueAllowed="255"></objectValue>
+						<objectValue valueForm="single" valueAllowed="256"></objectValue>
+						<objectValue valueForm="single" valueAllowed="257"></objectValue>
+						<objectValue valueForm="single" valueAllowed="258"></objectValue>
+						<objectValue valueForm="single" valueAllowed="259"></objectValue>
+						<objectValue valueForm="single" valueAllowed="260"></objectValue>
+						<objectValue valueForm="single" valueAllowed="261"></objectValue>
+						<objectValue valueForm="single" valueAllowed="262"></objectValue>
+						<objectValue valueForm="single" valueAllowed="263"></objectValue>
+						<objectValue valueForm="single" valueAllowed="264"></objectValue>
+<!-- Values within range 265~269 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="265~269"></objectValue>
+						<objectValue valueForm="single" valueAllowed="270"></objectValue>
+						<objectValue valueForm="single" valueAllowed="271"></objectValue>
+						<objectValue valueForm="single" valueAllowed="272"></objectValue>
+						<objectValue valueForm="single" valueAllowed="273"></objectValue>
+						<objectValue valueForm="single" valueAllowed="274"></objectValue>
+<!-- Values within range 275~277 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="275~277"></objectValue>
+						<objectValue valueForm="single" valueAllowed="278"></objectValue>
+						<objectValue valueForm="single" valueAllowed="279"></objectValue>
+						<objectValue valueForm="single" valueAllowed="280"></objectValue>
+						<objectValue valueForm="single" valueAllowed="281"></objectValue>
+						<objectValue valueForm="single" valueAllowed="282"></objectValue>
+						<objectValue valueForm="single" valueAllowed="283"></objectValue>
+						<objectValue valueForm="single" valueAllowed="284"></objectValue>
+<!-- Values within range 285~287 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="285~287"></objectValue>
+						<objectValue valueForm="single" valueAllowed="288"></objectValue>
+<!-- Values within range 289~289 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="289"></objectValue>
+						<objectValue valueForm="single" valueAllowed="290"></objectValue>
+<!-- Values within range 291~291 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="291"></objectValue>
+						<objectValue valueForm="single" valueAllowed="292"></objectValue>
+						<objectValue valueForm="single" valueAllowed="293"></objectValue>
+						<objectValue valueForm="single" valueAllowed="294"></objectValue>
+						<objectValue valueForm="single" valueAllowed="295"></objectValue>
+						<objectValue valueForm="single" valueAllowed="296"></objectValue>
+						<objectValue valueForm="single" valueAllowed="297"></objectValue>
+						<objectValue valueForm="single" valueAllowed="298"></objectValue>
+						<objectValue valueForm="single" valueAllowed="299"></objectValue>
+						<objectValue valueForm="single" valueAllowed="300"></objectValue>
+						<objectValue valueForm="single" valueAllowed="301"></objectValue>
+						<objectValue valueForm="single" valueAllowed="302"></objectValue>
+						<objectValue valueForm="single" valueAllowed="303"></objectValue>
+						<objectValue valueForm="single" valueAllowed="304"></objectValue>
+						<objectValue valueForm="single" valueAllowed="305"></objectValue>
+						<objectValue valueForm="single" valueAllowed="306"></objectValue>
+						<objectValue valueForm="single" valueAllowed="307"></objectValue>
+						<objectValue valueForm="single" valueAllowed="310"></objectValue>
+						<objectValue valueForm="single" valueAllowed="311"></objectValue>
+						<objectValue valueForm="single" valueAllowed="312"></objectValue>
+<!-- Values within range 313~314 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="313~314"></objectValue>
+						<objectValue valueForm="single" valueAllowed="315"></objectValue>
+<!-- Values within range 316~319 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="316~319"></objectValue>
+						<objectValue valueForm="single" valueAllowed="320"></objectValue>
+<!-- Values within range 321~329 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="321~329"></objectValue>
+						<objectValue valueForm="single" valueAllowed="330"></objectValue>
+						<objectValue valueForm="single" valueAllowed="331"></objectValue>
+						<objectValue valueForm="single" valueAllowed="332"></objectValue>
+						<objectValue valueForm="single" valueAllowed="333"></objectValue>
+						<objectValue valueForm="single" valueAllowed="334"></objectValue>
+<!-- Values within range 335~339 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="335~339"></objectValue>
+						<objectValue valueForm="single" valueAllowed="340"></objectValue>
+						<objectValue valueForm="single" valueAllowed="341"></objectValue>
+						<objectValue valueForm="single" valueAllowed="342"></objectValue>
+						<objectValue valueForm="single" valueAllowed="343"></objectValue>
+						<objectValue valueForm="single" valueAllowed="344"></objectValue>
+<!-- Values within range 345~349 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="345~349"></objectValue>
+						<objectValue valueForm="single" valueAllowed="350"></objectValue>
+						<objectValue valueForm="single" valueAllowed="351"></objectValue>
+						<objectValue valueForm="single" valueAllowed="352"></objectValue>
+						<objectValue valueForm="single" valueAllowed="353"></objectValue>
+						<objectValue valueForm="single" valueAllowed="354"></objectValue>
+						<objectValue valueForm="single" valueAllowed="355"></objectValue>
+						<objectValue valueForm="single" valueAllowed="356"></objectValue>
+						<objectValue valueForm="single" valueAllowed="357"></objectValue>
+						<objectValue valueForm="single" valueAllowed="358"></objectValue>
+<!-- Values within range 359~359 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="359"></objectValue>
+						<objectValue valueForm="single" valueAllowed="360"></objectValue>
+						<objectValue valueForm="single" valueAllowed="361"></objectValue>
+						<objectValue valueForm="single" valueAllowed="362"></objectValue>
+						<objectValue valueForm="single" valueAllowed="363"></objectValue>
+						<objectValue valueForm="single" valueAllowed="364"></objectValue>
+						<objectValue valueForm="single" valueAllowed="365"></objectValue>
+						<objectValue valueForm="single" valueAllowed="366"></objectValue>
+						<objectValue valueForm="single" valueAllowed="367"></objectValue>
+						<objectValue valueForm="single" valueAllowed="368"></objectValue>
+						<objectValue valueForm="single" valueAllowed="369"></objectValue>
+						<objectValue valueForm="single" valueAllowed="370"></objectValue>
+						<objectValue valueForm="single" valueAllowed="371"></objectValue>
+						<objectValue valueForm="single" valueAllowed="372"></objectValue>
+						<objectValue valueForm="single" valueAllowed="373"></objectValue>
+						<objectValue valueForm="single" valueAllowed="374"></objectValue>
+						<objectValue valueForm="single" valueAllowed="375"></objectValue>
+						<objectValue valueForm="single" valueAllowed="376"></objectValue>
+<!-- Values within range 377~379 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="377~379"></objectValue>
+						<objectValue valueForm="single" valueAllowed="390"></objectValue>
+<!-- Values within range 391~399 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="391~399"></objectValue>
+						<objectValue valueForm="single" valueAllowed="400"></objectValue>
+						<objectValue valueForm="single" valueAllowed="401"></objectValue>
+						<objectValue valueForm="single" valueAllowed="402"></objectValue>
+						<objectValue valueForm="single" valueAllowed="403"></objectValue>
+						<objectValue valueForm="single" valueAllowed="404"></objectValue>
+						<objectValue valueForm="single" valueAllowed="405"></objectValue>
+						<objectValue valueForm="single" valueAllowed="406"></objectValue>
+						<objectValue valueForm="single" valueAllowed="407"></objectValue>
+						<objectValue valueForm="single" valueAllowed="410"></objectValue>
+						<objectValue valueForm="single" valueAllowed="411"></objectValue>
+						<objectValue valueForm="single" valueAllowed="412"></objectValue>
+						<objectValue valueForm="single" valueAllowed="413"></objectValue>
+						<objectValue valueForm="single" valueAllowed="414"></objectValue>
+<!-- Values within range 415~419 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="415~419"></objectValue>
+						<objectValue valueForm="single" valueAllowed="420"></objectValue>
+						<objectValue valueForm="range"  valueAllowed="421~428"></objectValue>
+						<objectValue valueForm="single" valueAllowed="429"></objectValue>
+						<objectValue valueForm="single" valueAllowed="430"></objectValue>
+<!-- Values within range 431~439 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="431~439"></objectValue>
+						<objectValue valueForm="single" valueAllowed="440"></objectValue>
+						<objectValue valueForm="single" valueAllowed="441"></objectValue>
+						<objectValue valueForm="single" valueAllowed="442"></objectValue>
+<!-- Values within range 443~449 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="443~449"></objectValue>
+						<objectValue valueForm="single" valueAllowed="500"></objectValue>
+						<objectValue valueForm="single" valueAllowed="501"></objectValue>
+						<objectValue valueForm="single" valueAllowed="502"></objectValue>
+						<objectValue valueForm="single" valueAllowed="503"></objectValue>
+						<objectValue valueForm="single" valueAllowed="504"></objectValue>
+						<objectValue valueForm="single" valueAllowed="505"></objectValue>
+						<objectValue valueForm="single" valueAllowed="506"></objectValue>
+						<objectValue valueForm="single" valueAllowed="507"></objectValue>
+						<objectValue valueForm="single" valueAllowed="510"></objectValue>
+<!-- Values within range 511~519 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="511~519"></objectValue>
+						<objectValue valueForm="single" valueAllowed="520"></objectValue>
+						<objectValue valueForm="single" valueAllowed="521"></objectValue>
+						<objectValue valueForm="single" valueAllowed="522"></objectValue>
+						<objectValue valueForm="single" valueAllowed="523"></objectValue>
+						<objectValue valueForm="single" valueAllowed="524"></objectValue>
+						<objectValue valueForm="single" valueAllowed="525"></objectValue>
+						<objectValue valueForm="single" valueAllowed="526"></objectValue>
+<!-- Values within range 527~529 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="527~529"></objectValue>
+						<objectValue valueForm="single" valueAllowed="530"></objectValue>
+<!-- Values within range 531~539 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="531~539"></objectValue>
+						<objectValue valueForm="single" valueAllowed="540"></objectValue>
+<!-- Values within range 541~549 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="541~549"></objectValue>
+						<objectValue valueForm="single" valueAllowed="550"></objectValue>
+						<objectValue valueForm="single" valueAllowed="551"></objectValue>
+						<objectValue valueForm="single" valueAllowed="552"></objectValue>
+<!-- Values within range 553~559 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="553~559"></objectValue>
+						<objectValue valueForm="single" valueAllowed="600"></objectValue>
+						<objectValue valueForm="single" valueAllowed="601"></objectValue>
+						<objectValue valueForm="single" valueAllowed="602"></objectValue>
+						<objectValue valueForm="single" valueAllowed="603"></objectValue>
+						<objectValue valueForm="single" valueAllowed="604"></objectValue>
+						<objectValue valueForm="single" valueAllowed="605"></objectValue>
+						<objectValue valueForm="single" valueAllowed="606"></objectValue>
+						<objectValue valueForm="single" valueAllowed="607"></objectValue>
+						<objectValue valueForm="single" valueAllowed="610"></objectValue>
+						<objectValue valueForm="single" valueAllowed="611"></objectValue>
+						<objectValue valueForm="single" valueAllowed="612"></objectValue>
+						<objectValue valueForm="single" valueAllowed="613"></objectValue>
+						<objectValue valueForm="single" valueAllowed="614"></objectValue>
+						<objectValue valueForm="single" valueAllowed="615"></objectValue>
+<!-- Values within range 616~619 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="616~619"></objectValue>
+						<objectValue valueForm="single" valueAllowed="620"></objectValue>
+						<objectValue valueForm="single" valueAllowed="621"></objectValue>
+						<objectValue valueForm="single" valueAllowed="622"></objectValue>
+						<objectValue valueForm="single" valueAllowed="623"></objectValue>
+						<objectValue valueForm="single" valueAllowed="624"></objectValue>
+						<objectValue valueForm="single" valueAllowed="625"></objectValue>
+						<objectValue valueForm="single" valueAllowed="626"></objectValue>
+						<objectValue valueForm="single" valueAllowed="627"></objectValue>
+<!-- Values within range 628~629 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="628~629"></objectValue>
+						<objectValue valueForm="single" valueAllowed="630"></objectValue>
+						<objectValue valueForm="single" valueAllowed="631"></objectValue>
+						<objectValue valueForm="single" valueAllowed="632"></objectValue>
+						<objectValue valueForm="single" valueAllowed="633"></objectValue>
+						<objectValue valueForm="single" valueAllowed="634"></objectValue>
+						<objectValue valueForm="single" valueAllowed="635"></objectValue>
+						<objectValue valueForm="single" valueAllowed="636"></objectValue>
+<!-- Values within range 637~637 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="637"></objectValue>
+						<objectValue valueForm="single" valueAllowed="638"></objectValue>
+						<objectValue valueForm="single" valueAllowed="639"></objectValue>
+						<objectValue valueForm="single" valueAllowed="640"></objectValue>
+						<objectValue valueForm="single" valueAllowed="641"></objectValue>
+						<objectValue valueForm="single" valueAllowed="642"></objectValue>
+						<objectValue valueForm="single" valueAllowed="643"></objectValue>
+						<objectValue valueForm="single" valueAllowed="644"></objectValue>
+						<objectValue valueForm="single" valueAllowed="645"></objectValue>
+						<objectValue valueForm="single" valueAllowed="646"></objectValue>
+						<objectValue valueForm="single" valueAllowed="647"></objectValue>
+						<objectValue valueForm="single" valueAllowed="648"></objectValue>
+						<objectValue valueForm="single" valueAllowed="649"></objectValue>
+						<objectValue valueForm="single" valueAllowed="650"></objectValue>
+						<objectValue valueForm="single" valueAllowed="651"></objectValue>
+						<objectValue valueForm="single" valueAllowed="652"></objectValue>
+						<objectValue valueForm="single" valueAllowed="653"></objectValue>
+						<objectValue valueForm="single" valueAllowed="654"></objectValue>
+						<objectValue valueForm="single" valueAllowed="655"></objectValue>
+						<objectValue valueForm="single" valueAllowed="656"></objectValue>
+						<objectValue valueForm="single" valueAllowed="657"></objectValue>
+						<objectValue valueForm="single" valueAllowed="658"></objectValue>
+						<objectValue valueForm="single" valueAllowed="659"></objectValue>
+						<objectValue valueForm="single" valueAllowed="660"></objectValue>
+						<objectValue valueForm="single" valueAllowed="661"></objectValue>
+						<objectValue valueForm="single" valueAllowed="662"></objectValue>
+						<objectValue valueForm="single" valueAllowed="663"></objectValue>
+						<objectValue valueForm="single" valueAllowed="664"></objectValue>
+						<objectValue valueForm="single" valueAllowed="665"></objectValue>
+						<objectValue valueForm="single" valueAllowed="666"></objectValue>
+						<objectValue valueForm="single" valueAllowed="667"></objectValue>
+<!-- Values within range 668~669 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="668~669"></objectValue>
+						<objectValue valueForm="single" valueAllowed="670"></objectValue>
+<!-- Values within range 671~679 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="671~679"></objectValue>
+						<objectValue valueForm="single" valueAllowed="680"></objectValue>
+						<objectValue valueForm="single" valueAllowed="681"></objectValue>
+						<objectValue valueForm="single" valueAllowed="682"></objectValue>
+						<objectValue valueForm="single" valueAllowed="683"></objectValue>
+						<objectValue valueForm="single" valueAllowed="684"></objectValue>
+						<objectValue valueForm="single" valueAllowed="685"></objectValue>
+						<objectValue valueForm="single" valueAllowed="686"></objectValue>
+						<objectValue valueForm="single" valueAllowed="687"></objectValue>
+						<objectValue valueForm="single" valueAllowed="688"></objectValue>
+						<objectValue valueForm="single" valueAllowed="689"></objectValue>
+						<objectValue valueForm="single" valueAllowed="690"></objectValue>
+						<objectValue valueForm="single" valueAllowed="691"></objectValue>
+						<objectValue valueForm="single" valueAllowed="692"></objectValue>
+<!-- Values within range 693~699 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="693~699"></objectValue>
+						<objectValue valueForm="single" valueAllowed="700"></objectValue>
+						<objectValue valueForm="single" valueAllowed="701"></objectValue>
+						<objectValue valueForm="single" valueAllowed="702"></objectValue>
+						<objectValue valueForm="single" valueAllowed="703"></objectValue>
+						<objectValue valueForm="single" valueAllowed="704"></objectValue>
+						<objectValue valueForm="single" valueAllowed="705"></objectValue>
+						<objectValue valueForm="single" valueAllowed="706"></objectValue>
+						<objectValue valueForm="single" valueAllowed="707"></objectValue>
+						<objectValue valueForm="single" valueAllowed="710"></objectValue>
+						<objectValue valueForm="single" valueAllowed="711"></objectValue>
+						<objectValue valueForm="single" valueAllowed="712"></objectValue>
+						<objectValue valueForm="single" valueAllowed="713"></objectValue>
+<!-- Values within range 714~719 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="714~719"></objectValue>
+						<objectValue valueForm="single" valueAllowed="720"></objectValue>
+						<objectValue valueForm="single" valueAllowed="721"></objectValue>
+						<objectValue valueForm="single" valueAllowed="722"></objectValue>
+						<objectValue valueForm="single" valueAllowed="723"></objectValue>
+						<objectValue valueForm="single" valueAllowed="724"></objectValue>
+						<objectValue valueForm="single" valueAllowed="725"></objectValue>
+						<objectValue valueForm="single" valueAllowed="726"></objectValue>
+<!-- Values within range 727~729 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="727~729"></objectValue>
+						<objectValue valueForm="single" valueAllowed="730"></objectValue>
+<!-- Values within range 731~739 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="731~739"></objectValue>
+						<objectValue valueForm="single" valueAllowed="740"></objectValue>
+<!-- Values within range 741~749 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="741~749"></objectValue>
+						<objectValue valueForm="single" valueAllowed="750"></objectValue>
+<!-- Values within range 751~751 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="751"></objectValue>
+						<objectValue valueForm="single" valueAllowed="752"></objectValue>
+<!-- Values within range 753~759 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="753~759"></objectValue>
+						<objectValue valueForm="single" valueAllowed="800"></objectValue>
+						<objectValue valueForm="single" valueAllowed="801"></objectValue>
+						<objectValue valueForm="single" valueAllowed="802"></objectValue>
+						<objectValue valueForm="single" valueAllowed="803"></objectValue>
+						<objectValue valueForm="single" valueAllowed="804"></objectValue>
+						<objectValue valueForm="single" valueAllowed="805"></objectValue>
+						<objectValue valueForm="single" valueAllowed="806"></objectValue>
+						<objectValue valueForm="single" valueAllowed="807"></objectValue>
+						<objectValue valueForm="single" valueAllowed="810"></objectValue>
+						<objectValue valueForm="single" valueAllowed="811"></objectValue>
+						<objectValue valueForm="single" valueAllowed="812"></objectValue>
+<!-- Values within range 813~819 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="813~819"></objectValue>
+						<objectValue valueForm="single" valueAllowed="820"></objectValue>
+<!-- Values within range 821~829 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="821~829"></objectValue>
+						<objectValue valueForm="single" valueAllowed="830"></objectValue>
+						<objectValue valueForm="single" valueAllowed="831"></objectValue>
+<!-- Values within range 832~839 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="832~839"></objectValue>
+						<objectValue valueForm="single" valueAllowed="840"></objectValue>
+						<objectValue valueForm="single" valueAllowed="841"></objectValue>
+<!-- Values within range 842~849 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="842~849"></objectValue>
+						<objectValue valueForm="single" valueAllowed="850"></objectValue>
+<!-- Values within range 851~859 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="851~859"></objectValue>
+						<objectValue valueForm="single" valueAllowed="860"></objectValue>
+<!-- Values within range 861~869 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="861~869"></objectValue>
+						<objectValue valueForm="single" valueAllowed="870"></objectValue>
+						<objectValue valueForm="single" valueAllowed="871"></objectValue>
+<!-- Values within range 872~879 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="872~879"></objectValue>
+						<objectValue valueForm="single" valueAllowed="880"></objectValue>
+<!-- Values within range 881~889 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="881~889"></objectValue>
+						<objectValue valueForm="single" valueAllowed="890"></objectValue>
+<!-- Values within range 891~899 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="891~899"></objectValue>
+						<objectValue valueForm="single" valueAllowed="900"></objectValue>
+						<objectValue valueForm="single" valueAllowed="901"></objectValue>
+						<objectValue valueForm="single" valueAllowed="902"></objectValue>
+						<objectValue valueForm="single" valueAllowed="903"></objectValue>
+						<objectValue valueForm="single" valueAllowed="904"></objectValue>
+						<objectValue valueForm="single" valueAllowed="905"></objectValue>
+						<objectValue valueForm="single" valueAllowed="906"></objectValue>
+						<objectValue valueForm="single" valueAllowed="907"></objectValue>
+						<objectValue valueForm="single" valueAllowed="910"></objectValue>
+						<objectValue valueForm="single" valueAllowed="911"></objectValue>
+						<objectValue valueForm="single" valueAllowed="912"></objectValue>
+						<objectValue valueForm="single" valueAllowed="913"></objectValue>
+						<objectValue valueForm="single" valueAllowed="914"></objectValue>
+						<objectValue valueForm="single" valueAllowed="915"></objectValue>
+						<objectValue valueForm="single" valueAllowed="916"></objectValue>
+<!-- Values within range 917~919 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="917~919"></objectValue>
+						<objectValue valueForm="single" valueAllowed="920"></objectValue>
+						<objectValue valueForm="single" valueAllowed="921"></objectValue>
+						<objectValue valueForm="single" valueAllowed="922"></objectValue>
+						<objectValue valueForm="single" valueAllowed="923"></objectValue>
+<!-- Values within range 924~929 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="924~929"></objectValue>
+						<objectValue valueForm="single" valueAllowed="930"></objectValue>
+						<objectValue valueForm="single" valueAllowed="931"></objectValue>
+						<objectValue valueForm="single" valueAllowed="932"></objectValue>
+						<objectValue valueForm="single" valueAllowed="933"></objectValue>
+						<objectValue valueForm="single" valueAllowed="934"></objectValue>
+<!-- Values within range 935~939 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="935~939"></objectValue>
+						<objectValue valueForm="single" valueAllowed="940"></objectValue>
+						<objectValue valueForm="single" valueAllowed="941"></objectValue>
+						<objectValue valueForm="single" valueAllowed="942"></objectValue>
+<!-- Values within range 943~949 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="943~949"></objectValue>
+						<objectValue valueForm="single" valueAllowed="950"></objectValue>
+<!-- Values within range 951~959 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="951~959"></objectValue>
+						<objectValue valueForm="single" valueAllowed="980"></objectValue>
+						<objectValue valueForm="single" valueAllowed="981"></objectValue>
+						<objectValue valueForm="single" valueAllowed="982"></objectValue>
+						<objectValue valueForm="single" valueAllowed="989"></objectValue>
+						<objectValue valueForm="single" valueAllowed="990"></objectValue>
+						<objectValue valueForm="single" valueAllowed="991"></objectValue>
+						<objectValue valueForm="single" valueAllowed="992"></objectValue>
+<!-- Values within range 993~995 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range"  valueAllowed="993~995"></objectValue>
+						<objectValue valueForm="single" valueAllowed="996"></objectValue>
+						<objectValue valueForm="single" valueAllowed="997"></objectValue>
+						<objectValue valueForm="single" valueAllowed="998"></objectValue>
+<!-- Values within range 999~999 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="single" valueAllowed="999"></objectValue>
+					</structureObjectRule>
+
+<!-- 3.9.6.1 -->
+					<structureObjectRule>
+						<objectPath>//@accessPointTypeValue</objectPath>
+						<objectUse>Attribute accessPointTypeValue - Access point (Chap 3.9.6.1, Table 2)</objectUse>
+						<objectValue valueForm="single" valueAllowed="accpnl01">Access is a door</objectValue>
+						<objectValue valueForm="single" valueAllowed="accpnl02">Access is a panel</objectValue>
+						<objectValue valueForm="single" valueAllowed="accpnl03">Access is an electrical panel</objectValue>
+<!-- Values within range accpnl51~accpnl99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="accpnl51~accpnl99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@acronymType</objectPath>
+						<objectUse>Attribute acronymType - Type of acronym or abbreviation (Chap 3.9.6.1, Table 3)</objectUse>
+						<objectValue valueForm="single" valueAllowed="at01">Acronym (Candidate for list of abbreviations)</objectValue>
+						<objectValue valueForm="single" valueAllowed="at02">Term (Candidate for list of terms)</objectValue>
+						<objectValue valueForm="single" valueAllowed="at03">Symbol (Candidate for list of symbols)</objectValue>
+						<objectValue valueForm="single" valueAllowed="at04">Spec (Candidate for list of applicable specs)</objectValue>
+<!-- Values within range at51~at99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="at51~at99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@cancelCaption</objectPath>
+						<objectUse>Attribute cancelCaption - Caption for dialog cancel function (Chap 3.9.6.1, Table 4)</objectUse>
+						<objectValue valueForm="single" valueAllowed="ca01">Sets the caption to /CANCEL/</objectValue>
+						<objectValue valueForm="single" valueAllowed="ca02">Sets the caption to /ABORT/</objectValue>
+						<objectValue valueForm="single" valueAllowed="ca04">Sets the caption to /END/</objectValue>
+						<objectValue valueForm="single" valueAllowed="ca05">Sets the caption to /QUIT/</objectValue>
+<!-- Values within range ca51~ca99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="ca51~ca99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@caveat</objectPath>
+						<objectUse>Attribute caveat - National caveat (Chap 3.9.6.1, Table 5)</objectUse>
+<!-- Values within range cv51~cv99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="cv51~cv99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@checkListCategory</objectPath>
+						<objectUse>Attribute checkListCategory - Check list category (Chap 3.9.6.1, Table 6)</objectUse>
+						<objectValue valueForm="single" valueAllowed="clc01">Preventive maintenance inspection form</objectValue>
+						<objectValue valueForm="single" valueAllowed="clc02">Preventive Maintenance Checks and Services</objectValue>
+						<objectValue valueForm="single" valueAllowed="clc03">Schematic</objectValue>
+<!-- Values within range clc51~clc99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="clc51~clc99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@color</objectPath>
+						<objectUse>Attribute color - Caption color (Chap 3.9.6.1, Table 7)</objectUse>
+						<objectValue valueForm="single" valueAllowed="co00">None</objectValue>
+						<objectValue valueForm="single" valueAllowed="co01">Green</objectValue>
+						<objectValue valueForm="single" valueAllowed="co02">Amber</objectValue>
+						<objectValue valueForm="single" valueAllowed="co03">Yellow</objectValue>
+						<objectValue valueForm="single" valueAllowed="co04">Red</objectValue>
+						<objectValue valueForm="single" valueAllowed="co07">White</objectValue>
+						<objectValue valueForm="single" valueAllowed="co08">Grey</objectValue>
+						<objectValue valueForm="single" valueAllowed="co09">Clear</objectValue>
+<!-- Values within range co51~co99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="co51~co99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+<!-- Although non-dm BREX rules are currently not supported commentPriorityCode is included here since included in Chap 3.9.6.1 -->
+						<objectPath>//@commentPriorityCode</objectPath>
+						<objectUse>Attribute commentPriorityCode - Priority level of a comment (Chap 3.9.6.1, Table 8)</objectUse>
+						<objectValue valueForm="single" valueAllowed="cp01">Routine</objectValue>
+						<objectValue valueForm="single" valueAllowed="cp02">Emergency</objectValue>
+						<objectValue valueForm="single" valueAllowed="cp03">Safety critical</objectValue>
+<!-- Values within range cp51~cp99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="cp51~cp99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@commercialClassification</objectPath>
+						<objectUse>Attribute commercialClassification - Commercial security classification (Chap 3.9.6.1, Table 9)</objectUse>
+<!-- Values within range cc51~cc99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="cc51~cc99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@crewMemberType</objectPath>
+						<objectUse>Attribute crewMemberType - Type of crew member required for drill or procedural step (Chap 3.9.6.1, Table 10)</objectUse>
+						<objectValue valueForm="single" valueAllowed="cm01">All</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm02">Pilot</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm03">Co-pilot</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm04">Navigator</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm05">Engineer</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm06">Ground crew</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm07">Load master</objectValue>
+						<objectValue valueForm="single" valueAllowed="cm08">Cabin supervisor</objectValue>
+<!-- Values within range cm51~cm99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="cm51~cm99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule reasonForUpdateRefIds="rfu-0002" changeType="modify" changeMark="1">
+						<objectPath>//@crewStepCondition</objectPath>
+						<objectUse>Attribute crewStepCondition - Crew step condition (Chap 3.9.6.1, Table 11)</objectUse>
+						<!-- "csc01" - Equipment is installed or available -->
+						<!-- "csc02" - A detailed procedure for the step is located in the performance section of the condensed checklist -->
+						<!-- "csc03" - Performance of the step is mandatory for all through-flights used for combat/tactical operations -->
+						<!-- "csc04" - A step that is mandatory for night flights -->
+						<!-- "csc05" - A task or step required by the operator manual -->
+<!-- Values within range csc51~csc99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="pattern" valueAllowed="((csc0[1-5])|(csc5[1-9])|(csc[6-9][0-9]))((\ )+((csc0[1-5])|(csc5[1-9])|(csc[6-9][0-9])))*"/>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@descrForItemCode</objectPath>
+						<objectUse>Attribute descrForItemCode - IPD item description code (Chap 3.9.6.1, Table 12)</objectUse>
+						<objectValue valueForm="single" valueAllowed="dic01">Support Equipment</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic02">Break Down</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic03">Break Down Reassurance</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic04">Consumables</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic05">Category 1 Container</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic06">Engine Related Accessories</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic07">Standard Electrical Hardware Items</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic08">Standard Mechanical Hardware Items</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic09">Hardware</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic10">Line Replaceable Item</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic11">Anesthetics/Medical Chemicals</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic12">Module</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic13">Ammunition with Dangerous Substances </objectValue>
+						<objectValue valueForm="single" valueAllowed="dic14">Modification Leaflet </objectValue>
+						<objectValue valueForm="single" valueAllowed="dic15">Medical Supplies</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic16">Modification Set </objectValue>
+						<objectValue valueForm="single" valueAllowed="dic17">None of the Other Codes Applies</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic18">Role Equipment </objectValue>
+						<objectValue valueForm="single" valueAllowed="dic19">Raw Materials </objectValue>
+						<objectValue valueForm="single" valueAllowed="dic20">Split Design Module</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic21">Software REMARKS</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic22">Special Tool</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic23">Part</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic24">Basic Issue Item</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic25">Components of End Item</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic26">Tool</objectValue>
+						<objectValue valueForm="single" valueAllowed="dic27">Additional Authorization List Item</objectValue>
+<!-- Values within range dic51~dic99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="dic51~dic99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@drillType</objectPath>
+						<objectUse>Attribute drillType - Type of aircrew drill (Chap 3.9.6.1, Table 13)</objectUse>
+						<objectValue valueForm="single" valueAllowed="dt00">None</objectValue>
+						<objectValue valueForm="single" valueAllowed="dt01">Green</objectValue>
+						<objectValue valueForm="single" valueAllowed="dt02">Amber</objectValue>
+						<objectValue valueForm="single" valueAllowed="dt03">Yellow</objectValue>
+						<objectValue valueForm="single" valueAllowed="dt04">Red</objectValue>
+						<objectValue valueForm="single" valueAllowed="dt05">Orange</objectValue>
+						<objectValue valueForm="single" valueAllowed="dt06">Blue</objectValue>
+<!-- Values within range dt51~dt99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="dt51~dt99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@emphasisType</objectPath>
+						<objectUse>Attribute emphasisType - Type of emphasis (Chap 3.9.6.1, Table 14)</objectUse>
+						<objectValue valueForm="single" valueAllowed="em01">Bold</objectValue>
+						<objectValue valueForm="single" valueAllowed="em02">Italic (only for legacy data, see Chap 3.9.1)</objectValue>
+						<objectValue valueForm="single" valueAllowed="em03">Underline (only for legacy data, see Chap 3.9.1)</objectValue>
+						<objectValue valueForm="single" valueAllowed="em04">Overline (only for marking vectors)</objectValue>
+						<objectValue valueForm="single" valueAllowed="em05">Strikethrough (not to be used to mark deleted text)</objectValue>
+<!-- Values within range em51~em99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="em51~em99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@function</objectPath>
+						<objectUse>Attribute function - Maintenance function (Chap 3.9.6.1, Table 15)</objectUse>
+						<objectValue valueForm="single" valueAllowed="ft00">None</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft01">Inspect</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft02">Test</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft03">Service</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft04">Adjust</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft05">Align</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft06">Calibrate</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft07">Remove/Install</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft08">Replace</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft09">Repair</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft10">Overhaul</objectValue>
+						<objectValue valueForm="single" valueAllowed="ft11">Rebuild</objectValue>
+<!-- Values within range ft51~ft99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="ft51~ft99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@installationLocationType</objectPath>
+						<objectUse>Attribute installationLocationType - Type of install location (Chap 3.9.6.1, Table 16)</objectUse>
+						<objectValue valueForm="single" valueAllowed="instloctyp01">Zone</objectValue>
+						<objectValue valueForm="single" valueAllowed="instloctyp02">Section</objectValue>
+						<objectValue valueForm="single" valueAllowed="instloctyp03">Station</objectValue>
+						<objectValue valueForm="single" valueAllowed="instloctyp04">Water line</objectValue>
+						<objectValue valueForm="single" valueAllowed="instloctyp05">Buttock line</objectValue>
+<!-- Values within range instloctyp51~instloctyp99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="instloctyp51~instloctyp99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule reasonForUpdateRefIds="rfu-0003" changeType="modify" changeMark="1">
+						<objectPath>//@itemCharacteristic</objectPath>
+						<objectUse>Attribute itemCharacteristic - Item characteristic (Chap 3.9.6.1, Table 17)</objectUse>
+						<!-- "ic01" - Step related to hardness critical process -->
+						<!-- "ic02" - Step related to electrostatic discharge -->
+						<!-- "ic03" - Step with a quality assurance effect -->
+						<objectValue valueForm="pattern" valueAllowed="((ic0[1-3])|(ic5[1-9])|(ic[6-9][0-9]))((\ )+((ic0[1-3])|(ic5[1-9])|(ic[6-9][0-9])))*"/>
+<!-- Values within range ic51~ic99 can be allocated and defined by projects or organizations -->
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@itemOriginator</objectPath>
+						<objectUse>Attribute itemOriginator - Origin of equipment/harness/wire (Chap 3.9.6.1, Table 18)</objectUse>
+						<objectValue valueForm="single" valueAllowed="orig01">Manufacturer</objectValue>
+						<objectValue valueForm="single" valueAllowed="orig02">Vendor</objectValue>
+						<objectValue valueForm="single" valueAllowed="orig03">Partner</objectValue>
+<!-- Values within range orig51~orig99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="orig51~orig99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@limitUnitType</objectPath>
+						<objectUse>Attribute limitUnitType - Limit type (Chap 3.9.6.1, Table 19)</objectUse>
+						<objectValue valueForm="single" valueAllowed="lt01">Time between overhaul</objectValue>
+						<objectValue valueForm="single" valueAllowed="lt02">Hard time</objectValue>
+						<objectValue valueForm="single" valueAllowed="lt03">Since last maintenance</objectValue>
+						<objectValue valueForm="single" valueAllowed="lt04">Out time limit</objectValue>
+						<objectValue valueForm="single" valueAllowed="lt05">On condition</objectValue>
+						<objectValue valueForm="single" valueAllowed="lt06">Check maintenance</objectValue>
+						<objectValue valueForm="single" valueAllowed="lt07">Functional check</objectValue>
+<!-- Values within range lt51~lt99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="lt51~lt99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@listItemPrefix</objectPath>
+						<objectUse>Attribute listItemPrefix - Prefix for list items of random/unordered lists (Chap 3.9.6.1, Table 20)</objectUse>
+						<objectValue valueForm="single" valueAllowed="pf01">Simple (No prefix, only indent)</objectValue>
+						<objectValue valueForm="single" valueAllowed="pf02">Unorder (Depending on list level, prefix with short dash for first level, bullet for second, and short dash for third level - ISOpub: bull, dash)</objectValue>
+						<objectValue valueForm="single" valueAllowed="pf03">Dash (short dash - ISOpub: dash)</objectValue>
+						<objectValue valueForm="single" valueAllowed="pf04">Disc (filled circle in circle - ISOamsb: ocir)</objectValue>
+						<objectValue valueForm="single" valueAllowed="pf05">Circle (outline - ISOpub: cir)</objectValue>
+						<objectValue valueForm="single" valueAllowed="pf06">Square (outline - ISOtech: square)</objectValue>
+						<objectValue valueForm="single" valueAllowed="pf07">Bullet (outline - ISOpub: bull)</objectValue>
+<!-- Values within range pf51~pf99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="pf51~pf99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@lowestLevel</objectPath>
+						<objectUse>Attribute lowestLevel - Lowest authorized level (Chap 3.9.6.1, Table 21)</objectUse>
+						<objectValue valueForm="single" valueAllowed="la01">None</objectValue>
+						<objectValue valueForm="single" valueAllowed="la02">Field (Service) level</objectValue>
+						<objectValue valueForm="single" valueAllowed="la03">Field/ASB maintenance can remove, replace, and use the item.</objectValue>
+						<objectValue valueForm="single" valueAllowed="la04">Below depot sustainment maintenance can remove, replace, and use the item.</objectValue>
+						<objectValue valueForm="single" valueAllowed="la05">Specialized repair activity/TASMG can remove, replace, and use the item.</objectValue>
+						<objectValue valueForm="single" valueAllowed="la06">Afloat and ashore intermediate maintenance can remove, replace, and use the item.</objectValue>
+						<objectValue valueForm="single" valueAllowed="la07">Contractor facility can remove, replace, and use the item.</objectValue>
+						<objectValue valueForm="single" valueAllowed="la08">Item is not authorized to be removed, replace, or used at any maintenance level</objectValue>
+						<objectValue valueForm="single" valueAllowed="la09">Depot can remove, replace, and use the item.</objectValue>
+<!-- Values within range la51~la99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="la51~la99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@maintLevelCode</objectPath>
+						<objectUse>Attribute maintLevelCode - Maintenance Level Code (Chap 3.9.6.1, Table 22)</objectUse>
+						<objectValue valueForm="single" valueAllowed="ml01"></objectValue>
+						<objectValue valueForm="single" valueAllowed="ml02"></objectValue>
+						<objectValue valueForm="single" valueAllowed="ml03"></objectValue>
+						<objectValue valueForm="single" valueAllowed="ml04"></objectValue>
+						<objectValue valueForm="single" valueAllowed="ml05"></objectValue>
+<!-- Values within range ml51~ml99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="ml51~ml99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule reasonForUpdateRefIds="rfu-0004" changeType="modify" changeMark="1">
+						<objectPath>//@partCharacteristic</objectPath>
+						<objectUse>Attribute partCharacteristic - Part characteristic (Chap 3.9.6.1, Table 23)</objectUse>
+						<!-- "pc01" - A hardness critical item -->
+						<!-- "pc02" - Flight safety and critical aircraft part -->
+						<!-- "pc03" - Mandatory replacement part -->
+						<!-- "pc04" - Critical safety item -->
+						<!-- "pc05" - Test equipment -->
+						<!-- "pc06" - Part with electrostatic discharge sensitivity -->
+						<objectValue valueForm="pattern" valueAllowed="((pc0[1-6])|(pc5[1-9])|(pc[6-9][0-9]))((\ )+((pc0[1-6])|(pc5[1-9])|(pc[6-9][0-9])))*"/>
+						<!-- Values within range pc51~pc99 can be allocated and defined by projects or organizations -->
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@pmEntryType</objectPath>
+						<objectUse>Attribute pmEntryType - Publication module entry type (Chap 3.9.6.1, Table 24)</objectUse>
+<!-- Values within range pmt51~pmt99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="pmt51~pmt99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@quantityType</objectPath>
+						<objectUse>Attribute quantityType - Quantity data type (Chap 3.9.6.1, Table 25)</objectUse>
+						<objectValue valueForm="single" valueAllowed="qty01">Length</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty02">Price</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty03">Temperature</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty04">Time</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty05">Torque value</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty06">Voltage</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty07">Volume</objectValue>
+						<objectValue valueForm="single" valueAllowed="qty08">Mass</objectValue>
+<!-- Values within range qty51~qty99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="qty51~qty99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@reqCondCategory</objectPath>
+						<objectUse>Attribute reqCondCategory - Required condition category (Chap 3.9.6.1, Table 26)</objectUse>
+						<objectValue valueForm="single" valueAllowed="rcc01">Normal</objectValue>
+						<objectValue valueForm="single" valueAllowed="rcc02">Special environmental conditions such as reduced lighting, ventilation, and temperature.</objectValue>
+<!-- Values within range rcc51~rcc99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="rcc51~rcc99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@reqTechInfoCategory</objectPath>
+						<objectUse>Attribute reqTechInfoCategory - Required technical information category (Chap 3.9.6.1, Table 27)</objectUse>
+						<objectValue valueForm="single" valueAllowed="ti01">Publication module (PM)</objectValue>
+						<objectValue valueForm="single" valueAllowed="ti02">Data module (DM)</objectValue>
+						<objectValue valueForm="single" valueAllowed="ti03">Drawing</objectValue>
+						<objectValue valueForm="single" valueAllowed="ti04">Electrical diagram</objectValue>
+						<objectValue valueForm="single" valueAllowed="ti05">Schematic diagram</objectValue>
+						<objectValue valueForm="single" valueAllowed="ti06">Safety sheet</objectValue>
+<!-- Values within range ti51~ti99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="ti51~ti99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@resetCaption</objectPath>
+						<objectUse>Attribute resetCaption - Caption for dialog reset caption (Chap 3.9.6.1, Table 28)</objectUse>
+						<objectValue valueForm="single" valueAllowed="re01">Sets the caption to RESET</objectValue>
+						<objectValue valueForm="single" valueAllowed="re02">Sets the caption to CLEAR</objectValue>
+<!-- Values within range re51~re99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="re51~re99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@responseType</objectPath>
+						<objectUse>Attribute responseType - Type of response to a comment (Chap 3.9.6.1, Table 29)</objectUse>
+						<objectValue valueForm="single" valueAllowed="rt01">Accepted</objectValue>
+						<objectValue valueForm="single" valueAllowed="rt02">Pending</objectValue>
+						<objectValue valueForm="single" valueAllowed="rt03">Partly accepted</objectValue>
+						<objectValue valueForm="single" valueAllowed="rt04">Rejected</objectValue>
+<!-- Values within range rt51~rt99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="rt51~rt99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@securityClassification</objectPath>
+						<objectUse>Attribute securityClassification - Security classification (Chap 3.9.6.1, Table 30)</objectUse>
+						<objectValue valueForm="single" valueAllowed="01"></objectValue>
+						<objectValue valueForm="single" valueAllowed="02"></objectValue>
+						<objectValue valueForm="single" valueAllowed="03"></objectValue>
+						<objectValue valueForm="single" valueAllowed="04"></objectValue>
+						<objectValue valueForm="single" valueAllowed="05"></objectValue>
+						<objectValue valueForm="single" valueAllowed="06"></objectValue>
+						<objectValue valueForm="single" valueAllowed="07"></objectValue>
+						<objectValue valueForm="single" valueAllowed="08"></objectValue>
+						<objectValue valueForm="single" valueAllowed="09"></objectValue>
+<!-- Values within range 51~99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="51~99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@significantParaDataType</objectPath>
+						<objectUse>Attribute significantParaDataType - Paragraph significant data type (Chap 3.9.6.1, Table 31)</objectUse>
+						<objectValue valueForm="single" valueAllowed="psd01">Ammunition</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd02">Instruction disposition</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd03">Lubricant</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd04">Maintenance level</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd05">Manufacturer code</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd06">Manufacturers recommendation</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd07">Modification code</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd08">Qualification code</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd09">Training level</objectValue>
+						<objectValue valueForm="single" valueAllowed="psd10">Control or Indicator value</objectValue>
+<!-- Values within range psd51~psd99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="psd51~psd99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@skillLevelCode</objectPath>
+						<objectUse>Attribute skillLevelCode - Personnel skill level (Chap 3.9.6.1, Table 32)</objectUse>
+						<objectValue valueForm="single" valueAllowed="sk01">Basic</objectValue>
+						<objectValue valueForm="single" valueAllowed="sk02">Intermediate</objectValue>
+						<objectValue valueForm="single" valueAllowed="sk03">Advanced</objectValue>
+<!-- Values within range sk51~sk99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="sk51~sk99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@skillType</objectPath>
+						<objectUse>Attribute skillType - Personnel skill category (Chap 3.9.6.1, Table 33)</objectUse>
+						<objectValue valueForm="single" valueAllowed="st01">Airframe (AIRPL)</objectValue>
+						<objectValue valueForm="single" valueAllowed="st02">Electrical (ELEC)</objectValue>
+						<objectValue valueForm="single" valueAllowed="st03">Avionic (AVION)</objectValue>
+						<objectValue valueForm="single" valueAllowed="st04">Engine (ENGIN)</objectValue>
+<!-- Values within range st51~st99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="st51~st99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@sourceCriticality</objectPath>
+						<objectUse>Attribute sourceCriticality - Source criticality (Chap 3.9.6.1, Table 34)</objectUse>
+<!-- Values within range sc51~sc99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="sc51~sc99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@sourceTypeCode</objectPath>
+						<objectUse>Attribute sourceTypeCode - Source type code (Chap 3.9.6.1, Table 35)</objectUse>
+<!-- Values within range stc51~stc99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="stc51~stc99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@submitCaption</objectPath>
+						<objectUse>Attribute submitCaption - Caption for dialog submit function (Chap 3.9.6.1, Table 36)</objectUse>
+						<objectValue valueForm="single" valueAllowed="ok01">Sets the caption to OK</objectValue>
+						<objectValue valueForm="single" valueAllowed="ok02">Sets the caption to SUBMIT</objectValue>
+						<objectValue valueForm="single" valueAllowed="ok04">Sets the caption to CONTINUE</objectValue>
+						<objectValue valueForm="single" valueAllowed="ok05">Sets the caption to EXIT</objectValue>
+<!-- Values within range ok51~ok99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="ok51~ok99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@supervisorLevelCode</objectPath>
+						<objectUse>Attribute supervisorLevelCode - Supervisor level (Chap 3.9.6.1, Table 37)</objectUse>
+						<objectValue valueForm="single" valueAllowed="sl01">Low</objectValue>
+						<objectValue valueForm="single" valueAllowed="sl02">Low intermediate</objectValue>
+						<objectValue valueForm="single" valueAllowed="sl03">High intermediate</objectValue>
+						<objectValue valueForm="single" valueAllowed="sl03">High</objectValue>
+<!-- Values within range sl51~sl99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="sl51~sl99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@taskCode</objectPath>
+						<objectUse>Attribute taskCode - Task code (Chap 3.9.6.1, Table 38)</objectUse>
+						<objectValue valueForm="single" valueAllowed="taskcd01">Detailed inspection (DET)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd02">Discard (DIS)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd03">Functional Check (FNC)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd04">General visual inspection (GVI)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd05">Lubrication (LUB)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd06">Operational check (OPC)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd07">Restoration (RST)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd08">Servicing (SVC)</objectValue>
+						<objectValue valueForm="single" valueAllowed="taskcd09">Visual check (VCK)</objectValue>
+<!-- Values within range taskcd51~taskcd99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="taskcd51~taskcd99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@thresholdUnitOfMeasure</objectPath>
+						<objectUse>Attribute thresholdUnitOfMeasure - Unit of measurement for the threshold interval (Chap 3.9.6.1, Table 39)</objectUse>
+						<objectValue valueForm="single" valueAllowed="th01">Flight hours</objectValue>
+						<objectValue valueForm="single" valueAllowed="th02">Flight cycles</objectValue>
+						<objectValue valueForm="single" valueAllowed="th03">Months</objectValue>
+						<objectValue valueForm="single" valueAllowed="th04">Weeks</objectValue>
+						<objectValue valueForm="single" valueAllowed="th05">Years</objectValue>
+						<objectValue valueForm="single" valueAllowed="th06">Days</objectValue>
+						<objectValue valueForm="single" valueAllowed="th07">Supersonic cycles</objectValue>
+						<objectValue valueForm="single" valueAllowed="th08">Pressure cycles</objectValue>
+						<objectValue valueForm="single" valueAllowed="th09">Engine cycles</objectValue>
+						<objectValue valueForm="single" valueAllowed="th10">Engine change</objectValue>
+						<objectValue valueForm="single" valueAllowed="th11">Shop visits</objectValue>
+						<objectValue valueForm="single" valueAllowed="th12">Auxiliary power unit change</objectValue>
+						<objectValue valueForm="single" valueAllowed="th13">Landing gear change</objectValue>
+						<objectValue valueForm="single" valueAllowed="th14">Wheel change</objectValue>
+						<objectValue valueForm="single" valueAllowed="th15">Engine start</objectValue>
+						<objectValue valueForm="single" valueAllowed="th16">APU hours</objectValue>
+						<objectValue valueForm="single" valueAllowed="th17">Engine hours</objectValue>
+						<objectValue valueForm="single" valueAllowed="th18">Elapsed hours</objectValue>
+						<objectValue valueForm="single" valueAllowed="th19">Landings</objectValue>
+						<objectValue valueForm="single" valueAllowed="th20">Operating cycles</objectValue>
+						<objectValue valueForm="single" valueAllowed="th21">Operating hours</objectValue>
+						<objectValue valueForm="single" valueAllowed="th22">Supersonic hours</objectValue>
+						<objectValue valueForm="single" valueAllowed="th23">A check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th24">B check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th25">C check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th26">D check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th27">Daily</objectValue>
+						<objectValue valueForm="single" valueAllowed="th28">E check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th29">Overnight</objectValue>
+						<objectValue valueForm="single" valueAllowed="th30">Preflight</objectValue>
+						<objectValue valueForm="single" valueAllowed="th31">Routine check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th32">Structural C check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th33">Service check</objectValue>
+						<objectValue valueForm="single" valueAllowed="th34">Transit</objectValue>
+<!-- Values within range th51~th99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="th51~th99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@updateReasonType</objectPath>
+						<objectUse>Attribute updateReasonType - Update reason type for reason for update (Chap 3.9.6.1, Table 40)</objectUse>
+						<objectValue valueForm="single" valueAllowed="urt01">Editorial change (authored/technical content changed, but technically changes are deemed insignificant)</objectValue>
+						<objectValue valueForm="single" valueAllowed="urt02">Technical change (authored/technical content has changed, changes are significant and should be reviewed)</objectValue>
+						<objectValue valueForm="single" valueAllowed="urt03">Markup change (changes are solely related to XML markup)</objectValue>
+						<objectValue valueForm="single" valueAllowed="urt04">Applicability change (only the applicability has changed)</objectValue>
+						<objectValue valueForm="single" valueAllowed="urt05">Unique identifier of the referencing structure has changed</objectValue>
+<!-- Values within range urt51~urt99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="urt51~urt99"></objectValue>
+					</structureObjectRule>
+
+					<structureObjectRule>
+						<objectPath>//@verbatimStyle</objectPath>
+						<objectUse>Attribute verbatimStyle - Verbatim style (Chap 3.9.6.1, Table 41)</objectUse>
+						<objectValue valueForm="single" valueAllowed="vs01">Generic verbatim</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs02">Filename</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs11">XML/SGML markup</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs12">XML/SGML element name</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs13">XML/SGML attribute name</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs14">XML/SGML attribute value</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs15">XML/SGML entity name</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs16">XML/SGML processing instruction</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs21">Program prompt</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs22">User input</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs23">Computer output</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs24">Program listing</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs25">Program variable name</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs26">Program variable value</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs27">Constant</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs28">Class name</objectValue>
+						<objectValue valueForm="single" valueAllowed="vs29">Parameter name</objectValue>
+<!-- Values within range vs51~vs99 can be allocated and defined by projects or organizations -->
+						<objectValue valueForm="range" valueAllowed="vs51~vs99"></objectValue>
+					</structureObjectRule>
+
+				</structureObjectRuleGroup>
+			</contextRules>
+		</brex>
+	</content>
+</dmodule>
