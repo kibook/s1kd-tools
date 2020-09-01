@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="30" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="021" inWork="01"/>
+        <issueInfo issueNumber="022" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="07" day="07"/>
+        <issueDate year="2020" month="09" day="01"/>
         <dmTitle>
           <techName>s1kd-defaults(1) | s1kd-tools</techName>
         </dmTitle>
@@ -214,7 +214,7 @@
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
-        </para> 
+        </para>
         <levelledPara>
           <title><verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file</title>
           <para>This file specifies a mapping between BREX structure object rules and <verbatimText verbatimStyle="vs02">.defaults</verbatimText> and <verbatimText verbatimStyle="vs02">.dmtypes</verbatimText> files. The path to an object can be written in many different ways in a BREX rule, so the <verbatimText verbatimStyle="vs02">.brexmap</verbatimText> file allows any project's BREX to be used to generate these files without having to modify the BREX data module itself.</para>
