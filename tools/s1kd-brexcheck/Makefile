@@ -14,7 +14,7 @@ WARNING_FLAGS=-Wall -Werror -pedantic-errors
 CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifeq ($(DEBUG),1)
-  CFLAGS+=-g
+  CFLAGS+=-g -DDEBUG
 else
   CFLAGS+=-O3
 endif
@@ -25,7 +25,9 @@ PREFIX=/usr/local
 INSTALL_PREFIX=$(PREFIX)/bin
 INSTALL=install -Ds
 
-ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
+BREXCHECK_XPATH_ENGINE=LIBXML
+
+ifeq ($(BREXCHECK_XPATH_ENGINE),SAXON)
   ifeq ($(OS),Windows_NT)
     SAXON_C_DIR=/cygdrive/c/Progra~1/Saxonica/SaxonHEC1.2.1
   else
@@ -49,7 +51,6 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
   SAXON_OBJECTS+=saxon/XsltProcessor.o
 
   SOURCE+=$(SAXON_OBJECTS)
-  CFLAGS+=-DUSE_SAXON
   LDFLAGS+=-lstdc++ -L$(SAXON_C_DIR) -lsaxonhec
 
   ifneq ($(OSTYPE),msys)
@@ -71,6 +72,21 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
   endif
 endif
 
+ifeq ($(BREXCHECK_XPATH_ENGINE),XQILLA)
+  XQILLA_OBJECTS+=xqilla/xqilla.o
+
+  SOURCE+=$(XQILLA_OBJECTS)
+  LDFLAGS+=-lstdc++ -lxerces-c -lxqilla
+
+  ifeq ($(DEBUG),1)
+    XQILLA_C_FLAGS+=-g -DDEBUG
+  else
+    XQILLA_C_FLAGS+=-O3
+  endif
+endif
+
+CFLAGS+=-DXPATH_ENGINE=$(BREXCHECK_XPATH_ENGINE)
+
 all: $(OUTPUT)
 
 $(OUTPUT): $(SOURCE) brex.h
@@ -85,6 +101,9 @@ saxon/SaxonC%.o: $(SAXON_C_API)/SaxonC%.c
 saxon/saxon.o: saxon/saxon.cpp
 	$(CXX) $(SAXON_CFLAGS) -c -I$(SAXON_C_API) -o $@ `pkg-config --cflags libxml-2.0` $+
 
+xqilla/xqilla.o: xqilla/xqilla.cpp
+	$(CXX) -c $(XQILLA_C_FLAGS) `pkg-config --cflags libxml-2.0` -o $@ $+
+
 brex.h: brex/DMC-*.XML stats.xsl
 	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
@@ -92,8 +111,11 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-ifeq ($(BREXCHECK_XPATH_ENGINE),saxon)
+ifeq ($(BREXCHECK_XPATH_ENGINE),SAXON)
 	rm -f $(SAXON_OBJECTS)
+endif
+ifeq ($(BREXCHECK_XPATH_ENGINE),XQILLA)
+	rm -f $(XQILLA_OBJECTS)
 endif
 	rm -f $(OUTPUT) brex.h
 

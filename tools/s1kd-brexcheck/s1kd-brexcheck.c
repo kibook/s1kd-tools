@@ -13,12 +13,22 @@
 #include "brex.h"
 #include "s1kd_tools.h"
 
-#ifdef USE_SAXON
+#define LIBXML 1
+#define SAXON 2
+#define XQILLA 3
+
+#ifndef XPATH_ENGINE
+#define XPATH_ENGINE LIBXML
+#endif
+
+#if XPATH_ENGINE == SAXON
 #include "saxon/saxon.h"
+#elif XPATH_ENGINE == XQILLA
+#include "xqilla/xqilla.h"
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.7.2"
+#define VERSION "4.8.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -714,8 +724,10 @@ static void register_functions(xmlXPathContextPtr ctx)
 }
 
 /* Register all namespaces applicable to a node in a new XPath context. */
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 static void register_namespaces(xmlXPathContextPtr ctx, void *saxon_xpath, xmlNodePtr node)
+#elif XPATH_ENGINE == XQILLA
+static void register_namespaces(xmlXPathContextPtr ctx, void *xqilla_ns_resolver, xmlNodePtr node)
 #else
 static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
 #endif
@@ -728,8 +740,10 @@ static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
 			for (cur_ns = cur->nsDef; cur_ns; cur_ns = cur_ns->next) {
 				xmlXPathRegisterNs(ctx, cur_ns->prefix, cur_ns->href);
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 				saxon_register_namespace(saxon_xpath, cur_ns->prefix, cur_ns->href);
+#elif XPATH_ENGINE == XQILLA
+				xqilla_register_namespace(xqilla_ns_resolver, cur_ns->prefix, cur_ns->href);
 #endif
 
 			}
@@ -738,8 +752,10 @@ static void register_namespaces(xmlXPathContextPtr ctx, xmlNodePtr node)
 }
 
 /* Check the context rules of a BREX DM against a CSDB object. */
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname, const char *brexfname, xmlNodePtr documentNode, struct opts *opts, void *saxon_processor, void *saxon_node)
+#elif XPATH_ENGINE == XQILLA
+static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname, const char *brexfname, xmlNodePtr documentNode, struct opts *opts, void *xqilla_doc)
 #else
 static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr doc, const char *fname, const char *brexfname, xmlNodePtr documentNode, struct opts *opts)
 #endif
@@ -762,8 +778,10 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			xmlNodePtr brDecisionRef, objectPath, objectUse;
 			xmlChar *allowedObjectFlag, *path, *use, *brdp;
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 			void *xpath_processor = saxon_new_xpath_processor(saxon_processor);
+#elif XPATH_ENGINE == XQILLA
+			void *xqilla_ns_resolver = xqilla_create_ns_resolver(xqilla_doc);
 #endif
 
 			brDecisionRef = firstXPathNode(brex_doc, rules->nodeTab[i], "brDecisionRef");
@@ -778,10 +796,14 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 			context = xmlXPathNewContext(doc);
 			register_functions(context);
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 			register_namespaces(context, xpath_processor, objectPath);
 
-			object = saxon_eval_xpath(saxon_processor, xpath_processor, saxon_node, objectPath, path, context);
+			object = saxon_eval_xpath(saxon_processor, xpath_processor, saxon_node, path, context);
+#elif XPATH_ENGINE == XQILLA
+			register_namespaces(context, xqilla_ns_resolver, objectPath);
+
+			object = xqilla_eval_xpath(xqilla_doc, xqilla_ns_resolver, path, context);
 #else
 			register_namespaces(context, objectPath);
 
@@ -865,7 +887,7 @@ static int check_brex_rules(xmlDocPtr brex_doc, xmlNodeSetPtr rules, xmlDocPtr d
 				}
 			}
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 			saxon_free_xpath_processor(xpath_processor);
 #endif
 			/* FIXME: If the XPath expression was invalid, xmlXPathFreeObject doesn't
@@ -1187,8 +1209,10 @@ static void print_valid_fnames(xmlNodePtr node)
 }
 
 /* Check context, SNS, and notation rules of BREX DMs against a CSDB object. */
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck, struct opts *opts, void *saxon_processor)
+#elif XPATH_ENGINE == XQILLA
+static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck, struct opts *opts, void *xqilla_impl)
 #else
 static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fnames)[PATH_MAX], int num_brex_fnames, xmlNodePtr brexCheck, struct opts *opts)
 #endif
@@ -1205,8 +1229,11 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fname
 
 	xmlDocPtr validtree = NULL;
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	void *saxon_node;
+#elif XPATH_ENGINE == XQILLA
+	void *xqilla_parser;
+	void *xqilla_doc;
 #endif
 
 	/* Make a copy of the original XML tree before performing extra
@@ -1220,8 +1247,11 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fname
 		rem_delete_elems(dmod_doc);
 	}
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	saxon_node = saxon_new_node(saxon_processor, dmod_doc);
+#elif XPATH_ENGINE == XQILLA
+	xqilla_parser = xqilla_create_parser(xqilla_impl);
+	xqilla_doc = xqilla_create_doc(xqilla_impl, xqilla_parser, dmod_doc);
 #endif
 
 	schema = xmlGetNsProp(xmlDocGetRootElement(dmod_doc), BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
@@ -1260,8 +1290,10 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fname
 
 		result = xmlXPathEvalExpression(STRUCT_OBJ_RULE_PATH, context);
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname, brex_fnames[i], documentNode, opts, saxon_processor, saxon_node);
+#elif XPATH_ENGINE == XQILLA
+		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname, brex_fnames[i], documentNode, opts, xqilla_doc);
 #else
 		status = check_brex_rules(brex_doc, result->nodesetval, dmod_doc, docname, brex_fnames[i], documentNode, opts);
 #endif
@@ -1295,8 +1327,10 @@ static int check_brex(xmlDocPtr dmod_doc, const char *docname, char (*brex_fname
 		xmlFreeDoc(validtree);
 	}
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	saxon_free_node(saxon_node);
+#elif XPATH_ENGINE == XQILLA
+	xqilla_free_parser(xqilla_parser);
 #endif
 
 	return total;
@@ -1504,8 +1538,10 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 	xmlNodePtr node;
 	const char *brex_dmc;
 	struct opts opts;
-#ifdef USE_SAXON
-	void *saxon_processor;
+#if XPATH_ENGINE == SAXON
+	void *saxon_processor, *saxon_node;
+#elif XPATH_ENGINE == XQILLA
+	void *xqilla_impl, *xqilla_parser, *xqilla_doc;
 #endif
 
 	init_opts(&opts, options);
@@ -1524,7 +1560,7 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 	ctx = xmlXPathNewContext(brex);
 	obj = xmlXPathEvalExpression(BAD_CAST "//structureObjectRule", ctx);
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	saxon_processor = saxon_new_processor();
 	saxon_node = saxon_new_node(saxon_processor, doc);
 
@@ -1532,6 +1568,15 @@ int s1kdDocCheckDefaultBREX(xmlDocPtr doc, int options, xmlDocPtr *report)
 
 	saxon_free_node(saxon_node);
 	saxon_free_processor(saxon_processor);
+#elif XPATH_ENGINE == XQILLA
+	xqilla_impl = xqilla_initialize();
+	xqilla_parser = xqilla_create_parser(xqilla_impl);
+	xqilla_doc = xqilla_create_doc(xqilla_impl, xqilla_parser, doc);
+
+	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node, &opts, xqilla_doc);
+
+	xqilla_free_parser(xqilla_parser);
+	xqilla_terminate();
 #else
 	err = check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex_dmc, node, &opts);
 #endif
@@ -1576,8 +1621,10 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 	xmlXPathObjectPtr obj;
 	xmlNodePtr node;
 	struct opts opts;
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	void *saxon_processor, *saxon_node;
+#elif XPATH_ENGINE == XQILLA
+	void *xqilla_impl, *xqilla_parser, *xqilla_doc;
 #endif
 
 	init_opts(&opts, options);
@@ -1617,7 +1664,7 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 		xmlFreeDoc(notationRulesDoc);
 	}
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	saxon_processor = saxon_new_processor();
 	saxon_node = saxon_new_node(saxon_processor, doc);
 
@@ -1625,6 +1672,15 @@ int s1kdDocCheckBREX(xmlDocPtr doc, xmlDocPtr brex, int options, xmlDocPtr *repo
 
 	saxon_free_node(saxon_node);
 	saxon_free_processor(saxon_processor);
+#elif XPATH_ENGINE == XQILLA
+	xqilla_impl = xqilla_initialize();
+	xqilla_parser = xqilla_create_parser(xqilla_impl);
+	xqilla_doc = xqilla_create_doc(xqilla_impl, xqilla_parser, doc);
+
+	err += check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts, xqilla_doc);
+
+	xqilla_free_parser(xqilla_parser);
+	xqilla_terminate();
 #else
 	err += check_brex_rules(brex, obj->nodesetval, doc, doc->URL, brex->URL, node, &opts);
 #endif
@@ -1697,7 +1753,7 @@ static void show_help(void)
 }
 
 /* Show version information. */
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 static void show_version(void *saxon_processor)
 #else
 static void show_version(void)
@@ -1705,12 +1761,15 @@ static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(saxon_processor));
 	puts("XPath engine: Saxon");
+#elif XPATH_ENGINE == XQILLA
+	printf("Using libxml %s, libxslt %s, libexslt %s, Xerces-C++ %s and XQilla\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, xqilla_version());
+	puts("XPath engine: XQilla");
 #else
 	printf("Using libxml %s, libxslt %s and libexslt %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);
-	puts("XPath engine: libxml2");
+	puts("XPath engine: libxml");
 #endif
 }
 
@@ -1785,10 +1844,15 @@ int main(int argc, char *argv[])
 	};
 	int loptind = 0;
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	void *saxon_processor;
 
 	saxon_processor = saxon_new_processor();
+#elif XPATH_ENGINE == XQILLA
+	void *xqilla_impl;
+
+	xqilla_impl = xqilla_initialize();
+
 #endif
 
 	search_dir = strdup(".");
@@ -1797,7 +1861,7 @@ int main(int argc, char *argv[])
 		switch (c) {
 			case 0:
 				if (strcmp(lopts[loptind].name, "version") == 0) {
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 					show_version(saxon_processor);
 #else
 					show_version();
@@ -1964,8 +2028,10 @@ int main(int argc, char *argv[])
 				dmod_fnames, num_dmod_fnames, dmod_doc, &opts);
 		}
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 		status += check_brex(dmod_doc, dmod_fnames[i], brex_fnames, num_brex_fnames, brexCheck, &opts, saxon_processor);
+#elif XPATH_ENGINE == XQILLA
+		status += check_brex(dmod_doc, dmod_fnames[i], brex_fnames, num_brex_fnames, brexCheck, &opts, xqilla_impl);
 #else
 		status += check_brex(dmod_doc, dmod_fnames[i], brex_fnames, num_brex_fnames, brexCheck, &opts);
 #endif
@@ -2011,9 +2077,11 @@ cleanup:
 	free(dmod_fnames);
 	free(search_dir);
 
-#ifdef USE_SAXON
+#if XPATH_ENGINE == SAXON
 	saxon_free_processor(saxon_processor);
 	saxon_cleanup();
+#elif XPATH_ENGINE == XQILLA
+	xqilla_terminate();
 #endif
 
 	if (status > 0) {

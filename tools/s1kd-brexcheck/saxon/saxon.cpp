@@ -238,7 +238,7 @@ extern "C" void saxon_free_node(void *saxon_node)
 
 /* Use Saxon to evaluate an XPath expression in a libxml2 XPath context,
  * returning a libxml2 nodeset. */
-extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath_processor, void *saxon_node, xmlNodePtr ns, const xmlChar *expr, xmlXPathContextPtr ctx)
+extern "C" xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath_processor, void *saxon_node, const xmlChar *expr, xmlXPathContextPtr ctx)
 {
 	SaxonProcessor *saxon_proc = (SaxonProcessor *) saxon_processor;
 	XPathProcessor *xpath_proc = (XPathProcessor *) xpath_processor;

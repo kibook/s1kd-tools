@@ -37,7 +37,7 @@ void saxon_free_node(void *saxon_node);
 
 /* Use Saxon to evaluate an XPath expression in a libxml2 XPath context,
  * returning a libxml2 nodeset. */
-xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath_processor, void *saxon_node, const xmlNodePtr ns, const xmlChar *expr, xmlXPathContextPtr ctx);
+xmlXPathObjectPtr saxon_eval_xpath(void *saxon_processor, void *xpath_processor, void *saxon_node, const xmlChar *expr, xmlXPathContextPtr ctx);
 
 #ifdef __cplusplus
 }

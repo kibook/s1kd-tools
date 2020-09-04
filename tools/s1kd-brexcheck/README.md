@@ -280,16 +280,13 @@ Supported XPath syntax depends on what XPath engine was selected at
 compile-time:
 
 libxml2 (default)  
--   XPath 1.0
-
--   Partial support for EXSLT functions
+XPath 1.0 and partial support for EXSLT functions
 
 Saxon (experimental)  
--   XPath 1.0
+XPath 1.0, 2.0 and 3.0
 
--   XPath 2.0
-
--   XPath 3.0
+XQilla (experimental)  
+XPath 1.0 and 2.0
 
 Information on which XPath engine is in use can be obtained from the
 --version option.
