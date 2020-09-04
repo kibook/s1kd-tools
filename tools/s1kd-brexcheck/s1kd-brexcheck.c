@@ -28,7 +28,7 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.8.0"
+#define VERSION "4.8.1"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -1765,7 +1765,7 @@ static void show_version(void)
 	printf("Using libxml %s, libxslt %s, libexslt %s and %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, saxon_version(saxon_processor));
 	puts("XPath engine: Saxon");
 #elif XPATH_ENGINE == XQILLA
-	printf("Using libxml %s, libxslt %s, libexslt %s, Xerces-C++ %s and XQilla\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, xqilla_version());
+	printf("Using libxml %s, libxslt %s, libexslt %s and Xerces-C %s + XQilla\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion, xqilla_version());
 	puts("XPath engine: XQilla");
 #else
 	printf("Using libxml %s, libxslt %s and libexslt %s\n", xmlParserVersion, xsltEngineVersion, exsltLibraryVersion);

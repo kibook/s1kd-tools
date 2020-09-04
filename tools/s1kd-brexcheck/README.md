@@ -279,7 +279,7 @@ XPath support
 Supported XPath syntax depends on what XPath engine was selected at
 compile-time:
 
-libxml2 (default)  
+libxml (default)  
 XPath 1.0 and partial support for EXSLT functions
 
 Saxon (experimental)  

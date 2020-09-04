@@ -27,6 +27,7 @@ static xmlChar *xpath_of(DOMNode *node)
 
 		e = xmlNewChild(path, NULL, BAD_CAST "node", NULL);
 
+		/* Get the name of the node. */
 		char *name;
 
 		switch (type) {
@@ -47,6 +48,9 @@ static xmlChar *xpath_of(DOMNode *node)
 		xmlSetProp(e, BAD_CAST "name", BAD_CAST name);
 		delete name;
 
+		/* Get the position of the node relative to other nodes with
+		 * the same name.
+		 */
 		if (type != DOMNode::ATTRIBUTE_NODE) {
 			int n = 1;
 			xmlChar pos[16];
@@ -66,6 +70,7 @@ static xmlChar *xpath_of(DOMNode *node)
 		node = node->getParentNode();
 	}
 
+	/* Construct the XPath 1.0 expression. */
 	for (xmlNodePtr cur = path->last; cur; cur = cur->prev) {
 		xmlChar *name = xmlGetProp(cur, BAD_CAST "name");
 		xmlChar *pos  = xmlGetProp(cur, BAD_CAST "pos");
@@ -216,7 +221,7 @@ extern "C" xmlXPathObjectPtr xqilla_eval_xpath(void *doc, void *ns_resolver, con
 		return obj;
 	} catch (DOMXPathException e) {
 		char *m = XMLString::transcode(e.msg);
-		std::cerr << m << std::endl;
+		std::cerr << "XQilla: " << m << std::endl;
 		delete m;
 
 		return NULL;
