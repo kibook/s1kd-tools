@@ -53,6 +53,8 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),SAXON)
   SOURCE+=$(SAXON_OBJECTS)
   LDFLAGS+=-lstdc++ -L$(SAXON_C_DIR) -lsaxonhec
 
+  SAXON_CFLAGS+=`pkg-config --cflags libxml-2.0`
+
   ifneq ($(OSTYPE),msys)
     LDFLAGS+=-ldl
   endif
@@ -76,12 +78,14 @@ ifeq ($(BREXCHECK_XPATH_ENGINE),XQILLA)
   XQILLA_OBJECTS+=xqilla/xqilla.o
 
   SOURCE+=$(XQILLA_OBJECTS)
-  LDFLAGS+=-lstdc++ -lxerces-c -lxqilla
+  LDFLAGS+=-lstdc++ `pkg-config --libs xerces-c` -lxqilla
+
+  XQILLA_CFLAGS+=`pkg-config --cflags libxml-2.0 xerces-c`
 
   ifeq ($(DEBUG),1)
-    XQILLA_C_FLAGS+=-g -DDEBUG
+    XQILLA_CFLAGS+=-g -DDEBUG
   else
-    XQILLA_C_FLAGS+=-O3
+    XQILLA_CFLAGS+=-O3
   endif
 endif
 
@@ -99,10 +103,10 @@ saxon/SaxonC%.o: $(SAXON_C_API)/SaxonC%.c
 	$(CC) $(SAXON_CFLAGS) -c -o $@ $+
 
 saxon/saxon.o: saxon/saxon.cpp
-	$(CXX) $(SAXON_CFLAGS) -c -I$(SAXON_C_API) -o $@ `pkg-config --cflags libxml-2.0` $+
+	$(CXX) $(SAXON_CFLAGS) -c -I$(SAXON_C_API) -o $@ $+
 
 xqilla/xqilla.o: xqilla/xqilla.cpp
-	$(CXX) -c $(XQILLA_C_FLAGS) `pkg-config --cflags libxml-2.0` -o $@ $+
+	$(CXX) -c $(XQILLA_CFLAGS) -o $@ $+
 
 brex.h: brex/DMC-*.XML stats.xsl
 	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
@@ -111,13 +115,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-ifeq ($(BREXCHECK_XPATH_ENGINE),SAXON)
-	rm -f $(SAXON_OBJECTS)
-endif
-ifeq ($(BREXCHECK_XPATH_ENGINE),XQILLA)
-	rm -f $(XQILLA_OBJECTS)
-endif
-	rm -f $(OUTPUT) brex.h
+	rm -f $(OUTPUT) brex.h $(SAXON_OBJECTS) $(XQILLA_OBJECTS)
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
