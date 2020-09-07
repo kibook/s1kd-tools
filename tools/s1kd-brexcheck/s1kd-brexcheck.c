@@ -28,7 +28,7 @@
 #endif
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.8.1"
+#define VERSION "4.8.2"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \

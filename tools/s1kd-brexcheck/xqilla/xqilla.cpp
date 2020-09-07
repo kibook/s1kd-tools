@@ -48,10 +48,12 @@ static xmlChar *xpath_of(DOMNode *node)
 		xmlSetProp(e, BAD_CAST "name", BAD_CAST name);
 		delete name;
 
-		/* Get the position of the node relative to other nodes with
-		 * the same name.
-		 */
-		if (type != DOMNode::ATTRIBUTE_NODE) {
+		if (type == DOMNode::ATTRIBUTE_NODE) {
+			node = ((DOMAttr *) node)->getOwnerElement();
+		} else {
+			/* Get the position of the node relative to other nodes
+			 * with the same name.
+			 */
 			int n = 1;
 			xmlChar pos[16];
 
@@ -65,9 +67,9 @@ static xmlChar *xpath_of(DOMNode *node)
 
 			xmlStrPrintf(pos, 16, "%d", n);
 			xmlSetProp(e, BAD_CAST "pos", pos);
-		}
 
-		node = node->getParentNode();
+			node = node->getParentNode();
+		}
 	}
 
 	/* Construct the XPath 1.0 expression. */
