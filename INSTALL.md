@@ -104,44 +104,6 @@ Additional Makefile parameters
 The following parameters can be given to `make` to control certain
 options when building and installing.
 
-### `BREXCHECK_XPATH_ENGINE`
-
-The `BREXCHECK_XPATH_ENGINE` variable determines which XPath
-implementation the s1kd-brexcheck tool will use to evaluate the object
-paths of BREX rules.
-
-The s1kd-tools are built on libxml, so by default s1kd-brexcheck uses
-libxml's XPath implementation. However, libxml only supports XPath 1.0.
-While as of Issue 5.0, the S1000D default BREX rules are all compatible
-with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0
-specification. Therefore, if your project needs XPath 2.0 support for
-BREX rules, you should select a different implementation.
-
-`LIBXML`  
-The default implementation. Fast and requires no additional
-dependencies.
-
-Supports XPath 1.0 and some EXSLT functions.
-
-`SAXON`  
-Experimental implementation using the Saxon/C library. Slower, and
-Saxon/C itself is a very large dependency. Not recommended at this time
-due to memory leak issues.
-
-Supports XPath 1.0, 2.0 and 3.0.
-
-`XQILLA`  
-Experimental implementation using the Xerces-C and XQilla libraries. A
-little slower than libxml, but faster than Saxon/C, and the dependencies
-are much smaller than the latter. This is currently the recommended
-implementation if you need XPath 2.0 support.
-
-Supports XPath 1.0 and 2.0.
-
-Example:
-
-    $ make BREXCHECK_XPATH_ENGINE=XQILLA
-
 ### `PREFIX`
 
 The `PREFIX` variable determines where the s1kd-tools are installed when
@@ -153,3 +115,31 @@ Example:
     # make PREFIX=/usr install
 
     # make PREFIX=/usr uninstall
+
+### `XPATH2_ENGINE`
+
+The `XPATH2_ENGINE` variable determines which XPath 2.0 implementation
+the s1kd-brexcheck tool will use to evaluate the object paths of BREX
+rules.
+
+The s1kd-tools are built on libxml, so by default s1kd-brexcheck uses
+libxml's XPath implementation. However, libxml only supports XPath 1.0.
+While as of Issue 5.0, the S1000D default BREX rules are all compatible
+with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0
+specification. Therefore, if your project needs XPath 2.0 support for
+BREX rules, you should select one of these implementations:
+
+`SAXON`  
+Experimental implementation using the Saxon/C library. Slower, and
+Saxon/C itself is a very large dependency. Not recommended at this time
+due to memory leak issues.
+
+`XQILLA`  
+Experimental implementation using the Xerces-C and XQilla libraries. A
+little slower than libxml, but faster than Saxon/C, and the dependencies
+are much smaller than the latter. This is currently the recommended
+implementation if you need XPath 2.0 support.
+
+Example:
+
+    $ make XPATH2_ENGINE=XQILLA

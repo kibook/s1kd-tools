@@ -9,5 +9,5 @@ To set up XQilla for use with s1kd-brexcheck, do the following:
 
 2. Enable XQilla when building:
    ```
-   $ make BREXCHECK_XPATH_ENGINE=XQILLA
+   $ make XPATH2_ENGINE=XQILLA
    ```

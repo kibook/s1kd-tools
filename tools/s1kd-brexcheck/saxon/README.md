@@ -6,5 +6,5 @@ To set up Saxon/C for use with s1kd-brexcheck, do the following:
 
 2. Enable Saxon when building:
    ```
-   $ make BREXCHECK_XPATH_ENGINE=SAXON
+   $ make XPATH2_ENGINE=SAXON
    ```

@@ -7,7 +7,8 @@ SYNOPSIS
 ========
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?] [<object>...]
+                   [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?]
+                   [<object>...]
 
 DESCRIPTION
 ===========
@@ -111,6 +112,10 @@ Verbose mode. The success or failure of each test is printed explicitly.
 
 -w, --severity-levels &lt;file&gt;  
 Specify a list of severity levels for business rules.
+
+-X, --xpath-version &lt;version&gt;  
+Force the specified version of XPath to be used when evaluating the
+object paths of BREX rules.
 
 -x, --xml  
 Output an XML report.
@@ -276,20 +281,22 @@ notation.
 XPath support
 -------------
 
-Supported XPath syntax depends on what XPath engine was selected at
-compile-time:
+By default, s1kd-brexcheck supports only XPath 1.0, with partial support
+for EXSLT functions.
 
-libxml (default)  
-XPath 1.0 and partial support for EXSLT functions
+If experimental XPath 2.0 support is enabled at compile-time,
+s1kd-brexcheck will automatically choose a version of XPath based on the
+S1000D issue of the BREX data module:
 
-Saxon (experimental)  
-XPath 1.0, 2.0 and 3.0
+3.0 and lower  
+XPath 1.0
 
-XQilla (experimental)  
-XPath 1.0 and 2.0
+4.0 and up  
+XPath 2.0
 
-Information on which XPath engine is in use can be obtained from the
---version option.
+The -X (--xpath-version) option can be specified to force a particular
+version of XPath to be used regardless of issue. Information on which
+XPath versions are supported can be obtained from the --version option.
 
 If the XPath given for the `<objectPath>` of a rule is invalid, the rule
 will be ignored when validating objects. A warning will be printed to
@@ -310,6 +317,9 @@ One or more CSDB objects specified could not be read.
 
 3  
 A referenced BREX data module could not be found.
+
+4  
+The XPath version specified is unsupported.
 
 5  
 The number of paths or CSDB objects specified exceeded the available
