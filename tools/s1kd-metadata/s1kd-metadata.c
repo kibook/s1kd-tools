@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.4.1"
+#define VERSION "4.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -951,6 +951,17 @@ static void show_code(xmlNodePtr node, struct opts *opts)
 	xmlFree(code);
 }
 
+static int edit_code(xmlNodePtr node, const char *val)
+{
+	if (xmlStrcmp(node->name, BAD_CAST "dmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "avee") == 0) {
+		return edit_dmcode(node, val);
+	} else if (xmlStrcmp(node->name, BAD_CAST "pmCode") == 0 || xmlStrcmp(node->name, BAD_CAST "pmc") == 0) {
+		return edit_pmcode(node, val);
+	} else {
+		return EXIT_NO_EDIT;
+	}
+}
+
 static void show_issue_type(xmlNodePtr node, struct opts *opts)
 {
 	if (xmlStrcmp(node->name, BAD_CAST "issno") == 0) {
@@ -1808,7 +1819,7 @@ static struct metadata metadata[] = {
 		"//dmCode|//avee|//pmCode|//pmc|//commentCode|//ccode|//ddnCode|//ddnc|//dmlCode|//dmlc",
 		get_code,
 		show_code,
-		NULL,
+		edit_code,
 		NULL,
 		"CSDB object code"},
 	{"commentCode",
@@ -1878,7 +1889,7 @@ static struct metadata metadata[] = {
 		"//dmCode|//avee",
 		get_dmcode,
 		show_dmcode,
-		NULL,
+		edit_dmcode,
 		NULL,
 		"Data module code"},
 	{"dmlCode",
@@ -2046,7 +2057,7 @@ static struct metadata metadata[] = {
 		"//pmCode|//pmc",
 		get_pmcode,
 		show_pmcode,
-		NULL,
+		edit_pmcode,
 		NULL,
 		"Publication module code"},
 	{"pmIssuer",
@@ -2191,7 +2202,7 @@ static struct metadata metadata[] = {
 		"Source DM code"},
 	{"sourcePmCode",
 		"//sourcePmIdent/pmCode",
-		NULL,
+		get_pmcode,
 		show_pmcode,
 		edit_pmcode,
 		NULL,
