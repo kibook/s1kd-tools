@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "4.17.0"
+#define VERSION "4.17.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1387,7 +1387,7 @@ static void getCsnCode(char *dst, xmlNodePtr ref, xmlChar **csnValue, xmlChar **
 	}
 
 	/* If CSN is chapterized, attempt to match it to a DMC. */
-	if (modelIdentCode && systemDiffCode && systemCode && subSystemCode && subSubSystemCode && assyCode && figureNumber && itemLocationCode) {
+	if (modelIdentCode && systemDiffCode && systemCode && subSystemCode && subSubSystemCode && assyCode && figureNumber) {
 		xmlDocPtr tmp;
 		xmlNodePtr dmRef, dmRefIdent, dmCode;
 		xmlChar *disassyCodeVariant;
@@ -1410,6 +1410,10 @@ static void getCsnCode(char *dst, xmlNodePtr ref, xmlChar **csnValue, xmlChar **
 		 * character). Therefore, the figNumVarFormat pattern is used to
 		 * construct the full disassemby code variant. */
 		disassyCodeVariant = formatFigNumVar(figureNumberVariant);
+
+		if (!itemLocationCode) {
+			itemLocationCode = xmlCharStrdup("?");
+		}
 
 		xmlSetProp(dmCode, BAD_CAST "modelIdentCode", modelIdentCode);
 		xmlSetProp(dmCode, BAD_CAST "systemDiffCode", systemDiffCode);
