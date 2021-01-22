@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.2.0"
+#define VERSION "12.2.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1938,27 +1938,31 @@ static xmlNodePtr undepend_cir(xmlDocPtr dm, xmlNodePtr defs, const char *cirdoc
 	return xmlDocGetRootElement(dm);
 }
 
+/* General XSLT transformation with embedded stylesheet, preserving the DTD. */
+static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
+{
+	xmlDocPtr styledoc, res, src;
+	xsltStylesheetPtr style;
+	xmlNodePtr old;
+
+	styledoc = read_xml_mem((const char *) xml, len);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	src = xmlCopyDoc(doc, 1);
+	res = xsltApplyStylesheet(style, src, params);
+	xmlFreeDoc(src);
+
+	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
+	xmlFreeNode(old);
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
 /* Remove all change markup from the instance. */
 static void remove_change_markup(xmlDocPtr doc)
 {
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-
-	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST "//@changeMark|//@mark|//@changeType|//@change|//@reasonForUpdateRefIds|//@rfc|//reasonForUpdate", ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-			xmlFreeNode(obj->nodesetval->nodeTab[i]);
-			obj->nodesetval->nodeTab[i] = NULL;
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
+	transform_doc(doc, xsl_remove_change_markup_xsl, xsl_remove_change_markup_xsl_len, NULL);
 }
 
 /* Set the issue type of the instance. */
@@ -2273,27 +2277,6 @@ static void strip_extension(xmlDocPtr doc)
 
 	xmlUnlinkNode(ext);
 	xmlFreeNode(ext);
-}
-
-/* General XSLT transformation with embedded stylesheet, preserving the DTD. */
-static void transform_doc(xmlDocPtr doc, unsigned char *xml, unsigned int len, const char **params)
-{
-	xmlDocPtr styledoc, res, src;
-	xsltStylesheetPtr style;
-	xmlNodePtr old;
-
-	styledoc = read_xml_mem((const char *) xml, len);
-	style = xsltParseStylesheetDoc(styledoc);
-
-	src = xmlCopyDoc(doc, 1);
-	res = xsltApplyStylesheet(style, src, params);
-	xmlFreeDoc(src);
-
-	old = xmlDocSetRootElement(doc, xmlCopyNode(xmlDocGetRootElement(res), 1));
-	xmlFreeNode(old);
-
-	xmlFreeDoc(res);
-	xsltFreeStylesheet(style);
 }
 
 /* Flatten alts elements. */
