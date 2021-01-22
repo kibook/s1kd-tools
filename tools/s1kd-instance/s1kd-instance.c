@@ -2072,6 +2072,8 @@ static void set_issue(xmlDocPtr dm, char *issinfo, bool incr_iss)
 		xmlFree(type);
 	}
 
+	issueInfo = first_xpath_node(dm, NULL, ISSUE_INFO_XPATH);
+
 	if (xmlStrcmp(issueInfo->name, BAD_CAST "issueInfo") == 0) {
 		xmlSetProp(issueInfo, BAD_CAST "issueNumber", BAD_CAST issue);
 		xmlSetProp(issueInfo, BAD_CAST "inWork", BAD_CAST inwork);
