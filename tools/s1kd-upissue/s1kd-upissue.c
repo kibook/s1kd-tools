@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "5.0.0"
+#define VERSION "5.0.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -395,8 +395,8 @@ static void set_qa(xmlDocPtr doc, char *firstver, char *secondver, bool iss30)
 }
 
 /* Add RFUs to the upissued object. */
-#define ISS_30_RFU_PATH "(//qa|//sbc|//fic|//ein|//skill|//rfu)[last()]"
-#define ISS_4X_RFU_PATH "(//qualityAssurance|//systemBreakdownCode|//functionalItemCode|//functionalItemRef|//skillLevel|//reasonForUpdate)[last()]"
+#define ISS_30_RFU_PATH "(//qa|//sbc|//fic|//idstatus//ein|//skill|//rfu)[last()]"
+#define ISS_4X_RFU_PATH "(//qualityAssurance|//systemBreakdownCode|//functionalItemCode|//identAndStatusSection//functionalItemRef|//skillLevel|//reasonForUpdate)[last()]"
 
 static void add_rfus(xmlDocPtr doc, xmlNodePtr rfus, bool iss30)
 {
