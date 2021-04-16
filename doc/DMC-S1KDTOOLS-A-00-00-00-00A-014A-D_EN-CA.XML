@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="015" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="01"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Replace includePrevSnsTitle with snsLevels.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -547,7 +547,7 @@
                   <para>Data module code of BREX data module</para>
                 </entry>
               </row>
-              <row changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+              <row>
                 <entry>
                   <para>
                     <verbatimText verbatimStyle="vs14">snsLevels</verbatimText>
@@ -634,7 +634,7 @@
       <levelledPara>
         <title>Example - XML format</title>
         <para>
-          <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<?xml version="1.0"?>
+          <verbatimText verbatimStyle="vs11"><![CDATA[<?xml version="1.0"?>
 <defaults>
 <default ident="act" value="MYPRJ-A-00-00-00-00A-00WA-D"/>
 <default ident="assyCode" value="00"/>
@@ -694,7 +694,7 @@
       <levelledPara>
         <title>Example - Simple text format</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">act                            MYPRJ-A-00-00-00-00A-00WA-D
+          <verbatimText verbatimStyle="vs24">act                            MYPRJ-A-00-00-00-00A-00WA-D
 assyCode                       00
 authorization                  khzae.net
 brex                           MYPRJ-A-00-00-00-00A-022A-D

@@ -10,10 +10,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="018" infoCodeVariant="B" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="05"/>
+        <issueInfo issueNumber="001" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2019" month="12" day="13"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>S1000D tutorial</techName>
         </dmTitle>
@@ -42,6 +42,9 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>

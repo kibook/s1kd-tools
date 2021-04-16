@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="01"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,17 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --xml-catalog parser option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -5 (--print) and -q (--quiet) options.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Rename -q to -Q.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -d and -v options.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -61,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001 rfu-0002 rfu-0003"><![CDATA[s1kd-upissue [-045defilmNQqRsuvw^] [-1 <type>] [-2 <type>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-upissue [-045defilmNQqRsuvw^] [-1 <type>] [-2 <type>]
              [-c <reason> [-H] [-t <urt>]]
              [-I <date>] [-z <type>] [<file> ...]]]></verbatimText>
         </para>
@@ -99,7 +90,7 @@
                 <para>Remove change markup on elements, but not RFUs, in the upissued object. This is automatically applied if the issue type (-z) is not <verbatimText verbatimStyle="vs14">"changed"</verbatimText> or <verbatimText verbatimStyle="vs14">"rinstate-changed"</verbatimText>.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-5, --print</listItemTerm>
               <listItemDefinition>
                 <para>Print the file names of upissued objects.</para>
@@ -114,7 +105,7 @@
             <definitionListItem>
               <listItemTerm>-d, --dry-run</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Do not actually create or modify any files.</para>
+                <para>Do not actually create or modify any files.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -172,12 +163,12 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
-              <listItemTerm changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">-Q, --keep-qa</listItemTerm>
+              <listItemTerm>-Q, --keep-qa</listItemTerm>
               <listItemDefinition>
                 <para>Keep quality assurance information from old issue. Normally, when upissuing an official CSDB object to the first in-work issue, the quality assurance is set back to "unverified". Specify this option to indicate the upissue will not affect the contents of the CSDB object, and so does not require it to be re-verified.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-q, --quiet</listItemTerm>
               <listItemDefinition>
                 <para>Quiet mode. Errors are not printed.</para>
@@ -218,7 +209,7 @@
             <definitionListItem>
               <listItemTerm>-v, --verbose</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Verbose output.</para>
+                <para>Verbose output.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -309,7 +300,7 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem>
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>

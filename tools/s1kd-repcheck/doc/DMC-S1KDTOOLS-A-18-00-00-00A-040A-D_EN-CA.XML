@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="18" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="01"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-repcheck(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --xml-catalog parser option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -D (--dump-xsl), -t (--type) and -X (--xsl) options.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -81,7 +78,7 @@
                 <para>In addition to CIR data modules specified with -R or explicitly linked in CIR references, allow CIR references to be resolved against any CIR data modules that were specified as objects to check.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-D, --dump-xsl</listItemTerm>
               <listItemDefinition>
                 <para>Dump the built-in XSLT used to extract CIR references.</para>
@@ -166,7 +163,7 @@
                 <para>Print a summary of the check after it completes, including statistics on the number of objects that passed/failed the check.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-t, --type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>
@@ -218,7 +215,7 @@
                 <para>Verbose output. Specify multiple times to increase the verbosity.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+            <definitionListItem>
               <listItemTerm>-X, --xsl &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use custom XSLT to extract CIR references.</para>
@@ -295,7 +292,7 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem>
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
@@ -303,7 +300,7 @@
             </definitionListItem>
           </definitionList>
         </para>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Custom XSLT (-X)</title>
           <para>What elements are extracted as CIR references for validating, and how they are validated, can be configured through a custom XSLT script specified with the -X (--xsl) option.</para>
           <para>

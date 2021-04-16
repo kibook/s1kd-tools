@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="026" inWork="00"/>
+        <issueInfo issueNumber="027" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="01"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateReasonType="urt02" updateHighlight="1">
-        <simplePara>Remove -d (--schemas) option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --xml-catalog parser option.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[s1kd-validate [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
               [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -192,7 +189,7 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem>
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
@@ -201,8 +198,8 @@
           </definitionList>
         </para>
         <levelledPara>
-          <title changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">XML catalogs</title>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">XML catalogs allow redirecting the canonical URIs of XML schemas and other external resources to local files, so as to avoid the unnecessary overhead of downloading those static resources over the Internet.</para>
+          <title>XML catalogs</title>
+          <para>XML catalogs allow redirecting the canonical URIs of XML schemas and other external resources to local files, so as to avoid the unnecessary overhead of downloading those static resources over the Internet.</para>
           <para>Below is an example of a catalog file which maps the S1000D schemas to a local directory:</para>
           <para>
             <verbatimText verbatimStyle="vs11">&lt;catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"&gt;
@@ -211,11 +208,11 @@ uriStartString="http://www.s1000d.org"
 rewritePrefix="/usr/share/s1kd/schemas"/&gt;
 &lt;/catalog&gt;</verbatimText>
           </para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>):</para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+          <para>This can be placed in a catalog file automatically loaded by libxml2 (e.g., <verbatimText verbatimStyle="vs02">/etc/xml/catalog</verbatimText>) or saved to a file which is then specified in an environment variable used by libxml2 (e.g., <verbatimText>XML_CATALOG_FILES</verbatimText>):</para>
+          <para>
             <verbatimText verbatimStyle="vs24">$ XML_CATALOG_FILES=catalog.xml s1kd-validate &lt;DMs...&gt;</verbatimText>
           </para>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+          <para>
             Alternatively, the --xml-catalog option may be used:
             <verbatimText verbatimStyle="vs24">$ s1kd-validate --xml-catalog=catalog.xml &lt;DMs&gt;...</verbatimText>
           </para>

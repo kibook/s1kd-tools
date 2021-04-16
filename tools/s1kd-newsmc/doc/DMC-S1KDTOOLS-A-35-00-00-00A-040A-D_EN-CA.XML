@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="35" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="012" inWork="00"/>
+        <issueInfo issueNumber="013" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="01"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-newsmc(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --xml-catalog parser option.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -309,7 +309,7 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem>
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>

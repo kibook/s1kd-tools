@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="052" inWork="00"/>
+        <issueInfo issueNumber="053" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="01"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="changed">
+    <dmStatus issueType="status">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,20 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-xml-catalog" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add --xml-catalog parser option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Remove automatic inclusion of XSLT identity template.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Do not add source ident if the instance ident is the same as the source.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0003" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -S (--no-source-ident) option and add -3 (--no-repository-ident) option.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0004" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Change behaviour of -H (--list-properties) option.</simplePara>
+      <reasonForUpdate>
+        <simplePara>Upissued</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -230,7 +218,7 @@
             <definitionListItem>
               <listItemTerm>-H, --list-properties &lt;method&gt;</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0004">
+                <para>
                   Create an XML report of all the applicability properties used in, and product instances relevant to, the specified CSDB objects. &lt;method&gt; determines how to include values and products in the report:
                   <randomList>
                     <listItem>
@@ -452,7 +440,7 @@
             <definitionListItem>
               <listItemTerm>-S, --no-source-ident</listItemTerm>
               <listItemDefinition>
-                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; in the instance.</para>
+                <para>Do not include &lt;sourceDmIdent&gt;/&lt;sourcePmIdent&gt; in the instance.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -557,7 +545,7 @@
                 <para>Specify the CCT to read dependency tests from (-~).</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+            <definitionListItem>
               <listItemTerm>-3, --no-repository-ident</listItemTerm>
               <listItemDefinition>
                 <para>Do not include a &lt;repositorySourceDmIdent&gt; in the instance for each CIR.</para>
@@ -694,7 +682,7 @@
                 <para>Do XInclude processing.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-catalog">
+            <definitionListItem>
               <listItemTerm>--xml-catalog &lt;file&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Use an XML catalog when resolving entities. Multiple catalogs may be loaded by specifying this option multiple times.</para>
@@ -704,9 +692,9 @@
         </para>
         <levelledPara>
           <title>Identifying the source of an instance</title>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">If the identification information (extension, code, issue or language) of an instance differs from that of the source, the resulting data module instance will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data module used to instantiate it. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>
+          <para>If the identification information (extension, code, issue or language) of an instance differs from that of the source, the resulting data module instance will contain the element <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText>, which will contain the identification elements of the source data module used to instantiate it. Publication module instances will contain the element <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> instead.</para>
           <para>Additionally, the data module instance will contain an element <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> for each CIR specified with the -R option.</para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">If the -S (--no-source-ident) option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText> or <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements are added. If the -3 (--no-repository-ident) option is used, no <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements will be added. These options can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
+          <para>If the -S (--no-source-ident) option is used, neither the <verbatimText verbatimStyle="vs12">&lt;sourceDmIdent&gt;</verbatimText> or <verbatimText verbatimStyle="vs12">&lt;sourcePmIdent&gt;</verbatimText> elements are added. If the -3 (--no-repository-ident) option is used, no <verbatimText verbatimStyle="vs12">&lt;repositorySourceDmIdent&gt;</verbatimText> elements will be added. These options can be useful when this tool is not used to make an "instance" per se, but more generally to make a module based on an existing module.</para>
         </levelledPara>
         <levelledPara>
           <title>Removing/simplifying/pruning applicability annotations</title>

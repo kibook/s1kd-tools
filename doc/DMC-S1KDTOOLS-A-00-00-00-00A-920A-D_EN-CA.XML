@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="007" inWork="01"/>
+        <issueInfo issueNumber="008" inWork="00"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2020" month="09" day="08"/>
+        <issueDate year="2021" month="04" day="16"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
@@ -120,7 +120,7 @@
               </listItem>
               <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
                 <para>
-                  <emphasis>If using the <verbatimText>SAXON</verbatimText> XPath engine:</emphasis>
+                  <emphasis>If using the <verbatimText>SAXON</verbatimText> XPath engine: </emphasis>
                   <externalPubRef xlink:href="https://www.saxonica.com/saxon-c/index.xml">
                     <externalPubRefIdent>
                       <externalPubCode>https://www.saxonica.com/saxon-c/index.xml</externalPubCode>
@@ -131,7 +131,7 @@
               </listItem>
               <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
                 <para>
-                  <emphasis>If using the <verbatimText>XQILLA</verbatimText> XPath engine:</emphasis>
+                  <emphasis>If using the <verbatimText>XQILLA</verbatimText> XPath engine: </emphasis>
                   <externalPubRef xlink:href="https://xerces.apache.org/xerces-c/">
                     <externalPubRefIdent>
                       <externalPubCode>https://xerces.apache.org/xerces-c/</externalPubCode>
