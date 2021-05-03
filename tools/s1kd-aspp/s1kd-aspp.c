@@ -11,7 +11,7 @@
 #include "resources.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "5.0.0"
+#define VERSION "5.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -707,6 +707,7 @@ static void show_help(void)
 	puts("  -p, --presentation    Convert semantic applicability to presentation applicability.");
 	puts("  -q, --quiet           Quiet mode.");
 	puts("  -r, --recursive       Search for ACT/CCT recursively.");
+	puts("  -t, --tags <mode>     Add display text tags before elements with applicability.");
 	puts("  -v, --verbose         Verbose output.");
 	puts("  -x, --xsl <XSL>       Use custom XSLT script to generate display text.");
 	puts("  -h, -?, --help        Show help/usage message.");
