@@ -47,6 +47,11 @@ when resolving references.
 Always match the latest issue of an object found, regardless of the
 issue specified in the reference.
 
+-l, --list  
+Treat input (stdin or arguments) as lists of CSDB objects, rather than
+CSDB objects themselves. This option only applies to the simple "flat"
+format (-p/--simple).
+
 -m, --modify  
 Modify the references in the publication module without flattening them.
 
