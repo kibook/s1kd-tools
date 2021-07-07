@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.4.0"
+#define VERSION "3.4.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -599,7 +599,7 @@ static void flatten_file(xmlNodePtr pub, xmlNsPtr xiNs, const char *fname)
 
 static void flatten_list(const char *path, xmlNodePtr pub, xmlNsPtr xiNs)
 {
-	FILE *f;
+	FILE *f = NULL;
 	char line[PATH_MAX];
 
 	if (path) {
