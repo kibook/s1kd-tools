@@ -590,108 +590,6 @@ xmlChar *xpath_first_value(xmlDocPtr doc, xmlNodePtr node, const xmlChar *path)
 	return xmlNodeGetContent(xpath_first_node(doc, node, path));
 }
 
-/* Add a dependency test to an assertion if it contains any of the dependent
- * values.
- *
- * If the assertion uses a set (|), the values will be split up in order to
- * only add the dependency to the appropriate values.
- */
-static void add_cct_depend_to_assert(xmlNodePtr *assert, const xmlChar *id, const xmlChar *forval, xmlNodePtr applic)
-{
-	xmlChar *vals, *v = NULL;
-	bool match = false;
-	xmlNodePtr eval;
-	char *end = NULL;
-
-	vals = xmlGetProp(*assert, BAD_CAST "applicPropertyValues");
-
-	eval = xmlNewNode(NULL, BAD_CAST "evaluate");
-	xmlSetProp(eval, BAD_CAST "andOr", BAD_CAST "or");
-
-	/* Split any sets (|) */
-	while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
-		xmlNodePtr a;
-
-		a = xmlNewNode(NULL, BAD_CAST "assert");
-		xmlSetProp(a, BAD_CAST "applicPropertyIdent", id);
-		xmlSetProp(a, BAD_CAST "applicPropertyType", BAD_CAST "condition");
-		xmlSetProp(a, BAD_CAST "applicPropertyValues", v);
-
-		/* If the current value has a dependency, add the depedency
-		 * test to it with an AND evaluate.
-		 */
-		if (xmlStrcmp(v, forval) == 0) {
-			xmlNodePtr cur, e;
-
-			match = true;
-
-			e = xmlNewChild(eval, NULL, BAD_CAST "evaluate", NULL);
-			xmlSetProp(e, BAD_CAST "andOr", BAD_CAST "and");
-
-			for (cur = applic->children; cur; cur = cur->next) {
-				if (xmlStrcmp(cur->name, BAD_CAST "assert") == 0 || xmlStrcmp(cur->name, BAD_CAST "evaluate") == 0) {
-					xmlAddChild(e, xmlCopyNode(cur, 1));
-				}
-			}
-
-			xmlAddChild(e, a);
-		} else {
-			xmlAddChild(eval, a);
-		}
-	}
-
-	xmlFree(vals);
-
-	/* If any of the values in the set had a dependency, replace the assert
-	 * with the new evaluation.
-	 */
-	if (match) {
-		xmlChar *op;
-
-		op = xmlGetProp((*assert)->parent, BAD_CAST "andOr");
-
-		/* If the dependency test is being added to an OR evaluate,
-		 * simplify the output by combining the new OR and the existing
-		 * OR.
-		 */
-		if (!eval->children->next || (op && xmlStrcmp(op, BAD_CAST "or") == 0)) {
-			xmlNodePtr cur, last;
-
-			for (cur = eval->children, last = *assert; cur; cur = cur->next) {
-				xmlChar *o;
-
-				o = xmlGetProp(cur, BAD_CAST "andOr");
-
-				/* Combine evaluates with the same operation. */
-				if (o && xmlStrcmp(o, op) == 0) {
-					xmlNodePtr c;
-
-					for (c = cur->children; c; c = c->next) {
-						last = xmlAddNextSibling(last, xmlCopyNode(c, 1));
-					}
-				} else {
-					last = xmlAddNextSibling(last, xmlCopyNode(cur, 1));
-				}
-
-				xmlFree(o);
-			}
-
-			xmlFreeNode(eval);
-		/* Otherwise, just add the new OR. */
-		} else {
-			xmlAddNextSibling(*assert, eval);
-		}
-
-		xmlFree(op);
-
-		xmlUnlinkNode(*assert);
-		xmlFreeNode(*assert);
-		*assert = NULL;
-	} else {
-		xmlFreeNode(eval);
-	}
-}
-
 /* Add a dependency from the CCT. */
 static void add_cct_depend(xmlDocPtr doc, xmlNodePtr dep)
 {
@@ -711,55 +609,28 @@ static void add_cct_depend(xmlDocPtr doc, xmlNodePtr dep)
 	xmlFree(xpath);
 
 	if (applic) {
-		xmlXPathContextPtr ctx;
-		xmlXPathObjectPtr obj;
-		xmlChar *v = NULL;
-		char *end = NULL;
+		xmlNodePtr dm_applic;
 
-		ctx = xmlXPathNewContext(doc);
+		dm_applic = xpath_first_node(doc, NULL, BAD_CAST "//applic");
 
-		/* Add dependency tests to assertions that use the dependant values. */
-		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
-			n = xmlStrlen(id) + 70;
-			xpath = malloc(n * sizeof(xmlChar));
-			xmlStrPrintf(xpath, n, "//assert[@applicPropertyIdent='%s' and @applicPropertyType='condition']", id);
-			obj = xmlXPathEvalExpression(xpath, ctx);
-			xmlFree(xpath);
+		if (dm_applic) {
+			xmlXPathContextPtr ctx;
+			xmlXPathObjectPtr obj;
+
+			ctx = xmlXPathNewContext(doc);
+			ctx->node = applic;
+			obj = xmlXPathEvalExpression(BAD_CAST "assert|evaluate", ctx);
 
 			if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 				int i;
 
 				for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-					add_cct_depend_to_assert(&obj->nodesetval->nodeTab[i], id, v, applic);
 				}
 			}
 
 			xmlXPathFreeObject(obj);
+			xmlXPathFreeContext(ctx);
 		}
-
-		xmlXPathFreeContext(ctx);
-
-		/* Handle subdependencies, that is, dependant values which themselves
-		 * have dependencies.
-		 */
-		ctx = xmlXPathNewContext(applic->doc);
-		ctx->node = applic;
-		obj = xmlXPathEvalExpression(BAD_CAST ".//assert[@applicPropertyIdent and @applicPropertyType='condition']", ctx);
-
-		if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-			int i;
-
-			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-				xmlChar *ident;
-
-				ident = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "applicPropertyIdent");
-				add_cct_depends(doc, applic->doc, ident);
-				xmlFree(ident);
-			}
-		}
-
-		xmlXPathFreeObject(obj);
-		xmlXPathFreeContext(ctx);
 	}
 
 	xmlFree(id);
