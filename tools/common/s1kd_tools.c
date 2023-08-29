@@ -1069,3 +1069,157 @@ void rem_delete_elems(xmlDocPtr doc)
 {
 	rem_delete_nodes(xmlDocGetRootElement(doc));
 }
+
+/* Evaluate an applic statement, returning whether it is valid or invalid given
+ * the user-supplied applicability settings.
+ *
+ * If assume is true, undefined attributes and conditions are ignored. This is
+ * primarily useful for determining which elements are not applicable in content
+ * and may be removed.
+ *
+ * If assume is false, undefined attributes or conditions will cause an applic
+ * statement to evaluate as invalid. This is primarily useful for determining
+ * which applic statements and references are unambiguously true (they do not
+ * rely on any undefined attributes or conditions) and therefore may be removed.
+ *
+ * An undefined attribute/condition is a product attribute (ACT) or
+ * condition (CCT) for which a value is asserted in the applic statement but
+ * for which no value was supplied by the user.
+ */
+bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume);
+
+/* Evaluate multiple values for a property */
+static bool eval_multi(xmlNodePtr multi, const char *ident, const char *type, const char *value)
+{
+	xmlNodePtr cur;
+	bool result = false;
+
+	for (cur = multi->children; cur; cur = cur->next) {
+		xmlChar *cur_value;
+		bool in_set;
+
+		cur_value = xmlNodeGetContent(cur);
+		in_set = is_in_set((char *) cur_value, value);
+		xmlFree(cur_value);
+
+		if (in_set) {
+			result = true;
+			break;
+		}
+	}
+
+	return result;
+}
+
+/* Tests whether ident:type=value was defined by the user */
+bool is_applic(xmlNodePtr defs, const char *ident, const char *type, const char *value, bool assume)
+{
+	xmlNodePtr cur;
+
+	bool result = assume;
+
+	if (!(ident && type && value)) {
+		return assume;
+	}
+
+	for (cur = defs->children; cur; cur = cur->next) {
+		char *cur_ident = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		char *cur_type  = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyType");
+		char *cur_value = (char *) xmlGetProp(cur, BAD_CAST "applicPropertyValues");
+
+		bool match = strcmp(cur_ident, ident) == 0 && strcmp(cur_type, type) == 0;
+
+		if (match) {
+			if (cur_value) {
+				result = is_in_set(cur_value, value);
+			} else if (assume) {
+				result = eval_multi(cur, ident, type, value);
+			}
+		}
+
+		xmlFree(cur_ident);
+		xmlFree(cur_type);
+		xmlFree(cur_value);
+
+		if (match) {
+			break;
+		}
+
+	}
+
+	return result;
+}
+
+/* Tests whether an <assert> element is applicable */
+bool eval_assert(xmlNodePtr defs, xmlNodePtr assert, bool assume)
+{
+	xmlNodePtr ident_attr, type_attr, values_attr;
+	char *ident, *type, *values;
+
+	bool ret;
+
+	ident_attr  = xpath_first_node(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	type_attr   = xpath_first_node(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	values_attr = xpath_first_node(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+
+	ident  = (char *) xmlNodeGetContent(ident_attr);
+	type   = (char *) xmlNodeGetContent(type_attr);
+	values = (char *) xmlNodeGetContent(values_attr);
+
+	ret = is_applic(defs, ident, type, values, assume);
+
+	xmlFree(ident);
+	xmlFree(type);
+	xmlFree(values);
+
+	return ret;
+}
+
+enum operator { AND, OR };
+
+/* Test whether an <evaluate> element is applicable. */
+bool eval_evaluate(xmlNodePtr defs, xmlNodePtr evaluate, bool assume)
+{
+	xmlChar *andOr;
+	enum operator op;
+	bool ret = assume;
+	xmlNodePtr cur;
+
+	andOr = xpath_first_value(NULL, evaluate, BAD_CAST "@andOr|@operator");
+
+	if (!andOr) {
+		return false;
+	}
+
+	if (xmlStrcmp(andOr, BAD_CAST "and") == 0) {
+		op = AND;
+	} else {
+		op = OR;
+	}
+
+	xmlFree(andOr);
+
+	for (cur = evaluate->children; cur; cur = cur->next) {
+		if (xmlStrcmp(cur->name, BAD_CAST "assert") == 0 || xmlStrcmp(cur->name, BAD_CAST "evaluate") == 0) {
+			ret = eval_applic(defs, cur, assume);
+
+			if ((op == AND && !ret) || (op == OR && ret)) {
+				break;
+			}
+		}
+	}
+
+	return ret;
+}
+
+/* Generic test for either <assert> or <evaluate> */
+bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume)
+{
+	if (strcmp((char *) node->name, "assert") == 0) {
+		return eval_assert(defs, node, assume);
+	} else if (strcmp((char *) node->name, "evaluate") == 0) {
+		return eval_evaluate(defs, node, assume);
+	}
+
+	return false;
+}
