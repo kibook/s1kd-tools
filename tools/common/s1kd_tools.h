@@ -206,4 +206,16 @@ bool is_cir(const char *path, const bool ignore_del);
 /* Remove elements marked as "delete". */
 void rem_delete_elems(xmlDocPtr doc);
 
+/* Tests whether ident:type=value was defined by the user */
+bool is_applic(xmlNodePtr defs, const char *ident, const char *type, const char *value, bool assume);
+
+/* Tests whether an <assert> element is applicable */
+bool eval_assert(xmlNodePtr defs, xmlNodePtr assert, bool assume);
+
+/* Test whether an <evaluate> element is applicable. */
+bool eval_evaluate(xmlNodePtr defs, xmlNodePtr evaluate, bool assume);
+
+/* Generic test for either <assert> or <evaluate> */
+bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume);
+
 #endif

@@ -14,7 +14,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.2.0"
+#define VERSION "6.2.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -459,87 +459,30 @@ static xmlNodePtr add_redundant_error(xmlNodePtr report, xmlNodePtr node, xmlNod
 	return und;
 }
 
-/* Check that a value of an assertion in a nested applicability annotation is a
- * subset of the values of its parent.
- */
-static int check_nested_applic_val(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, const xmlChar *id, const xmlChar *type, const xmlChar *val, xmlNodePtr prop, const char *path, xmlNodePtr report)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	bool match = false;
-
-	ctx = xmlXPathNewContext(prop->doc);
-	ctx->node = prop;
-
-	obj = xmlXPathEvalExpression(BAD_CAST "enumeration|enum", ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; !match && i < obj->nodesetval->nodeNr; ++i) {
-			xmlChar *vals, *v = NULL;
-			char *end = NULL;
-
-			vals = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
-				BAD_CAST "@applicPropertyValues|@actvalues");
-
-			while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
-				if (is_in_range((char *) val, (char *) v)) {
-					match = true;
-					break;
-				}
-			}
-
-			xmlFree(vals);
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	if (match) {
-		return 0;
-	} else {
-		add_nested_error(report, node, parent, id, type, val, path);
-	}
-
-	return 1;
-}
-
 /* Check that an assertion in a nested applicability annotation is a subset of
  * its parent.
  */
-static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, xmlNodePtr props, const char *path, xmlNodePtr report)
+static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, xmlNodePtr parent_app, const char *path, xmlNodePtr report)
 {
-	xmlChar *id, *type, *vals;
-	xmlNodePtr cur, prop = NULL;
-	int err = 0;
+	xmlNodePtr defs, defs_assert;
+	int err;
 
-	id   = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
-	type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
-	vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
+	xmlChar *id   = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	xmlChar *type = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	xmlChar *vals = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
-	for (cur = props->children; cur && !prop; cur = cur->next) {
-		xmlChar *prop_id, *prop_type;
+	defs = xmlNewNode(NULL, BAD_CAST "applic");
+	defs_assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
+	xmlSetProp(defs_assert, BAD_CAST "applicPropertyIdent", id);
+	xmlSetProp(defs_assert, BAD_CAST "applicPropertyType", type);
+	xmlSetProp(defs_assert, BAD_CAST "applicPropertyValues", vals);
 
-		prop_id = xmlGetProp(cur, BAD_CAST "id");
-		prop_type = xmlGetProp(cur, BAD_CAST "type");
+	err = !eval_applic(defs, xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate"), true);
 
-		if (xmlStrcmp(id, prop_id) == 0 && xmlStrcmp(type, prop_type) == 0) {
-			prop = cur;
-		}
+	xmlFreeNode(defs);
 
-		xmlFree(prop_id);
-		xmlFree(prop_type);
-	}
-
-	if (prop) {
-		xmlChar *v = NULL;
-		char *end = NULL;
-
-		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|~", &end))) {
-			err += check_nested_applic_val(node, parent, assert, id, type, v, prop, path, report);
-		}
+	if (err) {
+		add_nested_error(report, node, parent, id, type, vals, path);
 	}
 
 	xmlFree(id);
@@ -549,85 +492,12 @@ static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNod
 	return err;
 }
 
-/* Add an assertion of a parent applicability annotation to a set in order to
- * check the annotations of its children against it.
- */
-static void check_nested_applic_add_assert(xmlNodePtr props, xmlNodePtr assert)
-{
-	xmlChar *id, *type, *vals;
-	xmlNodePtr cur, node, enu;
-
-	id   = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
-	type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
-	vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
-
-	for (cur = props->children, node = NULL; cur && !node; cur = cur->next) {
-		xmlChar *prop_id, *prop_type;
-
-		prop_id   = xmlGetProp(cur, BAD_CAST "id");
-		prop_type = xmlGetProp(cur, BAD_CAST "type");
-
-		if (xmlStrcmp(prop_id, id) == 0 && xmlStrcmp(prop_type, type) == 0) {
-			node = cur;
-		}
-
-		xmlFree(prop_id);
-		xmlFree(prop_type);
-	}
-
-	if (!node) {
-		node = xmlNewChild(props, NULL, BAD_CAST "prop", NULL);
-		xmlSetProp(node, BAD_CAST "id", id);
-		xmlSetProp(node, BAD_CAST "type", type);
-	}
-
-	for (cur = node->children, enu = NULL; cur && !enu; cur = cur->next) {
-		xmlChar *val;
-
-		val = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValue|@actvalue");
-
-		if (xmlStrcmp(val, vals) == 0) {
-			enu = cur;
-		}
-
-		xmlFree(val);
-	}
-
-	if (!enu) {
-		enu = xmlNewChild(node, NULL, BAD_CAST "enumeration", NULL);
-		xmlSetProp(enu, BAD_CAST "applicPropertyValues", vals);
-	}
-
-	xmlFree(id);
-	xmlFree(type);
-	xmlFree(vals);
-}
-
 /* Check that an applicability annotation is a subset of a given parent annotation. */
 static int check_nested_applic_props(xmlDocPtr doc, const char *path, xmlNodePtr node, xmlNodePtr parent, xmlNodePtr app, xmlNodePtr parent_app, xmlNodePtr report)
 {
-	xmlNodePtr props;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 	int err = 0;
-
-	props = xmlNewNode(NULL, BAD_CAST "props");
-
-	ctx = xmlXPathNewContext(doc);
-	ctx->node = parent_app;
-
-	obj = xmlXPathEvalExpression(BAD_CAST ".//assert", ctx);
-
-	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		int i;
-
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			check_nested_applic_add_assert(props, obj->nodesetval->nodeTab[i]);
-		}
-	}
-
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
 
 	ctx = xmlXPathNewContext(doc);
 	ctx->node = app;
@@ -638,14 +508,12 @@ static int check_nested_applic_props(xmlDocPtr doc, const char *path, xmlNodePtr
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			err += check_nested_applic_assert(node, parent, obj->nodesetval->nodeTab[i], props, path, report);
+			err += check_nested_applic_assert(node, parent, obj->nodesetval->nodeTab[i], parent_app, path, report);
 		}
 	}
 
 	xmlXPathFreeObject(obj);
 	xmlXPathFreeContext(ctx);
-
-	xmlFreeNode(props);
 
 	return err;
 }
