@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.2.3"
+#define VERSION "12.2.4"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -3628,15 +3628,17 @@ static bool annotation_is_superset(xmlNodePtr defs, xmlNodePtr applic, bool simp
 				op   = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
 					BAD_CAST "parent::evaluate/@andOr|parent::evaluate/@operator");
 
-				/* Do not remove assertions from AND evaluations,
-				 * unless they are unambiguously true.
-				 */
-				if (xmlStrcmp(op, BAD_CAST "and") != 0 || eval_assert(defscopy, obj->nodesetval->nodeTab[i], false)) {
-					xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
-					xmlFreeNode(obj->nodesetval->nodeTab[i]);
-					obj->nodesetval->nodeTab[i] = NULL;
+				if (vals && op) {
+					/* Do not remove assertions from AND evaluations,
+					 * unless they are unambiguously true.
+					 */
+					if (xmlStrcmp(op, BAD_CAST "and") != 0 || eval_assert(defscopy, obj->nodesetval->nodeTab[i], false)) {
+						xmlUnlinkNode(obj->nodesetval->nodeTab[i]);
+						xmlFreeNode(obj->nodesetval->nodeTab[i]);
+						obj->nodesetval->nodeTab[i] = NULL;
 
-					undefine_applic(a, vals);
+						undefine_applic(a, vals);
+					}
 				}
 
 				xmlFree(vals);
