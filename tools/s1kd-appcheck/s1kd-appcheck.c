@@ -7,6 +7,7 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/c14n.h>
+#include <libxml/hash.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 #include "s1kd_tools.h"
@@ -14,7 +15,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.2.1"
+#define VERSION "6.3.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -94,6 +95,9 @@ enum appcheckmode { CUSTOM, PCT, ALL, STANDALONE };
 /* Which filenames to print. */
 enum show_filenames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
 
+/* Applicability properties to ignore when validating objects. */
+xmlHashTablePtr ignored_properties = NULL;
+
 /* Applicability check options. */
 struct appcheckopts {
 	char *useract;
@@ -120,37 +124,38 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A, --act <file>       User-specified ACT.");
-	puts("  -a, --all              Validate against all property values.");
-	puts("  -b, --brexcheck        Validate against BREX.");
-	puts("  -C, --cct <file>       User-specified CCT.");
-	puts("  -c, --custom           Perform a customized check.");
-	puts("  -D, --duplicate        Check for duplicate applicability annotations.");
-	puts("  -d, --dir <dir>        Search for ACT/CCT/PCT in <dir>.");
-	puts("  -e, --exec <cmd>       Commands used to validate objects.");
-	puts("  -F, --valid-filenames  List valid files.");
-	puts("  -f, --filenames        List invalid files.");
-	puts("  -h, -?, --help         Show help/usage message.");
-	puts("  -K, --filter <cmd>     Command used to create objects.");
-	puts("  -k, --args <args>      Arguments used to create objects.");
-	puts("  -l, --list             Treat input as list of CSDB objects.");
-	puts("  -N, --omit-issue       Assume issue/inwork numbers are omitted.");
-	puts("  -n, --nested           Check nested applicability annotations.");
-	puts("  -o, --output-valid     Output valid CSDB objects to stdout.");
-	puts("  -P, --pct <file>       User-specified PCT.");
-	puts("  -p, --progress         Display a progress bar.");
-	puts("  -q, --quiet            Quiet mode.");
-	puts("  -R, --redundant        Check for redundant applicability annotations.");
-	puts("  -r, --recursive        Search for ACT/CCT/PCT recursively.");
-	puts("  -s, --strict           Check that all properties are defined.");
-	puts("  -T, --summary          Print a summary of the check.");
-	puts("  -t, --products         Validate against product instances.");
-	puts("  -v, --verbose          Verbose output.");
-	puts("  -x, --xml              Output XML report.");
-	puts("  -~, --dependencies     Check CCT dependencies.");
-	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
-	puts("  --version              Show version information.");
-	puts("  <object>...            CSDB object(s) to check.");
+	puts("  -A, --act <file>        User-specified ACT.");
+	puts("  -a, --all               Validate against all property values.");
+	puts("  -b, --brexcheck         Validate against BREX.");
+	puts("  -C, --cct <file>        User-specified CCT.");
+	puts("  -c, --custom            Perform a customized check.");
+	puts("  -D, --duplicate         Check for duplicate applicability annotations.");
+	puts("  -d, --dir <dir>         Search for ACT/CCT/PCT in <dir>.");
+	puts("  -e, --exec <cmd>        Commands used to validate objects.");
+	puts("  -F, --valid-filenames   List valid files.");
+	puts("  -f, --filenames         List invalid files.");
+	puts("  -h, -?, --help          Show help/usage message.");
+	puts("  -i, --ignore <id:type>  Ignore an applicability property when validating.");
+	puts("  -K, --filter <cmd>      Command used to create objects.");
+	puts("  -k, --args <args>       Arguments used to create objects.");
+	puts("  -l, --list              Treat input as list of CSDB objects.");
+	puts("  -N, --omit-issue        Assume issue/inwork numbers are omitted.");
+	puts("  -n, --nested            Check nested applicability annotations.");
+	puts("  -o, --output-valid      Output valid CSDB objects to stdout.");
+	puts("  -P, --pct <file>        User-specified PCT.");
+	puts("  -p, --progress          Display a progress bar.");
+	puts("  -q, --quiet             Quiet mode.");
+	puts("  -R, --redundant         Check for redundant applicability annotations.");
+	puts("  -r, --recursive         Search for ACT/CCT/PCT recursively.");
+	puts("  -s, --strict            Check that all properties are defined.");
+	puts("  -T, --summary           Print a summary of the check.");
+	puts("  -t, --products          Validate against product instances.");
+	puts("  -v, --verbose           Verbose output.");
+	puts("  -x, --xml               Output XML report.");
+	puts("  -~, --dependencies      Check CCT dependencies.");
+	puts("  -^, --remove-deleted    Validate with elements marked as \"delete\" removed.");
+	puts("  --version               Show version information.");
+	puts("  <object>...             CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1473,14 +1478,37 @@ static int check_object_props(xmlDocPtr doc, const char *path, struct appcheckop
 	return err;
 }
 
+/* Check if a property has been added to the ignord properties table. */
+static bool prop_is_ignored(const xmlChar *id, const xmlChar *type)
+{
+	if (ignored_properties == NULL)
+	{
+		return false;
+	}
+
+	xmlChar *specifier = xmlStrdup(id);
+	specifier = xmlStrcat(specifier, BAD_CAST ":");
+	specifier = xmlStrcat(specifier, type);
+
+	bool is_ignored = xmlHashLookup(ignored_properties, specifier) != NULL;
+
+	xmlFree(specifier);
+
+	return is_ignored;
+}
+
 /* Determine whether a property is used in the inline annotations of an object. */
-static bool prop_is_used(const xmlChar *id, const char *type, xmlDocPtr doc)
+static bool prop_is_used(const xmlChar *id, const xmlChar *type, xmlDocPtr doc)
 {
 	xmlChar *xpath;
 	int n;
 	xmlNodePtr node;
 
-	n = xmlStrlen(id) * 2 + strlen(type) * 2 + 126;
+	if (prop_is_ignored(id, type)) {
+		return false;
+	}
+
+	n = xmlStrlen(id) * 2 + xmlStrlen(type) * 2 + 126;
 	xpath = malloc(n * sizeof(xmlChar));
 	xmlStrPrintf(xpath, n, "(//content|//inlineapplics)//assert[(@applicPropertyIdent='%s' or @actidref='%s') and (@applicPropertyType='%s' or @actreftype='%s')]", id, id, type, type);
 	node = first_xpath_node(doc, NULL, xpath);
@@ -1545,7 +1573,7 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 
 			id = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "id");
 
-			if (prop_is_used(id, "prodattr", doc)) {
+			if (prop_is_used(id, BAD_CAST "prodattr", doc)) {
 				asserts = xmlNewNode(NULL, BAD_CAST "asserts");
 				extract_enumvals(asserts, obj->nodesetval->nodeTab[i], id, false);
 				xmlAddChild(propsets, asserts);
@@ -1570,7 +1598,7 @@ static int check_all_props(xmlDocPtr doc, const char *path, xmlDocPtr act, struc
 
 				id = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "id");
 
-				if (prop_is_used(id, "condition", doc)) {
+				if (prop_is_used(id, BAD_CAST "condition", doc)) {
 					xmlChar *typerefid;
 					xmlChar *xpath;
 					int n;
@@ -1876,11 +1904,21 @@ static void print_stats(xmlDocPtr doc)
 	xsltFreeStylesheet(style);
 }
 
+/* Add a property to the list of ones to ignore while validating. */
+static void add_ignored_property(char *specifier)
+{
+	if (ignored_properties == NULL) {
+		ignored_properties = xmlHashCreate(0);
+	}
+
+	xmlHashAddEntry(ignored_properties, BAD_CAST specifier, ignored_properties);
+}
+
 int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:FfNnK:k:loP:pqRrsTtvx~h?";
+	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtvx~h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -1894,6 +1932,7 @@ int main(int argc, char **argv)
 		{"exec"           , required_argument, 0, 'e'},
 		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
+		{"ignore"         , required_argument, 0, 'i'},
 		{"filter"         , required_argument, 0, 'K'},
 		{"args"           , required_argument, 0, 'k'},
 		{"list"           , no_argument      , 0, 'l'},
@@ -1998,6 +2037,9 @@ int main(int argc, char **argv)
 				break;
 			case 'f':
 				opts.filenames = SHOW_INVALID;
+				break;
+			case 'i':
+				add_ignored_property(optarg);
 				break;
 			case 'K':
 				opts.filter = strdup(optarg);
@@ -2104,6 +2146,8 @@ cleanup:
 	xmlFreeNode(opts.validators);
 	free(search_dir);
 	free(objects);
+
+	if (ignored_properties != NULL) xmlHashFree(ignored_properties, NULL);
 
 	xsltCleanupGlobals();
 	xmlCleanupParser();
