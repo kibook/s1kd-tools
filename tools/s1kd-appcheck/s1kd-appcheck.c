@@ -476,13 +476,17 @@ static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNod
 	xmlChar *type = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
 	xmlChar *vals = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
+	xmlNodePtr parent_app_node;
+
 	defs = xmlNewNode(NULL, BAD_CAST "applic");
 	defs_assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
 	xmlSetProp(defs_assert, BAD_CAST "applicPropertyIdent", id);
 	xmlSetProp(defs_assert, BAD_CAST "applicPropertyType", type);
 	xmlSetProp(defs_assert, BAD_CAST "applicPropertyValues", vals);
 
-	err = !eval_applic(defs, xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate"), true);
+	parent_app_node = xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate");
+
+	err = parent_app_node && !eval_applic(defs, xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate"), true);
 
 	xmlFreeNode(defs);
 

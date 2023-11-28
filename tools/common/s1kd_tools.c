@@ -1215,9 +1215,9 @@ bool eval_evaluate(xmlNodePtr defs, xmlNodePtr evaluate, bool assume)
 /* Generic test for either <assert> or <evaluate> */
 bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume)
 {
-	if (strcmp((char *) node->name, "assert") == 0) {
+	if (xmlStrcmp(node->name, BAD_CAST "assert") == 0) {
 		return eval_assert(defs, node, assume);
-	} else if (strcmp((char *) node->name, "evaluate") == 0) {
+	} else if (xmlStrcmp(node->name, BAD_CAST "evaluate") == 0) {
 		return eval_evaluate(defs, node, assume);
 	}
 
