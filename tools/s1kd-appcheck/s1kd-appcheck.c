@@ -1481,12 +1481,14 @@ static int check_object_props(xmlDocPtr doc, const char *path, struct appcheckop
 /* Check if a property has been added to the ignord properties table. */
 static bool prop_is_ignored(const xmlChar *id, const xmlChar *type)
 {
+	xmlChar *specifier;
+
 	if (ignored_properties == NULL)
 	{
 		return false;
 	}
 
-	xmlChar *specifier = xmlStrdup(id);
+	specifier = xmlStrdup(id);
 	specifier = xmlStrcat(specifier, BAD_CAST ":");
 	specifier = xmlStrcat(specifier, type);
 
