@@ -37,7 +37,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(OUTPUT) dmrl.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
