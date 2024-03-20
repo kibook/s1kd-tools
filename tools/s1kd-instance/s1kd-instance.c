@@ -2584,7 +2584,7 @@ static void clear_perdm_applic(xmlNodePtr defs, int *napplics)
  *
  * Older versions, and the publically documented API, have it as non-const.
  */
-#if LIBXML_VERSION < 20907
+#if LIBXML_VERSION < 20908
 static void clean_entities_callback(void *payload, void *data, xmlChar *name)
 #else
 static void clean_entities_callback(void *payload, void *data, const xmlChar *name)
