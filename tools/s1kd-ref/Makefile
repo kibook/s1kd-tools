@@ -44,7 +44,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) xslt.h
+	rm -f $(OUTPUT) xslt.h elems.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
