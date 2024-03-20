@@ -40,7 +40,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) xsl.h
+	rm -f $(OUTPUT) xsl.h defaults.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
