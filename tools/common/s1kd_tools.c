@@ -844,6 +844,16 @@ void print_progress_bar(float cur, float total)
 	fflush(stderr);
 }
 
+/* Print progress information in the zenity --progress format. */
+void print_zenity_progress(const char *message, float cur, float total)
+{
+	int p;
+
+	p = (int)((cur / total) * 100.0);
+
+	printf("# %s %d%% (%d/%d)\n%d\n", message, p, (int) cur, (int) total, p);
+}
+
 /* Determine if the file is an XML file. */
 static bool is_xml(const char *name)
 {

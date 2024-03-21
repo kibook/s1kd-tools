@@ -164,6 +164,9 @@ bool match_pattern(const xmlChar *value, const xmlChar *pattern);
 /* Display a progress bar. */
 void print_progress_bar(float cur, float total);
 
+/* Print progress information in the zenity --progress format. */
+void print_zenity_progress(const char *message, float cur, float total);
+
 /* Determine if the file is a data module. */
 bool is_dm(const char *name);
 
