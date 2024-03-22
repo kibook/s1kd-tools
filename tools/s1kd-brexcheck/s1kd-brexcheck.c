@@ -2212,7 +2212,7 @@ int main(int argc, char *argv[])
 				print_progress_bar(i, num_dmod_fnames);
 				break;
 			case PROGRESS_ZENITY:
-				print_zenity_progress("Performing BREX check...", i, num_dmod_fnames);
+				print_zenity_progress("BREX check complete.", i, num_dmod_fnames);
 				break;
 		}
 	}

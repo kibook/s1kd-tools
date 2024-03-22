@@ -2154,7 +2154,7 @@ int main(int argc, char **argv)
 				print_progress_bar(i, nobjects);
 				break;
 			case PROGRESS_ZENITY:
-				print_zenity_progress("Performing applicability check...", i, nobjects);
+				print_zenity_progress("Applicability check complete", i, nobjects);
 				break;
 		}
 	}

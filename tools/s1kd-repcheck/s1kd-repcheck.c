@@ -937,7 +937,7 @@ int main(int argc, char **argv)
 				print_progress_bar(i, opts.objects.count);
 				break;
 			case PROGRESS_ZENITY:
-				print_zenity_progress("Performing repository check...", i, opts.objects.count);
+				print_zenity_progress("Repository check complete.", i, opts.objects.count);
 				break;
 		}
 	}
