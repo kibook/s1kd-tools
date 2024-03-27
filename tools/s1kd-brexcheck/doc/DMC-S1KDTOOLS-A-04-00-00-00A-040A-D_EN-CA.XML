@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="00"/>
+        <issueInfo issueNumber="040" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2024" month="03" day="21"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,11 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add experimental XQilla support.</simplePara>
-      </reasonForUpdate>
-      <reasonForUpdate id="rfu-0002" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add -X (--xpath-version) option.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add --zenity-progress option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -55,7 +52,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
+          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
                [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?]
                [<object>...]]]></verbatimText>
         </para>
@@ -207,7 +204,7 @@
                 <para>Specify a list of severity levels for business rules.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>-X, --xpath-version &lt;version&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Force the specified version of XPath to be used when evaluating the object paths of BREX rules.</para>
@@ -229,6 +226,12 @@
               <listItemTerm>--version</listItemTerm>
               <listItemDefinition>
                 <para>Show version information.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItemTerm>--zenity-progress</listItemTerm>
+              <listItemDefinition>
+                <para>Print progress information in the zenity --progress format.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>
@@ -378,8 +381,8 @@
         </levelledPara>
         <levelledPara>
           <title>XPath support</title>
-          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">By default, s1kd-brexcheck supports only XPath 1.0, with partial support for EXSLT functions.</para>
-          <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002">
+          <para>By default, s1kd-brexcheck supports only XPath 1.0, with partial support for EXSLT functions.</para>
+          <para>
             If experimental XPath 2.0 support is enabled at compile-time, s1kd-brexcheck will automatically choose a version of XPath based on the S1000D issue of the BREX data module:
             <definitionList>
               <definitionListItem>
@@ -428,7 +431,7 @@
                 <para>A referenced BREX data module could not be found.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <definitionListItem>
               <listItemTerm>4</listItemTerm>
               <listItemDefinition>
                 <para>The XPath version specified is unsupported.</para>

@@ -15,7 +15,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.3.1"
+#define VERSION "6.4.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -70,6 +70,11 @@
 
 /* Namespace for special elements/attributes. */
 #define S1KD_APPCHECK_NS BAD_CAST "urn:s1kd-tools:s1kd-appcheck"
+
+/* Progress bar formats. */
+#define PROGRESS_OFF 0
+#define PROGRESS_CLI 1
+#define PROGRESS_ZENITY 2
 
 /* Initial maximum number of CSDB object paths. */
 static int OBJECT_MAX = 1;
@@ -155,6 +160,7 @@ static void show_help(void)
 	puts("  -~, --dependencies      Check CCT dependencies.");
 	puts("  -^, --remove-deleted    Validate with elements marked as \"delete\" removed.");
 	puts("  --version               Show version information.");
+	puts("  --zenity-progress       Print progress information in the zenity --progress format.");
 	puts("  <object>...             CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -1957,6 +1963,7 @@ int main(int argc, char **argv)
 		{"xml"            , no_argument      , 0, 'x'},
 		{"dependencies"   , no_argument      , 0, '~'},
 		{"remove-deleted" , no_argument      , 0, '^'},
+		{"zenity-progress", no_argument      , 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -1965,7 +1972,7 @@ int main(int argc, char **argv)
 	bool islist = false;
 	bool xmlout = false;
 	bool show_stats = false;
-	bool show_progress = false;
+	int show_progress = PROGRESS_OFF;
 
 	struct appcheckopts opts = {
 		/* useract */         NULL,
@@ -2007,6 +2014,8 @@ int main(int argc, char **argv)
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
 					goto cleanup;
+				} else if (strcmp(lopts[loptind].name, "zenity-progress") == 0) {
+					show_progress = PROGRESS_ZENITY;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
@@ -2069,7 +2078,7 @@ int main(int argc, char **argv)
 				opts.userpct = strdup(optarg);
 				break;
 			case 'p':
-				show_progress = true;
+				show_progress = PROGRESS_CLI;
 				break;
 			case 'R':
 				opts.check_redundant = true;
@@ -2125,13 +2134,29 @@ int main(int argc, char **argv)
 	for (i = 0; i < nobjects; ++i) {
 		err += check_applic_file(objects[i], &opts, appcheck);
 
-		if (show_progress) {
-			print_progress_bar(i, nobjects);
+		switch (show_progress) {
+			case PROGRESS_OFF:
+				break;
+			case PROGRESS_CLI:
+				print_progress_bar(i, nobjects);
+				break;
+			case PROGRESS_ZENITY:
+				print_zenity_progress("Performing applicability check...", i, nobjects);
+				break;
 		}
 	}
 
-	if (show_progress && nobjects) {
-		print_progress_bar(i, nobjects);
+	if (nobjects) {
+		switch (show_progress) {
+			case PROGRESS_OFF:
+				break;
+			case PROGRESS_CLI:
+				print_progress_bar(i, nobjects);
+				break;
+			case PROGRESS_ZENITY:
+				print_zenity_progress("Applicability check complete", i, nobjects);
+				break;
+		}
 	}
 
 	if (xmlout) {

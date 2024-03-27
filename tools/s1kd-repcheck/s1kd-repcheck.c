@@ -13,7 +13,7 @@
 
 /* Program information. */
 #define PROG_NAME "s1kd-repcheck"
-#define VERSION "1.9.0"
+#define VERSION "1.10.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -48,6 +48,11 @@
 
 /* Exit status codes. */
 #define EXIT_MAX_OBJECTS 2
+
+/* Progress formats. */
+#define PROGRESS_OFF 0
+#define PROGRESS_CLI 1
+#define PROGRESS_ZENITY 2
 
 /* Namespace for special attributes used to extract CIR references. */
 #define S1KD_REPCHECK_NS BAD_CAST "urn:s1kd-tools:s1kd-repcheck"
@@ -693,6 +698,7 @@ static void show_help(void)
 	puts("  -x, --xml              Output XML report.");
 	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
 	puts("  --version              Show version information.");
+	puts("  --zenity-progress      Print progress information in the zenity --progress format.");
 	puts("  <object>               CSDB object(s) to check.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -732,6 +738,7 @@ int main(int argc, char **argv)
 		{"xsl"            , required_argument, 0, 'X'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"remove-deleted" , no_argument      , 0, '^'},
+		{"zenity-progress", no_argument      , 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -739,7 +746,7 @@ int main(int argc, char **argv)
 
 	struct opts opts;
 	bool is_list = false;
-	bool show_progress = false;
+	int show_progress = PROGRESS_OFF;
 	bool find_cir = false;
 	bool show_stats = false;
 	bool xml_report = false;
@@ -771,6 +778,8 @@ int main(int argc, char **argv)
 				if (strcmp(lopts[loptind].name, "version") == 0) {
 					show_version();
 					goto cleanup;
+				} else if (strcmp(lopts[loptind].name, "zenity-progress") == 0) {
+					show_progress = PROGRESS_ZENITY;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
@@ -806,7 +815,7 @@ int main(int argc, char **argv)
 				opts.output_valid = true;
 				break;
 			case 'p':
-				show_progress = true;
+				show_progress = PROGRESS_CLI;
 				break;
 			case 'q':
 				--opts.verbosity;
@@ -908,13 +917,29 @@ int main(int argc, char **argv)
 			err = 1;
 		}
 
-		if (show_progress) {
-			print_progress_bar(i, opts.objects.count);
+		switch (show_progress) {
+			case PROGRESS_OFF:
+				break;
+			case PROGRESS_CLI:
+				print_progress_bar(i, opts.objects.count);
+				break;
+			case PROGRESS_ZENITY:
+				print_zenity_progress("Performing repository check...", i, opts.objects.count);
+				break;
 		}
 	}
 
-	if (show_progress && opts.objects.count > 0) {
-		print_progress_bar(i, opts.objects.count);
+	if (opts.objects.count > 0) {
+		switch (show_progress) {
+			case PROGRESS_OFF:
+				break;
+			case PROGRESS_CLI:
+				print_progress_bar(i, opts.objects.count);
+				break;
+			case PROGRESS_ZENITY:
+				print_zenity_progress("Repository check complete.", i, opts.objects.count);
+				break;
+		}
 	}
 
 	if (xml_report) {

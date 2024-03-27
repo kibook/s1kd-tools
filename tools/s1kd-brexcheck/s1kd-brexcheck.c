@@ -31,8 +31,13 @@
 #include "xqilla/xqilla.h"
 #endif
 
+/* Progress formats. */
+#define PROGRESS_OFF 0
+#define PROGRESS_CLI 1
+#define PROGRESS_ZENITY 2
+
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.9.0"
+#define VERSION "4.10.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -1885,6 +1890,7 @@ static void show_help(void)
 	puts("  -x, --xml                            XML output.");
 	puts("  -^, --remove-deleted                 Check with elements marked as \"delete\" removed.");
 	puts("  --version                            Show version information.");
+	puts("  --zenity-progress                    Prints progress information in the zenity --progress format.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -1927,7 +1933,7 @@ int main(int argc, char *argv[])
 
 	bool use_stdin = false;
 	bool xmlout = false;
-	bool progress = false;
+	int show_progress = PROGRESS_OFF;
 	bool is_list = false;
 	bool use_default_brex = false;
 	bool show_stats = false;
@@ -1977,6 +1983,7 @@ int main(int argc, char *argv[])
 		{"output-valid"   , no_argument      , 0, 'o'},
 		{"xpath-version"  , required_argument, 0, 'X'},
 		{"remove-deleted" , no_argument      , 0, '^'},
+		{"zenity-progress", no_argument      , 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -2005,6 +2012,8 @@ int main(int argc, char *argv[])
 					show_version();
 #endif
 					goto cleanup;
+				} else if (strcmp(lopts[loptind].name, "zenity-progress") == 0) {
+					show_progress = PROGRESS_ZENITY;
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
@@ -2030,7 +2039,7 @@ int main(int argc, char *argv[])
 			case 'S': opts.check_sns = true; break;
 			case 't': opts.strict_sns = true; break;
 			case 'u': opts.unstrict_sns = true; break;
-			case 'p': progress = true; break;
+			case 'p': show_progress = PROGRESS_CLI; break;
 			case 'F': show_fnames = SHOW_VALID; break;
 			case 'f': show_fnames = SHOW_INVALID; break;
 			case 'N': opts.ignore_issue = true; break;
@@ -2177,8 +2186,15 @@ int main(int argc, char *argv[])
 
 		xmlFreeDoc(dmod_doc);
 
-		if (progress) {
-			print_progress_bar(i, num_dmod_fnames);
+		switch (show_progress) {
+			case PROGRESS_OFF:
+				break;
+			case PROGRESS_CLI:
+				print_progress_bar(i, num_dmod_fnames);
+				break;
+			case PROGRESS_ZENITY:
+				print_zenity_progress("Performing BREX check...", i, num_dmod_fnames);
+				break;
 		}
 
 		/* If the referenced BREX was used, reset the BREX data module
@@ -2188,8 +2204,17 @@ int main(int argc, char *argv[])
 			num_brex_fnames = 0;
 	}
 
-	if (progress && num_dmod_fnames) {
-		print_progress_bar(i, num_dmod_fnames);
+	if (num_dmod_fnames) {
+		switch (show_progress) {
+			case PROGRESS_OFF:
+				break;
+			case PROGRESS_CLI:
+				print_progress_bar(i, num_dmod_fnames);
+				break;
+			case PROGRESS_ZENITY:
+				print_zenity_progress("BREX check complete.", i, num_dmod_fnames);
+				break;
+		}
 	}
 
 	if (xmlout) {
