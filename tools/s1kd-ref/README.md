@@ -1,141 +1,138 @@
-NAME
-====
+# NAME
 
 s1kd-ref - Generate XML to reference CSDB objects
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-ref [-cdfgiLlqRrStuvh?] [-$ <issue>] [-s <src>] [-T <opts>]
              [-x <xpath>] [-3 <file>] [-o <dst>] [<code>|<file> ...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-ref* tool generates the XML for S1000D reference elements
 using the specified code or filename. When using a filename, it can
 parse the CSDB object to include the issue, language, and/or title
 information in the reference.
 
-OPTIONS
-=======
+# OPTIONS
 
--$, --issue &lt;issue&gt;  
-Output XML for the specified issue of S1000D.
+  - \-$, --issue \<issue\>  
+    Output XML for the specified issue of S1000D.
 
--c, --content  
-When using the -T option, only transform textual references found in the
-content section of CSDB objects.
+  - \-c, --content  
+    When using the -T option, only transform textual references found in
+    the content section of CSDB objects.
 
--d, --include-date  
-Include the issue date in the reference (target must be a file)
+  - \-d, --include-date  
+    Include the issue date in the reference (target must be a file)
 
--f, --overwrite  
-Overwrite source data module instead of writing to stdout.
+  - \-f, --overwrite  
+    Overwrite source data module instead of writing to stdout.
 
--g, --guess-prefix  
-Accept references which do not include a standard prefix (e.g., "DMC-",
-"PMC-") and guess what they are based on their format and, when using
-the -T option, the XML context in which they occur.
+  - \-g, --guess-prefix  
+    Accept references which do not include a standard prefix (e.g.,
+    "DMC-", "PMC-") and guess what they are based on their format and,
+    when using the -T option, the XML context in which they occur.
 
--h, -?, --help  
-Show the usage message.
+  - \-h, -?, --help  
+    Show the usage message.
 
--i, --include-issue  
-Include the issue information in the reference (target must be a file)
+  - \-i, --include-issue  
+    Include the issue information in the reference (target must be a
+    file)
 
--L, --list  
-Treat input as a list of CSDB objects.
+  - \-L, --list  
+    Treat input as a list of CSDB objects.
 
--l, --include-lang  
-Include the language information in the reference (target must be a
-file)
+  - \-l, --include-lang  
+    Include the language information in the reference (target must be a
+    file)
 
--o, --out &lt;dst&gt;  
-Output to &lt;dst&gt; instead of stdout.
+  - \-o, --out \<dst\>  
+    Output to \<dst\> instead of stdout.
 
--q, --quiet  
-Quiet mode. Do not print errors.
+  - \-q, --quiet  
+    Quiet mode. Do not print errors.
 
--R, --repository-id  
-Generate a `<repositorySourceDmIdent>` for a data module.
+  - \-R, --repository-id  
+    Generate a `<repositorySourceDmIdent>` for a data module.
 
--r, --add  
-Add the generated reference to the source data module's `refs` table and
-output the modified data module to stdout.
+  - \-r, --add  
+    Add the generated reference to the source data module's `refs` table
+    and output the modified data module to stdout.
 
--S, --source-id  
-Generate a `<sourceDmIdent>` (for data modules) or `<sourcePmIdent>`
-(for publication modules).
+  - \-S, --source-id  
+    Generate a `<sourceDmIdent>` (for data modules) or `<sourcePmIdent>`
+    (for publication modules).
 
--s, --source &lt;src&gt;  
-Specify a source data module &lt;src&gt; to add references to when using
-the -r option.
+  - \-s, --source \<src\>  
+    Specify a source data module \<src\> to add references to when using
+    the -r option.
 
--T, --transform &lt;opts&gt;  
-Transform textual references into the appropriate XML within text nodes
-in the XML document(s) specified. The textual references must include
-the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p option is
-specified. &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for
-comment, data module, external publication, ICN, DML, publication
-module, SCORM content package and CSN references respectively. If "all"
-is given, then all types of references will be transformed.
+  - \-T, --transform \<opts\>  
+    Transform textual references into the appropriate XML within text
+    nodes in the XML document(s) specified. The textual references must
+    include the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p
+    option is specified. \<opts\> is a sequence of characters from
+    "CDEGLPSY", for comment, data module, external publication, ICN,
+    DML, publication module, SCORM content package and CSN references
+    respectively. If "all" is given, then all types of references will
+    be transformed.
 
--t, --include-title  
-Include the title in the reference (target must be a file).
+  - \-t, --include-title  
+    Include the title in the reference (target must be a file).
 
--u, --include-url  
-Include the full URL/filename of the reference with the `xlink:href`
-attribute.
+  - \-u, --include-url  
+    Include the full URL/filename of the reference with the `xlink:href`
+    attribute.
 
--v, --verbose  
-Verbose output.
+  - \-v, --verbose  
+    Verbose output.
 
--x, --xpath &lt;xpath&gt;  
-When using the -T option, this specifies which nodes to transform
-textual references in. By default, only the elements which can contain
-each type of reference are considered.
+  - \-x, --xpath \<xpath\>  
+    When using the -T option, this specifies which nodes to transform
+    textual references in. By default, only the elements which can
+    contain each type of reference are considered.
 
--3, --externalpubs &lt;file&gt;  
-Use a custom `.externalpubs` file.
+  - \-3, --externalpubs \<file\>  
+    Use a custom `.externalpubs` file.
 
---version  
-Show version information.
+  - \--version  
+    Show version information.
 
-&lt;code&gt;\|&lt;file&gt;  
-Either a code, including the prefix (DMC, PMC, etc.), or the filename of
-a CSDB object.
+  - \<code\>|\<file\>  
+    Either a code, including the prefix (DMC, PMC, etc.), or the
+    filename of a CSDB object.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.externalpubs` file
---------------------
+## `.externalpubs` file
 
 The `.externalpubs` file contains definitions of external publication
 references. This can be used to generate the XML for an external
@@ -152,8 +149,7 @@ Example of a `.externalpubs` file:
     </externalPubRef>
     </externalPubs>
 
-EXAMPLES
-========
+# EXAMPLES
 
 Reference to data module with data module code:
 

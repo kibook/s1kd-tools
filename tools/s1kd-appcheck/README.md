@@ -1,15 +1,12 @@
-NAME
-====
+# NAME
 
 s1kd-appcheck - Validate applicability of S1000D CSDB objects
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-appcheck [options] [<object>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-appcheck* tool validates the applicability of S1000D CSDB
 objects, detecting potential errors that could occur when the object is
@@ -25,180 +22,181 @@ object, but may still affect it.
 The s1kd-instance and s1kd-validate tools are used by default to perform
 the actual validation.
 
-OPTIONS
-=======
+# OPTIONS
 
--A, --act &lt;file&gt;  
-Specify the ACT to read product attributes from, and to use to find the
-CCT or PCT. This will override the ACT reference within the individual
-objects being validated.
+  - \-A, --act \<file\>  
+    Specify the ACT to read product attributes from, and to use to find
+    the CCT or PCT. This will override the ACT reference within the
+    individual objects being validated.
 
--a, --all  
-Validate objects against all possible combinations of relevant product
-attribute and condition values as defined in the ACT and CCT. Relevant
-product attributes and conditions are those that are used by an object
-with any value.
+  - \-a, --all  
+    Validate objects against all possible combinations of relevant
+    product attribute and condition values as defined in the ACT and
+    CCT. Relevant product attributes and conditions are those that are
+    used by an object with any value.
 
--b, --brexcheck  
-Validate objects with a BREX check (using the s1kd-brexcheck tool) in
-addition to the schema check.
+  - \-b, --brexcheck  
+    Validate objects with a BREX check (using the s1kd-brexcheck tool)
+    in addition to the schema check.
 
--C, --cct &lt;file&gt;  
-Specify the CCT to read conditions from. This will override the CCT
-reference within the ACT.
+  - \-C, --cct \<file\>  
+    Specify the CCT to read conditions from. This will override the CCT
+    reference within the ACT.
 
--c, --custom  
-Perform a customized check. The default standalone applicability check
-is disabled. This can then be combined with the -s option, to only check
-that all product attributes and conditions are defined in the ACT and
-CCT respectively, and/or the -n option, to only check nested
-applicability annotations. If neither of these options are specified, no
-checks will be performed.
+  - \-c, --custom  
+    Perform a customized check. The default standalone applicability
+    check is disabled. This can then be combined with the -s option, to
+    only check that all product attributes and conditions are defined in
+    the ACT and CCT respectively, and/or the -n option, to only check
+    nested applicability annotations. If neither of these options are
+    specified, no checks will be performed.
 
--D, --duplicate  
-Check for duplicate annotations.
+  - \-D, --duplicate  
+    Check for duplicate annotations.
 
--d, --dir &lt;dir&gt;  
-The directory to start searching for ACT/CCT/PCT data modules in. By
-default, the current directory is used.
+  - \-d, --dir \<dir\>  
+    The directory to start searching for ACT/CCT/PCT data modules in. By
+    default, the current directory is used.
 
--e, --exec &lt;cmd&gt;  
-The commands used to validate objects. Multiple commands can be used by
-specifying this option multiple times. The objects will be passed to
-each command on stdin, and the exit status of the command will be used
-to determine if the object is valid (with a non-zero exit status
-indicating it is invalid). This overrides the default commands
-(s1kd-validate, and s1kd-brexcheck if -b is specified).
+  - \-e, --exec \<cmd\>  
+    The commands used to validate objects. Multiple commands can be used
+    by specifying this option multiple times. The objects will be passed
+    to each command on stdin, and the exit status of the command will be
+    used to determine if the object is valid (with a non-zero exit
+    status indicating it is invalid). This overrides the default
+    commands (s1kd-validate, and s1kd-brexcheck if -b is specified).
 
--F, --valid-filenames  
-Print the filenames of valid objects.
+  - \-F, --valid-filenames  
+    Print the filenames of valid objects.
 
--f, --filenames  
-Print the filenames of invalid objects.
+  - \-f, --filenames  
+    Print the filenames of invalid objects.
 
--h, -?, --help  
-Show help/usage message.
+  - \-h, -?, --help  
+    Show help/usage message.
 
--K, --filter &lt;cmd&gt;  
-The command used to filter objects prior to validation. The objects will
-be passed to the command on stdin, and the filters will be supplied as
-arguments in the form of "`-s <ident>:<type>=<value>`". This overrides
-the default command (s1kd-instance).
+  - \-K, --filter \<cmd\>  
+    The command used to filter objects prior to validation. The objects
+    will be passed to the command on stdin, and the filters will be
+    supplied as arguments in the form of "`-s <ident>:<type>=<value>`".
+    This overrides the default command (s1kd-instance).
 
--k, --args &lt;args&gt;  
-The arguments to the filter command when filtering objects prior to
-validation.
+  - \-k, --args \<args\>  
+    The arguments to the filter command when filtering objects prior to
+    validation.
 
--l, --list  
-Treat input as a list of CSDB objects to validate.
+  - \-l, --list  
+    Treat input as a list of CSDB objects to validate.
 
--N, --omit-issue  
-Assume that the issue/inwork numbers are omitted from object filenames
-(they were created with the -N option).
+  - \-N, --omit-issue  
+    Assume that the issue/inwork numbers are omitted from object
+    filenames (they were created with the -N option).
 
--n, --nested  
-Check that all product attribute and condition values used in nested
-applicability annotations are subsets of the values used in their
-parents.
+  - \-n, --nested  
+    Check that all product attribute and condition values used in nested
+    applicability annotations are subsets of the values used in their
+    parents.
 
--o, --output-valid  
-Output valid CSDB objects to stdout.
+  - \-o, --output-valid  
+    Output valid CSDB objects to stdout.
 
--P, --pct &lt;file&gt;  
-Specify the PCT to read product instances from. This will override the
-PCT reference in the ACT.
+  - \-P, --pct \<file\>  
+    Specify the PCT to read product instances from. This will override
+    the PCT reference in the ACT.
 
--p, --progress  
-Display a progress bar.
+  - \-p, --progress  
+    Display a progress bar.
 
--q, --quiet  
-Quiet mode. Error messages will not be printed.
+  - \-q, --quiet  
+    Quiet mode. Error messages will not be printed.
 
--R, --redundant  
-Check for redundant annotations.
+  - \-R, --redundant  
+    Check for redundant annotations.
 
--r, --recursive  
-Search for the ACT/CCT/PCT recursively.
+  - \-r, --recursive  
+    Search for the ACT/CCT/PCT recursively.
 
--s, --strict  
-Check whether product attributes and conditions used by an object are
-declared in the ACT and CCT respectively.
+  - \-s, --strict  
+    Check whether product attributes and conditions used by an object
+    are declared in the ACT and CCT respectively.
 
--T, --summary  
-Print a summary of the check after it completes, including statistics on
-the number of objects that passed/failed the check.
+  - \-T, --summary  
+    Print a summary of the check after it completes, including
+    statistics on the number of objects that passed/failed the check.
 
--t, --products  
-Validate objects against the defined product instances within the PCT.
+  - \-t, --products  
+    Validate objects against the defined product instances within the
+    PCT.
 
--v, --verbose  
-Verbose output. Specify multiple times to increase the verbosity.
+  - \-v, --verbose  
+    Verbose output. Specify multiple times to increase the verbosity.
 
--x, --xml  
-Print an XML report of the check.
+  - \-x, --xml  
+    Print an XML report of the check.
 
--\~, --dependencies  
-Check with CCT dependency tests added to assertions which use the
-dependant values.
+  - \-\~, --dependencies  
+    Check with CCT dependency tests added to assertions which use the
+    dependant values.
 
--^, --remove-deleted  
-Validate objects with elements that have a change type of "delete"
-removed.
+  - \-^, --remove-deleted  
+    Validate objects with elements that have a change type of "delete"
+    removed.
 
---version  
-Show version information.
+  - \--version  
+    Show version information.
 
-&lt;object&gt;...  
-Object(s) to validate.
+  - \--zenity-progress  
+    Print progress information in the zenity --progress format.
+
+  - \<object\>...  
+    Object(s) to validate.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-EXIT STATUS
-===========
+# EXIT STATUS
 
-0  
-The check completed successfully, and all CSDB objects were valid.
+  - 0  
+    The check completed successfully, and all CSDB objects were valid.
 
-1  
-The check completed successfully, but some CSDB objects were invalid.
+  - 1  
+    The check completed successfully, but some CSDB objects were
+    invalid.
 
-2  
-One or more CSDB objects could not be read.
+  - 2  
+    One or more CSDB objects could not be read.
 
-3  
-The number of CSDB objects specified exceeded the available memory.
+  - 3  
+    The number of CSDB objects specified exceeded the available memory.
 
-EXAMPLES
-========
+# EXAMPLES
 
-Standalone validation
----------------------
+## Standalone validation
 
 Consider the following data module snippet:
 
@@ -258,8 +256,7 @@ When the data module is filtered for version A, the first levelled
 paragraph will be removed, which causes the reference to it in the
 second levelled paragraph to become broken.
 
-Full validation
----------------
+## Full validation
 
 Consider the following data module snippet:
 
@@ -375,8 +372,7 @@ In which case, the standalone check will now also detect the error:
     s1kd-appcheck: ERROR: <DM> is invalid when:
     s1kd-appcheck: ERROR:   condition weather = Normal
 
-Nested applicability annotations
---------------------------------
+## Nested applicability annotations
 
 Consider the following data module snippet:
 
@@ -438,8 +434,7 @@ object:
     when prodattr version = C, which is not a subset of the applicability
     of the whole object.
 
-Redundant applicability annotations
------------------------------------
+## Redundant applicability annotations
 
 Consider the following data module snippet:
 
@@ -462,14 +457,15 @@ nested element is redundant:
     s1kd-appcheck: ERROR: <DM>: figure on line 85 has the same
     applicability as its parent proceduralStep on line 83 (app-A)
 
-> **Note**
->
-> Currently, this check only detects when the exact same annotation
-> (with the same ID) is nested within itself. In the future, this should
-> also detect redundant logic between different nested annotations.
+<div class="note">
 
-Duplicate applicability annotations
------------------------------------
+Currently, this check only detects when the exact same annotation (with
+the same ID) is nested within itself. In the future, this should also
+detect redundant logic between different nested annotations.
+
+</div>
+
+## Duplicate applicability annotations
 
 Consider the following data module snippet:
 

@@ -1,17 +1,14 @@
-NAME
-====
+# NAME
 
 s1kd-fmgen - Generate front matter data module contents
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-fmgen [-D <TYPE>] [-F <FMTYPES>] [-I <date>] [-P <PM>]
                [-p <name>=<val> ...] [-t <TYPE>] [-x <XSL>]
                [-,.flqvh?] [<DM>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-fmgen* tool generates the content section for front matter
 data modules from either a standard publication module, or the combined
@@ -20,126 +17,126 @@ use of the combined format, particularly those that list information not
 directly found in the publication module, such as the highlights (HIGH)
 type.
 
-OPTIONS
-=======
+# OPTIONS
 
--,, --dump-fmtypes-xml  
-Dump the built-in `.fmtypes` XML format.
+  - \-,, --dump-fmtypes-xml  
+    Dump the built-in `.fmtypes` XML format.
 
--., --dump-fmtypes  
-Dump the built-in `.fmtypes` simple text format.
+  - \-., --dump-fmtypes  
+    Dump the built-in `.fmtypes` simple text format.
 
--D, --dump-xsl &lt;TYPE&gt;  
-Dump the built-in XSLT used to generate the specified type of front
-matter.
+  - \-D, --dump-xsl \<TYPE\>  
+    Dump the built-in XSLT used to generate the specified type of front
+    matter.
 
--F, --fmtypes &lt;FMTYPES&gt;  
-Specify a custom `.fmtypes` file.
+  - \-F, --fmtypes \<FMTYPES\>  
+    Specify a custom `.fmtypes` file.
 
--f, --overwrite  
-Overwrite the specified front matter data module files after generating
-their content.
+  - \-f, --overwrite  
+    Overwrite the specified front matter data module files after
+    generating their content.
 
--h, -?, --help  
-Show usage message.
+  - \-h, -?, --help  
+    Show usage message.
 
--I, --date &lt;date&gt;  
-Set the issue date of the generated front matter data modules. This can
-be a specific date in the form of "YYYY-MM-DD", "-" for the current
-date, or "pm" to use the issue date of the publication module.
+  - \-I, --date \<date\>  
+    Set the issue date of the generated front matter data modules. This
+    can be a specific date in the form of "YYYY-MM-DD", "-" for the
+    current date, or "pm" to use the issue date of the publication
+    module.
 
--l, --list  
-Treat input (stdin or arguments) as lists of front matter data modules
-to generate content for, rather than data modules themselves. If reading
-list from stdin, the -P option must be used to specify the publication
-module.
+  - \-l, --list  
+    Treat input (stdin or arguments) as lists of front matter data
+    modules to generate content for, rather than data modules
+    themselves. If reading list from stdin, the -P option must be used
+    to specify the publication module.
 
--P, --pm &lt;PM&gt;  
-Publication module or s1kd-flatten(1) PM format file to generate
-contents from. If none is specified, the tool will read from stdin.
+  - \-P, --pm \<PM\>  
+    Publication module or s1kd-flatten(1) PM format file to generate
+    contents from. If none is specified, the tool will read from stdin.
 
--p, --param &lt;name&gt;=&lt;value&gt;  
-Pass a parameter to the XSLT stylesheets used to generate the front
-matter content. Multiple parameters can be specified by using this
-option multiple times.
+  - \-p, --param \<name\>=\<value\>  
+    Pass a parameter to the XSLT stylesheets used to generate the front
+    matter content. Multiple parameters can be specified by using this
+    option multiple times.
+    
+    The following parameters are automatically supplied to any
+    stylesheet, and therefore their names should be considered reserved:
+    
+      - `"type"` - The front matter type name (e.g., HIGH) that was
+        matched in the `.fmtypes` file or specified by the user with the
+        -t option.
 
-The following parameters are automatically supplied to any stylesheet,
-and therefore their names should be considered reserved:
+  - \-q, --quiet  
+    Quiet mode. Do not print errors.
 
--   `"type"` - The front matter type name (e.g., HIGH) that was matched
-    in the `.fmtypes` file or specified by the user with the -t option.
+  - \-t, --type \<TYPE\>  
+    Generate content for this type of front matter. Supported types are:
+    
+      - HIGH - Highlights
+    
+      - LOA - List of abbreviations
+    
+      - LOASD - List of applicable specifications and documentation
+    
+      - LOEDM - List of effective data modules
+    
+      - LOI - List of illustrations
+    
+      - LOS - List of symbols
+    
+      - LOT - List of terms
+    
+      - LOTBL - List of tables
+    
+      - TOC - Table of contents
+    
+      - TP - Title page
 
--q, --quiet  
-Quiet mode. Do not print errors.
+  - \-v, --verbose  
+    Verbose output. Specify multiple times to increase the verbosity.
 
--t, --type &lt;TYPE&gt;  
-Generate content for this type of front matter. Supported types are:
+  - \-x, --xsl \<XSL\>  
+    Use the specified XSLT script to generate the front matter contents
+    instead of the built-in XSLT or the user-configured XSLT from the
+    `.fmtypes` file.
 
--   HIGH - Highlights
+  - \--version  
+    Show version information.
 
--   LOA - List of abbreviations
-
--   LOASD - List of applicable specifications and documentation
-
--   LOEDM - List of effective data modules
-
--   LOI - List of illustrations
-
--   LOS - List of symbols
-
--   LOT - List of terms
-
--   LOTBL - List of tables
-
--   TOC - Table of contents
-
--   TP - Title page
-
--v, --verbose  
-Verbose output. Specify multiple times to increase the verbosity.
-
--x, --xsl &lt;XSL&gt;  
-Use the specified XSLT script to generate the front matter contents
-instead of the built-in XSLT or the user-configured XSLT from the
-`.fmtypes` file.
-
---version  
-Show version information.
-
-&lt;DM&gt;...  
-Front matter data modules to generate content for. If no front matter
-type can be determined for a data module, it will be ignored.
+  - \<DM\>...  
+    Front matter data modules to generate content for. If no front
+    matter type can be determined for a data module, it will be ignored.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.fmtypes` file
----------------
+## `.fmtypes` file
 
 This file specifies a list of info codes to associate with a particular
 type of front matter.
@@ -160,19 +157,19 @@ included, while "`no`" means it will. If this attribute is not
 specified, then a default value will be used based on the type of front
 matter. The following types will ignore deleted content by default:
 
--   LOA
+  - LOA
 
--   LOASD
+  - LOASD
 
--   LOI
+  - LOI
 
--   LOS
+  - LOS
 
--   LOTBL
+  - LOTBL
 
--   TOC
+  - TOC
 
--   TP
+  - TP
 
 By default, the program will search for a file named `.fmtypes` in the
 current directory and parent directories, but any file can be specified
@@ -226,25 +223,25 @@ Entries are chosen in the order they are listed in the `.fmtypes` file.
 An info code which does not specify a variant matches all possible
 variants.
 
-Optional title page elements
-----------------------------
+## Optional title page elements
 
 When re-generating the front matter content for a title page data
 module, optional elements which cannot be derived from the publication
 module (such as the product illustration or bar code) will be copied
 from the source data module when updating it.
 
-Multi-pass transforms
----------------------
+## Multi-pass transforms
 
 Rather than a literal XSLT file, the path specified for the `xsl`
 attribute in the `.fmtypes` file or the -x (--xsl) option may be an
 XProc file which contains a pipeline with multiple stylesheets. This
 allows for multi-pass transformations.
 
-> **Note**
->
-> Only a small subset of XProc is supported at this time.
+<div class="note">
+
+Only a small subset of XProc is supported at this time.
+
+</div>
 
 Example:
 
@@ -269,30 +266,28 @@ Example:
     </p:xslt>
     </p:pipeline>
 
-EXIT STATUS
-===========
+# EXIT STATUS
 
-0  
-No errors.
+  - 0  
+    No errors.
 
-1  
-The date specified with -I is invalid.
+  - 1  
+    The date specified with -I is invalid.
 
-2  
-No front matter types were specified.
+  - 2  
+    No front matter types were specified.
 
-3  
-An unknown front matter type was specified.
+  - 3  
+    An unknown front matter type was specified.
 
-4  
-The resulting front matter content could not be merged in to a data
-module.
+  - 4  
+    The resulting front matter content could not be merged in to a data
+    module.
 
-5  
-The stylesheet specified for a type of front matter was invalid.
+  - 5  
+    The stylesheet specified for a type of front matter was invalid.
 
-EXAMPLE
-=======
+# EXAMPLE
 
 Generate the content for a title page front matter data module and
 overwrite the file:

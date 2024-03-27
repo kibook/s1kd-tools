@@ -1,242 +1,242 @@
-NAME
-====
+# NAME
 
 s1kd-refs - Manage references between CSDB objects
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
               [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
               [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-refs* tool lists external references in CSDB objects,
 optionally matching them to a filename in the CSDB directory hierarchy.
 
 This allows you to:
 
--   obtain a list of dependencies for CSDB objects, such as ICNs, to
+  - obtain a list of dependencies for CSDB objects, such as ICNs, to
     ensure they are delivered together
 
--   check for references to objects which do not exist in the current
+  - check for references to objects which do not exist in the current
     CSDB
 
--   update reference metadata, such as titles, from the matched objects
+  - update reference metadata, such as titles, from the matched objects
 
-OPTIONS
-=======
+# OPTIONS
 
--a, --all  
-List all references, both matched and unmatched.
+  - \-a, --all  
+    List all references, both matched and unmatched.
 
--B, -C, -D, -E, -G, -H, -K, -L, -P, -S, -T, -Y, -Z  
-List references to IPDs, comments, data modules, external publications,
-ICNs, hotspots, CSNs, data management lists, publication modules, SCORM
-content packages, referred fragments, repository source DMs and source
-objects respectively. If none are specified, -BCDEGHKLPSTYZ is assumed.
+  - \-B, -C, -D, -E, -G, -H, -K, -L, -P, -S, -T, -Y, -Z  
+    List references to IPDs, comments, data modules, external
+    publications, ICNs, hotspots, CSNs, data management lists,
+    publication modules, SCORM content packages, referred fragments,
+    repository source DMs and source objects respectively. If none are
+    specified, -BCDEGHKLPSTYZ is assumed.
+    
+    The following long options can also be used for each: --ipd, --com,
+    --dm, --epr, --icn, --hotspot, --csn, --dml, --pm, --smc,
+    --fragment, --repository, --source.
 
-The following long options can also be used for each: --ipd, --com,
---dm, --epr, --icn, --hotspot, --csn, --dml, --pm, --smc, --fragment,
---repository, --source.
+  - \-b, --ipd-sns \<SNS\>  
+    Specify the SNS for non-chapterized IPD data modules, in the form of
+    SYSTEM-SUBSYSTEM-ASSY (for example, "ZD-00-35"). This code is used
+    to resolve non-chapterized CSN references.
+    
+    If "-" is given for \<SNS\>, then the SNS will be derived from
+    current data module.
 
--b, --ipd-sns &lt;SNS&gt;  
-Specify the SNS for non-chapterized IPD data modules, in the form of
-SYSTEM-SUBSYSTEM-ASSY (for example, "ZD-00-35"). This code is used to
-resolve non-chapterized CSN references.
+  - \-c, --content  
+    List references in the `content` section of a CSDB object only.
 
-If "-" is given for &lt;SNS&gt;, then the SNS will be derived from
-current data module.
+  - \-d, --dir \<dir\>  
+    Directory to search for matches to references in. By default, the
+    current directory is used.
 
--c, --content  
-List references in the `content` section of a CSDB object only.
+  - \-e, --exec \<cmd\>  
+    Execute a command for each referenced CSDB object matched. The
+    string "{}" is replaced by the current CSDB object file name
+    everywhere it occurs in the arguments to the command.
 
--d, --dir &lt;dir&gt;  
-Directory to search for matches to references in. By default, the
-current directory is used.
+  - \-F, --overwrite  
+    When using the -U or -X options, overwrite the input objects that
+    have been updated or tagged.
 
--e, --exec &lt;cmd&gt;  
-Execute a command for each referenced CSDB object matched. The string
-"{}" is replaced by the current CSDB object file name everywhere it
-occurs in the arguments to the command.
+  - \-f, --filename  
+    Include the filename of the source object where each reference was
+    found in the output.
 
--F, --overwrite  
-When using the -U or -X options, overwrite the input objects that have
-been updated or tagged.
+  - \-h, -?, --help  
+    Show help/usage message.
 
--f, --filename  
-Include the filename of the source object where each reference was found
-in the output.
+  - \-I, --update-issue  
+    Update the issue number, issue date, language, and title of
+    references to that of the latest matched object. This option implies
+    the -U and -i options.
 
--h, -?, --help  
-Show help/usage message.
+  - \-i, --ignore-issue  
+    Ignore issue info when matching. This will always match the latest
+    issue of an object found, regardless of the issue specified in the
+    reference.
 
--I, --update-issue  
-Update the issue number, issue date, language, and title of references
-to that of the latest matched object. This option implies the -U and -i
-options.
+  - \-J \<ns=URL\>  
+    Registers an XML namespace prefix, which can then be used in the
+    hotspot XPath expression (-j). Multiple namespaces can be registered
+    by specifying this option multiple times.
 
--i, --ignore-issue  
-Ignore issue info when matching. This will always match the latest issue
-of an object found, regardless of the issue specified in the reference.
+  - \-j \<xpath\>  
+    Specify a custom XPath expression to use when matching hotspots (-H)
+    in XML-based ICN formats.
 
--J &lt;ns=URL&gt;  
-Registers an XML namespace prefix, which can then be used in the hotspot
-XPath expression (-j). Multiple namespaces can be registered by
-specifying this option multiple times.
+  - \-k, --ipd-dcv \<pattern\>  
+    Specify a pattern used to determine the disassembly code variant for
+    IPD data modules when resolving CSN references.
+    
+    Within the pattern, the following characters have special meaning:
+    
+      - % - The figure number variant code.
+    
+      - ? - A wildcard that matches any single character.
+    
+    The default pattern is "%", which means the disassembly code variant
+    is exactly the same as the figure number variant. Projects that use
+    a 2- or 3-character disassembly code variant must specify a pattern
+    of the appropriate length in order for their IPD DMs to be matched
+    (for example, "%?" or "%??").
 
--j &lt;xpath&gt;  
-Specify a custom XPath expression to use when matching hotspots (-H) in
-XML-based ICN formats.
+  - \-l, --list  
+    Treat input (stdin or arguments) as lists of filenames of CSDB
+    objects to list references in, rather than CSDB objects themselves.
 
--k, --ipd-dcv &lt;pattern&gt;  
-Specify a pattern used to determine the disassembly code variant for IPD
-data modules when resolving CSN references.
+  - \-m, --strict-match  
+    Be more strict when matching codes of CSDB objects to filenames. By
+    default, the name of a file (minus the extension) only needs to
+    start with the code to be matched. When this option is specified,
+    the name must match the code exactly.
+    
+    For example, the code "ABC" will normally match either of the files
+    "ABC.PDF" or "ABC\_1.PDF", but when strict matching is enabled, it
+    will only match the former.
 
-Within the pattern, the following characters have special meaning:
+  - \-N, --omit-issue  
+    Assume filenames of referenced CSDB objects omit the issue info,
+    i.e. they were created with the -N option to the s1kd-new\* tools.
 
--   % - The figure number variant code.
+  - \-n, --lineno  
+    Include the filename of the source object where each reference was
+    found, and display the line number where the reference occurs in the
+    source file after its filename.
 
--   ? - A wildcard that matches any single character.
+  - \-o, --output-valid  
+    Output valid CSDB objects to stdout.
 
-The default pattern is "%", which means the disassembly code variant is
-exactly the same as the figure number variant. Projects that use a 2- or
-3-character disassembly code variant must specify a pattern of the
-appropriate length in order for their IPD DMs to be matched (for
-example, "%?" or "%??").
+  - \-q, --quiet  
+    Quiet mode. Errors are not printed.
 
--l, --list  
-Treat input (stdin or arguments) as lists of filenames of CSDB objects
-to list references in, rather than CSDB objects themselves.
+  - \-R, --recursively  
+    List references in matched objects recursively.
 
--m, --strict-match  
-Be more strict when matching codes of CSDB objects to filenames. By
-default, the name of a file (minus the extension) only needs to start
-with the code to be matched. When this option is specified, the name
-must match the code exactly.
+  - \-r, --recursive  
+    Search for matches to references in directories recursively.
 
-For example, the code "ABC" will normally match either of the files
-"ABC.PDF" or "ABC\_1.PDF", but when strict matching is enabled, it will
-only match the former.
+  - \-s, --include-src  
+    Include the source object as a reference. This is helpful when the
+    output of this tool is used to apply some operation to a source
+    object and all its dependencies together.
 
--N, --omit-issue  
-Assume filenames of referenced CSDB objects omit the issue info, i.e.
-they were created with the -N option to the s1kd-new\* tools.
+  - \-t, --format \<fmt\>  
+    Specify a custom format for printed references. \<fmt\> is a format
+    string, where the following variables can be given:
+    
+      - %file% - The filename of the referenced object (nothing is
+        printed if no file is matched).
+    
+      - %line% - The line number where the reference occurs in the
+        source.
+    
+      - %ref% - The reference. May be a code (if no file is matched), a
+        file name (for objects where a file is matched) or a file name +
+        fragment name.
+    
+      - %src% - The source of the reference.
+    
+      - %xpath% - The XPath denoting where the reference occurs in the
+        source.
+    
+    For example, `-t '%src% (%line%): %ref%'` is equivalent to the -n
+    option.
 
--n, --lineno  
-Include the filename of the source object where each reference was
-found, and display the line number where the reference occurs in the
-source file after its filename.
+  - \-U, --update  
+    Update the title of matched references from the corresponding
+    object.
 
--o, --output-valid  
-Output valid CSDB objects to stdout.
+  - \-u, --unmatched  
+    Show only unmatched reference errors, or unmatched codes if combined
+    with the -a option.
 
--q, --quiet  
-Quiet mode. Errors are not printed.
+  - \-v, --verbose  
+    Verbose output. Specify multiple times to increase the verbosity.
 
--R, --recursively  
-List references in matched objects recursively.
+  - \-w, --where-used  
+    Instead of listing references contained within specified objects,
+    list places within other objects where the specified objects are
+    referenced.
+    
+    In this case, \<object\> may also be a code (with the appropriate
+    prefix) instead of an actual file. For example: `s1kd-refs -w
+    DMC-TEST-A-00-00-00-00A-040A-D`
 
--r, --recursive  
-Search for matches to references in directories recursively.
+  - \-X, --tag-unmatched  
+    Tag unmatched references with the processing instruction
+    `<?unmatched?>`.
 
--s, --include-src  
-Include the source object as a reference. This is helpful when the
-output of this tool is used to apply some operation to a source object
-and all its dependencies together.
+  - \-x, --xml  
+    Output a detailed XML report instead of plain text messages.
 
--t, --format &lt;fmt&gt;  
-Specify a custom format for printed references. &lt;fmt&gt; is a format
-string, where the following variables can be given:
+  - \-3, --externalpubs \<file\>  
+    Use a custom `.externalpubs` file.
 
--   %file% - The filename of the referenced object (nothing is printed
-    if no file is matched).
+  - \-^, --remove-deleted  
+    List references with elements that have a change type of "delete"
+    removed.
 
--   %line% - The line number where the reference occurs in the source.
+  - \--version  
+    Show version information.
 
--   %ref% - The reference. May be a code (if no file is matched), a file
-    name (for objects where a file is matched) or a file name + fragment
-    name.
-
--   %src% - The source of the reference.
-
--   %xpath% - The XPath denoting where the reference occurs in the
-    source.
-
-For example, `-t '%src% (%line%): %ref%'` is equivalent to the -n
-option.
-
--U, --update  
-Update the title of matched references from the corresponding object.
-
--u, --unmatched  
-Show only unmatched reference errors, or unmatched codes if combined
-with the -a option.
-
--v, --verbose  
-Verbose output. Specify multiple times to increase the verbosity.
-
--w, --where-used  
-Instead of listing references contained within specified objects, list
-places within other objects where the specified objects are referenced.
-
-In this case, &lt;object&gt; may also be a code (with the appropriate
-prefix) instead of an actual file. For example:
-`s1kd-refs -w DMC-TEST-A-00-00-00-00A-040A-D`
-
--X, --tag-unmatched  
-Tag unmatched references with the processing instruction
-`<?unmatched?>`.
-
--x, --xml  
-Output a detailed XML report instead of plain text messages.
-
--3, --externalpubs &lt;file&gt;  
-Use a custom `.externalpubs` file.
-
--^, --remove-deleted  
-List references with elements that have a change type of "delete"
-removed.
-
---version  
-Show version information.
-
-&lt;object&gt;...  
-CSDB object(s) to list references in. If none are specified, the tool
-will read from stdin.
+  - \<object\>...  
+    CSDB object(s) to list references in. If none are specified, the
+    tool will read from stdin.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.externalpubs` file
---------------------
+## `.externalpubs` file
 
 The `.externalpubs` file contains definitions of external publication
 references. This can be used to update external publication references
@@ -260,18 +260,17 @@ Example of a `.externalpubs` file:
 External publication references will be updated whether they are matched
 to a file or not.
 
-Hotspot matching (-H)
----------------------
+## Hotspot matching (-H)
 
 Hotspots can be matched in XML-based ICN formats, such as SVG or X3D. By
 default, matching is based on the APS ID of the hotspot and the
 following attributes:
 
-SVG  
-`@id`
+  - SVG  
+    `@id`
 
-X3D  
-`@DEF`
+  - X3D  
+    `@DEF`
 
 If hotspots are identified in a different way in a project's ICNs, a
 custom XPath expression can be specified with the -j option. In this
@@ -279,38 +278,34 @@ XPath expression, the variable `$id` represents the hotspot APS ID:
 
     $ s1kd-refs -H -j "//*[@attr = $id]" <DM>
 
-EXIT STATUS
-===========
+# EXIT STATUS
 
-0  
-No errors, all references were matched.
+  - 0  
+    No errors, all references were matched.
 
-1  
-Some references were unmatched.
+  - 1  
+    Some references were unmatched.
 
-2  
-The number of objects found in a recursive check (-R) exceeded the
-available memory.
+  - 2  
+    The number of objects found in a recursive check (-R) exceeded the
+    available memory.
 
-3  
-stdin did not contain valid XML and not in list mode (-l).
+  - 3  
+    stdin did not contain valid XML and not in list mode (-l).
 
-4  
-The non-chapterized SNS specified (-b) is not valid.
+  - 4  
+    The non-chapterized SNS specified (-b) is not valid.
 
-EXAMPLES
-========
+# EXAMPLES
 
-General
--------
+## General
 
     $ s1kd-refs DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
       DMC-EX-A-00-00-00-00A-022A-D_001-00_EN-CA.XML
       DMC-EX-A-01-00-00-00A-040A-D_000-01_EN-CA.XML
       ICN-12345-00001-001-01.JPG
 
-CSN references
---------------
+## CSN references
 
 These examples are based on the following CSN reference:
 

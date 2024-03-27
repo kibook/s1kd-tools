@@ -1,161 +1,160 @@
-NAME
-====
+# NAME
 
 s1kd-repcheck - Validate CIR references in S1000D CSDB objects
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-repcheck [options] [<objects>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-repcheck* tool validates references to Common Information
 Repository (CIR) items within S1000D CSDB objects. Any CIR references
 which cannot be resolved to a specification within a CIR data module
 will cause the tool to report an error.
 
-OPTIONS
-=======
+# OPTIONS
 
--A, --all-refs  
-Validate indirect tool/supply/part CIR references using the element
-`<identNumber>`. Normally, only the direct reference elements
-`<toolRef>`, `<supplyRef>` and `<partRef>` are validated.
+  - \-A, --all-refs  
+    Validate indirect tool/supply/part CIR references using the element
+    `<identNumber>`. Normally, only the direct reference elements
+    `<toolRef>`, `<supplyRef>` and `<partRef>` are validated.
 
--a, --all  
-In addition to CIR data modules specified with -R or explicitly linked
-in CIR references, allow CIR references to be resolved against any CIR
-data modules that were specified as objects to check.
+  - \-a, --all  
+    In addition to CIR data modules specified with -R or explicitly
+    linked in CIR references, allow CIR references to be resolved
+    against any CIR data modules that were specified as objects to
+    check.
 
--D, --dump-xsl  
-Dump the built-in XSLT used to extract CIR references.
+  - \-D, --dump-xsl  
+    Dump the built-in XSLT used to extract CIR references.
 
--d, --dir &lt;dir&gt;  
-The directory to start searching for CIR data modules in. By default,
-the current directory is used.
+  - \-d, --dir \<dir\>  
+    The directory to start searching for CIR data modules in. By
+    default, the current directory is used.
 
--F, --valid-filenames  
-Print the filenames of valid objects.
+  - \-F, --valid-filenames  
+    Print the filenames of valid objects.
 
--f, --filenames  
-Print the filenames of invalid objects.
+  - \-f, --filenames  
+    Print the filenames of invalid objects.
 
--h, -?, --help  
-Show help/usage message.
+  - \-h, -?, --help  
+    Show help/usage message.
 
--L, --list-refs  
-List CIR references found in objects instead of validating them.
+  - \-L, --list-refs  
+    List CIR references found in objects instead of validating them.
 
--l, --list  
-Treat input as a list of CSDB objects to check.
+  - \-l, --list  
+    Treat input as a list of CSDB objects to check.
 
--N, --omit-issue  
-Assume that the issue/inwork numbers are omitted from object filenames
-(they were created with the -N option).
+  - \-N, --omit-issue  
+    Assume that the issue/inwork numbers are omitted from object
+    filenames (they were created with the -N option).
 
--o, --output-valid  
-Output valid CSDB objects to stdout.
+  - \-o, --output-valid  
+    Output valid CSDB objects to stdout.
 
--p, --progress  
-Display a progress bar.
+  - \-p, --progress  
+    Display a progress bar.
 
--q, --quiet  
-Quiet mode. Error messages will not be printed.
+  - \-q, --quiet  
+    Quiet mode. Error messages will not be printed.
 
--R, --cir &lt;CIR&gt;  
-A CIR to resolve references in CSDB objects against. Multiple CIRs can
-be specified by using this option multiple times.
+  - \-R, --cir \<CIR\>  
+    A CIR to resolve references in CSDB objects against. Multiple CIRs
+    can be specified by using this option multiple times.
+    
+    If "\*" is given for \<CIR\>, the tool will search for CIR data
+    modules automatically.
 
-If "\*" is given for &lt;CIR&gt;, the tool will search for CIR data
-modules automatically.
+  - \-r, --recursive  
+    Search for CIR data modules recursively.
 
--r, --recursive  
-Search for CIR data modules recursively.
+  - \-T, --summary  
+    Print a summary of the check after it completes, including
+    statistics on the number of objects that passed/failed the check.
 
--T, --summary  
-Print a summary of the check after it completes, including statistics on
-the number of objects that passed/failed the check.
+  - \-t, --type \<type\>  
+    Validate or list only CIR references of the specified type. The
+    built-in types are:
+    
+      - acp (Access point)
+    
+      - app (Applicability annotation)
+    
+      - caut (Caution)
+    
+      - cbr (Circuit breaker)
+    
+      - cin (Control/Indicator)
+    
+      - ent (Enterprise)
+    
+      - fin (Functional item)
+    
+      - part
+    
+      - supply
+    
+      - tool
+    
+      - warn (Warning)
+    
+      - zone
 
--t, --type &lt;type&gt;  
-Validate or list only CIR references of the specified type. The built-in
-types are:
+  - \-v, --verbose  
+    Verbose output. Specify multiple times to increase the verbosity.
 
--   acp (Access point)
+  - \-X, --xsl \<file\>  
+    Use custom XSLT to extract CIR references.
 
--   app (Applicability annotation)
+  - \-x, --xml  
+    Print an XML report of the check.
 
--   caut (Caution)
+  - \-^, --remove-deleted  
+    Validate with elements that have a change type of "delete" removed.
+    CIR data modules with an issue type of "deleted" will also be
+    ignored in the automatic search when this option is specified.
 
--   cbr (Circuit breaker)
+  - \--version  
+    Show version information.
 
--   cin (Control/Indicator)
+  - \--zenity-progress  
+    Print progress information in the zenity --progress format.
 
--   ent (Enterprise)
-
--   fin (Functional item)
-
--   part
-
--   supply
-
--   tool
-
--   warn (Warning)
-
--   zone
-
--v, --verbose  
-Verbose output. Specify multiple times to increase the verbosity.
-
--X, --xsl &lt;file&gt;  
-Use custom XSLT to extract CIR references.
-
--x, --xml  
-Print an XML report of the check.
-
--^, --remove-deleted  
-Validate with elements that have a change type of "delete" removed. CIR
-data modules with an issue type of "deleted" will also be ignored in the
-automatic search when this option is specified.
-
---version  
-Show version information.
-
-&lt;object&gt;...  
-Object(s) to check CIR references in.
+  - \<object\>...  
+    Object(s) to check CIR references in.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-Custom XSLT (-X)
-----------------
+## Custom XSLT (-X)
 
 What elements are extracted as CIR references for validating, and how
 they are validated, can be configured through a custom XSLT script
@@ -164,15 +163,16 @@ specified with the -X (--xsl) option.
 The custom XSLT script should add the following attributes to elements
 which will be validated as CIR references:
 
-`type`  
-A name for the type of CIR reference.
+  - `type`  
+    A name for the type of CIR reference.
 
-`name`  
-A descriptive name for the CIR reference that can be used in reports.
+  - `name`  
+    A descriptive name for the CIR reference that can be used in
+    reports.
 
-`test`  
-An XPath expression used to match the corresponding CIR identification
-element.
+  - `test`  
+    An XPath expression used to match the corresponding CIR
+    identification element.
 
 The namespace for these attributes must be:
 `urn:s1kd-tools:s1kd-repcheck`
@@ -227,21 +227,20 @@ The built-in XSLT for extracting CIR references can be dumped as a
 starting point for a custom script by specifying the -D (--dump-xsl)
 option.
 
-EXIT STATUS
-===========
+# EXIT STATUS
 
-0  
-The check completed successfully, and all CIR references were resolved.
+  - 0  
+    The check completed successfully, and all CIR references were
+    resolved.
 
-1  
-The check completed successfully, but some CIR references could not be
-resolved.
+  - 1  
+    The check completed successfully, but some CIR references could not
+    be resolved.
 
-2  
-The number of CSDB objects specified exceeded the available memory.
+  - 2  
+    The number of CSDB objects specified exceeded the available memory.
 
-EXAMPLE
-=======
+# EXAMPLE
 
 Part repository:
 

@@ -1,150 +1,145 @@
-NAME
-====
+# NAME
 
 s1kd-newcom - Create a new S1000D comment.
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-newcom [options]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-newcom* tool creates a new S1000D comment with the code and
 metadata specified.
 
-OPTIONS
-=======
+# OPTIONS
 
--\#, --code &lt;code&gt;  
-The code of the comment, in the form of
-MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.
+  - \-\#, --code \<code\>  
+    The code of the comment, in the form of
+    MODELIDENTCODE-SENDERIDENT-YEAR-SEQ-TYPE.
 
--$, --issue &lt;issue&gt;  
-Specify which issue of S1000D to use. Currently supported issues are:
+  - \-$, --issue \<issue\>  
+    Specify which issue of S1000D to use. Currently supported issues
+    are:
+    
+      - 5.0 (default)
+    
+      - 4.2
+    
+      - 4.1
+    
+      - 4.0
+    
+      - 3.0
+    
+      - 2.3
+    
+      - 2.2
+    
+      - 2.1
+    
+      - 2.0
 
--   5.0 (default)
+  - \-@, --out \<path\>  
+    Save the new comment to \<path\>. If \<path\> is an existing
+    directory, the comment will be created in it instead of the current
+    directory. Otherwise, the comment will be saved as the filename
+    \<path\> instead of being automatically named.
 
--   4.2
+  - \-%, --templates \<dir\>  
+    Use the XML template in the specified directory instead of the
+    built-in template. The template must be named `comment.xml` inside
+    \<dir\> and must conform to the default S1000D issue (5.0).
 
--   4.1
+  - \-\~, --dump-templates \<dir\>  
+    Dump the built-in XML template to the specified directory.
 
--   4.0
+  - \-b, --brex \<BREX\>  
+    BREX data module code.
 
--   3.0
+  - \-C, --country \<country\>  
+    The country ISO code of the new comment.
 
--   2.3
+  - \-c, --security \<sec\>  
+    The security classification of the new comment.
 
--   2.2
+  - \-d, --defaults \<file\>  
+    Specify the `.defaults` file name.
 
--   2.1
+  - \-f, --overwrite  
+    Overwrite existing file.
 
--   2.0
+  - \-h, -?, --help  
+    Show help/usage message.
 
--@, --out &lt;path&gt;  
-Save the new comment to &lt;path&gt;. If &lt;path&gt; is an existing
-directory, the comment will be created in it instead of the current
-directory. Otherwise, the comment will be saved as the filename
-&lt;path&gt; instead of being automatically named.
+  - \-I, --date \<date\>  
+    The issue date of the new comment in the form of YYYY-MM-DD.
 
--%, --templates &lt;dir&gt;  
-Use the XML template in the specified directory instead of the built-in
-template. The template must be named `comment.xml` inside &lt;dir&gt;
-and must conform to the default S1000D issue (5.0).
+  - \-L, --language \<lang\>  
+    The language ISO code of the new comment.
 
--\~, --dump-templates &lt;dir&gt;  
-Dump the built-in XML template to the specified directory.
+  - \-m, --remarks \<remarks\>  
+    Set the remarks for the new comment.
 
--b, --brex &lt;BREX&gt;  
-BREX data module code.
+  - \-o, --origname \<orig\>  
+    The enterprise name of the originator of the comment.
 
--C, --country &lt;country&gt;  
-The country ISO code of the new comment.
+  - \-P, --priority \<code\>  
+    The priority code of the new comment.
 
--c, --security &lt;sec&gt;  
-The security classification of the new comment.
+  - \-p, --prompt  
+    Prompt the user for values left unspecified.
 
--d, --defaults &lt;file&gt;  
-Specify the `.defaults` file name.
+  - \-q, --quiet  
+    Do not report an error when the file already exists.
 
--f, --overwrite  
-Overwrite existing file.
+  - \-r, --response \<type\>  
+    The response type of the new comment.
 
--h, -?, --help  
-Show help/usage message.
+  - \-t, --title \<title\>  
+    The title of the new comment.
 
--I, --date &lt;date&gt;  
-The issue date of the new comment in the form of YYYY-MM-DD.
+  - \-v, --verbose  
+    Print the file name of the newly created comment.
 
--L, --language &lt;lang&gt;  
-The language ISO code of the new comment.
+  - \-z, --issue-type \<type\>  
+    The issue type of the new comment.
 
--m, --remarks &lt;remarks&gt;  
-Set the remarks for the new comment.
-
--o, --origname &lt;orig&gt;  
-The enterprise name of the originator of the comment.
-
--P, --priority &lt;code&gt;  
-The priority code of the new comment.
-
--p, --prompt  
-Prompt the user for values left unspecified.
-
--q, --quiet  
-Do not report an error when the file already exists.
-
--r, --response &lt;type&gt;  
-The response type of the new comment.
-
--t, --title &lt;title&gt;  
-The title of the new comment.
-
--v, --verbose  
-Print the file name of the newly created comment.
-
--z, --issue-type &lt;type&gt;  
-The issue type of the new comment.
-
---version  
-Show version information.
+  - \--version  
+    Show version information.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.defaults` file
-----------------
+## `.defaults` file
 
 Refer to s1kd-newdm(1) for information on the `.defaults` file which is
 used by all the s1kd-new\* commands.
 
-EXAMPLE
-=======
+# EXAMPLE
 
     $ s1kd-newcom -# EX-12345-2018-00001-Q

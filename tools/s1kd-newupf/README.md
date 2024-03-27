@@ -1,108 +1,103 @@
-NAME
-====
+# NAME
 
 s1kd-newupf - Create a new data update file
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-newupf [options] <SOURCE> <TARGET>
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-newupf* tool creates a new S1000D data update file for two
 specified issues of a CIR data module. Changes to items between the
 source and target issues of the CIR are recorded in the resulting UPF,
 along with update instructions.
 
-OPTIONS
-=======
+# OPTIONS
 
--$, --issue &lt;issue&gt;  
-Specify which issue of S1000D to use. Currently supported issues are:
+  - \-$, --issue \<issue\>  
+    Specify which issue of S1000D to use. Currently supported issues
+    are:
+    
+      - 5.0 (default)
+    
+      - 4.2
+    
+      - 4.1
 
--   5.0 (default)
+  - \-@, --out \<path\>  
+    Save the new update file to \<path\>. If \<path\> is an existing
+    directory, the update file will be created in it instead of the
+    current directory. Otherwise, the update file will be saved as the
+    filename \<path\> instead of being automatically named.
 
--   4.2
+  - \-%, --templates \<dir\>  
+    Use XML template in the specified directory instead of the built-in
+    template. The template must be named `update.xml` in the directory
+    \<dir\>, and must conform to the default S1000D issue of this tool
+    (5.0).
 
--   4.1
+  - \-\~, --dump-templates \<dir\>  
+    Dump the built-in XML template to the specified directory.
 
--@, --out &lt;path&gt;  
-Save the new update file to &lt;path&gt;. If &lt;path&gt; is an existing
-directory, the update file will be created in it instead of the current
-directory. Otherwise, the update file will be saved as the filename
-&lt;path&gt; instead of being automatically named.
+  - \-d, --defaults \<file\>  
+    Specify the `.defaults` file name.
 
--%, --templates &lt;dir&gt;  
-Use XML template in the specified directory instead of the built-in
-template. The template must be named `update.xml` in the directory
-&lt;dir&gt;, and must conform to the default S1000D issue of this tool
-(5.0).
+  - \-f, --overwrite  
+    Overwrite existing file.
 
--\~, --dump-templates &lt;dir&gt;  
-Dump the built-in XML template to the specified directory.
+  - \-h, -?, --help  
+    Show help/usage message.
 
--d, --defaults &lt;file&gt;  
-Specify the `.defaults` file name.
+  - \-q, --quiet  
+    Do not report an error when the file already exists.
 
--f, --overwrite  
-Overwrite existing file.
+  - \-v, --verbose  
+    Print the file name of the newly created data update file.
 
--h, -?, --help  
-Show help/usage message.
+  - \--version  
+    Show version information.
 
--q, --quiet  
-Do not report an error when the file already exists.
+  - \<SOURCE\>  
+    The source (original) issue of the CIR data module.
 
--v, --verbose  
-Print the file name of the newly created data update file.
-
---version  
-Show version information.
-
-&lt;SOURCE&gt;  
-The source (original) issue of the CIR data module.
-
-&lt;TARGET&gt;  
-The target (updated) issue of the CIR data module.
+  - \<TARGET\>  
+    The target (updated) issue of the CIR data module.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.defaults` file
-----------------
+## `.defaults` file
 
 Refer to s1kd-newdm(1) for information on the `.defaults` file which is
 used by all the s1kd-new\* tools.
 
-EXAMPLE
-=======
+# EXAMPLE
 
     $ s1kd-newupf \
         DMC-EX-A-00-00-00-00A-00GA-D_001-00_EN-CA.XML \

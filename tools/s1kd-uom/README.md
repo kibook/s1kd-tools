@@ -1,138 +1,134 @@
-NAME
-====
+# NAME
 
 s1kd-uom - Convert units of measure in quantity data
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-uom [-dflqv,.h?] [-D <fmt>] [-F <fmt>]
              [-u <uom> -t <uom> [-e <expr>] [-F <fmt>] ...]
              [-s <name>|-S <path> ...] [-U <path>] [-p <fmt> [-P <path>]]
              [<object>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-uom* tool converts between specified units of measure in
 quantity data, for example, to automatically localize units of measure
 in data modules.
 
-OPTIONS
-=======
+# OPTIONS
 
--D, --duplicate-format &lt;fmt&gt;  
-Specify a custom format for duplicating quantities (-d). The '%'
-character acts as a placeholder for the duplicate quantity value. The
-default format for -d is equivalent to `-D ' (%)'`.
+  - \-D, --duplicate-format \<fmt\>  
+    Specify a custom format for duplicating quantities (-d). The '%'
+    character acts as a placeholder for the duplicate quantity value.
+    The default format for -d is equivalent to `-D ' (%)'`.
 
--d, --duplicate  
-When converting, instead of overwriting the original quantity, include
-the converted quantity after the original in parenthesis. For example,
-"200 mm" when converting mm to in would become "200 mm (7.87 in)".
+  - \-d, --duplicate  
+    When converting, instead of overwriting the original quantity,
+    include the converted quantity after the original in parenthesis.
+    For example, "200 mm" when converting mm to in would become "200 mm
+    (7.87 in)".
 
--e, --formula &lt;expr&gt;  
-Specify the formula for a conversion, given as an XPath expression.
+  - \-e, --formula \<expr\>  
+    Specify the formula for a conversion, given as an XPath expression.
 
--F, --format &lt;fmt&gt;  
-Specify the format for quantity values. When used before -u, this
-specifies the default format for all conversions. Otherwise, this
-specifies the format for each individual conversion. Formats specified
-for individual conversions override the default format set for all
-conversions.
+  - \-F, --format \<fmt\>  
+    Specify the format for quantity values. When used before -u, this
+    specifies the default format for all conversions. Otherwise, this
+    specifies the format for each individual conversion. Formats
+    specified for individual conversions override the default format set
+    for all conversions.
 
--f, --overwrite  
-Overwrite input CSDB objects.
+  - \-f, --overwrite  
+    Overwrite input CSDB objects.
 
--h, -?, --help  
-Show help/usage message.
+  - \-h, -?, --help  
+    Show help/usage message.
 
--l, --list  
-Treat input (stdin or arguments) as lists of filenames of CSDB objects
-to list references in, rather than CSDB objects themselves.
+  - \-l, --list  
+    Treat input (stdin or arguments) as lists of filenames of CSDB
+    objects to list references in, rather than CSDB objects themselves.
 
--P, --uomdisplay &lt;path&gt;  
-Use a custom `.uomdisplay` file.
+  - \-P, --uomdisplay \<path\>  
+    Use a custom `.uomdisplay` file.
 
--p, --preformat &lt;fmt&gt;  
-Preformat quantity data to the specified decimal format. The built-in
-formats are:
+  - \-p, --preformat \<fmt\>  
+    Preformat quantity data to the specified decimal format. The
+    built-in formats are:
+    
+      - SI - comma for decimal separator, space for grouping
+    
+      - euro - comma for decimal separator, full-stop for grouping
+    
+      - imperial - full-stop for decimal separator, comma for grouping
 
--   SI - comma for decimal separator, space for grouping
+  - \-q, --quiet  
+    Quiet mode. Errors are not printed.
 
--   euro - comma for decimal separator, full-stop for grouping
+  - \-S, --set \<path\>  
+    Apply a set of conversions defined in an XML file.
 
--   imperial - full-stop for decimal separator, comma for grouping
+  - \-s, --preset \<name\>  
+    Apply a set of predefined conversions. The available presets are:
+    
+      - SI - convert imperial/US customary units to SI units.
+    
+      - imperial - convert SI units to British imperial units.
+    
+      - US - convert SI units to US customary units.
 
--q, --quiet  
-Quiet mode. Errors are not printed.
+  - \-t, --to \<uom\>  
+    Unit of measure to convert to.
 
--S, --set &lt;path&gt;  
-Apply a set of conversions defined in an XML file.
+  - \-U, --uom \<path\>  
+    Use a custom `.uom` file.
 
--s, --preset &lt;name&gt;  
-Apply a set of predefined conversions. The available presets are:
+  - \-u, --from \<uom\>  
+    Unit of measure to convert from.
 
--   SI - convert imperial/US customary units to SI units.
+  - \-v, --verbose  
+    Verbose output.
 
--   imperial - convert SI units to British imperial units.
+  - \-,, --dump-uom  
+    Dump the default `.uom` file.
 
--   US - convert SI units to US customary units.
+  - \-., --dump-uomdisplay  
+    Dump the default `.uomdisplay` file.
 
--t, --to &lt;uom&gt;  
-Unit of measure to convert to.
+  - \--version  
+    Show version information.
 
--U, --uom &lt;path&gt;  
-Use a custom `.uom` file.
-
--u, --from &lt;uom&gt;  
-Unit of measure to convert from.
-
--v, --verbose  
-Verbose output.
-
--,, --dump-uom  
-Dump the default `.uom` file.
-
--., --dump-uomdisplay  
-Dump the default `.uomdisplay` file.
-
---version  
-Show version information.
-
-&lt;object&gt;  
-CSDB objects to convert quantities in.
+  - \<object\>  
+    CSDB objects to convert quantities in.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.uom` file
------------
+## `.uom` file
 
 This file contains the rules for converting units of measure. If no
 specific conversions are given with the -u and -t options, this file
@@ -169,25 +165,23 @@ conversions to perform. In this case, the attribute `formula` is
 optional, as the default formula or the formula in the `.uom` file will
 be used if it is not specified.
 
-Conversion formula variables (-e)
----------------------------------
+## Conversion formula variables (-e)
 
 When specifying a formula for conversion, the following variables can be
 used:
 
-`$pi`  
-The constant π
+  - `$pi`  
+    The constant π
 
-`$value`  
-The original quantity value
+  - `$value`  
+    The original quantity value
 
 For example, the formula to convert degrees to radians can be given as
 follows:
 
 `$value * ($pi div 180)`
 
-Preformatting UOMs (-p) and the `.uomdisplay` file
---------------------------------------------------
+## Preformatting UOMs (-p) and the `.uomdisplay` file
 
 The tool can also convert semantic quantity data to presentation
 quantity data. The -p option specifies which conventions to use for
@@ -271,11 +265,9 @@ used to create a default `.uomdisplay` file by use of the -. option:
 
     $ s1kd-uom -. > .uomdisplay
 
-EXAMPLES
-========
+# EXAMPLES
 
-Common units of measure
------------------------
+## Common units of measure
 
 Input:
 
@@ -297,8 +289,7 @@ Output:
     </quantityGroup>
     </quantity>
 
-Using a custom formula and format
----------------------------------
+## Using a custom formula and format
 
 Input:
 
@@ -316,24 +307,21 @@ Output:
     quantityType="qty02"
     quantityTypeSpecifics="USD">7.36</quantity>
 
-UOM FILE SCHEMA
-===============
+# UOM FILE SCHEMA
 
-UOM
----
+## UOM
 
 *Markup element:* `<uom>`
 
 *Attributes:*
 
--   `format` (O), the number format for all rules.
+  - `format` (O), the number format for all rules.
 
 *Child elements:*
 
--   `<convert>`
+  - `<convert>`
 
-Conversion rule
----------------
+## Conversion rule
 
 The element `<convert>` defines a rule to convert one unit of measure to
 another.
@@ -342,61 +330,57 @@ another.
 
 *Attributes:*
 
--   `format` (O), the number format for this specific rule.
+  - `format` (O), the number format for this specific rule.
 
--   `formula` (M), the expression used to convert the quantity value.
+  - `formula` (M), the expression used to convert the quantity value.
 
--   `from` (M), unit of measure to convert from.
+  - `from` (M), unit of measure to convert from.
 
--   `to` (M), unit of measure to convert to.
+  - `to` (M), unit of measure to convert to.
 
 *Child elements:*
 
--   None
+  - None
 
-UOMDISPLAY FILE SCHEMA
-======================
+# UOMDISPLAY FILE SCHEMA
 
-UOM display
------------
+## UOM display
 
 *Markup element:* `<uomDisplay>`
 
 *Attributes:*
 
--   None
+  - None
 
 *Child elements:*
 
--   `<format>`
+  - `<format>`
 
--   `<groupTypePrefixes>`
+  - `<groupTypePrefixes>`
 
--   `<wrapInto>`
+  - `<wrapInto>`
 
--   `<uoms>`
+  - `<uoms>`
 
--   `<currencies>`
+  - `<currencies>`
 
-Quantity value format
----------------------
+## Quantity value format
 
 *Markup element:* `<format>`
 
 *Attributes:*
 
--   `name` (M), the name of the format
+  - `name` (M), the name of the format
 
--   `decimalSeparator` (M), the decimal separator
+  - `decimalSeparator` (M), the decimal separator
 
--   `groupingSeparator` (M), the grouping separator
+  - `groupingSeparator` (M), the grouping separator
 
 *Child elements:*
 
--   None
+  - None
 
-Group type prefixes
--------------------
+## Group type prefixes
 
 The element `<groupTypePrefixes>` specifies prefixes which are added for
 specific group types.
@@ -405,60 +389,57 @@ specific group types.
 
 *Attributes:*
 
--   None
+  - None
 
 *Child elements:*
 
--   `<nominal>`, text placed before a nominal group.
+  - `<nominal>`, text placed before a nominal group.
 
--   `<minimum>`, text placed before a minimum group.
+  - `<minimum>`, text placed before a minimum group.
 
--   `<minimumRange>`, text placed before a minimum group that is
+  - `<minimumRange>`, text placed before a minimum group that is
     followed by a maximum group to specify a range.
 
--   `<maximum>`, text placed before a maximum group.
+  - `<maximum>`, text placed before a maximum group.
 
--   `<maximumRange>`, text placed before a maximum group that is
+  - `<maximumRange>`, text placed before a maximum group that is
     preceded by a minimum group to specify a range.
 
-Wrap into element
------------------
+## Wrap into element
 
 *Markup element:* `<wrapInto>`
 
 *Attributes:*
 
--   None
+  - None
 
 *Child elements:*
 
 The element `<wrapInto>` contains one child element of any type, which
 quantities will be wrapped in to after formatting.
 
-Units of measure
-----------------
+## Units of measure
 
 *Markup element:* `<uoms>`
 
 *Attributes:*
 
--   None
+  - None
 
 *Child elements:*
 
--   `<uom>`
+  - `<uom>`
 
 The element `<uoms>` may also contain arbitrary XSLT elements which will
 be processed for all units of measure.
 
-Display of a unit of measure
-----------------------------
+## Display of a unit of measure
 
 *Markup element:* `<uom>`
 
 *Attributes:*
 
--   `name` (M), the name of the UOM.
+  - `name` (M), the name of the UOM.
 
 *Child elements:*
 
@@ -467,36 +448,34 @@ the display of the unit of measure. This can include XSLT elements,
 which allows for handling complex cases of UOM display, such as
 pluralization.
 
-Currencies
-----------
+## Currencies
 
 *Markup element:* `<currencies>`
 
 *Attributes:*
 
--   None
+  - None
 
 *Child elements:*
 
--   `<currency>`
+  - `<currency>`
 
 The element `<currencies>` may also contain arbitrary XSLT elements
 which will be processed for all currencies.
 
-Display of a currency
----------------------
+## Display of a currency
 
 *Markup element:* `<currency>`
 
 *Attributes:*
 
--   `name` (M), the name of the currency.
+  - `name` (M), the name of the currency.
 
 *Child elements:*
 
--   `<prefix>`, text placed before the currency value.
+  - `<prefix>`, text placed before the currency value.
 
--   `<postfix>`, text placed after the currency value.
+  - `<postfix>`, text placed after the currency value.
 
 The child elements of `<currency>` may contain mixed content, which will
 be used for the display of the unit of measure. This can include XSLT

@@ -1,16 +1,14 @@
-General
-=======
+# General
 
 This document contains an alphabetic index of all valid `.defaults` file
 identifiers, and a description of the values they may be assigned. It
 also contains examples of a `.defaults` file using all identifiers in
 both the XML format and simple text format.
 
-Alphabetic index
-================
+# Alphabetic index
 
 | Identifier                      | Value description                        |
-|---------------------------------|------------------------------------------|
+| ------------------------------- | ---------------------------------------- |
 | `act`                           | Data module code of ACT data module      |
 | `assyCode`                      | 2 to 4 alphanumeric characters           |
 | `authorization`                 | string                                   |
@@ -68,8 +66,9 @@ Alphabetic index
 | `templates`                     | Path to custom XML templates directory   |
 | `yearOfDataIssue`               | 4 digits                                 |
 
-Example - XML format
-====================
+`.defaults` file - Identifier value descriptions
+
+# Example - XML format
 
     <?xml version="1.0"?>
     <defaults>
@@ -127,8 +126,7 @@ Example - XML format
     <default ident="yearOfDataIssue" value="2017"/>
     </defaults>
 
-Example - Simple text format
-============================
+# Example - Simple text format
 
     act                            MYPRJ-A-00-00-00-00A-00WA-D
     assyCode                       00

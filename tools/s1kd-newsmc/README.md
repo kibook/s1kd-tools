@@ -1,165 +1,160 @@
-NAME
-====
+# NAME
 
 s1kd-newsmc - Create new S1000D SCORM content package
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-newsmc [options] [<DM>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-newsmc* tool creates a new S1000D SCORM content package with
 the SCORM content package code and other metadata specified.
 
-OPTIONS
-=======
+# OPTIONS
 
--\#, --code &lt;SMC&gt;  
-The SCORM content package code of the new SCORM content package.
+  - \-\#, --code \<SMC\>  
+    The SCORM content package code of the new SCORM content package.
 
--$, --issue &lt;issue&gt;  
-Specify which issue of S1000D to use. Currently supported issues are:
+  - \-$, --issue \<issue\>  
+    Specify which issue of S1000D to use. Currently supported issues
+    are:
+    
+      - 5.0 (default)
+    
+      - 4.2
+    
+      - 4.1
 
--   5.0 (default)
+  - \-@, --out \<path\>  
+    Save the new SCORM content package to \<path\>. If \<path\> is an
+    existing directory, the SCORM content package will be created in it
+    instead of the current directory. Otherwise, the SCORM content
+    package will be saved as the filename \<path\> instead of being
+    automatically named.
 
--   4.2
+  - \-%, --templates \<dir\>  
+    Use the XML template in \<dir\> instead of the built-in template.
+    The template must be named `scormcontentpackage.xml` in \<dir\> and
+    must conform to the default S1000D issue (5.0).
 
--   4.1
+  - \-\~, --dump-templates \<dir\>  
+    Dump the built-in XML template to the specified directory.
 
--@, --out &lt;path&gt;  
-Save the new SCORM content package to &lt;path&gt;. If &lt;path&gt; is
-an existing directory, the SCORM content package will be created in it
-instead of the current directory. Otherwise, the SCORM content package
-will be saved as the filename &lt;path&gt; instead of being
-automatically named.
+  - \-a, --act \<ACT\>  
+    ACT data module code.
 
--%, --templates &lt;dir&gt;  
-Use the XML template in &lt;dir&gt; instead of the built-in template.
-The template must be named `scormcontentpackage.xml` in &lt;dir&gt; and
-must conform to the default S1000D issue (5.0).
+  - \-b, --brex \<BREX\>  
+    BREX data module code.
 
--\~, --dump-templates &lt;dir&gt;  
-Dump the built-in XML template to the specified directory.
+  - \-C, --country \<country\>  
+    The country ISO code of the new SCORM content package.
 
--a, --act &lt;ACT&gt;  
-ACT data module code.
+  - \-c, --security \<sec\>  
+    The security classification of the new SCORM content package.
 
--b, --brex &lt;BREX&gt;  
-BREX data module code.
+  - \-D, --include-date  
+    Include issue date in referenced data modules.
 
--C, --country &lt;country&gt;  
-The country ISO code of the new SCORM content package.
+  - \-d, --defaults \<file\>  
+    Specify the `.defaults` file name.
 
--c, --security &lt;sec&gt;  
-The security classification of the new SCORM content package.
+  - \-f, --overwrite  
+    Overwrite existing file.
 
--D, --include-date  
-Include issue date in referenced data modules.
+  - \-h, -?, --help  
+    Show help/usage message.
 
--d, --defaults &lt;file&gt;  
-Specify the `.defaults` file name.
+  - \-I, --date \<date\>  
+    The issue date of the new SCORM content package in the form of
+    YYYY-MM-DD.
 
--f, --overwrite  
-Overwrite existing file.
+  - \-i, --include-issue  
+    Include issue information in referenced data modules.
 
--h, -?, --help  
-Show help/usage message.
+  - \-k, --skill \<skill\>  
+    The skill level code of the new SCORM content package.
 
--I, --date &lt;date&gt;  
-The issue date of the new SCORM content package in the form of
-YYYY-MM-DD.
+  - \-L, --language \<language\>  
+    The language ISO code of the new SCORM content package.
 
--i, --include-issue  
-Include issue information in referenced data modules.
+  - \-l, --include-lang  
+    Include language information in referenced data modules.
 
--k, --skill &lt;skill&gt;  
-The skill level code of the new SCORM content package.
+  - \-m, --remarks \<remarks\>  
+    Set remarks for the new SCORM content package.
 
--L, --language &lt;language&gt;  
-The language ISO code of the new SCORM content package.
+  - \-n, --issno \<issue\>  
+    The issue number of the new SCORM content package.
 
--l, --include-lang  
-Include language information in referenced data modules.
+  - \-p, --prompt  
+    Prompt the user for any values left unspecified.
 
--m, --remarks &lt;remarks&gt;  
-Set remarks for the new SCORM content package.
+  - \-q, --quiet  
+    Do not report an error when the file already exists.
 
--n, --issno &lt;issue&gt;  
-The issue number of the new SCORM content package.
+  - \-R, --rpccode \<CAGE\>  
+    The CAGE code of the responsible partner company.
 
--p, --prompt  
-Prompt the user for any values left unspecified.
+  - \-r, --rpcname \<RPC\>  
+    The responsible partner company enterprise name of the new SCORM
+    content package.
 
--q, --quiet  
-Do not report an error when the file already exists.
+  - \-T, --include-title  
+    Include titles in referenced data modules.
 
--R, --rpccode &lt;CAGE&gt;  
-The CAGE code of the responsible partner company.
+  - \-t, --title \<title\>  
+    The title of the new SCORM content package.
 
--r, --rpcname &lt;RPC&gt;  
-The responsible partner company enterprise name of the new SCORM content
-package.
+  - \-v, --verbose  
+    Print the file name of the newly created SCORM content package.
 
--T, --include-title  
-Include titles in referenced data modules.
+  - \-w, --inwork \<inwork\>  
+    The inwork number of the new SCORM content package.
 
--t, --title &lt;title&gt;  
-The title of the new SCORM content package.
+  - \-z, --issue-type \<type\>  
+    The issue type of the new SCORM content package.
 
--v, --verbose  
-Print the file name of the newly created SCORM content package.
+  - \--version  
+    Show version information.
 
--w, --inwork &lt;inwork&gt;  
-The inwork number of the new SCORM content package.
-
--z, --issue-type &lt;type&gt;  
-The issue type of the new SCORM content package.
-
---version  
-Show version information.
-
-&lt;DM&gt;...  
-Any number of data modules to automatically reference in the new SCORM
-content package's content.
+  - \<DM\>...  
+    Any number of data modules to automatically reference in the new
+    SCORM content package's content.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-`.defaults` file
-----------------
+## `.defaults` file
 
 Refer to s1kd-newdm(1) for information on the `.defaults` file which is
 used by all the s1kd-new\* commands.
 
-EXAMPLE
-=======
+# EXAMPLE
 
     $ s1kd-newsmc -# EX-12345-00001-00

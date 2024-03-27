@@ -1,88 +1,83 @@
-NAME
-====
+# NAME
 
 s1kd-mvref - Change one reference in to another in S1000D CSDB objects
 
-SYNOPSIS
-========
+# SYNOPSIS
 
     s1kd-mvref [-d <dir>] [-s <source>] [-t <target>] [-cflqvh?]
                [<object>...]
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 The *s1kd-mvref* tool changes all references to one object (the source
 object) into references to another object (the target object) in a
 specified set of objects.
 
-OPTIONS
-=======
+# OPTIONS
 
--c, --content  
-Only move references within the content section of objects.
+  - \-c, --content  
+    Only move references within the content section of objects.
 
--d, --dir &lt;dir&gt;  
-Move references in all objects in the specified directory.
+  - \-d, --dir \<dir\>  
+    Move references in all objects in the specified directory.
 
--f, --overwrite  
-Overwrite updated input objects.
+  - \-f, --overwrite  
+    Overwrite updated input objects.
 
--h, -?, --help  
-Show help/usage message
+  - \-h, -?, --help  
+    Show help/usage message
 
--l, --list  
-Treat input as a list of data module filenames, rather than a data
-module itself.
+  - \-l, --list  
+    Treat input as a list of data module filenames, rather than a data
+    module itself.
 
--q, --quiet  
-Quiet mode. Errors are not printed.
+  - \-q, --quiet  
+    Quiet mode. Errors are not printed.
 
--s, --source &lt;source&gt;  
-The source object.
+  - \-s, --source \<source\>  
+    The source object.
 
--t, --target &lt;target&gt;  
-Change all references to the source object specified with -s into
-references that point to &lt;target&gt;.
+  - \-t, --target \<target\>  
+    Change all references to the source object specified with -s into
+    references that point to \<target\>.
 
--v, --verbose  
-Verbose output.
+  - \-v, --verbose  
+    Verbose output.
 
---version  
-Show version information.
+  - \--version  
+    Show version information.
 
-&lt;object&gt;...  
-Objects to move references in.
+  - \<object\>...  
+    Objects to move references in.
 
 In addition, the following options allow configuration of the XML
 parser:
 
---dtdload  
-Load the external DTD.
+  - \--dtdload  
+    Load the external DTD.
 
---huge  
-Remove any internal arbitrary parser limits.
+  - \--huge  
+    Remove any internal arbitrary parser limits.
 
---net  
-Allow network access to load external DTD and entities.
+  - \--net  
+    Allow network access to load external DTD and entities.
 
---noent  
-Resolve entities.
+  - \--noent  
+    Resolve entities.
 
---parser-errors  
-Emit errors from parser.
+  - \--parser-errors  
+    Emit errors from parser.
 
---parser-warnings  
-Emit warnings from parser.
+  - \--parser-warnings  
+    Emit warnings from parser.
 
---xinclude  
-Do XInclude processing.
+  - \--xinclude  
+    Do XInclude processing.
 
---xml-catalog &lt;file&gt;  
-Use an XML catalog when resolving entities. Multiple catalogs may be
-loaded by specifying this option multiple times.
+  - \--xml-catalog \<file\>  
+    Use an XML catalog when resolving entities. Multiple catalogs may be
+    loaded by specifying this option multiple times.
 
-EXAMPLE
-=======
+# EXAMPLE
 
     $ s1kd-mvref -f -s <old DM> -t <new DM> DMC-*.XML
