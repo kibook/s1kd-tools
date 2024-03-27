@@ -17,8 +17,8 @@ TUTORIAL=../TUTORIAL.md
 S1KD2DB=s1kd2db
 S1KD2DB_FLAGS+=-param include.emphasis.role 1
 
-PANDOC_MD=pandoc -f docbook -t markdown_github -s
-PANDOC_MD_TOC=pandoc -f docbook -t markdown | pandoc -f markdown -t markdown_github -s --toc
+PANDOC_MD=pandoc -f docbook -t gfm -s
+PANDOC_MD_TOC=pandoc -f docbook -t markdown | pandoc -f markdown -t gfm -s --toc
 PANDOC_MAN=pandoc -f docbook -t man -s
 
 PREFIX=/usr/local

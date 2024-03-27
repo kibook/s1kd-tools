@@ -2,7 +2,7 @@
 
 S1KD_UOM=../s1kd-uom
 SOURCE=DMC-EX-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-TO_MARKDOWN=s1kd2db - | pandoc -f docbook -t markdown_github
+TO_MARKDOWN=s1kd2db - | pandoc -f docbook -t gfm
 
 # Fetch exchange rates from the internet
 CAD2EUR=\$$value * `sh exchange-rate.sh CAD EUR`

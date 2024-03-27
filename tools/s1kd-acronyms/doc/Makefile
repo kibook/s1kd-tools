@@ -9,7 +9,7 @@ INSTALL=install -D
 all: $(OUTPUT) $(README)
 
 $(README): $(SOURCE)
-	s1kd2db $^ | pandoc -f docbook -t markdown_github -s -o $@
+	s1kd2db $^ | pandoc -f docbook -t gfm -s -o $@
 
 $(OUTPUT): $(SOURCE)
 	s1kd2db $^ | pandoc -f docbook -t man -s -o $@
