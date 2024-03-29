@@ -20,7 +20,7 @@
             <xsl:value-of select="@id"/>
           </xsl:when>
           <xsl:when test="acronymDefinition/@id">
-            <xsl:value-of select="@acronymDefinition/@id"/>
+            <xsl:value-of select="acronymDefinition/@id"/>
           </xsl:when>
           <xsl:when test="@id">
             <xsl:value-of select="@id"/>
