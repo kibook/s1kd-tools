@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.2.4"
+#define VERSION "12.3.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2150,6 +2150,18 @@ static void autocomplete(xmlDocPtr doc)
 	transform_doc(doc, xsl_autocomplete_xsl, xsl_autocomplete_xsl_len, NULL);
 }
 
+/* Copy acronym definitions to all acronyms prior to filtering. */
+static void fix_acronyms_pre(xmlDocPtr doc)
+{
+	transform_doc(doc, xsl_acronyms_pre_xsl, xsl_acronyms_pre_xsl_len, NULL);
+}
+
+/* Turn occurrences of acronyms after the first into acronymTerms that reference the first. */
+static void fix_acronyms_post(xmlDocPtr doc)
+{
+	transform_doc(doc, xsl_acronyms_post_xsl, xsl_acronyms_post_xsl_len, NULL);
+}
+
 /* Insert a custom comment. */
 static void insert_comment(xmlDocPtr doc, const char *text, const char *path)
 {
@@ -3941,6 +3953,7 @@ static void show_help(void)
 	puts("  -k, --skill <level>               Set the skill level of the instance.");
 	puts("  -L, --list                        Treat input as a list of objects.");
 	puts("  -l, --language <lang>             Specify the language of the instance.");
+	puts("  -M, --fix-acronyms                Ensure acronyms remain valid after filtering.");
 	puts("  -m, --remarks <remarks>           Set the remarks for the instance.");
 	puts("  -N, --omit-issue                  Omit issue/inwork numbers from automatic filename.");
 	puts("  -n, --issue <iss>                 Set the issue and inwork numbers of the instance.");
@@ -4072,6 +4085,7 @@ int main(int argc, char **argv)
 	bool write_files = true;
 	bool print_non_applic = false;
 	bool delete = false;
+	bool fix_acronyms = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -4079,7 +4093,7 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	enum listprops listprops = STANDALONE;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:m:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:34567890~H:^";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:Mm:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:34567890~H:^";
 	struct option lopts[] = {
 		{"version"            , no_argument      , 0, 0},
 		{"help"               , no_argument      , 0, 'h'},
@@ -4103,6 +4117,7 @@ int main(int argc, char **argv)
 		{"skill"              , required_argument, 0, 'k'},
 		{"list"               , no_argument      , 0, 'L'},
 		{"language"           , required_argument, 0, 'l'},
+		{"fix-acronyms"       , no_argument      , 0, 'M'},
 		{"remarks"            , required_argument, 0, 'm'},
 		{"omit-issue"         , no_argument      , 0, 'N'},
 		{"issue"              , required_argument, 0, 'n'},
@@ -4231,6 +4246,9 @@ int main(int argc, char **argv)
 				break;
 			case 'l':
 				strncpy(language, optarg, 255);
+				break;
+			case 'M':
+				fix_acronyms = true;
 				break;
 			case 'm':
 				free(remarks);
@@ -4707,6 +4725,10 @@ int main(int argc, char **argv)
 				bool ispm;
 				xmlNodePtr root;
 
+				if (fix_acronyms) {
+					fix_acronyms_pre(doc);
+				}
+
 				if (add_source_ident) {
 					add_source(doc);
 				}
@@ -4882,6 +4904,10 @@ int main(int argc, char **argv)
 
 				if (autocomp) {
 					autocomplete(doc);
+				}
+
+				if (fix_acronyms) {
+					fix_acronyms_post(doc);
 				}
 
 				/* Resolve references to containers. */

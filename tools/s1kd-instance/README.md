@@ -187,6 +187,9 @@ The applications for this tool include:
     Set the language and country of the instance. For example, to create
     an instance for US English, lang would be "en-US".
 
+  - \-M, --fix-acronyms  
+    Ensure acronyms are still valid after filtering.
+
   - \-m, --remarks \<remarks\>  
     Set the remarks for the instance.
 
@@ -1086,6 +1089,107 @@ data module is applicable to version A, and therefore, when the -8
 option is specified, this is added to the user-defined assertions
 automatically for the given data module. Now the annotation is fully
 resolved, and can be removed in accordance with the -a option.
+
+## Ensuring acronyms remain valid after filtering (-M)
+
+The -M (--fix-acronyms) option will ensure that acronyms remain valid
+after filtering. Consider the following example:
+
+    ...
+    <referencedApplicGroup>
+    <applic id="app-A">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="app-B">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    </referencedApplicGroup>
+    ...
+    <para applicRefId="app-A">
+    This document discusses
+    <acronym>
+    <acronymTerm>XML</acronymTerm>
+    <acronymDefinition id="acr-XML">
+    Extensible Markup Language
+    </acronymDefinition>
+    </acronym>
+    as it is used in Version A of the product.
+    </para>
+    <para applicRefId="app-B">
+    This document discusses
+    <acronymTerm internalRefId="acr-XML">XML</acronymTerm>
+    as it is used in Version B of the product.
+    </para>
+    <para>
+    Users must have a basic understanding of
+    <acronymTerm internalRefId="acr-XML">XML</acronymTerm>
+    in order to make full use of the product.
+    </para>
+    ...
+
+If the data module is filtered for Version B, this will cause the
+resulting instance to be invalid, because the acronymTerm in the
+paragraph applicable to Version B references the acronym definition in
+the paragraph applicable to Version A:
+
+    ...
+    <referencedApplicGroup>
+    <applic id="app-B">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    </referencedApplicGroup>
+    ...
+    <para applicRefId="app-B">
+    This document discusses
+    <acronymTerm internalRefId="acr-XML">XML</acronymTerm>
+    as it is used in Version B of the product.
+    </para>
+    <para>
+    Users must have a basic understanding of
+    <acronymTerm internalRefId="acr-XML">XML</acronymTerm>
+    in order to make full use of the product.
+    </para>
+    ...
+
+However, if the -M (--fix-acronyms) option is used, the tool will
+automatically correct this issue by transforming the first orphaned
+acronymTerm into a full acronym element:
+
+    ...
+    <referencedApplicGroup>
+    <applic id="app-B">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    </referencedApplicGroup>
+    ...
+    <para applicRefId="app-B">
+    This document discusses
+    <acronym>
+    <acronymTerm>XML</acronymTerm>
+    <acronymDefinition id="acr-XML">
+    Extensible Markup Language
+    </acronymDefinition>
+    </acronym>
+    as it is used in Version B of the product.
+    </para>
+    <para>
+    Users must have a basic understanding of
+    <acronymTerm internalRefId="acr-XML">XML</acronymTerm>
+    in order to make full use of the product.
+    </para>
+    ...
 
 # EXIT STATUS
 
