@@ -15,7 +15,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.4.0"
+#define VERSION "6.4.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -49,6 +49,7 @@
 #define E_NESTEDCHECK_REDUNDANT ERR_PREFIX "%s: %s on line %ld has the same applicability as its parent %s on line %ld (%s)\n"
 #define E_DUPLICATECHECK ERR_PREFIX "%s: Annotation on line %ld is a duplicate of annotation on line %ld.\n"
 #define E_MAX_OBJECTS ERR_PREFIX "Out of memory\n"
+#define E_POPEN ERR_PREFIX "Error executing %s: %s\n"
 
 /* Warning messages. */
 #define W_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
@@ -62,6 +63,7 @@
 /* Exit status codes. */
 #define EXIT_BAD_OBJECT 2
 #define EXIT_MAX_OBJECTS 3
+#define EXIT_POPEN 4
 
 /* Default commands used to filter and validate. */
 #define DEFAULT_FILTER "s1kd-instance"
@@ -943,6 +945,12 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 			strncat(cmd, (char *) c, 4095 - strlen(cmd));
 
 			p = popen(cmd, "w");
+
+			if (p == NULL) {
+				fprintf(stderr, E_POPEN, cmd, strerror(errno));
+				exit(EXIT_POPEN);
+			}
+
 			xmlDocDump(p, doc);
 			e += pclose(p);
 
@@ -968,6 +976,12 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		}
 
 		p = popen(cmd, "w");
+
+		if (p == NULL) {
+			fprintf(stderr, E_POPEN, cmd, strerror(errno));
+			exit(EXIT_POPEN);
+		}
+
 		xmlDocDump(p, doc);
 		e += pclose(p);
 
@@ -997,6 +1011,12 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 			}
 
 			p = popen(cmd, "w");
+
+			if (p == NULL) {
+				fprintf(stderr, E_POPEN, cmd, strerror(errno));
+				exit(EXIT_POPEN);
+			}
+
 			xmlDocDump(p, doc);
 			e += pclose(p);
 		}

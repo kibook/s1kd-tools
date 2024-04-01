@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="01"/>
+        <issueInfo issueNumber="010" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="03" day="21"/>
+        <issueDate year="2024" month="04" day="01"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -40,6 +40,9 @@
       </qualityAssurance>
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
         <simplePara>Add --zenity-progress option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add new exit status.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -339,6 +342,12 @@
               <listItemTerm>3</listItemTerm>
               <listItemDefinition>
                 <para>The number of CSDB objects specified exceeded the available memory.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>4</listItemTerm>
+              <listItemDefinition>
+                <para>The commands used to filter and/or validate objects failed to be executed.</para>
               </listItemDefinition>
             </definitionListItem>
           </definitionList>

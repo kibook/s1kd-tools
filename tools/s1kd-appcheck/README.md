@@ -194,6 +194,10 @@ parser:
   - 3  
     The number of CSDB objects specified exceeded the available memory.
 
+  - 4  
+    The commands used to filter and/or validate objects failed to be
+    executed.
+
 # EXAMPLES
 
 ## Standalone validation
