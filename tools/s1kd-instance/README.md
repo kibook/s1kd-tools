@@ -1191,6 +1191,17 @@ acronymTerm into a full acronym element:
     </para>
     ...
 
+There are generally two ways a project may point an acronymTerm to the
+definition of the acronym: pointing to the `<acronymDefinition>`
+element, or pointing to the `<acronym>` element. S1000D does not
+explicitly state which is the "correct" option, and has included
+examples of both options between different issues of the specification;
+however, the later issues after 4.0 use the former option where the
+`<acronymTerm>` references the `<acronymDefinition>` element. The -M
+option will work with either option, but may not function correctly if
+both styles are mixed within the same data module. It is recommended
+that projects pick one of the two options and use it consistently.
+
 # EXIT STATUS
 
   - 0  

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="053" inWork="01"/>
+        <issueInfo issueNumber="053" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="03" day="29"/>
+        <issueDate year="2024" month="04" day="01"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -1275,6 +1275,7 @@ in order to make full use of the product.
 </para>
 ...]]></verbatimText>
           </para>
+          <para>There are generally two ways a project may point an acronymTerm to the definition of the acronym: pointing to the <verbatimText verbatimStyle="vs12">&lt;acronymDefinition&gt;</verbatimText> element, or pointing to the <verbatimText verbatimStyle="vs12">&lt;acronym&gt;</verbatimText> element. S1000D does not explicitly state which is the "correct" option, and has included examples of both options between different issues of the specification; however, the later issues after 4.0 use the former option where the <verbatimText verbatimStyle="vs12">&lt;acronymTerm&gt;</verbatimText> references the <verbatimText verbatimStyle="vs12">&lt;acronymDefinition&gt;</verbatimText> element. The -M option will work with either option, but may not function correctly if both styles are mixed within the same data module. It is recommended that projects pick one of the two options and use it consistently.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
