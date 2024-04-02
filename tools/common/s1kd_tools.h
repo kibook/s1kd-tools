@@ -98,8 +98,10 @@ int copy(const char *from, const char *to);
 /* Determine if a path is a directory. */
 bool isdir(const char *path, bool recursive);
 
-/* Free an XML entity. From libxml2, but not exposed by the API. */
+/* Free an XML entity. From libxml2, but not exposed by the API < 2.12.0 */
+#if LIBXML_VERSION < 21200
 void xmlFreeEntity(xmlEntityPtr entity);
+#endif
 
 /* Match a string with a pattern case-insensitively, using ? as a wildcard. */
 bool strmatch(const char *p, const char *s);

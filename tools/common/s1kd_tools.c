@@ -192,7 +192,8 @@ bool isdir(const char *path, bool recursive)
 	return S_ISDIR(st.st_mode);
 }
 
-/* Not exposed by the libxml API */
+/* Not exposed by the libxml API < 2.12.0 */
+#if LIBXML_VERSION < 21200
 void xmlFreeEntity(xmlEntityPtr entity)
 {
     xmlDictPtr dict = NULL;
@@ -239,6 +240,7 @@ void xmlFreeEntity(xmlEntityPtr entity)
     }
     xmlFree(entity);
 }
+#endif
 
 /* Compare the codes of two CSDB objects. */
 static int codecmp(const char *p1, const char *p2)
