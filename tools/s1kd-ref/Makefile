@@ -21,8 +21,10 @@ endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
 
-ifeq ($(OSTYPE),msys)
+ifeq ($(MSYSTEM),MINGW32)
   LDFLAGS+=-lregex2
+else ifeq ($(MSYSTEM),MINGW64)
+  LDFLAGS+=`pkg-config --libs regex`
 endif
 
 PREFIX=/usr/local

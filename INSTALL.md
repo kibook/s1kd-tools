@@ -47,7 +47,13 @@ commands:
 
 To build the executables:
 
-  - coreutils and binutils
+  - coreutils
+
+  - binutils
+
+  - gcc
+
+  - make
 
   - xxd
 
@@ -61,6 +67,12 @@ To build the executables:
   - **If using the `XQILLA` XPath engine:**
     [Xerces-C](https://xerces.apache.org/xerces-c/),
     [XQilla](http://xqilla.sourceforge.net/HomePage)
+
+If building on MSYS2 MINGW64, you will additionally need:
+
+  - mingw-w64-x86_64-libsystre
+
+  - A sys/wait.h header for Windows: https://github.com/win32ports/sys_wait_h
 
 To build the documentation from source:
 
