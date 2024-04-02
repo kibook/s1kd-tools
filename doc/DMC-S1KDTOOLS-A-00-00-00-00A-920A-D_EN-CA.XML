@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="00"/>
+        <issueInfo issueNumber="008" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2024" month="04" day="02"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
@@ -39,8 +39,11 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate id="rfu-0001" updateHighlight="1" updateReasonType="urt02">
-        <simplePara>Add Makefile parameter section.</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Update Linux requirements</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add instructions for Cygwin and MinGW64</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -98,9 +101,18 @@
           <title>Requirements</title>
           <para>To build the executables:</para>
           <para>
-            <randomList>
+            <randomList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
               <listItem>
-                <para>coreutils and binutils</para>
+                <para>coreutils</para>
+              </listItem>
+              <listItem>
+                <para>binutils</para>
+              </listItem>
+              <listItem>
+                <para>gcc</para>
+              </listItem>
+              <listItem>
+                <para>make</para>
               </listItem>
               <listItem>
                 <para>xxd</para>
@@ -118,7 +130,7 @@
                   </externalPubRef>
                 </para>
               </listItem>
-              <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItem>
                 <para>
                   <emphasis>If using the <verbatimText>SAXON</verbatimText> XPath engine: </emphasis>
                   <externalPubRef xlink:href="https://www.saxonica.com/saxon-c/index.xml">
@@ -129,7 +141,7 @@
                   </externalPubRef>
                 </para>
               </listItem>
-              <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+              <listItem>
                 <para>
                   <emphasis>If using the <verbatimText>XQILLA</verbatimText> XPath engine: </emphasis>
                   <externalPubRef xlink:href="https://xerces.apache.org/xerces-c/">
@@ -177,6 +189,44 @@
         <levelledPara>
           <title>Windows build environment</title>
           <para>To build the executables on Windows, an environment such as MinGW or Cygwin is recommended. These provide POSIX-compatible tools, such as <verbatimText>make</verbatimText>, that allow the s1kd-tools to be built and installed on a Windows system in the same way as on a Linux system.</para>
+          <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <title>Cygwin</title>
+            <para>To build the executables on Cygwin, you will need the following packages from the package installer:</para>
+            <para>
+              <randomList>
+                <listItem>
+                  <para>binutils</para>
+                </listItem>
+                <listItem>
+                  <para>gcc-core</para>
+                </listItem>
+                <listItem>
+                  <para>make</para>
+                </listItem>
+                <listItem>
+                  <para>xxd</para>
+                </listItem>
+                <listItem>
+                  <para>libxml2-devel</para>
+                </listItem>
+                <listItem>
+                  <para>libxslt-devel</para>
+                </listItem>
+              </randomList>
+            </para>
+          </levelledPara>
+          <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <title>MSYS2 MINGW64</title>
+            <para>Prior to building the executables on MSYS2 MINGW64, run the following to install the necessary packages from pacman:</para>
+            <para>
+              <verbatimText verbatimStyle="vs24">pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkgconf mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt mingw-w64-x86_64-libsystre vim</verbatimText>
+            </para>
+            <para>You will also need to install a sys/wait.h header for Windows: <externalPubRef xlink:href="https://github.com/win32ports/sys_wait_h">
+                <externalPubRefIdent>
+                  <externalPubCode>https://github.com/win32ports/sys_wait_h</externalPubCode>
+                </externalPubRefIdent>
+              </externalPubRef></para>
+          </levelledPara>
         </levelledPara>
         <levelledPara>
           <title>Building and installing</title>
@@ -193,7 +243,7 @@
             <verbatimText verbatimStyle="vs24"># make uninstall</verbatimText>
           </para>
         </levelledPara>
-        <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+        <levelledPara>
           <title>Additional Makefile parameters</title>
           <para>The following parameters can be given to <verbatimText>make</verbatimText> to control certain options when building and installing.</para>
           <levelledPara>

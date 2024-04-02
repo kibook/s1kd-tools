@@ -68,12 +68,6 @@ To build the executables:
     [Xerces-C](https://xerces.apache.org/xerces-c/),
     [XQilla](http://xqilla.sourceforge.net/HomePage)
 
-If building on MSYS2 MINGW64, you will additionally need:
-
-  - mingw-w64-x86_64-libsystre
-
-  - A sys/wait.h header for Windows: https://github.com/win32ports/sys_wait_h
-
 To build the documentation from source:
 
   - [s1kd2db](http://github.com/kibook/s1kd2db)
@@ -86,6 +80,33 @@ To build the executables on Windows, an environment such as MinGW or
 Cygwin is recommended. These provide POSIX-compatible tools, such as
 `make`, that allow the s1kd-tools to be built and installed on a Windows
 system in the same way as on a Linux system.
+
+### Cygwin
+
+To build the executables on Cygwin, you will need the following packages
+from the package installer:
+
+  - binutils
+
+  - gcc-core
+
+  - make
+
+  - xxd
+
+  - libxml2-devel
+
+  - libxslt-devel
+
+### MSYS2 MINGW64
+
+Prior to building the executables on MSYS2 MINGW64, run the following to
+install the necessary packages from pacman:
+
+    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkgconf mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt mingw-w64-x86_64-libsystre vim
+
+You will also need to install a sys/wait.h header for Windows:
+<https://github.com/win32ports/sys_wait_h>
 
 ## Building and installing
 
