@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "3.1.0"
+#define VERSION "3.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -79,7 +79,12 @@ static struct s1kd_schema_parser *schema_parsers;
 
 static int schema_parser_count = 0;
 
+/* The signature of xmlStructuredErrorFunc is different from v2.12.0 and up. */
+#if LIBXML_VERSION < 21200
 static void print_error(void *userData, xmlErrorPtr error)
+#else
+static void print_error(void *userData, const xmlError *error)
+#endif
 {
 	if (error->file) {
 		fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
@@ -88,7 +93,11 @@ static void print_error(void *userData, xmlErrorPtr error)
 	}
 }
 
+#if LIBXML_VERSION < 21200
 static void print_non_parser_error(void *userData, xmlErrorPtr error)
+#else
+static void print_non_parser_error(void *userData, const xmlError *error)
+#endif
 {
 	if (error->domain != XML_FROM_PARSER) {
 		if (error->file) {
@@ -99,7 +108,11 @@ static void print_non_parser_error(void *userData, xmlErrorPtr error)
 	}
 }
 
+#if LIBXML_VERSION < 21200
 static void suppress_error(void *userData, xmlErrorPtr error)
+#else
+static void suppress_error(void *userData, const xmlError *error)
+#endif
 {
 }
 
