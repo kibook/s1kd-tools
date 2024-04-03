@@ -47,7 +47,7 @@ clean:
 maintainer-clean: clean
 	$(MAKE) -C doc clean
 
-install:
+install: $(OUTPUT)
 	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)/$(OUTPUT)
 	$(MAKE) -C doc install
 
