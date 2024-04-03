@@ -105,9 +105,6 @@ install the necessary packages from pacman:
 
     pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkgconf mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt mingw-w64-x86_64-libsystre vim
 
-You will also need to install a sys/wait.h header for Windows:
-<https://github.com/win32ports/sys_wait_h>
-
 ## Building and installing
 
 Run the following commands to build the executables, and install both

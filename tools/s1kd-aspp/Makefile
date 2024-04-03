@@ -13,6 +13,10 @@ endif
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
 CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
+ifeq ($(MSYSTEM),MINGW64)
+  CFLAGS+=-isystem $(COMMON)/mingw64
+endif
+
 ifeq ($(DEBUG),1)
   CFLAGS+=-g
 else

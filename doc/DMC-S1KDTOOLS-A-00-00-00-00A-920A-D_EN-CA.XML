@@ -221,11 +221,6 @@
             <para>
               <verbatimText verbatimStyle="vs24">pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkgconf mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt mingw-w64-x86_64-libsystre vim</verbatimText>
             </para>
-            <para>You will also need to install a sys/wait.h header for Windows: <externalPubRef xlink:href="https://github.com/win32ports/sys_wait_h">
-                <externalPubRefIdent>
-                  <externalPubCode>https://github.com/win32ports/sys_wait_h</externalPubCode>
-                </externalPubRefIdent>
-              </externalPubRef></para>
           </levelledPara>
         </levelledPara>
         <levelledPara>
