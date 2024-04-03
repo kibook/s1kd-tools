@@ -1,34 +1,35 @@
-General
-=======
+# General
 
 This document summarizes the compatibility between the s1kd-tools and
 each issue of the S1000D specification for which support is planned.
 
-\[empty\]  
-Support is planned but not yet implemented.
+  - \[empty\]  
+    Support is planned but not yet implemented.
 
-X  
-Support is implemented.
+  - X  
+    Support is implemented.
 
-/  
-Support is partially implemented.
+  - /  
+    Support is partially implemented.
 
-\~  
-Support is not planned. Usually this is because older issues of the
-specification did not cover the function of the tool.
+  - \~  
+    Support is not planned. Usually this is because older issues of the
+    specification did not cover the function of the tool.
 
-> **Note**
->
-> Although a tool may not directly support an issue of S1000D, it may
-> still be possible to use with that issue.
->
-> For example, the s1kd-brexcheck tool is said not to support Issue 2.0
-> or Issue 2.1, because the BREX data module schema was not introduced
-> until Issue 2.2. However, an Issue 2.2 or greater BREX data module can
-> still be used to check Issue 2.0 or Issue 2.1 CSDB objects.
+<div class="note">
+
+Although a tool may not directly support an issue of S1000D, it may
+still be possible to use with that issue.
+
+For example, the s1kd-brexcheck tool is said not to support Issue 2.0 or
+Issue 2.1, because the BREX data module schema was not introduced until
+Issue 2.2. However, an Issue 2.2 or greater BREX data module can still
+be used to check Issue 2.0 or Issue 2.1 CSDB objects.
+
+</div>
 
 | Tool            | 5.0 | 4.2 | 4.1 | 4.0 | 3.0 | 2.3 | 2.2 | 2.1 | 2.0 |
-|-----------------|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+| --------------- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | s1kd-acronyms   | X   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-addicn     | X   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-appcheck   | X   | X   | X   | X   | X   | \~  | \~  | \~  | \~  |
@@ -61,3 +62,5 @@ specification did not cover the function of the tool.
 | s1kd-uom        | X   | X   | X   | X   | X   | X   | \~  | \~  | \~  |
 | s1kd-upissue    | X   | X   | X   | X   | X   | X   | X   | X   | X   |
 | s1kd-validate   | X   | X   | X   | X   | X   | X   | X   | X   | X   |
+
+Compatibility with supported issues of S1000D

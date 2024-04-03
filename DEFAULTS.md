@@ -1,16 +1,14 @@
-General
-=======
+# General
 
 This document contains an alphabetic index of all valid `.defaults` file
 identifiers, and a description of the values they may be assigned. It
 also contains examples of a `.defaults` file using all identifiers in
 both the XML format and simple text format.
 
-Alphabetic index
-================
+# Alphabetic index
 
 | Identifier                      | Value description                        |
-|---------------------------------|------------------------------------------|
+| ------------------------------- | ---------------------------------------- |
 | `act`                           | Data module code of ACT data module      |
 | `assyCode`                      | 2 to 4 alphanumeric characters           |
 | `authorization`                 | string                                   |
@@ -23,7 +21,6 @@ Alphabetic index
 | `disassyCodeVariant`            | 1 to 3 alphanumeric characters           |
 | `disassyCode`                   | 2 alphanumeric characters                |
 | `dmlType`                       | C, P, or S                               |
-| `includePrevSnsTitle`           | true or false                            |
 | `infoCodeVariant`               | 1 alphanumeric character                 |
 | `infoCode`                      | 3 alphanumeric characters                |
 | `infoName`                      | string                                   |
@@ -60,6 +57,7 @@ Alphabetic index
 | `seqNumber`                     | 00001-99999                              |
 | `skillLevelCode`                | sk01-sk99                                |
 | `sns`                           | Data module code of BREX data module     |
+| `snsLevels`                     | 1 thru 4                                 |
 | `subSubSystemCode`              | 1 alphanumeric character                 |
 | `subSystemCode`                 | 1 alphanumeric character                 |
 | `systemCode`                    | 2 to 3 alphanumeric characters           |
@@ -68,8 +66,9 @@ Alphabetic index
 | `templates`                     | Path to custom XML templates directory   |
 | `yearOfDataIssue`               | 4 digits                                 |
 
-Example - XML format
-====================
+`.defaults` file - Identifier value descriptions
+
+# Example - XML format
 
     <?xml version="1.0"?>
     <defaults>
@@ -85,7 +84,6 @@ Example - XML format
     <default ident="disassyCodeVariant" value="A"/>
     <default ident="disassyCode" value="00"/>
     <default ident="dmlType" value="C"/>
-    <default ident="includePrevSnsTitle" value="true"/>
     <default ident="infoCodeVariant" value="A"/>
     <default ident="infoCode" value="258"/>
     <default ident="infoName" value="Other procedure to clean"/>
@@ -119,6 +117,7 @@ Example - XML format
     <default ident="seqNumber" value="00001"/>
     <default ident="skillLevelCode" value="sk01"/>
     <default ident="sns" value="MYPRJ-A-00-00-00-00A-022A-D"/>
+    <default ident="snsLevels" value="1"/>
     <default ident="subSubSystem" value="0"/>
     <default ident="subSystem" value="0"/>
     <default ident="systemCode" value="00"/>
@@ -127,8 +126,7 @@ Example - XML format
     <default ident="yearOfDataIssue" value="2017"/>
     </defaults>
 
-Example - Simple text format
-============================
+# Example - Simple text format
 
     act                            MYPRJ-A-00-00-00-00A-00WA-D
     assyCode                       00
@@ -142,7 +140,6 @@ Example - Simple text format
     disassyCodeVariant             A
     disassyCode                    00
     dmlType                        C
-    includePrevSnsTitle            true
     infoCodeVariant                A
     infoCode                       258
     infoName                       Other procedure to clean
@@ -177,6 +174,7 @@ Example - Simple text format
     seqNumber                      00001
     skillLevelCode                 sk01
     sns                            MYPRJ-A-00-00-00-00A-022A-D
+    snsLevels                      1
     subSubSystem                   0
     subSystem                      0
     systemCode                     00

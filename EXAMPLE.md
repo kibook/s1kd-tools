@@ -1,38 +1,37 @@
--   [General](#general)
--   [Initial setup](#initial-setup)
-    -   [`.defaults` file](#defaults-file)
-    -   [`.dmtypes` file](#dmtypes-file)
--   [Creating the DMRL and populating the
+  - [General](#general)
+  - [Initial setup](#initial-setup)
+      - [`.defaults` file](#defaults-file)
+      - [`.dmtypes` file](#dmtypes-file)
+  - [Creating the DMRL and populating the
     CSDB](#creating-the-dmrl-and-populating-the-csdb)
-    -   [Adding DMRL entries](#adding-dmrl-entries)
-    -   [Populating the CSDB from the
+      - [Adding DMRL entries](#adding-dmrl-entries)
+      - [Populating the CSDB from the
         DMRL](#populating-the-csdb-from-the-dmrl)
-    -   [Creating CSDB objects
+      - [Creating CSDB objects
         on-the-fly](#creating-csdb-objects-on-the-fly)
--   [Data module workflow](#data-module-workflow)
-    -   [Inwork data modules](#inwork-data-modules)
-    -   [Making data modules official](#making-data-modules-official)
-        -   [Validating against the
+  - [Data module workflow](#data-module-workflow)
+      - [Inwork data modules](#inwork-data-modules)
+      - [Making data modules official](#making-data-modules-official)
+          - [Validating against the
             schema](#validating-against-the-schema)
-        -   [Validating against a BREX data
+          - [Validating against a BREX data
             module](#validating-against-a-brex-data-module)
-        -   [Checking applicability](#checking-applicability)
-        -   [Quality assurance
+          - [Checking applicability](#checking-applicability)
+          - [Quality assurance
             verification](#quality-assurance-verification)
-    -   [Changes to official data
+      - [Changes to official data
         modules](#changes-to-official-data-modules)
-    -   [Deleting data modules](#deleting-data-modules)
--   [Building publications](#building-publications)
-    -   [Publication module content](#publication-module-content)
-    -   [Creating a customized
+      - [Deleting data modules](#deleting-data-modules)
+  - [Building publications](#building-publications)
+      - [Publication module content](#publication-module-content)
+      - [Creating a customized
         publication](#creating-a-customized-publication)
-    -   [Creating a script for
+      - [Creating a script for
         publishing](#creating-a-script-for-publishing)
--   [Use with other version control
+  - [Use with other version control
     systems](#use-with-other-version-control-systems)
 
-General
-=======
+# General
 
 This document provides examples of the usage of the **s1kd-tools**.
 
@@ -44,8 +43,7 @@ may need to be adapted.
 ![Example - Authoring with Vim +
 MuPDF](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00002-A-001-01.PNG)
 
-Initial setup
-=============
+# Initial setup
 
 ![Initial setup](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00005-A-001-01.GIF)
 
@@ -65,14 +63,15 @@ Afterwards, these files can be edited to customize them for your
 project. More information on the contents of these files is provided
 below.
 
-> **Note**
->
-> If the tools are run in a directory that does not have these
-> configuration files, they will search for them in the parent
-> directories to find the top of the CSDB directory tree.
+<div class="note">
 
-`.defaults` file
-----------------
+If the tools are run in a directory that does not have these
+configuration files, they will search for them in the parent directories
+to find the top of the CSDB directory tree.
+
+</div>
+
+## `.defaults` file
 
 The `.defaults` file is used by all of the s1kd-new\* tools. It provides
 default values for various S1000D metadata. The `.defaults` file can be
@@ -99,8 +98,7 @@ written in either a simple text format or an XML format.
     <default ident="techName" value="My project"/>
     </defaults>
 
-`.dmtypes` file
----------------
+## `.dmtypes` file
 
 The `.dmtypes` file is used by the **s1kd-newdm** tool. It contains a
 list of information codes and associated info names and schemas to be
@@ -137,8 +135,7 @@ of the `-.` (simple text format) or `-,` (XML) options:
 The generated `.dmtypes` file can then be customized to fit your
 project.
 
-Creating the DMRL and populating the CSDB
-=========================================
+# Creating the DMRL and populating the CSDB
 
 ![Creating the DMRL and populating the
 CSDB](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00006-A-001-01.GIF)
@@ -156,8 +153,7 @@ to create a new one:
 This would create the file `DML-MYPRJ-NCAGE-C-2017-00001_000-01.XML` in
 your CSDB folder.
 
-Adding DMRL entries
--------------------
+## Adding DMRL entries
 
 Each entry in the DMRL describes a data module that is planned to be
 created:
@@ -191,8 +187,7 @@ The XML for the `dmRef` of each entry can be quickly generated using the
 
     $ s1kd-ref DMC-MYPRJ-A-00-00-00-00A-040A-D
 
-Populating the CSDB from the DMRL
----------------------------------
+## Populating the CSDB from the DMRL
 
 Once the DMRL is prepared, the **s1kd-dmrl** tool can be used to
 automatically populate the CSDB based on the CSDB objects listed in the
@@ -212,8 +207,7 @@ will not be overwritten:
 
     $ s1kd-dmrl -q DML-MYPRJ-NCAGE-C-2017-00001_000-02.XML
 
-Creating CSDB objects on-the-fly
---------------------------------
+## Creating CSDB objects on-the-fly
 
 Data modules and other CSDB objects can also be created in an
 "on-the-fly" manner, without the use of a DMRL, by invoking the
@@ -229,16 +223,14 @@ Each of the s1kd-new\* tools has various options for setting specific
 metadata, and information not included as arguments to these commands is
 pulled from the `.defaults` and `.dmtypes` files.
 
-Data module workflow
-====================
+# Data module workflow
 
 Data modules are put through the general S1000D workflow with the
 **s1kd-upissue** tool. Whenever a data module will be changed, the
 s1kd-upissue tool should first be used to indicate the forthcoming
 change, creating the next inwork issue of the data module.
 
-Inwork data modules
--------------------
+## Inwork data modules
 
 To increment the inwork issue of a data module, the s1kd-upissue tool is
 called without any additional options:
@@ -272,21 +264,20 @@ upissuing, make the changes. For example:
     </description>
     </content>
 
-Making data modules official
-----------------------------
+## Making data modules official
 
 Before a data module can be made official, it must be validated. This
 means:
 
--   It is a valid XML file
+  - It is a valid XML file
 
--   It is valid according to the relevant S1000D schema
+  - It is valid according to the relevant S1000D schema
 
--   It is valid according to the relevant business rules
+  - It is valid according to the relevant business rules
 
--   Any applicability filtering applied will not affect the above
+  - Any applicability filtering applied will not affect the above
 
--   The actual narrative (content) is correct
+  - The actual narrative (content) is correct
 
 ![Data module validation
 tests](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF)
@@ -378,8 +369,7 @@ it official with the `-i` option:
 
     $ s1kd-upissue -i DMC-MYPRJ-A-00-00-00-00A-040A-D_000-03_EN-CA.XML
 
-Changes to official data modules
---------------------------------
+## Changes to official data modules
 
 When a change must be made to an official data module (for example, as a
 result of feedback), the s1kd-upissue tool is used again to bring the
@@ -426,8 +416,7 @@ reasons for update and change marking. For example:
 Reasons for update from the previous official issue are automatically
 removed when upissuing to the first inwork issue.
 
-Deleting data modules
----------------------
+## Deleting data modules
 
 The basic cycle continues until a data module is deleted. "Deleting" a
 data module is a special case of upissuing:
@@ -444,8 +433,7 @@ Deleted data modules may be reinstated later in a similar way:
 The data module is upissued to the next inwork issue, and the issue type
 is set to one of the "`rinstate-x"` types.
 
-Building publications
-=====================
+# Building publications
 
 S1000D publications are managed by use of publication modules. Like data
 modules, publication modules may be created as part of the project's
@@ -470,8 +458,7 @@ or "on-the-fly" with the **s1kd-newpm** tool:
 
     $ s1kd-newpm -# MYPRJ-12345-00001-00
 
-Publication module content
---------------------------
+## Publication module content
 
 The publication module lays out the hierarchical structure of the data
 modules in a publication:
@@ -513,8 +500,7 @@ modules in a publication:
     </pmEntry>
     </content>
 
-Creating a customized publication
----------------------------------
+## Creating a customized publication
 
 ![Applicability filtering
 example](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01.GIF)
@@ -558,8 +544,7 @@ The above command will filter the publication module and all included
 data modules, and output the resulting objects to the `customerB`
 directory.
 
-Creating a script for publishing
---------------------------------
+## Creating a script for publishing
 
 The publishing process will often involve many different steps, and many
 different tools, so it's a good idea to create a script to automate it.
@@ -567,33 +552,32 @@ Below is an example of a script which publishes a CSDB for a given
 product serial number:
 
     #!/bin/sh
-
+    
     # Usage: sh build.sh <zip> <csdb> <serialno>
     zip=$1
     csdb=$2
     serialno=$3
-
+    
     # Create a temporary directory.
     tmp=$(mktemp -d)
-
+    
     # Copy all CSDB objects to the temp directory. The CSDB objects
     # are filtered for a given serial number.
     s1kd-ls "$csdb" |
       xargs s1kd-instance -O "$tmp" -s serialno:prodattr="$serialno"
-
+    
     # Synchronize references in the filtered DMs. This is necessary
     # since some references may have been removed during filtering.
     s1kd-ls -D "$tmp" |
       xargs s1kd-syncrefs -f
-
+    
     # Create the ZIP package.
     zip -jr "$zip" "$tmp"
-
+    
     # Clean up the temp directory.
     rm -r "$tmp"
 
-Use with other version control systems
-======================================
+# Use with other version control systems
 
 The issue/inwork numbers and S1000D file naming conventions as seen
 above provide a basic form of version control. In this case, each file
@@ -601,11 +585,11 @@ represents a single issue of a CSDB object, and multiple files together
 represent the whole logical object. For example, all of the following
 files represent different versions of the same object:
 
--   `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML`
+  - `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-01_EN-CA.XML`
 
--   `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML`
+  - `DMC-MYPRJ-A-00-00-00-00A-040A-D_000-02_EN-CA.XML`
 
--   `DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML`
+  - `DMC-MYPRJ-A-00-00-00-00A-040A-D_001-00_EN-CA.XML`
 
 However, if you prefer to use an existing version control system such as
 Git or SVN, it is often more useful for each file to represent a whole
