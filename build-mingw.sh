@@ -1,6 +1,6 @@
 #!/bin/sh
 
-out=build/mingw64
+out=build/$MSYSTEM
 
 make
 mkdir -p "$out"
