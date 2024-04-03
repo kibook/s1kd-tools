@@ -13,8 +13,8 @@ endif
 WARNING_FLAGS=-Wall -Werror -pedantic-errors
 CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0`
 
-ifeq ($(MSYSTEM),MINGW64)
-  CFLAGS+=-isystem $(COMMON)/mingw64
+ifneq ($(MSYSTEM),)
+  CFLAGS+=-isystem $(COMMON)/msys
 endif
 
 ifeq ($(DEBUG),1)
@@ -25,9 +25,7 @@ endif
 
 LDFLAGS=`pkg-config --libs libxml-2.0`
 
-ifeq ($(MSYSTEM),MINGW32)
-  LDFLAGS+=-lregex2
-else ifeq ($(MSYSTEM),MINGW64)
+ifneq ($(MSYSTEM),)
   LDFLAGS+=`pkg-config --libs regex`
 endif
 
