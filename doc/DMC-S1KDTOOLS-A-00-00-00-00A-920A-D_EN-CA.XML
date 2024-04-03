@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="01"/>
+        <issueInfo issueNumber="008" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="04" day="02"/>
+        <issueDate year="2024" month="04" day="03"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
@@ -43,7 +43,7 @@
         <simplePara>Update Linux requirements</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1">
-        <simplePara>Add instructions for Cygwin and MinGW64</simplePara>
+        <simplePara>Add instructions for Cygwin, MinGW32 and MinGW64</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -213,6 +213,13 @@
                   <para>libxslt-devel</para>
                 </listItem>
               </randomList>
+            </para>
+          </levelledPara>
+          <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+            <title>MSYS2 MINGW32</title>
+            <para>Prior to building the executables on MSYS2 MINGW32, run the following to install the necessary packages from pacman:</para>
+            <para>
+              <verbatimText verbatimStyle="vs24">pacman -S mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-pkgconf mingw-w64-i686-libxml2 mingw-w64-i686-libxslt mingw-w64-i686-libsystre vim</verbatimText>
             </para>
           </levelledPara>
           <levelledPara changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">

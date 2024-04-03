@@ -98,6 +98,13 @@ from the package installer:
 
   - libxslt-devel
 
+### MSYS2 MINGW32
+
+Prior to building the executables on MSYS2 MINGW32, run the following to
+install the necessary packages from pacman:
+
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-pkgconf mingw-w64-i686-libxml2 mingw-w64-i686-libxslt mingw-w64-i686-libsystre vim
+
 ### MSYS2 MINGW64
 
 Prior to building the executables on MSYS2 MINGW64, run the following to
