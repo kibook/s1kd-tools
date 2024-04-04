@@ -45,11 +45,8 @@ commands:
 
 ## Requirements
 
-To build the executables:
-
-  - coreutils
-
-  - binutils
+The typical requirements to build the executables on any Linux
+distribution are:
 
   - gcc
 
@@ -87,8 +84,6 @@ system in the same way as on a Linux system.
 
 To build the executables on Cygwin, you will need the following packages
 from the package installer:
-
-  - binutils
 
   - gcc-core
 

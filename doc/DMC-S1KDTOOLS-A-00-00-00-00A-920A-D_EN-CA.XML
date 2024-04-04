@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="02"/>
+        <issueInfo issueNumber="008" inWork="03"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="04" day="03"/>
+        <issueDate year="2024" month="04" day="04"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
@@ -44,6 +44,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002" updateHighlight="1">
         <simplePara>Add instructions for Cygwin, MinGW32 and MinGW64</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003" updateHighlight="1">
+        <simplePara>Update libxml2 and libxslt links</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -97,17 +100,11 @@
       </levelledPara>
       <levelledPara>
         <title>Building from source</title>
-        <levelledPara>
+        <levelledPara changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
           <title>Requirements</title>
-          <para>To build the executables:</para>
+          <para>The typical requirements to build the executables on any Linux distribution are:</para>
           <para>
-            <randomList changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
-              <listItem>
-                <para>coreutils</para>
-              </listItem>
-              <listItem>
-                <para>binutils</para>
-              </listItem>
+            <randomList>
               <listItem>
                 <para>gcc</para>
               </listItem>
@@ -120,7 +117,7 @@
               <listItem>
                 <para>pkg-config</para>
               </listItem>
-              <listItem>
+              <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
                 <para>
                   <externalPubRef xlink:href="https://gitlab.gnome.org/GNOME/libxml2">
                     <externalPubRefIdent>
@@ -130,7 +127,7 @@
                   </externalPubRef>
                 </para>
               </listItem>
-              <listItem>
+              <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
                 <para>
                   <externalPubRef xlink:href="https://gitlab.gnome.org/GNOME/libxslt">
                     <externalPubRefIdent>
@@ -204,9 +201,6 @@
             <para>To build the executables on Cygwin, you will need the following packages from the package installer:</para>
             <para>
               <randomList>
-                <listItem>
-                  <para>binutils</para>
-                </listItem>
                 <listItem>
                   <para>gcc-core</para>
                 </listItem>
