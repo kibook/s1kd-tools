@@ -59,7 +59,9 @@ To build the executables:
 
   - pkg-config
 
-  - [libxml2, libxslt, libexslt](http://xmlsoft.org)
+  - [libxml2](https://gitlab.gnome.org/GNOME/libxml2)
+
+  - [libxslt](https://gitlab.gnome.org/GNOME/libxslt)
 
   - **If using the `SAXON` XPath engine:**
     [Saxon/C](https://www.saxonica.com/saxon-c/index.xml)

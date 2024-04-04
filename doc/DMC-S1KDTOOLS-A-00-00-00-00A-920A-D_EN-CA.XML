@@ -122,10 +122,20 @@
               </listItem>
               <listItem>
                 <para>
-                  <externalPubRef xlink:href="http://xmlsoft.org">
+                  <externalPubRef xlink:href="https://gitlab.gnome.org/GNOME/libxml2">
                     <externalPubRefIdent>
-                      <externalPubCode>http://xmlsoft.org</externalPubCode>
-                      <externalPubTitle>libxml2, libxslt, libexslt</externalPubTitle>
+                      <externalPubCode>https://gitlab.gnome.org/GNOME/libxml2</externalPubCode>
+                      <externalPubTitle>libxml2</externalPubTitle>
+                    </externalPubRefIdent>
+                  </externalPubRef>
+                </para>
+              </listItem>
+              <listItem>
+                <para>
+                  <externalPubRef xlink:href="https://gitlab.gnome.org/GNOME/libxslt">
+                    <externalPubRefIdent>
+                      <externalPubCode>https://gitlab.gnome.org/GNOME/libxslt</externalPubCode>
+                      <externalPubTitle>libxslt</externalPubTitle>
                     </externalPubRefIdent>
                   </externalPubRef>
                 </para>
