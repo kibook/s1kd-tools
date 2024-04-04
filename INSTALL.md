@@ -153,12 +153,12 @@ with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0
 specification. Therefore, if your project needs XPath 2.0 support for
 BREX rules, you should select one of these implementations:
 
-  - `saxon`  
+  - `SAXON`  
     Experimental implementation using the Saxon/C library. Slower, and
     Saxon/C itself is a very large dependency. Not recommended at this
     time due to memory leak issues.
 
-  - `xqilla`  
+  - `XQILLA`  
     Experimental implementation using the Xerces-C and XQilla libraries.
     A little slower than libxml, but faster than Saxon/C, and the
     dependencies are much smaller than the latter. This is currently the

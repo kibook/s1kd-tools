@@ -32,9 +32,9 @@ bindir = $(exec_prefix)/bin
 
 INSTALL = install -Ds
 
-xpath2_engine = none
+xpath2_engine = NONE
 
-ifeq ($(xpath2_engine),saxon)
+ifeq ($(xpath2_engine),SAXON)
   ifeq ($(OS),Windows_NT)
     saxon_c_dir = /cygdrive/c/Progra~1/Saxonica/SaxonHEC1.2.1
   else
@@ -81,7 +81,7 @@ ifeq ($(xpath2_engine),saxon)
   endif
 endif
 
-ifeq ($(xpath2_engine),xqilla)
+ifeq ($(xpath2_engine),XQILLA)
   xqilla_objects += xqilla/xqilla.o
 
   sources += $(xqilla_objects)

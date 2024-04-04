@@ -273,7 +273,7 @@
               <definitionList>
                 <definitionListItem>
                   <listItemTerm>
-                    <verbatimText>saxon</verbatimText>
+                    <verbatimText>SAXON</verbatimText>
                   </listItemTerm>
                   <listItemDefinition>
                     <para>Experimental implementation using the Saxon/C library. Slower, and Saxon/C itself is a very large dependency. Not recommended at this time due to memory leak issues.</para>
@@ -281,7 +281,7 @@
                 </definitionListItem>
                 <definitionListItem>
                   <listItemTerm>
-                    <verbatimText>xqilla</verbatimText>
+                    <verbatimText>XQILLA</verbatimText>
                   </listItemTerm>
                   <listItemDefinition>
                     <para>Experimental implementation using the Xerces-C and XQilla libraries. A little slower than libxml, but faster than Saxon/C, and the dependencies are much smaller than the latter. This is currently the recommended implementation if you need XPath 2.0 support.</para>
