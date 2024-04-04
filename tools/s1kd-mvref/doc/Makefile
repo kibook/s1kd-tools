@@ -1,26 +1,29 @@
-SOURCE=DMC-S1KDTOOLS-A-19-00-00-00A-040A-D_EN-CA.XML
-OUTPUT=s1kd-mvref.1
-README=../README.md
+source = DMC-S1KDTOOLS-A-19-00-00-00A-040A-D_EN-CA.XML
+manpage = s1kd-mvref.1
+readme = ../README.md
 
-PREFIX=/usr/local
-MAN_PREFIX=$(PREFIX)/share/man/man1
-INSTALL=install -D
+prefix = /usr/local
+datarootdir = $(prefix)/share
+mandir = $(datarootdir)/man
+man1dir = $(mandir)/man1
 
-all: $(OUTPUT) $(README)
+INSTALL = install -D
 
-$(README): $(SOURCE)
-	s1kd2db $(SOURCE) | pandoc -f docbook -t gfm -s -o $(README)
+all: $(manpage) $(readme)
 
-$(OUTPUT): $(SOURCE)
-	s1kd2db $(SOURCE) | pandoc -f docbook -t man -s -o $(OUTPUT)
+$(readme): $(source)
+	s1kd2db $^ | pandoc -f docbook -t gfm -s -o $@
+
+$(manpage): $(source)
+	s1kd2db $^ | pandoc -f docbook -t man -s -o $@
 
 .PHONY: clean install uninstall
 
 clean:
-	rm -f $(OUTPUT) $(README)
+	$(RM) $(manpage) $(readme)
 
-install:
-	$(INSTALL) $(OUTPUT) $(MAN_PREFIX)/$(OUTPUT)
+install: $(manpage)
+	$(INSTALL) $(manpage) $(man1dir)/$(manpage)
 
 uninstall:
-	rm -f $(MAN_PREFIX)/$(OUTPUT)
+	$(RM) $(man1dir)/$(manpage)

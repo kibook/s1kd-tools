@@ -1,11 +1,11 @@
-OUTPUTS+=all.txt
-OUTPUTS+=abbreviations.xml
-OUTPUTS+=terms.xml
-OUTPUTS+=definitionList.xml
-OUTPUTS+=DMC-ACRONYMS-A-00-00-00-00A-005A-D_000-02_EN-CA.XML
-OUTPUTS+=DMC-ACRONYMS-A-00-00-02-00A-000A-D_000-02_EN-CA.XML
+outputs += all.txt
+outputs += abbreviations.xml
+outputs += terms.xml
+outputs += definitionList.xml
+outputs += DMC-ACRONYMS-A-00-00-00-00A-005A-D_000-02_EN-CA.XML
+outputs += DMC-ACRONYMS-A-00-00-02-00A-000A-D_000-02_EN-CA.XML
 
-all: $(OUTPUTS)
+all: $(outputs)
 
 DMC-ACRONYMS-A-00-00-02-00A-000A-D_000-02_EN-CA.XML: DMC-ACRONYMS-A-00-00-02-00A-000A-D_000-01_EN-CA.XML abbreviations.xml
 	s1kd-upissue DMC-ACRONYMS-A-00-00-02-00A-000A-D_000-01_EN-CA.XML
@@ -28,4 +28,4 @@ DMC-ACRONYMS-A-00-00-00-00A-005A-D_000-02_EN-CA.XML: DMC-ACRONYMS-A-00-00-00-00A
 	xml-merge DMC-ACRONYMS-A-00-00-00-00A-005A-D_000-02_EN-CA.XML definitionList.xml | xmllint --format - | sponge DMC-ACRONYMS-A-00-00-00-00A-005A-D_000-02_EN-CA.XML
 
 clean:
-	rm -f $(OUTPUTS)
+	rm -f $(outputs)

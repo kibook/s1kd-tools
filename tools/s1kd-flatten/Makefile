@@ -1,55 +1,58 @@
 .PHONY: docs clean maintainer-clean install uninstall
 
-COMMON=../common
+common_dir = ../common
 
-SOURCE=s1kd-flatten.c $(COMMON)/s1kd_tools.c
+sources = s1kd-flatten.c $(common_dir)/s1kd_tools.c
 
 ifeq ($(OS),Windows_NT)
-  OUTPUT=s1kd-flatten.exe
+  executable = s1kd-flatten.exe
 else
-  OUTPUT=s1kd-flatten
+  executable = s1kd-flatten
 endif
 
-WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
+warning_flags = -Wall -Werror -pedantic-errors
+
+CFLAGS = $(warning_flags) -I $(common_dir) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifneq ($(MSYSTEM),)
-  CFLAGS+=-isystem $(COMMON)/msys
+  CFLAGS += -isystem $(common_dir)/msys
 endif
 
-ifeq ($(DEBUG),1)
-  CFLAGS+=-g
+ifeq ($(debug),1)
+  CFLAGS += -g
 else
-  CFLAGS+=-O3
+  CFLAGS += -O3
 endif
 
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
+LDFLAGS = `pkg-config --libs libxml-2.0 libxslt`
 
-PREFIX=/usr/local
-INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install -Ds
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
 
-all: $(OUTPUT)
+INSTALL = install -Ds
 
-$(OUTPUT): $(SOURCE) xsl.h
-	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
+all: $(executable)
 
-xsl.h: xsl/remdups1.xsl xsl/remdups2.xsl $(COMMON)/remove-empty-pmentries.xsl
+$(executable): $(sources) xsl.h
+	$(CC) $(CFLAGS) -o $(executable) $(sources) $(LDFLAGS)
+
+xsl.h: xsl/remdups1.xsl xsl/remdups2.xsl $(common_dir)/remove-empty-pmentries.xsl
 	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
 
 docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) xsl.h
+	$(RM) $(executable) xsl.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
 
-install: $(OUTPUT)
-	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)/$(OUTPUT)
+install: $(executable)
+	$(INSTALL) $(executable) $(bindir)/$(executable)
 	$(MAKE) -C doc install
 
 uninstall:
-	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(RM) $(bindir)/$(executable)
 	$(MAKE) -C doc uninstall

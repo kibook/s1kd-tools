@@ -1,12 +1,12 @@
-SOURCE=DMC-SYNCREFS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
-OUTPUT=DMC-SYNCREFS-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
+source=DMC-SYNCREFS-A-00-00-00-00A-040A-D_000-01_EN-CA.XML
+output=DMC-SYNCREFS-A-00-00-00-00A-040A-D_000-02_EN-CA.XML
 
-all: $(OUTPUT)
+all: $(output)
 
-$(OUTPUT): $(SOURCE)
-	s1kd-upissue $(SOURCE)
-	s1kd-syncrefs -f $(OUTPUT)
-	xmllint --format $(OUTPUT) -o $(OUTPUT)
+$(output): $(source)
+	s1kd-upissue $(source)
+	s1kd-syncrefs -f $(output)
+	xmllint --format $(output) -o $(output)
 
 clean:
-	rm $(OUTPUT)
+	$(RM) $(output)

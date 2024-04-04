@@ -128,21 +128,21 @@ To uninstall the executables and documentation:
 The following parameters can be given to `make` to control certain
 options when building and installing.
 
-### `PREFIX`
+### `prefix`
 
-The `PREFIX` variable determines where the s1kd-tools are installed when
+The `prefix` variable determines where the s1kd-tools are installed when
 running `make install`, and where they are uninstalled from when running
 `make uninstall`. The default value is `/usr/local`.
 
 Example:
 
-    # make PREFIX=/usr install
+    # make prefix=/usr install
 
-    # make PREFIX=/usr uninstall
+    # make prefix=/usr uninstall
 
-### `XPATH2_ENGINE`
+### `xpath2_engine`
 
-The `XPATH2_ENGINE` variable determines which XPath 2.0 implementation
+The `xpath2_engine` variable determines which XPath 2.0 implementation
 the s1kd-brexcheck tool will use to evaluate the object paths of BREX
 rules.
 
@@ -153,12 +153,12 @@ with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0
 specification. Therefore, if your project needs XPath 2.0 support for
 BREX rules, you should select one of these implementations:
 
-  - `SAXON`  
+  - `saxon`  
     Experimental implementation using the Saxon/C library. Slower, and
     Saxon/C itself is a very large dependency. Not recommended at this
     time due to memory leak issues.
 
-  - `XQILLA`  
+  - `xqilla`  
     Experimental implementation using the Xerces-C and XQilla libraries.
     A little slower than libxml, but faster than Saxon/C, and the
     dependencies are much smaller than the latter. This is currently the
@@ -166,4 +166,13 @@ BREX rules, you should select one of these implementations:
 
 Example:
 
-    $ make XPATH2_ENGINE=XQILLA
+    $ make xpath2_engine=xqilla
+
+### `debug`
+
+The `debug` variable enables building the tools with debugging
+information still included.
+
+Example:
+
+    $ make debug=1

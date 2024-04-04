@@ -1,22 +1,26 @@
 .PHONY: all install uninstall
 
-PREFIX=/usr/local
-INSTALL_PREFIX=$(PREFIX)/share/xml/schema/s1kd-tools
-INSTALL=install
+prefix = /usr/local
+datarootdir = $(prefix)/share
 
-SCHEMAS=*.xsd
+install_prefix = $(datarootdir)/xml/schema/s1kd-tools
 
-XML_CATALOG_FILE=/etc/xml/catalog
-ORIG_SCHEMA_URL=http://khzae.net/x/s1000d/s1kd-tools/schema
-REPL_SCHEMA_URL=file://$(INSTALL_PREFIX)
+INSTALL = install
+
+schemas = *.xsd
+
+xml_catalog_file=/etc/xml/catalog
+
+orig_schema_url=http://khzae.net/x/s1000d/s1kd-tools/schema
+repl_schema_url=file://$(install_prefix)
 
 all:
 
 install:
-	mkdir -p $(INSTALL_PREFIX)
-	$(INSTALL) $(SCHEMAS) $(INSTALL_PREFIX)
-	xmlcatalog --noout --add rewriteURI '$(ORIG_SCHEMA_URL)' '$(REPL_SCHEMA_URL)' $(XML_CATALOG_FILE)
+	mkdir -p $(install_prefix)
+	$(INSTALL) $(schemas) $(install_prefix)
+	xmlcatalog --noout --add rewriteURI '$(orig_schema_url)' '$(repl_schema_url)' $(xml_catalog_file)
 
 uninstall:
-	rm -rf $(INSTALL_PREFIX)
-	xmlcatalog --noout --del '$(ORIG_SCHEMA_URL)' $(XML_CATALOG_FILE)
+	rm -rf $(install_prefix)
+	xmlcatalog --noout --del '$(orig_schema_url)' $(xml_catalog_file)

@@ -1,8 +1,8 @@
-TARGETS=doc tools/s1kd-*
+targets=doc tools/s1kd-*
 
-all docs clean maintainer-clean install uninstall: $(TARGETS)
+all docs clean maintainer-clean install uninstall: $(targets)
 
-$(TARGETS)::
+$(targets)::
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
 githooks:

@@ -1,116 +1,119 @@
 .PHONY: docs clean maintainer-clean install uninstall
 
-COMMON=../common
+common_dir = ../common
 
-SOURCE=s1kd-brexcheck.c $(COMMON)/s1kd_tools.c
+sources = s1kd-brexcheck.c $(common_dir)/s1kd_tools.c
 
 ifeq ($(OS),Windows_NT)
-  OUTPUT=s1kd-brexcheck.exe
+  executable = s1kd-brexcheck.exe
 else
-  OUTPUT=s1kd-brexcheck
+  executable = s1kd-brexcheck
 endif
 
-WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt libexslt`
+warning_flags = -Wall -Werror -pedantic-errors
+
+CFLAGS = $(warning_flags) -I $(common_dir) `pkg-config --cflags libxml-2.0 libxslt libexslt`
 
 ifneq ($(MSYSTEM),)
-  CFLAGS+=-isystem $(COMMON)/msys
+  CFLAGS += -isystem $(common_dir)/msys
 endif
 
-ifeq ($(DEBUG),1)
-  CFLAGS+=-g -DDEBUG
+ifeq ($(debug),1)
+  CFLAGS += -g -DDEBUG
 else
-  CFLAGS+=-O3
+  CFLAGS += -O3
 endif
 
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt libexslt`
+LDFLAGS = `pkg-config --libs libxml-2.0 libxslt libexslt`
 
-PREFIX=/usr/local
-INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install -Ds
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
 
-XPATH2_ENGINE=NONE
+INSTALL = install -Ds
 
-ifeq ($(XPATH2_ENGINE),SAXON)
+xpath2_engine = none
+
+ifeq ($(xpath2_engine),saxon)
   ifeq ($(OS),Windows_NT)
-    SAXON_C_DIR=/cygdrive/c/Progra~1/Saxonica/SaxonHEC1.2.1
+    saxon_c_dir = /cygdrive/c/Progra~1/Saxonica/SaxonHEC1.2.1
   else
-    SAXON_C_DIR=/usr/lib
+    saxon_c_dir = /usr/lib
   endif
 
-  SAXON_C_API=saxon/Saxon.C.API
+  saxon_c_api = saxon/Saxon.C.API
 
-  SAXON_OBJECTS+=saxon/saxon.o
-  SAXON_OBJECTS+=saxon/SaxonCGlue.o
-  SAXON_OBJECTS+=saxon/SaxonCXPath.o
-  SAXON_OBJECTS+=saxon/SaxonProcessor.o
-  SAXON_OBJECTS+=saxon/SchemaValidator.o
-  SAXON_OBJECTS+=saxon/XdmAtomicValue.o
-  SAXON_OBJECTS+=saxon/XdmItem.o
-  SAXON_OBJECTS+=saxon/XdmNode.o
-  SAXON_OBJECTS+=saxon/XdmValue.o
-  SAXON_OBJECTS+=saxon/XPathProcessor.o
-  SAXON_OBJECTS+=saxon/XQueryProcessor.o
-  SAXON_OBJECTS+=saxon/Xslt30Processor.o
-  SAXON_OBJECTS+=saxon/XsltProcessor.o
+  saxon_objects += saxon/saxon.o
+  saxon_objects += saxon/SaxonCGlue.o
+  saxon_objects += saxon/SaxonCXPath.o
+  saxon_objects += saxon/SaxonProcessor.o
+  saxon_objects += saxon/SchemaValidator.o
+  saxon_objects += saxon/XdmAtomicValue.o
+  saxon_objects += saxon/XdmItem.o
+  saxon_objects += saxon/XdmNode.o
+  saxon_objects += saxon/XdmValue.o
+  saxon_objects += saxon/XPathProcessor.o
+  saxon_objects += saxon/XQueryProcessor.o
+  saxon_objects += saxon/Xslt30Processor.o
+  saxon_objects += saxon/XsltProcessor.o
 
-  SOURCE+=$(SAXON_OBJECTS)
-  LDFLAGS+=-lstdc++ -L$(SAXON_C_DIR) -lsaxonhec
+  sources += $(saxon_objects)
+  LDFLAGS += -lstdc++ -L$(saxon_c_dir) -lsaxonhec
 
-  SAXON_CFLAGS+=`pkg-config --cflags libxml-2.0`
+  saxon_cflags += `pkg-config --cflags libxml-2.0`
 
   ifneq ($(OSTYPE),msys)
-    LDFLAGS+=-ldl
+    LDFLAGS += -ldl
   endif
 
   # Treat MinGW/Cygwin as Linux when compiling Saxon/C API
   ifeq ($(OSTYPE),msys)
-    SAXON_CFLAGS+=-D__linux__
+    saxon_cflags += -D__linux__
   endif
   ifeq ($(OSTYPE),cygwin)
-    SAXON_CFLAGS+=-D__linux__
+    saxon_cflags += -D__linux__
   endif
 
-  ifeq ($(DEBUG),1)
-    SAXON_CFLAGS+=-g -DDEBUG
+  ifeq ($(debug),1)
+    saxon_cflags += -g -DDEBUG
   else
-    SAXON_CFLAGS+=-O3
+    saxon_cflags += -O3
   endif
 endif
 
-ifeq ($(XPATH2_ENGINE),XQILLA)
-  XQILLA_OBJECTS+=xqilla/xqilla.o
+ifeq ($(xpath2_engine),xqilla)
+  xqilla_objects += xqilla/xqilla.o
 
-  SOURCE+=$(XQILLA_OBJECTS)
-  LDFLAGS+=-lstdc++ `pkg-config --libs xerces-c` -lxqilla
+  sources += $(xqilla_objects)
+  LDFLAGS += -lstdc++ `pkg-config --libs xerces-c` -lxqilla
 
-  XQILLA_CFLAGS+=`pkg-config --cflags libxml-2.0 xerces-c`
+  xqilla_cflags += `pkg-config --cflags libxml-2.0 xerces-c`
 
-  ifeq ($(DEBUG),1)
-    XQILLA_CFLAGS+=-g -DDEBUG
+  ifeq ($(debug),1)
+    xqilla_cflags += -g -DDEBUG
   else
-    XQILLA_CFLAGS+=-O3
+    xqilla_cflags += -O3
   endif
 endif
 
-CFLAGS+=-DXPATH2_ENGINE=$(XPATH2_ENGINE)
+CFLAGS += -DXPATH2_ENGINE=$(xpath2_engine)
 
-all: $(OUTPUT)
+all: $(executable)
 
-$(OUTPUT): $(SOURCE) brex.h
-	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
+$(executable): $(sources) brex.h
+	$(CC) $(CFLAGS) -o $(executable) $(sources) $(LDFLAGS)
 
-saxon/%.o: $(SAXON_C_API)/%.cpp
-	$(CXX) $(SAXON_CFLAGS) -c -o $@ $+
+saxon/%.o: $(saxon_c_api)/%.cpp
+	$(CXX) $(saxon_cflags) -c -o $@ $+
 
-saxon/SaxonC%.o: $(SAXON_C_API)/SaxonC%.c
-	$(CC) $(SAXON_CFLAGS) -c -o $@ $+
+saxon/SaxonC%.o: $(saxon_c_api)/SaxonC%.c
+	$(CC) $(saxon_cflags) -c -o $@ $+
 
 saxon/saxon.o: saxon/saxon.cpp
-	$(CXX) $(SAXON_CFLAGS) -c -I$(SAXON_C_API) -o $@ $+
+	$(CXX) $(saxon_cflags) -c -I$(saxon_c_api) -o $@ $+
 
 xqilla/xqilla.o: xqilla/xqilla.cpp
-	$(CXX) -c $(XQILLA_CFLAGS) -o $@ $+
+	$(CXX) -c $(xqilla_cflags) -o $@ $+
 
 brex.h: brex/DMC-*.XML stats.xsl
 	> $@ && for f in $+; do xxd -i "$$f" >> $@; done
@@ -119,15 +122,15 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) brex.h $(SAXON_OBJECTS) $(XQILLA_OBJECTS)
+	$(RM) $(executable) brex.h $(saxon_objects) $(xqilla_objects)
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
 
-install: $(OUTPUT)
-	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)/$(OUTPUT)
+install: $(executable)
+	$(INSTALL) $(executable) $(bindir)/$(executable)
 	$(MAKE) -C doc install
 
 uninstall:
-	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(RM) $(bindir)/$(executable)
 	$(MAKE) -C doc uninstall

@@ -1,55 +1,58 @@
 .PHONY: docs clean maintainer-clean install uninstall
 
-COMMON=../common
+common_dir = ../common
 
-SOURCE=s1kd-newcom.c $(COMMON)/s1kd_tools.c
+sources = s1kd-newcom.c $(common_dir)/s1kd_tools.c
 
 ifeq ($(OS),Windows_NT)
-  OUTPUT=s1kd-newcom.exe
+  executable = s1kd-newcom.exe
 else
-  OUTPUT=s1kd-newcom
+  executable = s1kd-newcom
 endif
 
-WARNING_FLAGS=-Wall -Werror -pedantic-errors
-CFLAGS=$(WARNING_FLAGS) -I $(COMMON) `pkg-config --cflags libxml-2.0 libxslt`
+warning_flags = -Wall -Werror -pedantic-errors
+
+CFLAGS = $(warning_flags) -I $(common_dir) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifneq ($(MSYSTEM),)
-  CFLAGS+=-isystem $(COMMON)/msys
+  CFLAGS += -isystem $(common_dir)/msys
 endif
 
-ifeq ($(DEBUG),1)
-  CFLAGS+=-g
+ifeq ($(debug),1)
+  CFLAGS += -g
 else
-  CFLAGS+=-O3
+  CFLAGS += -O3
 endif
 
-LDFLAGS=`pkg-config --libs libxml-2.0 libxslt`
+LDFLAGS = `pkg-config --libs libxml-2.0 libxslt`
 
-PREFIX=/usr/local
-INSTALL_PREFIX=$(PREFIX)/bin
-INSTALL=install -Ds
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
 
-all: $(OUTPUT)
+INSTALL = install -Ds
 
-template.h: comment.xml $(COMMON)/to*.xsl
+all: $(executable)
+
+template.h: comment.xml $(common_dir)/to*.xsl
 	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
-$(OUTPUT): $(SOURCE) template.h
-	$(CC) $(CFLAGS) -o $(OUTPUT) $(SOURCE) $(LDFLAGS)
+$(executable): $(sources) template.h
+	$(CC) $(CFLAGS) -o $(executable) $(sources) $(LDFLAGS)
 
 docs:
 	$(MAKE) -C doc
 
 clean:
-	rm -f $(OUTPUT) template.h
+	$(RM) $(executable) template.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
 
-install: $(OUTPUT)
-	$(INSTALL) $(OUTPUT) $(INSTALL_PREFIX)/$(OUTPUT)
+install: $(executable)
+	$(INSTALL) $(executable) $(bindir)/$(executable)
 	$(MAKE) -C doc install
 
 uninstall:
-	rm -f $(INSTALL_PREFIX)/$(OUTPUT)
+	$(RM) $(bindir)/$(executable)
 	$(MAKE) -C doc uninstall

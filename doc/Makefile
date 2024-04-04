@@ -1,76 +1,79 @@
-README_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
-INTRO_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-018A-D_EN-CA.XML
-DEFAULTS_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-014A-D_EN-CA.XML
-INSTALL_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-920A-D_EN-CA.XML
-EXAMPLE_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-130A-D_EN-CA.XML
-COMPAT_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-C30A-D_EN-CA.XML
-TUTORIAL_SRC=DMC-S1KDTOOLS-A-00-00-00-00A-018B-D_EN-CA.XML
+readme_src = DMC-S1KDTOOLS-A-00-00-00-00A-040A-D_EN-CA.XML
+intro_src = DMC-S1KDTOOLS-A-00-00-00-00A-018A-D_EN-CA.XML
+defaults_src = DMC-S1KDTOOLS-A-00-00-00-00A-014A-D_EN-CA.XML
+install_src = DMC-S1KDTOOLS-A-00-00-00-00A-920A-D_EN-CA.XML
+example_src = DMC-S1KDTOOLS-A-00-00-00-00A-130A-D_EN-CA.XML
+compat_src = DMC-S1KDTOOLS-A-00-00-00-00A-C30A-D_EN-CA.XML
+tutorial_src = DMC-S1KDTOOLS-A-00-00-00-00A-018B-D_EN-CA.XML
 
-README=../README.md
-INTRO=../INTRO.md
-DEFAULTS=../DEFAULTS.md
-INSTALL_DOC=../INSTALL.md
-EXAMPLE=../EXAMPLE.md
-COMPAT=../COMPATIBILITY.md
-TUTORIAL=../TUTORIAL.md
+readme = ../README.md
+intro = ../INTRO.md
+defaults = ../DEFAULTS.md
+install_doc = ../INSTALL.md
+example = ../EXAMPLE.md
+compat = ../COMPATIBILITY.md
+tutorial = ../TUTORIAL.md
 
-S1KD2DB=s1kd2db
-S1KD2DB_FLAGS+=-param include.emphasis.role 1
+s1kd2db = s1kd2db
+s1kd2db_flags += -param include.emphasis.role 1
 
-PANDOC_MD=pandoc -f docbook -t gfm -s
-PANDOC_MD_TOC=pandoc -f docbook -t markdown | pandoc -f markdown -t gfm -s --toc
-PANDOC_MAN=pandoc -f docbook -t man -s
+pandoc_md = pandoc -f docbook -t gfm -s
+pandoc_md_toc = pandoc -f docbook -t markdown | pandoc -f markdown -t gfm -s --toc
+pandoc_man = pandoc -f docbook -t man -s
 
-PREFIX=/usr/local
-MAN1_PREFIX=$(PREFIX)/share/man/man1
-MAN5_PREFIX=$(PREFIX)/share/man/man5
-INSTALL=install -D
+prefix = /usr/local
+datarootdir = $(prefix)/share
+mandir = $(datarootdir)/man
+man1dir = $(mandir)/man1
+man5dir = $(mandir)/man5
+
+INSTALL = install -D
 
 all:
 
-docs: s1kd-tools.1 s1kd-defaults.5 $(README) $(INTRO) $(DEFAULTS) $(INSTALL_DOC) $(EXAMPLE) $(COMPAT) $(TUTORIAL)
+docs: s1kd-tools.1 s1kd-defaults.5 $(readme) $(intro) $(defaults) $(install_doc) $(example) $(compat) $(tutorial)
 
-$(README): $(README_SRC) .icncatalog
-	s1kd-icncatalog -m github $(README_SRC) | $(S1KD2DB) - $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(README)
+$(readme): $(readme_src) .icncatalog
+	s1kd-icncatalog -m github $(readme_src) | $(s1kd2db) - $(s1kd2db_flags) | $(pandoc_md) -o $(readme)
 
-$(INTRO): $(INTRO_SRC)
-	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INTRO)
+$(intro): $(intro_src)
+	$(s1kd2db) $(intro_src) $(s1kd2db_flags) | $(pandoc_md) -o $(intro)
 
-$(DEFAULTS): $(DEFAULTS_SRC)
-	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(DEFAULTS)
+$(defaults): $(defaults_src)
+	$(s1kd2db) $(defaults_src) $(s1kd2db_flags) | $(pandoc_md) -o $(defaults)
 
-$(INSTALL_DOC): $(INSTALL_SRC)
-	$(S1KD2DB) $(INSTALL_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(INSTALL_DOC)
+$(install_doc): $(install_src)
+	$(s1kd2db) $(install_src) $(s1kd2db_flags) | $(pandoc_md) -o $(install_doc)
 
-$(EXAMPLE): $(EXAMPLE_SRC) .icncatalog
-	s1kd-icncatalog -m github $(EXAMPLE_SRC) | $(S1KD2DB) - $(S1KD2DB_FLAGS) | $(PANDOC_MD_TOC) -o $(EXAMPLE)
+$(example): $(example_src) .icncatalog
+	s1kd-icncatalog -m github $(example_src) | $(s1kd2db) - $(s1kd2db_flags) | $(pandoc_md_toc) -o $(example)
 
-$(COMPAT): $(COMPAT_SRC)
-	$(S1KD2DB) $(COMPAT_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MD) -o $(COMPAT)
+$(compat): $(compat_src)
+	$(s1kd2db) $(compat_src) $(s1kd2db_flags) | $(pandoc_md) -o $(compat)
 
-$(TUTORIAL): $(TUTORIAL_SRC) .icncatalog ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG
-	s1kd-icncatalog -m github $(TUTORIAL_SRC) | $(S1KD2DB) - $(S1KD2DB_FLAGS) | $(PANDOC_MD_TOC) -o $(TUTORIAL)
+$(tutorial): $(tutorial_src) .icncatalog ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG
+	s1kd-icncatalog -m github $(tutorial_src) | $(s1kd2db) - $(s1kd2db_flags) | $(pandoc_md_toc) -o $(tutorial)
 
 ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG: ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.DOT
 	dot -Tpng -Gdpi=150 $< > $@
 
-s1kd-tools.1: $(INTRO_SRC)
-	$(S1KD2DB) $(INTRO_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
+s1kd-tools.1: $(intro_src)
+	$(s1kd2db) $(intro_src) $(s1kd2db_flags) | $(pandoc_man) -o $@
 
-s1kd-defaults.5: $(DEFAULTS_SRC)
-	$(S1KD2DB) $(DEFAULTS_SRC) $(S1KD2DB_FLAGS) | $(PANDOC_MAN) -o $@
+s1kd-defaults.5: $(defaults_src)
+	$(s1kd2db) $(defaults_src) $(s1kd2db_flags) | $(pandoc_man) -o $@
 
 .PHONY: docs clean maintainer-clean install uninstall
 
 clean:
 
 maintainer-clean:
-	rm -f s1kd-tools.1 s1kd-defaults.5 $(README) $(INTRO) $(DEFAULTS) $(INSTALL_DOC) $(EXAMPLE) $(COMPAT)
+	$(RM) s1kd-tools.1 s1kd-defaults.5 $(readme) $(intro) $(defaults) $(install_doc) $(example) $(compat)
 
 install:
-	$(INSTALL) s1kd-tools.1 $(MAN1_PREFIX)/s1kd-tools.1
-	$(INSTALL) s1kd-defaults.5 $(MAN5_PREFIX)/s1kd-defaults.5
+	$(INSTALL) s1kd-tools.1 $(man1dir)/s1kd-tools.1
+	$(INSTALL) s1kd-defaults.5 $(man5dir)/s1kd-defaults.5
 
 uninstall:
-	rm -f $(MAN1_PREFIX)/s1kd-tools.1
-	rm -f $(MAN5_PREFIX)/s1kd-defaults.5
+	$(RM) $(man1dir)/s1kd-tools.1
+	$(RM) $(man5dir)/s1kd-defaults.5

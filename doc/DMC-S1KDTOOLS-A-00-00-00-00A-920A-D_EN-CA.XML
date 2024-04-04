@@ -254,26 +254,26 @@
           <para>The following parameters can be given to <verbatimText>make</verbatimText> to control certain options when building and installing.</para>
           <levelledPara>
             <title>
-              <verbatimText>PREFIX</verbatimText>
+              <verbatimText>prefix</verbatimText>
             </title>
-            <para>The <verbatimText>PREFIX</verbatimText> variable determines where the s1kd-tools are installed when running <verbatimText>make install</verbatimText>, and where they are uninstalled from when running <verbatimText>make uninstall</verbatimText>. The default value is <verbatimText>/usr/local</verbatimText>.</para>
+            <para>The <verbatimText>prefix</verbatimText> variable determines where the s1kd-tools are installed when running <verbatimText>make install</verbatimText>, and where they are uninstalled from when running <verbatimText>make uninstall</verbatimText>. The default value is <verbatimText>/usr/local</verbatimText>.</para>
             <para>
               Example:
-              <verbatimText verbatimStyle="vs24"># make PREFIX=/usr install</verbatimText>
-              <verbatimText verbatimStyle="vs24"># make PREFIX=/usr uninstall</verbatimText>
+              <verbatimText verbatimStyle="vs24"># make prefix=/usr install</verbatimText>
+              <verbatimText verbatimStyle="vs24"># make prefix=/usr uninstall</verbatimText>
             </para>
           </levelledPara>
           <levelledPara>
             <title>
-              <verbatimText>XPATH2_ENGINE</verbatimText>
+              <verbatimText>xpath2_engine</verbatimText>
             </title>
-            <para>The <verbatimText>XPATH2_ENGINE</verbatimText> variable determines which XPath 2.0 implementation the s1kd-brexcheck tool will use to evaluate the object paths of BREX rules.</para>
+            <para>The <verbatimText>xpath2_engine</verbatimText> variable determines which XPath 2.0 implementation the s1kd-brexcheck tool will use to evaluate the object paths of BREX rules.</para>
             <para>
               The s1kd-tools are built on libxml, so by default s1kd-brexcheck uses libxml's XPath implementation. However, libxml only supports XPath 1.0. While as of Issue 5.0, the S1000D default BREX rules are all compatible with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0 specification. Therefore, if your project needs XPath 2.0 support for BREX rules, you should select one of these implementations:
               <definitionList>
                 <definitionListItem>
                   <listItemTerm>
-                    <verbatimText>SAXON</verbatimText>
+                    <verbatimText>saxon</verbatimText>
                   </listItemTerm>
                   <listItemDefinition>
                     <para>Experimental implementation using the Saxon/C library. Slower, and Saxon/C itself is a very large dependency. Not recommended at this time due to memory leak issues.</para>
@@ -281,7 +281,7 @@
                 </definitionListItem>
                 <definitionListItem>
                   <listItemTerm>
-                    <verbatimText>XQILLA</verbatimText>
+                    <verbatimText>xqilla</verbatimText>
                   </listItemTerm>
                   <listItemDefinition>
                     <para>Experimental implementation using the Xerces-C and XQilla libraries. A little slower than libxml, but faster than Saxon/C, and the dependencies are much smaller than the latter. This is currently the recommended implementation if you need XPath 2.0 support.</para>
@@ -291,7 +291,17 @@
             </para>
             <para>
               Example:
-              <verbatimText verbatimStyle="vs24">$ make XPATH2_ENGINE=XQILLA</verbatimText>
+              <verbatimText verbatimStyle="vs24">$ make xpath2_engine=xqilla</verbatimText>
+            </para>
+          </levelledPara>
+          <levelledPara>
+            <title>
+              <verbatimText>debug</verbatimText>
+            </title>
+            <para>The <verbatimText>debug</verbatimText> variable enables building the tools with debugging information still included.</para>
+            <para>
+              Example:
+              <verbatimText verbatimStyle="vs24">$ make debug=1</verbatimText>
             </para>
           </levelledPara>
         </levelledPara>
