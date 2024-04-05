@@ -21,6 +21,6 @@ jobs:
         with:
           msystem: MSYS
           update: true
-          install: gcc make pkgconf libxml2-devel libxslt-devel libsystre vim
+          install: gcc make pkgconf libxml2-devel libxslt-devel vim
       - name: make
         run: make CC=gcc
