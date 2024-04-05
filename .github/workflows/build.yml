@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: MSYS2
           update: true
-          install: perl-Pod-Usage mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkgconf mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt mingw-w64-x86_64-libsystre vim
+          install: gcc make pkgconf libxml2-devel libxslt-devel libsystre vim
       - name: make
         run: make CC=gcc
