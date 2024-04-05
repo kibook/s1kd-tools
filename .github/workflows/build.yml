@@ -1,12 +1,9 @@
 name: Build s1kd-tools
-
 on: [push]
 
 jobs:
-  build:
-
+  build-linux:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: Update repositories
@@ -15,3 +12,15 @@ jobs:
       run: sudo apt-get install -y -qq libxml2-dev libxslt1-dev vim-common
     - name: make
       run: make
+
+  build-mingw64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkgconf mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt mingw-w64-x86_64-libsystre vim
+      - name: make
+        run: make
