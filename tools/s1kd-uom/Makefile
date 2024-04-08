@@ -28,7 +28,7 @@ LDFLAGS = `pkg-config --libs libxml-2.0 libxslt`
 
 prefix = /usr/local
 exec_prefix = $(prefix)
-bindir = $(exec_prefix)/bindir
+bindir = $(exec_prefix)/bin
 
 INSTALL = install -Ds
 
