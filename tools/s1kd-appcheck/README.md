@@ -75,6 +75,16 @@ the actual validation.
   - \-h, -?, --help  
     Show help/usage message.
 
+  - \-j, --jobs \<jobs\>  
+    Specifies the number of jobs to run simultaneously when checking
+    objects.
+    
+    If this is unspecified or \<= 1, then objects are checked in a
+    single thread in the order they are specified on the command line.
+    
+    If this is \> 1, then objects will be checked in parallel, and the
+    order they are checked in is undefined.
+
   - \-K, --filter \<cmd\>  
     The command used to filter objects prior to validation. The objects
     will be passed to the command on stdin, and the filters will be

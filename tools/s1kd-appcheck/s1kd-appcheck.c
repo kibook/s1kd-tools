@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <pthread.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
@@ -16,7 +17,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.4.2"
+#define VERSION "6.5.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -33,6 +34,7 @@
 #define I_NESTEDCHECK INF_PREFIX "Checking nested applicability in %s...\n"
 #define I_PROPCHECK INF_PREFIX "Checking product attribute and condition definitions in %s...\n"
 #define I_NUM_PRODS INF_PREFIX "Checking %s for %d configurations...\n"
+#define I_THREADS INF_PREFIX "Creating %d threads...\n"
 
 /* Error messages. */
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
@@ -106,6 +108,9 @@ enum show_filenames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
 /* Applicability properties to ignore when validating objects. */
 xmlHashTablePtr ignored_properties = NULL;
 
+/* Number of simultaneous jobs to run in parallel. */
+int jobs = 1;
+
 /* Applicability check options. */
 struct appcheckopts {
 	char *useract;
@@ -144,6 +149,7 @@ static void show_help(void)
 	puts("  -f, --filenames         List invalid files.");
 	puts("  -h, -?, --help          Show help/usage message.");
 	puts("  -i, --ignore <id:type>  Ignore an applicability property when validating.");
+	puts("  -j, --jobs <jobs>       Maximum number of jobs to run in parallel.");
 	puts("  -K, --filter <cmd>      Command used to create objects.");
 	puts("  -k, --args <args>       Arguments used to create objects.");
 	puts("  -l, --list              Treat input as list of CSDB objects.");
@@ -1282,6 +1288,88 @@ static int custom_check(xmlDocPtr doc, const char *path, struct appcheckopts *op
 	return err;
 }
 
+/* Check that an object is valid for a single product instances. */
+static int check_prod(xmlDocPtr doc, const char *path, xmlDocPtr all, const char *pctfname, xmlNodePtr prod, struct appcheckopts *opts, xmlNodePtr report)
+{
+	xmlNodePtr asserts;
+	xmlChar *id;
+	int err = 0;
+
+	asserts = xmlNewNode(NULL, BAD_CAST "asserts");
+
+	if (all) {
+		id = NULL;
+	} else {
+		xmlChar line_s[16], *xpath;
+
+		id = xmlGetProp(prod, BAD_CAST "id");
+
+		if (id) {
+			xmlSetProp(asserts, BAD_CAST "product", id);
+		}
+
+		xmlStrPrintf(line_s, 16, "%ld", xmlGetLineNo(prod));
+		xmlSetProp(asserts, BAD_CAST "line", line_s);
+
+		xpath = xpath_of(prod);
+		xmlSetProp(asserts, BAD_CAST "xpath", xpath);
+		xmlFree(xpath);
+	}
+
+	extract_assigns(asserts, prod);
+
+	err += check_assigns(doc, path, asserts, prod, id, pctfname, opts);
+
+	xmlAddChild(report, xmlCopyNode(asserts, 1));
+
+	xmlFreeNode(asserts);
+
+	xmlFree(id);
+
+	return err;
+}
+
+/* Struct to pass data to a check_prod thread. */
+struct check_prod_thread_args {
+	xmlDocPtr doc;
+	const char *path;
+	xmlDocPtr all;
+	const char *pctfname;
+	xmlNodeSetPtr nodes;
+	struct appcheckopts *opts;
+	int job;
+};
+
+/* Struct to pass the results of check_prod back to the main thread. */
+struct check_prod_thread_result {
+	int err;
+	xmlNodePtr report;
+};
+
+/* Function used to run check_prod in parallel. */
+static void *check_prod_thread(void *data)
+{
+	int i;
+
+	struct check_prod_thread_args *args = (struct check_prod_thread_args *) data;
+
+	struct check_prod_thread_result *result;
+
+	result = malloc(sizeof(struct check_prod_thread_result));
+	result->err = 0;
+	result->report = xmlNewNode(NULL, BAD_CAST "report");
+
+	for (i = args->job; i < args->nodes->nodeNr; i += jobs) {
+		result->err += check_prod(args->doc, args->path, args->all, args->pctfname, args->nodes->nodeTab[i], args->opts, result->report);
+	}
+
+	free(args);
+
+	pthread_exit(result);
+
+	return NULL;
+}
+
 /* Check that an object is valid for all defined product instances. */
 static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr act, struct appcheckopts *opts, xmlNodePtr report)
 {
@@ -1313,40 +1401,51 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 			fprintf(stderr, I_NUM_PRODS, path, obj->nodesetval->nodeNr);
 		}
 
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlNodePtr asserts;
-			xmlChar *id;
+		/* If jobs > 1, check objects in parallel. */
+		if (jobs > 1) {
+			pthread_t threads[jobs];
 
-			asserts = xmlNewNode(NULL, BAD_CAST "asserts");
-
-			if (all) {
-				id = NULL;
-			} else {
-				xmlChar line_s[16], *xpath;
-
-				id = xmlGetProp(obj->nodesetval->nodeTab[i], BAD_CAST "id");
-
-				if (id) {
-					xmlSetProp(asserts, BAD_CAST "product", id);
-				}
-
-				xmlStrPrintf(line_s, 16, "%ld", xmlGetLineNo(obj->nodesetval->nodeTab[i]));
-				xmlSetProp(asserts, BAD_CAST "line", line_s);
-
-				xpath = xpath_of(obj->nodesetval->nodeTab[i]);
-				xmlSetProp(asserts, BAD_CAST "xpath", xpath);
-				xmlFree(xpath);
+			if (verbosity >= DEBUG) {
+				fprintf(stderr, I_THREADS, jobs);
 			}
 
-			extract_assigns(asserts, obj->nodesetval->nodeTab[i]);
+			/* Create threads. */
+			for (i = 0; i < jobs; ++i) {
+				struct check_prod_thread_args *args;
 
-			err += check_assigns(doc, path, asserts, obj->nodesetval->nodeTab[i], id, pctfname, opts);
+				args = malloc(sizeof(struct check_prod_thread_args));
+				args->doc = doc;
+				args->path = path;
+				args->all = all;
+				args->pctfname = pctfname;
+				args->nodes = obj->nodesetval;
+				args->opts = opts;
+				args->job = i;
 
-			xmlAddChild(report, xmlCopyNode(asserts, 1));
+				pthread_create(&threads[i], NULL, check_prod_thread, args);
+			}
 
-			xmlFreeNode(asserts);
+			/* Wait for all threads to finish and combine results into main report. */
+			for (i = 0; i < jobs; ++i) {
+				struct check_prod_thread_result *result;
+				xmlNodePtr child;
 
-			xmlFree(id);
+				pthread_join(threads[i], (void **) &result);
+
+				err += result->err;
+
+				for (child = result->report->children; child; child = child->next) {
+					xmlAddChild(report, xmlCopyNode(child, 1));
+				}
+
+				xmlFreeNode(result->report);
+				free(result);
+			}
+		/* Otherwise, check all objects in the main thread. */
+		} else {
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				err += check_prod(doc, path, all, pctfname, obj->nodesetval->nodeTab[i], opts, report);
+			}
 		}
 	}
 
@@ -1951,7 +2050,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtvx~h?";
+	const char *sopts = "A:abC:cDd:e:Ffi:Nnj:K:k:loP:pqRrsTtvx~h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -1966,6 +2065,7 @@ int main(int argc, char **argv)
 		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
 		{"ignore"         , required_argument, 0, 'i'},
+		{"jobs"           , required_argument, 0, 'j'},
 		{"filter"         , required_argument, 0, 'K'},
 		{"args"           , required_argument, 0, 'k'},
 		{"list"           , no_argument      , 0, 'l'},
@@ -2076,6 +2176,9 @@ int main(int argc, char **argv)
 				break;
 			case 'i':
 				add_ignored_property(optarg);
+				break;
+			case 'j':
+				jobs = atoi(optarg);
 				break;
 			case 'K':
 				opts.filter = strdup(optarg);

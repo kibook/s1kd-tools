@@ -24,7 +24,7 @@ else
   CFLAGS += -O3
 endif
 
-LDFLAGS = `pkg-config --libs libxml-2.0 libxslt libexslt`
+LDFLAGS = `pkg-config --libs libxml-2.0 libxslt libexslt` -pthread
 
 prefix = /usr/local
 exec_prefix = $(prefix)
