@@ -1,8 +1,15 @@
 #!/bin/sh
 
+set -e
+
 out=build/$MSYSTEM
 
-make
+for module in gcc make pkgconf libxml2 libxslt libsystre vim
+do
+	pacman --no-confirm -S --needed ${MINGW_PACKAGE_PREFIX}-${module}
+done
+
 mkdir -p "$out"
-cp tools/s1kd-*/s1kd-*.exe "$out"
-ldd "$out"/s1kd-*.exe | awk '{print $3}' | grep '^/mingw' | sort -u | xargs cp -t "$out"
+make -j$(nproc)
+cp tools/*/*.exe "$out"
+ldd "$out"/*.exe | awk '{print $3}' | grep '^/mingw' | sort -u | xargs cp -t "$out"
