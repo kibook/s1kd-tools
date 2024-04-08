@@ -4,10 +4,7 @@ set -e
 
 out=build/$MSYSTEM
 
-for module in gcc make pkgconf libxml2 libxslt libsystre vim
-do
-	pacman --noconfirm -S --needed ${MINGW_PACKAGE_PREFIX}-${module}
-done
+pacman --noconfirm -S --needed $(printf "${MINGW_PACKAGE_PREFIX}-%s " gcc make pkgconf libxml2 libxslt libsystre) vim
 
 mkdir -p "$out"
 make -j$(nproc)
