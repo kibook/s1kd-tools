@@ -9,4 +9,4 @@ pacman --noconfirm -S --needed $(printf "${MINGW_PACKAGE_PREFIX}-%s " gcc make p
 mkdir -p "$out"
 make -j$(nproc)
 cp tools/*/*.exe "$out"
-ldd "$out"/*.exe | awk '{print $3}' | grep '^/mingw' | sort -u | xargs cp -t "$out"
+ldd "$out"/*.exe | awk '{print $3}' | grep '^/mingw' | sort -u | xargs -r cp -t "$out"
