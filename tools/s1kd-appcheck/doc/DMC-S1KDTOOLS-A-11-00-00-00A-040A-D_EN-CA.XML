@@ -47,6 +47,9 @@
       <reasonForUpdate id="rfu-0003" updateHighlight="1">
         <simplePara>Add --jobs option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0004" updateHighlight="1">
+        <simplePara>Add --ignore option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -135,6 +138,12 @@
               <listItemTerm>-h, -?, --help</listItemTerm>
               <listItemDefinition>
                 <para>Show help/usage message.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0004">
+              <listItemTerm>-i, --ignore &lt;id:type&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Ignore a specified applicability property when validating.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">

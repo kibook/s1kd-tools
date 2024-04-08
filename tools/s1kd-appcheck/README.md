@@ -75,6 +75,9 @@ the actual validation.
   - \-h, -?, --help  
     Show help/usage message.
 
+  - \-i, --ignore \<id:type\>  
+    Ignore a specified applicability property when validating.
+
   - \-j, --jobs \<jobs\>  
     Specifies the number of jobs to run simultaneously when checking
     objects.
