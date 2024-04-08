@@ -79,14 +79,8 @@ the actual validation.
     Ignore a specified applicability property when validating.
 
   - \-j, --jobs \<jobs\>  
-    Specifies the number of jobs to run simultaneously when checking
-    objects.
-    
-    If this is unspecified or \<= 1, then objects are checked in a
-    single thread in the order they are specified on the command line.
-    
-    If this is \> 1, then objects will be checked in parallel, and the
-    order they are checked in is undefined.
+    Specifies the number of jobs to run in parallel when checking an
+    object's applicability.
 
   - \-K, --filter \<cmd\>  
     The command used to filter objects prior to validation. The objects
