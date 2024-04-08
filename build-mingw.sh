@@ -6,7 +6,7 @@ out=build/$MSYSTEM
 
 for module in gcc make pkgconf libxml2 libxslt libsystre vim
 do
-	pacman --no-confirm -S --needed ${MINGW_PACKAGE_PREFIX}-${module}
+	pacman --noconfirm -S --needed ${MINGW_PACKAGE_PREFIX}-${module}
 done
 
 mkdir -p "$out"
