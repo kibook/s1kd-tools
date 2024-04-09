@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="04"/>
+        <issueInfo issueNumber="010" inWork="05"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="04" day="08"/>
+        <issueDate year="2024" month="04" day="09"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -45,7 +45,7 @@
         <simplePara>Add new exit status.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0003" updateHighlight="1">
-        <simplePara>Add --jobs option.</simplePara>
+        <simplePara>Add --threads option.</simplePara>
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0004" updateHighlight="1">
         <simplePara>Add --ignore option.</simplePara>
@@ -144,12 +144,6 @@
               <listItemTerm>-i, --ignore &lt;id:type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Ignore a specified applicability property when validating.</para>
-              </listItemDefinition>
-            </definitionListItem>
-            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
-              <listItemTerm>-j, --jobs &lt;jobs&gt;</listItemTerm>
-              <listItemDefinition>
-                <para>Specifies the number of jobs to run in parallel when checking an object's applicability.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -252,6 +246,14 @@
               <listItemTerm>-~, --dependencies</listItemTerm>
               <listItemDefinition>
                 <para>Check with CCT dependency tests added to assertions which use the dependant values.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">
+              <listItemTerm>-#, --threads &lt;x[,y]&gt;</listItemTerm>
+              <listItemDefinition>
+                <para>Specifies the number of parallel threads to use for object validation. <verbatimText>x</verbatimText> represents the number of threads used to iterate over the list of objects. <verbatimText>y</verbatimText> represents the number of threads used to check each individual object. If both are specified, this means that in total <verbatimText>x * y</verbatimText> threads will be created. When either is unspecified, the default value is 1.</para>
+                <para>The numbers chosen typically will depend on the number of CPU cores available, how many objects are being validated, and the complexity of the applicability in the objects. Generally, the total number of threads (<verbatimText>x * y</verbatimText>) should not exceed the number of available cores. If you are validating a large number of objects with relatively little applicability, then <verbatimText>x</verbatimText> should be greater than <verbatimText>y</verbatimText>. On the other hand, if you are validating a small number of objects with complex applicability, then <verbatimText>y</verbatimText> should be greater than <verbatimText>x</verbatimText>. When validating a single object, <verbatimText>x</verbatimText> should always be 1.</para>
+                <para>Benchmarks should be performed to find the combination that is the best for your hardware and data.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -78,10 +78,6 @@ the actual validation.
   - \-i, --ignore \<id:type\>  
     Ignore a specified applicability property when validating.
 
-  - \-j, --jobs \<jobs\>  
-    Specifies the number of jobs to run in parallel when checking an
-    object's applicability.
-
   - \-K, --filter \<cmd\>  
     The command used to filter objects prior to validation. The objects
     will be passed to the command on stdin, and the filters will be
@@ -144,6 +140,27 @@ the actual validation.
   - \-\~, --dependencies  
     Check with CCT dependency tests added to assertions which use the
     dependant values.
+
+  - \-\#, --threads \<x\[,y\]\>  
+    Specifies the number of parallel threads to use for object
+    validation. `x` represents the number of threads used to iterate
+    over the list of objects. `y` represents the number of threads used
+    to check each individual object. If both are specified, this means
+    that in total `x * y` threads will be created. When either is
+    unspecified, the default value is 1.
+    
+    The numbers chosen typically will depend on the number of CPU cores
+    available, how many objects are being validated, and the complexity
+    of the applicability in the objects. Generally, the total number of
+    threads (`x * y`) should not exceed the number of available cores.
+    If you are validating a large number of objects with relatively
+    little applicability, then `x` should be greater than `y`. On the
+    other hand, if you are validating a small number of objects with
+    complex applicability, then `y` should be greater than `x`. When
+    validating a single object, `x` should always be 1.
+    
+    Benchmarks should be performed to find the combination that is the
+    best for your hardware and data.
 
   - \-^, --remove-deleted  
     Validate objects with elements that have a change type of "delete"

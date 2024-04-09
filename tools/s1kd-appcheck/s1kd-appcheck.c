@@ -17,7 +17,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.5.1"
+#define VERSION "6.6.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -108,8 +108,11 @@ enum show_filenames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
 /* Applicability properties to ignore when validating objects. */
 xmlHashTablePtr ignored_properties = NULL;
 
-/* Number of simultaneous jobs to run in parallel. */
-int jobs = 1;
+/* Number of simultaneous threads to run in parallel when iterating over the object list. */
+int object_threads = 1;
+
+/* Number of simultaneous threads to run in parallel when checking product instances. */
+int check_prod_threads = 1;
 
 /* Applicability check options. */
 struct appcheckopts {
@@ -131,6 +134,40 @@ struct appcheckopts {
 	enum appcheckmode mode;
 };
 
+/* Struct to pass data to object_thread. */
+struct object_thread_args {
+	struct appcheckopts *opts;
+	int show_progress;
+	int job;
+};
+
+/* Struct to pass the results of an object_thread back to the main thread. */
+struct object_thread_result {
+	int err;
+	xmlNodePtr report;
+};
+
+/* The number of objects checked so far when using multiple threads. */
+pthread_mutex_t object_thread_progress_mutex;
+int object_thread_progress = 0;
+
+/* Struct to pass data to a check_prod thread. */
+struct check_prod_thread_args {
+	xmlDocPtr doc;
+	const char *path;
+	xmlDocPtr all;
+	const char *pctfname;
+	xmlNodeSetPtr nodes;
+	struct appcheckopts *opts;
+	int job;
+};
+
+/* Struct to pass the results of check_prod back to the main thread. */
+struct check_prod_thread_result {
+	int err;
+	xmlNodePtr report;
+};
+
 /* Show usage message. */
 static void show_help(void)
 {
@@ -149,7 +186,6 @@ static void show_help(void)
 	puts("  -f, --filenames         List invalid files.");
 	puts("  -h, -?, --help          Show help/usage message.");
 	puts("  -i, --ignore <id:type>  Ignore an applicability property when validating.");
-	puts("  -j, --jobs <jobs>       Maximum number of jobs to run in parallel.");
 	puts("  -K, --filter <cmd>      Command used to create objects.");
 	puts("  -k, --args <args>       Arguments used to create objects.");
 	puts("  -l, --list              Treat input as list of CSDB objects.");
@@ -168,6 +204,7 @@ static void show_help(void)
 	puts("  -x, --xml               Output XML report.");
 	puts("  -~, --dependencies      Check CCT dependencies.");
 	puts("  -^, --remove-deleted    Validate with elements marked as \"delete\" removed.");
+	puts("  -#, --threads <x[,y]>   Number of threads to use. x * y threads are created in total.");
 	puts("  --version               Show version information.");
 	puts("  --zenity-progress       Print progress information in the zenity --progress format.");
 	puts("  <object>...             CSDB object(s) to check.");
@@ -698,15 +735,17 @@ static int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xm
 
 			for (i = 0; !match && i < obj->nodesetval->nodeNr; ++i) {
 				xmlChar *vals, *v = NULL;
-				char *end = NULL;
+				char *saveptr = NULL;
 
 				vals = first_xpath_value(NULL, obj->nodesetval->nodeTab[i],
 					BAD_CAST "@applicPropertyValues|@actvalues");
 
-				while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &end))) {
-					if (is_in_range((char *) val, (char *) v)) {
-						match = true;
-						break;
+				if (vals) {
+					while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|", &saveptr))) {
+						if (is_in_range((char *) val, (char *) v)) {
+							match = true;
+							break;
+						}
 					}
 				}
 
@@ -738,73 +777,72 @@ static int check_val_against_prop(xmlNodePtr assert, const xmlChar *id, const xm
 /* Check whether a property is defined in the ACT/CCT. */
 static int check_prop_against_ct(xmlNodePtr assert, xmlDocPtr act, xmlDocPtr cct, const char *path, xmlNodePtr report)
 {
-	xmlChar *id, *type, *vals, *xpath = NULL;
-	int n, err = 0;
-	xmlNodePtr prop;
+	xmlChar *id, *type, *vals;
+	int err = 0;
 
-	if (!(id = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref"))) {
-		return 0;
-	}
-	if (!(type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype"))) {
-		return 0;
-	}
-	if (!(vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@applicPropertyValue|@actvalues|@actvalue"))) {
-		return 0;
-	}
+	id = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
+	type = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
+	vals = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@applicPropertyValue|@actvalues|@actvalue");
 
-	if (xmlStrcmp(type, BAD_CAST "condition") == 0 && cct) {
-		/* For conditions, first get the condition itself. */
-		n = xmlStrlen(id) + 29;
-		xpath = malloc(n * sizeof(xmlChar));
-		xmlStrPrintf(xpath, n, "(//cond|//condition)[@id='%s']", id);
-		prop = first_xpath_node(cct, NULL, xpath);
+	if (id && type && vals) {
+		xmlChar *xpath = NULL;
+		int n;
+		xmlNodePtr prop;
 
-		/* Then get the condition type. */
+		if (xmlStrcmp(type, BAD_CAST "condition") == 0 && cct) {
+			/* For conditions, first get the condition itself. */
+			n = xmlStrlen(id) + 29;
+			xpath = malloc(n * sizeof(xmlChar));
+			xmlStrPrintf(xpath, n, "(//cond|//condition)[@id='%s']", id);
+			prop = first_xpath_node(cct, NULL, xpath);
+
+			/* Then get the condition type. */
+			if (prop) {
+				xmlChar *condtype;
+
+				condtype = first_xpath_value(cct, prop, BAD_CAST "@condTypeRefId|@condtyperef");
+
+				if (condtype) {
+					xmlFree(xpath);
+					n = xmlStrlen(condtype) + 37;
+					xpath = malloc(n * sizeof(xmlChar));
+					xmlStrPrintf(xpath, n, "(//condType|//conditiontype)[@id='%s']", condtype);
+					prop = first_xpath_node(cct, NULL, xpath);
+				}
+
+				xmlFree(condtype);
+			}
+		} else if (xmlStrcmp(type, BAD_CAST "prodattr") == 0 && act) {
+			n = xmlStrlen(id) + 40;
+			xpath = malloc(n * sizeof(xmlChar));
+			xmlStrPrintf(xpath, n, "(//productAttribute|//prodattr)[@id='%s']", id);
+			prop = first_xpath_node(act, NULL, xpath);
+		} else {
+			prop = NULL;
+		}
+
+		xmlFree(xpath);
+
 		if (prop) {
-			xmlChar *condtype;
+			xmlChar *v = NULL;
+			char *saveptr = NULL;
 
-			condtype = first_xpath_value(cct, prop, BAD_CAST "@condTypeRefId|@condtyperef");
+			while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|~", &saveptr))) {
+				err += check_val_against_prop(assert, id, type, v, prop, path, report);
+			}
+		} else {
+			long int line;
 
-			if (condtype) {
-				xmlFree(xpath);
-				n = xmlStrlen(condtype) + 37;
-				xpath = malloc(n * sizeof(xmlChar));
-				xmlStrPrintf(xpath, n, "(//condType|//conditiontype)[@id='%s']", condtype);
-				prop = first_xpath_node(cct, NULL, xpath);
+			line = xmlGetLineNo(assert);
+
+			if (verbosity >= NORMAL) {
+				fprintf(stderr, E_PROPCHECK, path, (char *) type, (char *) id, line);
 			}
 
-			xmlFree(condtype);
+			add_undef_node(report, assert, id, type, NULL, line);
+
+			++err;
 		}
-	} else if (xmlStrcmp(type, BAD_CAST "prodattr") == 0 && act) {
-		n = xmlStrlen(id) + 40;
-		xpath = malloc(n * sizeof(xmlChar));
-		xmlStrPrintf(xpath, n, "(//productAttribute|//prodattr)[@id='%s']", id);
-		prop = first_xpath_node(act, NULL, xpath);
-	} else {
-		prop = NULL;
-	}
-
-	xmlFree(xpath);
-
-	if (prop) {
-		xmlChar *v = NULL;
-		char *end = NULL;
-
-		while ((v = BAD_CAST strtok_r(v ? NULL : (char *) vals, "|~", &end))) {
-			err += check_val_against_prop(assert, id, type, v, prop, path, report);
-		}
-	} else {
-		long int line;
-
-		line = xmlGetLineNo(assert);
-
-		if (verbosity >= NORMAL) {
-			fprintf(stderr, E_PROPCHECK, path, (char *) type, (char *) id, line);
-		}
-
-		add_undef_node(report, assert, id, type, NULL, line);
-
-		++err;
 	}
 
 	xmlFree(id);
@@ -1078,10 +1116,11 @@ static void extract_enumvals(xmlNodePtr asserts, xmlNodePtr prop, const xmlChar 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 			xmlChar *v;
 			xmlChar *c = NULL;
+			char *saveptr = NULL;
 
 			v = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
 
-			while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|~"))) {
+			while ((c = BAD_CAST strtok_r(c ? NULL : (char *) v, "|~", &saveptr))) {
 				xmlNodePtr assert;
 
 				assert = xmlNewNode(NULL, BAD_CAST "assign");
@@ -1329,23 +1368,6 @@ static int check_prod(xmlDocPtr doc, const char *path, xmlDocPtr all, const char
 	return err;
 }
 
-/* Struct to pass data to a check_prod thread. */
-struct check_prod_thread_args {
-	xmlDocPtr doc;
-	const char *path;
-	xmlDocPtr all;
-	const char *pctfname;
-	xmlNodeSetPtr nodes;
-	struct appcheckopts *opts;
-	int job;
-};
-
-/* Struct to pass the results of check_prod back to the main thread. */
-struct check_prod_thread_result {
-	int err;
-	xmlNodePtr report;
-};
-
 /* Function used to run check_prod in parallel. */
 static void *check_prod_thread(void *data)
 {
@@ -1359,7 +1381,7 @@ static void *check_prod_thread(void *data)
 	result->err = 0;
 	result->report = xmlNewNode(NULL, BAD_CAST "report");
 
-	for (i = args->job; i < args->nodes->nodeNr; i += jobs) {
+	for (i = args->job; i < args->nodes->nodeNr; i += check_prod_threads) {
 		result->err += check_prod(args->doc, args->path, args->all, args->pctfname, args->nodes->nodeTab[i], args->opts, result->report);
 	}
 
@@ -1401,16 +1423,16 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 			fprintf(stderr, I_NUM_PRODS, path, obj->nodesetval->nodeNr);
 		}
 
-		/* If jobs > 1, check objects in parallel. */
-		if (jobs > 1) {
-			pthread_t threads[jobs];
+		/* If check_prod_threads > 1, check objects in parallel. */
+		if (check_prod_threads > 1) {
+			pthread_t threads[check_prod_threads];
 
 			if (verbosity >= DEBUG) {
-				fprintf(stderr, I_THREADS, jobs);
+				fprintf(stderr, I_THREADS, check_prod_threads);
 			}
 
 			/* Create threads. */
-			for (i = 0; i < jobs; ++i) {
+			for (i = 0; i < check_prod_threads; ++i) {
 				struct check_prod_thread_args *args;
 
 				args = malloc(sizeof(struct check_prod_thread_args));
@@ -1426,7 +1448,7 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 			}
 
 			/* Wait for all threads to finish and combine results into main report. */
-			for (i = 0; i < jobs; ++i) {
+			for (i = 0; i < check_prod_threads; ++i) {
 				struct check_prod_thread_result *result;
 				xmlNodePtr child;
 
@@ -1463,38 +1485,41 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 static void add_assert(xmlNodePtr asserts, xmlNodePtr assert)
 {
 	xmlChar *i, *t, *v, *c = NULL;
+	char *saveptr = NULL;
 
 	i = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
 	t = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
 	v = first_xpath_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
-	while ((c = BAD_CAST strtok(c ? NULL : (char *) v, "|~"))) {
-		xmlNodePtr cur;
-		bool exists = false;
+	if (i && t && v) {
+		while ((c = BAD_CAST strtok_r(c ? NULL : (char *) v, "|~", &saveptr))) {
+			xmlNodePtr cur;
+			bool exists = false;
 
-		for (cur = asserts->children; cur && !exists; cur = cur->next) {
-			xmlChar *ci, *ct, *cv;
+			for (cur = asserts->children; cur && !exists; cur = cur->next) {
+				xmlChar *ci, *ct, *cv;
 
-			ci = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent");
-			ct = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
-			cv = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue");
+				ci = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent");
+				ct = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
+				cv = first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyValue");
 
-			exists = xmlStrcmp(i, ci) == 0 && xmlStrcmp(t, ct) == 0 && xmlStrcmp(c, cv) == 0;
+				exists = xmlStrcmp(i, ci) == 0 && xmlStrcmp(t, ct) == 0 && xmlStrcmp(c, cv) == 0;
 
-			xmlFree(ci);
-			xmlFree(ct);
-			xmlFree(cv);
-		}
+				xmlFree(ci);
+				xmlFree(ct);
+				xmlFree(cv);
+			}
 
-		if (!exists) {
-			xmlNodePtr new;
+			if (!exists) {
+				xmlNodePtr new;
 
-			new = xmlNewNode(NULL, BAD_CAST "assign");
-			xmlSetProp(new, BAD_CAST "applicPropertyIdent", i);
-			xmlSetProp(new, BAD_CAST "applicPropertyType", t);
-			xmlSetProp(new, BAD_CAST "applicPropertyValue", c);
+				new = xmlNewNode(NULL, BAD_CAST "assign");
+				xmlSetProp(new, BAD_CAST "applicPropertyIdent", i);
+				xmlSetProp(new, BAD_CAST "applicPropertyType", t);
+				xmlSetProp(new, BAD_CAST "applicPropertyValue", c);
 
-			xmlAddChild(asserts, new);
+				xmlAddChild(asserts, new);
+			}
 		}
 	}
 
@@ -2046,11 +2071,66 @@ static void add_ignored_property(char *specifier)
 	xmlHashAddEntry(ignored_properties, BAD_CAST specifier, ignored_properties);
 }
 
+/* Function used to check object files in parallel. */
+static void *object_thread(void *data)
+{
+	int i;
+	struct object_thread_args *args = (struct object_thread_args *) data;
+	struct object_thread_result *result;
+
+	result = malloc(sizeof(struct object_thread_result));
+	result->err = 0;
+	result->report = xmlNewNode(NULL, BAD_CAST "report");
+
+	for (i = args->job; i < nobjects; i += object_threads) {
+		result->err += check_applic_file(objects[i], args->opts, result->report);
+
+		/* Use mutex lock to ensure only one thread is writing the progress at a time. */
+		if (args->show_progress != PROGRESS_OFF) {
+			pthread_mutex_lock(&object_thread_progress_mutex);
+
+			switch (args->show_progress) {
+				case PROGRESS_CLI:
+					print_progress_bar(object_thread_progress, nobjects);
+					break;
+				case PROGRESS_ZENITY:
+					print_zenity_progress("Performing applicability check...", object_thread_progress, nobjects);
+					break;
+			}
+
+			++object_thread_progress;
+
+			pthread_mutex_unlock(&object_thread_progress_mutex);
+		}
+	}
+
+	free(args);
+
+	pthread_exit(result);
+
+	return NULL;
+}
+
+/* Parse the number of threads to use, in the form of <x[,y]>. */
+static void parse_thread_arg(char *optarg)
+{
+	char *x, *y, *saveptr;
+
+	x = strtok_r(optarg, ",", &saveptr);
+	y = strtok_r(NULL, ",", &saveptr);
+
+	object_threads = atoi(x);
+
+	if (y) {
+		check_prod_threads = atoi(y);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:Ffi:Nnj:K:k:loP:pqRrsTtvx~h?";
+	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtvx~#:h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -2065,7 +2145,6 @@ int main(int argc, char **argv)
 		{"valid-filenames", no_argument      , 0, 'F'},
 		{"filenames"      , no_argument      , 0, 'f'},
 		{"ignore"         , required_argument, 0, 'i'},
-		{"jobs"           , required_argument, 0, 'j'},
 		{"filter"         , required_argument, 0, 'K'},
 		{"args"           , required_argument, 0, 'k'},
 		{"list"           , no_argument      , 0, 'l'},
@@ -2083,6 +2162,7 @@ int main(int argc, char **argv)
 		{"verbose"        , no_argument      , 0, 'v'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"dependencies"   , no_argument      , 0, '~'},
+		{"threads"        , required_argument, 0, '#'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		{"zenity-progress", no_argument      , 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -2177,9 +2257,6 @@ int main(int argc, char **argv)
 			case 'i':
 				add_ignored_property(optarg);
 				break;
-			case 'j':
-				jobs = atoi(optarg);
-				break;
 			case 'K':
 				opts.filter = strdup(optarg);
 				break;
@@ -2234,6 +2311,9 @@ int main(int argc, char **argv)
 			case '^':
 				opts.rem_delete = true;
 				break;
+			case '#':
+				parse_thread_arg(optarg);
+				break;
 			case 'h':
 			case '?':
 				show_help();
@@ -2255,18 +2335,49 @@ int main(int argc, char **argv)
 		add_object("-");
 	}
 
-	for (i = 0; i < nobjects; ++i) {
-		err += check_applic_file(objects[i], &opts, appcheck);
+	if (object_threads > 1) {
+		pthread_t threads[object_threads];
 
-		switch (show_progress) {
-			case PROGRESS_OFF:
-				break;
-			case PROGRESS_CLI:
-				print_progress_bar(i, nobjects);
-				break;
-			case PROGRESS_ZENITY:
-				print_zenity_progress("Performing applicability check...", i, nobjects);
-				break;
+		for (i = 0; i < object_threads; ++i) {
+			struct object_thread_args *args;
+
+			args = malloc(sizeof(struct object_thread_args));
+			args->opts = &opts;
+			args->show_progress = show_progress;
+			args->job = i;
+
+			pthread_create(&threads[i], NULL, object_thread, args);
+		}
+
+		for (i = 0; i < object_threads; ++i) {
+			struct object_thread_result *result;
+			xmlNodePtr child;
+
+			pthread_join(threads[i], (void **) &result);
+
+			err += result-> err;
+
+			for (child = result->report->children; child; child = child->next) {
+				xmlAddChild(appcheck, xmlCopyNode(child, 1));
+			}
+
+			xmlFreeNode(result->report);
+			free(result);
+		}
+	} else {
+		for (i = 0; i < nobjects; ++i) {
+			err += check_applic_file(objects[i], &opts, appcheck);
+
+			switch (show_progress) {
+				case PROGRESS_OFF:
+					break;
+				case PROGRESS_CLI:
+					print_progress_bar(i, nobjects);
+					break;
+				case PROGRESS_ZENITY:
+					print_zenity_progress("Performing applicability check...", i, nobjects);
+					break;
+			}
 		}
 	}
 
@@ -2275,10 +2386,10 @@ int main(int argc, char **argv)
 			case PROGRESS_OFF:
 				break;
 			case PROGRESS_CLI:
-				print_progress_bar(i, nobjects);
+				print_progress_bar(nobjects, nobjects);
 				break;
 			case PROGRESS_ZENITY:
-				print_zenity_progress("Applicability check complete", i, nobjects);
+				print_zenity_progress("Applicability check complete", nobjects, nobjects);
 				break;
 		}
 	}
