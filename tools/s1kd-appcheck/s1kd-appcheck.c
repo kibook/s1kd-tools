@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <pthread.h>
+#include <math.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
@@ -17,7 +18,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.6.0"
+#define VERSION "6.7.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -34,7 +35,7 @@
 #define I_NESTEDCHECK INF_PREFIX "Checking nested applicability in %s...\n"
 #define I_PROPCHECK INF_PREFIX "Checking product attribute and condition definitions in %s...\n"
 #define I_NUM_PRODS INF_PREFIX "Checking %s for %d configurations...\n"
-#define I_THREADS INF_PREFIX "Creating %d threads...\n"
+#define I_AUTO_THREADS INF_PREFIX "Threads automatically set to %d,%d\n"
 
 /* Error messages. */
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
@@ -1427,10 +1428,6 @@ static int check_prods(xmlDocPtr doc, const char *path, xmlDocPtr all, xmlDocPtr
 		if (check_prod_threads > 1) {
 			pthread_t threads[check_prod_threads];
 
-			if (verbosity >= DEBUG) {
-				fprintf(stderr, I_THREADS, check_prod_threads);
-			}
-
 			/* Create threads. */
 			for (i = 0; i < check_prod_threads; ++i) {
 				struct check_prod_thread_args *args;
@@ -2126,6 +2123,48 @@ static void parse_thread_arg(char *optarg)
 	}
 }
 
+static void auto_determine_threads(void)
+{
+	int nproc;
+	int a;
+	int x = 0;
+	int y = 0;
+
+#ifdef _WIN32
+	nproc = atoi(getenv("NUMBER_OF_PROCESSORS"));
+#else
+	nproc = sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+
+	a = sqrt(nproc);
+
+	if (nproc % a == 0) {
+		x = a;
+		y = a;
+	} else {
+		int i;
+
+		for (i = a; i < nproc; ++i) {
+			if (nproc % i == 0) {
+				x = nproc / i;
+				y = i;
+			}
+		}
+	}
+
+	if (x == 0 || nobjects < x) {
+		object_threads = 1;
+		check_prod_threads = nproc;
+	} else {
+		object_threads = x;
+		check_prod_threads = y;
+	}
+
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_AUTO_THREADS, object_threads, check_prod_threads);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int i;
@@ -2174,6 +2213,7 @@ int main(int argc, char **argv)
 	bool xmlout = false;
 	bool show_stats = false;
 	int show_progress = PROGRESS_OFF;
+	bool auto_threads = false;
 
 	struct appcheckopts opts = {
 		/* useract */         NULL,
@@ -2312,7 +2352,11 @@ int main(int argc, char **argv)
 				opts.rem_delete = true;
 				break;
 			case '#':
-				parse_thread_arg(optarg);
+				if (strcmp(optarg, "auto") == 0) {
+					auto_threads = true;
+				} else {
+					parse_thread_arg(optarg);
+				}
 				break;
 			case 'h':
 			case '?':
@@ -2333,6 +2377,10 @@ int main(int argc, char **argv)
 		add_object_list(NULL);
 	} else {
 		add_object("-");
+	}
+
+	if (auto_threads) {
+		auto_determine_threads();
 	}
 
 	if (object_threads > 1) {
