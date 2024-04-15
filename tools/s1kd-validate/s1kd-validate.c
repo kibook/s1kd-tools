@@ -1,13 +1,14 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <pthread.h>
 #include <libxml/tree.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/debugXML.h>
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "3.1.1"
+#define VERSION "3.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -121,6 +122,30 @@ xmlStructuredErrorFunc schema_errfunc = print_error;
 /* Print the XML tree to stdout if it is valid. */
 static int output_tree = 0;
 
+/* Number of threads to use .*/
+static int object_threads = 1;
+
+/* Struct used to pass arguments to threads. */
+struct thread_args {
+	int thread;
+	char **argv;
+	int argc;
+	int is_list;
+	char *schema;
+	xmlNodePtr ignore_ns;
+	enum show_fnames show_fnames;
+	int ignore_empty;
+	int rem_del;
+};
+
+/* Struct used to return results back to the main thread. */
+struct thread_result {
+	int err;
+};
+
+/* Mutex to protect write to schema_parsers and SCHEMA_PARSERS_MAX. */
+pthread_mutex_t schema_parsers_mutex;
+
 static struct s1kd_schema_parser *get_schema_parser(const char *url)
 {
 	int i;
@@ -163,21 +188,22 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-s <path>] [-x <URI>] [-efloqv^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-s <path>] [-x <URI>] [-# <threads>] [-efloqv^h?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -e, --ignore-empty    Ignore empty/non-XML documents.");
-	puts("  -f, --filenames       List invalid files.");
-	puts("  -h, -?, --help        Show help/usage message.");
-	puts("  -l, --list            Treat input as list of filenames.");
-	puts("  -o, --output-valid    Output valid CSDB objects to stdout.");
-	puts("  -q, --quiet           Silent (no output).");
-	puts("  -s, --schema <path>   Validate against the given schema.");
-	puts("  -v, --verbose         Verbose output.");
-	puts("  -x, --exclude <URI>   Exclude namespace from validation by URI.");
-	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
-	puts("  --version             Show version information.");
-	puts("  <object>              Any number of CSDB objects to validate.");
+	puts("  -e, --ignore-empty       Ignore empty/non-XML documents.");
+	puts("  -f, --filenames          List invalid files.");
+	puts("  -h, -?, --help           Show help/usage message.");
+	puts("  -l, --list               Treat input as list of filenames.");
+	puts("  -o, --output-valid       Output valid CSDB objects to stdout.");
+	puts("  -q, --quiet              Silent (no output).");
+	puts("  -s, --schema <path>      Validate against the given schema.");
+	puts("  -v, --verbose            Verbose output.");
+	puts("  -x, --exclude <URI>      Exclude namespace from validation by URI.");
+	puts("  -#, --threads <threads>  Number of threads to use.");
+	puts("  -^, --remove-deleted     Validate with elements marked as \"delete\" removed.");
+	puts("  --version                Show version information.");
+	puts("  <object>                 Any number of CSDB objects to validate.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -362,11 +388,15 @@ static int validate_file(const char *fname, const char *schema, xmlNodePtr ignor
 	if ((parser = get_schema_parser(url))) {
 		xmlFree(url);
 	} else {
+		if (object_threads > 1) pthread_mutex_lock(&schema_parsers_mutex);
+
 		if (schema_parser_count == SCHEMA_PARSERS_MAX) {
 			resize_schema_parsers();
 		}
 
 		parser = add_schema_parser(url);
+
+		if (object_threads > 1) pthread_mutex_unlock(&schema_parsers_mutex);
 	}
 
 	if (xmlSchemaValidateDoc(parser->valid_ctxt, doc)) {
@@ -427,6 +457,30 @@ static int validate_file_list(const char *fname, const char *schema, xmlNodePtr 
 	return err;
 }
 
+static void *validate_file_thread(void *data)
+{
+	struct thread_args *args = (struct thread_args *) data;
+	struct thread_result *result;
+	int i;
+
+	result = malloc(sizeof(struct thread_result));
+	result->err = 0;
+
+	for (i = args->thread; i < args->argc; i += object_threads) {
+		if (args->is_list) {
+			result->err += validate_file_list(args->argv[i], args->schema, args->ignore_ns, args->show_fnames, args->ignore_empty, args->rem_del);
+		} else {
+			result->err += validate_file(args->argv[i], args->schema, args->ignore_ns, args->show_fnames, args->ignore_empty, args->rem_del);
+		}
+	}
+
+	free(args);
+
+	pthread_exit(result);
+
+	return NULL;
+}
+
 int main(int argc, char *argv[])
 {
 	int c, i;
@@ -439,7 +493,7 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqx:Ffloes:^h?";
+	const char *sopts = "vqx:Ffloes:#:^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -452,6 +506,7 @@ int main(int argc, char *argv[])
 		{"exclude"        , required_argument, 0, 'x'},
 		{"ignore-empty"   , no_argument      , 0, 'e'},
 		{"schema"         , required_argument, 0, 's'},
+		{"threads"        , required_argument, 0, '#'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -480,6 +535,7 @@ int main(int argc, char *argv[])
 			case 'o': output_tree = 1; break;
 			case 'e': ignore_empty = 1; break;
 			case 's': schema = strdup(optarg); break;
+			case '#': object_threads = atoi(optarg); break;
 			case '^': rem_del = 1; break;
 			case 'h': 
 			case '?': show_help(); return EXIT_SUCCESS;
@@ -497,11 +553,42 @@ int main(int argc, char *argv[])
 	xmlSetStructuredErrorFunc(stderr, schema_errfunc);
 
 	if (optind < argc) {
-		for (i = optind; i < argc; ++i) {
-			if (is_list) {
-				err += validate_file_list(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
-			} else {
-				err += validate_file(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+		if (object_threads > 1) {
+			pthread_t threads[object_threads];
+
+			for (i = 0; i < object_threads; ++i) {
+				struct thread_args *args;
+
+				args = malloc(sizeof(struct thread_args));
+				args->thread = i;
+				args->argv = argv;
+				args->argc = argc;
+				args->is_list = is_list;
+				args->schema = schema;
+				args->ignore_ns = ignore_ns;
+				args->show_fnames = show_fnames;
+				args->ignore_empty = ignore_empty;
+				args->rem_del = rem_del;
+
+				pthread_create(&threads[i], NULL, validate_file_thread, args);
+			}
+
+			for (i = 0; i < object_threads; ++i) {
+				struct thread_result *result;
+
+				pthread_join(threads[i], (void **) &result);
+
+				err += result->err;
+
+				free(result);
+			}	
+		} else {
+			for (i = optind; i < argc; ++i) {
+				if (is_list) {
+					err += validate_file_list(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+				} else {
+					err += validate_file(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+				}
 			}
 		}
 	} else if (is_list) {
