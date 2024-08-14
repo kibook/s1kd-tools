@@ -17,7 +17,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.6.0"
+#define VERSION "6.6.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -109,10 +109,10 @@ enum show_filenames { SHOW_NONE, SHOW_INVALID, SHOW_VALID };
 xmlHashTablePtr ignored_properties = NULL;
 
 /* Number of simultaneous threads to run in parallel when iterating over the object list. */
-int object_threads = 1;
+static int object_threads = 1;
 
 /* Number of simultaneous threads to run in parallel when checking product instances. */
-int check_prod_threads = 1;
+static int check_prod_threads = 1;
 
 /* Applicability check options. */
 struct appcheckopts {
