@@ -131,6 +131,13 @@ the actual validation.
     Validate objects against the defined product instances within the
     PCT.
 
+  - \-u, --unstrict-nested  
+    Perform a nested applicability check (refer to the -n, --nested
+    option above) in "unstrict" mode. The normal, strict nested check
+    always checks that each individual assert is a subset of its parent
+    applicability, but in this mode errors will only be reported if the
+    applicability annotation as a whole is not a subset of its parent.
+
   - \-v, --verbose  
     Verbose output. Specify multiple times to increase the verbosity.
 
@@ -462,6 +469,54 @@ object:
     when prodattr version = C, which is not a subset of the applicability
     of the whole object.
 
+The -u (--unstrict-nested) option performs the nested check in
+"unstrict" mode. How this differs from the normal, strict nested check
+can be illustrated as follows:
+
+    <referencedApplicGroup>
+    <applic id="app-A">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    </applic>
+    <applic id="app-B">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    <applic id="app-A-or-B">
+    <evaluate andOr="or">
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="A"/>
+    <assert
+    applicPropertyIdent="version"
+    applicPropertyType="prodattr"
+    applicPropertyValues="B"/>
+    </applic>
+    </referencedApplicGroup>
+    ...
+    <proceduralStep applicRefId="app-A">
+    <para>Step 1</para>
+    <proceduralStep applicRefId="app-A-or-B">
+    <para>Step 1.1</para>
+    </proceduralStep>
+    <proceduralStep applicRefId="app-B">
+    <para>Step 1.2</para>
+    </proceduralStep>
+    </proceduralStep>
+
+When performing a normal, strict nested check, both steps 1.1 and 1.2
+will be reported as having nested applicability errors, because they are
+inside a step that is applicable only to Version A yet each contain an
+assertion for Version B. However, in unstrict mode, only Step 1.2 will
+be reported as an error, because the applicability of Step 1.1 is "A
+*or* B" and so is technically still valid (even though the inclusion of
+B can be considered pointless).
+
 ## Redundant applicability annotations
 
 Consider the following data module snippet:
@@ -485,13 +540,11 @@ nested element is redundant:
     s1kd-appcheck: ERROR: <DM>: figure on line 85 has the same
     applicability as its parent proceduralStep on line 83 (app-A)
 
-<div class="note">
-
-Currently, this check only detects when the exact same annotation (with
-the same ID) is nested within itself. In the future, this should also
-detect redundant logic between different nested annotations.
-
-</div>
+> **Note**
+> 
+> Currently, this check only detects when the exact same annotation
+> (with the same ID) is nested within itself. In the future, this should
+> also detect redundant logic between different nested annotations.
 
 ## Duplicate applicability annotations
 

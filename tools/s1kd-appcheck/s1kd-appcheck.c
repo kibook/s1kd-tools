@@ -17,7 +17,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.6.1"
+#define VERSION "6.7.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -128,6 +128,7 @@ struct appcheckopts {
 	bool add_deps;
 	bool check_props;
 	bool check_nested;
+	bool strict_nested;
 	bool check_redundant;
 	bool check_duplicate;
 	bool rem_delete;
@@ -200,6 +201,7 @@ static void show_help(void)
 	puts("  -s, --strict            Check that all properties are defined.");
 	puts("  -T, --summary           Print a summary of the check.");
 	puts("  -t, --products          Validate against product instances.");
+	puts("  -u, --unstrict-nested   Perform a nested check in unstrict mode.");
 	puts("  -v, --verbose           Verbose output.");
 	puts("  -x, --xml               Output XML report.");
 	puts("  -~, --dependencies      Check CCT dependencies.");
@@ -519,7 +521,7 @@ static xmlNodePtr add_redundant_error(xmlNodePtr report, xmlNodePtr node, xmlNod
 /* Check that an assertion in a nested applicability annotation is a subset of
  * its parent.
  */
-static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, xmlNodePtr parent_app, const char *path, xmlNodePtr report)
+static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, xmlNodePtr parent_app_node, const char *path, xmlNodePtr report)
 {
 	xmlNodePtr defs, defs_assert;
 	int err;
@@ -528,17 +530,13 @@ static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNod
 	xmlChar *type = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
 	xmlChar *vals = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
-	xmlNodePtr parent_app_node;
-
 	defs = xmlNewNode(NULL, BAD_CAST "applic");
 	defs_assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
 	xmlSetProp(defs_assert, BAD_CAST "applicPropertyIdent", id);
 	xmlSetProp(defs_assert, BAD_CAST "applicPropertyType", type);
 	xmlSetProp(defs_assert, BAD_CAST "applicPropertyValues", vals);
 
-	parent_app_node = xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate");
-
-	err = parent_app_node && !eval_applic(defs, xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate"), true);
+	err = !eval_applic(defs, parent_app_node, true);
 
 	xmlFreeNode(defs);
 
@@ -554,11 +552,18 @@ static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNod
 }
 
 /* Check that an applicability annotation is a subset of a given parent annotation. */
-static int check_nested_applic_props(xmlDocPtr doc, const char *path, xmlNodePtr node, xmlNodePtr parent, xmlNodePtr app, xmlNodePtr parent_app, xmlNodePtr report)
+static int check_nested_applic_props(xmlDocPtr doc, const char *path, xmlNodePtr node, xmlNodePtr parent, xmlNodePtr app, xmlNodePtr parent_app, struct appcheckopts *opts, xmlNodePtr report)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+	xmlNodePtr parent_app_node;
 	int err = 0;
+
+	parent_app_node = xpath_first_node(parent_app->doc, parent_app, BAD_CAST "assert|evaluate");
+
+	if (parent_app_node == NULL) {
+		return 0;
+	}
 
 	ctx = xmlXPathNewContext(doc);
 	ctx->node = app;
@@ -568,8 +573,40 @@ static int check_nested_applic_props(xmlDocPtr doc, const char *path, xmlNodePtr
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
 
-		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			err += check_nested_applic_assert(node, parent, obj->nodesetval->nodeTab[i], parent_app, path, report);
+		if (opts->strict_nested) {
+			/* Check individual asserts regardless of whether the whole annotation is applicable to its parent. */
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				err += check_nested_applic_assert(node, parent, obj->nodesetval->nodeTab[i], parent_app_node, path, report);
+			}
+		} else {
+			/* Only check individual asserts if the whole annotation is not applicable to its parent. */
+			xmlNodePtr defs = xmlNewNode(NULL, BAD_CAST "applic");
+
+			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+				xmlChar *id, *type, *vals;
+				xmlNodePtr defs_assert;
+
+				id   = xpath_first_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyIdent|@actidref");
+				type = xpath_first_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType|@actreftype");
+				vals = xpath_first_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyValues|@actvalues");
+
+				defs_assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
+				xmlSetProp(defs_assert, BAD_CAST "applicPropertyIdent", id);
+				xmlSetProp(defs_assert, BAD_CAST "applicPropertyType", type);
+				xmlSetProp(defs_assert, BAD_CAST "applicPropertyValues", vals);
+
+				xmlFree(id);
+				xmlFree(type);
+				xmlFree(vals);
+			}
+
+			if (!eval_applic(defs, parent_app_node, true)) {
+				for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+					err += check_nested_applic_assert(node, parent, obj->nodesetval->nodeTab[i], parent_app_node, path, report);
+				}
+			}
+
+			xmlFreeNode(defs);
 		}
 	}
 
@@ -627,7 +664,7 @@ static int check_nested_applic(xmlDocPtr doc, xmlNodePtr node, const char *path,
 			xmlFree(xpath);
 
 			/* Check for incompatible annotations. */
-			if (opts->check_nested && check_nested_applic_props(doc, path, node, parent, app, parent_app, report) != 0) {
+			if (opts->check_nested && check_nested_applic_props(doc, path, node, parent, app, parent_app, opts, report) != 0) {
 				err = 1;
 			}
 
@@ -647,7 +684,7 @@ static int check_nested_applic(xmlDocPtr doc, xmlNodePtr node, const char *path,
 	/* Check against the whole object applicability. */
 	if ((parent_app = first_xpath_node(doc, node, BAD_CAST "//applic"))) {
 		/* Check for incompatible annotations. */
-		if (opts->check_nested && check_nested_applic_props(doc, path, node, NULL, app, parent_app, report) != 0) {
+		if (opts->check_nested && check_nested_applic_props(doc, path, node, NULL, app, parent_app, opts, report) != 0) {
 			err = 1;
 		}
 	}
@@ -2130,7 +2167,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtvx~#:h?";
+	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtuvx~#:h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -2159,6 +2196,7 @@ int main(int argc, char **argv)
 		{"strict"         , no_argument      , 0, 's'},
 		{"summary"        , no_argument      , 0, 'T'},
 		{"products"       , no_argument      , 0, 't'},
+		{"unstrict-nested", no_argument      , 0, 'u'},
 		{"verbose"        , no_argument      , 0, 'v'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"dependencies"   , no_argument      , 0, '~'},
@@ -2188,6 +2226,7 @@ int main(int argc, char **argv)
 		/* add_deps */        false,
 		/* check_props */     false,
 		/* check_nested */    false,
+		/* strict_nested */   true,
 		/* check_redundant */ false,
 		/* check_duplicate */ false,
 		/* rem_delete */      false,
@@ -2295,6 +2334,10 @@ int main(int argc, char **argv)
 				break;
 			case 't':
 				opts.mode = PCT;
+				break;
+			case 'u':
+				opts.check_nested = true;
+				opts.strict_nested = false;
 				break;
 			case 'q':
 				--verbosity;

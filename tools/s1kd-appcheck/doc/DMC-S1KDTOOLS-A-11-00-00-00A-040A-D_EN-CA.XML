@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="05"/>
+        <issueInfo issueNumber="010" inWork="06"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="04" day="09"/>
+        <issueDate year="2024" month="08" day="14"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -49,6 +49,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0004" updateHighlight="1">
         <simplePara>Add --ignore option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0005" updateHighlight="1">
+        <simplePara>Add --unstrict-nested option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -228,6 +231,12 @@
               <listItemTerm>-t, --products</listItemTerm>
               <listItemDefinition>
                 <para>Validate objects against the defined product instances within the PCT.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0005">
+              <listItemTerm>-u, --unstrict-nested</listItemTerm>
+              <listItemDefinition>
+                <para>Perform a nested applicability check (refer to the -n, --nested option above) in "unstrict" mode. The normal, strict nested check always checks that each individual assert is a subset of its parent applicability, but in this mode errors will only be reported if the applicability annotation as a whole is not a subset of its parent.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -595,6 +604,45 @@ s1kd-appcheck: ERROR: &lt;DM&gt;: proceduralStep on line 62 is applicable
 when prodattr version = C, which is not a subset of the applicability
 of the whole object.</verbatimText>
           </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0005">The -u (--unstrict-nested) option performs the nested check in "unstrict" mode. How this differs from the normal, strict nested check can be illustrated as follows:</para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0005">
+            <verbatimText verbatimStyle="vs11"><![CDATA[<referencedApplicGroup>
+<applic id="app-A">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+</applic>
+<applic id="app-B">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/>
+</applic>
+<applic id="app-A-or-B">
+<evaluate andOr="or">
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="A"/>
+<assert
+applicPropertyIdent="version"
+applicPropertyType="prodattr"
+applicPropertyValues="B"/>
+</applic>
+</referencedApplicGroup>
+...
+<proceduralStep applicRefId="app-A">
+<para>Step 1</para>
+<proceduralStep applicRefId="app-A-or-B">
+<para>Step 1.1</para>
+</proceduralStep>
+<proceduralStep applicRefId="app-B">
+<para>Step 1.2</para>
+</proceduralStep>
+</proceduralStep>]]></verbatimText>
+          </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0005">When performing a normal, strict nested check, both steps 1.1 and 1.2 will be reported as having nested applicability errors, because they are inside a step that is applicable only to Version A yet each contain an assertion for Version B. However, in unstrict mode, only Step 1.2 will be reported as an error, because the applicability of Step 1.1 is "A <emphasis>or</emphasis> B" and so is technically still valid (even though the inclusion of B can be considered pointless).</para>
         </levelledPara>
         <levelledPara>
           <title>Redundant applicability annotations</title>
