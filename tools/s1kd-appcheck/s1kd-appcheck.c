@@ -17,7 +17,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.7.0"
+#define VERSION "6.7.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -518,23 +518,89 @@ static xmlNodePtr add_redundant_error(xmlNodePtr report, xmlNodePtr node, xmlNod
 	return und;
 }
 
+/* Define a value for a product attribute or condition. */
+static void define_applic(xmlNodePtr defs, const xmlChar *ident, const xmlChar *type, const xmlChar *value)
+{
+	xmlNodePtr assert = NULL;
+	xmlNodePtr cur;
+
+	if (!(ident && type && value)) {
+		return;
+	}
+
+	/* Check if an assert has already been created for this property. */
+	for (cur = defs->children; cur; cur = cur->next) {
+		xmlChar *cur_ident = xmlGetProp(cur, BAD_CAST "applicPropertyIdent");
+		xmlChar *cur_type  = xmlGetProp(cur, BAD_CAST "applicPropertyType");
+
+		if (xmlStrcmp(cur_ident, ident) == 0 && xmlStrcmp(cur_type, type) == 0) {
+			assert = cur;
+		}
+
+		xmlFree(cur_ident);
+		xmlFree(cur_type);
+	}
+
+	/* If no assert exists, add a new one. */
+	if (!assert) {
+		assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
+		xmlSetProp(assert, BAD_CAST "applicPropertyIdent", ident);
+		xmlSetProp(assert, BAD_CAST "applicPropertyType",  type);
+		xmlSetProp(assert, BAD_CAST "applicPropertyValues", value);
+	/* Or, if an assert already exists... */
+	} else {
+		/* Check for duplicate value in a single-assert. */
+		if (xmlHasProp(assert, BAD_CAST "applicPropertyValues")) {
+			xmlChar *first_value;
+
+			first_value = xmlGetProp(assert, BAD_CAST "applicPropertyValues");
+
+			/* If the value is not a duplicate, and the assertion
+			 * may be modified, convert to a multi-assert and add
+			 * the original and new values. */
+			if (xmlStrcmp(first_value, BAD_CAST value) != 0) {
+				xmlNewChild(assert, NULL, BAD_CAST "value", first_value);
+				xmlNewChild(assert, NULL, BAD_CAST "value", value);
+				xmlUnsetProp(assert, BAD_CAST "applicPropertyValues");
+			}
+
+			xmlFree(first_value);
+		/* Check for duplicate value in a multi-assert. */
+		} else {
+			bool dup = false;
+
+			for (cur = assert->children; cur && !dup; cur = cur->next) {
+				xmlChar *cur_value;
+				cur_value = xmlNodeGetContent(cur);
+				dup = xmlStrcmp(cur_value, value) == 0;
+				xmlFree(cur_value);
+			}
+
+			/* If the value is not a duplicate, and the assertion
+			 * may be modified, add the new value to the
+			 * multi-assert. */
+			if (!dup) {
+				xmlNewChild(assert, NULL, BAD_CAST "value", value);
+			}
+		}
+	}
+}
+
 /* Check that an assertion in a nested applicability annotation is a subset of
  * its parent.
  */
 static int check_nested_applic_assert(xmlNodePtr node, xmlNodePtr parent, xmlNodePtr assert, xmlNodePtr parent_app_node, const char *path, xmlNodePtr report)
 {
-	xmlNodePtr defs, defs_assert;
+	xmlNodePtr defs;
 	int err;
+
+	defs = xmlNewNode(NULL, BAD_CAST "applic");
 
 	xmlChar *id   = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyIdent|@actidref");
 	xmlChar *type = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyType|@actreftype");
 	xmlChar *vals = xpath_first_value(NULL, assert, BAD_CAST "@applicPropertyValues|@actvalues");
 
-	defs = xmlNewNode(NULL, BAD_CAST "applic");
-	defs_assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
-	xmlSetProp(defs_assert, BAD_CAST "applicPropertyIdent", id);
-	xmlSetProp(defs_assert, BAD_CAST "applicPropertyType", type);
-	xmlSetProp(defs_assert, BAD_CAST "applicPropertyValues", vals);
+	define_applic(defs, id, type, vals);
 
 	err = !eval_applic(defs, parent_app_node, true);
 
@@ -584,16 +650,12 @@ static int check_nested_applic_props(xmlDocPtr doc, const char *path, xmlNodePtr
 
 			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
 				xmlChar *id, *type, *vals;
-				xmlNodePtr defs_assert;
 
 				id   = xpath_first_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyIdent|@actidref");
 				type = xpath_first_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyType|@actreftype");
 				vals = xpath_first_value(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "@applicPropertyValues|@actvalues");
 
-				defs_assert = xmlNewChild(defs, NULL, BAD_CAST "assert", NULL);
-				xmlSetProp(defs_assert, BAD_CAST "applicPropertyIdent", id);
-				xmlSetProp(defs_assert, BAD_CAST "applicPropertyType", type);
-				xmlSetProp(defs_assert, BAD_CAST "applicPropertyValues", vals);
+				define_applic(defs, id, type, vals);
 
 				xmlFree(id);
 				xmlFree(type);
