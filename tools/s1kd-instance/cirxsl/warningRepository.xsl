@@ -15,8 +15,7 @@
 
   <xsl:template match="warningRef">
     <xsl:variable name="warningIdentNumber" select="@warningIdentNumber"/>
-    <xsl:variable name="warningIdent" select="(//warningIdent[$warningIdentNumber = @warningIdentNumber])[1]"/>
-    <xsl:variable name="warningSpec" select="$warningIdent/parent::warningSpec"/>
+    <xsl:variable name="warningSpec" select="(//warningSpec[warningIdent[@warningIdentNumber = $warningIdentNumber]])[1]"/>
     <xsl:choose>
       <xsl:when test="$warningSpec">
         <warning>

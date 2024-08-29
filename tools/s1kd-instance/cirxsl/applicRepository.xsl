@@ -15,8 +15,7 @@
 
   <xsl:template match="applicRef">
     <xsl:variable name="applicIdentValue" select="@applicIdentValue"/>
-    <xsl:variable name="applicSpecIdent" select="(//applicSpecIdent[$applicIdentValue = @applicIdentValue])[1]"/>
-    <xsl:variable name="applicSpec" select="$applicSpecIdent/parent::applicSpec"/>
+    <xsl:variable name="applicSpec" select="(//applicSpec[applicSpecIdent[@applicIdentValue = $applicIdentValue]])[1]"/>
     <xsl:variable name="applicMapRefId" select="$applicSpec/@applicMapRefId"/>
     <xsl:variable name="applic" select="$applicSpec/ancestor::content//applic[@id = $applicMapRefId]"/>
     <applic>

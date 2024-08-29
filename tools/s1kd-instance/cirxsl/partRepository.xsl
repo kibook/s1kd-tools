@@ -10,15 +10,15 @@
   <xsl:template match="spareDescr[partRef]">
     <xsl:variable name="partNumberValue" select="partRef/@partNumberValue"/>
     <xsl:variable name="manufacturerCodeValue" select="partRef/@manufacturerCodeValue"/>
-    <xsl:variable name="partIdent" select="(//partIdent[@partNumberValue = $partNumberValue and @manufacturerCodeValue = $manufacturerCodeValue])[1]"/>
-    <xsl:variable name="partSpec" select="$partIdent/parent::partSpec"/>
+    <xsl:variable name="partSpec" select="(//partSpec[partIdent[@partNumberValue = $partNumberValue and @manufacturerCodeValue = $manufacturerCodeValue]])[1]"/>
     <spareDescr>
       <xsl:choose>
         <xsl:when test="$partSpec">
           <xsl:apply-templates select="@*"/>
           <xsl:apply-templates select="$partSpec/itemIdentData/descrForPart" mode="name"/>
           <xsl:apply-templates select="$partSpec/itemIdentData/shortName"/>
-          <xsl:apply-templates select="catalogSeqNumberRef|natoStockNumber|identNumber|partRef|functionalItemRef|materialSetRef"/>
+          <xsl:apply-templates select="catalogSeqNumberRef|identNumber|partRef|functionalItemRef|materialSetRef"/>
+          <xsl:apply-templates select="$partSpec/itemIdentData/natoStockNumber"/>
           <xsl:apply-templates select="reqQuantity"/>
           <xsl:apply-templates select="remarks|footnoteRemarks"/>
           <xsl:apply-templates select="embeddedSpareDescr"/>
@@ -33,8 +33,7 @@
   <xsl:template match="itemSeqNumber[partRef]">
     <xsl:variable name="partNumberValue" select="partRef/@partNumberValue"/>
     <xsl:variable name="manufacturerCodeValue" select="partRef/@manufacturerCodeValue"/>
-    <xsl:variable name="partIdent" select="//partIdent[@partNumberValue = $partNumberValue and @manufacturerCodeValue = $manufacturerCodeValue]"/>
-    <xsl:variable name="partSpec" select="$partIdent/parent::partSpec"/>
+    <xsl:variable name="partSpec" select="(//partSpec[partIdent[@partNumberValue = $partNumberValue and @manufacturerCodeValue = $manufacturerCodeValue]])[1]"/>
     <itemSeqNumber>
       <xsl:choose>
         <xsl:when test="$partSpec">

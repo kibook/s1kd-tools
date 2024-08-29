@@ -15,8 +15,7 @@
 
   <xsl:template match="cautionRef">
     <xsl:variable name="cautionIdentNumber" select="@cautionIdentNumber"/>
-    <xsl:variable name="cautionIdent" select="(//cautionIdent[$cautionIdentNumber = @cautionIdentNumber])[1]"/>
-    <xsl:variable name="cautionSpec" select="$cautionIdent/parent::cautionSpec"/>
+    <xsl:variable name="cautionSpec" select="(//cautionSpec[cautionIdent[@cautionIdentNumber = $cautionIdentNumber]])[1]"/>
     <xsl:choose>
       <xsl:when test="$cautionSpec">
         <caution>

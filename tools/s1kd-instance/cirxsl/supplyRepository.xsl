@@ -10,15 +10,15 @@
   <xsl:template match="supplyDescr[supplyRef]">
     <xsl:variable name="supplyNumber" select="supplyRef/@supplyNumber"/>
     <xsl:variable name="supplyNumberType" select="supplyRef/@supplyNumberType"/>
-    <xsl:variable name="supplyIdent" select="(//supplyIdent[@supplyNumber = $supplyNumber and @supplyNumberType = $supplyNumberType])[1]"/>
-    <xsl:variable name="supplySpec" select="$supplyIdent/parent::supplySpec"/>
+    <xsl:variable name="supplySpec" select="(//supplySpec[supplyIdent[@supplyNumber = $supplyNumber and @supplyNumberType = $supplyNumberType]])[1]"/>
     <supplyDescr>
       <xsl:choose>
         <xsl:when test="$supplySpec">
           <xsl:apply-templates select="@*"/>
           <xsl:apply-templates select="$supplySpec/name"/>
           <xsl:apply-templates select="$supplySpec/shortName"/>
-          <xsl:apply-templates select="catalogSeqNumberRef|natoStockNumber|identNumber|supplyRef|supplyRqmtRef|materialSetRef"/>
+          <xsl:apply-templates select="catalogSeqNumberRef|identNumber|supplyRef|supplyRqmtRef|materialSetRef"/>
+          <xsl:apply-templates select="$supplySpec/natoStockNumber"/>
           <xsl:apply-templates select="reqQuantity"/>
           <xsl:apply-templates select="remarks|footnoteRemarks"/>
           <xsl:apply-templates select="embeddedSupplyDescr"/>

@@ -10,15 +10,15 @@
   <xsl:template match="supportEquipDescr[toolRef]">
     <xsl:variable name="toolNumber" select="toolRef/@toolNumber"/>
     <xsl:variable name="manufacturerCodeValue" select="toolRef/@manufacturerCodeValue"/>
-    <xsl:variable name="toolIdent" select="(//toolIdent[@toolNumber = $toolNumber and (not($manufacturerCodeValue) or @manufacturerCodeValue = $manufacturerCodeValue)])[1]"/>
-    <xsl:variable name="toolSpec" select="$toolIdent/parent::toolSpec"/>
+    <xsl:variable name="toolSpec" select="(//toolSpec[toolIdent[@toolNumber = $toolNumber and (not($manufacturerCodeValue) or @manufacturerCodeValue = $manufacturerCodeValue)]])[1]"/>
     <supportEquipDescr>
       <xsl:choose>
         <xsl:when test="$toolSpec">
           <xsl:apply-templates select="@*"/>
           <xsl:apply-templates select="$toolSpec/itemIdentData/descrForPart" mode="name"/>
           <xsl:apply-templates select="$toolSpec/itemIdentData/shortName"/>
-          <xsl:apply-templates select="catalogSeqNumberRef|natoStockNumber|identNumber|toolRef|materialSetRef"/>
+          <xsl:apply-templates select="catalogSeqNumberRef|identNumber|toolRef|materialSetRef"/>
+          <xsl:apply-templates select="$toolSpec/itemIdentData/natoStockNumber"/>
           <xsl:apply-templates select="reqQuantity"/>
           <xsl:apply-templates select="remarks|footnoteRemarks"/>
           <xsl:apply-templates select="embeddedSupportEquipDescr"/>

@@ -9,8 +9,7 @@
   
   <xsl:template match="circuitBreakerRef">
     <xsl:variable name="circuitBreakerNumber" select="@circuitBreakerNumber"/>
-    <xsl:variable name="circuitBreakerIdent" select="(//circuitBreakerIdent[@circuitBreakerNumber = $circuitBreakerNumber])[1]"/>
-    <xsl:variable name="circuitBreakerSpec" select="$circuitBreakerIdent/parent::circuitBreakerSpec"/>
+    <xsl:variable name="circuitBreakerSpec" select="(//circuitBreakerSpec[circuitBreakerIdent[@circuitBreakerNumber = $circuitBreakerNumber]])[1]"/>
     <circuitBreakerRef>
       <xsl:apply-templates select="@*"/>
       <xsl:choose>
