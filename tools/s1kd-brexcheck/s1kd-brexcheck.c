@@ -37,7 +37,7 @@
 #define PROGRESS_ZENITY 2
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "4.10.0"
+#define VERSION "5.0.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -339,6 +339,7 @@ static bool is_xml_file(const char *fname)
 /* Search for the BREX in the built-in default BREX data modules. */
 static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 {
+	if (strncasecmp(dmcode, "DMC-S1000D-H-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-H-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-H-04-10-0301-00A-022A-D");
 	if (strncasecmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-G-04-10-0301-00A-022A-D");
 	if (strncasecmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-F-04-10-0301-00A-022A-D");
 	if (strncasecmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D_012-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-E-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-E-04-10-0301-00A-022A-D");
@@ -1517,7 +1518,9 @@ static const char *default_brex_dmc(xmlDocPtr doc)
 
 	schema = xmlGetNsProp(xmlDocGetRootElement(doc), BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
 
-	if (schema == NULL || xmlStrstr(schema, BAD_CAST "S1000D_5-0")) {
+	if (schema == NULL || xmlStrstr(schema, BAD_CAST "S1000D_6")) {
+		code = "DMC-S1000D-H-04-10-0301-00A-022A-D";
+	} else if (xmlStrstr(schema, BAD_CAST "S1000D_5-0")) {
 		code = "DMC-S1000D-G-04-10-0301-00A-022A-D";
 	} else if (xmlStrstr(schema, BAD_CAST "S1000D_4-2")) {
 		code = "DMC-S1000D-F-04-10-0301-00A-022A-D";
