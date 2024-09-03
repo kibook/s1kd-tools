@@ -19,7 +19,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newsmc"
-#define VERSION "2.2.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME " ERROR: "
 
@@ -72,14 +72,15 @@ static xmlChar *issue_type = NULL;
 static xmlChar *remarks = NULL;
 static xmlChar *skill_level_code = NULL;
 
-#define DEFAULT_S1000D_ISSUE ISS_50
+#define DEFAULT_S1000D_ISSUE ISS_6
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 #define ISS_42_DEFAULT_BREX "S1000D-F-04-10-0301-00A-022A-D"
+#define ISS_50_DEFAULT_BREX "S1000D-G-04-10-0301-00A-022A-D"
 
 #define DEFAULT_LANGUAGE_ISO_CODE "und"
 #define DEFAULT_COUNTRY_ISO_CODE "ZZ"
 
-static enum issue { NO_ISS, ISS_41, ISS_42, ISS_50 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_41, ISS_42, ISS_50, ISS_6 } issue = NO_ISS;
 
 static char *template_dir = NULL;
 
@@ -104,7 +105,9 @@ static xmlDocPtr xml_skeleton(void)
 
 static enum issue get_issue(const char *iss)
 {
-	if (strcmp(iss, "5.0") == 0)
+	if (strcmp(iss, "6") == 0)
+		return ISS_6;
+	else if (strcmp(iss, "5.0") == 0)
 		return ISS_50;
 	else if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
@@ -125,6 +128,10 @@ static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	unsigned int len;
 
 	switch (iss) {
+		case ISS_50:
+			xml = ___common_to50_xsl;
+			len = ___common_to50_xsl_len;
+			break;
 		case ISS_42:
 			xml = ___common_to42_xsl;
 			len = ___common_to42_xsl_len;
@@ -878,8 +885,11 @@ int main(int argc, char **argv)
 		snprintf(iss, 16, "_%s-%s", issue_number, in_work);
 	}
 
-	if (issue < ISS_50) {
+	if (issue < ISS_6) {
 		switch (issue) {
+			case ISS_50:
+				set_brex(smc_doc, ISS_50_DEFAULT_BREX);
+				break;
 			case ISS_42:
 				set_brex(smc_doc, ISS_42_DEFAULT_BREX);
 				break;

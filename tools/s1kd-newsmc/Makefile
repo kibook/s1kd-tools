@@ -34,7 +34,7 @@ INSTALL = install -Ds
 
 all: $(executable)
 
-template.h: scormcontentpackage.xml $(common_dir)/to41.xsl $(common_dir)/to42.xsl
+template.h: scormcontentpackage.xml $(common_dir)/to*.xsl
 	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 $(executable): $(sources) template.h
