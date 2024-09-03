@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule>
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_6/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="ACRONYMS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="03" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="02"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2024" month="09" day="03"/>
+        <dmTitle>
+          <techName>s1kd-acronyms example data module 4</techName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus issueType="new">
+      <sourceDmIdent>
+        <dmCode modelIdentCode="ACRONYMS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="02" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </sourceDmIdent>
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany/>
+      <originator/>
+      <applic>
+        <displayText>
+          <simplePara>All</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="S1000D" systemDiffCode="F" systemCode="04" subSystemCode="1" subSubSystemCode="0" assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <levelledPara>
+        <title>General</title>
+        <para>In computing, <terminologyRef terminologyIdentNumber="term-00005"/> is a markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable through use of tags that can be created and defined by users. Much like natural language is extensible (that is, can grow) when speakers create new words and agree on what they mean, <terminologyRef terminologyIdentNumber="term-00005"/> is a markup language that can grow when users create new elements and agree on what they mean. This makes <terminologyRef terminologyIdentNumber="term-00005"/> able to capture intent in a way much broader than a nonextensible markup language such as <terminologyRef terminologyIdentNumber="term-00004"/>. For example, <terminologyRef terminologyIdentNumber="term-00005"/> can mark up machine-readably that apples and bananas are types of fruit, which is semantically deeper than the purpose of <terminologyRef terminologyIdentNumber="term-00004"/>. However, <terminologyRef terminologyIdentNumber="term-00004"/> is useful for display of content; often <terminologyRef terminologyIdentNumber="term-00004"/> is used to display <terminologyRef terminologyIdentNumber="term-00005"/> content after transformation with <terminologyRef terminologyIdentNumber="term-00006"/>.</para>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

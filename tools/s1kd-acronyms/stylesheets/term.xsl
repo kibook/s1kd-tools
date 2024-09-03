@@ -66,4 +66,10 @@
     <xsl:apply-templates/>
   </xsl:template>
 
+  <xsl:template match="terminologySpec">
+    <terminologyRef>
+      <xsl:apply-templates select="terminologyIdent/@terminologyIdentNumber"/>
+    </terminologyRef>
+  </xsl:template>
+
 </xsl:stylesheet>

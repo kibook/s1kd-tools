@@ -4,18 +4,23 @@
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
-        <dmCode modelIdentCode="ACRONYMS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="02" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
+        <dmCode modelIdentCode="ACRONYMS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="03" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
         <issueInfo issueNumber="000" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2017" month="10" day="31"/>
         <dmTitle>
-          <techName>s1kd-acronyms example data module 3</techName>
+          <techName>s1kd-acronyms example data module 4</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
     <dmStatus issueType="new">
+      <sourceDmIdent>
+        <dmCode modelIdentCode="ACRONYMS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="02" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="en" countryIsoCode="CA"/>
+        <issueInfo issueNumber="000" inWork="01"/>
+      </sourceDmIdent>
       <security securityClassification="01"/>
       <responsiblePartnerCompany/>
       <originator/>

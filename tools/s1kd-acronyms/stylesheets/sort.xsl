@@ -15,4 +15,12 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="terminologyRepository">
+    <xsl:copy>
+      <xsl:apply-templates select="terminologySpec">
+        <xsl:sort select="string-length(terminologyTerm)" order="descending"/>
+      </xsl:apply-templates>
+    </xsl:copy>
+  </xsl:template>
+
 </xsl:stylesheet>

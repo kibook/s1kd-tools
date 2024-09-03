@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-acronyms"
-#define VERSION "1.14.0"
+#define VERSION "2.0.0"
 
 /* Paths to text nodes where acronyms may occur */
 #define ACRO_MARKUP_XPATH BAD_CAST "//para/text()|//notePara/text()|//warningAndCautionPara/text()|//attentionListItemPara/text()|//title/text()|//listItemTerm/text()|//term/text()|//termTitle/text()|//emphasis/text()|//changeInline/text()|//change/text()"
@@ -250,28 +250,6 @@ static xmlDocPtr limitToTypes(xmlDocPtr doc, const char *types)
 	return result;
 }
 
-static xmlNodePtr firstXPathNode(char *xpath, xmlNodePtr from)
-{
-	xmlXPathContextPtr ctx;
-	xmlXPathObjectPtr obj;
-	xmlNodePtr node;
-
-	ctx = xmlXPathNewContext(from->doc);
-	ctx->node = from;
-
-	obj = xmlXPathEvalExpression(BAD_CAST xpath, ctx);
-
-	if (xmlXPathNodeSetIsEmpty(obj->nodesetval))
-		node = NULL;
-	 else
-	 	node = obj->nodesetval->nodeTab[0];
-	
-	xmlXPathFreeObject(obj);
-	xmlXPathFreeContext(ctx);
-
-	return node;
-}
-
 static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const xmlChar *content)
 {
 	xmlXPathContextPtr ctx;
@@ -317,7 +295,7 @@ static xmlNodePtr chooseAcronym(xmlNodePtr acronym, const xmlChar *term, const x
 		puts("Choose definition:");
 
 		for (i = 0; i < obj->nodesetval->nodeNr && i < 9; ++i) {
-			xmlNodePtr acronymDefinition = firstXPathNode("acronymDefinition", obj->nodesetval->nodeTab[i]);
+			xmlNodePtr acronymDefinition = xpath_first_node(NULL, obj->nodesetval->nodeTab[i], BAD_CAST "acronymDefinition");
 			xmlChar *definition = xmlNodeGetContent(acronymDefinition);
 
 			printf("%d) %s\n", i + 1, (char *) definition);
@@ -439,14 +417,14 @@ static void markupAcronyms(xmlDocPtr doc, xmlNodePtr acronyms)
 	xmlNodePtr cur;
 
 	for (cur = acronyms->children; cur; cur = cur->next) {
-		if (xmlStrcmp(cur->name, BAD_CAST "acronym") == 0) {
+		if (xmlStrcmp(cur->name, BAD_CAST "acronym") == 0 || xmlStrcmp(cur->name, BAD_CAST "terminologySpec") == 0) {
 			xmlXPathContextPtr ctx;
 			xmlXPathObjectPtr obj;
 			xmlChar *term;
 			int termLen;
 
 			/* Skip acronyms with empty terms. */
-			if (!(term = xmlNodeGetContent(firstXPathNode("acronymTerm", cur)))) {
+			if (!(term = xmlNodeGetContent(xpath_first_node(NULL, cur, BAD_CAST "acronymTerm|terminologyTerm")))) {
 				continue;
 			}
 			if ((termLen = xmlStrlen(term)) == 0) {
@@ -942,7 +920,11 @@ int main(int argc, char **argv)
 		}
 
 		doc = sortAcronyms(doc);
-		acronyms = xmlDocGetRootElement(doc);
+
+		acronyms = xpath_first_node(doc, NULL, BAD_CAST "//terminologyRepository");
+		if (!acronyms) {
+			acronyms = xmlDocGetRootElement(doc);
+		}
 
 		termStylesheetDoc = read_xml_mem((const char *) stylesheets_term_xsl,
 			stylesheets_term_xsl_len);

@@ -169,6 +169,10 @@ Example of .acronyms file format:
     </acronym>
     </acronyms>
 
+The .acronyms file or the file specified to the -M option may also be a
+terminology common information repository. In this case, acronyms will
+be replaced with a `<terminologyRef>`.
+
 # EXAMPLES
 
 List all acronyms used in all data modules:

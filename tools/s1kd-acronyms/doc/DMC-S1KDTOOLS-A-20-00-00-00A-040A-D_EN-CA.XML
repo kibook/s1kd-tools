@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="20" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="00"/>
+        <issueInfo issueNumber="027" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2024" month="09" day="03"/>
         <dmTitle>
           <techName>s1kd-acronyms(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Add support for terminology CIR</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -291,6 +291,7 @@ s1kd-acronyms [-D|-P] [-flqv] [-o <file>] [<dmodule>...]]]></verbatimText>
 </acronym>
 </acronyms>]]></verbatimText>
           </para>
+          <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">The .acronyms file or the file specified to the -M option may also be a terminology common information repository. In this case, acronyms will be replaced with a <verbatimText verbatimStyle="vs12">&lt;terminologyRef&gt;</verbatimText>.</para>
         </levelledPara>
       </levelledPara>
       <levelledPara>
