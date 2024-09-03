@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "2.2.0"
+#define VERSION "3.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -29,9 +29,9 @@
 
 #define E_BAD_TEMPL_DIR ERR_PREFIX "Cannot dump template in directory: %s\n"
 
-#define DEFAULT_S1000D_ISSUE ISS_50
+#define DEFAULT_S1000D_ISSUE ISS_6
 
-static enum issue { NO_ISS, ISS_41, ISS_42, ISS_50 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_41, ISS_42, ISS_50, ISS_6 } issue = NO_ISS;
 
 #define CIR_OBJECT_XPATH \
 	"//accessPointSpec|" \
@@ -65,7 +65,9 @@ static char *templateDir = NULL;
 
 static enum issue getIssue(const char *iss)
 {
-	if (strcmp(iss, "5.0") == 0) {
+	if (strcmp(iss, "6") == 0) {
+		return ISS_6;
+	} else if (strcmp(iss, "5.0") == 0) {
 		return ISS_50;
 	} else if (strcmp(iss, "4.2") == 0) {
 		return ISS_42;
@@ -535,6 +537,10 @@ static xmlDocPtr toIssue(xmlDocPtr doc, enum issue iss)
 	unsigned int len;
 
 	switch (iss) {
+		case ISS_50:
+			xml = ___common_to50_xsl;
+			len = ___common_to50_xsl_len;
+			break;
 		case ISS_42:
 			xml = ___common_to42_xsl;
 			len = ___common_to42_xsl_len;
@@ -785,7 +791,7 @@ int main(int argc, char **argv)
 		xmlAddChild(update, replaceObjectGroup);
 	}
 
-	if (issue < ISS_50) {
+	if (issue < ISS_6) {
 		xmlXPathFreeContext(updateFileContext);
 		updateFile = toIssue(updateFile, issue);
 		updateFileContext = xmlXPathNewContext(updateFile);

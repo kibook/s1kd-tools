@@ -34,7 +34,7 @@ INSTALL = install -Ds
 
 all: $(executable)
 
-templates.h: update.xml $(common_dir)/to41.xsl $(common_dir)/to42.xsl
+templates.h: update.xml $(common_dir)/to*.xsl
 	> $@ && for f in $+; do xxd -i $$f >> $@; done
 
 $(executable): $(sources) templates.h
