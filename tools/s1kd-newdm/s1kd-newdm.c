@@ -22,7 +22,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdm"
-#define VERSION "4.0.0"
+#define VERSION "5.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -117,9 +117,9 @@ static xmlChar *skill_level_code = NULL;
 static bool no_issue = false;
 static bool no_issue_set = false;
 
-static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50, ISS_6 } issue = NO_ISS;
 
-#define DEFAULT_S1000D_ISSUE ISS_50
+#define DEFAULT_S1000D_ISSUE ISS_6
 
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_23_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -127,6 +127,7 @@ static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_
 #define ISS_40_DEFAULT_BREX "S1000D-A-04-10-0301-00A-022A-D"
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 #define ISS_42_DEFAULT_BREX "S1000D-F-04-10-0301-00A-022A-D"
+#define ISS_50_DEFAULT_BREX "S1000D-G-04-10-0301-00A-022A-D"
 
 /* ISO language and country codes if none can be determined. */
 #define DEFAULT_LANGUAGE_ISO_CODE "und"
@@ -145,7 +146,9 @@ static char *act_dmcode = NULL;
 
 static enum issue get_issue(const char *iss)
 {
-	if (strcmp(iss, "5.0") == 0)
+	if (strcmp(iss, "6") == 0)
+		return ISS_6;
+	else if (strcmp(iss, "5.0") == 0)
 		return ISS_50;
 	else if (strcmp(iss, "4.2") == 0)
 		return ISS_42;
@@ -173,6 +176,7 @@ static enum issue get_issue(const char *iss)
 static const char *issue_name(enum issue iss)
 {
 	switch (iss) {
+		case ISS_6: return "6";
 		case ISS_50: return "5.0";
 		case ISS_42: return "4.2";
 		case ISS_41: return "4.1";
@@ -702,6 +706,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_descript_xml;
 				len = templates_descript_xml_len;
 				break;
@@ -719,6 +724,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_proced_xml;
 				len = templates_proced_xml_len;
 				break;
@@ -730,6 +736,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_frontmatter_xml;
 				len = templates_frontmatter_xml_len;
 				break;
@@ -745,6 +752,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				if (maint_sns) {
 					struct inmem_xml res;
 					res = maint_sns_xml();
@@ -762,6 +770,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 		switch (iss) {
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_brdoc_xml;
 				len = templates_brdoc_xml_len;
 				break;
@@ -775,6 +784,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_appliccrossreftable_xml;
 				len = templates_appliccrossreftable_xml_len;
 				break;
@@ -788,6 +798,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_prdcrossreftable_xml;
 				len = templates_prdcrossreftable_xml_len;
 				break;
@@ -801,6 +812,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_condcrossreftable_xml;
 				len = templates_condcrossreftable_xml_len;
 				break;
@@ -812,6 +824,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_comrep_xml;
 				len = templates_comrep_xml_len;
 				break;
@@ -829,6 +842,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_process_xml;
 				len = templates_process_xml_len;
 				break;
@@ -846,6 +860,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_ipd_xml;
 				len = templates_ipd_xml_len;
 				break;
@@ -863,6 +878,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_fault_xml;
 				len = templates_fault_xml_len;
 				break;
@@ -875,6 +891,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_checklist_xml;
 				len = templates_checklist_xml_len;
 				break;
@@ -887,6 +904,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_learning_xml;
 				len = templates_learning_xml_len;
 				break;
@@ -901,6 +919,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_container_xml;
 				len = templates_container_xml_len;
 				break;
@@ -918,6 +937,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_crew_xml;
 				len = templates_crew_xml_len;
 				break;
@@ -929,6 +949,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_sb_xml;
 				len = templates_sb_xml_len;
 				break;
@@ -946,6 +967,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_schedul_xml;
 				len = templates_schedul_xml_len;
 				break;
@@ -963,6 +985,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_wrngdata_xml;
 				len = templates_wrngdata_xml_len;
 				break;
@@ -980,6 +1003,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_wrngflds_xml;
 				len = templates_wrngflds_xml_len;
 				break;
@@ -991,6 +1015,7 @@ static xmlDocPtr xml_skeleton(const char *dmtype, enum issue iss)
 			case ISS_41:
 			case ISS_42:
 			case ISS_50:
+			case ISS_6:
 				xml = templates_scocontent_xml;
 				len = templates_scocontent_xml_len;
 				break;
@@ -1030,6 +1055,10 @@ static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	unsigned int len;
 
 	switch (iss) {
+		case ISS_50:
+			xml = ___common_to50_xsl;
+			len = ___common_to50_xsl_len;
+			break;
 		case ISS_42:
 			xml = ___common_to42_xsl;
 			len = ___common_to42_xsl_len;
@@ -1970,7 +1999,7 @@ int main(int argc, char **argv)
 		snprintf(iss, 16, "_%s-%s", issueNumber, inWork);
 	}
 
-	if (issue < ISS_50) {
+	if (issue < ISS_6) {
 		if (strcmp(brex_dmcode, "") == 0) {
 			switch (issue) {
 				case ISS_22:
@@ -1990,6 +2019,9 @@ int main(int argc, char **argv)
 					break;
 				case ISS_42:
 					set_brex(dm, ISS_42_DEFAULT_BREX);
+					break;
+				case ISS_50:
+					set_brex(dm, ISS_50_DEFAULT_BREX);
 					break;
 				default:
 					break;

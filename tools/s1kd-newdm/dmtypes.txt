@@ -99,6 +99,8 @@
 0A3  appliccrossreftable  Applicability cross-reference table catalog
 0A4  comrep               Warnings - List of warnings in the common information repository
 0A5  comrep               Cautions - List of cautions in the common information repository
+0A6  comrep               Hazards - List of hazard types in the common information repository
+0A7  comrep               Terminology - List of reusable terms and definitions in the common information repository
 0B0  descript             Maintenance planning information
 0B1  descript             Time limits
 0B2  descript             System maintenance/inspection tasks list

@@ -110,7 +110,9 @@
   <type infoCode="0A3" schema="appliccrossreftable" infoName="Applicability cross-reference table catalog"/>
   <type infoCode="0A4" schema="comrep" infoName="Warnings - List of warnings in the common information repository"/>
   <type infoCode="0A5" schema="comrep" infoName="Cautions - List of cautions in the common information repository"/>
-  <!-- 0A6 thru 0AZ not available for projects  -->
+  <type infoCode="0A6" schema="comrep" infoName="Hazards - List of hazard types in the common information repository"/>
+  <type infoCode="0A7" schema="comrep" infoName="Terminology - List of reusable terms and definitions in the common information repository"/>
+  <!-- 0A8 thru 0AZ not available for projects  -->
   <type infoCode="0B0" schema="descript" infoName="Maintenance planning information"/>
   <type infoCode="0B1" schema="descript" infoName="Time limits"/>
   <type infoCode="0B2" schema="descript" infoName="System maintenance/inspection tasks list"/>
