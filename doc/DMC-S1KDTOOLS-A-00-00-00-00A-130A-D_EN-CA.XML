@@ -8,7 +8,7 @@
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00007-A-001-01.GIF" NDATA GIF>
 <!ENTITY ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01 SYSTEM "ICN-S1KDTOOLS-A-000000-A-KHZAE-00008-A-001-01.GIF" NDATA GIF>
 ]>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_5-0/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_6/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>

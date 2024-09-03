@@ -728,19 +728,18 @@ The first annotation is kept because it is entirely valid. The third
 annotation is simplified by removing the invalid assertions, but the
 valid assertions are preserved.
 
-<div class="note">
-
-The -A and -9 options may change the *meaning* of certain applicability
-annotations without changing the *display text*. Display text is always
-left untouched, so using this option may cause display text to be
-technically incorrect.
-
-These options are best used when display text will be automatically
-generated after filtering, such as with the s1kd-aspp tool. The -J
-option of this tool can be combined with the -k option of the s1kd-aspp
-tool to only generate display text for annotations which are modified.
-
-</div>
+> **Note**
+> 
+> The -A and -9 options may change the *meaning* of certain
+> applicability annotations without changing the *display text*. Display
+> text is always left untouched, so using this option may cause display
+> text to be technically incorrect.
+> 
+> These options are best used when display text will be automatically
+> generated after filtering, such as with the s1kd-aspp tool. The -J
+> option of this tool can be combined with the -k option of the
+> s1kd-aspp tool to only generate display text for annotations which are
+> modified.
 
 ## Applicability of an instance (-W, -Y, -y)
 
@@ -1022,13 +1021,11 @@ and is set to apply only to the correct customer:
     ...
     </dmStatus>
 
-<div class="note">
-
-The assertions in the applicability of an instance must use single
-values in order to work in this mode. Ranges (\~) and sets (|) are not
-supported.
-
-</div>
+> **Note**
+> 
+> The assertions in the applicability of an instance must use single
+> values in order to work in this mode. Ranges (\~) and sets (|) are not
+> supported.
 
 Now, when a change is made to the master data module, this tool can be
 used to update these instances automatically:

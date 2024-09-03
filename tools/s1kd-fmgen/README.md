@@ -237,11 +237,9 @@ attribute in the `.fmtypes` file or the -x (--xsl) option may be an
 XProc file which contains a pipeline with multiple stylesheets. This
 allows for multi-pass transformations.
 
-<div class="note">
-
-Only a small subset of XProc is supported at this time.
-
-</div>
+> **Note**
+> 
+> Only a small subset of XProc is supported at this time.
 
 Example:
 

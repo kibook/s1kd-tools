@@ -1,25 +1,9 @@
--   [What is S1000D?](#what-is-s1000d)
--   [The CSDB](#the-csdb)
-    -   [CSDB objects](#csdb-objects)
--   [Data modules](#data-modules)
-    -   [Structure of a data module](#structure-of-a-data-module)
-    -   [Data module code](#data-module-code)
-        -   [Model identification code](#model-identification-code)
-        -   [System difference code](#system-difference-code)
-        -   [Standard numbering system](#standard-numbering-system)
-        -   [Disassembly code](#disassembly-code)
-        -   [Information code](#information-code)
-        -   [Item location code](#item-location-code)
-    -   [Data module title](#data-module-title)
-    -   [Data module content](#data-module-content)
-
 > **Note**
->
+> 
 > This is a work-in-progress tutorial to introduce the basic concepts of
 > S1000D.
 
-What is S1000D?
-===============
+# What is S1000D?
 
 S1000D is "an international specification for the procurement and
 production of technical publications". It combines common, international
@@ -38,8 +22,7 @@ These typically divide content in to "chapters", "sections",
 topic-based and consists of units of information called **data
 modules**, which are stored in a Common Source Database (CSDB).
 
-The CSDB
-========
+# The CSDB
 
 The full title of the S1000D specification is "International
 specification for technical publications using a common source
@@ -58,42 +41,39 @@ of ways. Often, a CSDB is built on top of an existing relational
 database management system.
 
 > **Note**
->
+> 
 > For the purposes of the s1kd-tools, the CSDB is simply a folder in a
 > typical filesystem.
 
-CSDB objects
-------------
+## CSDB objects
 
 The CSDB is made up of many CSDB objects. These include:
 
--   Data modules, which represent individual topics
+  - Data modules, which represent individual topics
 
--   Publication modules, which place data modules in to a hierarchical
+  - Publication modules, which place data modules in to a hierarchical
     structure for publishing
 
--   Information control numbers (ICNs), such as illustrations, which
+  - Information control numbers (ICNs), such as illustrations, which
     support data modules.
 
 The following sections will discuss some of these different types of
 objects in more detail.
 
-Data modules
-============
+# Data modules
 
 The data module is the smallest self-contained unit of information in
 S1000D. This could be, for example, a description of how a piece of
 equipment was made, or a procedure to remove it from the system for
 maintenance.
 
-Structure of a data module
---------------------------
+## Structure of a data module
 
 Every data module has the same basic structure, consisting of:
 
--   an identification and status section
+  - an identification and status section
 
--   a content section
+  - a content section
 
 The identification and status section of a data module contains metadata
 about the data module.
@@ -101,32 +81,31 @@ about the data module.
 The first part uniquely identifies the data module. The unique
 identifier for a data module is composed of:
 
--   a unique data module code
+  - a unique data module code
 
--   the issue of the data module
+  - the issue of the data module
 
--   the language of the data module
+  - the language of the data module
 
 The second part gives the status of the data module, including:
 
--   the security classification of the data module
+  - the security classification of the data module
 
--   who is responsible for the data module
+  - who is responsible for the data module
 
--   restrictions on how the data module may be distributed
+  - restrictions on how the data module may be distributed
 
--   what changes have been made to the data module
+  - what changes have been made to the data module
 
--   whether the data module has been quality assurance tested
+  - whether the data module has been quality assurance tested
 
-Data module code
-----------------
+## Data module code
 
 Each data module is given a unique data module code, which identifies:
 
--   what part of the system the data module is about
+  - what part of the system the data module is about
 
--   what kind of information the data module contains
+  - what kind of information the data module contains
 
 ![Generic structure of the data module
 code](doc/ICN-1654N-S1000D0002-001-01.PNG)
@@ -134,20 +113,20 @@ code](doc/ICN-1654N-S1000D0002-001-01.PNG)
 The first part, which identifies the piece of hardware or part of the
 system, consists of four major components:
 
--   Model identification code
+  - Model identification code
 
--   System difference code
+  - System difference code
 
--   Standard numbering system
+  - Standard numbering system
 
--   Disassembly code
+  - Disassembly code
 
 The second part, which identifies the type of information contained
 within the data module, consists of two major components:
 
--   Information code
+  - Information code
 
--   Item location code
+  - Item location code
 
 An optional third part, the learn type, identifies information about
 training content. The details of this code are outside the scope of this
@@ -162,7 +141,7 @@ their model identification codes with the NATO Support and Procurement
 Agency, which maintains a list of registered codes, to avoid conflicts
 with other projects.
 
-<a href="https://www.nspa.nato.int/PDF/Log/S2000M/S2000M%20MOI%20codes.pdf" class="uri">https://www.nspa.nato.int/PDF/Log/S2000M/S2000M%20MOI%20codes.pdf</a>
+<https://www.nspa.nato.int/PDF/Log/S2000M/S2000M%20MOI%20codes.pdf>
 
 An example of a model identification code might be "BIKE" if you are
 documenting the operation and maintenance of a line of bicycles.
@@ -176,10 +155,10 @@ For example, if a bicycle is available in two different configurations,
 road or off-road, the system difference codes "A" and "B" could indicate
 which data modules apply to each configuration:
 
--   BIKE-A-00-00-00-00A-040A-D: contains information for the road
+  - BIKE-A-00-00-00-00A-040A-D: contains information for the road
     variant.
 
--   BIKE-B-00-00-00-00A-040A-D: contains information for the off-road
+  - BIKE-B-00-00-00-00A-040A-D: contains information for the off-road
     variant.
 
 ### Standard numbering system
@@ -195,22 +174,24 @@ its own SNS.
 For example, the bicycle might be broken down as follows:
 
 | System | Subsystem | Name            |
-|:-------|:----------|:----------------|
-| D00    | -00       | Bicycle         |
-| DA0    | -00       | Wheels          |
-|        | -10       | Front wheel     |
-|        | -20       | Rear wheel      |
-| DA1    | -00       | Brakes          |
-|        | -10       | Brake pads      |
-|        | -20       | Front brake     |
-| DA2    | -00       | Steering system |
-|        | -10       | Stem            |
-|        | -20       | Handlebar       |
-|        | -30       | Headset         |
-| DA3    | -00       | Frame           |
-|        | -10       | Horn            |
-| DA4    | -00       | Drivetrain      |
-|        | -10       | Chain           |
+| :----- | :-------- | :-------------- |
+| D00    | \-00      | Bicycle         |
+| DA0    | \-00      | Wheels          |
+|        | \-10      | Front wheel     |
+|        | \-20      | Rear wheel      |
+| DA1    | \-00      | Brakes          |
+|        | \-10      | Brake pads      |
+|        | \-20      | Front brake     |
+| DA2    | \-00      | Steering system |
+|        | \-10      | Stem            |
+|        | \-20      | Handlebar       |
+|        | \-30      | Headset         |
+| DA3    | \-00      | Frame           |
+|        | \-10      | Horn            |
+| DA4    | \-00      | Drivetrain      |
+|        | \-10      | Chain           |
+
+Example SNS
 
 ### Disassembly code
 
@@ -225,10 +206,10 @@ For example, two alternative physical parts that perform the same
 function (and thus have the same SNS in a functional breakdown) could be
 identified by disassembly code variants B and C respectively:
 
--   BIKE-A-DA1-10-00-00B-720A-D: Installation procedures for brake pads
+  - BIKE-A-DA1-10-00-00B-720A-D: Installation procedures for brake pads
     produced by ABC company
 
--   BIKE-A-DA1-10-00-00C-720A-D: Installation procedures for brake pads
+  - BIKE-A-DA1-10-00-00C-720A-D: Installation procedures for brake pads
     produced by XYZ company
 
 ### Information code
@@ -239,27 +220,27 @@ the primary, secondary, and tertiary codes. The S1000D specification
 defines a base set of information codes divided in to 11 primary
 categories:
 
--   000 - Function, data for plans and description
+  - 000 - Function, data for plans and description
 
--   100 - Operation
+  - 100 - Operation
 
--   200 - Servicing
+  - 200 - Servicing
 
--   300 - Examinations, tests and checks
+  - 300 - Examinations, tests and checks
 
--   400 - Fault reports and isolation procedures
+  - 400 - Fault reports and isolation procedures
 
--   500 - Disconnect, remove and disassembly procedures
+  - 500 - Disconnect, remove and disassembly procedures
 
--   600 - Repairs and locally make procedures and data
+  - 600 - Repairs and locally make procedures and data
 
--   700 - Assemble, install and connect procedures
+  - 700 - Assemble, install and connect procedures
 
--   800 - Package, handling, storage and transportation
+  - 800 - Package, handling, storage and transportation
 
--   900 - Miscellaneous
+  - 900 - Miscellaneous
 
--   C00 - Computer systems, software and data
+  - C00 - Computer systems, software and data
 
 The secondary code and tertiary codes break down these categories
 further in to more specific kinds of information. For example, 040
@@ -290,25 +271,24 @@ The item location code identifies the context of the information
 contained in a data module, particularly where a task will be carried
 out. It is one of five codes:
 
--   A - the information is related to components installed in the system
+  - A - the information is related to components installed in the system
 
--   B - the information is related to components installed in a
+  - B - the information is related to components installed in a
     component removed from the system
 
--   C - the information is related to components on the bench
+  - C - the information is related to components on the bench
 
--   D - the information is related to all three contexts above
+  - D - the information is related to all three contexts above
 
--   T - the information is related to training
+  - T - the information is related to training
 
-Data module title
------------------
+## Data module title
 
 The title of an S1000D data module is formed from two parts:
 
--   The technical name
+  - The technical name
 
--   The information name
+  - The information name
 
 The tech name is derived from the SNS of the data module, and the info
 name is derived from the short definition of the information code of the
@@ -316,8 +296,7 @@ data module. For example, the data module BIKE-DA0-00-00-00A-040A-D,
 which has the SNS DA0-00-00 (Wheels) and information code 040
 (Description), would be titled "Wheels - Description".
 
-Data module content
--------------------
+## Data module content
 
 S1000D provides a number of different schemas for different kinds of
 content within a data module. The schema dictates what elements can be

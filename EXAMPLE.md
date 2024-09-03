@@ -1,36 +1,3 @@
-  - [General](#general)
-  - [Initial setup](#initial-setup)
-      - [`.defaults` file](#defaults-file)
-      - [`.dmtypes` file](#dmtypes-file)
-  - [Creating the DMRL and populating the
-    CSDB](#creating-the-dmrl-and-populating-the-csdb)
-      - [Adding DMRL entries](#adding-dmrl-entries)
-      - [Populating the CSDB from the
-        DMRL](#populating-the-csdb-from-the-dmrl)
-      - [Creating CSDB objects
-        on-the-fly](#creating-csdb-objects-on-the-fly)
-  - [Data module workflow](#data-module-workflow)
-      - [Inwork data modules](#inwork-data-modules)
-      - [Making data modules official](#making-data-modules-official)
-          - [Validating against the
-            schema](#validating-against-the-schema)
-          - [Validating against a BREX data
-            module](#validating-against-a-brex-data-module)
-          - [Checking applicability](#checking-applicability)
-          - [Quality assurance
-            verification](#quality-assurance-verification)
-      - [Changes to official data
-        modules](#changes-to-official-data-modules)
-      - [Deleting data modules](#deleting-data-modules)
-  - [Building publications](#building-publications)
-      - [Publication module content](#publication-module-content)
-      - [Creating a customized
-        publication](#creating-a-customized-publication)
-      - [Creating a script for
-        publishing](#creating-a-script-for-publishing)
-  - [Use with other version control
-    systems](#use-with-other-version-control-systems)
-
 # General
 
 This document provides examples of the usage of the **s1kd-tools**.
@@ -63,13 +30,11 @@ Afterwards, these files can be edited to customize them for your
 project. More information on the contents of these files is provided
 below.
 
-<div class="note">
-
-If the tools are run in a directory that does not have these
-configuration files, they will search for them in the parent directories
-to find the top of the CSDB directory tree.
-
-</div>
+> **Note**
+> 
+> If the tools are run in a directory that does not have these
+> configuration files, they will search for them in the parent
+> directories to find the top of the CSDB directory tree.
 
 ## `.defaults` file
 
