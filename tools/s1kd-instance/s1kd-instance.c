@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.3.3"
+#define VERSION "12.4.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1623,6 +1623,12 @@ static bool get_cir_xsl(const char *cirtype, unsigned char **xsl, unsigned int *
 	} else if (strcmp(cirtype, "zoneRepository") == 0) {
 		*xsl = cirxsl_zoneRepository_xsl;
 		*len = cirxsl_zoneRepository_xsl_len;
+	} else if (strcmp(cirtype, "hazardRepository") == 0) {
+		*xsl = cirxsl_hazardRepository_xsl;
+		*len = cirxsl_hazardRepository_xsl_len;
+	} else if (strcmp(cirtype, "terminologyRepository") == 0) {
+		*xsl = cirxsl_terminologyRepository_xsl;
+		*len = cirxsl_terminologyRepository_xsl_len;
 	} else {
 		if (verbosity > QUIET) {
 			fprintf(stderr, S_NO_XSLT, cirtype);
