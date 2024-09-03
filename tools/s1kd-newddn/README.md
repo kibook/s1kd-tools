@@ -21,7 +21,9 @@ code, metadata, and list of files specified.
     Specifiy which issue of S1000D to use. Currently supported issues
     are:
     
-      - 5.0 (default)
+      - 6 (default)
+    
+      - 5.0
     
       - 4.2
     
@@ -48,7 +50,7 @@ code, metadata, and list of files specified.
   - \-%, --templates \<dir\>  
     Use the XML template in the specified directory instead of the
     built-in template. The template must be named `ddn.xml` inside
-    \<dir\> and must conform to the default S1000D issue (5.0).
+    \<dir\> and must conform to the default S1000D issue (6).
 
   - \-\~, --dump-templates \<dir\>  
     Dump the built-in XML template to the specified directory.

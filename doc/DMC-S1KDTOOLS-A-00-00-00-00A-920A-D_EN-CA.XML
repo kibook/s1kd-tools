@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="920" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="008" inWork="03"/>
+        <issueInfo issueNumber="008" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="04" day="04"/>
+        <issueDate year="2024" month="09" day="03"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Building, installing and uninstalling</infoName>
@@ -269,7 +269,7 @@
             </title>
             <para>The <verbatimText>xpath2_engine</verbatimText> variable determines which XPath 2.0 implementation the s1kd-brexcheck tool will use to evaluate the object paths of BREX rules.</para>
             <para>
-              The s1kd-tools are built on libxml, so by default s1kd-brexcheck uses libxml's XPath implementation. However, libxml only supports XPath 1.0. While as of Issue 5.0, the S1000D default BREX rules are all compatible with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0 specification. Therefore, if your project needs XPath 2.0 support for BREX rules, you should select one of these implementations:
+              The s1kd-tools are built on libxml, so by default s1kd-brexcheck uses libxml's XPath implementation. However, libxml only supports XPath 1.0. While as of Issue 6, the S1000D default BREX rules are all compatible with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0 specification. Therefore, if your project needs XPath 2.0 support for BREX rules, you should select one of these implementations:
               <definitionList>
                 <definitionListItem>
                   <listItemTerm>

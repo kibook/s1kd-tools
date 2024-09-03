@@ -80,11 +80,15 @@ The applications for this tool include:
     
       - functionalItemRepository
     
+      - hazardRepository
+    
       - illustratedPartsCatalog
     
       - partRepository
     
       - supplyRepository
+    
+      - terminologyRepository
     
       - toolRepository
     

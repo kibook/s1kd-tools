@@ -148,7 +148,7 @@ rules.
 
 The s1kd-tools are built on libxml, so by default s1kd-brexcheck uses
 libxml's XPath implementation. However, libxml only supports XPath 1.0.
-While as of Issue 5.0, the S1000D default BREX rules are all compatible
+While as of Issue 6, the S1000D default BREX rules are all compatible
 with XPath 1.0, Issue 4.0 and up do reference the XPath 2.0
 specification. Therefore, if your project needs XPath 2.0 support for
 BREX rules, you should select one of these implementations:

@@ -22,10 +22,10 @@ available here:
 
   - [S1000D spec sample](http://github.com/kibook/S1000D)
 
-These tools are primarily developed around Issue 5.0 of the
-specification, and are generally compatibile with the previous 4.X
-issues. Support for Issue 3.0 and lower is a work-in-progress. Support
-for SGML schemas is not planned.
+These tools are primarily developed around Issue 6 of the specification,
+and are generally compatibile with the previous 5.0 and 4.X issues.
+Support for Issue 3.0 and lower is a work-in-progress. Support for SGML
+schemas is not planned.
 
   - [Compatibility with each issue of the
     specification](COMPATIBILITY.md)

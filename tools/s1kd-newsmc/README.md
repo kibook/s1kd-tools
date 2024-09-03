@@ -20,7 +20,9 @@ the SCORM content package code and other metadata specified.
     Specify which issue of S1000D to use. Currently supported issues
     are:
     
-      - 5.0 (default)
+      - 6 (default)
+    
+      - 5.0
     
       - 4.2
     
@@ -36,7 +38,7 @@ the SCORM content package code and other metadata specified.
   - \-%, --templates \<dir\>  
     Use the XML template in \<dir\> instead of the built-in template.
     The template must be named `scormcontentpackage.xml` in \<dir\> and
-    must conform to the default S1000D issue (5.0).
+    must conform to the default S1000D issue (6).
 
   - \-\~, --dump-templates \<dir\>  
     Dump the built-in XML template to the specified directory.

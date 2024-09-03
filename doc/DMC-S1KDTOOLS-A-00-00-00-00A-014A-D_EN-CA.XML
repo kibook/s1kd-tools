@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="00"/>
+        <issueInfo issueNumber="016" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2024" month="09" day="03"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
@@ -38,9 +38,6 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
-      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -264,7 +261,7 @@
                   </para>
                 </entry>
                 <entry>
-                  <para>S1000D issue number (5.0, 4.2, 4.1, ...)</para>
+                  <para>S1000D issue number (6, 5.0, 4.2, 4.1, ...)</para>
                 </entry>
               </row>
               <row>
@@ -655,7 +652,7 @@
 <default ident="inWork" value="01"/>
 <default ident="issueNumber" value="000"/>
 <default ident="issueType" value="new"/>
-<default ident="issue" value="5.0"/>
+<default ident="issue" value="6"/>
 <default ident="itemLocationCode" value="D"/>
 <default ident="languageIsoCode" value="en"/>
 <default ident="learnCode" value="H10"/>
@@ -713,7 +710,7 @@ infoNameVariant                Clean with water
 inWork                         01
 issueNumber                    000
 issueType                      new
-issue                          5.0
+issue                          6
 itemLocationCode               D
 languageIsoCode                en
 learnCode                      H10

@@ -27,7 +27,9 @@ module code and other metadata specified.
     Specify which issue of S1000D to use. Currently supported issues
     are:
     
-      - 5.0 (default)
+      - 6 (default)
+    
+      - 5.0
     
       - 4.2
     
@@ -421,9 +423,9 @@ the schema, matching one of the schema names in the `.dmtypes` file or
 the schema specified with the -T option.
 
 The templates must be written to conform to the default S1000D issue of
-this tool (currently 5.0), regardless of what issue of S1000D the
-project is using. The final output will be automatically transformed
-when another issue is specified with the -$ option.
+this tool (currently 6), regardless of what issue of S1000D the project
+is using. The final output will be automatically transformed when
+another issue is specified with the -$ option.
 
 The `templates` default can also be specified in the `.defaults` file to
 use these custom templates by default.

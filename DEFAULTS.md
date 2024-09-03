@@ -7,64 +7,64 @@ both the XML format and simple text format.
 
 # Alphabetic index
 
-| Identifier                      | Value description                        |
-| ------------------------------- | ---------------------------------------- |
-| `act`                           | Data module code of ACT data module      |
-| `assyCode`                      | 2 to 4 alphanumeric characters           |
-| `authorization`                 | string                                   |
-| `brex`                          | Data module code of BREX data module     |
-| `city`                          | string (Sender city)                     |
-| `commentPriorityCode`           | cp01-cp99                                |
-| `commentType`                   | Q, I, or R                               |
-| `countryIsoCode`                | ISO 2-character country code             |
-| `country`                       | string (Sender country)                  |
-| `disassyCodeVariant`            | 1 to 3 alphanumeric characters           |
-| `disassyCode`                   | 2 alphanumeric characters                |
-| `dmlType`                       | C, P, or S                               |
-| `infoCodeVariant`               | 1 alphanumeric character                 |
-| `infoCode`                      | 3 alphanumeric characters                |
-| `infoName`                      | string                                   |
-| `infoNameVariant`               | string                                   |
-| `inWork`                        | 2 digits                                 |
-| `issueNumber`                   | 3 digits                                 |
-| `issueType`                     | S1000D issue type (new, changed, ...)    |
-| `issue`                         | S1000D issue number (5.0, 4.2, 4.1, ...) |
-| `itemLocationCode`              | A, B, C, D, or T                         |
-| `languageIsoCode`               | 2 to 3 character ISO language code       |
-| `learnCode`                     | 3 alphanumeric characters                |
-| `learnEventCode`                | A, B, C, D, or E                         |
-| `maintainedSns`                 | string                                   |
-| `modelIdentCode`                | 1 to 14 alphanumeric characters          |
-| `originatorCode`                | 5-character NCAGE code                   |
-| `originator`                    | string                                   |
-| `pmIssuer`                      | 5-character NCAGE code                   |
-| `pmNumber`                      | 5 alphanumeric characters                |
-| `pmVolume`                      | 2 digits                                 |
-| `receiver`                      | string                                   |
-| `receiverCity`                  | string                                   |
-| `receiverCountry`               | string                                   |
-| `receiverIdent`                 | 5-character NCAGE code                   |
-| `remarks`                       | string                                   |
-| `responsiblePartnerCompanyCode` | 5-character NCAGE code                   |
-| `responsiblePartnerCompany`     | string                                   |
-| `schema`                        | URI                                      |
-| `scormContentPackageIssuer`     | 5-character NCAGE code                   |
-| `scormContentPackageNumber`     | 5 alphanumeric characters                |
-| `scormContentPackageVolume`     | 2 digits                                 |
-| `securityClassification`        | 2 digits                                 |
-| `sender`                        | string                                   |
-| `senderIdent`                   | 5-character NCAGE code                   |
-| `seqNumber`                     | 00001-99999                              |
-| `skillLevelCode`                | sk01-sk99                                |
-| `sns`                           | Data module code of BREX data module     |
-| `snsLevels`                     | 1 thru 4                                 |
-| `subSubSystemCode`              | 1 alphanumeric character                 |
-| `subSystemCode`                 | 1 alphanumeric character                 |
-| `systemCode`                    | 2 to 3 alphanumeric characters           |
-| `systemDiffCode`                | 1 to 4 alphanumeric characters           |
-| `techName`                      | string                                   |
-| `templates`                     | Path to custom XML templates directory   |
-| `yearOfDataIssue`               | 4 digits                                 |
+| Identifier                      | Value description                           |
+| ------------------------------- | ------------------------------------------- |
+| `act`                           | Data module code of ACT data module         |
+| `assyCode`                      | 2 to 4 alphanumeric characters              |
+| `authorization`                 | string                                      |
+| `brex`                          | Data module code of BREX data module        |
+| `city`                          | string (Sender city)                        |
+| `commentPriorityCode`           | cp01-cp99                                   |
+| `commentType`                   | Q, I, or R                                  |
+| `countryIsoCode`                | ISO 2-character country code                |
+| `country`                       | string (Sender country)                     |
+| `disassyCodeVariant`            | 1 to 3 alphanumeric characters              |
+| `disassyCode`                   | 2 alphanumeric characters                   |
+| `dmlType`                       | C, P, or S                                  |
+| `infoCodeVariant`               | 1 alphanumeric character                    |
+| `infoCode`                      | 3 alphanumeric characters                   |
+| `infoName`                      | string                                      |
+| `infoNameVariant`               | string                                      |
+| `inWork`                        | 2 digits                                    |
+| `issueNumber`                   | 3 digits                                    |
+| `issueType`                     | S1000D issue type (new, changed, ...)       |
+| `issue`                         | S1000D issue number (6, 5.0, 4.2, 4.1, ...) |
+| `itemLocationCode`              | A, B, C, D, or T                            |
+| `languageIsoCode`               | 2 to 3 character ISO language code          |
+| `learnCode`                     | 3 alphanumeric characters                   |
+| `learnEventCode`                | A, B, C, D, or E                            |
+| `maintainedSns`                 | string                                      |
+| `modelIdentCode`                | 1 to 14 alphanumeric characters             |
+| `originatorCode`                | 5-character NCAGE code                      |
+| `originator`                    | string                                      |
+| `pmIssuer`                      | 5-character NCAGE code                      |
+| `pmNumber`                      | 5 alphanumeric characters                   |
+| `pmVolume`                      | 2 digits                                    |
+| `receiver`                      | string                                      |
+| `receiverCity`                  | string                                      |
+| `receiverCountry`               | string                                      |
+| `receiverIdent`                 | 5-character NCAGE code                      |
+| `remarks`                       | string                                      |
+| `responsiblePartnerCompanyCode` | 5-character NCAGE code                      |
+| `responsiblePartnerCompany`     | string                                      |
+| `schema`                        | URI                                         |
+| `scormContentPackageIssuer`     | 5-character NCAGE code                      |
+| `scormContentPackageNumber`     | 5 alphanumeric characters                   |
+| `scormContentPackageVolume`     | 2 digits                                    |
+| `securityClassification`        | 2 digits                                    |
+| `sender`                        | string                                      |
+| `senderIdent`                   | 5-character NCAGE code                      |
+| `seqNumber`                     | 00001-99999                                 |
+| `skillLevelCode`                | sk01-sk99                                   |
+| `sns`                           | Data module code of BREX data module        |
+| `snsLevels`                     | 1 thru 4                                    |
+| `subSubSystemCode`              | 1 alphanumeric character                    |
+| `subSystemCode`                 | 1 alphanumeric character                    |
+| `systemCode`                    | 2 to 3 alphanumeric characters              |
+| `systemDiffCode`                | 1 to 4 alphanumeric characters              |
+| `techName`                      | string                                      |
+| `templates`                     | Path to custom XML templates directory      |
+| `yearOfDataIssue`               | 4 digits                                    |
 
 `.defaults` file - Identifier value descriptions
 
@@ -91,7 +91,7 @@ both the XML format and simple text format.
     <default ident="inWork" value="01"/>
     <default ident="issueNumber" value="000"/>
     <default ident="issueType" value="new"/>
-    <default ident="issue" value="5.0"/>
+    <default ident="issue" value="6"/>
     <default ident="itemLocationCode" value="D"/>
     <default ident="languageIsoCode" value="en"/>
     <default ident="learnCode" value="H10"/>
@@ -147,7 +147,7 @@ both the XML format and simple text format.
     inWork                         01
     issueNumber                    000
     issueType                      new
-    issue                          5.0
+    issue                          6
     itemLocationCode               D
     languageIsoCode                en
     learnCode                      H10

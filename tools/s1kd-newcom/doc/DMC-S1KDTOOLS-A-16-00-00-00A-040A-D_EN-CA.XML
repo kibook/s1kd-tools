@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="16" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2024" month="09" day="03"/>
         <dmTitle>
           <techName>s1kd-newcom(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Change default issue to 6</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -75,8 +75,11 @@
                 <para>Specify which issue of S1000D to use. Currently supported issues are:</para>
                 <para>
                   <randomList>
-                    <listItem>
-                      <para>5.0 (default)</para>
+                    <listItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0001">
+                      <para>6 (default)</para>
+                    </listItem>
+                    <listItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">
+                      <para>5.0</para>
                     </listItem>
                     <listItem>
                       <para>4.2</para>
@@ -115,7 +118,7 @@
             <definitionListItem>
               <listItemTerm>-%, --templates &lt;dir&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">comment.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (5.0).</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">Use the XML template in the specified directory instead of the built-in template. The template must be named <verbatimText verbatimStyle="vs02">comment.xml</verbatimText> inside &lt;dir&gt; and must conform to the default S1000D issue (6).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="EX" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="000" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="000" inWork="01"/>
+        <issueInfo issueNumber="000" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2017" month="12" day="01"/>
+        <issueDate year="2024" month="09" day="03"/>
         <dmTitle>
           <techName>Namespace exclusion example</techName>
         </dmTitle>
@@ -77,7 +77,7 @@
             </mrow>
           </math>
         </para>
-        <para>Since MathML is not supported as of S1000D Issue 5.0, this would normally fail to validate. However, the -x option allows specified XML namespaces to be ignored when validating.</para>
+        <para>Since MathML is not supported as of S1000D Issue 6, this would normally fail to validate. However, the -x option allows specified XML namespaces to be ignored when validating.</para>
         <para>To ignore MathML, for example:</para>
         <para>
           <verbatimText>$ s1kd-validate -x http://www.w3.org/1998/Math/MathML &lt;data modules&gt;</verbatimText>

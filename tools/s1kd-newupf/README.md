@@ -19,7 +19,9 @@ along with update instructions.
     Specify which issue of S1000D to use. Currently supported issues
     are:
     
-      - 5.0 (default)
+      - 6 (default)
+    
+      - 5.0
     
       - 4.2
     
@@ -35,7 +37,7 @@ along with update instructions.
     Use XML template in the specified directory instead of the built-in
     template. The template must be named `update.xml` in the directory
     \<dir\>, and must conform to the default S1000D issue of this tool
-    (5.0).
+    (6).
 
   - \-\~, --dump-templates \<dir\>  
     Dump the built-in XML template to the specified directory.
