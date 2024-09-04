@@ -37,7 +37,7 @@
 #define PROGRESS_ZENITY 2
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "5.0.0"
+#define VERSION "5.0.1"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -971,7 +971,10 @@ static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 		unsigned char *xml = NULL;
 		unsigned int len = 0;
 
-		if (strcmp(name, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0) {
+		if (strcmp(name, "DMC-S1000D-H-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_H_04_10_0301_00A_022A_D_001_00_EN_US_XML;
+			len = brex_DMC_S1000D_H_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0) {
 			xml = brex_DMC_S1000D_G_04_10_0301_00A_022A_D_001_00_EN_US_XML;
 			len = brex_DMC_S1000D_G_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
 		} else if (strcmp(name, "DMC-S1000D-F-04-10-0301-00A-022A-D") == 0) {
