@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "5.0.0"
+#define VERSION "5.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1010,14 +1010,8 @@ static int matchFragment(xmlDocPtr doc, xmlNodePtr ref, const char *code, const 
 		}
 	}
 
-	if (err) {
-		if (tagUnmatched) {
-			tagUnmatchedRef(ref);
-		} else if (showUnmatched) {
-			printMatchedFn(ref, src, code, id, doc ? fname : NULL);
-		} else if (verbosity >= NORMAL) {
-			printUnmatchedFn(ref, src, code, id, doc ? fname : NULL);
-		}
+	if (err && showUnmatched) {
+		printMatchedFn(ref, src, code, id, doc ? fname : NULL);
 	}
 
 	xmlFree(id);
