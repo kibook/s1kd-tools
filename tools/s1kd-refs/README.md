@@ -149,8 +149,13 @@ This allows you to:
     Specify a custom format for printed references. \<fmt\> is a format
     string, where the following variables can be given:
     
+      - %code% - The code of the reference.
+    
       - %file% - The filename of the referenced object (nothing is
         printed if no file is matched).
+    
+      - %fragment% - The fragment part of a reference (nothing is
+        printed if there is no fragment).
     
       - %line% - The line number where the reference occurs in the
         source.
