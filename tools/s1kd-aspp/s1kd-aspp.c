@@ -11,7 +11,7 @@
 #include "resources.h"
 
 #define PROG_NAME "s1kd-aspp"
-#define VERSION "5.0.1"
+#define VERSION "5.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -344,7 +344,7 @@ static void generateDisplayText(xmlDocPtr doc, xmlNodePtr acts, xmlNodePtr ccts,
 
 	res = xsltApplyStylesheet(style, muxdoc, params);
 
-	new = xmlCopyNode(firstXPathNode(res, NULL, "/mux/dmodule"), 1);
+	new = xmlCopyNode(firstXPathNode(res, NULL, "/mux/*"), 1);
 	old = xmlDocSetRootElement(doc, new);
 	xmlFreeNode(old);
 
