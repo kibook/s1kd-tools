@@ -15,7 +15,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-flatten"
-#define VERSION "3.4.1"
+#define VERSION "3.5.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -53,6 +53,7 @@ static int flatten_container = 0;
 static int recursive = 0;
 static int recursive_search = 0;
 static int remove_unresolved = 0;
+static int add_pmentry = 0;
 
 static int only_pm_refs = 0;
 
@@ -60,27 +61,28 @@ static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-cDfilmNPpqRruvxh?] <pubmodule> [<dmodule>...]");
+	puts("Usage: " PROG_NAME " [-d <dir>] [-I <path>] [-acDfilmNPpqRruvxh?] <pubmodule> [<dmodule>...]");
 	puts("");
 	puts("Options:");
-	puts("  -c, --containers      Flatten referenced container data modules.");
-	puts("  -D, --remove          Remove unresolved references.");
-	puts("  -d, --dir <dir>       Directory to start search in.");
-	puts("  -f, --overwrite       Overwrite publication module.");
-	puts("  -h, -?, --help        Show help/usage message.");
-	puts("  -I, --include <path>  Search <path> for referenced objects.");
-	puts("  -i, --ignore-issue    Always match the latest issue of an object found.");
-	puts("  -l, --list            Treat input as a list of objects.");
-	puts("  -m, --modify          Modiy references without flattening them.");
-	puts("  -N, --omit-issue      Assume issue/inwork numbers are omitted.");
-	puts("  -P, --only-pm-refs    Only flatten PM refs.");
-	puts("  -p, --simple          Output a simple, flat XML file.");
-	puts("  -q, --quiet           Quiet mode.");
-	puts("  -R, --recursively     Recursively flatten referenced PMs.");
-	puts("  -r, --recursive       Search directories recursively.");
-	puts("  -u, --unique          Remove duplicate references.");
-	puts("  -v, --verbose         Verbose output.");
-	puts("  -x, --use-xinclude    Use XInclude references.");
+	puts("  -a, --recursively-add-entries   Recursively flatten referenced PMs, adding a new PM entry for each.");
+	puts("  -c, --containers                Flatten referenced container data modules.");
+	puts("  -D, --remove                    Remove unresolved references.");
+	puts("  -d, --dir <dir>                 Directory to start search in.");
+	puts("  -f, --overwrite                 Overwrite publication module.");
+	puts("  -h, -?, --help                  Show help/usage message.");
+	puts("  -I, --include <path>            Search <path> for referenced objects.");
+	puts("  -i, --ignore-issue              Always match the latest issue of an object found.");
+	puts("  -l, --list                      Treat input as a list of objects.");
+	puts("  -m, --modify                    Modiy references without flattening them.");
+	puts("  -N, --omit-issue                Assume issue/inwork numbers are omitted.");
+	puts("  -P, --only-pm-refs              Only flatten PM refs.");
+	puts("  -p, --simple                    Output a simple, flat XML file.");
+	puts("  -q, --quiet                     Quiet mode.");
+	puts("  -R, --recursively               Recursively flatten referenced PMs.");
+	puts("  -r, --recursive                 Search directories recursively.");
+	puts("  -u, --unique                    Remove duplicate references.");
+	puts("  -v, --verbose                   Verbose output.");
+	puts("  -x, --use-xinclude              Use XInclude references.");
 	puts("  --version  Show version information.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -238,6 +240,7 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 
 			if (recursive) {
 				xmlDocPtr subpm;
+				xmlNodePtr pmentry = NULL;
 				xmlNodePtr content;
 
 				if (verbosity >= VERBOSE) {
@@ -245,6 +248,20 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 				}
 
 				subpm = read_xml_doc(fs_pm_fname);
+
+				/* Create a new PM entry to contain the contents of the referenced PM. */
+				if (add_pmentry) {
+					xmlChar *title;
+
+					pmentry = xmlNewNode(NULL, BAD_CAST "pmEntry");
+
+					title = xpath_first_value(subpm, NULL, BAD_CAST "//pmTitle");
+					xmlNewChild(pmentry, NULL, BAD_CAST "pmEntryTitle", title);
+					xmlFree(title);
+
+					pmentry = xmlAddNextSibling(pm_ref, pmentry);
+				}
+
 				content = first_xpath_node(subpm, NULL, "//content");
 
 				if (content) {
@@ -252,11 +269,24 @@ static void flatten_pm_ref(xmlNodePtr pm_ref, xmlNsPtr xiNs)
 
 					flatten_pm_entry(content, xiNs);
 
-					for (c = content->last; c; c = c->prev) {
-						if (xmlStrcmp(c->name, BAD_CAST "pmEntry") != 0) {
-							continue;
+					/* Add the contents to the new PM entry. */
+					if (add_pmentry) {
+						for (c = content->children; c; c = c->next) {
+							if (xmlStrcmp(c->name, BAD_CAST "pmEntry") != 0) {
+								continue;
+							}
+
+							xmlAddChild(pmentry, xmlCopyNode(c, 1));
 						}
-						xmlAddNextSibling(pm_ref, xmlCopyNode(c, 1));
+					/* Or, add the contents directly to the main PM. */
+					} else {
+						for (c = content->last; c; c = c->prev) {
+							if (xmlStrcmp(c->name, BAD_CAST "pmEntry") != 0) {
+								continue;
+							}
+
+							xmlAddNextSibling(pm_ref, xmlCopyNode(c, 1));
+						}
 					}
 				}
 
@@ -635,26 +665,27 @@ int main(int argc, char **argv)
 
 	xmlNodePtr cur;
 
-	const char *sopts = "cDd:fxmNPpqRruvI:ilh?";
+	const char *sopts = "acDd:fxmNPpqRruvI:ilh?";
 	struct option lopts[] = {
-		{"version"     , no_argument      , 0, 0},
-		{"help"        , no_argument      , 0, 'h'},
-		{"containers"  , no_argument      , 0, 'c'},
-		{"remove"      , no_argument      , 0, 'D'},
-		{"dir"         , required_argument, 0, 'd'},
-		{"overwrite"   , no_argument      , 0, 'f'},
-		{"use-xinclude", no_argument      , 0, 'x'},
-		{"modify"      , no_argument      , 0, 'm'},
-		{"omit-issue"  , no_argument      , 0, 'N'},
-		{"only-pm-refs", no_argument      , 0, 'P'},
-		{"simple"      , no_argument      , 0, 'p'},
-		{"quiet"       , no_argument      , 0, 'q'},
-		{"recursively" , no_argument      , 0, 'R'},
-		{"recursive"   , no_argument      , 0, 'r'},
-		{"unique"      , no_argument      , 0, 'u'},
-		{"verbose"     , no_argument      , 0, 'v'},
-		{"include"     , required_argument, 0, 'I'},
-		{"ignore-issue", no_argument      , 0, 'i'},
+		{"version"                , no_argument      , 0, 0},
+		{"recursively-add-entries", no_argument      , 0, 'a'},
+		{"help"                   , no_argument      , 0, 'h'},
+		{"containers"             , no_argument      , 0, 'c'},
+		{"remove"                 , no_argument      , 0, 'D'},
+		{"dir"                    , required_argument, 0, 'd'},
+		{"overwrite"              , no_argument      , 0, 'f'},
+		{"use-xinclude"           , no_argument      , 0, 'x'},
+		{"modify"                 , no_argument      , 0, 'm'},
+		{"omit-issue"             , no_argument      , 0, 'N'},
+		{"only-pm-refs"           , no_argument      , 0, 'P'},
+		{"simple"                 , no_argument      , 0, 'p'},
+		{"quiet"                  , no_argument      , 0, 'q'},
+		{"recursively"            , no_argument      , 0, 'R'},
+		{"recursive"              , no_argument      , 0, 'r'},
+		{"unique"                 , no_argument      , 0, 'u'},
+		{"verbose"                , no_argument      , 0, 'v'},
+		{"include"                , required_argument, 0, 'I'},
+		{"ignore-issue"           , no_argument      , 0, 'i'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -678,6 +709,7 @@ int main(int argc, char **argv)
 				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
+			case 'a': recursive = 1; add_pmentry = 1; break;
 			case 'c': flatten_container = 1; break;
 			case 'D': remove_unresolved = 1; break;
 			case 'd': free(search_dir); search_dir = strdup(optarg); break;

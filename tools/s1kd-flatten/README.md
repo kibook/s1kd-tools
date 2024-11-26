@@ -18,6 +18,13 @@ reference.
 
 # OPTIONS
 
+  - \-a, --recursively-add-entries  
+    Recursively flatten referenced publication modules, copying their
+    content in to a new PM entry in the "master" publication module. The
+    PM entry is given the title of the referenced publication module.
+    The -R (--recursively) option works similarly, but does not create a
+    new PM entry.
+
   - \-c, --containers  
     Flatten referenced container data modules by copying the references
     inside the container directly in to the publication module. The
@@ -71,7 +78,9 @@ reference.
 
   - \-R, --recursively  
     Recursively flatten referenced publication modules, copying their
-    content in to the "master" publication module.
+    content in to the "master" publication module. This is similar to
+    the -a (--recursively-add-entries) option, but the contents are
+    copied directly rather than being added to a new PM entry.
 
   - \-r, --recursive  
     Search directories recursively.
