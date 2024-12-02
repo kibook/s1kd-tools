@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "5.1.0"
+#define VERSION "5.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -40,6 +40,9 @@
 static bool contentOnly = false;
 
 static enum verbosity { QUIET, NORMAL, VERBOSE, DEBUG } verbosity = NORMAL;
+
+/* Whether to perform reference matching or not. */
+static bool matchReferences = true;
 
 /* Assume objects were created with the -N option. */
 static bool noIssue = false;
@@ -441,7 +444,7 @@ static bool exact_match(char *dst, const char *code)
 /* Match a code to a file name. */
 static bool find_object_fname(char *dst, const char *dir, const char *code, bool recursive)
 {
-	return find_csdb_object(dst, dir, code, NULL, recursive) && (looseMatch || exact_match(dst, code));
+	return matchReferences && find_csdb_object(dst, dir, code, NULL, recursive) && (looseMatch || exact_match(dst, code));
 }
 
 /* Tag unmatched references in the source object. */
@@ -2341,7 +2344,7 @@ static void readnonChapIpdSns(const char *s)
 /* Display the usage message. */
 static void show_help(void)
 {
-	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqrSsTUuvwXxYZ^h?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]");
+	puts("Usage: s1kd-refs [-aBCcDEFfGHIiKLlMmNnoPqrSsTUuvwXxYZ^h?] [-b <SNS>] [-d <dir>] [-e <cmd>] [-J <ns=URL> ...] [-j <xpath>] [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -a, --all                    Print unmatched codes.");
@@ -2366,6 +2369,7 @@ static void show_help(void)
 	puts("  -k, --ipd-dcv <pattern>      Pattern for IPD disassembly code variant.");
 	puts("  -L, --dml                    List DML references.");
 	puts("  -l, --list                   Treat input as list of CSDB objects.");
+	puts("  -M, --no-match               Do not attempt to match references to CSDB objects.");
 	puts("  -m, --strict-match           Be more strict when matching filenames of objects.");
 	puts("  -N, --omit-issue             Assume filenames omit issue info.");
 	puts("  -n, --lineno                 Print the source filename and line number for each reference.");
@@ -2414,7 +2418,7 @@ int main(int argc, char **argv)
 	/* Which types of object references will be listed. */
 	int showObjects = 0;
 
-	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:mHj:J:Tt:3:wYZBKb:k:^h?";
+	const char *sopts = "qcNaFfLlUuCDGPRrd:IinEXxSsove:MmHj:J:Tt:3:wYZBKb:k:^h?";
 	struct option lopts[] = {
 		{"version"       , no_argument      , 0, 0},
 		{"help"          , no_argument      , 0, 'h'},
@@ -2447,6 +2451,7 @@ int main(int argc, char **argv)
 		{"include-src"   , no_argument      , 0, 's'},
 		{"output-valid"  , no_argument      , 0, 'o'},
 		{"verbose"       , no_argument      , 0, 'v'},
+		{"no-match"      , no_argument      , 0, 'M'},
 		{"strict-match"  , no_argument      , 0, 'm'},
 		{"hotspot"       , no_argument      , 0, 'H'},
 		{"hotspot-xpath" , required_argument, 0, 'j'},
@@ -2493,6 +2498,8 @@ int main(int argc, char **argv)
 			case 'N':
 				noIssue = true;
 				break;
+			case 'M':
+				matchReferences = false;
 			case 'a':
 				showUnmatched = true;
 				break;

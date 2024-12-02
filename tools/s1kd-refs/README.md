@@ -4,7 +4,7 @@ s1kd-refs - Manage references between CSDB objects
 
 # SYNOPSIS
 
-    s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
+    s1kd-refs [-aBCcDEFfGHIiKLlMmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
               [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
               [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]
 
@@ -108,6 +108,12 @@ This allows you to:
   - \-l, --list  
     Treat input (stdin or arguments) as lists of filenames of CSDB
     objects to list references in, rather than CSDB objects themselves.
+
+  - \-M, --no-match  
+    Do not attempt to match any references to CSDB object filenames.
+    This also implies the -a (--all) option, since otherwise nothing
+    would occur as all references will be considered unmatched with this
+    option specified.
 
   - \-m, --strict-match  
     Be more strict when matching codes of CSDB objects to filenames. By

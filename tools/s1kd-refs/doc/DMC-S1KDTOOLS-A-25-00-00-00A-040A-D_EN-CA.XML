@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="25" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="033" inWork="01"/>
+        <issueInfo issueNumber="033" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="10" day="10"/>
+        <issueDate year="2024" month="12" day="02"/>
         <dmTitle>
           <techName>s1kd-refs(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
         <simplePara>Add %code% and %fragment% format variables.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add -M (--no-match) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-refs [-aBCcDEFfGHIiKLlMmNnoPqRrSsTUuvwXxYZ^h?] [-b <SNS>]
           [-d <dir>] [-e <cmd>] [-J <ns=URL>] [-j <xpath>]
           [-k <pattern>] [-t <fmt>] [-3 <file>] [<object>...]]]></verbatimText>
         </para>
@@ -181,6 +184,12 @@
               <listItemTerm>-l, --list</listItemTerm>
               <listItemDefinition>
                 <para>Treat input (stdin or arguments) as lists of filenames of CSDB objects to list references in, rather than CSDB objects themselves.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-M, --no-match</listItemTerm>
+              <listItemDefinition>
+                <para>Do not attempt to match any references to CSDB object filenames. This also implies the -a (--all) option, since otherwise nothing would occur as all references will be considered unmatched with this option specified.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
