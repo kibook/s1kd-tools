@@ -17,7 +17,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.7.1"
+#define VERSION "6.7.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2020,30 +2020,6 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 			break;
 	}
 
-	if (opts->check_props) {
-		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "yes");
-	} else {
-		xmlSetProp(report, BAD_CAST "strict", BAD_CAST "no");
-	}
-
-	if (opts->check_nested) {
-		xmlSetProp(report, BAD_CAST "checkNestedApplic", BAD_CAST "yes");
-	} else {
-		xmlSetProp(report, BAD_CAST "checkNestedApplic", BAD_CAST "no");
-	}
-
-	if (opts->check_redundant) {
-		xmlSetProp(report, BAD_CAST "checkRedundantApplic", BAD_CAST "yes");
-	} else {
-		xmlSetProp(report, BAD_CAST "checkRedundantApplic", BAD_CAST "no");
-	}
-
-	if (opts->check_duplicate) {
-		xmlSetProp(report, BAD_CAST "checkDuplicateApplic", BAD_CAST "yes");
-	} else {
-		xmlSetProp(report, BAD_CAST "checkDuplicateApplic", BAD_CAST "no");
-	}
-
 	if (opts->mode == CUSTOM) {
 		err += custom_check(doc, path, opts, report_node);
 	} else if (opts->mode == STANDALONE) {
@@ -2424,6 +2400,31 @@ int main(int argc, char **argv)
 				show_help();
 				goto cleanup;
 		}
+	}
+
+	/* Record options in the XML report. */
+	if (opts.check_props) {
+		xmlSetProp(appcheck, BAD_CAST "strict", BAD_CAST "yes");
+	} else {
+		xmlSetProp(appcheck, BAD_CAST "strict", BAD_CAST "no");
+	}
+
+	if (opts.check_nested) {
+		xmlSetProp(appcheck, BAD_CAST "checkNestedApplic", BAD_CAST "yes");
+	} else {
+		xmlSetProp(appcheck, BAD_CAST "checkNestedApplic", BAD_CAST "no");
+	}
+
+	if (opts.check_redundant) {
+		xmlSetProp(appcheck, BAD_CAST "checkRedundantApplic", BAD_CAST "yes");
+	} else {
+		xmlSetProp(appcheck, BAD_CAST "checkRedundantApplic", BAD_CAST "no");
+	}
+
+	if (opts.check_duplicate) {
+		xmlSetProp(appcheck, BAD_CAST "checkDuplicateApplic", BAD_CAST "yes");
+	} else {
+		xmlSetProp(appcheck, BAD_CAST "checkDuplicateApplic", BAD_CAST "no");
 	}
 
 	if (optind < argc) {
