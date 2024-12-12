@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.5.0"
+#define VERSION "4.6.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -1070,6 +1070,30 @@ static void show_issue_info(xmlNodePtr node, struct opts *opts)
 	xmlFree(s);
 }
 
+static xmlChar *get_language(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *l, *c;
+	l = first_xpath_string(node, BAD_CAST "@languageIsoCode|@language");
+	c = first_xpath_string(node, BAD_CAST "@countryIsoCode|@country");
+
+	l = xmlStrcat(l, BAD_CAST "-");
+	l = xmlStrcat(l, c);
+
+	xmlFree(c);
+
+	return l;
+}
+
+static void show_language(xmlNodePtr node, struct opts *opts)
+{
+	xmlChar *s;
+	s = get_language(node, opts);
+	if (s) {
+		printf("%s", (char *) s);
+	}
+	xmlFree(s);
+}
+
 static int create_act_ref(xmlXPathContextPtr ctxt, const char *val)
 {
 	xmlNodePtr node;
@@ -1997,6 +2021,13 @@ static struct metadata metadata[] = {
 		edit_item_location_code,
 		NULL,
 		"Item location code"},
+	{"language",
+		"//language",
+		get_language,
+		show_language,
+		NULL,
+		NULL,
+		"Language and country ISO codes (en-CA, en-US, fr-FR, ...)"},
 	{"languageIsoCode",
 		"//language/@languageIsoCode|//language/@language",
 		NULL,
