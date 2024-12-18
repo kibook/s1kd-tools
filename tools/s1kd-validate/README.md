@@ -4,7 +4,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 
 # SYNOPSIS
 
-    s1kd-validate [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
+    s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqv^h?]
                   [<object>...]
 
 # DESCRIPTION
@@ -46,9 +46,12 @@ schemas.
     Verbose mode. Success/failure will be explicitly reported on top of
     any errors.
 
-  - \-x, --exclude \<URI\>  
+  - \-X, --exclude \<URI\>  
     Exclude an XML namespace from the validation. Elements in the
     namespace specified by \<URI\> are ignored.
+
+  - \-x, --xml  
+    Output an XML report.
 
   - \-^, --remove-deleted  
     Validate with elements that have a change type of "delete" removed.

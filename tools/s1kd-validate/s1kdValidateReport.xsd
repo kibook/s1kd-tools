@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="errorElemType" mixed="true">
+    <xs:attribute name="line" type="xs:integer" use="required"/>
+    <xs:attribute name="xpath" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="objectElemType">
+    <xs:sequence>
+      <xs:element name="error" type="errorElemType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="path" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="s1kdValidateReportElemType">
+    <xs:sequence>
+      <xs:element name="object" type="objectElemType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="s1kdValidateReport" type="s1kdValidateReportElemType"/>
+</xs:schema>

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="00"/>
+        <issueInfo issueNumber="027" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2024" month="12" day="18"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,11 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
+      <reasonForUpdate id="rfu-xml-report" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -x (--xml) option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-change-exclude" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Change --exclude short option to -X.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -52,7 +55,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-validate [-s <path>] [-x <URI>] [-F|-f] [-eloqv^h?]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-report rfu-change-exclude"><![CDATA[s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqv^h?]
               [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -118,10 +121,16 @@
                 <para>Verbose mode. Success/failure will be explicitly reported on top of any errors.</para>
               </listItemDefinition>
             </definitionListItem>
-            <definitionListItem>
-              <listItemTerm>-x, --exclude &lt;URI&gt;</listItemTerm>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-change-exclude">
+              <listItemTerm>-X, --exclude &lt;URI&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Exclude an XML namespace from the validation. Elements in the namespace specified by &lt;URI&gt; are ignored.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-xml-report">
+              <listItemTerm>-x, --xml</listItemTerm>
+              <listItemDefinition>
+                <para>Output an XML report.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

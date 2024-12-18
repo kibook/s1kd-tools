@@ -7,15 +7,17 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "3.1.1"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
 #define FAILED_PREFIX PROG_NAME ": FAILED: "
 
+#define S_BAD_IDREF "No matching ID for '%s'."
+
 #define E_BAD_LIST ERR_PREFIX "Could not read list file: %s\n"
 #define E_MAX_SCHEMA_PARSERS ERR_PREFIX "Maximum number of schemas reached: %d\n"
-#define E_BAD_IDREF ERR_PREFIX "%s (%ld): No matching ID for '%s'.\n"
+#define E_BAD_IDREF ERR_PREFIX "%s (%ld): " S_BAD_IDREF "\n"
 
 #define EXIT_MAX_SCHEMAS 2
 #define EXIT_MISSING_SCHEMA 3
@@ -79,6 +81,27 @@ static struct s1kd_schema_parser *schema_parsers;
 
 static int schema_parser_count = 0;
 
+/* Root element of the XML report. */
+static xmlDocPtr xml_report_doc = NULL;
+
+/* Add an error to the XML report. */
+static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr node, const long lineno, const char *message)
+{
+	char line[16];
+
+	snprintf(line, 16, "%ld", lineno);
+
+	xmlNodePtr error = xmlNewChild(report_node, NULL, BAD_CAST "error", BAD_CAST message);
+	xmlSetProp(error, BAD_CAST "line", BAD_CAST line);
+
+	if (node) {
+		xmlChar *xpath;
+		xpath = xpath_of(node);
+		xmlSetProp(error, BAD_CAST "xpath", xpath);
+		xmlFree(xpath);
+	}
+}
+
 /* The signature of xmlStructuredErrorFunc is different from v2.12.0 and up. */
 #if LIBXML_VERSION < 21200
 static void print_error(void *userData, xmlErrorPtr error)
@@ -86,10 +109,18 @@ static void print_error(void *userData, xmlErrorPtr error)
 static void print_error(void *userData, const xmlError *error)
 #endif
 {
-	if (error->file) {
-		fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
-	} else {
-		fprintf(userData, ERR_PREFIX "%s\n", error->message);
+	if (verbosity > SILENT) {
+		if (error->file) {
+			fprintf(stderr, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
+		} else {
+			fprintf(stderr, ERR_PREFIX "%s\n", error->message);
+		}
+	}
+
+	/* If -x is specified, add error to XML report. */
+	if (xml_report_doc) {
+		error->message[strcspn(error->message, "\n")] = 0;
+		add_xml_report_error((xmlNodePtr) userData, error->node, error->line, error->message);
 	}
 }
 
@@ -99,21 +130,11 @@ static void print_non_parser_error(void *userData, xmlErrorPtr error)
 static void print_non_parser_error(void *userData, const xmlError *error)
 #endif
 {
-	if (error->domain != XML_FROM_PARSER) {
-		if (error->file) {
-			fprintf(userData, ERR_PREFIX "%s (%d): %s", error->file, error->line, error->message);
-		} else {
-			fprintf(userData, ERR_PREFIX "%s\n", error->message);
-		}
+	if (error->domain == XML_FROM_PARSER) {
+		return;
 	}
-}
 
-#if LIBXML_VERSION < 21200
-static void suppress_error(void *userData, xmlErrorPtr error)
-#else
-static void suppress_error(void *userData, const xmlError *error)
-#endif
-{
+	print_error(userData, error);
 }
 
 xmlStructuredErrorFunc schema_errfunc = print_error;
@@ -146,9 +167,6 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 	schema = xmlSchemaParse(ctxt);
 	valid_ctxt = xmlSchemaNewValidCtxt(schema);
 
-	xmlSchemaSetParserStructuredErrors(ctxt, schema_errfunc, stderr);
-	xmlSchemaSetValidStructuredErrors(valid_ctxt, schema_errfunc, stderr);
-
 	schema_parsers[schema_parser_count].url = url;
 	schema_parsers[schema_parser_count].ctxt = ctxt;
 	schema_parsers[schema_parser_count].schema = schema;
@@ -163,21 +181,23 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-s <path>] [-x <URI>] [-efloqv^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqv^h?] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -e, --ignore-empty    Ignore empty/non-XML documents.");
-	puts("  -f, --filenames       List invalid files.");
-	puts("  -h, -?, --help        Show help/usage message.");
-	puts("  -l, --list            Treat input as list of filenames.");
-	puts("  -o, --output-valid    Output valid CSDB objects to stdout.");
-	puts("  -q, --quiet           Silent (no output).");
-	puts("  -s, --schema <path>   Validate against the given schema.");
-	puts("  -v, --verbose         Verbose output.");
-	puts("  -x, --exclude <URI>   Exclude namespace from validation by URI.");
-	puts("  -^, --remove-deleted  Validate with elements marked as \"delete\" removed.");
-	puts("  --version             Show version information.");
-	puts("  <object>              Any number of CSDB objects to validate.");
+	puts("  -e, --ignore-empty     Ignore empty/non-XML documents.");
+	puts("  -F, --valid-filenames  List valid files.");
+	puts("  -f, --filenames        List invalid files.");
+	puts("  -h, -?, --help         Show help/usage message.");
+	puts("  -l, --list             Treat input as list of filenames.");
+	puts("  -o, --output-valid     Output valid CSDB objects to stdout.");
+	puts("  -q, --quiet            Silent (no output).");
+	puts("  -s, --schema <path>    Validate against the given schema.");
+	puts("  -v, --verbose          Verbose output.");
+	puts("  -X, --exclude <URI>    Exclude namespace from validation by URI.");
+	puts("  -x, --xml              Output an XML report.");
+	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
+	puts("  --version              Show version information.");
+	puts("  <object>               Any number of CSDB objects to validate.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -224,7 +244,7 @@ static void strip_ns(xmlDocPtr doc, xmlNodePtr ignore)
 /* Check that certain attributes of type xs:IDREF and xs:IDREFS have a matching
  * xs:ID attribute.
  */
-static int check_idrefs(xmlDocPtr doc, const char *fname)
+static int check_idrefs(xmlDocPtr doc, const char *fname, const xmlNodePtr report_node)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -236,17 +256,28 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 	obj = xmlXPathEvalExpression(INVALID_ID_XPATH, ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
-		if (verbosity > SILENT) {
-			int i;
-			for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-				xmlChar *id = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlChar *id = xmlNodeGetContent(obj->nodesetval->nodeTab[i]);
+			long line = xmlGetLineNo(obj->nodesetval->nodeTab[i]->parent);
+
+			if (verbosity > SILENT) {
 				fprintf(stderr,
 					E_BAD_IDREF,
 					fname,
-					xmlGetLineNo(obj->nodesetval->nodeTab[i]->parent),
+					line,
 					(char *) id);
-				xmlFree(id);
 			}
+
+			/* If -x is specified, add error to XML report. */
+			if (xml_report_doc) {
+				char message[256];
+				snprintf(message, 256, S_BAD_IDREF, (char *) id);
+				add_xml_report_error(report_node, obj->nodesetval->nodeTab[i], line, message);
+			}
+
+			xmlFree(id);
 		}
 
 		++err;
@@ -273,12 +304,21 @@ static int check_idrefs(xmlDocPtr doc, const char *fname)
 				res = xmlXPathEvalExpression(xpath, ctx);
 
 				if (xmlXPathNodeSetIsEmpty(res->nodesetval)) {
+					long line = xmlGetLineNo(obj->nodesetval->nodeTab[i]->parent);
+
 					if (verbosity > SILENT) {
 						fprintf(stderr,
 							E_BAD_IDREF,
 							fname,
 							xmlGetLineNo(obj->nodesetval->nodeTab[i]->parent),
 							(char *) id);
+					}
+
+					/* If -x is specified, add error to XML report. */
+					if (xml_report_doc) {
+						char message[256];
+						snprintf(message, 256, S_BAD_IDREF, (char *) id);
+						add_xml_report_error(report_node, obj->nodesetval->nodeTab[i], line, message);
 					}
 
 					++err;
@@ -314,6 +354,7 @@ static int validate_file(const char *fname, const char *schema, xmlNodePtr ignor
 	char *url;
 	struct s1kd_schema_parser *parser;
 	int err = 0;
+	xmlNodePtr report_node = NULL;
 
 	if (!(doc = read_xml_doc(fname))) {
 		return !ignore_empty;
@@ -338,11 +379,17 @@ static int validate_file(const char *fname, const char *schema, xmlNodePtr ignor
 		rem_delete_elems(doc);
 	}
 
+	/* Add a node to the XML report (if enabled) for the current file. */
+	if (xml_report_doc) {
+		report_node = xmlNewChild(xmlDocGetRootElement(xml_report_doc), NULL, BAD_CAST "object", NULL);
+		xmlSetProp(report_node, BAD_CAST "path", BAD_CAST fname);
+	}
+
 	/* This shouldn't be needed because the xs:ID, xs:IDREF and xs:IDREFS
 	 * are defined in the schema, but at this time libxml2 does not check
 	 * these when validating.
 	 */
-	err += check_idrefs(doc, fname);
+	err += check_idrefs(doc, fname, report_node);
 
 	dmodule = xmlDocGetRootElement(doc);
 
@@ -368,6 +415,9 @@ static int validate_file(const char *fname, const char *schema, xmlNodePtr ignor
 
 		parser = add_schema_parser(url);
 	}
+
+	xmlSchemaSetParserStructuredErrors(parser->ctxt, schema_errfunc, report_node);
+	xmlSchemaSetValidStructuredErrors(parser->valid_ctxt, schema_errfunc, report_node);
 
 	if (xmlSchemaValidateDoc(parser->valid_ctxt, doc)) {
 		++err;
@@ -439,7 +489,7 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqx:Ffloes:^h?";
+	const char *sopts = "vqX:xFfloes:^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -449,9 +499,10 @@ int main(int argc, char *argv[])
 		{"output-valid"   , no_argument      , 0, 'o'},
 		{"quiet"          , no_argument      , 0, 'q'},
 		{"verbose"        , no_argument      , 0, 'v'},
-		{"exclude"        , required_argument, 0, 'x'},
+		{"exclude"        , required_argument, 0, 'X'},
 		{"ignore-empty"   , no_argument      , 0, 'e'},
 		{"schema"         , required_argument, 0, 's'},
+		{"xml"            , no_argument      , 0, 'x'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -473,7 +524,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
-			case 'x': add_ignore_ns(ignore_ns, optarg); break;
+			case 'X': add_ignore_ns(ignore_ns, optarg); break;
 			case 'F': show_fnames = SHOW_VALID; break;
 			case 'f': show_fnames = SHOW_INVALID; break;
 			case 'l': is_list = 1; break;
@@ -481,6 +532,10 @@ int main(int argc, char *argv[])
 			case 'e': ignore_empty = 1; break;
 			case 's': schema = strdup(optarg); break;
 			case '^': rem_del = 1; break;
+			case 'x':
+				  xml_report_doc = xmlNewDoc(BAD_CAST "1.0");
+				  xmlDocSetRootElement(xml_report_doc, xmlNewNode(NULL, BAD_CAST "s1kdValidateReport"));
+				  break;
 			case 'h': 
 			case '?': show_help(); return EXIT_SUCCESS;
 		}
@@ -488,13 +543,12 @@ int main(int argc, char *argv[])
 
 	LIBXML2_PARSE_INIT
 
-	if (verbosity == SILENT) {
-		schema_errfunc = suppress_error;
-	} else if (ignore_empty) {
+	if (ignore_empty) {
 		schema_errfunc = print_non_parser_error;
 	}
 
-	xmlSetStructuredErrorFunc(stderr, schema_errfunc);
+	/* FIXME: This function is deprecated, is it still needed here when we set per-context error handlers as well? */
+	xmlSetStructuredErrorFunc(NULL, schema_errfunc);
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
@@ -521,6 +575,11 @@ int main(int argc, char *argv[])
 	xmlFreeNode(ignore_ns);
 	free(schema);
 	xmlCleanupParser();
+
+	if (xml_report_doc) {
+		save_xml_doc(xml_report_doc, "-");
+		xmlFreeDoc(xml_report_doc);
+	}
 
 	return err ? EXIT_FAILURE : EXIT_SUCCESS;
 }
