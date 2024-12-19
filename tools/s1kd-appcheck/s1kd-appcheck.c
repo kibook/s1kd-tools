@@ -10,6 +10,7 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/c14n.h>
 #include <libxml/hash.h>
+#include <libxml/xmlsave.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 #include "s1kd_tools.h"
@@ -17,7 +18,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.7.2"
+#define VERSION "6.8.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -80,6 +81,9 @@
 #define PROGRESS_OFF 0
 #define PROGRESS_CLI 1
 #define PROGRESS_ZENITY 2
+
+/* Maximum number of applicability properties that will be used in the filter command. */
+#define MAX_APPLIC_PROPS 64
 
 /* Initial maximum number of CSDB object paths. */
 static int OBJECT_MAX = 1;
@@ -1022,14 +1026,88 @@ static void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Send an XML document to an external command's stdin, and read an XML document from the command's stdout. */
+static int exec_doc(xmlDocPtr doc, const char *file, char **argv, xmlDocPtr *out)
+{
+	int stdin_pipe[2];
+	int stdout_pipe[2];
+	int childpid;
+
+	if (pipe(stdin_pipe) == -1) {
+		fprintf(stderr, E_POPEN, file, strerror(errno));
+		exit(EXIT_POPEN);
+	}
+
+	if (pipe(stdout_pipe) == -1) {
+		close(stdin_pipe[0]);
+		close(stdin_pipe[1]);
+		fprintf(stderr, E_POPEN, file, strerror(errno));
+		exit(EXIT_POPEN);
+	}
+
+	childpid = fork();
+
+	if (childpid > 0) {
+		// parent
+		close(stdin_pipe[0]);
+		close(stdout_pipe[1]);
+
+		xmlSaveCtxtPtr ctxt = xmlSaveToFd(stdin_pipe[1], NULL, 0);
+		xmlSaveDoc(ctxt, doc);
+		xmlSaveClose(ctxt);
+
+		close(stdin_pipe[1]);
+
+		int status;
+		waitpid(childpid, &status, 0);
+
+		if (out) {
+			*out = xmlReadFd(stdout_pipe[0], NULL, NULL, 0);
+		}
+
+		close(stdout_pipe[0]);
+
+		if (WIFEXITED(status)) {
+			return WEXITSTATUS(status);
+		} else {
+			fprintf(stderr, E_POPEN, file, "Child process exited abnormally");
+			exit(EXIT_POPEN);
+		}
+	} else if (childpid == 0) {
+		// child
+		close(stdin_pipe[1]);
+		close(stdout_pipe[0]);
+
+		dup2(stdin_pipe[0], STDIN_FILENO);
+		dup2(stdout_pipe[1], STDOUT_FILENO);
+
+		close(stdin_pipe[0]);
+		close(stdout_pipe[1]);
+
+		execvp(file, argv);
+
+		fprintf(stderr, E_POPEN, file, strerror(errno));
+		exit(EXIT_POPEN);
+	} else {
+		// fork failed
+		close(stdin_pipe[0]);
+		close(stdin_pipe[1]);
+		close(stdout_pipe[0]);
+		close(stdout_pipe[1]);
+		fprintf(stderr, E_POPEN, file, strerror(errno));
+		exit(EXIT_POPEN);
+	}
+}
+
 /* Check if an object is valid for a set of assertions. */
 static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePtr product, const xmlChar *id, const char *pctfname, struct appcheckopts *opts)
 {
 	xmlNodePtr cur;
 	int err = 0, e = 0;
-	char filter_cmd[1024] = "";
-	char cmd[4096];
-	FILE *p;
+	char *filter_argv[MAX_APPLIC_PROPS] = {DEFAULT_FILTER, NULL, NULL};
+	int n;
+	char *filter_cmd = DEFAULT_FILTER;
+	xmlDocPtr filtered_doc;
 
 	if (verbosity >= DEBUG) {
 		if (opts->mode >= ALL) {
@@ -1042,21 +1120,19 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 	}
 
 	if (opts->filter) {
-		strncpy(filter_cmd, opts->filter, 1023);
-	} else {
-		strncpy(filter_cmd, DEFAULT_FILTER, 1023);
+		filter_cmd = opts->filter;
+		filter_argv[0] = opts->filter;
 	}
 
 	if (opts->args) {
-		strcat(filter_cmd, " ");
-		strncat(filter_cmd, opts->args, 1023 - strlen(filter_cmd));
+		filter_argv[1] = opts->args;
 	} else {
-		strcat(filter_cmd, " -w");
+		filter_argv[1] = "-w";
 	}
 
-	for (cur = asserts->children; cur; cur = cur->next) {
+	/* Add -s arguments to the filter command args. */
+	for (n = 2, cur = asserts->children; cur && n < MAX_APPLIC_PROPS; cur = cur->next, n += 2) {
 		char *i, *t, *v;
-		char *c;
 
 		i = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyIdent");
 		t = (char *) first_xpath_value(NULL, cur, BAD_CAST "@applicPropertyType");
@@ -1066,103 +1142,73 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 			fprintf(stderr, I_CHECK_ALL_PROP, t, i, v);
 		}
 
-		c = malloc(strlen(i) + strlen(t) + strlen(v) + 9);
-		sprintf(c, " -s \"%s:%s=%s\"", i, t, v);
-		strcat(filter_cmd, c);
-		free(c);
+		filter_argv[n] = "-s";
+		filter_argv[n + 1] = malloc(strlen(i) + strlen(t) + strlen(v) + 3);
+		sprintf(filter_argv[n + 1], "%s:%s=%s", i, t, v);
 
 		xmlFree(i);
 		xmlFree(t);
 		xmlFree(v);
 	}
 
+	exec_doc(doc, filter_cmd, filter_argv, &filtered_doc);
+
+	/* Free strings allocated for -s arguments to filter command. */
+	for (n -= 1; n > 2; n -= 2) {
+		free(filter_argv[n]);
+	}
+
 	/* Custom validators. */
 	if (opts->validators) {
 		for (cur = opts->validators->children; cur; cur = cur->next) {
 			xmlChar *c;
-
-			strcpy(cmd, filter_cmd);
-			strcat(cmd, "|");
-
+			char *argv[2] = {NULL};
 			c = xmlNodeGetContent(cur);
-
-			strncat(cmd, (char *) c, 4095 - strlen(cmd));
-
-			p = popen(cmd, "w");
-
-			if (p == NULL) {
-				fprintf(stderr, E_POPEN, cmd, strerror(errno));
-				exit(EXIT_POPEN);
-			}
-
-			xmlDocDump(p, doc);
-			e += pclose(p);
-
+			argv[1] = (char *) c;
+			e += exec_doc(filtered_doc, (char *) c, argv, NULL);
 			xmlFree(c);
 		}
 	/* Default validators. */
 	} else {
-		strcpy(cmd, filter_cmd);
-
-		/* Schema validation */
-		strcat(cmd, "|" DEFAULT_VALIDATE " -e");
+		char *validate_argv[5] = {DEFAULT_VALIDATE, "-e", "-x", NULL, NULL};
+		xmlDocPtr validate_report;
 
 		switch (verbosity) {
 			case QUIET:
 			case NORMAL:
-				strcat(cmd, " -q");
+				validate_argv[3] = "-q";
 				break;
 			case VERBOSE:
 				break;
 			case DEBUG:
-				strcat(cmd, " -v");
+				validate_argv[3] = "-v";
 				break;
 		}
 
-		p = popen(cmd, "w");
-
-		if (p == NULL) {
-			fprintf(stderr, E_POPEN, cmd, strerror(errno));
-			exit(EXIT_POPEN);
-		}
-
-		xmlDocDump(p, doc);
-		e += pclose(p);
+		e += exec_doc(filtered_doc, DEFAULT_VALIDATE, validate_argv, &validate_report);
 
 		/* BREX validation */
 		if (opts->brexcheck) {
-			strcpy(cmd, filter_cmd);
-			strcat(cmd, "|" DEFAULT_BREXCHECK " -cel");
-
-			strcat(cmd, " -d '");
-			strcat(cmd, search_dir);
-			strcat(cmd, "'");
-
-			if (recursive_search) {
-				strcat(cmd, " -r");
-			}
+			char *brexcheck_argv[9] = {DEFAULT_BREXCHECK, "-c", "-e", "-l", "-d", search_dir, NULL, NULL, NULL};
+			xmlDocPtr brexcheck_report;
 
 			switch (verbosity) {
 				case QUIET:
 				case NORMAL:
-					strcat(cmd, " -q");
+					brexcheck_argv[6] = "-q";
 					break;
 				case VERBOSE:
 					break;
 				case DEBUG:
-					strcat(cmd, " -v");
+					brexcheck_argv[6] = "-v";
 					break;
 			}
 
-			p = popen(cmd, "w");
-
-			if (p == NULL) {
-				fprintf(stderr, E_POPEN, cmd, strerror(errno));
-				exit(EXIT_POPEN);
+			if (recursive_search) {
+				brexcheck_argv[7] = "-r";
 			}
 
-			xmlDocDump(p, doc);
-			e += pclose(p);
+			e += exec_doc(filtered_doc, DEFAULT_BREXCHECK, brexcheck_argv, &brexcheck_report);
 		}
 	}
 
