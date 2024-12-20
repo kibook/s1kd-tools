@@ -5,11 +5,13 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <pthread.h>
+#include <paths.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/c14n.h>
 #include <libxml/hash.h>
+#include <libxml/xmlsave.h>
 #include <libxslt/transform.h>
 #include <libexslt/exslt.h>
 #include "s1kd_tools.h"
@@ -17,7 +19,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.7.2"
+#define VERSION "6.8.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -35,6 +37,7 @@
 #define I_PROPCHECK INF_PREFIX "Checking product attribute and condition definitions in %s...\n"
 #define I_NUM_PRODS INF_PREFIX "Checking %s for %d configurations...\n"
 #define I_THREADS INF_PREFIX "Creating %d threads...\n"
+#define I_EXEC INF_PREFIX "Executing: %s\n"
 
 /* Error messages. */
 #define E_CHECK_FAIL_PROD ERR_PREFIX "%s is invalid for product %s (line %ld of %s)\n"
@@ -52,7 +55,7 @@
 #define E_NESTEDCHECK_REDUNDANT ERR_PREFIX "%s: %s on line %ld has the same applicability as its parent %s on line %ld (%s)\n"
 #define E_DUPLICATECHECK ERR_PREFIX "%s: Annotation on line %ld is a duplicate of annotation on line %ld.\n"
 #define E_MAX_OBJECTS ERR_PREFIX "Out of memory\n"
-#define E_POPEN ERR_PREFIX "Error executing %s: %s\n"
+#define E_PIPE ERR_PREFIX "Error executing %s: %s\n"
 
 /* Warning messages. */
 #define W_MISSING_REF_DM WRN_PREFIX "Could not read referenced object: %s\n"
@@ -66,7 +69,7 @@
 /* Exit status codes. */
 #define EXIT_BAD_OBJECT 2
 #define EXIT_MAX_OBJECTS 3
-#define EXIT_POPEN 4
+#define EXIT_PIPE 4
 
 /* Default commands used to filter and validate. */
 #define DEFAULT_FILTER "s1kd-instance"
@@ -133,6 +136,7 @@ struct appcheckopts {
 	bool check_duplicate;
 	bool rem_delete;
 	enum appcheckmode mode;
+	bool include_errors;
 };
 
 /* Struct to pass data to object_thread. */
@@ -203,7 +207,7 @@ static void show_help(void)
 	puts("  -t, --products          Validate against product instances.");
 	puts("  -u, --unstrict-nested   Perform a nested check in unstrict mode.");
 	puts("  -v, --verbose           Verbose output.");
-	puts("  -x, --xml               Output XML report.");
+	puts("  -x, --xml               Output an XML report.");
 	puts("  -~, --dependencies      Check CCT dependencies.");
 	puts("  -^, --remove-deleted    Validate with elements marked as \"delete\" removed.");
 	puts("  -#, --threads <x[,y]>   Number of threads to use. x * y threads are created in total.");
@@ -1022,14 +1026,140 @@ static void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 	xmlXPathFreeContext(ctx);
 }
 
+/* Send an XML document to an external command's stdin, and (optionally) read an XML document from the command's stdout. */
+static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
+{
+	/* Pipe to write to the stdin of the command. */
+	int stdin_pipe[2];
+
+	/* Pipe to read the stdout from the command. */
+	int stdout_pipe[2];
+
+	/* The PID of the child process. */
+	int pid;
+
+	/* Create a pipe for stdin. Abort on error. */
+	if (pipe(stdin_pipe) == -1) {
+		fprintf(stderr, E_PIPE, cmd, strerror(errno));
+		exit(EXIT_PIPE);
+	}
+
+	/* Create a pipe for stdout. Abort on error. */
+	if (pipe(stdout_pipe) == -1) {
+		close(stdin_pipe[0]);
+		close(stdin_pipe[1]);
+		fprintf(stderr, E_PIPE, cmd, strerror(errno));
+		exit(EXIT_PIPE);
+	}
+
+	/* Create a child process to execute the command. */
+	pid = fork();
+
+	/* If there is an error forking, abort. */
+	if (pid == -1) {
+		close(stdin_pipe[0]);
+		close(stdin_pipe[1]);
+		close(stdout_pipe[0]);
+		close(stdout_pipe[1]);
+		fprintf(stderr, E_PIPE, cmd, strerror(errno));
+		exit(EXIT_PIPE);
+	}
+
+	/* The child process executes the given command with stdin and stdout directed to the created pipes. */
+	if (pid == 0) {
+		/* Direct stdin and stdout to the created pipes. */
+		if (dup2(stdin_pipe[0], STDIN_FILENO) == -1 || dup2(stdout_pipe[1], STDOUT_FILENO) == -1) {
+			fprintf(stderr, E_PIPE, cmd, strerror(errno));
+		}
+
+		/* Close the ends of the pipes now that they have been dup'd. */
+		close(stdin_pipe[0]);
+		close(stdin_pipe[1]);
+		close(stdout_pipe[0]);
+		close(stdout_pipe[1]);
+
+		/* Print an info message with the command in DEBUG verbosity. */
+		if (verbosity >= DEBUG) {
+			fprintf(stderr, I_EXEC, cmd);
+		}
+
+		/* Replace the child process with the execution of the command. */
+		execl(_PATH_BSHELL, "sh", "-c", cmd, (char *) NULL);
+
+		/* If the exec fails, abort. */
+		fprintf(stderr, E_PIPE, cmd, strerror(errno));
+		exit(EXIT_PIPE);
+	}
+
+	/* Parent process continues here. */
+
+	/* Close the ends of the pipes we don't use in the parent process. */
+	close(stdin_pipe[0]);
+	close(stdout_pipe[1]);
+
+	/* Write the XML document to the stdin of the child process. */
+	xmlSaveCtxtPtr ctxt = xmlSaveToFd(stdin_pipe[1], NULL, 0);
+	xmlSaveDoc(ctxt, doc);
+	xmlSaveClose(ctxt);
+
+	/* Close stdin of the child process. */
+	close(stdin_pipe[1]);
+
+	/* If out is not NULL, read the stdout of the child process into a new XML document. */
+	if (out) {
+		*out = xmlReadFd(stdout_pipe[0], NULL, NULL, 0);
+	}
+
+	/* Close the stdout of the child process. */
+	close(stdout_pipe[0]);
+
+	/* Wait for the child process to finish to get its exit status. */
+	int status;
+	pid_t wait_pid;
+	do {
+		wait_pid = waitpid(pid, &status, 0);
+	} while (wait_pid == -1 && errno == EINTR);
+
+	/* If the child process returned normally, return the exit status. Otherwise, abort. */
+	if (WIFEXITED(status)) {
+		return WEXITSTATUS(status);
+	} else {
+		fprintf(stderr, E_PIPE, cmd, "Child process exited abnormally");
+		exit(EXIT_PIPE);
+	}
+}
+
+/* Add error elements from reports to the collection of errors. */
+static void add_errors_from_report(xmlNodePtr errors, xmlDocPtr report, const char *cmd)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(report);
+	obj = xmlXPathEvalExpression(BAD_CAST "//error", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlNodePtr err;
+			err = xmlAddChild(errors, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
+			xmlSetProp(err, BAD_CAST "command", BAD_CAST cmd);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+}
+
 /* Check if an object is valid for a set of assertions. */
 static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePtr product, const xmlChar *id, const char *pctfname, struct appcheckopts *opts)
 {
 	xmlNodePtr cur;
 	int err = 0, e = 0;
 	char filter_cmd[1024] = "";
-	char cmd[4096];
-	FILE *p;
+	xmlDocPtr filtered_doc = NULL;
+	xmlNodePtr errors = NULL;
 
 	if (verbosity >= DEBUG) {
 		if (opts->mode >= ALL) {
@@ -1076,36 +1206,45 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		xmlFree(v);
 	}
 
+	exec_doc(doc, filter_cmd, &filtered_doc);
+
+	if (opts->include_errors) {
+		errors = xmlNewNode(NULL, BAD_CAST "errors");
+	}
+
 	/* Custom validators. */
 	if (opts->validators) {
 		for (cur = opts->validators->children; cur; cur = cur->next) {
-			xmlChar *c;
+			xmlChar *cmd;
 
-			strcpy(cmd, filter_cmd);
-			strcat(cmd, "|");
+			cmd = xmlNodeGetContent(cur);
 
-			c = xmlNodeGetContent(cur);
+			if (opts->include_errors) {
+				xmlDocPtr report = NULL;
 
-			strncat(cmd, (char *) c, 4095 - strlen(cmd));
+				e += exec_doc(filtered_doc, (char *) cmd, &report);
 
-			p = popen(cmd, "w");
+				if (report) {
+					add_errors_from_report(errors, report, (char *) cmd);
+				}
 
-			if (p == NULL) {
-				fprintf(stderr, E_POPEN, cmd, strerror(errno));
-				exit(EXIT_POPEN);
+				xmlFreeDoc(report);
+			} else {
+				e += exec_doc(filtered_doc, (char *) cmd, NULL);
 			}
 
-			xmlDocDump(p, doc);
-			e += pclose(p);
-
-			xmlFree(c);
+			xmlFree(cmd);
 		}
 	/* Default validators. */
 	} else {
-		strcpy(cmd, filter_cmd);
+		char cmd[4096];
 
 		/* Schema validation */
-		strcat(cmd, "|" DEFAULT_VALIDATE " -e");
+		if (opts->include_errors) {
+			strcpy(cmd, DEFAULT_VALIDATE " -ex");
+		} else {
+			strcpy(cmd, DEFAULT_VALIDATE " -e");
+		}
 
 		switch (verbosity) {
 			case QUIET:
@@ -1119,20 +1258,27 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 				break;
 		}
 
-		p = popen(cmd, "w");
+		if (opts->include_errors) {
+			xmlDocPtr validate_report = NULL;
 
-		if (p == NULL) {
-			fprintf(stderr, E_POPEN, cmd, strerror(errno));
-			exit(EXIT_POPEN);
+			e += exec_doc(filtered_doc, cmd, &validate_report);
+
+			if (validate_report) {
+				add_errors_from_report(errors, validate_report, cmd);
+			}
+
+			xmlFreeDoc(validate_report);
+		} else {
+			e += exec_doc(filtered_doc, cmd, NULL);
 		}
-
-		xmlDocDump(p, doc);
-		e += pclose(p);
 
 		/* BREX validation */
 		if (opts->brexcheck) {
-			strcpy(cmd, filter_cmd);
-			strcat(cmd, "|" DEFAULT_BREXCHECK " -cel");
+			if (opts->include_errors) {
+				strcpy(cmd, DEFAULT_BREXCHECK " -celx");
+			} else {
+				strcpy(cmd, DEFAULT_BREXCHECK " -cel");
+			}
 
 			strcat(cmd, " -d '");
 			strcat(cmd, search_dir);
@@ -1154,17 +1300,23 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 					break;
 			}
 
-			p = popen(cmd, "w");
+			if (opts->include_errors) {
+				xmlDocPtr brexcheck_report = NULL;
 
-			if (p == NULL) {
-				fprintf(stderr, E_POPEN, cmd, strerror(errno));
-				exit(EXIT_POPEN);
+				e += exec_doc(filtered_doc, cmd, &brexcheck_report);
+
+				if (brexcheck_report) {
+					add_errors_from_report(errors, brexcheck_report, cmd);
+				}
+
+				xmlFreeDoc(brexcheck_report);
+			} else {
+				e += exec_doc(filtered_doc, cmd, NULL);
 			}
-
-			xmlDocDump(p, doc);
-			e += pclose(p);
 		}
 	}
+
+	xmlFreeDoc(filtered_doc);
 
 	if (e) {
 		if (verbosity >= NORMAL) {
@@ -1191,9 +1343,18 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		}
 
 		xmlSetProp(asserts, BAD_CAST "valid", BAD_CAST "no");
+
+		if (opts->include_errors) {
+			xmlAddChild(asserts, xmlCopyNode(errors, 1));
+		}
+
 		++err;
 	} else {
 		xmlSetProp(asserts, BAD_CAST "valid", BAD_CAST "yes");
+	}
+
+	if (opts->include_errors) {
+		xmlFreeNode(errors);
 	}
 
 	return err ? 1 : 0;
@@ -2205,7 +2366,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtuvx~#:h?";
+	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtuvXx~#:h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -2236,6 +2397,7 @@ int main(int argc, char **argv)
 		{"products"       , no_argument      , 0, 't'},
 		{"unstrict-nested", no_argument      , 0, 'u'},
 		{"verbose"        , no_argument      , 0, 'v'},
+		{"xml-with-errors", no_argument      , 0, 'X'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"dependencies"   , no_argument      , 0, '~'},
 		{"threads"        , required_argument, 0, '#'},
@@ -2268,7 +2430,8 @@ int main(int argc, char **argv)
 		/* check_redundant */ false,
 		/* check_duplicate */ false,
 		/* rem_delete */      false,
-		/* mode */            STANDALONE
+		/* mode */            STANDALONE,
+		/* xml */             false
 	};
 
 	int err = 0;
@@ -2383,6 +2546,8 @@ int main(int argc, char **argv)
 			case 'v':
 				++verbosity;
 				break;
+			case 'X':
+				opts.include_errors = true;
 			case 'x':
 				xmlout = true;
 				break;
