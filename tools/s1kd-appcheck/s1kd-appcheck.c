@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -6,6 +8,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <paths.h>
+#include <fcntl.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
@@ -1026,8 +1029,20 @@ static void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 	xmlXPathFreeContext(ctx);
 }
 
-/* Send an XML document to an external command's stdin, and (optionally) read an XML document from the command's stdout. */
-static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
+/* Send an XML document to an external command's stdin, and return the exit status code. */
+static int execute_command_on_doc(xmlDocPtr doc, const char *cmd)
+{
+	FILE *p;
+	p = popen(cmd, "w");
+	if (p == NULL) {
+		fprintf(stderr, E_PIPE, cmd, strerror(errno));
+	}
+	xmlDocDump(p, doc);
+	return pclose(p);
+}
+
+/* Send an XML document to an external command's stdin, and read an XML document from the command's stdout. */
+static int execute_command_on_doc_and_parse_output(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 {
 	/* Pipe to write to the stdin of the command. */
 	int stdin_pipe[2];
@@ -1039,17 +1054,13 @@ static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 	int pid;
 
 	/* Create a pipe for stdin. Abort on error. */
-	if (pipe(stdin_pipe) == -1) {
-		fprintf(stderr, E_PIPE, cmd, strerror(errno));
-		exit(EXIT_PIPE);
+	if (pipe2(stdin_pipe, O_CLOEXEC) < 0) {
+		goto pipe_error;
 	}
 
 	/* Create a pipe for stdout. Abort on error. */
-	if (pipe(stdout_pipe) == -1) {
-		close(stdin_pipe[0]);
-		close(stdin_pipe[1]);
-		fprintf(stderr, E_PIPE, cmd, strerror(errno));
-		exit(EXIT_PIPE);
+	if (pipe2(stdout_pipe, O_CLOEXEC) < 0) {
+		goto pipe_error;
 	}
 
 	/* Create a child process to execute the command. */
@@ -1057,26 +1068,27 @@ static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 
 	/* If there is an error forking, abort. */
 	if (pid == -1) {
-		close(stdin_pipe[0]);
-		close(stdin_pipe[1]);
-		close(stdout_pipe[0]);
-		close(stdout_pipe[1]);
-		fprintf(stderr, E_PIPE, cmd, strerror(errno));
-		exit(EXIT_PIPE);
+		goto pipe_error;
 	}
 
 	/* The child process executes the given command with stdin and stdout directed to the created pipes. */
 	if (pid == 0) {
-		/* Direct stdin and stdout to the created pipes. */
-		if (dup2(stdin_pipe[0], STDIN_FILENO) == -1 || dup2(stdout_pipe[1], STDOUT_FILENO) == -1) {
-			fprintf(stderr, E_PIPE, cmd, strerror(errno));
+		/* Close the ends of the pipes we don't use in the child process. */
+		if (close(stdin_pipe[1]) == -1 || close(stdout_pipe[0]) == -1) {
+			goto child_pipe_error;
 		}
 
-		/* Close the ends of the pipes now that they have been dup'd. */
-		close(stdin_pipe[0]);
-		close(stdin_pipe[1]);
-		close(stdout_pipe[0]);
-		close(stdout_pipe[1]);
+		/* Direct stdin and stdout to the created pipes, and close the dup'd pipe ends. */
+		if (stdin_pipe[0] != STDIN_FILENO) {
+			if (dup2(stdin_pipe[0], STDIN_FILENO) == -1 || close(stdin_pipe[0]) == -1) {
+				goto child_pipe_error;
+			}
+		}
+		if (stdout_pipe[1] != STDOUT_FILENO) {
+			if (dup2(stdout_pipe[1], STDOUT_FILENO) == -1 || close(stdout_pipe[1]) == -1) {
+				goto child_pipe_error;
+			}
+		}
 
 		/* Print an info message with the command in DEBUG verbosity. */
 		if (verbosity >= DEBUG) {
@@ -1086,16 +1098,18 @@ static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 		/* Replace the child process with the execution of the command. */
 		execl(_PATH_BSHELL, "sh", "-c", cmd, (char *) NULL);
 
-		/* If the exec fails, abort. */
+		/* If for some reason exec fails, abort. */
+child_pipe_error:
 		fprintf(stderr, E_PIPE, cmd, strerror(errno));
-		exit(EXIT_PIPE);
+		_exit(EXIT_FAILURE);
 	}
 
 	/* Parent process continues here. */
 
 	/* Close the ends of the pipes we don't use in the parent process. */
-	close(stdin_pipe[0]);
-	close(stdout_pipe[1]);
+	if (close(stdin_pipe[0]) == -1 || close(stdout_pipe[1]) == -1) {
+		goto pipe_error;
+	}
 
 	/* Write the XML document to the stdin of the child process. */
 	xmlSaveCtxtPtr ctxt = xmlSaveToFd(stdin_pipe[1], NULL, 0);
@@ -1103,15 +1117,17 @@ static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 	xmlSaveClose(ctxt);
 
 	/* Close stdin of the child process. */
-	close(stdin_pipe[1]);
-
-	/* If out is not NULL, read the stdout of the child process into a new XML document. */
-	if (out) {
-		*out = xmlReadFd(stdout_pipe[0], NULL, NULL, 0);
+	if (close(stdin_pipe[1]) == -1) {
+		goto pipe_error;
 	}
 
+	/* Read the stdout of the child process into a new XML document. */
+	*out = xmlReadFd(stdout_pipe[0], NULL, NULL, XML_PARSE_NOERROR);
+
 	/* Close the stdout of the child process. */
-	close(stdout_pipe[0]);
+	if (close(stdout_pipe[0]) == -1) {
+		goto pipe_error;
+	}
 
 	/* Wait for the child process to finish to get its exit status. */
 	int status;
@@ -1123,17 +1139,23 @@ static int exec_doc(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 	/* If the child process returned normally, return the exit status. Otherwise, abort. */
 	if (WIFEXITED(status)) {
 		return WEXITSTATUS(status);
-	} else {
-		fprintf(stderr, E_PIPE, cmd, "Child process exited abnormally");
-		exit(EXIT_PIPE);
 	}
+
+	/* Abort if there are any errors creating/executing the child process. */
+pipe_error:
+	fprintf(stderr, E_PIPE, cmd, strerror(errno));
+	exit(EXIT_PIPE);
 }
 
 /* Add error elements from reports to the collection of errors. */
-static void add_errors_from_report(xmlNodePtr errors, xmlDocPtr report, const char *cmd)
+static void add_errors_from_report(const xmlNodePtr errors, const xmlDocPtr report, const xmlChar *cmd)
 {
+	xmlNodePtr cmd_node;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
+
+	cmd_node = xmlNewChild(errors, NULL, BAD_CAST "validator", NULL);
+	xmlSetProp(cmd_node, BAD_CAST "command", cmd);
 
 	ctx = xmlXPathNewContext(report);
 	obj = xmlXPathEvalExpression(BAD_CAST "//error", ctx);
@@ -1142,9 +1164,7 @@ static void add_errors_from_report(xmlNodePtr errors, xmlDocPtr report, const ch
 		int i;
 
 		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
-			xmlNodePtr err;
-			err = xmlAddChild(errors, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
-			xmlSetProp(err, BAD_CAST "command", BAD_CAST cmd);
+			xmlAddChild(cmd_node, xmlCopyNode(obj->nodesetval->nodeTab[i], 1));
 		}
 	}
 
@@ -1206,7 +1226,12 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		xmlFree(v);
 	}
 
-	exec_doc(doc, filter_cmd, &filtered_doc);
+	execute_command_on_doc_and_parse_output(doc, filter_cmd, &filtered_doc);
+
+	/* If the filtered doc is empty, the doc was not applicable to the given assigns. */
+	if (filtered_doc == NULL) {
+		return 0;
+	}
 
 	if (opts->include_errors) {
 		errors = xmlNewNode(NULL, BAD_CAST "errors");
@@ -1222,15 +1247,15 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 			if (opts->include_errors) {
 				xmlDocPtr report = NULL;
 
-				e += exec_doc(filtered_doc, (char *) cmd, &report);
+				e += execute_command_on_doc_and_parse_output(filtered_doc, (char *) cmd, &report);
 
 				if (report) {
-					add_errors_from_report(errors, report, (char *) cmd);
+					add_errors_from_report(errors, report, cmd);
 				}
 
 				xmlFreeDoc(report);
 			} else {
-				e += exec_doc(filtered_doc, (char *) cmd, NULL);
+				e += execute_command_on_doc(filtered_doc, (char *) cmd);
 			}
 
 			xmlFree(cmd);
@@ -1241,9 +1266,9 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 
 		/* Schema validation */
 		if (opts->include_errors) {
-			strcpy(cmd, DEFAULT_VALIDATE " -ex");
+			strcpy(cmd, DEFAULT_VALIDATE " -x");
 		} else {
-			strcpy(cmd, DEFAULT_VALIDATE " -e");
+			strcpy(cmd, DEFAULT_VALIDATE);
 		}
 
 		switch (verbosity) {
@@ -1261,23 +1286,23 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		if (opts->include_errors) {
 			xmlDocPtr validate_report = NULL;
 
-			e += exec_doc(filtered_doc, cmd, &validate_report);
+			e += execute_command_on_doc_and_parse_output(filtered_doc, cmd, &validate_report);
 
 			if (validate_report) {
-				add_errors_from_report(errors, validate_report, cmd);
+				add_errors_from_report(errors, validate_report, BAD_CAST cmd);
 			}
 
 			xmlFreeDoc(validate_report);
 		} else {
-			e += exec_doc(filtered_doc, cmd, NULL);
+			e += execute_command_on_doc(filtered_doc, cmd);
 		}
 
 		/* BREX validation */
 		if (opts->brexcheck) {
 			if (opts->include_errors) {
-				strcpy(cmd, DEFAULT_BREXCHECK " -celx");
+				strcpy(cmd, DEFAULT_BREXCHECK " -clx");
 			} else {
-				strcpy(cmd, DEFAULT_BREXCHECK " -cel");
+				strcpy(cmd, DEFAULT_BREXCHECK " -cl");
 			}
 
 			strcat(cmd, " -d '");
@@ -1303,15 +1328,15 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 			if (opts->include_errors) {
 				xmlDocPtr brexcheck_report = NULL;
 
-				e += exec_doc(filtered_doc, cmd, &brexcheck_report);
+				e += execute_command_on_doc_and_parse_output(filtered_doc, cmd, &brexcheck_report);
 
 				if (brexcheck_report) {
-					add_errors_from_report(errors, brexcheck_report, cmd);
+					add_errors_from_report(errors, brexcheck_report, BAD_CAST cmd);
 				}
 
 				xmlFreeDoc(brexcheck_report);
 			} else {
-				e += exec_doc(filtered_doc, cmd, NULL);
+				e += execute_command_on_doc(filtered_doc, cmd);
 			}
 		}
 	}
@@ -2431,7 +2456,7 @@ int main(int argc, char **argv)
 		/* check_duplicate */ false,
 		/* rem_delete */      false,
 		/* mode */            STANDALONE,
-		/* xml */             false
+		/* include_errors */  false
 	};
 
 	int err = 0;
