@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="11" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="010" inWork="06"/>
+        <issueInfo issueNumber="010" inWork="07"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="08" day="14"/>
+        <issueDate year="2024" month="12" day="23"/>
         <dmTitle>
           <techName>s1kd-appcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -52,6 +52,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0005" updateHighlight="1">
         <simplePara>Add --unstrict-nested option.</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0006" updateHighlight="1">
+        <simplePara>Add --xml-with-errors option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -123,6 +126,7 @@
               <listItemTerm>-e, --exec &lt;cmd&gt;</listItemTerm>
               <listItemDefinition>
                 <para>The commands used to validate objects. Multiple commands can be used by specifying this option multiple times. The objects will be passed to each command on stdin, and the exit status of the command will be used to determine if the object is valid (with a non-zero exit status indicating it is invalid). This overrides the default commands (s1kd-validate, and s1kd-brexcheck if -b is specified).</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0006">When the -X (--xml-with-errors) option is used, if these commands output an XML document with any elements named <verbatimText>error</verbatimText>, those elements will be copied into the XML report output by this tool.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
@@ -245,10 +249,16 @@
                 <para>Verbose output. Specify multiple times to increase the verbosity.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0006">
+              <listItemTerm>-X, --xml-with-errors</listItemTerm>
+              <listItemDefinition>
+                <para>Output an XML report of the check, including full details of errors produced by the validation tools (such as s1kd-validate and s1kd-brexcheck) for each set of assertions tested.</para>
+              </listItemDefinition>
+            </definitionListItem>
             <definitionListItem>
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
-                <para>Print an XML report of the check.</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0006">Output a simplified XML report of the check, only including whether sets of assertions passed or failed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
