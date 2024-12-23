@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.0.0"
+#define VERSION "4.1.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -91,13 +91,21 @@ static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr 
 
 	snprintf(line, 16, "%ld", lineno);
 
-	xmlNodePtr error = xmlNewChild(report_node, NULL, BAD_CAST "error", BAD_CAST message);
+	xmlNodePtr error = xmlNewChild(report_node, NULL, BAD_CAST "error", NULL);
+	xmlNewChild(error, NULL, BAD_CAST "message", BAD_CAST message);
 	xmlSetProp(error, BAD_CAST "line", BAD_CAST line);
 
 	if (node) {
+		xmlNodePtr object;
 		xmlChar *xpath;
+
+		object = xmlNewChild(error, NULL, BAD_CAST "object", NULL);
+
 		xpath = xpath_of(node);
-		xmlSetProp(error, BAD_CAST "xpath", xpath);
+		xmlSetProp(object, BAD_CAST "xpath", xpath);
+
+		xmlAddChild(object, xmlCopyNode(node, 1));
+
 		xmlFree(xpath);
 	}
 }
@@ -381,7 +389,7 @@ static int validate_file(const char *fname, const char *schema, xmlNodePtr ignor
 
 	/* Add a node to the XML report (if enabled) for the current file. */
 	if (xml_report_doc) {
-		report_node = xmlNewChild(xmlDocGetRootElement(xml_report_doc), NULL, BAD_CAST "object", NULL);
+		report_node = xmlNewChild(xmlDocGetRootElement(xml_report_doc), NULL, BAD_CAST "document", NULL);
 		xmlSetProp(report_node, BAD_CAST "path", BAD_CAST fname);
 	}
 
