@@ -65,6 +65,10 @@ the actual validation.
     used to determine if the object is valid (with a non-zero exit
     status indicating it is invalid). This overrides the default
     commands (s1kd-validate, and s1kd-brexcheck if -b is specified).
+    
+    When the -X (--xml-with-errors) option is used, if these commands
+    output an XML document with any elements named `error`, those
+    elements will be copied into the XML report output by this tool.
 
   - \-F, --valid-filenames  
     Print the filenames of valid objects.
@@ -141,8 +145,14 @@ the actual validation.
   - \-v, --verbose  
     Verbose output. Specify multiple times to increase the verbosity.
 
+  - \-X, --xml-with-errors  
+    Output an XML report of the check, including full details of errors
+    produced by the validation tools (such as s1kd-validate and
+    s1kd-brexcheck) for each set of assertions tested.
+
   - \-x, --xml  
-    Print an XML report of the check.
+    Output a simplified XML report of the check, only including whether
+    sets of assertions passed or failed.
 
   - \-\~, --dependencies  
     Check with CCT dependency tests added to assertions which use the

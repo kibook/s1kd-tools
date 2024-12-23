@@ -210,7 +210,8 @@ static void show_help(void)
 	puts("  -t, --products          Validate against product instances.");
 	puts("  -u, --unstrict-nested   Perform a nested check in unstrict mode.");
 	puts("  -v, --verbose           Verbose output.");
-	puts("  -x, --xml               Output an XML report.");
+	puts("  -X, --xml-with-errors   Output an XML report, including all details on errors.");
+	puts("  -x, --xml               Output a simpler XML report.");
 	puts("  -~, --dependencies      Check CCT dependencies.");
 	puts("  -^, --remove-deleted    Validate with elements marked as \"delete\" removed.");
 	puts("  -#, --threads <x[,y]>   Number of threads to use. x * y threads are created in total.");
