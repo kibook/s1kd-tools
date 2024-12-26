@@ -7,7 +7,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.1.0"
+#define VERSION "4.1.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -104,7 +104,7 @@ static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr 
 		xpath = xpath_of(node);
 		xmlSetProp(object, BAD_CAST "xpath", xpath);
 
-		xmlAddChild(object, xmlCopyNode(node, 1));
+		xmlAddChild(object, xmlCopyNode(node, 2));
 
 		xmlFree(xpath);
 	}
