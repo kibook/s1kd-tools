@@ -12,7 +12,7 @@ endif
 
 warning_flags = -Wall -Werror -pedantic-errors
 
-CFLAGS = $(warning_flags) -I $(common_dir) `pkg-config --cflags libxml-2.0`
+CFLAGS = $(warning_flags) -I $(common_dir) `pkg-config --cflags libxml-2.0 libxslt`
 
 ifneq ($(MSYSTEM),)
   CFLAGS += -isystem $(common_dir)/msys
@@ -24,7 +24,7 @@ else
   CFLAGS += -O3
 endif
 
-LDFLAGS = `pkg-config --libs libxml-2.0`
+LDFLAGS = `pkg-config --libs libxml-2.0 libxslt`
 
 prefix = /usr/local
 exec_prefix = $(prefix)
@@ -34,7 +34,10 @@ INSTALL = install -Ds
 
 all: $(executable)
 
-$(executable): $(sources)
+stats.h: stats.xsl
+	xxd -i $+ > $@
+
+$(executable): $(sources) stats.h
 	$(CC) $(CFLAGS) -o $(executable) $(sources) $(LDFLAGS)
 
 docs:

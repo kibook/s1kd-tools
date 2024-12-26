@@ -4,10 +4,12 @@
 #include <libxml/tree.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/debugXML.h>
+#include <libxslt/transform.h>
 #include "s1kd_tools.h"
+#include "stats.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.1.1"
+#define VERSION "4.2.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -189,7 +191,7 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqv^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -e, --ignore-empty     Ignore empty/non-XML documents.");
@@ -200,6 +202,7 @@ static void show_help(void)
 	puts("  -o, --output-valid     Output valid CSDB objects to stdout.");
 	puts("  -q, --quiet            Silent (no output).");
 	puts("  -s, --schema <path>    Validate against the given schema.");
+	puts("  -T, --summary          Print a summary of the check.");
 	puts("  -v, --verbose          Verbose output.");
 	puts("  -X, --exclude <URI>    Exclude namespace from validation by URI.");
 	puts("  -x, --xml              Output an XML report.");
@@ -212,7 +215,7 @@ static void show_help(void)
 static void show_version(void)
 {
 	printf("%s (s1kd-tools) %s\n", PROG_NAME, VERSION);
-	printf("Using libxml %s\n", xmlParserVersion);
+	printf("Using libxml %s and libxslt %s\n", xmlParserVersion, xsltEngineVersion);
 }
 
 static void add_ignore_ns(xmlNodePtr ignore_ns, const char *arg)
@@ -485,6 +488,23 @@ static int validate_file_list(const char *fname, const char *schema, xmlNodePtr 
 	return err;
 }
 
+static void print_stats()
+{
+	xmlDocPtr styledoc;
+	xsltStylesheetPtr style;
+	xmlDocPtr res;
+
+	styledoc = read_xml_mem((const char *) stats_xsl, stats_xsl_len);
+	style = xsltParseStylesheetDoc(styledoc);
+
+	res = xsltApplyStylesheet(style, xml_report_doc, NULL);
+
+	fprintf(stderr, "%s", (char *) res->children->content);
+
+	xmlFreeDoc(res);
+	xsltFreeStylesheet(style);
+}
+
 int main(int argc, char *argv[])
 {
 	int c, i;
@@ -494,10 +514,12 @@ int main(int argc, char *argv[])
 	int ignore_empty = 0;
 	int rem_del = 0;
 	char *schema = NULL;
+	int xml = 0;
+	int show_stats = 0;
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqX:xFfloes:^h?";
+	const char *sopts = "vqX:xFfloes:T^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -510,6 +532,7 @@ int main(int argc, char *argv[])
 		{"exclude"        , required_argument, 0, 'X'},
 		{"ignore-empty"   , no_argument      , 0, 'e'},
 		{"schema"         , required_argument, 0, 's'},
+		{"summary"        , no_argument      , 0, 'T'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -540,10 +563,8 @@ int main(int argc, char *argv[])
 			case 'e': ignore_empty = 1; break;
 			case 's': schema = strdup(optarg); break;
 			case '^': rem_del = 1; break;
-			case 'x':
-				  xml_report_doc = xmlNewDoc(BAD_CAST "1.0");
-				  xmlDocSetRootElement(xml_report_doc, xmlNewNode(NULL, BAD_CAST "s1kdValidateReport"));
-				  break;
+			case 'T': show_stats = 1; break;
+			case 'x': xml = 1; break;
 			case 'h': 
 			case '?': show_help(); return EXIT_SUCCESS;
 		}
@@ -557,6 +578,11 @@ int main(int argc, char *argv[])
 
 	/* FIXME: This function is deprecated, is it still needed here when we set per-context error handlers as well? */
 	xmlSetStructuredErrorFunc(NULL, schema_errfunc);
+
+	if (xml || show_stats) {
+		xml_report_doc = xmlNewDoc(BAD_CAST "1.0");
+		xmlDocSetRootElement(xml_report_doc, xmlNewNode(NULL, BAD_CAST "s1kdValidateReport"));
+	}
 
 	if (optind < argc) {
 		for (i = optind; i < argc; ++i) {
@@ -582,12 +608,19 @@ int main(int argc, char *argv[])
 	free(schema_parsers);
 	xmlFreeNode(ignore_ns);
 	free(schema);
-	xmlCleanupParser();
 
-	if (xml_report_doc) {
+	if (xml) {
 		save_xml_doc(xml_report_doc, "-");
-		xmlFreeDoc(xml_report_doc);
 	}
+
+	if (show_stats) {
+		print_stats(xml_report_doc);
+	}
+
+	xmlFreeDoc(xml_report_doc);
+
+	xsltCleanupGlobals();
+	xmlCleanupParser();
 
 	return err ? EXIT_FAILURE : EXIT_SUCCESS;
 }

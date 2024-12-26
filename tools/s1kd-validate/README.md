@@ -4,7 +4,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 
 # SYNOPSIS
 
-    s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqv^h?]
+    s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?]
                   [<object>...]
 
 # DESCRIPTION
@@ -41,6 +41,10 @@ schemas.
   - \-s, --schema \<path\>  
     Validate the objects against the specified schema, rather than the
     one that they reference.
+
+  - \-T, --summary  
+    Print a summary of the validation after it completes, including
+    statistics on the number of documents that passed/failed.
 
   - \-v, --verbose  
     Verbose mode. Success/failure will be explicitly reported on top of

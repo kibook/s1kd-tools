@@ -9,7 +9,7 @@ s1kd\-validate \- Validate S1000D CSDB objects against their schemas
 .IP
 .nf
 \f[C]
-s1kd\-validate\ [\-s\ <path>]\ [\-X\ <URI>]\ [\-F|\-f]\ [\-o|\-x]\ [\-elqv^h?]
+s1kd\-validate\ [\-s\ <path>]\ [\-X\ <URI>]\ [\-F|\-f]\ [\-o|\-x]\ [\-elqTv^h?]
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ [<object>...]
 \f[]
 .fi
@@ -61,6 +61,12 @@ Success/failure will only be indicated through the exit status.
 .B \-s, \-\-schema <path>
 Validate the objects against the specified schema, rather than the one
 that they reference.
+.RS
+.RE
+.TP
+.B \-T, \-\-summary
+Print a summary of the validation after it completes, including
+statistics on the number of documents that passed/failed.
 .RS
 .RE
 .TP

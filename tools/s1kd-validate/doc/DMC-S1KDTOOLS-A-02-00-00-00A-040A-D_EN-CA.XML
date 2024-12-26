@@ -44,6 +44,9 @@
       <reasonForUpdate id="rfu-change-exclude" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Change --exclude short option to -X.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-summary" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -T (--summary) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -55,7 +58,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-report rfu-change-exclude"><![CDATA[s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqv^h?]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-report rfu-change-exclude rfu-summary"><![CDATA[s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?]
               [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -113,6 +116,12 @@
               <listItemTerm>-s, --schema &lt;path&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Validate the objects against the specified schema, rather than the one that they reference.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-summary">
+              <listItemTerm>-T, --summary</listItemTerm>
+              <listItemDefinition>
+                <para>Print a summary of the validation after it completes, including statistics on the number of documents that passed/failed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
