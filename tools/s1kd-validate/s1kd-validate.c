@@ -9,7 +9,7 @@
 #include "stats.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.2.0"
+#define VERSION "4.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -23,6 +23,11 @@
 
 #define EXIT_MAX_SCHEMAS 2
 #define EXIT_MISSING_SCHEMA 3
+
+/* Progress formats. */
+#define PROGRESS_OFF 0
+#define PROGRESS_CLI 1
+#define PROGRESS_ZENITY 2
 
 /* FIXME:
  *
@@ -191,7 +196,7 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elpqTv^h?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -e, --ignore-empty     Ignore empty/non-XML documents.");
@@ -200,6 +205,7 @@ static void show_help(void)
 	puts("  -h, -?, --help         Show help/usage message.");
 	puts("  -l, --list             Treat input as list of filenames.");
 	puts("  -o, --output-valid     Output valid CSDB objects to stdout.");
+	puts("  -p, --progress         Display progress bar.");
 	puts("  -q, --quiet            Silent (no output).");
 	puts("  -s, --schema <path>    Validate against the given schema.");
 	puts("  -T, --summary          Print a summary of the check.");
@@ -208,6 +214,7 @@ static void show_help(void)
 	puts("  -x, --xml              Output an XML report.");
 	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
 	puts("  --version              Show version information.");
+	puts("  --zenity-progress      Prints progress information in the zenity --progress format.");
 	puts("  <object>               Any number of CSDB objects to validate.");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
@@ -516,10 +523,11 @@ int main(int argc, char *argv[])
 	char *schema = NULL;
 	int xml = 0;
 	int show_stats = 0;
+	int show_progress = PROGRESS_OFF;
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqX:xFfloes:T^h?";
+	const char *sopts = "vpqX:xFfloes:T^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -527,6 +535,7 @@ int main(int argc, char *argv[])
 		{"filenames"      , no_argument      , 0, 'f'},
 		{"list"           , no_argument      , 0, 'l'},
 		{"output-valid"   , no_argument      , 0, 'o'},
+		{"progress"       , no_argument      , 0, 'p'},
 		{"quiet"          , no_argument      , 0, 'q'},
 		{"verbose"        , no_argument      , 0, 'v'},
 		{"exclude"        , required_argument, 0, 'X'},
@@ -535,6 +544,7 @@ int main(int argc, char *argv[])
 		{"summary"        , no_argument      , 0, 'T'},
 		{"xml"            , no_argument      , 0, 'x'},
 		{"remove-deleted" , no_argument      , 0, '^'},
+		{"zenity-progress", no_argument      , 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -551,8 +561,12 @@ int main(int argc, char *argv[])
 					show_version();
 					return EXIT_SUCCESS;
 				}
+				else if (strcmp(lopts[loptind].name, "zenity-progress") == 0) {
+					show_progress = PROGRESS_ZENITY;
+				}
 				LIBXML2_PARSE_LONGOPT_HANDLE(lopts, loptind, optarg)
 				break;
+			case 'p': show_progress = PROGRESS_CLI; break;
 			case 'q': verbosity = SILENT; break;
 			case 'v': verbosity = VERBOSE; break;
 			case 'X': add_ignore_ns(ignore_ns, optarg); break;
@@ -590,6 +604,17 @@ int main(int argc, char *argv[])
 				err += validate_file_list(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
 			} else {
 				err += validate_file(argv[i], schema, ignore_ns, show_fnames, ignore_empty, rem_del);
+			}
+
+			switch (show_progress) {
+				case PROGRESS_OFF:
+					break;
+				case PROGRESS_CLI:
+					print_progress_bar(i - optind + 1, argc - i);
+					break;
+				case PROGRESS_ZENITY:
+					print_zenity_progress("Performing schema validation...", i - optind + 1, argc - i);
+					break;
 			}
 		}
 	} else if (is_list) {
