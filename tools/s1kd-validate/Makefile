@@ -44,7 +44,7 @@ docs:
 	$(MAKE) -C doc
 
 clean:
-	$(RM) $(executable)
+	$(RM) $(executable) stats.h
 
 maintainer-clean: clean
 	$(MAKE) -C doc clean
