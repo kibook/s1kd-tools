@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="04" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="040" inWork="01"/>
+        <issueInfo issueNumber="040" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="03" day="21"/>
+        <issueDate year="2024" month="12" day="27"/>
         <dmTitle>
           <techName>s1kd-brexcheck(1) | s1kd-tools</techName>
         </dmTitle>
@@ -41,6 +41,9 @@
       <reasonForUpdate id="rfu-0001" updateHighlight="1">
         <simplePara>Add --zenity-progress option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0002" updateHighlight="1">
+        <simplePara>Add -8 (--deep-copy-nodes) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -52,8 +55,8 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-               [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0002"><![CDATA[s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
+               [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx8^h?]
                [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -214,6 +217,12 @@
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para>Output an XML report.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0002">
+              <listItemTerm>-8, --deep-copy-nodes</listItemTerm>
+              <listItemDefinition>
+                <para>Include a deep copy of invalid nodes on the XML report (-x). By default, only a shallow copy of the node is included (the node and its attributes but no children).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

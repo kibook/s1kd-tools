@@ -5,7 +5,7 @@ s1kd-brexcheck - Validate S1000D CSDB objects against BREX data modules
 # SYNOPSIS
 
     s1kd-brexcheck [-b <brex>] [-d <dir>] [-I <path>] [-w <severities>]
-                   [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?]
+                   [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx8^h?]
                    [<object>...]
 
 # DESCRIPTION
@@ -118,6 +118,11 @@ invalid XML tree.
 
   - \-x, --xml  
     Output an XML report.
+
+  - \-8, --deep-copy-nodes  
+    Include a deep copy of invalid nodes on the XML report (-x). By
+    default, only a shallow copy of the node is included (the node and
+    its attributes but no children).
 
   - \-^, --remove-deleted  
     Check the CSDB objects with elements that have a change type of

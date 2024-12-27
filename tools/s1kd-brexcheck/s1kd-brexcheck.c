@@ -37,7 +37,7 @@
 #define PROGRESS_ZENITY 2
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "5.0.1"
+#define VERSION "5.1.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -113,6 +113,9 @@ static bool ignore_empty = false;
 
 /* Remove elements marked as "delete" before check. */
 static bool rem_delete = false;
+
+/* Whether to do a deep copy of invalid nodes for the XML report. */
+static bool deep_copy_nodes = false;
 
 /* Version of XPath to use. */
 enum xpath_version { DYNAMIC, XPATH_1, XPATH_2 };
@@ -326,7 +329,7 @@ static void dump_nodes_xml(xmlNodeSetPtr nodes, const char *fname, xmlNodePtr br
 
 		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
-		xmlAddChild(object, xmlCopyNode(node, 2));
+		xmlAddChild(object, xmlCopyNode(node, deep_copy_nodes ? 1 : 2));
 	}
 }
 
@@ -1867,7 +1870,7 @@ int s1kdCheckBREX(const char *object_xml, int object_size, const char *brex_xml,
 /* Show usage message. */
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-b <brex>] [-d <dir>] [-I <path>] [-w <file>] [-X <version>] [-F|-f] [-BceLlNnopqrS[tu]sTvx8^h?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -B, --default-brex                   Use the default BREX.");
@@ -1894,6 +1897,7 @@ static void show_help(void)
 	puts("  -w, --severity-levels <file>         List of severity levels.");
 	puts("  -X, --xpath-version <version>        Force the version of XPath that will be used.");
 	puts("  -x, --xml                            XML output.");
+	puts("  -8, --deep-copy-nodes                The XML report will contain a deep copy of invalid nodes.");
 	puts("  -^, --remove-deleted                 Check with elements marked as \"delete\" removed.");
 	puts("  --version                            Show version information.");
 	puts("  --zenity-progress                    Prints progress information in the zenity --progress format.");
@@ -1959,7 +1963,7 @@ int main(int argc, char *argv[])
 		/* xpath_version */ DYNAMIC
 	};
 
-	const char *sopts = "Bb:eI:xvqslw:StupFfNncLTrd:oX:^h?";
+	const char *sopts = "Bb:eI:xvqslw:StupFfNncLTrd:oX:8^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -1988,6 +1992,7 @@ int main(int argc, char *argv[])
 		{"recursive"      , no_argument      , 0, 'r'},
 		{"output-valid"   , no_argument      , 0, 'o'},
 		{"xpath-version"  , required_argument, 0, 'X'},
+		{"deep-copy-nodes", no_argument      , 0, '8'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		{"zenity-progress", no_argument      , 0, 0},
 		LIBXML2_PARSE_LONGOPT_DEFS
@@ -2036,6 +2041,7 @@ int main(int argc, char *argv[])
 			case 'I':
 				add_path(&brex_search_paths, &num_brex_search_paths, &BREX_PATH_MAX, optarg, &opts);
 				break;
+			case '8': deep_copy_nodes = true;
 			case 'x': xmlout = true; break;
 			case 'q': opts.verbosity = SILENT; break;
 			case 'v': opts.verbosity = VERBOSE; break;
