@@ -4,7 +4,7 @@ s1kd-validate - Validate S1000D CSDB objects against their schemas
 
 # SYNOPSIS
 
-    s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?]
+    s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv8^h?]
                   [<object>...]
 
 # DESCRIPTION
@@ -56,6 +56,11 @@ schemas.
 
   - \-x, --xml  
     Output an XML report.
+
+  - \-8, --deep-copy-nodes  
+    Include a deep copy of invalid nodes on the XML report (-x). By
+    default, only a shallow copy of the node is included (the node and
+    its attributes but no children).
 
   - \-^, --remove-deleted  
     Validate with elements that have a change type of "delete" removed.

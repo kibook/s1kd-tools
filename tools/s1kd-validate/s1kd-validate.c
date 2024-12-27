@@ -9,7 +9,7 @@
 #include "stats.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.2.0"
+#define VERSION "4.3.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -86,6 +86,8 @@ static int schema_parser_count = 0;
 /* Root element of the XML report. */
 static xmlDocPtr xml_report_doc = NULL;
 
+static int deep_copy_nodes = 0;
+
 /* Add an error to the XML report. */
 static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr node, const long lineno, const char *message)
 {
@@ -106,7 +108,7 @@ static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr 
 		xpath = xpath_of(node);
 		xmlSetProp(object, BAD_CAST "xpath", xpath);
 
-		xmlAddChild(object, xmlCopyNode(node, 2));
+		xmlAddChild(object, xmlCopyNode(node, deep_copy_nodes ? 1 : 2));
 
 		xmlFree(xpath);
 	}
@@ -191,7 +193,7 @@ static struct s1kd_schema_parser *add_schema_parser(char *url)
 
 static void show_help(void)
 {
-	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?] [<object>...]");
+	puts("Usage: " PROG_NAME " [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv8^h?] [<object>...]");
 	puts("");
 	puts("Options:");
 	puts("  -e, --ignore-empty     Ignore empty/non-XML documents.");
@@ -206,6 +208,7 @@ static void show_help(void)
 	puts("  -v, --verbose          Verbose output.");
 	puts("  -X, --exclude <URI>    Exclude namespace from validation by URI.");
 	puts("  -x, --xml              Output an XML report.");
+	puts("  -8, --deep-copy-nodes  The XML report will include a deep copy of invalid nodes.");
 	puts("  -^, --remove-deleted   Validate with elements marked as \"delete\" removed.");
 	puts("  --version              Show version information.");
 	puts("  <object>               Any number of CSDB objects to validate.");
@@ -519,7 +522,7 @@ int main(int argc, char *argv[])
 
 	xmlNodePtr ignore_ns;
 
-	const char *sopts = "vqX:xFfloes:T^h?";
+	const char *sopts = "vqX:xFfloes:T8^h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -534,6 +537,7 @@ int main(int argc, char *argv[])
 		{"schema"         , required_argument, 0, 's'},
 		{"summary"        , no_argument      , 0, 'T'},
 		{"xml"            , no_argument      , 0, 'x'},
+		{"deep-copy-nodes", no_argument      , 0, '8'},
 		{"remove-deleted" , no_argument      , 0, '^'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
@@ -564,6 +568,7 @@ int main(int argc, char *argv[])
 			case 's': schema = strdup(optarg); break;
 			case '^': rem_del = 1; break;
 			case 'T': show_stats = 1; break;
+			case '8': deep_copy_nodes = 1;
 			case 'x': xml = 1; break;
 			case 'h': 
 			case '?': show_help(); return EXIT_SUCCESS;

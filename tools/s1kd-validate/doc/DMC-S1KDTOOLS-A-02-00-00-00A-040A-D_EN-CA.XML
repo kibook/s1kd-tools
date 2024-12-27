@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="02" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="027" inWork="01"/>
+        <issueInfo issueNumber="027" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="12" day="18"/>
+        <issueDate year="2024" month="12" day="27"/>
         <dmTitle>
           <techName>s1kd-validate(1) | s1kd-tools</techName>
         </dmTitle>
@@ -47,6 +47,9 @@
       <reasonForUpdate id="rfu-summary" updateHighlight="1" updateReasonType="urt02">
         <simplePara>Add -T (--summary) option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-deep-copy" updateHighlight="1" updateReasonType="urt02">
+        <simplePara>Add -8 (--deep-copy-nodes) option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -58,7 +61,7 @@
       <levelledPara>
         <title>SYNOPSIS</title>
         <para>
-          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-report rfu-change-exclude rfu-summary"><![CDATA[s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv^h?]
+          <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-xml-report rfu-change-exclude rfu-summary rfu-deep-copy"><![CDATA[s1kd-validate [-s <path>] [-X <URI>] [-F|-f] [-o|-x] [-elqTv8^h?]
               [<object>...]]]></verbatimText>
         </para>
       </levelledPara>
@@ -140,6 +143,12 @@
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para>Output an XML report.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-deep-copy">
+              <listItemTerm>-8, --deep-copy-nodes</listItemTerm>
+              <listItemDefinition>
+                <para>Include a deep copy of invalid nodes on the XML report (-x). By default, only a shallow copy of the node is included (the node and its attributes but no children).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
