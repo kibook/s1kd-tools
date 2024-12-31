@@ -22,7 +22,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.8.0"
+#define VERSION "6.8.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1149,14 +1149,14 @@ pipe_error:
 }
 
 /* Add error elements from reports to the collection of errors. */
-static void add_errors_from_report(const xmlNodePtr errors, const xmlDocPtr report, const xmlChar *cmd)
+static void add_errors_from_report(const xmlNodePtr errors, const xmlDocPtr report, const char *cmd)
 {
 	xmlNodePtr cmd_node;
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
 	cmd_node = xmlNewChild(errors, NULL, BAD_CAST "validator", NULL);
-	xmlSetProp(cmd_node, BAD_CAST "command", cmd);
+	xmlSetProp(cmd_node, BAD_CAST "command", BAD_CAST cmd);
 
 	ctx = xmlXPathNewContext(report);
 	obj = xmlXPathEvalExpression(BAD_CAST "//error", ctx);
@@ -1178,7 +1178,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 {
 	xmlNodePtr cur;
 	int err = 0, e = 0;
-	char filter_cmd[1024] = "";
+	char cmd[4096] = "";
 	xmlDocPtr filtered_doc = NULL;
 	xmlNodePtr errors = NULL;
 
@@ -1193,16 +1193,16 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 	}
 
 	if (opts->filter) {
-		strncpy(filter_cmd, opts->filter, 1023);
+		strcpy(cmd, opts->filter);
 	} else {
-		strncpy(filter_cmd, DEFAULT_FILTER, 1023);
+		strcpy(cmd, DEFAULT_FILTER);
 	}
 
 	if (opts->args) {
-		strcat(filter_cmd, " ");
-		strncat(filter_cmd, opts->args, 1023 - strlen(filter_cmd));
+		strcat(cmd, " ");
+		strcat(cmd, opts->args);
 	} else {
-		strcat(filter_cmd, " -w");
+		strcat(cmd, " -w");
 	}
 
 	for (cur = asserts->children; cur; cur = cur->next) {
@@ -1219,7 +1219,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 
 		c = malloc(strlen(i) + strlen(t) + strlen(v) + 9);
 		sprintf(c, " -s \"%s:%s=%s\"", i, t, v);
-		strcat(filter_cmd, c);
+		strcat(cmd, c);
 		free(c);
 
 		xmlFree(i);
@@ -1227,7 +1227,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		xmlFree(v);
 	}
 
-	execute_command_on_doc_and_parse_output(doc, filter_cmd, &filtered_doc);
+	execute_command_on_doc_and_parse_output(doc, cmd, &filtered_doc);
 
 	/* If the filtered doc is empty, the doc was not applicable to the given assigns. */
 	if (filtered_doc == NULL) {
@@ -1251,7 +1251,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 				e += execute_command_on_doc_and_parse_output(filtered_doc, (char *) cmd, &report);
 
 				if (report) {
-					add_errors_from_report(errors, report, cmd);
+					add_errors_from_report(errors, report, (char *) cmd);
 				}
 
 				xmlFreeDoc(report);
@@ -1263,8 +1263,6 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 		}
 	/* Default validators. */
 	} else {
-		char cmd[4096];
-
 		/* Schema validation */
 		if (opts->include_errors) {
 			strcpy(cmd, DEFAULT_VALIDATE " -x");
@@ -1290,7 +1288,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 			e += execute_command_on_doc_and_parse_output(filtered_doc, cmd, &validate_report);
 
 			if (validate_report) {
-				add_errors_from_report(errors, validate_report, BAD_CAST cmd);
+				add_errors_from_report(errors, validate_report, cmd);
 			}
 
 			xmlFreeDoc(validate_report);
@@ -1332,7 +1330,7 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 				e += execute_command_on_doc_and_parse_output(filtered_doc, cmd, &brexcheck_report);
 
 				if (brexcheck_report) {
-					add_errors_from_report(errors, brexcheck_report, BAD_CAST cmd);
+					add_errors_from_report(errors, brexcheck_report, cmd);
 				}
 
 				xmlFreeDoc(brexcheck_report);
