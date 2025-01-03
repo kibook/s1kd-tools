@@ -56,6 +56,9 @@
       <reasonForUpdate id="rfu-0006" updateHighlight="1">
         <simplePara>Add --xml-with-errors option.</simplePara>
       </reasonForUpdate>
+      <reasonForUpdate id="rfu-0007" updateHighlight="1">
+        <simplePara>Add --deep-copy-nodes option.</simplePara>
+      </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
   <content>
@@ -259,6 +262,12 @@
               <listItemTerm>-x, --xml</listItemTerm>
               <listItemDefinition>
                 <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0006">Output a simplified XML report of the check, only including whether sets of assertions passed or failed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0007">
+              <listItemTerm>-8, --deep-copy-nodes</listItemTerm>
+              <listItemDefinition>
+                <para>Include a deep copy of invalid nodes on the detailed XML report (-X). By default, only a shallow copy of the node is included (the node and its attributes but no children).</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

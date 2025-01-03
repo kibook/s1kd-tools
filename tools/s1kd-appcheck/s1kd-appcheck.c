@@ -26,7 +26,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.8.3"
+#define VERSION "6.9.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -144,6 +144,7 @@ struct appcheckopts {
 	bool rem_delete;
 	enum appcheckmode mode;
 	bool include_errors;
+	bool deep_copy_nodes;
 };
 
 /* Struct to pass data to object_thread. */
@@ -216,6 +217,7 @@ static void show_help(void)
 	puts("  -v, --verbose           Verbose output.");
 	puts("  -X, --xml-with-errors   Output an XML report, including all details on errors.");
 	puts("  -x, --xml               Output a simpler XML report.");
+	puts("  -8, --deep-copy-nodes   The XML report will include a deep copy of invalid nodes.");
 	puts("  -~, --dependencies      Check CCT dependencies.");
 	puts("  -^, --remove-deleted    Validate with elements marked as \"delete\" removed.");
 	puts("  -#, --threads <x[,y]>   Number of threads to use. x * y threads are created in total.");
@@ -1038,11 +1040,20 @@ static void extract_assigns(xmlNodePtr asserts, xmlNodePtr product)
 static int execute_command_on_doc(xmlDocPtr doc, const char *cmd)
 {
 	FILE *p;
+
+	/* Print an info message with the command in DEBUG verbosity. */
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_EXEC, cmd);
+	}
+
 	p = popen(cmd, "w");
+
 	if (p == NULL) {
 		fprintf(stderr, E_PIPE, cmd, strerror(errno));
 	}
+
 	xmlDocDump(p, doc);
+
 	return pclose(p);
 }
 
@@ -1273,6 +1284,32 @@ static void add_errors_from_report(const xmlNodePtr errors, const xmlDocPtr repo
 	xmlXPathFreeContext(ctx);
 }
 
+/* Add the libxml2 parser options specified to this tool to the arguments of other tools. */
+static void append_libxml2_parse_opts(char *cmd)
+{
+	if (DEFAULT_PARSE_OPTS & XML_PARSE_DTDLOAD) {
+		strcat(cmd, " --dtdload");
+	}
+	if (DEFAULT_PARSE_OPTS & XML_PARSE_HUGE) {
+		strcat(cmd, " --huge");
+	}
+	if (!(DEFAULT_PARSE_OPTS & XML_PARSE_NONET)) {
+		strcat(cmd, " --net");
+	}
+	if (DEFAULT_PARSE_OPTS & XML_PARSE_NOENT) {
+		strcat(cmd, " --noent");
+	}
+	if (!(DEFAULT_PARSE_OPTS & XML_PARSE_NOERROR)) {
+		strcat(cmd, " --parser-errors");
+	}
+	if (!(DEFAULT_PARSE_OPTS & XML_PARSE_NOWARNING)) {
+		strcat(cmd, " --parser-warnings");
+	}
+	if (DEFAULT_PARSE_OPTS & XML_PARSE_XINCLUDE) {
+		strcat(cmd, " --xinclude");
+	}
+}
+
 /* Check if an object is valid for a set of assertions. */
 static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xmlNodePtr product, const xmlChar *id, const char *pctfname, struct appcheckopts *opts)
 {
@@ -1364,10 +1401,14 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 	/* Default validators. */
 	} else {
 		/* Schema validation */
+		strcpy(cmd, DEFAULT_VALIDATE);
+
 		if (opts->include_errors) {
-			strcpy(cmd, DEFAULT_VALIDATE " -x");
-		} else {
-			strcpy(cmd, DEFAULT_VALIDATE);
+			strcat(cmd, " -x");
+		}
+
+		if (opts->deep_copy_nodes) {
+			strcat(cmd, " -8");
 		}
 
 		switch (verbosity) {
@@ -1381,6 +1422,8 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 				strcat(cmd, " -v");
 				break;
 		}
+
+		append_libxml2_parse_opts(cmd);
 
 		if (opts->include_errors) {
 			xmlDocPtr validate_report = NULL;
@@ -1398,10 +1441,14 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 
 		/* BREX validation */
 		if (opts->brexcheck) {
+			strcpy(cmd, DEFAULT_BREXCHECK " -cl");
+
 			if (opts->include_errors) {
-				strcpy(cmd, DEFAULT_BREXCHECK " -clx");
-			} else {
-				strcpy(cmd, DEFAULT_BREXCHECK " -cl");
+				strcat(cmd, " -x");
+			}
+
+			if (opts->deep_copy_nodes) {
+				strcat(cmd, " -8");
 			}
 
 			strcat(cmd, " -d '");
@@ -1423,6 +1470,8 @@ static int check_assigns(xmlDocPtr doc, const char *path, xmlNodePtr asserts, xm
 					strcat(cmd, " -v");
 					break;
 			}
+
+			append_libxml2_parse_opts(cmd);
 
 			if (opts->include_errors) {
 				xmlDocPtr brexcheck_report = NULL;
@@ -2490,7 +2539,7 @@ int main(int argc, char **argv)
 {
 	int i;
 
-	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtuvXx~#:h?";
+	const char *sopts = "A:abC:cDd:e:Ffi:NnK:k:loP:pqRrsTtuvXx8~#:h?";
 	struct option lopts[] = {
 		{"version"        , no_argument      , 0, 0},
 		{"help"           , no_argument      , 0, 'h'},
@@ -2523,6 +2572,7 @@ int main(int argc, char **argv)
 		{"verbose"        , no_argument      , 0, 'v'},
 		{"xml-with-errors", no_argument      , 0, 'X'},
 		{"xml"            , no_argument      , 0, 'x'},
+		{"deep-copy-nodes", no_argument      , 0, '8'},
 		{"dependencies"   , no_argument      , 0, '~'},
 		{"threads"        , required_argument, 0, '#'},
 		{"remove-deleted" , no_argument      , 0, '^'},
@@ -2555,7 +2605,8 @@ int main(int argc, char **argv)
 		/* check_duplicate */ false,
 		/* rem_delete */      false,
 		/* mode */            STANDALONE,
-		/* include_errors */  false
+		/* include_errors */  false,
+		/* deep_copy_nodes */ false
 	};
 
 	int err = 0;
@@ -2670,6 +2721,8 @@ int main(int argc, char **argv)
 			case 'v':
 				++verbosity;
 				break;
+			case '8':
+				opts.deep_copy_nodes = true;
 			case 'X':
 				opts.include_errors = true;
 			case 'x':

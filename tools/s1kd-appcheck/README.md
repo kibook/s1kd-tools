@@ -154,6 +154,11 @@ the actual validation.
     Output a simplified XML report of the check, only including whether
     sets of assertions passed or failed.
 
+  - \-8, --deep-copy-nodes  
+    Include a deep copy of invalid nodes on the detailed XML report
+    (-X). By default, only a shallow copy of the node is included (the
+    node and its attributes but no children).
+
   - \-\~, --dependencies  
     Check with CCT dependency tests added to assertions which use the
     dependant values.
