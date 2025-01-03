@@ -9,7 +9,7 @@
 #include "stats.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.3.0"
+#define VERSION "4.3.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -89,7 +89,7 @@ static xmlDocPtr xml_report_doc = NULL;
 static int deep_copy_nodes = 0;
 
 /* Add an error to the XML report. */
-static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr node, const long lineno, const char *message)
+static void add_xml_report_error(const xmlNodePtr report_node, xmlNodePtr node, const long lineno, const char *message)
 {
 	char line[16];
 
@@ -107,6 +107,8 @@ static void add_xml_report_error(const xmlNodePtr report_node, const xmlNodePtr 
 
 		xpath = xpath_of(node);
 		xmlSetProp(object, BAD_CAST "xpath", xpath);
+
+		if (node->type == XML_ATTRIBUTE_NODE) node = node->parent;
 
 		xmlAddChild(object, xmlCopyNode(node, deep_copy_nodes ? 1 : 2));
 
