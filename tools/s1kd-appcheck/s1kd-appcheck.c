@@ -7,7 +7,11 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <pthread.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <paths.h>
+#endif
 #include <fcntl.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -22,7 +26,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.8.1"
+#define VERSION "6.8.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1045,6 +1049,101 @@ static int execute_command_on_doc(xmlDocPtr doc, const char *cmd)
 /* Send an XML document to an external command's stdin, and read an XML document from the command's stdout. */
 static int execute_command_on_doc_and_parse_output(xmlDocPtr doc, const char *cmd, xmlDocPtr *out)
 {
+	xmlSaveCtxtPtr ctxt;
+
+#ifdef _WIN32
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	HANDLE hChildStdIn_R = NULL;
+	HANDLE hChildStdIn_W = NULL;
+	HANDLE hChildStdOut_R = NULL;
+	HANDLE hChildStdOut_W = NULL;
+
+	SECURITY_ATTRIBUTES saAttr;
+
+	int fd;
+
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+
+	if (!CreatePipe(&hChildStdOut_R, &hChildStdOut_W, &saAttr, 0)) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to create stdout pipe");
+		exit(EXIT_PIPE);
+	}
+	if (!SetHandleInformation(hChildStdOut_R, HANDLE_FLAG_INHERIT, 0)) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to set handle info for stdout pipe");
+		exit(EXIT_PIPE);
+	}
+
+	if (!CreatePipe(&hChildStdIn_R, &hChildStdIn_W, &saAttr, 0)) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to create stdin pipe");
+		exit(EXIT_PIPE);
+	}
+	if (!SetHandleInformation(hChildStdIn_W, HANDLE_FLAG_INHERIT, 0)) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to set handle info for stdin pipe");
+		exit(EXIT_PIPE);
+	}
+
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	si.hStdOutput = hChildStdOut_W;
+	si.hStdInput = hChildStdIn_R;
+	si.dwFlags |= STARTF_USESTDHANDLES;
+
+	ZeroMemory(&pi, sizeof(pi));
+
+	/* Print an info message with the command in DEBUG verbosity. */
+	if (verbosity >= DEBUG) {
+		fprintf(stderr, I_EXEC, cmd);
+	}
+
+	CreateProcess(NULL, (char *) cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
+
+	CloseHandle(hChildStdOut_W);
+	CloseHandle(hChildStdIn_R);
+
+	/* Write the XML document to the stdin of the child process. */
+	fd = _open_osfhandle((intptr_t) hChildStdIn_W, O_TEXT);
+
+	if (fd == -1) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to create file descriptor for stdin pipe");
+		exit(EXIT_PIPE);
+	}
+
+	ctxt = xmlSaveToFd(fd, NULL, 0);
+	xmlSaveDoc(ctxt, doc);
+	xmlSaveClose(ctxt);
+
+	_close(fd);
+
+	/* Read the stdout of the child process into a new XML document. */
+	fd = _open_osfhandle((intptr_t) hChildStdOut_R, O_TEXT);
+
+	if (fd == -1) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to create file descriptor for stdout pipe");
+		exit(EXIT_PIPE);
+	}
+
+	*out = xmlReadFd(fd, NULL, NULL, XML_PARSE_NOERROR);
+
+	_close(fd);
+
+	WaitForSingleObject(pi.hProcess, INFINITE);
+
+	DWORD status = 0;
+
+	if (!GetExitCodeProcess(pi.hProcess, &status)) {
+		fprintf(stderr, E_PIPE, cmd, "Failed to retrieve exit code");
+		exit(EXIT_PIPE);
+	}
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	return status;
+#else
 	/* Pipe to write to the stdin of the command. */
 	int stdin_pipe[2];
 
@@ -1146,6 +1245,7 @@ child_pipe_error:
 pipe_error:
 	fprintf(stderr, E_PIPE, cmd, strerror(errno));
 	exit(EXIT_PIPE);
+#endif
 }
 
 /* Add error elements from reports to the collection of errors. */
