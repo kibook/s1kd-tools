@@ -26,7 +26,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.8.2"
+#define VERSION "6.8.3"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1212,7 +1212,7 @@ child_pipe_error:
 	}
 
 	/* Write the XML document to the stdin of the child process. */
-	xmlSaveCtxtPtr ctxt = xmlSaveToFd(stdin_pipe[1], NULL, 0);
+	ctxt = xmlSaveToFd(stdin_pipe[1], NULL, 0);
 	xmlSaveDoc(ctxt, doc);
 	xmlSaveClose(ctxt);
 
