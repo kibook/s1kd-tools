@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.4.0"
+#define VERSION "12.4.1"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -185,6 +185,11 @@ static void define_applic(xmlNodePtr defs, int *napplics, const xmlChar *ident, 
 		if (userdefined) {
 			++(*napplics);
 		}
+
+		/* Tag asserts that may only be true for individual DMs. */
+		if (perdm) {
+			xmlSetProp(assert, BAD_CAST "perDm", BAD_CAST "true");
+		}
 	/* Or, if an assert already exists... */
 	} else {
 		xmlChar *user_defined_attr;
@@ -227,11 +232,6 @@ static void define_applic(xmlNodePtr defs, int *napplics, const xmlChar *ident, 
 		}
 
 		xmlFree(user_defined_attr);
-	}
-
-	/* Tag asserts that may only be true for individual DMs. */
-	if (perdm) {
-		xmlSetProp(assert, BAD_CAST "perDm", BAD_CAST "true");
 	}
 }
 
@@ -2055,7 +2055,7 @@ static bool check_wholedm_applic(xmlDocPtr dm, xmlNodePtr defs)
 /* Read applicability definitions from the <assign> elements of a
  * product instance in the specified PCT data module.\
  */
-static void load_applic_from_pct(xmlNodePtr defs, int *napplics, xmlDocPtr pct, const char *pctfname, const char *product)
+static void load_applic_from_pct(xmlNodePtr defs, int *napplics, xmlDocPtr pct, const char *pctfname, const char *product, const bool userpct)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
@@ -2107,7 +2107,8 @@ static void load_applic_from_pct(xmlNodePtr defs, int *napplics, xmlDocPtr pct, 
 			value = xmlGetProp(obj->nodesetval->nodeTab[i],
 				BAD_CAST "applicPropertyValue");
 
-			define_applic(defs, napplics, ident, type, value, true, true);
+			/* If the PCT is specified by the user, these defines are not per DM. */
+			define_applic(defs, napplics, ident, type, value, !userpct, true);
 
 			xmlFree(ident);
 			xmlFree(type);
@@ -4548,7 +4549,7 @@ int main(int argc, char **argv)
 		/* If a PCT filename is specified with -P, use that for all data
 		 * modules and ignore their individual ACT->PCT refs. */
 		if (pct) {
-			load_applic_from_pct(applicability, &napplics, pct, userpct, product);
+			load_applic_from_pct(applicability, &napplics, pct, userpct, product, true);
 		/* Otherwise the PCT must be loaded separately for each data
 		 * module, since they may reference different ones. */
 		} else {
@@ -4712,7 +4713,7 @@ int main(int argc, char **argv)
 				char fname[PATH_MAX];
 				if (find_pct_fname(fname, act)) {
 					if ((pct = read_xml_doc(fname))) {
-						load_applic_from_pct(applicability, &napplics, pct, fname, product);
+						load_applic_from_pct(applicability, &napplics, pct, fname, product, false);
 						xmlFreeDoc(pct);
 					}
 				}
@@ -4960,7 +4961,7 @@ int main(int argc, char **argv)
 			/* The ACT/PCT may be different for the next DM, so these
 			 * assigns must be cleared. Those directly set with -s will
 			 * carry over. */
-			if (load_applic_per_dm) {
+			if (load_applic_per_dm || re_applic) {
 				clear_perdm_applic(applicability, &napplics);
 			}
 
