@@ -38,7 +38,7 @@ INSTALL = install -Ds
 
 all: $(executable)
 
-$(executable): $(SOURCE)
+$(executable): $(sources)
 	$(CC) $(CFLAGS) -o $(executable) $(sources) $(LDFLAGS)
 
 docs:
