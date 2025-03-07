@@ -218,7 +218,7 @@ The applications for this tool include:
         default issue type will be that of the master.
     
       - If the issue is 001-01 and up but the master is "new", the
-        default issue type will be "status".
+        default issue type will be none.
     
     A different issue type than the default can be set with the -z
     (--issue-type) option.
@@ -394,6 +394,8 @@ The applications for this tool include:
 
   - \-z, --issue-type \<type\>  
     Set the issue type of the instance.
+    
+    The special value of "none" will remove the issue type.
 
   - \-1, --act  
     Specify the ACT to use to find the CCT and/or PCT.

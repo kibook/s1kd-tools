@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="053" inWork="03"/>
+        <issueInfo issueNumber="053" inWork="04"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="09" day="03"/>
+        <issueDate year="2025" month="03" day="07"/>
         <dmTitle>
           <techName>s1kd-instance(1) | s1kd-tools</techName>
         </dmTitle>
@@ -43,6 +43,9 @@
       </reasonForUpdate>
       <reasonForUpdate id="rfu-0002">
         <simplePara>Add hazard and terminology repository XSL</simplePara>
+      </reasonForUpdate>
+      <reasonForUpdate id="rfu-0003">
+        <simplePara>Add "none" value for -z (--issue-type) option, and make this the default issue type.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -330,7 +333,7 @@
                       <para>If the issue is 001-01 and up and the master is not "new", the default issue type will be that of the master.</para>
                     </listItem>
                     <listItem>
-                      <para>If the issue is 001-01 and up but the master is "new", the default issue type will be "status".</para>
+                      <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0003">If the issue is 001-01 and up but the master is "new", the default issue type will be none.</para>
                     </listItem>
                   </randomList>
                   A different issue type than the default can be set with the -z (--issue-type) option.
@@ -546,6 +549,7 @@
               <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue type of the instance.</para>
+                <para changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0003">The special value of "none" will remove the issue type.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>

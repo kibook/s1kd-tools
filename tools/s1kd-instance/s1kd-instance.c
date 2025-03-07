@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.4.1"
+#define VERSION "13.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -78,10 +78,6 @@
  */
 #define DEFAULT_ORIG_CODE "S1KDI"
 #define DEFAULT_ORIG_NAME "s1kd-instance tool"
-
-/* Text of the default RFU added when a "new" master produces non-new
- * instances. */
-#define DEFAULT_RFU BAD_CAST "New master"
 
 /* Search for ACT/PCT recursively. */
 static bool recursive_search = false;
@@ -1822,43 +1818,18 @@ static void set_issue_type(xmlDocPtr doc, const char *type)
 	status = first_xpath_node(doc, NULL, BAD_CAST "//dmStatus|//pmStatus|//commentStatus|//dmlStatus|//scormContentPackageStatus|//issno");
 
 	if (xmlStrcmp(status->name, BAD_CAST "issno") == 0) {
-		xmlSetProp(status, BAD_CAST "type", BAD_CAST type);
+		if (type == NULL || strcmp(type, "none") == 0) {
+			xmlUnsetProp(status, BAD_CAST "type");
+		} else {
+			xmlSetProp(status, BAD_CAST "type", BAD_CAST type);
+		}
 	} else {
-		xmlSetProp(status, BAD_CAST "issueType", BAD_CAST type);
+		if (type == NULL || strcmp(type, "none") == 0) {
+			xmlUnsetProp(status, BAD_CAST "issueType");
+		} else {
+			xmlSetProp(status, BAD_CAST "issueType", BAD_CAST type);
+		}
 	}
-}
-
-/* Add a default RFU when a "new" master produces non-new instances. */
-static void add_default_rfu(xmlDocPtr dm)
-{
-	xmlNodePtr node, rfu;
-	bool iss30;
-
-	/* Issue 4.2+ allows "new" DMs to have RFUs, so use this instead if
-	 * present. */
-	if (first_xpath_node(dm, NULL, BAD_CAST "//rfu|//reasonForUpdate")) {
-		return;
-	}
-
-	node = first_xpath_node(dm, NULL, BAD_CAST
-		"("
-		"//dmStatus/*|//status/*|"
-		"//pmStatus/*|//pmstatus/*|"
-		"//commentStatus/*|"
-		"//ddnStatus/*|"
-		"//dmlStatus/*|"
-		"//scormContentPackageStatus/*"
-		")[not(self::productSafety or self::remarks)][last()]");
-
-	if (!node) {
-		return;
-	}
-
-	iss30 = xmlStrcmp(node->parent->name, BAD_CAST "status") == 0 || xmlStrcmp(node->parent->name, BAD_CAST "pmstatus") == 0;
-
-	rfu = xmlNewNode(node->ns, BAD_CAST (iss30 ? "rfu" : "reasonForUpdate"));
-	xmlAddNextSibling(node, rfu);
-	xmlNewTextChild(rfu, rfu->ns, BAD_CAST (iss30 ? "p" : "simplePara"), DEFAULT_RFU);
 }
 
 /* Set the issue and inwork numbers of the instance. */
@@ -1909,10 +1880,9 @@ static void set_issue(xmlDocPtr dm, char *issinfo, bool incr_iss)
 		type = first_xpath_value(dm, NULL, BAD_CAST "//@issueType|//issno/@type");
 
 		/* If the master is "new" but the target issue cannot be,
-		 * default to "status" as their should be no change marks. */
+		 * default to no issue type as their should be no change marks. */
 		if (xmlStrcmp(type, BAD_CAST "new") == 0) {
-			set_issue_type(dm, "status");
-			add_default_rfu(dm);
+			set_issue_type(dm, "none");
 		/* Otherwise, use the master's issue type. */
 		} else {
 			set_issue_type(dm, (char *) type);
