@@ -139,6 +139,8 @@ are simply copied.
   - \-z, --issue-type \<type\>  
     Set the issue type of the new issue.
     
+    The special value of "none" will remove the issue type entirely.
+    
     If this option is not specified, then the issue type of the new
     issue will be set as follows:
     
@@ -147,7 +149,7 @@ are simply copied.
         issue.
     
       - if the previous issue is an official issue, the issue type of
-        the new issue will default to "status".
+        the new issue will default to "none".
 
   - \-^, --remove-deleted  
     Remove elements with change type of "delete". These elements are

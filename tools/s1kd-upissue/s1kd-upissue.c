@@ -9,7 +9,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-upissue"
-#define VERSION "5.0.1"
+#define VERSION "6.0.0"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -476,10 +476,18 @@ static void set_status(xmlDocPtr dmdoc, const char *status, bool iss30, xmlNodeP
 	xmlNodePtr dmStatus;
 
 	if (iss30) {
-		xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
+		if (strcmp(status, "none") == 0) {
+			xmlUnsetProp(issueInfo, BAD_CAST "type");
+		} else {
+			xmlSetProp(issueInfo, BAD_CAST "type", BAD_CAST status);
+		}
 	} else {
 		if ((dmStatus = xpath_first_node(dmdoc, NULL, BAD_CAST "//dmStatus|//pmStatus"))) {
-			xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
+			if (strcmp(status, "none") == 0) {
+				xmlUnsetProp(dmStatus, BAD_CAST "issueType");
+			} else {
+				xmlSetProp(dmStatus, BAD_CAST "issueType", BAD_CAST status);
+			}
 		}
 	}
 }
@@ -747,10 +755,10 @@ static void upissue(const char *path)
 		if (status) {
 			set_status(dmdoc, status, iss30, issueInfo);
 		/* Otherwise:
-		 * - if the object is official, default to "status"
+		 * - if the object is official, default to no issue type.
 		 * - if the object is not official, keep the previous issue type. */
 		} else if (inWork_int == 0) {
-			set_status(dmdoc, "status", iss30, issueInfo);
+			set_status(dmdoc, "none", iss30, issueInfo);
 		}
 
 		if (remove_marks) {

@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="05" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="029" inWork="00"/>
+        <issueInfo issueNumber="029" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2025" month="03" day="07"/>
         <dmTitle>
           <techName>s1kd-upissue(1) | s1kd-tools</techName>
         </dmTitle>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
+      <reasonForUpdate id="rfu-issue-type" updateHighlight="1">
+        <simplePara>Change default issue type to none.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -222,6 +222,7 @@
               <listItemTerm>-z, --issue-type &lt;type&gt;</listItemTerm>
               <listItemDefinition>
                 <para>Set the issue type of the new issue.</para>
+                <para>The special value of "none" will remove the issue type entirely.</para>
                 <para>
                   If this option is not specified, then the issue type of the new issue will be set as follows:
                   <randomList>
@@ -229,7 +230,7 @@
                       <para>if the previous issue is not an official issue (in-work 00), the issue type of the new issue will be the same as the previous issue.</para>
                     </listItem>
                     <listItem>
-                      <para>if the previous issue is an official issue, the issue type of the new issue will default to "status".</para>
+                      <para>if the previous issue is an official issue, the issue type of the new issue will default to "none".</para>
                     </listItem>
                   </randomList>
                 </para>
