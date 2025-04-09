@@ -159,4 +159,4 @@ attribute, and will only match a BREX rule with the specified ID.
 
 ## Set a default value in the current `.defaults` file
 
-    $ s1kd-defaults -df -n issue -v 5.0
+    $ s1kd-defaults -df -n issue -v 6
