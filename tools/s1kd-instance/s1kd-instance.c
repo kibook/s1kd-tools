@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.4.1"
+#define VERSION "12.4.2"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2657,13 +2657,16 @@ static int find_source(char *src, xmlDocPtr *doc)
 	return !found;
 }
 
+/* Load applic defs from the applic of an object. */
 static void load_applic_from_inst(xmlNodePtr defs, xmlDocPtr doc)
 {
 	xmlXPathContextPtr ctx;
 	xmlXPathObjectPtr obj;
 
 	ctx = xmlXPathNewContext(doc);
-	obj = xmlXPathEvalExpression(BAD_CAST "//identAndStatusSection//applic[1]//assert", ctx);
+
+	// FIXME: "or" is not really supported by the applic defs mechanism so we must ignore any asserts inside an "or".
+	obj = xmlXPathEvalExpression(BAD_CAST "//identAndStatusSection//applic[1]//assert[not(ancestor::evaluate/@andOr = 'or')]", ctx);
 
 	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
 		int i;
@@ -3230,7 +3233,7 @@ static void add_ct_prop_vals(xmlDocPtr act, xmlDocPtr cct, const xmlChar *id, co
 					}
 
 					if (defs) {
-						add &= is_applic(defs, (char *) id, (char *) type, (char *) c, true);
+						add = add && is_applic(defs, (char *) id, (char *) type, (char *) c, true);
 					}
 
 					if (add) {
