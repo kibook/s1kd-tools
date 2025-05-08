@@ -127,6 +127,10 @@ The applications for this tool include:
     tool (-O), this will force it to be overwritten. Otherwise, a
     warning will be printed and the existing file will not be
     overwritten.
+    
+    When used with the -w (--whole-objects) option, if the source object
+    is not applicable to the specified filters, the source object will
+    be deleted.
 
   - \-G, --custom-orig \<CODE\>/\<NAME\>  
     Similar to the -g option, but instead of the default enterprise code

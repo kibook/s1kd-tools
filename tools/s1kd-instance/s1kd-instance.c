@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "12.4.2"
+#define VERSION "13.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -72,6 +72,7 @@
 #define I_FIND_CIR_FOUND INF_PREFIX "Found CIR %s...\n"
 #define I_FIND_CIR_ADD INF_PREFIX "Added CIR %s\n"
 #define I_NON_APPLIC INF_PREFIX "Ignoring non-applicable object: %s\n"
+#define I_NON_APPLIC_DELETE INF_PREFIX "Deleting non-applicable object: %s\n"
 
 /* When using the -g option, these are set as the values for the
  * originator.
@@ -4952,8 +4953,17 @@ int main(int argc, char **argv)
 					}
 				}
 			} else {
-				if (verbosity >= VERBOSE) {
-					fprintf(stderr, I_NON_APPLIC, src);
+				/* Delete non-applicable DMs if -f is specified. */
+				if (force_overwrite) {
+					remove(src);
+
+					if (verbosity >= VERBOSE) {
+						fprintf(stderr, I_NON_APPLIC_DELETE, src);
+					}
+				} else {
+					if (verbosity >= VERBOSE) {
+						fprintf(stderr, I_NON_APPLIC, src);
+					}
 				}
 
 				if (print_non_applic) {
