@@ -9,7 +9,7 @@
 #include "stats.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.3.1"
+#define VERSION "4.3.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (show_stats) {
-		print_stats(xml_report_doc);
+		print_stats();
 	}
 
 	xmlFreeDoc(xml_report_doc);
