@@ -166,7 +166,7 @@ BREX rules, you should select one of these implementations:
 
 Example:
 
-    $ make xpath2_engine=xqilla
+    $ make xpath2_engine=XQILLA
 
 ### `debug`
 

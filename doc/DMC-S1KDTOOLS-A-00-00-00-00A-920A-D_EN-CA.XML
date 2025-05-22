@@ -291,7 +291,7 @@
             </para>
             <para>
               Example:
-              <verbatimText verbatimStyle="vs24">$ make xpath2_engine=xqilla</verbatimText>
+              <verbatimText verbatimStyle="vs24">$ make xpath2_engine=XQILLA</verbatimText>
             </para>
           </levelledPara>
           <levelledPara>
