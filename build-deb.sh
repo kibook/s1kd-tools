@@ -24,7 +24,7 @@ build_deb() {
 			;;
 	esac
 
-	tmp=$(pwd)/${name}_${version}
+	tmp=$(pwd)/${name}_${version}_amd64
 	mkdir "$tmp"
 	
 	make prefix="$tmp" clean all install
