@@ -4,8 +4,6 @@ set -e
 
 out=build/$MSYSTEM
 
-pacman --noconfirm -S --needed $(printf "${MINGW_PACKAGE_PREFIX}-%s " gcc make pkgconf libxml2 libxslt libsystre) vim
-
 mkdir -p "$out"
 make -j$(nproc) clean
 make -j$(nproc) all
