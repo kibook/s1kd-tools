@@ -19,7 +19,7 @@ build_deb() {
 	depends="libxml2, libxslt1.1"
 	case "$xpath2_engine" in
 		xqilla)
-			name="$name+xqilla"
+			name="$name+xpath2-xqilla"
 			depends="$depends, libxqilla6v5"
 			;;
 	esac

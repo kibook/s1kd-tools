@@ -18,7 +18,7 @@ build_tar() {
 	name=s1kd-tools
 	case "$xpath2_engine" in
 		xqilla)
-			name="$name+xqilla"
+			name="$name+xpath2-xqilla"
 			;;
 	esac
 
