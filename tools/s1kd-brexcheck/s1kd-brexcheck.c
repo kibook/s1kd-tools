@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxml/xmlstring.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/debugXML.h>
 #include <libxslt/transform.h>
@@ -37,7 +38,7 @@
 #define PROGRESS_ZENITY 2
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "5.2.0"
+#define VERSION "5.2.1"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -189,6 +190,31 @@ static xmlChar *firstXPathValue(xmlNodePtr node, const char *expr)
 	return xmlNodeGetContent(firstXPathNode(NULL, node, expr));
 }
 
+/* Get the value allowed string from an objectValue/objval node. */
+static xmlChar *get_value_allowed(xmlNodePtr objval)
+{
+	xmlChar *allowed;
+
+	/* S1000D <= 3.0: @val1~@val2 */
+	if (xpath_first_node(NULL, objval, BAD_CAST "@val1")) {
+		xmlChar *v2;
+
+		allowed = xpath_first_value(NULL, objval, BAD_CAST "@val1");
+
+		v2 = xpath_first_value(NULL, objval, BAD_CAST "@val2");
+		if (v2) {
+			allowed = xmlStrcat(allowed, BAD_CAST "~");
+			allowed = xmlStrcat(allowed, v2);
+			xmlFree(v2);
+		}
+	/* S1000D >= 4.0: @valueAllowed */
+	} else {
+		allowed = xpath_first_value(NULL, objval, BAD_CAST "@valueAllowed");
+	}
+
+	return allowed;
+}
+
 /* Check the values of objects against the patterns in the BREX rule. */
 static bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 {
@@ -201,8 +227,8 @@ static bool check_node_values(xmlNodePtr node, xmlNodeSetPtr values)
 	for (i = 0; i < values->nodeNr; ++i) {
 		xmlChar *allowed, *value, *form;
 
-		allowed = firstXPathValue(values->nodeTab[i], "@valueAllowed|@val1");
-		form    = firstXPathValue(values->nodeTab[i], "@valueForm|@valtype");
+		allowed = get_value_allowed(values->nodeTab[i]);
+		form    = xpath_first_value(NULL, values->nodeTab[i], BAD_CAST "@valueForm|@valtype");
 		value   = xmlNodeGetContent(node);
 
 		if (form && xmlStrcmp(form, BAD_CAST "range") == 0) {
@@ -676,7 +702,7 @@ static void print_node(xmlNodePtr node)
 		}
 		xmlFree(use);
 	} else if (strcmp((char *) node->name, "objectValue") == 0 && !shortmsg) {
-		char *allowed = (char *) xmlGetProp(node, BAD_CAST "valueAllowed");
+		char *allowed = (char *) get_value_allowed(node);
 		char *content = (char *) xmlNodeGetContent(node);
 		fprintf(stderr, "  VALUE ALLOWED:");
 		if (allowed)
@@ -687,7 +713,7 @@ static void print_node(xmlNodePtr node)
 		xmlFree(content);
 		xmlFree(allowed);
 	} else if (strcmp((char *) node->name, "objval") == 0 && !shortmsg) {
-		char *allowed = (char *) xmlGetProp(node, BAD_CAST "val1");
+		char *allowed = (char *) get_value_allowed(node);
 		char *content = (char *) xmlNodeGetContent(node);
 		fprintf(stderr, "  VALUE ALLOWED:");
 		if (allowed)
