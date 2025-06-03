@@ -26,7 +26,7 @@ static unsigned UPF_MAX = OBJECT_MAX;
 static unsigned NON_MAX = OBJECT_MAX;
 
 #define PROG_NAME "s1kd-ls"
-#define VERSION "1.15.0"
+#define VERSION "1.16.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -735,18 +735,21 @@ int main(int argc, char **argv)
 	} else {
 		free(dmls);
 	}
+	if (ncoms) {
+		qsort(coms, ncoms, PATH_MAX, compare_basename);
+	} else {
+		free(coms);
+	}
+	if (nddns) {
+		qsort(ddns, nddns, PATH_MAX, compare_basename);
+	} else {
+		free(ddns);
+	}
 	if (nicns) {
 		qsort(icns, nicns, PATH_MAX, compare_icn);
 		if (only_latest || only_old) latest_icns = malloc(nicns * PATH_MAX);
 	} else {
 		free(icns);
-	}
-
-	if (!ncoms) {
-		free(coms);
-	}
-	if (!nddns) {
-		free(ddns);
 	}
 
 	if (only_official_issue || only_inwork) {
