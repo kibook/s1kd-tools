@@ -447,6 +447,18 @@ The applications for this tool include:
     Rather than source objects, the objects specified are existing
     instances that will be updated.
 
+  - \-\#, --remove-duplicate-annotations  
+    Remove duplicate applicability annotations, replacing references to
+    the duplicates with references to the first occurrence of the same
+    annotation.
+    
+    Two annotations are considered duplicates if they have the exact
+    same logic.
+    
+    This option is particularly useful when combined with the -A
+    (--simplify) option, since annotations that were different may
+    become the same after simplification.
+
   - \-%, --read-only  
     Make instance objects read-only.
 

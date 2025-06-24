@@ -1235,3 +1235,33 @@ bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume)
 
 	return false;
 }
+
+/* Determine if two applicability annotations are the same. */
+bool same_annotation(xmlNodePtr app1, xmlNodePtr app2)
+{
+	xmlDocPtr d1, d2;
+	xmlChar *s1, *s2;
+	bool same;
+
+	/* Compare c14n representation of XML to
+	 * determine if the annotations are duplicates.
+	 */
+	d1 = xmlNewDoc(BAD_CAST "1.0");
+	d2 = xmlNewDoc(BAD_CAST "1.0");
+
+	xmlDocSetRootElement(d1, xmlCopyNode(app1, 1));
+	xmlDocSetRootElement(d2, xmlCopyNode(app2, 1));
+
+	xmlC14NDocDumpMemory(d1, NULL, XML_C14N_1_0, NULL, 0, &s1);
+	xmlC14NDocDumpMemory(d2, NULL, XML_C14N_1_0, NULL, 0, &s2);
+
+	same = xmlStrcmp(s1, s2) == 0;
+
+	xmlFree(s1);
+	xmlFree(s2);
+
+	xmlFreeDoc(d1);
+	xmlFreeDoc(d2);
+
+	return same;
+}

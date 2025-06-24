@@ -16,6 +16,7 @@
 #include <libxml/xinclude.h>
 #include <libxml/xpath.h>
 #include <libxml/catalog.h>
+#include <libxml/c14n.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -222,5 +223,8 @@ bool eval_evaluate(xmlNodePtr defs, xmlNodePtr evaluate, bool assume);
 
 /* Generic test for either <assert> or <evaluate> */
 bool eval_applic(xmlNodePtr defs, xmlNodePtr node, bool assume);
+
+/* Determine if two applicability annotations are the same. */
+bool same_annotation(xmlNodePtr app1, xmlNodePtr app2);
 
 #endif

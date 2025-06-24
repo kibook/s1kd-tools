@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "13.0.0"
+#define VERSION "13.1.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -674,6 +674,68 @@ static void clean_applic(xmlNodePtr referencedApplicGroup, xmlNodePtr node)
 	for (cur = node->children; cur; cur = cur->next) {
 		clean_applic(referencedApplicGroup, cur);
 	}
+}
+
+/* Replaces all references from one annotation to another. */
+static void replace_annotation(xmlDocPtr doc, xmlNodePtr app1, xmlNodePtr app2)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	xmlChar *app1_id = xmlGetProp(app1->parent, BAD_CAST "id");
+	xmlChar *app2_id = xmlGetProp(app2->parent, BAD_CAST "id");
+
+	ctx = xmlXPathNewContext(doc);
+	xmlXPathRegisterVariable(ctx, BAD_CAST "id", xmlXPathNewString(app1_id));
+	obj = xmlXPathEval(BAD_CAST "//*[@applicRefId=$id]", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlSetProp(obj->nodesetval->nodeTab[i], BAD_CAST "applicRefId", app2_id);
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	xmlFree(app1_id);
+	xmlFree(app2_id);
+}
+
+/* Remove duplicate annotations. */
+static xmlNodePtr rem_dupl_annotations(xmlDocPtr doc, xmlNodePtr referencedApplicGroup)
+{
+	xmlXPathContextPtr ctx;
+	xmlXPathObjectPtr obj;
+
+	ctx = xmlXPathNewContext(doc);
+	xmlXPathSetContextNode(referencedApplicGroup, ctx);
+
+	obj = xmlXPathEval(BAD_CAST "//referencedApplicGroup/applic/assert|//referencedApplicGroup/applic/evaluate", ctx);
+
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			int j;
+			for (j = i + 1; j < obj->nodesetval->nodeNr; ++j) {
+				if (same_annotation(obj->nodesetval->nodeTab[i], obj->nodesetval->nodeTab[j])) {
+					replace_annotation(doc, obj->nodesetval->nodeTab[j], obj->nodesetval->nodeTab[i]);
+				}
+			}
+		}
+	}
+
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
+
+	if (xmlChildElementCount(referencedApplicGroup) == 0) {
+		xmlUnlinkNode(referencedApplicGroup);
+		xmlFreeNode(referencedApplicGroup);
+		return NULL;
+	}
+
+	return referencedApplicGroup;
 }
 
 /* Remove unused applicability annotations. */
@@ -3942,73 +4004,74 @@ static void show_help(void)
 	puts("Usage: " PROG_NAME " [options] [<object>...]");
 	puts("");
 	puts("Options:");
-	puts("  -A, --simplify                    Simplify and reduce applicability annotations.");
-	puts("  -a, --reduce                      Remove applicability annotations which are unambiguously valid or invalid.");
-	puts("  -C, --comment <comment>           Add an XML comment to the top of the instance.");
-	puts("  -c, --code <DMC>                  The new code of the instance.");
-	puts("  -D, --dump <CIR>                  Dump default XSLT for resolving CIR references.");
-	puts("  -d, --dir <dir>                   Directory to start searching for referenced data modules in.");
-	puts("  -E, --no-extension                Remove extension from instance.");
-	puts("  -e, --extension <ext>             Specify an extension on the instance code (DME/PME).");
-	puts("  -F, --flatten-alts                Flatten alts elements.");
-	puts("  -f, --overwrite                   Force overwriting of files.");
-	puts("  -G, --custom-orig <NCAGE/name>    Use custom NCAGE/name for originator.");
-	puts("  -g, --set-orig                    Set originator of the instance to identify this tool.");
-	puts("  -H, --list-properties <method>    List the applicability properties used in objects.");
-	puts("  -h, -?, --help                    Show this help/usage message.");
-	puts("  -I, --date <date>                 Set the issue date of the instance (- for current date).");
-	puts("  -i, --infoname <infoName>         Give the data module instance a different infoName.");
-	puts("  -J, --clean-display-text          Remove display text from simplified annotations (-A).");
-	puts("  -j, --clean-ents                  Remove unused external entities (such as ICNs)");
-	puts("  -K, --skill-levels <levels>       Filter on the specified skill levels.");
-	puts("  -k, --skill <level>               Set the skill level of the instance.");
-	puts("  -L, --list                        Treat input as a list of objects.");
-	puts("  -l, --language <lang>             Specify the language of the instance.");
-	puts("  -M, --fix-acronyms                Ensure acronyms remain valid after filtering.");
-	puts("  -m, --remarks <remarks>           Set the remarks for the instance.");
-	puts("  -N, --omit-issue                  Omit issue/inwork numbers from automatic filename.");
-	puts("  -n, --issue <iss>                 Set the issue and inwork numbers of the instance.");
-	puts("  -O, --outdir <dir>                Output instance in dir, automatically named.");
-	puts("  -o, --out <file>                  Output instance to file instead of stdout.");
-	puts("  -P, --pct <PCT>                   PCT file to read products from.");
-	puts("  -p, --product <product>           ID/primary key of a product in the PCT to filter on.");
-	puts("  -Q, --resolve-containers          Resolve references to containers.");
-	puts("  -q, --quiet                       Quiet mode.");
-	puts("  -R, --cir <CIR>                   Resolve externalized items using the given CIR.");
-	puts("  -r, --recursive                   Search for referenced data modules recursively.");
-	puts("  -S, --no-source-ident             Do not include <sourceDmIdent>/<sourcePmIdent>.");
-	puts("  -s, --assign <applic>             An assign in the form of <ident>:<type>=<value>");
-	puts("  -T, --tag                         Tag non-applicable elements instead of removing them.");
-	puts("  -t, --techname <techName>         Give the instance a different techName/pmTitle.");
-	puts("  -U, --security-classes <classes>  Filter on the specified security classes.");
-	puts("  -u, --security <sec>              Set the security classification of the instance.");
-	puts("  -V, --infoname-variant <variant>  Give the instance a different info name variant.");
-	puts("  -v, --verbose                     Verbose output.");
-	puts("  -W, --set-applic                  Overwrite whole object applicability.");
-	puts("  -w, --whole-objects               Check the status of the whole object.");
-	puts("  -X, --comment-xpath <xpath>       XPath where the -C comment will be inserted.");
-	puts("  -x, --xsl <XSL>                   Use custom XSLT to resolve CIR references.");
-	puts("  -Y, --applic <text>               Set applic for DM with text as the display text.");
-	puts("  -y, --update-applic               Set applic for DM based on the user-defined defs.");
-	puts("  -Z, --add-required                Fix certain elements automatically after filtering.");
-	puts("  -z, --issue-type <type>           Set the issue type of the instance.");
-	puts("  -1, --act <file>                  Specify custom ACT.");
-	puts("  -2, --cct <file>                  Specify custom CCT.");
-	puts("  -3, --no-repository-ident         Do not include <repositorySourceDmIdent>.");
-	puts("  -4, --flatten-alts-refs           Flatten alts elements and adjust cross-references to them.");
-	puts("  -5, --print                       Print the file name of the instance when -O is used.");
-	puts("  -6, --clean-annotations           Remove unused applicability annotations.");
-	puts("  -7, --dry-run                     Do not write anything out.");
-	puts("  -8, --reapply                     Reapply the source object's applicability.");
-	puts("  -9, --prune                       Simplify by removing only false assertions.");
-	puts("  -0, --print-non-applic            Print the file names of objects which are not applicable.");
-	puts("  -@, --update-instances            Update existing instance objects from their source.");
-	puts("  -%, --read-only                   Make instances read-only.");
-	puts("  -!, --no-infoname                 Do not include an infoName for the instance.");
-	puts("  -~, --dependencies                Add CCT dependencies to annotations.");
-	puts("  -^, --remove-deleted              Remove deleted objects/elements.");
-	puts("  --version                         Show version information.");
-	puts("  <object>...                       Source CSDB object(s)");
+	puts("  -A, --simplify                      Simplify and reduce applicability annotations.");
+	puts("  -a, --reduce                        Remove applicability annotations which are unambiguously valid or invalid.");
+	puts("  -C, --comment <comment>             Add an XML comment to the top of the instance.");
+	puts("  -c, --code <DMC>                    The new code of the instance.");
+	puts("  -D, --dump <CIR>                    Dump default XSLT for resolving CIR references.");
+	puts("  -d, --dir <dir>                     Directory to start searching for referenced data modules in.");
+	puts("  -E, --no-extension                  Remove extension from instance.");
+	puts("  -e, --extension <ext>               Specify an extension on the instance code (DME/PME).");
+	puts("  -F, --flatten-alts                  Flatten alts elements.");
+	puts("  -f, --overwrite                     Force overwriting of files.");
+	puts("  -G, --custom-orig <NCAGE/name>      Use custom NCAGE/name for originator.");
+	puts("  -g, --set-orig                      Set originator of the instance to identify this tool.");
+	puts("  -H, --list-properties <method>      List the applicability properties used in objects.");
+	puts("  -h, -?, --help                      Show this help/usage message.");
+	puts("  -I, --date <date>                   Set the issue date of the instance (- for current date).");
+	puts("  -i, --infoname <infoName>           Give the data module instance a different infoName.");
+	puts("  -J, --clean-display-text            Remove display text from simplified annotations (-A).");
+	puts("  -j, --clean-ents                    Remove unused external entities (such as ICNs)");
+	puts("  -K, --skill-levels <levels>         Filter on the specified skill levels.");
+	puts("  -k, --skill <level>                 Set the skill level of the instance.");
+	puts("  -L, --list                          Treat input as a list of objects.");
+	puts("  -l, --language <lang>               Specify the language of the instance.");
+	puts("  -M, --fix-acronyms                  Ensure acronyms remain valid after filtering.");
+	puts("  -m, --remarks <remarks>             Set the remarks for the instance.");
+	puts("  -N, --omit-issue                    Omit issue/inwork numbers from automatic filename.");
+	puts("  -n, --issue <iss>                   Set the issue and inwork numbers of the instance.");
+	puts("  -O, --outdir <dir>                  Output instance in dir, automatically named.");
+	puts("  -o, --out <file>                    Output instance to file instead of stdout.");
+	puts("  -P, --pct <PCT>                     PCT file to read products from.");
+	puts("  -p, --product <product>             ID/primary key of a product in the PCT to filter on.");
+	puts("  -Q, --resolve-containers            Resolve references to containers.");
+	puts("  -q, --quiet                         Quiet mode.");
+	puts("  -R, --cir <CIR>                     Resolve externalized items using the given CIR.");
+	puts("  -r, --recursive                     Search for referenced data modules recursively.");
+	puts("  -S, --no-source-ident               Do not include <sourceDmIdent>/<sourcePmIdent>.");
+	puts("  -s, --assign <applic>               An assign in the form of <ident>:<type>=<value>");
+	puts("  -T, --tag                           Tag non-applicable elements instead of removing them.");
+	puts("  -t, --techname <techName>           Give the instance a different techName/pmTitle.");
+	puts("  -U, --security-classes <classes>    Filter on the specified security classes.");
+	puts("  -u, --security <sec>                Set the security classification of the instance.");
+	puts("  -V, --infoname-variant <variant>    Give the instance a different info name variant.");
+	puts("  -v, --verbose                       Verbose output.");
+	puts("  -W, --set-applic                    Overwrite whole object applicability.");
+	puts("  -w, --whole-objects                 Check the status of the whole object.");
+	puts("  -X, --comment-xpath <xpath>         XPath where the -C comment will be inserted.");
+	puts("  -x, --xsl <XSL>                     Use custom XSLT to resolve CIR references.");
+	puts("  -Y, --applic <text>                 Set applic for DM with text as the display text.");
+	puts("  -y, --update-applic                 Set applic for DM based on the user-defined defs.");
+	puts("  -Z, --add-required                  Fix certain elements automatically after filtering.");
+	puts("  -z, --issue-type <type>             Set the issue type of the instance.");
+	puts("  -1, --act <file>                    Specify custom ACT.");
+	puts("  -2, --cct <file>                    Specify custom CCT.");
+	puts("  -3, --no-repository-ident           Do not include <repositorySourceDmIdent>.");
+	puts("  -4, --flatten-alts-refs             Flatten alts elements and adjust cross-references to them.");
+	puts("  -5, --print                         Print the file name of the instance when -O is used.");
+	puts("  -6, --clean-annotations             Remove unused applicability annotations.");
+	puts("  -7, --dry-run                       Do not write anything out.");
+	puts("  -8, --reapply                       Reapply the source object's applicability.");
+	puts("  -9, --prune                         Simplify by removing only false assertions.");
+	puts("  -0, --print-non-applic              Print the file names of objects which are not applicable.");
+	puts("  -@, --update-instances              Update existing instance objects from their source.");
+	puts("  -#, --remove-duplicate-annotations  Remove duplicate applicability annotations.");
+	puts("  -%, --read-only                     Make instances read-only.");
+	puts("  -!, --no-infoname                   Do not include an infoName for the instance.");
+	puts("  -~, --dependencies                  Add CCT dependencies to annotations.");
+	puts("  -^, --remove-deleted                Remove deleted objects/elements.");
+	puts("  --version                           Show version information.");
+	puts("  <object>...                         Source CSDB object(s)");
 	LIBXML2_PARSE_LONGOPT_HELP
 }
 
@@ -4097,6 +4160,7 @@ int main(int argc, char **argv)
 	bool print_non_applic = false;
 	bool delete = false;
 	bool fix_acronyms = false;
+	bool rem_dupl = false;
 
 	xmlNodePtr cirs, cir;
 	xmlDocPtr def_cir_xsl = NULL;
@@ -4104,74 +4168,75 @@ int main(int argc, char **argv)
 	xmlDocPtr props_report = NULL;
 	enum listprops listprops = STANDALONE;
 
-	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:Mm:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:34567890~H:^";
+	const char *sopts = "AaC:c:D:d:Ee:FfG:gh?I:i:JjK:k:Ll:Mm:Nn:O:o:P:p:QqR:rSs:Tt:U:u:V:vWwX:x:Y:yZz:@%!1:2:34567890~H:^#";
 	struct option lopts[] = {
-		{"version"            , no_argument      , 0, 0},
-		{"help"               , no_argument      , 0, 'h'},
-		{"reduce"             , no_argument      , 0, 'a'},
-		{"simplify"           , no_argument      , 0, 'A'},
-		{"code"               , required_argument, 0, 'c'},
-		{"comment"            , required_argument, 0, 'C'},
-		{"dump"               , required_argument, 0, 'D'},
-		{"dir"                , required_argument, 0, 'd'},
-		{"no-extension"       , no_argument      , 0, 'E'},
-		{"extension"          , required_argument, 0, 'e'},
-		{"flatten-alts"       , no_argument      , 0, 'F'},
-		{"overwrite"          , no_argument      , 0, 'f'},
-		{"set-orig"           , no_argument      , 0, 'g'},
-		{"custom-orig"        , required_argument, 0, 'G'},
-		{"infoname"           , required_argument, 0, 'i'},
-		{"date"               , required_argument, 0, 'I'},
-		{"clean-display-text" , no_argument      , 0, 'J'},
-		{"clean-ents"         , no_argument      , 0, 'j'},
-		{"skill-levels"       , required_argument, 0, 'K'},
-		{"skill"              , required_argument, 0, 'k'},
-		{"list"               , no_argument      , 0, 'L'},
-		{"language"           , required_argument, 0, 'l'},
-		{"fix-acronyms"       , no_argument      , 0, 'M'},
-		{"remarks"            , required_argument, 0, 'm'},
-		{"omit-issue"         , no_argument      , 0, 'N'},
-		{"issue"              , required_argument, 0, 'n'},
-		{"outdir"             , required_argument, 0, 'O'},
-		{"out"                , required_argument, 0, 'o'},
-		{"pct"                , required_argument, 0, 'P'},
-		{"product"            , required_argument, 0, 'p'},
-		{"quiet"              , no_argument      , 0, 'q'},
-		{"cir"                , required_argument, 0, 'R'},
-		{"recursive"          , no_argument      , 0, 'r'},
-		{"no-source-ident"    , no_argument      , 0, 'S'},
-		{"assign"             , required_argument, 0, 's'},
-		{"tag"                , no_argument      , 0, 'T'},
-		{"techname"           , required_argument, 0, 't'},
-		{"security-classes"   , required_argument, 0, 'U'},
-		{"security"           , required_argument, 0, 'u'},
-		{"print"              , no_argument      , 0, '5'},
-		{"verbose"            , no_argument      , 0, 'v'},
-		{"set-applic"         , no_argument      , 0, 'W'},
-		{"whole-objects"      , no_argument      , 0, 'w'},
-		{"comment-xpath"      , required_argument, 0, 'X'},
-		{"xsl"                , required_argument, 0, 'x'},
-		{"applic"             , required_argument, 0, 'Y'},
-		{"update-applic"      , no_argument      , 0 ,'y'},
-		{"add-required"       , no_argument      , 0, 'Z'},
-		{"issue-type"         , required_argument, 0, 'z'},
-		{"update-instances"   , no_argument      , 0, '@'},
-		{"read-only"          , no_argument      , 0, '%'},
-		{"no-infoname"        , no_argument      , 0, '!'},
-		{"act"                , required_argument, 0, '1'},
-		{"cct"                , required_argument, 0, '2'},
-		{"dependencies"       , no_argument      , 0, '~'},
-		{"resolve-containers" , no_argument      , 0, 'Q'},
-		{"no-repository-ident", no_argument      , 0, '3'},
-		{"flatten-alts-refs"  , no_argument      , 0, '4'},
-		{"list-properties"    , required_argument, 0, 'H'},
-		{"infoname-variant"   , required_argument, 0, 'V'},
-		{"clean-annotations"  , no_argument      , 0, '6'},
-		{"dry-run"            , no_argument      , 0, '7'},
-		{"reapply"            , no_argument      , 0, '8'},
-		{"prune"              , no_argument      , 0, '9'},
-		{"print-non-applic"   , no_argument      , 0, '0'},
-		{"remove-deleted"     , no_argument      , 0, '^'},
+		{"version"                     , no_argument      , 0, 0},
+		{"help"                        , no_argument      , 0, 'h'},
+		{"reduce"                      , no_argument      , 0, 'a'},
+		{"simplify"                    , no_argument      , 0, 'A'},
+		{"code"                        , required_argument, 0, 'c'},
+		{"comment"                     , required_argument, 0, 'C'},
+		{"dump"                        , required_argument, 0, 'D'},
+		{"dir"                         , required_argument, 0, 'd'},
+		{"no-extension"                , no_argument      , 0, 'E'},
+		{"extension"                   , required_argument, 0, 'e'},
+		{"flatten-alts"                , no_argument      , 0, 'F'},
+		{"overwrite"                   , no_argument      , 0, 'f'},
+		{"set-orig"                    , no_argument      , 0, 'g'},
+		{"custom-orig"                 , required_argument, 0, 'G'},
+		{"infoname"                    , required_argument, 0, 'i'},
+		{"date"                        , required_argument, 0, 'I'},
+		{"clean-display-text"          , no_argument      , 0, 'J'},
+		{"clean-ents"                  , no_argument      , 0, 'j'},
+		{"skill-levels"                , required_argument, 0, 'K'},
+		{"skill"                       , required_argument, 0, 'k'},
+		{"list"                        , no_argument      , 0, 'L'},
+		{"language"                    , required_argument, 0, 'l'},
+		{"fix-acronyms"                , no_argument      , 0, 'M'},
+		{"remarks"                     , required_argument, 0, 'm'},
+		{"omit-issue"                  , no_argument      , 0, 'N'},
+		{"issue"                       , required_argument, 0, 'n'},
+		{"outdir"                      , required_argument, 0, 'O'},
+		{"out"                         , required_argument, 0, 'o'},
+		{"pct"                         , required_argument, 0, 'P'},
+		{"product"                     , required_argument, 0, 'p'},
+		{"quiet"                       , no_argument      , 0, 'q'},
+		{"cir"                         , required_argument, 0, 'R'},
+		{"recursive"                   , no_argument      , 0, 'r'},
+		{"no-source-ident"             , no_argument      , 0, 'S'},
+		{"assign"                      , required_argument, 0, 's'},
+		{"tag"                         , no_argument      , 0, 'T'},
+		{"techname"                    , required_argument, 0, 't'},
+		{"security-classes"            , required_argument, 0, 'U'},
+		{"security"                    , required_argument, 0, 'u'},
+		{"print"                       , no_argument      , 0, '5'},
+		{"verbose"                     , no_argument      , 0, 'v'},
+		{"set-applic"                  , no_argument      , 0, 'W'},
+		{"whole-objects"               , no_argument      , 0, 'w'},
+		{"comment-xpath"               , required_argument, 0, 'X'},
+		{"xsl"                         , required_argument, 0, 'x'},
+		{"applic"                      , required_argument, 0, 'Y'},
+		{"update-applic"               , no_argument      , 0 ,'y'},
+		{"add-required"                , no_argument      , 0, 'Z'},
+		{"issue-type"                  , required_argument, 0, 'z'},
+		{"update-instances"            , no_argument      , 0, '@'},
+		{"read-only"                   , no_argument      , 0, '%'},
+		{"no-infoname"                 , no_argument      , 0, '!'},
+		{"act"                         , required_argument, 0, '1'},
+		{"cct"                         , required_argument, 0, '2'},
+		{"dependencies"                , no_argument      , 0, '~'},
+		{"resolve-containers"          , no_argument      , 0, 'Q'},
+		{"no-repository-ident"         , no_argument      , 0, '3'},
+		{"flatten-alts-refs"           , no_argument      , 0, '4'},
+		{"list-properties"             , required_argument, 0, 'H'},
+		{"infoname-variant"            , required_argument, 0, 'V'},
+		{"clean-annotations"           , no_argument      , 0, '6'},
+		{"dry-run"                     , no_argument      , 0, '7'},
+		{"reapply"                     , no_argument      , 0, '8'},
+		{"prune"                       , no_argument      , 0, '9'},
+		{"print-non-applic"            , no_argument      , 0, '0'},
+		{"remove-deleted"              , no_argument      , 0, '^'},
+		{"remove-duplicate-annotations", no_argument      , 0, '#'},
 		LIBXML2_PARSE_LONGOPT_DEFS
 		{0, 0, 0, 0}
 	};
@@ -4419,6 +4484,9 @@ int main(int argc, char **argv)
 				break;
 			case '^':
 				delete = true;
+				break;
+			case '#':
+				rem_dupl = true;
 				break;
 			case 'h':
 			case '?':
@@ -4814,6 +4882,10 @@ int main(int argc, char **argv)
 								referencedApplicGroup = rem_supersets(applicability, referencedApplicGroup, root, !simpl);
 							}
 						}
+					}
+
+					if (rem_dupl && referencedApplicGroup) {
+						referencedApplicGroup = rem_dupl_annotations(doc, referencedApplicGroup);
 					}
 
 					if (rem_unused && referencedApplicGroup) {
