@@ -16,7 +16,6 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
-#include <libxml/c14n.h>
 #include <libxml/hash.h>
 #include <libxml/xmlsave.h>
 #include <libxslt/transform.h>
@@ -26,7 +25,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.9.0"
+#define VERSION "6.9.1"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -1648,35 +1647,6 @@ static xmlNodePtr add_duplicate_error(xmlNodePtr report, xmlNodePtr node1, xmlNo
 	xmlFree(xpath);
 
 	return error;
-}
-
-static bool same_annotation(xmlNodePtr app1, xmlNodePtr app2)
-{
-	xmlDocPtr d1, d2;
-	xmlChar *s1, *s2;
-	bool same;
-
-	/* Compare c14n representation of XML to
-	 * determine if the annotations are duplicates.
-	 */
-	d1 = xmlNewDoc(BAD_CAST "1.0");
-	d2 = xmlNewDoc(BAD_CAST "1.0");
-
-	xmlDocSetRootElement(d1, xmlCopyNode(app1, 1));
-	xmlDocSetRootElement(d2, xmlCopyNode(app2, 1));
-
-	xmlC14NDocDumpMemory(d1, NULL, XML_C14N_1_0, NULL, 0, &s1);
-	xmlC14NDocDumpMemory(d2, NULL, XML_C14N_1_0, NULL, 0, &s2);
-
-	same = xmlStrcmp(s1, s2) == 0;
-
-	xmlFree(s1);
-	xmlFree(s2);
-
-	xmlFreeDoc(d1);
-	xmlFreeDoc(d2);
-
-	return same;
 }
 
 /* Check for duplicate annotations. */
