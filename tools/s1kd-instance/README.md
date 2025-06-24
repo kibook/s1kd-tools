@@ -450,7 +450,7 @@ The applications for this tool include:
   - \-\#, --remove-duplicate-annotations  
     Remove duplicate applicability annotations, replacing references to
     the duplicates with references to the first occurrence of the same
-    annotation.
+    annotation, and removing redundant references.
     
     Two annotations are considered duplicates if they have the exact
     same logic.

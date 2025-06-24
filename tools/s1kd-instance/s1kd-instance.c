@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "13.1.0"
+#define VERSION "13.2.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -734,6 +734,18 @@ static xmlNodePtr rem_dupl_annotations(xmlDocPtr doc, xmlNodePtr referencedAppli
 		xmlFreeNode(referencedApplicGroup);
 		return NULL;
 	}
+
+	/* Remove redundant uses of applicability annotations. */
+	ctx = xmlXPathNewContext(doc);
+	obj = xmlXPathEval(BAD_CAST "//*[@applicRefId = ancestor::*/@applicRefId]", ctx);
+	if (!xmlXPathNodeSetIsEmpty(obj->nodesetval)) {
+		int i;
+		for (i = 0; i < obj->nodesetval->nodeNr; ++i) {
+			xmlUnsetProp(obj->nodesetval->nodeTab[i], BAD_CAST "applicRefId");
+		}
+	}
+	xmlXPathFreeObject(obj);
+	xmlXPathFreeContext(ctx);
 
 	return referencedApplicGroup;
 }

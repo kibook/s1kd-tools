@@ -6,7 +6,7 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="03" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="053" inWork="05"/>
+        <issueInfo issueNumber="053" inWork="06"/>
       </dmIdent>
       <dmAddressItems>
         <issueDate year="2025" month="06" day="24"/>
@@ -624,7 +624,7 @@
             <definitionListItem changeMark="1" changeType="add" reasonForUpdateRefIds="rfu-0004">
               <listItemTerm>-#, --remove-duplicate-annotations</listItemTerm>
               <listItemDefinition>
-                <para>Remove duplicate applicability annotations, replacing references to the duplicates with references to the first occurrence of the same annotation.</para>
+                <para>Remove duplicate applicability annotations, replacing references to the duplicates with references to the first occurrence of the same annotation, and removing redundant references.</para>
                 <para>Two annotations are considered duplicates if they have the exact same logic.</para>
                 <para>This option is particularly useful when combined with the -A (--simplify) option, since annotations that were different may become the same after simplification.</para>
               </listItemDefinition>
