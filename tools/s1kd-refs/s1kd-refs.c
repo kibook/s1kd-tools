@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "5.2.0"
+#define VERSION "5.2.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -175,6 +175,84 @@ static bool remDelete = false;
 
 /* Separator for fragments. */
 #define FRAGMENT_SEP "#"
+
+#if LIBXML_VERSION >= 21400
+/* FIXME:
+ * These functions were removed from libxml 2.14.
+ *
+ * There's probably a better way to print the XML of the references, but for
+ * now these are still useful.
+ */
+
+/**
+ * xmlShellReadlineFunc:
+ * @prompt:  a string prompt
+ *
+ * This is a generic signature for the XML shell input function.
+ *
+ * Returns a string which will be freed by the Shell.
+ */
+
+typedef char * (* xmlShellReadlineFunc)(char *prompt);
+/**
+ * xmlShellCtxt:
+ *
+ * A debugging shell context.
+ * TODO: add the defined function tables.
+ */
+typedef struct _xmlShellCtxt xmlShellCtxt;
+typedef xmlShellCtxt *xmlShellCtxtPtr;
+struct _xmlShellCtxt {
+    char *filename;
+    xmlDocPtr doc;
+    xmlNodePtr node;
+    xmlXPathContextPtr pctxt;
+    int loaded;
+    FILE *output;
+    xmlShellReadlineFunc input;
+};
+
+/**
+ * xmlShellPrintNodeCtxt:
+ * @ctxt : a non-null shell context
+ * @node : a non-null node to print to the output FILE
+ *
+ * Print node to the output FILE
+ */
+static void
+xmlShellPrintNodeCtxt(xmlShellCtxtPtr ctxt,xmlNodePtr node)
+{
+    FILE *fp;
+
+    if (!node)
+        return;
+    if (ctxt == NULL)
+	fp = stdout;
+    else
+	fp = ctxt->output;
+
+    if (node->type == XML_DOCUMENT_NODE)
+        xmlDocDump(fp, (xmlDocPtr) node);
+    else if (node->type == XML_ATTRIBUTE_NODE)
+        xmlDebugDumpAttrList(fp, (xmlAttrPtr) node, 0);
+    else
+        xmlElemDump(fp, node->doc, node);
+
+    fprintf(fp, "\n");
+}
+
+/**
+ * xmlShellPrintNode:
+ * @node : a non-null node to print to the output FILE
+ *
+ * Print node to the output FILE
+ */
+void
+xmlShellPrintNode(xmlNodePtr node)
+{
+    xmlShellPrintNodeCtxt(NULL, node);
+}
+#endif
 
 /* Return the first node matching an XPath expression. */
 static xmlNodePtr firstXPathNode(xmlDocPtr doc, xmlNodePtr root, const xmlChar *path)
