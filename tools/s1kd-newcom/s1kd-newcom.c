@@ -16,7 +16,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newcom"
-#define VERSION "3.0.1"
+#define VERSION "3.0.2"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -515,7 +515,7 @@ int main(int argc, char **argv)
 	xmlNodePtr commentPriority;
 	xmlNodePtr commentResponse;
 
-	char language_fname[4];
+	char language_fname[5];
 
 	char code[256] = "";
 	char defaults_fname[PATH_MAX];
