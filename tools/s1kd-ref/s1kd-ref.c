@@ -14,7 +14,7 @@
 #include "elems.h"
 
 #define PROG_NAME "s1kd-ref"
-#define VERSION "3.8.0"
+#define VERSION "3.8.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define WRN_PREFIX PROG_NAME ": WARNING: "
@@ -149,11 +149,11 @@ static void dump_node(xmlNodePtr node, const char *dst)
 	buf = xmlBufferCreate();
 	xmlNodeDump(buf, NULL, node, 0, 0);
 	if (strcmp(dst, "-") == 0) {
-		puts((char *) buf->content);
+		puts((char *) xmlBufferContent(buf));
 	} else {
 		FILE *f;
 		f = fopen(dst, "w");
-		fputs((char *) buf->content, f);
+		fputs((char *) xmlBufferContent(buf), f);
 		fclose(f);
 	}
 	xmlBufferFree(buf);
