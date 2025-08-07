@@ -15,7 +15,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newupf"
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -367,7 +367,7 @@ static bool sameNodes(xmlNodePtr a, xmlNodePtr b)
 	xmlNodeDump(bufA, a->doc, a, 0, 0);
 	xmlNodeDump(bufB, b->doc, b, 0, 0);
 
-	equal = xmlStrcmp(bufA->content, bufB->content) == 0;
+	equal = xmlStrcmp(xmlBufferContent(bufA), xmlBufferContent(bufB)) == 0;
 
 	xmlBufferFree(bufA);
 	xmlBufferFree(bufB);
