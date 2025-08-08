@@ -29,7 +29,9 @@ endif
 LDFLAGS = `pkg-config --libs libxml-2.0`
 
 ifneq ($(MSYSTEM),)
+ifneq ($(MSYSTEM),MSYS)
   LDFLAGS += `pkg-config --libs regex`
+endif
 endif
 
 prefix = /usr/local
