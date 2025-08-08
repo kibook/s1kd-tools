@@ -15,7 +15,9 @@ warning_flags = -Wall -Werror -pedantic-errors
 CFLAGS=$(warning_flags) -I $(common_dir) `pkg-config --cflags libxml-2.0`
 
 ifneq ($(MSYSTEM),)
+ifneq ($(MSYSTEM),MSYS)
   CFLAGS += -isystem $(common_dir)/msys
+endif
 endif
 
 ifeq ($(debug),1)
