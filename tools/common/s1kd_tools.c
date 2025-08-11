@@ -438,31 +438,21 @@ bool is_in_set(const char *value, const char *set)
 /* Add a NOTATION to the DTD. */
 void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, const xmlChar *sysId)
 {
-	xmlValidCtxtPtr valid;
-
 	if (!doc->intSubset) {
 		xmlCreateIntSubset(doc, xmlDocGetRootElement(doc)->name, NULL, NULL);
 	}
 
 	if (!xmlHashLookup(doc->intSubset->notations, BAD_CAST name)) {
-		valid = xmlNewValidCtxt();
 /* FIXME:
  *
- * Needed for libxml >= 2.14.0
+ * Needed for libxml >= 2.14.0 and < (TBD)
  *
- * xmlAddNotationDecl was marked as deprecated/internal use only, but I can't
- * find any other function to add a NOTATION to the DTD.
- *
- * See: https://discourse.gnome.org/t/how-to-add-a-notation-to-a-dtd/30557
- *
- * If a more appropriate function is found/added later, this should be used
- * instead.
+ * See: https://gitlab.gnome.org/GNOME/libxml2/-/commit/c4b278ec
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		xmlAddNotationDecl(valid, doc->intSubset, name, pubId, sysId);
+		xmlAddNotationDecl(NULL, doc->intSubset, name, pubId, sysId);
 #pragma GCC diagnostic pop
-		xmlFreeValidCtxt(valid);
 	}
 }
 
