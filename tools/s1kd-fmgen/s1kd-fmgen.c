@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.6.0"
+#define VERSION "3.6.1"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -26,6 +26,8 @@
 #define EXIT_BAD_TYPE 3
 #define EXIT_MERGE 4
 #define EXIT_BAD_STYLESHEET 5
+#define EXIT_GENERATE_ERR 6
+#define EXIT_BAD_PM 7
 
 #define S_NO_PM_ERR ERR_PREFIX "No publication module.\n"
 #define S_NO_TYPE_ERR ERR_PREFIX "No FM type specified.\n"
@@ -34,7 +36,9 @@
 #define E_BAD_DATE ERR_PREFIX "Bad date: %s\n"
 #define E_MERGE_NAME ERR_PREFIX "Failed to update %s: no <%s> element to merge on.\n"
 #define E_MERGE_ELEM ERR_PREFIX "Failed to update %s: no front matter contents generated.\n"
-#define E_BAD_STYLESHEET ERR_PREFIX "Failed to update %s: %s is not a valid stylesheet.\n"
+#define E_GENERATE_ERR ERR_PREFIX "Failed to update %s: Transformation using %s failed.\n"
+#define E_BAD_STYLESHEET ERR_PREFIX "Failed to parse stylesheet %s\n"
+#define E_BAD_PM ERR_PREFIX "Error reading PM %s\n"
 #define I_GENERATE INF_PREFIX "Generating FM content for %s (%s)...\n"
 #define I_NO_INFOCODE INF_PREFIX "Skipping %s as no FM type is associated with info code: %s%s\n"
 #define I_TRANSFORM INF_PREFIX "Applying transformation %s...\n"
@@ -209,7 +213,10 @@ static xmlDocPtr transform_doc(xmlDocPtr doc, const char *xslpath, const char **
 		fprintf(stderr, I_TRANSFORM, xslpath);
 	}
 
-	styledoc = read_xml_doc(xslpath);
+	if (!(styledoc = read_xml_doc(xslpath))) {
+		fprintf(stderr, E_BAD_STYLESHEET, xslpath);
+		exit(EXIT_BAD_STYLESHEET);
+	}
 
 	ctx = xmlXPathNewContext(styledoc);
 	xmlXPathRegisterNs(ctx, BAD_CAST "p", BAD_CAST "http://www.w3.org/ns/xproc");
@@ -597,9 +604,9 @@ static void generate_fm_content_for_dm(
 
 		if (!(res = generate_fm_content_for_type(pm, type, fmxsl, xslpath, params, ignore_del))) {
 			if (verbosity >= NORMAL) {
-				fprintf(stderr, E_BAD_STYLESHEET, dmpath, xslpath ? xslpath : fmxsl);
+				fprintf(stderr, E_GENERATE_ERR, dmpath, xslpath ? xslpath : fmxsl);
 			}
-			exit(EXIT_BAD_STYLESHEET);
+			exit(EXIT_GENERATE_ERR);
 		}
 
 		if (strcmp(type, "TP") == 0) {
@@ -960,7 +967,10 @@ int main(int argc, char **argv)
 		pmpath = strdup("-");
 	}
 
-	pm = read_xml_doc(pmpath);
+	if (!(pm = read_xml_doc(pmpath))) {
+		fprintf(stderr, E_BAD_PM, pmpath);
+		exit(EXIT_BAD_PM);
+	}
 
 	if (optind < argc) {
 		void (*gen_fn)(xmlDocPtr, const char *, xmlDocPtr, const char *,

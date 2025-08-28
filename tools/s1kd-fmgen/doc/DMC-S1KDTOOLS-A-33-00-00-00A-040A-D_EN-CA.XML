@@ -403,6 +403,18 @@ version="1.0">
                 <para>The stylesheet specified for a type of front matter was invalid.</para>
               </listItemDefinition>
             </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>6</listItemTerm>
+              <listItemDefinition>
+                <para>The transformation of a front matter data module failed.</para>
+              </listItemDefinition>
+            </definitionListItem>
+            <definitionListItem>
+              <listItemTerm>7</listItemTerm>
+              <listItemDefinition>
+                <para>The publication module could not be read.</para>
+              </listItemDefinition>
+            </definitionListItem>
           </definitionList>
         </para>
       </levelledPara>

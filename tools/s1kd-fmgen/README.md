@@ -285,6 +285,12 @@ Example:
   - 5  
     The stylesheet specified for a type of front matter was invalid.
 
+  - 6  
+    The transformation of a front matter data module failed.
+
+  - 7  
+    The publication module could not be read.
+
 # EXAMPLE
 
 Generate the content for a title page front matter data module and
