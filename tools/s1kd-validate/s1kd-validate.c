@@ -9,7 +9,7 @@
 #include "stats.h"
 
 #define PROG_NAME "s1kd-validate"
-#define VERSION "4.3.2"
+#define VERSION "4.3.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCCESS_PREFIX PROG_NAME ": SUCCESS: "
@@ -57,7 +57,7 @@
 
 /* XPath to match all IDREFS attributes to check their validity. */
 #define INVALID_IDS_XPATH BAD_CAST \
-	"//@reasonForUpdateRefIds|//@warningRefs|//@cautionRefs|//@controlAuthorityRefs"
+	"//@applicRefIds|//@cautionRefs|//@controlAuthorityRefs|//@reasonForUpdateRefIds|//@warningRefs"
 
 /* URI for XML schema instance namespace. */
 #define XSI_URI BAD_CAST "http://www.w3.org/2001/XMLSchema-instance"
