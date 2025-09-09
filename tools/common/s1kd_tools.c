@@ -445,7 +445,7 @@ void add_notation(xmlDocPtr doc, const xmlChar *name, const xmlChar *pubId, cons
 	if (!xmlHashLookup(doc->intSubset->notations, BAD_CAST name)) {
 /* FIXME:
  *
- * Needed for libxml >= 2.14.0 and < (TBD)
+ * Needed for libxml >= 2.14.0 and < 2.14.6
  *
  * See: https://gitlab.gnome.org/GNOME/libxml2/-/commit/c4b278ec
  */
