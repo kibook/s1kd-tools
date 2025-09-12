@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <fmtypes>
-  <fm infoCode="001" type="TP"/>
+  <fm infoCode="001" type="TITLE"/>
   <fm infoCode="005" type="LOA"/>
   <fm infoCode="006" type="LOT"/>
   <fm infoCode="007" type="LOS"/>

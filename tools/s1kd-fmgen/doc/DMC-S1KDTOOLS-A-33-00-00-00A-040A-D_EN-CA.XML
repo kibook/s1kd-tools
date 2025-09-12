@@ -6,16 +6,16 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="33" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="025" inWork="00"/>
+        <issueInfo issueNumber="025" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2025" month="09" day="12"/>
         <dmTitle>
           <techName>s1kd-fmgen(1) | s1kd-tools</techName>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
-    <dmStatus issueType="status">
+    <dmStatus issueType="changed">
       <security securityClassification="01"/>
       <responsiblePartnerCompany>
         <enterpriseName>khzae.net</enterpriseName>
@@ -38,8 +38,8 @@
       <qualityAssurance>
         <unverified/>
       </qualityAssurance>
-      <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
+      <reasonForUpdate id="rfu-0001" updateHighlight="1">
+        <simplePara>Change "TP" FM type to "TITLE"</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -173,7 +173,7 @@
                       <para>TOC - Table of contents</para>
                     </listItem>
                     <listItem>
-                      <para>TP - Title page</para>
+                      <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">TITLE - Title page</para>
                     </listItem>
                   </randomList>
                 </para>
@@ -284,14 +284,14 @@
                 <para>TOC</para>
               </listItem>
               <listItem>
-                <para>TP</para>
+                <para changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">TITLE</para>
               </listItem>
             </randomList>
           </para>
           <para>By default, the program will search for a file named <verbatimText verbatimStyle="vs02">.fmtypes</verbatimText> in the current directory and parent directories, but any file can be specified using the -F option.</para>
           <para>Example of simple text format:</para>
           <para>
-            <verbatimText verbatimStyle="vs24">001    TP
+            <verbatimText verbatimStyle="vs24" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001">001    TITLE
 005    LOA
 006    LOT
 007    LOS
@@ -304,8 +304,8 @@
           </para>
           <para>Example of XML format:</para>
           <para>
-            <verbatimText verbatimStyle="vs11"><![CDATA[<fmtypes>
-<fm infoCode="001" type="TP"/>
+            <verbatimText verbatimStyle="vs11" changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0001"><![CDATA[<fmtypes>
+<fm infoCode="001" type="TITLE"/>
 <fm infoCode="005" type="LOA"/>
 <fm infoCode="006" type="LOT"/>
 <fm infoCode="007" type="LOS"/>

@@ -91,7 +91,7 @@ type.
     
       - TOC - Table of contents
     
-      - TP - Title page
+      - TITLE - Title page
 
   - \-v, --verbose  
     Verbose output. Specify multiple times to increase the verbosity.
@@ -169,7 +169,7 @@ matter. The following types will ignore deleted content by default:
 
   - TOC
 
-  - TP
+  - TITLE
 
 By default, the program will search for a file named `.fmtypes` in the
 current directory and parent directories, but any file can be specified
@@ -177,7 +177,7 @@ using the -F option.
 
 Example of simple text format:
 
-    001    TP
+    001    TITLE
     005    LOA
     006    LOT
     007    LOS
@@ -191,7 +191,7 @@ Example of simple text format:
 Example of XML format:
 
     <fmtypes>
-    <fm infoCode="001" type="TP"/>
+    <fm infoCode="001" type="TITLE"/>
     <fm infoCode="005" type="LOA"/>
     <fm infoCode="006" type="LOT"/>
     <fm infoCode="007" type="LOS"/>

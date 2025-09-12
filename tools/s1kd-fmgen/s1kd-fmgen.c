@@ -16,7 +16,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-fmgen"
-#define VERSION "3.6.1"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define INF_PREFIX PROG_NAME ": INFO: "
@@ -264,7 +264,7 @@ static xmlDocPtr transform_doc_builtin(xmlDocPtr doc, unsigned char *xsl, unsign
 
 static void get_builtin_xsl(const char *type, unsigned char **xsl, unsigned int *len)
 {
-	if (strcmp(type, "TP") == 0) {
+	if (strcmp(type, "TITLE") == 0) {
 		*xsl = xsl_tp_xsl;
 		*len = xsl_tp_xsl_len;
 	} else if (strcmp(type, "TOC") == 0) {
@@ -334,7 +334,7 @@ static bool default_ignore_del(const char *type)
 		strcmp(type, "LOT")   == 0 ||
 		strcmp(type, "LOTBL") == 0 ||
 		strcmp(type, "TOC")   == 0 ||
-		strcmp(type, "TP")    == 0;
+		strcmp(type, "TITLE")    == 0;
 }
 
 /* Remove "deleted" DMs from the flattend PM format. */
@@ -420,7 +420,7 @@ static xmlNodePtr find_fm(xmlDocPtr fmtypes, const xmlChar *incode, const xmlCha
 	return node;
 }
 
-/* Copy elements from the source TP DM that can't be derived from the PM. */
+/* Copy elements from the source TITLE DM that can't be derived from the PM. */
 static void copy_tp_elems(xmlDocPtr res, xmlDocPtr doc)
 {
 	xmlNodePtr fmtp, node;
@@ -609,7 +609,7 @@ static void generate_fm_content_for_dm(
 			exit(EXIT_GENERATE_ERR);
 		}
 
-		if (strcmp(type, "TP") == 0) {
+		if (strcmp(type, "TITLE") == 0) {
 			copy_tp_elems(res, doc);
 		}
 
