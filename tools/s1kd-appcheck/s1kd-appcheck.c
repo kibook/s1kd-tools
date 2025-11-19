@@ -25,7 +25,7 @@
 
 /* Program name and version information. */
 #define PROG_NAME "s1kd-appcheck"
-#define VERSION "6.9.1"
+#define VERSION "6.9.2"
 
 /* Message prefixes. */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2308,22 +2308,6 @@ static int check_applic_file(const char *path, struct appcheckopts *opts, xmlNod
 		report_node = add_object_node(report, "object", path);
 	}
 
-	/* Add the type of check to the report. */
-	switch (opts->mode) {
-		case CUSTOM:
-			xmlSetProp(report, BAD_CAST "type", BAD_CAST "custom");
-			break;
-		case PCT:
-			xmlSetProp(report, BAD_CAST "type", BAD_CAST "pct");
-			break;
-		case ALL:
-			xmlSetProp(report, BAD_CAST "type", BAD_CAST "all");
-			break;
-		case STANDALONE:
-			xmlSetProp(report, BAD_CAST "type", BAD_CAST "standalone");
-			break;
-	}
-
 	if (opts->mode == CUSTOM) {
 		err += custom_check(doc, path, opts, report_node);
 	} else if (opts->mode == STANDALONE) {
@@ -2712,6 +2696,22 @@ int main(int argc, char **argv)
 				show_help();
 				goto cleanup;
 		}
+	}
+
+	/* Add the type of check to the report. */
+	switch (opts.mode) {
+		case CUSTOM:
+			xmlSetProp(appcheck, BAD_CAST "type", BAD_CAST "custom");
+			break;
+		case PCT:
+			xmlSetProp(appcheck, BAD_CAST "type", BAD_CAST "pct");
+			break;
+		case ALL:
+			xmlSetProp(appcheck, BAD_CAST "type", BAD_CAST "all");
+			break;
+		case STANDALONE:
+			xmlSetProp(appcheck, BAD_CAST "type", BAD_CAST "standalone");
+			break;
 	}
 
 	/* Record options in the XML report. */
