@@ -20,7 +20,7 @@ ifneq ($(MSYSTEM),MSYS)
 endif
 endif
 
-ifeq ($(DEBUG),1)
+ifeq ($(debug),1)
   CFLAGS += -g
 else
   CFLAGS += -O3
