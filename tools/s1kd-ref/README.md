@@ -72,7 +72,7 @@ information in the reference.
   - \-T, --transform \<opts\>  
     Transform textual references into the appropriate XML within text
     nodes in the XML document(s) specified. The textual references must
-    include the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p
+    include the standard prefixes (e.g., "DMC-", "PMC-'), unless the -g
     option is specified. \<opts\> is a sequence of characters from
     "CDEGLPSY", for comment, data module, external publication, ICN,
     DML, publication module, SCORM content package and CSN references

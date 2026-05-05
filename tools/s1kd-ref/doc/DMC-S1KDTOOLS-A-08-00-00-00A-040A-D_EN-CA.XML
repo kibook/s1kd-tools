@@ -6,10 +6,10 @@
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="08" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="028" inWork="00"/>
+        <issueInfo issueNumber="028" inWork="01"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2021" month="04" day="16"/>
+        <issueDate year="2026" month="05" day="05"/>
         <dmTitle>
           <techName>s1kd-ref(1) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate>
-        <simplePara>Upissued</simplePara>
+        <simplePara>Correct usage of -g option.</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -157,7 +157,7 @@
             <definitionListItem>
               <listItemTerm>-T, --transform &lt;opts&gt;</listItemTerm>
               <listItemDefinition>
-                <para>Transform textual references into the appropriate XML within text nodes in the XML document(s) specified. The textual references must include the standard prefixes (e.g., "DMC-", "PMC-'), unless the -p option is specified. &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for comment, data module, external publication, ICN, DML, publication module, SCORM content package and CSN references respectively. If "all" is given, then all types of references will be transformed.</para>
+                <para>Transform textual references into the appropriate XML within text nodes in the XML document(s) specified. The textual references must include the standard prefixes (e.g., "DMC-", "PMC-'), unless the -g option is specified. &lt;opts&gt; is a sequence of characters from "CDEGLPSY", for comment, data module, external publication, ICN, DML, publication module, SCORM content package and CSN references respectively. If "all" is given, then all types of references will be transformed.</para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
