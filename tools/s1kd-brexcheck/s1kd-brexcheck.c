@@ -38,7 +38,7 @@
 #define PROGRESS_ZENITY 2
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "5.2.1"
+#define VERSION "5.2.2"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -671,9 +671,14 @@ static void print_node(xmlNodePtr node)
 			}
 		} else {
 			if (shortmsg) {
-				char *line = (char *) xmlGetProp(xpath_first_node(NULL, node, BAD_CAST "object"), BAD_CAST "line");
-				fprintf(stderr, "BREX ERROR: %s (%s): ", dpath, line);
-				xmlFree(line);
+				xmlNodePtr o = xpath_first_node(NULL, node, BAD_CAST "object");
+				if (xmlHasProp(o, BAD_CAST "line")) {
+					xmlChar *line = xmlGetProp(o, BAD_CAST "line");
+					fprintf(stderr, "BREX ERROR: %s (%s): ", dpath, (char *) line);
+					xmlFree(line);
+				} else {
+					fprintf(stderr, "BREX ERROR: %s: ", dpath);
+				}
 			} else {
 				fprintf(stderr, "BREX ERROR: %s\n", dpath);
 				fprintf(stderr, "  BREX: %s\n", bpath);
