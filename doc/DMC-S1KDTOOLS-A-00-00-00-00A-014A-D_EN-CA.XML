@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_6/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_7/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="014" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="016" inWork="01"/>
+        <issueInfo issueNumber="016" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="09" day="03"/>
+        <issueDate year="2026" month="09" day="01"/>
         <dmTitle>
           <techName>s1kd-defaults(5) | s1kd-tools</techName>
         </dmTitle>
@@ -39,7 +39,7 @@
         <unverified/>
       </qualityAssurance>
       <reasonForUpdate>
-        <simplePara>Update for Issue 6</simplePara>
+        <simplePara>Update for Issue 6 and 7</simplePara>
       </reasonForUpdate>
     </dmStatus>
   </identAndStatusSection>
@@ -264,7 +264,7 @@
                   </para>
                 </entry>
                 <entry>
-                  <para>S1000D issue number (6, 5.0, 4.2, 4.1, ...)</para>
+                  <para>S1000D issue number (7, 6, 5.0, 4.2, 4.1, ...)</para>
                 </entry>
               </row>
               <row>
@@ -655,7 +655,7 @@
 <default ident="inWork" value="01"/>
 <default ident="issueNumber" value="000"/>
 <default ident="issueType" value="new"/>
-<default ident="issue" value="6"/>
+<default ident="issue" value="7"/>
 <default ident="itemLocationCode" value="D"/>
 <default ident="languageIsoCode" value="en"/>
 <default ident="learnCode" value="H10"/>
@@ -713,7 +713,7 @@ infoNameVariant                Clean with water
 inWork                         01
 issueNumber                    000
 issueType                      new
-issue                          6
+issue                          7
 itemLocationCode               D
 languageIsoCode                en
 learnCode                      H10

@@ -32,8 +32,8 @@ means a data module is not tied to a particular publication, but can be
 reused among several publications wherever it is needed, avoiding
 duplication of data.
 
-![Traditional publications
-vs. CSDB](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG)
+![Traditional publications vs.
+CSDB](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00003-A-001-01.PNG)
 
 The S1000D specification does not give specific requirements for the
 implementation of a CSDB, and so CSDBs can be implemented in any number

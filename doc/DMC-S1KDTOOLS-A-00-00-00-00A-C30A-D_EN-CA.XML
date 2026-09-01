@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dmodule>
-<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_6/xml_schema_flat/descript.xsd">
+<dmodule xmlns:dc="http://www.purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_7/xml_schema_flat/descript.xsd">
   <identAndStatusSection>
     <dmAddress>
       <dmIdent>
         <dmCode modelIdentCode="S1KDTOOLS" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="C30" infoCodeVariant="A" itemLocationCode="D"/>
         <language languageIsoCode="en" countryIsoCode="CA"/>
-        <issueInfo issueNumber="022" inWork="01"/>
+        <issueInfo issueNumber="022" inWork="02"/>
       </dmIdent>
       <dmAddressItems>
-        <issueDate year="2024" month="09" day="03"/>
+        <issueDate year="2026" month="09" day="01"/>
         <dmTitle>
           <techName>s1kd-tools</techName>
           <infoName>Issue compatibility</infoName>
@@ -96,10 +96,14 @@
           <colspec colname="c8" colwidth="1*"/>
           <colspec colname="c9" colwidth="1*"/>
           <colspec colname="c10" colwidth="1*"/>
+          <colspec colname="c11" colwidth="1*"/>
           <thead>
             <row rowsep="1">
               <entry>
                 <para>Tool</para>
+              </entry>
+              <entry>
+                <para>7</para>
               </entry>
               <entry>
                 <para>6</para>
@@ -168,10 +172,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-addicn</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -227,6 +237,9 @@
                 <para>X</para>
               </entry>
               <entry>
+                <para>X</para>
+              </entry>
+              <entry>
                 <para>~</para>
               </entry>
               <entry>
@@ -262,6 +275,9 @@
                 <para>X</para>
               </entry>
               <entry>
+                <para>X</para>
+              </entry>
+              <entry>
                 <para>~</para>
               </entry>
               <entry>
@@ -277,6 +293,9 @@
             <row>
               <entry>
                 <para>s1kd-brexcheck</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -343,10 +362,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-dmrl</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -413,10 +438,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-fmgen</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -483,6 +514,9 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
@@ -518,10 +552,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-instance</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -588,10 +628,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-metadata</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -658,10 +704,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-neutralize</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -728,10 +780,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-newddn</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -798,6 +856,9 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
@@ -833,10 +894,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-newimf</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -903,10 +970,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-newsmc</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -942,6 +1015,9 @@
             <row>
               <entry>
                 <para>s1kd-newupf</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -1008,10 +1084,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-refs</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -1070,6 +1152,9 @@
                 <para>X</para>
               </entry>
               <entry>
+                <para>X</para>
+              </entry>
+              <entry>
                 <para>~</para>
               </entry>
               <entry>
@@ -1082,6 +1167,9 @@
             <row>
               <entry>
                 <para>s1kd-sns</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -1148,10 +1236,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-uom</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>
@@ -1218,10 +1312,16 @@
               <entry>
                 <para>X</para>
               </entry>
+              <entry>
+                <para>X</para>
+              </entry>
             </row>
             <row>
               <entry>
                 <para>s1kd-validate</para>
+              </entry>
+              <entry>
+                <para>X</para>
               </entry>
               <entry>
                 <para>X</para>

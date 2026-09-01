@@ -1,4 +1,4 @@
-![s1kd-tools](doc/ICN-S1KDTOOLS-A-000000-A-KHZAE-00001-A-002-01.PNG)
+![s1kd-tools](ICN-S1KDTOOLS-A-000000-A-KHZAE-00001-A-002-01.PNG)
 
 A set of small, free and open source software tools for manipulating
 [S1000D](http://www.s1000d.org) data.
@@ -22,8 +22,8 @@ available here:
 
   - [S1000D spec sample](http://github.com/kibook/S1000D)
 
-These tools are primarily developed around Issue 6 of the specification,
-and are generally compatible with the previous 5.0 and 4.X issues.
+These tools are primarily developed around Issue 7 of the specification,
+and are generally compatible with the previous 6, 5.0, and 4.X issues.
 Support for Issue 3.0 and lower is a work-in-progress. Support for SGML
 schemas is not planned.
 

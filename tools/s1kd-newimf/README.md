@@ -17,7 +17,9 @@ specified ICN files.
     Specify which issue of S1000D to use. Currently supported issues
     are:
     
-      - 6 (default)
+      - 7 (default)
+    
+      - 6
     
       - 5.0
     
@@ -32,7 +34,7 @@ specified ICN files.
   - \-%, --templates \<dir\>  
     Use the XML template in \<dir\> instead of the built-in template.
     The template must be named `icnmetadata.xml` inside \<dir\> and must
-    conform to the default S1000D issue (6).
+    conform to the default S1000D issue (7).
 
   - \-\~, --dump-templates \<dir\>  
     Dump the built-in XML template to the specified directory.

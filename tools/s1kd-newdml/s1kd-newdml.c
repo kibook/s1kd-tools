@@ -17,7 +17,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-newdml"
-#define VERSION "3.0.1"
+#define VERSION "4.0.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -69,7 +69,7 @@ static xmlChar *issue_type = NULL;
 
 static xmlChar *remarks = NULL;
 
-#define DEFAULT_S1000D_ISSUE ISS_6
+#define DEFAULT_S1000D_ISSUE ISS_7
 #define ISS_22_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_23_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
 #define ISS_30_DEFAULT_BREX "AE-A-04-10-0301-00A-022A-D"
@@ -77,8 +77,9 @@ static xmlChar *remarks = NULL;
 #define ISS_41_DEFAULT_BREX "S1000D-E-04-10-0301-00A-022A-D"
 #define ISS_42_DEFAULT_BREX "S1000D-F-04-10-0301-00A-022A-D"
 #define ISS_50_DEFAULT_BREX "S1000D-G-04-10-0301-00A-022A-D"
+#define ISS_6_DEFAULT_BREX "S1000D-H-04-10-0301-00A-022A-D"
 
-static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50, ISS_6 } issue = NO_ISS;
+static enum issue { NO_ISS, ISS_20, ISS_21, ISS_22, ISS_23, ISS_30, ISS_40, ISS_41, ISS_42, ISS_50, ISS_6, ISS_7 } issue = NO_ISS;
 
 static char *defaultRpcName = NULL;
 static char *defaultRpcCode = NULL;
@@ -104,7 +105,9 @@ static xmlDocPtr xml_skeleton(void)
 
 static enum issue get_issue(const char *iss)
 {
-	if (strcmp(iss, "6") == 0)
+	if (strcmp(iss, "7") == 0)
+		return ISS_7;
+	else if (strcmp(iss, "6") == 0)
 		return ISS_6;
 	else if (strcmp(iss, "5.0") == 0)
 		return ISS_50;
@@ -159,6 +162,10 @@ static xmlDocPtr toissue(xmlDocPtr doc, enum issue iss)
 	unsigned int len;
 
 	switch (iss) {
+		case ISS_6:
+			xml = ___common_to6_xsl;
+			len = ___common_to6_xsl_len;
+			break;
 		case ISS_50:
 			xml = ___common_to50_xsl;
 			len = ___common_to50_xsl_len;
@@ -1063,7 +1070,7 @@ int main(int argc, char **argv)
 
 	sort_entries(dml_doc);
 
-	if (issue < ISS_6) {
+	if (issue < ISS_7) {
 		if (strcmp(brex_dmcode, "") == 0) {
 			switch (issue) {
 				case ISS_22:
@@ -1086,6 +1093,9 @@ int main(int argc, char **argv)
 					break;
 				case ISS_50:
 					set_brex(dml_doc, ISS_50_DEFAULT_BREX);
+					break;
+				case ISS_6:
+					set_brex(dml_doc, ISS_6_DEFAULT_BREX);
 					break;
 				default:
 					break;

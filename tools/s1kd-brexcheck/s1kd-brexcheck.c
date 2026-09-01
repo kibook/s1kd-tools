@@ -38,7 +38,7 @@
 #define PROGRESS_ZENITY 2
 
 #define PROG_NAME "s1kd-brexcheck"
-#define VERSION "5.2.2"
+#define VERSION "6.0.0"
 
 #define STRUCT_OBJ_RULE_PATH BAD_CAST \
 	"//contextRules[not(@rulesContext) or @rulesContext=$schema]//structureObjectRule|" \
@@ -368,6 +368,7 @@ static bool is_xml_file(const char *fname)
 /* Search for the BREX in the built-in default BREX data modules. */
 static bool search_brex_fname_from_default_brex(char *fname, char *dmcode, int len)
 {
+	if (strncasecmp(dmcode, "DMC-S1000D-J-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-J-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-J-04-10-0301-00A-022A-D");
 	if (strncasecmp(dmcode, "DMC-S1000D-H-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-H-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-H-04-10-0301-00A-022A-D");
 	if (strncasecmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-G-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-G-04-10-0301-00A-022A-D");
 	if (strncasecmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US", len) == 0 || strncasecmp(dmcode, "DMC-S1000D-F-04-10-0301-00A-022A-D_\?\?\?-\?\?_EN-US", len) == 0) return strcpy(fname, "DMC-S1000D-F-04-10-0301-00A-022A-D");
@@ -1007,7 +1008,10 @@ static xmlDocPtr load_brex(const char *name, xmlDocPtr dmod_doc)
 		unsigned char *xml = NULL;
 		unsigned int len = 0;
 
-		if (strcmp(name, "DMC-S1000D-H-04-10-0301-00A-022A-D") == 0) {
+		if (strcmp(name, "DMC-S1000D-J-04-10-0301-00A-022A-D") == 0) {
+			xml = brex_DMC_S1000D_J_04_10_0301_00A_022A_D_001_00_EN_US_XML;
+			len = brex_DMC_S1000D_J_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
+		} else if (strcmp(name, "DMC-S1000D-H-04-10-0301-00A-022A-D") == 0) {
 			xml = brex_DMC_S1000D_H_04_10_0301_00A_022A_D_001_00_EN_US_XML;
 			len = brex_DMC_S1000D_H_04_10_0301_00A_022A_D_001_00_EN_US_XML_len;
 		} else if (strcmp(name, "DMC-S1000D-G-04-10-0301-00A-022A-D") == 0) {
@@ -1557,7 +1561,9 @@ static const char *default_brex_dmc(xmlDocPtr doc)
 
 	schema = xmlGetNsProp(xmlDocGetRootElement(doc), BAD_CAST "noNamespaceSchemaLocation", XSI_URI);
 
-	if (schema == NULL || xmlStrstr(schema, BAD_CAST "S1000D_6")) {
+	if (schema == NULL || xmlStrstr(schema, BAD_CAST "S1000D_7")) {
+		code = "DMC-S1000D-J-04-10-0301-00A-022A-D";
+	} else if (xmlStrstr(schema, BAD_CAST "S1000D_6")) {
 		code = "DMC-S1000D-H-04-10-0301-00A-022A-D";
 	} else if (xmlStrstr(schema, BAD_CAST "S1000D_5-0")) {
 		code = "DMC-S1000D-G-04-10-0301-00A-022A-D";

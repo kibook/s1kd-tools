@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-metadata"
-#define VERSION "4.7.0"
+#define VERSION "4.8.0"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 
@@ -411,6 +411,8 @@ static int edit_issue(xmlNodePtr node, const char *val)
 			xsi = xmlStrcat(xsi, BAD_CAST "5-0");
 		} else if (strcmp(val, "6") == 0) {
 			xsi = xmlStrcat(xsi, BAD_CAST "6");
+		} else if (strcmp(val, "7") == 0) {
+			xsi = xmlStrcat(xsi, BAD_CAST "7");
 		} else {
 			err = EXIT_INVALID_VALUE;
 		}

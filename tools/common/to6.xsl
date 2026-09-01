@@ -14,7 +14,7 @@
 
   <xsl:template match="@xsi:noNamespaceSchemaLocation">
     <xsl:attribute name="xsi:noNamespaceSchemaLocation">
-      <xsl:text>http://www.s1000d.org/S1000D_5-0/xml_schema_flat/</xsl:text>
+      <xsl:text>http://www.s1000d.org/S1000D_6/xml_schema_flat/</xsl:text>
       <xsl:value-of select="substring-after(., $schema-prefix)"/>
     </xsl:attribute>
   </xsl:template>
