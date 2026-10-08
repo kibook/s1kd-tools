@@ -13,7 +13,7 @@
 #include "s1kd_tools.h"
 
 #define PROG_NAME "s1kd-refs"
-#define VERSION "5.2.2"
+#define VERSION "5.2.3"
 
 #define ERR_PREFIX PROG_NAME ": ERROR: "
 #define SUCC_PREFIX PROG_NAME ": SUCCESS: "
@@ -1741,8 +1741,8 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 		}
 		dmRefAddressItems = xmlNewChild(ref, NULL, BAD_CAST "dmRefAddressItems", NULL);
 
-		techName = firstXPathValue(doc, NULL, BAD_CAST "//techName|//techname");
-		infoName = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
+		techName = firstXPathValue(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/techName|//dmaddres/dmtitle/techname");
+		infoName = firstXPathValue(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/infoName|//dmaddres/dmtitle/infoname");
 		infoNameVariant = firstXPathValue(doc, NULL, BAD_CAST "//infoNameVariant");
 
 		dmTitle = xmlNewChild(dmRefAddressItems, NULL, BAD_CAST "dmTitle", NULL);
@@ -1829,7 +1829,7 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 		}
 		pmRefAddressItems = xmlNewChild(ref, NULL, BAD_CAST "pmRefAddressItems", NULL);
 
-		pmTitle = firstXPathValue(doc, NULL, BAD_CAST "//pmTitle|//pmtitle");
+		pmTitle = firstXPathValue(doc, NULL, BAD_CAST "//pmAddressItems/pmTitle|//pmaddres/pmtitle");
 
 		xmlNewTextChild(pmRefAddressItems, NULL, BAD_CAST "pmTitle", pmTitle);
 
@@ -1897,8 +1897,8 @@ static void updateRef(xmlNodePtr *refptr, const char *src, const char *code, con
 			xmlFreeNode(oldlanguage);
 		}
 
-		techname = firstXPathValue(doc, NULL, BAD_CAST "//techName|//techname");
-		infoname = firstXPathValue(doc, NULL, BAD_CAST "//infoName|//infoname");
+		techname = firstXPathValue(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/techName|//dmaddres/dmtitle/techname");
+		infoname = firstXPathValue(doc, NULL, BAD_CAST "//dmAddressItems/dmTitle/infoName|//dmaddres/dmtitle/infoname");
 
 		newtitle = xmlNewNode(NULL, BAD_CAST "dmtitle");
 
