@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "13.3.0"
+#define VERSION "13.4.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2061,24 +2061,34 @@ static xmlNodePtr find_or_create_orig(xmlDocPtr doc)
  *
  * Otherwise, origspec is a string in the form of "CODE/NAME", where CODE is
  * the NCAGE code and NAME is the enterprise name.
+ *
+ * Additionally, the RPC code and name can be set with a string in the form of
+ * "ORIGCODE/ORIGNAME/RPCCODE/RPCCNAME".
+ *
+ * A "-" for any of the codes/names will skip setting that code/name.
  */
 static void set_orig(xmlDocPtr doc, const char *origspec)
 {
-	xmlNodePtr originator;
-	const char *code, *name;
+	xmlNodePtr originator, rpc;
+	const char *orig_code, *orig_name, *rpc_code, *rpc_name;
 	enum issue iss;
 	char *s;
 
 	if (origspec) {
 		s = strdup(origspec);
-		code = strtok(s, "/");
-		name = strtok(NULL, "");
+		orig_code = strtok(s, "/");
+		orig_name = strtok(NULL, "/");
+		rpc_code = strtok(NULL, "/");
+		rpc_name = strtok(NULL, "");
 	} else {
-		code = DEFAULT_ORIG_CODE;
-		name = DEFAULT_ORIG_NAME;
+		orig_code = DEFAULT_ORIG_CODE;
+		orig_name = DEFAULT_ORIG_NAME;
+		rpc_code = NULL;
+		rpc_name = NULL;
 	}
 
 	originator = find_or_create_orig(doc);
+	rpc = first_xpath_node(doc, NULL, BAD_CAST "//responsiblePartnerCompany|//rpc");
 
 	if (xmlStrcmp(originator->name, BAD_CAST "orig") == 0) {
 		iss = ISS_30;
@@ -2086,24 +2096,46 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 		iss = ISS_4X;
 	}
 
-	if (code && strcmp(code, "-") != 0) {
+	if (orig_code && strcmp(orig_code, "-") != 0) {
 		if (iss == ISS_30) {
-			xmlNodeSetContent(originator, BAD_CAST code);
+			xmlNodeSetContent(originator, BAD_CAST orig_code);
 		} else {
-			xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST code);
+			xmlSetProp(originator, BAD_CAST "enterpriseCode", BAD_CAST orig_code);
 		}
 	}
 
-	if (name) {
+	if (orig_name && strcmp(orig_name, "-") != 0) {
 		if (iss == ISS_30) {
-			xmlSetProp(originator, BAD_CAST "origname", BAD_CAST name);
+			xmlSetProp(originator, BAD_CAST "origname", BAD_CAST orig_name);
 		} else {
 			xmlNodePtr enterpriseName;
 			enterpriseName = find_child(originator, "enterpriseName");	
 			if (enterpriseName) {
-				xmlNodeSetContent(enterpriseName, BAD_CAST name);
+				xmlNodeSetContent(enterpriseName, BAD_CAST orig_name);
 			} else {
-				xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST name);
+				xmlNewChild(originator, NULL, BAD_CAST "enterpriseName", BAD_CAST orig_name);
+			}
+		}
+	}
+
+	if (rpc_code && strcmp(rpc_code, "-") != 0) {
+		if (iss == ISS_30) {
+			xmlNodeSetContent(rpc, BAD_CAST rpc_code);
+		} else {
+			xmlSetProp(rpc, BAD_CAST "enterpriseCode", BAD_CAST rpc_code);
+		}
+	}
+
+	if (rpc_name && strcmp(rpc_name, "-") != 0) {
+		if (iss == ISS_30) {
+			xmlSetProp(rpc, BAD_CAST "rpcname", BAD_CAST rpc_name);
+		} else {
+			xmlNodePtr enterpriseName;
+			enterpriseName = find_child(rpc, "enterpriseName");
+			if (enterpriseName) {
+				xmlNodeSetContent(enterpriseName, BAD_CAST rpc_name);
+			} else {
+				xmlNewChild(rpc, NULL, BAD_CAST "enterpriseName", BAD_CAST rpc_name);
 			}
 		}
 	}
@@ -2113,6 +2145,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 	}
 }
 
+/* Retrieve the applicability of the whole DM or PM. */
 static xmlNodePtr get_wholedm_applic(xmlDocPtr dm)
 {
 	return first_xpath_node(dm, NULL, BAD_CAST "//dmStatus/applic|//pmStatus/applic");
