@@ -132,7 +132,7 @@ The applications for this tool include:
     is not applicable to the specified filters, the source object will
     be deleted.
 
-  - \-G, --custom-orig \<CODE\>\[/\<NAME\>\[/\<RPC CODE\>\[/\<RPC
+  - \-G, --custom-orig \<CODE\>\[/\<NAME\>\[|\<RPC CODE\>\[/\<RPC
     NAME\>\]\]\]  
     Similar to the -g option, but instead of the default enterprise code
     and name, use the values \<CODE\> and \<NAME\>, which are separated
@@ -141,9 +141,26 @@ The applications for this tool include:
     
     The responsible partner company code and name may also be set using
     this option by specifying them after the originator code and name,
-    also separated by slashes. To only set the responsible partner
+    separated with a pipe (|). To only set the responsible partner
     company info without setting the originator, leave those sections
-    empty or specify only a dash (-).
+    empty.
+    
+    A dash (-) used for any code or name will use the default enterprise
+    code or name, like with the -g option.
+    
+    Examples:
+    
+      - Originator code and name: `-G "12345/Company Name"`
+    
+      - Originator code without name: `-G "12345"`
+    
+      - Originator name without code: `-G "/Company Name"`
+    
+      - Originator and RPC: `-G "12345/Company Name|12345/Company Name"`
+    
+      - RPC only: `-G "/|12345/Company Name"`
+    
+      - Default originator and custom RPC: `-G "-/-|12345/Company Name"`
 
   - \-g, --set-orig  
     Set the originator of the instance. When this option is specified,

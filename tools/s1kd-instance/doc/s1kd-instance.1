@@ -145,7 +145,7 @@ is not applicable to the specified filters, the source object will be
 deleted.
 .RE
 .TP
-.B \-G, \-\-custom\-orig <CODE>[/<NAME>[/<RPC CODE>[/<RPC NAME>]]]
+.B \-G, \-\-custom\-orig <CODE>[/<NAME>[|<RPC CODE>[/<RPC NAME>]]]
 Similar to the \-g option, but instead of the default enterprise code
 and name, use the values <CODE> and <NAME>, which are separated by a
 slash (/).
@@ -154,10 +154,29 @@ To only include a name, specify <NAME> prefixed by a slash.
 .RS
 .PP
 The responsible partner company code and name may also be set using this
-option by specifying them after the originator code and name, also
-separated by slashes.
+option by specifying them after the originator code and name, separated
+with a pipe (|).
 To only set the responsible partner company info without setting the
-originator, leave those sections empty or specify only a dash (\-).
+originator, leave those sections empty.
+.PP
+A dash (\-) used for any code or name will use the default enterprise
+code or name, like with the \-g option.
+.PP
+Examples:
+.IP \[bu] 2
+Originator code and name: \f[C]\-G \[dq]12345/Company Name\[dq]\f[R]
+.IP \[bu] 2
+Originator code without name: \f[C]\-G \[dq]12345\[dq]\f[R]
+.IP \[bu] 2
+Originator name without code: \f[C]\-G \[dq]/Company Name\[dq]\f[R]
+.IP \[bu] 2
+Originator and RPC:
+\f[C]\-G \[dq]12345/Company Name|12345/Company Name\[dq]\f[R]
+.IP \[bu] 2
+RPC only: \f[C]\-G \[dq]/|12345/Company Name\[dq]\f[R]
+.IP \[bu] 2
+Default originator and custom RPC:
+\f[C]\-G \[dq]\-/\-|12345/Company Name\[dq]\f[R]
 .RE
 .TP
 .B \-g, \-\-set\-orig

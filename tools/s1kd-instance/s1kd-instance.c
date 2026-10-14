@@ -17,7 +17,7 @@
 #include "xsl.h"
 
 #define PROG_NAME "s1kd-instance"
-#define VERSION "13.4.0"
+#define VERSION "14.0.0"
 
 /* Prefixes before messages printed to console */
 #define ERR_PREFIX PROG_NAME ": ERROR: "
@@ -2063,28 +2063,40 @@ static xmlNodePtr find_or_create_orig(xmlDocPtr doc)
  * the NCAGE code and NAME is the enterprise name.
  *
  * Additionally, the RPC code and name can be set with a string in the form of
- * "ORIGCODE/ORIGNAME/RPCCODE/RPCCNAME".
+ * "ORIGCODE/ORIGNAME|RPCCODE/RPCCNAME".
  *
- * A "-" for any of the codes/names will skip setting that code/name.
+ * A "-" for any of the codes/names will also use the default values for that
+ * code/name.
  */
 static void set_orig(xmlDocPtr doc, const char *origspec)
 {
 	xmlNodePtr originator, rpc;
-	const char *orig_code, *orig_name, *rpc_code, *rpc_name;
+	char *s = NULL;
+	const char *orig_code = "-";
+	const char *orig_name = "-";
+	const char *rpc_code = NULL;
+	const char *rpc_name = NULL;
 	enum issue iss;
-	char *s;
 
 	if (origspec) {
 		s = strdup(origspec);
 		orig_code = strtok(s, "/");
-		orig_name = strtok(NULL, "/");
+		orig_name = strtok(NULL, "|");
 		rpc_code = strtok(NULL, "/");
 		rpc_name = strtok(NULL, "");
-	} else {
+	}
+
+	if (orig_code && strcmp(orig_code, "-") == 0) {
 		orig_code = DEFAULT_ORIG_CODE;
+	}
+	if (orig_name && strcmp(orig_name, "-") == 0) {
 		orig_name = DEFAULT_ORIG_NAME;
-		rpc_code = NULL;
-		rpc_name = NULL;
+	}
+	if (rpc_code && strcmp(rpc_code, "-") == 0) {
+		rpc_code = DEFAULT_ORIG_CODE;
+	}
+	if (rpc_name && strcmp(rpc_name, "-") == 0) {
+		rpc_name = DEFAULT_ORIG_NAME;
 	}
 
 	originator = find_or_create_orig(doc);
@@ -2096,7 +2108,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 		iss = ISS_4X;
 	}
 
-	if (orig_code && strcmp(orig_code, "-") != 0) {
+	if (orig_code) {
 		if (iss == ISS_30) {
 			xmlNodeSetContent(originator, BAD_CAST orig_code);
 		} else {
@@ -2104,7 +2116,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 		}
 	}
 
-	if (orig_name && strcmp(orig_name, "-") != 0) {
+	if (orig_name) {
 		if (iss == ISS_30) {
 			xmlSetProp(originator, BAD_CAST "origname", BAD_CAST orig_name);
 		} else {
@@ -2118,7 +2130,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 		}
 	}
 
-	if (rpc_code && strcmp(rpc_code, "-") != 0) {
+	if (rpc_code) {
 		if (iss == ISS_30) {
 			xmlNodeSetContent(rpc, BAD_CAST rpc_code);
 		} else {
@@ -2126,7 +2138,7 @@ static void set_orig(xmlDocPtr doc, const char *origspec)
 		}
 	}
 
-	if (rpc_name && strcmp(rpc_name, "-") != 0) {
+	if (rpc_name) {
 		if (iss == ISS_30) {
 			xmlSetProp(rpc, BAD_CAST "rpcname", BAD_CAST rpc_name);
 		} else {

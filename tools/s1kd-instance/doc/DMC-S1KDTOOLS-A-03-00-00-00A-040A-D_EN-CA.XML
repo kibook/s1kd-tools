@@ -226,10 +226,34 @@
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem changeMark="1" changeType="modify" reasonForUpdateRefIds="rfu-0005">
-              <listItemTerm>-G, --custom-orig &lt;CODE&gt;[/&lt;NAME&gt;[/&lt;RPC CODE&gt;[/&lt;RPC NAME&gt;]]]</listItemTerm>
+              <listItemTerm>-G, --custom-orig &lt;CODE&gt;[/&lt;NAME&gt;[|&lt;RPC CODE&gt;[/&lt;RPC NAME&gt;]]]</listItemTerm>
               <listItemDefinition>
                 <para>Similar to the -g option, but instead of the default enterprise code and name, use the values &lt;CODE&gt; and &lt;NAME&gt;, which are separated by a slash (/). To only include a code, specify &lt;CODE&gt; with no slash. To only include a name, specify &lt;NAME&gt; prefixed by a slash.</para>
-                <para>The responsible partner company code and name may also be set using this option by specifying them after the originator code and name, also separated by slashes. To only set the responsible partner company info without setting the originator, leave those sections empty or specify only a dash (-).</para>
+                <para>The responsible partner company code and name may also be set using this option by specifying them after the originator code and name, separated with a pipe (|). To only set the responsible partner company info without setting the originator, leave those sections empty.</para>
+                <para>A dash (-) used for any code or name will use the default enterprise code or name, like with the -g option.</para>
+                <para>
+                  Examples:
+                  <randomList>
+                    <listItem>
+                      <para>Originator code and name: <verbatimText>-G "12345/Company Name"</verbatimText></para>
+                    </listItem>
+                    <listItem>
+                      <para>Originator code without name: <verbatimText>-G "12345"</verbatimText></para>
+                    </listItem>
+                    <listItem>
+                      <para>Originator name without code: <verbatimText>-G "/Company Name"</verbatimText></para>
+                    </listItem>
+                    <listItem>
+                      <para>Originator and RPC: <verbatimText>-G "12345/Company Name|12345/Company Name"</verbatimText></para>
+                    </listItem>
+                    <listItem>
+                      <para>RPC only: <verbatimText>-G "/|12345/Company Name"</verbatimText></para>
+                    </listItem>
+                    <listItem>
+                      <para>Default originator and custom RPC: <verbatimText>-G "-/-|12345/Company Name"</verbatimText></para>
+                    </listItem>
+                  </randomList>
+                </para>
               </listItemDefinition>
             </definitionListItem>
             <definitionListItem>
